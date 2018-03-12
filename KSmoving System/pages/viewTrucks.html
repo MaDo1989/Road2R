@@ -1,0 +1,436 @@
+﻿<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="KSMoving">
+    <meta name="author" content="Coderthemes">
+
+    <link rel="shortcut icon" href="assets/images/favicon_1.ico">
+
+    <title>משאיות</title>
+
+    <!-- DataTables -->
+    <link href="../plugins/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/buttons.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/fixedHeader.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/responsive.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/scroller.bootstrap.min.css" rel="stylesheet" type="text/css" />
+
+    <!-- Sweet Alert css -->
+    <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
+
+    <link href="../plugins/switchery/switchery.min.css" rel="stylesheet" />
+    <link href="assets/css/bootstrap-rtl.min.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/core.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/icons.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/components.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/pages.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/menu.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/responsive.css" rel="stylesheet" type="text/css">
+
+    <script src="assets/js/CookiesFunctions.js"></script>
+
+    <script src="assets/js/modernizr.min.js"></script>
+
+    <!--GENERAL object and additional functions-->
+    <script src="lib/master.js"></script>
+
+    <script src="assets/js/jquery.min.js"></script>
+
+    <!-- Select2 css+js -->
+    <link href="assets/css/select2.css" rel="stylesheet" />
+    <script src="assets/js/select2.min.js"></script>
+
+    <script>
+        checkCookie();
+        $(document).ready(function () {
+            //Create a DataTable from the Table
+            t = $('#datatable-buttons').DataTable();
+
+            refreshTable();
+        });
+
+        function refreshTable() {
+            checkCookie();
+            var active = $("#activeTrucks").prop('checked');
+            t.clear().draw();
+
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getTrucks",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                data: JSON.stringify({ active: active }),
+                success: function (data) {
+                    var arr_trucks = JSON.parse(data.d);
+                    localStorage.trucksList = arr_trucks;
+                    for (i in arr_trucks) {
+                        var btnStr = ""
+                        var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='פרטים נוספים'><i class='fa fa-wpforms'></i></button>";
+                        var editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='ערוך'><i class='ti-pencil'></i></button>";
+
+                        btnStr += showBtn + " " + editBtn;
+
+                        if (arr_trucks[i].Active == 'N') {
+                            var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזר'><i class='fa fa-undo' ></i></button>";
+                            btnStr += " " + reactiveBtn;
+                        }
+                        else {
+                            var deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחק'><i class='fa fa-remove' ></i></button>";
+                            btnStr += " " + deleteBtn;
+                        }
+
+                        var numericDate = parseInt(arr_trucks[i].OnRoadDate.substring(6, 19));
+                        var jsDate = new Date(numericDate);
+                        var dt = new Date(parseInt(arr_trucks[i].OnRoadDate.replace('/Date(', '')));
+                        dt = dt.toLocaleDateString("he-IL");
+
+                        var btnHandlings = "<button type='button' class='btn btn-inverse waves-effect w-md waves-light m-b-5' id='showHandlings' title='לצפייה בטיפולי משאית'>  צפיה בטיפולים</button>";
+
+                        t.row.add([arr_trucks[i].TruckID, arr_trucks[i].TruckLicense, arr_trucks[i].Manufacturer, "<span hidden>" + numericDate + "</span>" + dt + "<span hidden>" + jsDate + "</span>", arr_trucks[i].TruckType.TruckType, btnHandlings, btnStr]).draw(false);
+
+                    }
+
+                    t.columns([2]).order('desc').draw();
+
+                    $('#datatable-buttons tbody').on('click', '#showHandlings', function () {
+                        var data = t.row($(this).parents('tr')).data();
+                        arr_details = { truckID: data[0], func: "showHandlings" };
+                        GENERAL.TRUCKS.setTrucksList(JSON.stringify(arr_details));
+                        location.href = "viewHandlings.html";
+                    });
+
+                    $('#datatable-buttons tbody').on('click', '#edit', function () {
+                        var data = t.row($(this).parents('tr')).data();
+                        arr_details = { truckID: data[0], func: "edit" };
+                        GENERAL.TRUCKS.setTrucksList(JSON.stringify(arr_details));
+                        location.href = "trucksForm.html";
+                    });
+
+                    $('#datatable-buttons tbody').on('click', '#show', function () {
+                        var data = t.row($(this).parents('tr')).data();
+                        arr_details = { truckID: data[0], func: "show" };
+                        GENERAL.TRUCKS.setTrucksList(JSON.stringify(arr_details));
+                        location.href = "trucksForm.html";
+                    });
+
+                    $('#datatable-buttons tbody').on('click', '#remove', function () {
+                        var data = t.row($(this).parents('tr')).data();
+                        swal({
+                            title: "אתה בטוח שברצונך למחוק את המשאית:",
+                            type: "warning",
+                            text: data[1],
+                            showCancelButton: true,
+                            cancelButtonText: "בטל",
+                            confirmButtonClass: 'btn-warning',
+                            confirmButtonText: "מחק",
+                            closeOnConfirm: false
+                        }, function () {
+                            deactivateTruck(data[0], 'N');
+                            swal({
+                                title: "המשאית הפכה ללא פעילה",
+                                timer: 1000,
+                                type: "success",
+                                showConfirmButton: false
+                            });
+                            setTimeout(function () { refreshTable() }, 1001);
+                        });
+                    });
+
+                    $('#datatable-buttons tbody').on('click', '#reactive', function () {
+                        var data = t.row($(this).parents('tr')).data();
+                        swal({
+                            title: "אתה בטוח שברצונך לשחזר את המשאית:",
+                            type: "warning",
+                            text: data[1],
+                            showCancelButton: true,
+                            cancelButtonText: "בטל",
+                            confirmButtonClass: 'btn-warning',
+                            confirmButtonText: "שחזר",
+                            closeOnConfirm: false
+                        }, function () {
+                            deactivateTruck(data[0], 'Y');
+                            swal({
+                                title: "המשאית הפכה לפעילה",
+                                timer: 1000,
+                                type: "success",
+                                showConfirmButton: false
+                            });
+                            setTimeout(function () { refreshTable() }, 1001);
+                        });
+
+                    });
+                },
+                error: function (err) { alert("Error"); }
+            });
+        }
+
+        function deactivateTruck(truckID, active) {
+            checkCookie();
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/deactivateTruck",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                data: JSON.stringify({ truckID: truckID, active: active }),
+                success: function (data) { },
+                error: function (err) { alert("Error"); }
+            });
+
+        }
+
+        function newTruckForm() {
+            truckID = -1;
+            arr_details = { truckID: truckID, func: "new" };
+            localStorage.trucksList = JSON.stringify(arr_details);
+            location.href = "trucksForm.html";
+        }
+    </script>
+</head>
+
+
+<body class="fixed-left">
+    <!-- Begin page -->
+    <div id="wrapper">
+        <!-- Top Bar Start -->
+        <div class="topbar">
+
+            <!-- Navbar -->
+            <div class="navbar navbar-default" role="navigation">
+                <div class="container">
+                    <div class="">
+                        <!--Expend/Collaps Side Menue-->
+                        <div class="pull-left">
+                            <button class="button-menu-mobile open-left waves-effect">
+                                <i class="md md-menu"></i>
+                            </button>
+                            <span class="clearfix"></span>
+                        </div>
+
+                        <!-- LOGO -->
+                        <div class="pull-left">
+                            <div class="text-center">
+                                <a href="index.html" class="logo"><span>קסלסי סעדיה שירותי הובלה בע"מ</span>&nbsp&nbsp&nbsp<i class="ti-truck"></i>  </a>
+                            </div>
+                        </div>
+
+
+
+                        <!--Search-->
+                        <!--<form role="search" class="navbar-right app-search pull-right hidden-xs">
+                            <input type="text" placeholder="חיפוש..." class="form-control app-search-input">
+                            <a href=""><i class="fa fa-search"></i></a>
+                        </form>-->
+                    </div>
+                    <!--/.nav-collapse -->
+                </div>
+            </div>
+        </div>
+        <!-- Top Bar End -->
+        <!-- ========== Right Sidebar Start ========== -->
+        <div class="left side-menu">
+
+            <div class="sidebar-inner slimscrollleft">
+
+                <div id="sidebar-menu">
+
+                    <ul>
+
+                        <li>
+                            <a href="index.html" class="waves-effect waves-primary">
+                                <i class="md md-dashboard"></i><span> דף הבית </span>
+                            </a>
+                        </li>
+
+                        <li class="has_sub">
+                            <a href="javascript:void(0);" class="waves-effect waves-primary">
+                                <i class="md md-wallet-travel"></i> <span> ניהול הזמנות </span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <ul class="list-unstyled">
+                                <li><a href="viewOrders.html">הזמנות</a></li>
+                                <li><a href="viewDocuments.html">מסמכים</a></li>
+                                <li><a href="viewInvoices.html">חשבוניות</a></li>
+                                <li><a href="viewServices.html">מחירונים</a></li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="shiftOrganizer.html" class="waves-effect waves-primary">
+                                <i class="md md-today"></i><span> סידור עבודה</span>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="viewCustomers.html" class="waves-effect waves-primary">
+                                <i class="md md-recent-actors"></i><span> ניהול לקוחות</span>
+                            </a>
+                        </li>
+
+                        <li class="has_sub">
+                            <a href="javascript:void(0);" class="waves-effect waves-primary">
+                                <i class="md md-local-shipping"></i> <span> ניהול משאיות </span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <ul class="list-unstyled">
+                                <li><a href="viewTrucks.html">משאיות</a></li>
+                                <li><a href="viewHandlings.html">טיפולים</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="has_sub">
+                            <a href="javascript:void(0);" class="waves-effect waves-primary">
+                                <i class="md md-person"></i> <span> ניהול הנהגים </span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <ul class="list-unstyled">
+                                <li><a href="viewDrivers.html">נהגים</a></li>
+                                <li><a href="viewDriverConstrains.html">זמינות הנהגים</a></li>
+                            </ul>
+                        </li>
+
+
+                        <li>
+                            <a href="viewReports.html" class="waves-effect waves-primary">
+                                <i class="md md-poll"></i><span> דוחות</span>
+                            </a>
+                        </li>
+
+
+                    </ul>
+                    <div class="clearfix"></div>
+                </div>
+
+                <div class="clearfix"></div>
+            </div>
+
+        </div>
+        <!-- Right Sidebar End -->
+        <!-- ============================================================== -->
+        <!-- Start page Content here -->
+        <!-- ============================================================== -->
+        <div class="content-page">
+            <!-- Start content -->
+            <div class="content">
+                <div class="container">
+                    <!-- Page-Title -->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="page-title-box">
+                                <ol class="breadcrumb pull-right">
+                                    <li>ניהול משאיות</li>
+                                    <li class="active">משאיות</li>
+                                </ol>
+                                <h4 class="page-title">משאיות&nbsp&nbsp<i class="md md-local-shipping"></i></h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card-box table-responsive">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h4 class="m-t-0 header-title"><b>טבלת משאיות</b></h4>
+                                        <p class="text-muted font-13 m-b-30">
+                                            מבט כללי על המשאיות השונות.
+                                        </p>
+                                    </div>
+                                    <div class="col-md-4 text-right">
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='פרטים נוספים'><i class='fa fa-wpforms'></i></button> צפייה
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='ערוך'><i class='ti-pencil'></i></button> ערוך
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחק'><i class='fa fa-remove'></i></button> מחק
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזר'><i class='fa fa-undo'></i></button> שחזר
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 checkbox checkbox-primary text-left">
+                                        <input id="activeTrucks" type="checkbox" onchange="refreshTable()" checked>
+                                        <label for="activeTrucks">
+                                            משאיות פעילות בלבד
+                                        </label>
+                                    </div>
+                                    <div class="col-md-9 text-right m-b-30">
+                                        <button type="button" id="createTruck" onclick="newTruckForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>חדש</button>
+                                    </div>
+                                </div>
+                                <div id="trucksTable">
+                                </div>
+                                <table id="datatable-buttons" class="table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>מספר משאית</th>
+                                            <th>מספר רישוי</th>
+                                            <th>יצרן</th>
+                                            <th>עליה לכביש</th>
+                                            <th>סוג</th>
+                                            <th>טיפולים</th>
+                                            <th>ערוך משאית</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end container -->
+            </div>
+            <!-- end content -->
+            <!-- FOOTER -->
+            <footer class="footer text-right">
+                2016 © KSmoving Management System Powered by Neta Reuveni, Hanan Ben Shitrit, Sharon Krepner
+            </footer>
+            <!-- End FOOTER -->
+        </div>
+        <!-- ============================================================== -->
+        <!-- End page content here -->
+        <!-- ============================================================== -->
+    </div>
+    <!-- END wrapper -->
+    <script>
+        var resizefunc = [];
+    </script>
+
+    <!-- jQuery  -->
+    <script src="assets/js/bootstrap-rtl.min.js"></script>
+    <script src="assets/js/detect.js"></script>
+    <script src="assets/js/fastclick.js"></script>
+    <script src="assets/js/jquery.slimscroll.js"></script>
+    <script src="assets/js/jquery.blockUI.js"></script>
+    <script src="assets/js/waves.js"></script>
+    <script src="assets/js/wow.min.js"></script>
+    <script src="assets/js/jquery.nicescroll.js"></script>
+    <script src="assets/js/jquery.scrollTo.min.js"></script>
+    <script src="../plugins/switchery/switchery.min.js"></script>
+
+    <!-- Datatables-->
+    <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="../plugins/datatables/dataTables.bootstrap.js"></script>
+    <script src="../plugins/datatables/dataTables.buttons.min.js"></script>
+    <script src="../plugins/datatables/buttons.bootstrap.min.js"></script>
+    <script src="../plugins/datatables/jszip.min.js"></script>
+    <script src="../plugins/datatables/pdfmake.min.js"></script>
+    <script src="../plugins/datatables/vfs_fonts.js"></script>
+    <script src="../plugins/datatables/buttons.html5.min.js"></script>
+    <script src="../plugins/datatables/buttons.print.min.js"></script>
+    <script src="../plugins/datatables/dataTables.fixedHeader.min.js"></script>
+    <script src="../plugins/datatables/dataTables.keyTable.min.js"></script>
+    <script src="../plugins/datatables/dataTables.responsive.min.js"></script>
+    <script src="../plugins/datatables/responsive.bootstrap.min.js"></script>
+    <script src="../plugins/datatables/dataTables.scroller.min.js"></script>
+
+    <!-- Datatable init js -->
+    <script src="assets/pages/datatables.init.js"></script>
+
+    <!-- Sweet Alert js -->
+    <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
+    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+
+    <script src="assets/js/jquery.core.js"></script>
+    <script src="assets/js/jquery.app.js"></script>
+
+    <script type="text/javascript">TableManageButtons.init();</script>
+
+</body>
+</html>

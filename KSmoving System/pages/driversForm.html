@@ -1,0 +1,746 @@
+﻿<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="KSMoving">
+    <meta name="author" content="Coderthemes">
+
+    <link rel="shortcut icon" href="assets/images/favicon_1.ico">
+
+    <title>נהג</title>
+
+    <link href="../plugins/switchery/switchery.min.css" rel="stylesheet" />
+    <link href="assets/css/bootstrap-rtl.min.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/core.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/icons.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/components.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/pages.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/menu.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/responsive.css" rel="stylesheet" type="text/css">
+
+    <script src="assets/js/CookiesFunctions.js"></script>
+
+    <script src="assets/js/modernizr.min.js"></script>
+
+    <!-- Sweet Alert css -->
+    <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
+
+    <!--GENERAL object and additional functions-->
+    <script src="lib/master.js"></script>
+
+    <script src="assets/js/jquery.min.js"></script>
+
+    <!-- Select2 css+js -->
+    <link href="assets/css/select2.css" rel="stylesheet" />
+    <script src="assets/js/select2.min.js"></script>
+
+    <!--DatePicker css+js-->
+    <link href="../plugins/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" rel="stylesheet">
+    <link href="../plugins/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+    <script src="../plugins/moment/moment.js"></script>
+    <script src="../plugins/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <script src="../plugins/bootstrap-daterangepicker/daterangepicker.js"></script>
+
+    <script>
+        checkCookie();
+        function generateCities() {
+            var $select = $("#city");
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getCities",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                async: false,
+                data: JSON.stringify({}),
+                success: function (data) {
+                    var arr_cities = JSON.parse(data.d);
+                    $('<option>', { value: -1, text: 'בחר' }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
+                    for (i in arr_cities) {
+                        $('<option>', { value: arr_cities[i].CityID, text: arr_cities[i].CityName }).appendTo($select);
+                    }
+                },
+                error: function (err) { alert("Error"); }
+            });
+        }
+
+        function generateTrucks() {
+            var $select = $("#truck");
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getTrucks",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                async: false,
+                data: JSON.stringify({ active: true }),
+                success: function (data) {
+                    var arr_trucks = JSON.parse(data.d);
+                    $('<option>', { value: -1, text: 'בחר' }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
+                    for (i in arr_trucks) {
+                        $('<option>', { value: arr_trucks[i].TruckID, text: arr_trucks[i].TruckLicense }).appendTo($select);
+                    }
+                },
+                error: function (err) {
+                    alert("Error");
+                }
+            });
+        }
+
+        function generateDriverLicenses() {
+            var $select = $("#driverLicense");
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getDriverLicenseTypes",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                async: false,
+                data: JSON.stringify({ LicenseORCertification: "רישיון" }),
+                success: function (data) {
+                    var arr_driverLicenses = JSON.parse(data.d);
+                    $('<option>', { value: -1, text: 'בחר' }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
+                    for (i in arr_driverLicenses) {
+                        $('<option>', { value: arr_driverLicenses[i].DriverLicenseTypeID, text: arr_driverLicenses[i].DriverLicenseTypeName }).appendTo($select);
+                    }
+                },
+                error: function (err) { alert("Error"); }
+            });
+        }
+
+        function generateDriverCertifications() {
+            var $select = $("#driverCertification");
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getDriverLicenseTypes",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                async: false,
+                data: JSON.stringify({ LicenseORCertification: "היתר" }),
+                success: function (data) {
+                    var arr_driverCertifications = JSON.parse(data.d);
+                    $('<option>', { value: -1, text: 'בחר' }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
+                    for (i in arr_driverCertifications) {
+                        $('<option>', { value: arr_driverCertifications[i].DriverLicenseTypeID, text: (arr_driverCertifications[i].DriverLicenseTypeName + " - " + arr_driverCertifications[i].DriverLicenseTypeDescription) }).appendTo($select);
+                    }
+                },
+                error: function (err) { alert("Error"); }
+            });
+        }
+
+        function initializeSelect2() {
+            arrSelectors = ['city', 'truck', 'driverLicense', 'driverCertification'];
+            for (var i in arrSelectors) {
+                $('#' + arrSelectors[i]).select2();
+            }
+        }
+
+        //wait until the dom is loaded
+        $(document).ready(function () {
+
+            //generate select options
+            generateCities();
+            generateTrucks();
+            generateDriverLicenses();
+            generateDriverCertifications();
+            initializeSelect2();
+
+            if (JSON.parse(localStorage.driversList).length != 0) {
+                arr_driver = JSON.parse(localStorage.driversList);
+                if (arr_driver.func == "edit" || arr_driver.func == "show") {
+                    uploadData(arr_driver.driverID);
+                    if (arr_driver.func == "show") {
+
+                        $("#driverNumber").attr('disabled', 'disabled');
+                        $("#city").attr('disabled', 'disabled');
+                        $("#firstName").attr('disabled', 'disabled');
+                        $("#lastName").attr('disabled', 'disabled');
+                        $("#phone").attr('disabled', 'disabled');
+                        $("#email").attr('disabled', 'disabled');
+                        $("#accountID").attr('disabled', 'disabled');
+                        $("#appPassword").attr('disabled', 'disabled');
+                        $("#saveDriver").attr('disabled', 'disabled');
+                        $("#truck").attr('disabled', 'disabled');
+                        $("#driverLicense").attr('disabled', 'disabled');
+                        $("#driverCertification").attr('disabled', 'disabled');
+                        $("#dateOfBirth").attr('disabled', 'disabled');
+                        $("#driverLicenseExpiredDate").attr('disabled', 'disabled');
+                        $("#driverCertificationExpiredDate").attr('disabled', 'disabled');
+                    }
+                }
+                else {
+                    $("#activeDrivers").prop('checked', 'checked');
+                }
+
+            }
+
+        });
+
+        //function to fill form for edit
+        function uploadData(driverID) {
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getDriver",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                data: JSON.stringify({ driverID: driverID }),
+                success: function (data) {
+                    var driver = JSON.parse(data.d);
+                    localStorage.driversList = driver;
+                    $("#driverNumber").val(driver.DriverNumber);
+                    $("#city").val(driver.CityLiving.CityID);
+                    $("#select2-city-container").text(driver.CityLiving.CityName);
+                    $("#firstName").val(driver.FirstName);
+                    $("#lastName").val(driver.LastName);
+                    $("#phone").val(driver.Phone);
+                    $("#email").val(driver.Email);
+                    $("#accountID").val(driver.AccountID);
+                    $("#appPassword").val(driver.AppPassword);
+                    $("#truck").val(driver.DriverTruck.TruckID);
+                    $("#select2-truck-container").text(driver.DriverTruck.TruckLicense);
+                    $("#driverLicense").val(driver.LicenseType.DriverLicenseTypeID);
+                    $("#select2-driverLicense-container").text(driver.LicenseType.DriverLicenseTypeName);
+                    $("#driverCertification").val(driver.CertificationType.DriverLicenseTypeID);
+                    $("#select2-driverCertification-container").text(driver.CertificationType.DriverLicenseTypeName + " - " + driver.CertificationType.DriverLicenseTypeDescription);
+
+                    var dBirth = new Date(parseInt(driver.DateOfBirth.replace('/Date(', '')));
+                    dBirth = dBirth.toLocaleDateString("he-IL");
+                    var dLExpired = new Date(parseInt(driver.DriverLicenseExpiredDate.replace('/Date(', '')));
+                    dLExpired = dLExpired.toLocaleDateString("he-IL");
+                    var dCExpired = new Date(parseInt(driver.DriverCertificationExpiredDate.replace('/Date(', '')));
+                    dCExpired = dCExpired.toLocaleDateString("he-IL");
+                    
+                    $("#dateOfBirth").val(dBirth);
+                    $("#driverLicenseExpiredDate").val(dLExpired);
+                    $("#driverCertificationExpiredDate").val(dCExpired);
+
+                    if (driver.Active == 'Y') {
+                        $("#activeDrivers").prop('checked', 'checked');
+                    }
+                },
+
+                error: function (err) {
+
+                    alert("Error");
+                }
+            });
+        }
+
+        function returnDriver() {
+            location.href = "viewDrivers.html"
+        }
+
+    </script>
+</head>
+
+<body class="fixed-left">
+    <!-- Begin page -->
+    <div id="wrapper">
+        <!-- Top Bar Start -->
+        <div class="topbar">
+
+
+
+            <!-- Navbar -->
+            <div class="navbar navbar-default" role="navigation">
+                <div class="container">
+                    <div class="">
+                        <!--Expend/Collaps Side Menue-->
+                        <div class="pull-left">
+                            <button class="button-menu-mobile open-left waves-effect">
+                                <i class="md md-menu"></i>
+                            </button>
+                            <span class="clearfix"></span>
+                        </div>
+
+                        <!-- LOGO -->
+                        <div class="pull-left">
+                            <div class="text-center">
+                                <a href="index.html" class="logo"><span>קסלסי סעדיה שירותי הובלה בע"מ</span>&nbsp&nbsp&nbsp<i class="ti-truck"></i>  </a>
+                            </div>
+                        </div>
+
+
+
+                        <!--Search-->
+                        <!--<form role="search" class="navbar-right app-search pull-right hidden-xs">
+                            <input type="text" placeholder="חיפוש..." class="form-control app-search-input">
+                            <a href=""><i class="fa fa-search"></i></a>
+                        </form>-->
+                    </div>
+                    <!--/.nav-collapse -->
+                </div>
+            </div>
+        </div>
+        <!-- Top Bar End -->
+        <!-- ========== Right Sidebar Start ========== -->
+        <div class="left side-menu">
+
+            <div class="sidebar-inner slimscrollleft">
+
+                <div id="sidebar-menu">
+
+                    <ul>
+
+                        <li>
+                            <a href="index.html" class="waves-effect waves-primary">
+                                <i class="md md-dashboard"></i><span> דף הבית </span>
+                            </a>
+                        </li>
+
+                        <li class="has_sub">
+                            <a href="javascript:void(0);" class="waves-effect waves-primary">
+                                <i class="md md-wallet-travel"></i> <span> ניהול הזמנות </span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <ul class="list-unstyled">
+                                <li><a href="viewOrders.html">הזמנות</a></li>
+                                <li><a href="viewDocuments.html">מסמכים</a></li>
+                                <li><a href="viewInvoices.html">חשבוניות</a></li>
+                                <li><a href="viewServices.html">מחירונים</a></li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="shiftOrganizer.html" class="waves-effect waves-primary">
+                                <i class="md md-today"></i><span> סידור עבודה</span>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="viewCustomers.html" class="waves-effect waves-primary">
+                                <i class="md md-recent-actors"></i><span> ניהול לקוחות</span>
+                            </a>
+                        </li>
+
+                        <li class="has_sub">
+                            <a href="javascript:void(0);" class="waves-effect waves-primary">
+                                <i class="md md-local-shipping"></i> <span> ניהול משאיות </span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <ul class="list-unstyled">
+                                <li><a href="viewTrucks.html">משאיות</a></li>
+                                <li><a href="viewHandlings.html">טיפולים</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="has_sub">
+                            <a href="javascript:void(0);" class="waves-effect waves-primary">
+                                <i class="md md-person"></i> <span> ניהול הנהגים </span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <ul class="list-unstyled">
+                                <li><a href="viewDrivers.html">נהגים</a></li>
+                                <li><a href="viewDriverConstrains.html">זמינות הנהגים</a></li>
+                            </ul>
+                        </li>
+
+
+                        <li>
+                            <a href="viewReports.html" class="waves-effect waves-primary">
+                                <i class="md md-poll"></i><span> דוחות</span>
+                            </a>
+                        </li>
+
+
+                    </ul>
+                    <div class="clearfix"></div>
+                </div>
+
+                <div class="clearfix"></div>
+            </div>
+
+        </div>
+        <!-- Right Sidebar End -->
+
+        <!-- ============================================================== -->
+        <!-- Start page Content here -->
+        <!-- ============================================================== -->
+        <div class="content-page">
+            <!-- Start content -->
+            <div class="content">
+                <div class="container">
+                    <!-- Page-Title -->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="page-title-box">
+                                <ol class="breadcrumb pull-right">
+                                    <li>ניהול נהגים</li>
+                                    <li><a href="viewDrivers.html">נהגים</a></li>
+                                    <li class="active">פרטי נהג</li>
+                                </ol>
+                                <h4 class="page-title">נהג&nbsp&nbsp<i class="md md-person"></i></h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card-box">
+                                <div class="row">
+                                    <h4 class="m-t-0 header-title"><b>טופס נהג</b></h4>
+                                    <p class="text-muted font-13 m-b-30">
+                                        יצירת, צפייה ועריכת נהג. לחץ על כפתור חזור בכדי לצפות בכל הנהגים.
+                                    </p>
+                                    <div class="text-right m-b-30 m-r-5">
+                                        <button type="button" onclick="returnDriver()" class="btn btn-default waves-effect w-md m-b-5"><i class="ti-back-right m-r-5"></i>חזור</button>
+                                    </div>
+                                    <form class="form-horizontal" role="form" id="driverForm">
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">מספר ת.ז</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="driverNumber" name="driverNumber" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">שם פרטי</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="firstName" name="firstName" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">שם משפחה</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="lastName" name="lastName" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label"> מס' טלפון</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="phone" name="phone" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">כתובת מייל</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="email" name="email" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group  text-left">
+                                                    <label class="control-label col-sm-3">תאריך לידה</label>
+                                                    <div class="col-sm-6">
+                                                        <input type="text" class="form-control" placeholder="dd/mm/yyyy" id="dateOfBirth" name="dateOfBirth">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">עיר מגורים</label>
+                                                    <div class="col-sm-6" id="selectCity">
+                                                        <select id="city" name="city" class="form-control"></select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">מס' חשבונאי</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="accountID" name="accountID" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">סיסמא לאפליקציה</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="appPassword" name="appPassword" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">דרגת רישיון</label>
+                                                    <div class="col-sm-6" id="selectDriverLicense">
+                                                        <select id="driverLicense" name="driverLicense" class="form-control"></select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">היתר מיוחד</label>
+                                                    <div class="col-sm-6" id="selectDriverCertification">
+                                                        <select id="driverCertification" name="driverCertification" class="form-control"></select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group  text-left">
+                                                    <label class="control-label col-sm-3">תוקף רישיון</label>
+                                                    <div class="col-sm-6">
+                                                        <input type="text" class="form-control" placeholder="dd/mm/yyyy" id="driverLicenseExpiredDate" name="driverLicenseExpiredDate">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group  text-left">
+                                                    <label class="control-label col-sm-3">תוקף היתר</label>
+                                                    <div class="col-sm-6">
+                                                        <input type="text" class="form-control" placeholder="dd/mm/yyyy" id="driverCertificationExpiredDate" name="driverCertificationExpiredDate">
+                                                    </div>
+                                                </div>
+                                            </div> 
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">משאית</label>
+                                                <div class="col-sm-6" id="selectTruck">
+                                                    <select id="truck" name="truck" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <br />
+                                                <div class="col-md-6 checkbox checkbox-primary text-left">
+                                                    <input id="activeDrivers" type="checkbox" disabled>
+                                                    <label for="activeDrivers">
+                                                        נהג פעיל
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-right m-t-30 row ">
+                                            <button type="submit" id="saveDriver" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-save m-r-5"></i>שמור</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end container -->
+            </div>
+            <!-- end content -->
+            <!-- FOOTER -->
+            <footer class="footer text-right">
+                2016 © KSmoving Management System Powered by Neta Reuveni, Hanan Ben Shitrit, Sharon Krepner
+            </footer>
+            <!-- End FOOTER -->
+
+        </div>
+        <!-- ============================================================== -->
+        <!-- End page content here -->
+        <!-- ============================================================== -->
+    </div>
+    <!-- END wrapper -->
+
+    <script>
+        var resizefunc = [];
+    </script>
+
+
+    <!--Validators-->
+    <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // DO NOT REMOVE : GLOBAL FUNCTIONS!
+            var errorClass = 'invalid';
+            var errorElement = 'em';
+            var $serviceForm = $('#driverForm').validate({
+
+                highlight: function (element) {
+                    jQuery(element).closest('.form-group').addClass('has-error');
+                },
+                unhighlight: function (element) {
+                    jQuery(element).closest('.form-group').removeClass('has-error');
+                },
+
+                // Rules for form validation
+                rules: {
+                    driverNumber: {
+                        required: true,
+                        number: true
+
+                    },
+                    firstName: {
+                        required: true
+
+                    },
+                    lastName: {
+                        required: true
+                    },
+                    phone: {
+                        required: true,
+                        number: true
+                    },
+                    email: {
+                        required: true,
+                        email: true
+                    },
+                    city: {
+                        required: true
+                    },
+                    accountID: {
+                        required: true
+                    },
+                    truck: {
+                        required: true
+                    },
+                    appPassword: {
+                        required: true
+                    },
+                    driverLicense: {
+                        required: true,
+                        number: true
+                    },
+                    driverCertification: {
+                        required: true
+                    }
+                },
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    //START OF Insert Product Code
+                    var driverNumber = $("#driverNumber").val();
+                    var cityID = $("#city option:selected").val();
+                    var firstName = $("#firstName").val();
+                    var lastName = $("#lastName").val();
+                    var phone = $("#phone").val();
+                    var email = $("#email").val();
+                    var accountID = $("#accountID").val();
+                    var appPassword = $("#appPassword").val();
+                    var truckID = $("#truck option:selected").val();
+                    var driverLicenseID = $("#driverLicense option:selected").val();
+                    var driverCertificationID = $("#driverCertification option:selected").val();
+                    var dateOfBirth = $("#dateOfBirth").val();
+                    var driverLicenseExpiredDate = $("#driverLicenseExpiredDate").val();
+                    var driverCertificationExpiredDate = $("#driverCertificationExpiredDate").val();
+
+                    var func = arr_driver.func;
+                    var driverID = arr_driver.driverID;
+
+                    $.ajax({
+                        dataType: "json",
+                        url: "WebService.asmx/setDriver",
+                        contentType: "application/json; charset=utf-8",
+                        type: "POST",
+                        data: JSON.stringify({ driverID: driverID, driverNumber: driverNumber, firstName: firstName, lastName: lastName, phone: phone, email: email, accountID: accountID, appPassword: appPassword, dateOfBirth: dateOfBirth, driverLicenseExpiredDate: driverLicenseExpiredDate, driverCertificationExpiredDate: driverCertificationExpiredDate, cityID: cityID, licenseTypeID: driverLicenseID, certificationTypeID: driverCertificationID, truckID: truckID, func: func }),
+                        success: function (data) {
+                            swal({
+                                title: "נשמר",
+                                type: "success",
+                                timer: 1000,
+                                showConfirmButton: false
+                            });
+                            setTimeout(function () { returnDriver() }, 1001);
+
+                        },
+                        error: function (err) { alert("Error"); }
+                    });
+                    //END OF Insert Product Code
+
+                    return false;
+                },
+
+                // Messages for form validation
+                messages: {
+                    driverNumber: {
+                        required: "אנא הכנס תעודת זהות",
+                        number: "אנא הכנס רק ספרות"
+
+                    },
+                    firstName: {
+                        required: "אנא הכנס שם פרטי"
+
+                    },
+                    lastName: {
+                        required: "אנא הכנס שם משפחה"
+                    },
+                    phone: {
+                        required: "אנא הכנס טלפון",
+                        number: "אנא הכנס רק ספרות"
+                    },
+                    email: {
+                        required: "אנא הכנס כתובת Email",
+                        email: "אנא הכנס כתובת תקינה"
+                    },
+                    city: {
+                        required: "אנא בחר עיר"
+                    },
+                    accountID: {
+                        required: "אנא הכנס מספר חשבון"
+                    },
+                    truck: {
+                        required: "אנא בחר משאית"
+                    },
+                    appPassword: {
+                        required: "אנא הכנס סיסמא"
+                    },
+                    driverLicense: {
+                        required: "אנא הכנס רשיון",
+                        number: "אנא הכנס רק ספרות"
+                    },
+                    driverCertification: {
+                        required: "אנא בחר סוג רשיון"
+                    }
+                },
+
+
+            });
+        });
+    </script>
+
+    <!-- jQuery  -->
+    <script src="assets/js/bootstrap-rtl.min.js"></script>
+    <script src="assets/js/detect.js"></script>
+    <script src="assets/js/fastclick.js"></script>
+    <script src="assets/js/jquery.slimscroll.js"></script>
+    <script src="assets/js/jquery.blockUI.js"></script>
+    <script src="assets/js/waves.js"></script>
+    <script src="assets/js/wow.min.js"></script>
+    <script src="assets/js/jquery.nicescroll.js"></script>
+    <script src="assets/js/jquery.scrollTo.min.js"></script>
+    <script src="../plugins/switchery/switchery.min.js"></script>
+
+    <!-- Sweet Alert js -->
+    <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
+    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+
+    <script src="assets/js/jquery.core.js"></script>
+    <script src="assets/js/jquery.app.js"></script>
+
+    <script>
+        //DatePicker
+        jQuery('#driverLicenseExpiredDate').datepicker({
+            toggleActive: true,
+            clearBtn: true,
+            autoclose: true,
+            format: 'dd/mm/yyyy'
+        });
+        jQuery('#dateOfBirth').datepicker({
+            toggleActive: true,
+            clearBtn: true,
+            autoclose: true,
+            format: 'dd/mm/yyyy'
+        });
+        jQuery('#driverCertificationExpiredDate').datepicker({
+            toggleActive: true,
+            clearBtn: true,
+            autoclose: true,
+            format: 'dd/mm/yyyy'
+        });
+    </script>
+
+</body>
+</html>

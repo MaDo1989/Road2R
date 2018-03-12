@@ -1,0 +1,22 @@
+﻿{
+	"records":"1",
+	"page":1,
+	"total":1,
+	"rows":[
+    {
+      "עיר": "1",
+      "רחוב": "Nancy",
+      "מספר": "Davolio",
+      "מיקוד": "Seattle",
+      "הערות": "Seattle"
+    },
+    {
+      "עיר": "1",
+      "רחוב": "Nancy",
+      "מספר": "Davolio",
+      "מיקוד": "Seattle",
+      "הערות": "Seattle"
+    },
+    {"עיר":"1","רחוב":"Nancy","מספר":"Davolio","מיקוד":"Seattle", "הערות":"Seattle"}
+	]
+}

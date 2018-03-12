@@ -1,0 +1,408 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" dir=rtl>
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="KSMoving">
+    <meta name="author" content="Coderthemes">
+
+    <link rel="shortcut icon" href="assets/images/favicon_1.ico">
+
+    <title>חשבונית</title>
+
+    <link href="../plugins/switchery/switchery.min.css" rel="stylesheet" />
+    <link href="assets/css/bootstrap-rtl.min.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/core.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/icons.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/components.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/pages.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/menu.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/responsive.css" rel="stylesheet" type="text/css">
+
+    <script src="assets/js/CookiesFunctions.js"></script>
+
+    <script src="assets/js/modernizr.min.js"></script>
+
+    <script src="assets/js/jquery.min.js"></script>
+
+    <!-- The jQuery library is a prerequisite for all jqSuite products -->
+    <script type="text/ecmascript" src="assets/js/jquery.min.js"></script>
+
+    <!-- Sweet Alert css -->
+    <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
+
+    <!--GENERAL object and additional functions-->
+    <script src="lib/master.js"></script>
+
+    <!-- Select2 css+js -->
+    <link href="assets/css/select2.css" rel="stylesheet" />
+    <script src="assets/js/select2.min.js"></script>
+
+    <!--DatePicker css+js-->
+    <link href="../plugins/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" rel="stylesheet">
+    <link href="../plugins/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+    <script src="../plugins/moment/moment.js"></script>
+    <script src="../plugins/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <script src="../plugins/bootstrap-daterangepicker/daterangepicker.js"></script>
+
+
+    <script>
+        checkCookie();
+
+        $(document).ready(function () {
+            if (JSON.parse(localStorage.invoice_arr).length != 0) {
+                invoice_arr = JSON.parse(localStorage.invoice_arr);
+                uploadInvoice(invoice_arr.InvoiceID);
+            }
+        });
+
+        //function to fill form for edit
+        function uploadInvoice(InvoiceID) {
+            t = $("#invoiceTable");
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/showInvoice",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                async: false,
+                data: JSON.stringify({ invoiceID: InvoiceID }),
+                success: function (data) {
+                    debugger;
+                    var Invoice = JSON.parse(data.d);
+
+                    var dt = new Date(parseInt(Invoice.Date.replace('/Date(', '')));
+                    dt = dt.toLocaleDateString("he-IL");
+                    $("#InvoiceDate").text(dt);
+                    $("#InvoiceID").text(Invoice.InvoiceID)
+                    $('#customerName').text(Invoice.InvoiceCustomer.CustomerName);
+                    $('#customerAddress').text(Invoice.InvoiceCustomer.BillingAddress);
+                    $('#customerOM').text(Invoice.InvoiceCustomer.RegistrationNumber);
+                    $('#customerPhone').text(Invoice.InvoiceCustomer.Phone1);
+
+                    sum = 0;
+
+
+                    for (i in Invoice.InvoiceLines) {
+
+                        var $tr = $("<tr>");
+                        var $tdi = $("<td>").text(i * 1 + 1);
+                        var $tdOrderName = $("<td>").text(Invoice.InvoiceLines[i].OrderName);
+                        var $tdService = $("<td>").text(Invoice.InvoiceLines[i].OrderService.Service);
+                        var $tdShipFrom = $("<td>").text(Invoice.InvoiceLines[i].ShipFrom.AddressName);
+                        var $tdShipTo = $("<td>").text(Invoice.InvoiceLines[i].ShipTo.AddressName);
+                        var $tdTotalPrice = $("<td>").text("₪" + Invoice.InvoiceLines[i].TotalPrice);
+
+                        var dt = new Date(parseInt(Invoice.InvoiceLines[i].OrderDate.replace('/Date(', '')));
+                        dt = dt.toLocaleDateString("he-IL");
+
+                        var $tdOrderDate = $("<td>").text(dt);
+                        sum += Invoice.InvoiceLines[i].TotalPrice;
+                        $("#tbodyInvoice").append($tr);
+                        $tr.append($tdi).append($tdOrderName).append($tdOrderDate).append($tdService).append($tdShipFrom).append($tdShipTo).append($tdTotalPrice);
+                    }
+
+                    $('#priceBefore').text("₪" + Math.round((sum) * 0.83));
+                    $('#vatPrice').text("₪" + Math.round((sum) * 0.17));
+                    $('#priceAfter').text("סכום כולל מע''מ: " + "₪" + sum);
+                },
+                error: function (err) {
+                    alert("Error");
+                }
+            });
+        }
+    </script>
+</head>
+<body class="fixed-left">
+
+    <!-- Begin page -->
+    <div id="wrapper">
+
+        <!-- Top Bar Start -->
+        <div class="topbar">
+
+
+
+            <!-- Navbar -->
+            <div class="navbar navbar-default" role="navigation">
+                <div class="container">
+                    <div class="">
+                        <!--Expend/Collaps Side Menue-->
+                        <div class="pull-left">
+                            <button class="button-menu-mobile open-left waves-effect">
+                                <i class="md md-menu"></i>
+                            </button>
+                            <span class="clearfix"></span>
+                        </div>
+
+                        <!-- LOGO -->
+                        <div class="pull-left">
+                            <div class="text-center">
+                                <a href="index.html" class="logo"><span>קסלסי סעדיה שירותי הובלה בע"מ</span>&nbsp&nbsp&nbsp<i class="ti-truck"></i>  </a>
+                            </div>
+                        </div>
+
+
+
+                        <!--Search-->
+                        <!--<form role="search" class="navbar-right app-search pull-right hidden-xs">
+                            <input type="text" placeholder="חיפוש..." class="form-control app-search-input">
+                            <a href=""><i class="fa fa-search"></i></a>
+                        </form>-->
+                    </div>
+                    <!--/.nav-collapse -->
+                </div>
+            </div>
+        </div>
+        <!-- Top Bar End -->
+        <!-- ========== Right Sidebar Start ========== -->
+        <div class="left side-menu">
+
+            <div class="sidebar-inner slimscrollleft">
+
+                <div id="sidebar-menu">
+
+                    <ul>
+
+                        <li>
+                            <a href="index.html" class="waves-effect waves-primary">
+                                <i class="md md-dashboard"></i><span> דף הבית </span>
+                            </a>
+                        </li>
+
+                        <li class="has_sub">
+                            <a href="javascript:void(0);" class="waves-effect waves-primary">
+                                <i class="md md-wallet-travel"></i> <span> ניהול הזמנות </span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            ז
+                            <ul class="list-unstyled">
+                                <li><a href="viewOrders.html">הזמנות</a></li>
+                                <li><a href="viewDocuments.html">מסמכים</a></li>
+                                <li><a href="viewInvoices.html">חשבוניות</a></li>
+                                <li><a href="viewServices.html">מחירונים</a></li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="shiftOrganizer.html" class="waves-effect waves-primary">
+                                <i class="md md-today"></i><span> סידור עבודה</span>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="viewCustomers.html" class="waves-effect waves-primary">
+                                <i class="md md-recent-actors"></i><span> ניהול לקוחות</span>
+                            </a>
+                        </li>
+
+                        <li class="has_sub">
+                            <a href="javascript:void(0);" class="waves-effect waves-primary">
+                                <i class="md md-local-shipping"></i> <span> ניהול משאיות </span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <ul class="list-unstyled">
+                                <li><a href="viewTrucks.html">משאיות</a></li>
+                                <li><a href="viewHandlings.html">טיפולים</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="has_sub">
+                            <a href="javascript:void(0);" class="waves-effect waves-primary">
+                                <i class="md md-person"></i> <span> ניהול הנהגים </span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <ul class="list-unstyled">
+                                <li><a href="viewDrivers.html">נהגים</a></li>
+                                <li><a href="viewDriverConstrains.html">זמינות הנהגים</a></li>
+                            </ul>
+                        </li>
+
+
+                        <li>
+                            <a href="viewReports.html" class="waves-effect waves-primary">
+                                <i class="md md-poll"></i><span> דוחות</span>
+                            </a>
+                        </li>
+
+
+                    </ul>
+                    <div class="clearfix"></div>
+                </div>
+
+                <div class="clearfix"></div>
+            </div>
+
+        </div>
+        <!-- Right Sidebar End -->
+        <!-- ============================================================== -->
+        <!-- Start page Content here -->
+        <!-- ============================================================== -->
+        <div class="content-page">
+            <!-- Start content -->
+            <div class="content">
+                <div class="container">
+                    <!-- Page-Title -->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="page-title-box">
+                                <ol class="breadcrumb pull-right">
+                                    <li><a href="viewInvoices.html">ניהול חשבוניות</a></li>
+                                    <li class="active">חשבונית</li>
+                                </ol>
+                                <h4 class="page-title">חשבונית&nbsp&nbsp<i class="md md-wallet- "></i></h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="panel panel-default">
+                                <!-- <div class="panel-heading">
+                                    <h4>Invoice</h4>
+                                </div> -->
+                                <div class="panel-body">
+                                    <div class="clearfix">
+                                        <div class="pull-left">
+                                            <h1 class="text-right"><i class="fa fa-truck"></i> קסלסי סעדיה שירותי הובלה בע''מ</h1>
+                                        </div>
+                                        <div class="pull-right">
+                                            <address>
+                                                <b>
+                                                    עוסק מורשה: 123456
+                                                </b>
+                                                <br />
+                                                איזור תעשיה צפוני 1,
+                                                קרית שמונה, ישראל<br />
+                                                0503353330 | maork8@gmail.com
+                                            </address>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <div class="pull-left">
+                                                
+                                                <h3><b>חשבונית מס</b> <span id="InvoiceID"></span></h3>
+                                                </div>
+                                            <div class="pull-right">
+                                                <h3><b>מקור</b></h3>
+                                                </div>
+                                            </div>                               
+                                    </div>
+                                    <hr />
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <div class="pull-left">
+                                                <h3>עבור:</h3>
+                                                <strong>לקוח: </strong><span id="customerName"></span><br />
+                                                <strong>כתובת: </strong><span id="customerAddress"></span><br />
+                                                <strong>טלפון: </strong><span id="customerPhone"></span><br />
+                                                <strong>עוסק מורשה: </strong><span id="customerOM"></span><br />
+                                            </div>
+                                            <div class="pull-right">
+                                                <h3>פרטים:</h3>
+                                                <strong>תאריך הפקה: </strong><span id="InvoiceDate"></span><br />
+                                            </div>
+                                            </div>
+                                        </div>
+                                    <hr />
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <table class="table" id="invoiceTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>
+                                                            #
+                                                        </th>
+                                                        <th>
+                                                            מספר הזמנה
+                                                        </th>
+                                                        <th>
+                                                            תאריך הזמנה
+                                                        </th>
+                                                        <th>
+                                                            שירות
+                                                        </th>
+                                                        <th>
+                                                            מוצא
+                                                        </th>
+                                                        <th>
+                                                            יעד
+                                                        </th>
+                                                        <th>
+                                                            סכום
+                                                        </th>
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="tbodyInvoice">
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-9">
+
+                                        </div>
+                                        <br />
+                                        <div class="col-sm-3">
+                                            <strong>סכום לפני מע"מ: </strong><span id="priceBefore"></span><br />
+                                            <strong>מע"מ: </strong><span id="vatPrice"></span><br />
+                                            <hr>
+                                            <h3 id="priceAfter"></h3>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="hidden-print">
+                                        <div class="pull-right">
+                                            <a href="javascript:window.print()" class="btn btn-inverse waves-effect w-md waves-light m-b-5  m-r-15"><i class="fa fa-print  m-r-5"></i>הדפס</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+                <!-- end container -->
+            </div>
+            <!-- end content -->
+            <!-- FOOTER -->
+            <footer class="footer text-right">
+                2016 © KSmoving Management System Powered by Neta Reuveni, Hanan Ben Shitrit, Sharon Krepner
+            </footer>
+            <!-- End FOOTER -->
+        </div>
+        <!-- ============================================================== -->
+        <!-- End page content here -->
+        <!-- ============================================================== -->
+    </div>
+    <!-- END wrapper -->
+    <script>
+        var resizefunc = [];
+    </script>
+
+    <!-- jQuery  -->
+    <script src="assets/js/bootstrap-rtl.min.js"></script>
+    <script src="assets/js/detect.js"></script>
+    <script src="assets/js/fastclick.js"></script>
+    <script src="assets/js/jquery.slimscroll.js"></script>
+    <script src="assets/js/jquery.blockUI.js"></script>
+    <script src="assets/js/waves.js"></script>
+    <script src="assets/js/wow.min.js"></script>
+    <script src="assets/js/jquery.nicescroll.js"></script>
+    <script src="assets/js/jquery.scrollTo.min.js"></script>
+    <script src="../plugins/switchery/switchery.min.js"></script>
+
+    <!-- Sweet Alert js -->
+    <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
+    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+
+    <script src="assets/js/jquery.core.js"></script>
+    <script src="assets/js/jquery.app.js"></script>
+</body>
+</html>
