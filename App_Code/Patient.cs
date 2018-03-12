@@ -522,6 +522,7 @@ public class Patient
             e.Status = dr["statusEscorted"].ToString();
             e.ContactType = dr["contactType"].ToString();
             e.Gender = dr["gender"].ToString();
+            e.Addrees= dr["city"].ToString();
 
             list.Add(e);
         }
