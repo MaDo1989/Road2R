@@ -653,11 +653,11 @@
                     var contactType = $("#contactType").val();
                     var func = arr_customer.func;
                     if (cellphone2 == "") { cellphone2 = "0"; }
-                    var temp = GENERAL.ESCORTED.getEscortedList();
+                    var id = JSON.parse(GENERAL.ESCORTED.getEscortedList()).Id
 
                     patient = { displayName: displayNamePat }
                     escorted = {
-                        pat: patient, id: JSON.parse(GENERAL.ESCORTED.getEscortedList()).Id, displayName: displayName, firstNameH: firstNameH, firstNameA: nameA, lastNameH: lastNameH, lastNameA: lastNameA, addrees: city, cellPhone: cellPhone, cellphone2: cellphone2, homePhone: homePhone,
+                        pat: patient, id: id, displayName: displayName, firstNameH: firstNameH, firstNameA: nameA, lastNameH: lastNameH, lastNameA: lastNameA, addrees: city, cellPhone: cellPhone, cellphone2: cellphone2, homePhone: homePhone,
                         status: status, contactType: contactType, gender: gender
                     }
                     $.ajax({
