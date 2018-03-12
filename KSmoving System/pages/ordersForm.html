@@ -1,0 +1,932 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" dir=rtl>
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="KSMoving">
+    <meta name="author" content="Coderthemes">
+
+    <link rel="shortcut icon" href="assets/images/favicon_1.ico">
+
+    <title>הזמנה</title>
+
+    <link href="../plugins/switchery/switchery.min.css" rel="stylesheet" />
+    <link href="assets/css/bootstrap-rtl.min.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/core.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/icons.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/components.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/pages.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/menu.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/responsive.css" rel="stylesheet" type="text/css">
+
+    <script src="assets/js/CookiesFunctions.js"></script>
+
+    <script src="assets/js/modernizr.min.js"></script>
+
+    <script src="assets/js/jquery.min.js"></script>
+
+    <!-- The jQuery library is a prerequisite for all jqSuite products -->
+    <script type="text/ecmascript" src="assets/js/jquery.min.js"></script>
+
+    <!-- Sweet Alert css -->
+    <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
+
+    <!--GENERAL object and additional functions-->
+    <script src="lib/master.js"></script>
+
+    <!-- Select2 css+js -->
+    <link href="assets/css/select2.css" rel="stylesheet" />
+    <script src="assets/js/select2.min.js"></script>
+
+    <!--DatePicker css+js-->
+    <link href="../plugins/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" rel="stylesheet">
+    <link href="../plugins/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+    <script src="../plugins/moment/moment.js"></script>
+    <script src="../plugins/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <script src="../plugins/bootstrap-daterangepicker/daterangepicker.js"></script>
+
+
+    <script>
+
+        checkCookie();
+        counter = 0;
+        function generateAddresses(customerID) {
+            arr = ['origin', 'destination'];
+            for (var j = 0; j < arr.length; j++) {
+                $select = $("#" + arr[j]);
+                $.ajax({
+                    dataType: "json",
+                    url: "WebService.asmx/getCustomerAddresses",
+                    contentType: "application/json; charset=utf-8",
+                    type: "POST",
+                    async: false,
+                    data: JSON.stringify({ customerID: customerID }),
+                    success: function (data) {
+                        var arr_addresses = JSON.parse(data.d);
+                        $('<option>', { value: -1, text: 'בחר' }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
+                        for (i in arr_addresses) {
+                            $('<option>', { value: arr_addresses[i].AddressID, text: arr_addresses[i].AddressName }).appendTo($select);
+                        }
+                    },
+                    error: function (err) { alert("Error"); }
+                });
+            }
+        }
+
+        function generateCustomers() {
+            var $select = $("#customer");
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getCustomers",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                async: false,
+                data: JSON.stringify({ active: true }),
+                success: function (data) {
+                    var arr_customers = JSON.parse(data.d);
+                    $('<option>', { value: -1, text: 'בחר' }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
+                    for (i in arr_customers) {
+                        $('<option>', { value: arr_customers[i].CustomerID, text: (arr_customers[i].CustomerName) }).appendTo($select);
+                    }
+                },
+                error: function (err) {
+                    alert("Error");
+                }
+            });
+        }
+
+        function generateOrderName ()
+        {
+            var $orderName = $("#orderName");
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getOrderName",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                async: false,
+                data: JSON.stringify({ active: true }),
+                success: function (data) {
+                    var orderName = JSON.parse(data.d);
+                    $orderName.val(orderName).attr('disabled', 'disabled');
+                },
+                error: function (err) {
+                    alert("Error");
+                }
+            });
+        }
+
+        function generateServices() {
+            var $select = $("#service");
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getServices",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                async: false,
+                data: JSON.stringify({ active: true }),
+                success: function (data) {
+
+                    var arr_services = JSON.parse(data.d);
+                    $('<option>', { value: -1, text: 'בחר' }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
+                    for (i in arr_services) {
+                        $('<option>', { value: arr_services[i].ServiceID, text: arr_services[i].Service }).appendTo($select);
+                    }
+                },
+                error: function (err) {
+                    alert("Error");
+                }
+            });
+        }
+
+        function generateDriverLicenses() {
+            var $select = $("#licenseType");
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getDriverLicenseTypes",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                async: false,
+                data: JSON.stringify({ LicenseORCertification: "רישיון" }),
+                success: function (data) {
+                    var arr_driverLicenses = JSON.parse(data.d);
+                    //$('<option>', { value: -1, text: 'בחר' }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
+                    for (i in arr_driverLicenses) {
+                        if (arr_driverLicenses[i].DriverLicenseTypeID == 2) {
+                            $('<option>', { value: arr_driverLicenses[i].DriverLicenseTypeID, text: arr_driverLicenses[i].DriverLicenseTypeName }).attr({ 'selected': 'selected' }).appendTo($select);
+                        }
+                        else {
+                            $('<option>', { value: arr_driverLicenses[i].DriverLicenseTypeID, text: arr_driverLicenses[i].DriverLicenseTypeName }).appendTo($select);
+                        }
+                    }
+                },
+                error: function (err) { alert("Error"); }
+            });
+        }
+
+        function generateDriverCertifications() {
+            var $select = $("#certificationType");
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getDriverLicenseTypes",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                async: false,
+                data: JSON.stringify({ LicenseORCertification: "היתר" }),
+                success: function (data) {
+                    var arr_driverCertifications = JSON.parse(data.d);
+                    //$('<option>', { value: -1, text: 'בחר' }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
+                    for (i in arr_driverCertifications) {
+                        if (arr_driverCertifications[i].DriverLicenseTypeID == 10) {
+                            $('<option>', { value: arr_driverCertifications[i].DriverLicenseTypeID, text: (arr_driverCertifications[i].DriverLicenseTypeName + " - " + arr_driverCertifications[i].DriverLicenseTypeDescription) }).attr({ 'selected': 'selected' }).appendTo($select);
+                        }
+                        else {
+                            $('<option>', { value: arr_driverCertifications[i].DriverLicenseTypeID, text: (arr_driverCertifications[i].DriverLicenseTypeName + " - " + arr_driverCertifications[i].DriverLicenseTypeDescription) }).appendTo($select);
+                        }
+                    }
+                },
+                error: function (err) { alert("Error"); }
+            });
+        }
+
+        function checkForPriceList() {
+            if (counter >= 4 && ($("#origin").val() != null) && ($("#destination").val() != null) && ($("#service").val() != null)) {
+
+                customerID = $("#customer").val();
+                serviceID = $("#service").val();
+                originID = $("#origin").val();
+                destinationID = $("#destination").val();
+
+                $.ajax({
+                    dataType: "json",
+                    url: "WebService.asmx/getPriceListUnknown",
+                    contentType: "application/json; charset=utf-8",
+                    type: "POST",
+                    data: JSON.stringify({ customerID: customerID, serviceID: serviceID, originID: originID, destinationID: destinationID }),
+                    success: function (data) {
+                        var priceList = JSON.parse(data.d);
+                        localStorage.priceListList = priceList;
+                        $("#deliveryTime").val(priceList.DeliveryTime);
+                        $("#price").val(priceList.Price);
+                        priceNoVAT = priceList.Price;
+                        $("#totalPrice").val(Math.round(priceList.Price * 1.17));
+                    },
+                    error: function (err) { alert("this Error"); }
+                });
+            }
+            else {
+                $("#price").val(0);
+                $("#totalPrice").val(0);
+            }
+
+        }
+
+
+
+        function initializeSelect2() {
+            arrSelectors = ['customer', 'service', 'origin', 'destination', 'licenseType', 'certificationType'];
+            for (var i in arrSelectors) {
+                $('#' + arrSelectors[i]).select2();
+            }
+            $('#' + arrSelectors[0]).select2().on("change", function () {
+                $("#origin").empty();
+                $("#destination").empty();
+                var customerID = $("#customer option:selected").val();
+                generateAddresses(customerID);
+                $("#origin").attr('disabled', false);
+                $("#destination").attr('disabled', false);
+                counter++;
+                if (counter >= 4) {
+                    checkForPriceList();
+                }
+            });
+            $('#' + arrSelectors[1]).select2().on("change", function () {
+                counter++;
+                if (counter >= 4) {
+                    checkForPriceList();
+                }
+            });
+            $('#' + arrSelectors[2]).select2().on("change", function () {
+                counter++;
+                if (counter >= 4) {
+                    checkForPriceList();
+                }
+            });
+            $('#' + arrSelectors[3]).select2().on("change", function () {
+                counter++;
+                if (counter >= 4) {
+                    checkForPriceList();
+                }
+            });
+        }
+
+
+        $(document).ready(function () {
+            RealQuantity = 1;
+            if (JSON.parse(localStorage.ordersList).length != 0) {
+                arr_order = JSON.parse(localStorage.ordersList);
+                if (arr_order.func == "edit") {
+                    $.ajax({
+                        dataType: "json",
+                        url: "WebService.asmx/getOrderLean",
+                        contentType: "application/json; charset=utf-8",
+                        type: "POST",
+                        data: JSON.stringify({ orderID: arr_order.orderID }),
+                        success: function (data) {
+                            var order = JSON.parse(data.d);
+                            localStorage.ordersList = order;
+                            customerIDedit = order.Customer.CustomerID;
+                            generateCustomers();
+                            generateServices();
+                            generateDriverLicenses();
+                            generateDriverCertifications();
+                            generateAddresses(customerIDedit);
+                            initializeSelect2();
+                            uploadData(arr_order.orderID);
+                        },
+                        error: function (err) { alert("Error"); }
+                    });
+                    
+                }
+                else {
+                    //generate select options
+                    generateCustomers();
+                    generateServices();
+                    generateDriverLicenses();
+                    generateDriverCertifications();
+                    initializeSelect2();
+                    generateOrderName();
+                }
+               
+            }
+
+            $("#price").on("change keyup paste", function () {
+                $("#totalPrice").val(Math.round(($("#price").val()) * 1.17));
+            })
+            $("#totalPrice").on("change keyup paste", function () {
+                $("#price").val(Math.round(($("#totalPrice").val()) / 1.17));
+            })
+            if (JSON.parse(localStorage.ordersList).length != 0) {
+                arr_order = JSON.parse(localStorage.ordersList);
+                if (arr_order.func == "edit" || arr_order.func == "show") {
+                    $("#quantity").attr('disabled', 'disabled');
+                    if (arr_order.func == "show") {
+                        uploadData(arr_order.orderID);
+                        $("#orderName").attr('disabled', 'disabled');
+                        $("#customer").attr('disabled', 'disabled');
+                        $("#orderDate").attr('disabled', 'disabled');
+                        $("#service").attr('disabled', 'disabled');
+                        $("#price").attr('disabled', 'disabled');
+                        $("#totalPrice").attr('disabled', 'disabled');
+                        $("#comments").attr('disabled', 'disabled');
+                        $("#licenseType").attr('disabled', 'disabled');
+                        $("#certificationType").attr('disabled', 'disabled');
+                        $("#origin").attr('disabled', 'disabled');
+                        $("#destination").attr('disabled', 'disabled');
+                        $("#container").attr('disabled', 'disabled');
+                        $("#addTime").attr('disabled', 'disabled');
+                        $("#deliveryTime").attr('disabled', 'disabled');
+                        $("#saveOrder").attr('disabled', 'disabled');
+                    }
+                }
+                else {
+                    $("#activeOrder").prop('checked', 'checked');
+                }
+            }
+        });
+
+        //function to fill form for edit
+        function uploadData(orderID) {
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getOrderLean",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                data: JSON.stringify({ orderID: orderID }),
+                success: function (data) {
+                    var order = JSON.parse(data.d);
+                    localStorage.ordersList = order;
+
+                    var dt = new Date(parseInt(order.OrderDate.replace('/Date(', '')));
+                    dt = dt.toLocaleDateString("he-IL");
+
+                    $("#orderName").val(order.OrderName);
+                    $("#customer").val(order.Customer.CustomerID);
+                    $("#select2-customer-container").text(order.Customer.CustomerName);
+                    $("#orderDate").val(dt);
+                    $("#service").val(order.OrderService.ServiceID);
+                    $("#select2-service-container").text(order.OrderService.Service);
+                    $("#price").val(Math.round((order.TotalPrice) / 1.17));
+                    $("#totalPrice").val(order.TotalPrice);
+                    $("#comments").val(order.Comments);
+                    $("#licenseType").val(order.OrderLicenseType.DriverLicenseTypeID);
+                    $("#select2-licenseType-container").text(order.OrderLicenseType.DriverLicenseTypeName);
+                    $("#certificationType").val(order.OrderCertificationType.DriverLicenseTypeID);
+                    $("#select2-certificationType-container").text(order.OrderCertificationType.DriverLicenseTypeName + " - " + order.OrderCertificationType.DriverLicenseTypeDescription);
+                    $("#origin").val(order.ShipFrom.AddressID);
+                    $("#select2-origin-container").text(order.ShipFrom.AddressName);
+                    $("#destination").val(order.ShipTo.AddressID);
+                    $("#select2-destination-container").text(order.ShipTo.AddressName);
+                    $("#container").val(order.Container);
+                    $("#addTime").val(order.AddTime);
+                    $("#deliveryTime").val(order.DeliveryDuration);
+                    if (arr_order.func == "edit") {
+                        $("#origin").attr('disabled', false);
+                        $("#destination").attr('disabled', false);
+                    }
+                    if (order.OrderStatus.OrderStatusID != 5) {
+                        $("#activeOrder").prop('checked', 'checked');
+                    }
+
+                },
+                error: function (err) { alert("Error"); }
+            });
+        }
+
+        function returnOrders() {
+            location.href = "viewOrders.html"
+        }
+
+
+        //if needed for customer vallidation example
+
+        //function checkCity(value) {
+        //    if (value == "-1") {
+        //        // validate the fields here
+        //        return [false, "אנא בחר עיר"];
+        //    } else {
+        //        return [true,""];
+        //    }
+        //};
+
+        function multiQuantity() {
+            var serviceID = $("#service").val();
+            var quantity = $("#quantity").val();
+            if (priceNoVAT != null && quantity > 0 && serviceID == 16) {
+                RealQuantity = quantity;
+                $("#price").val(priceNoVAT * quantity);
+                $("#totalPrice").val(Math.round(priceNoVAT * quantity * 1.17));
+            }
+        }
+
+    </script>
+</head>
+<body class="fixed-left">
+
+    <!-- Begin page -->
+    <div id="wrapper">
+
+        <!-- Top Bar Start -->
+        <div class="topbar">
+
+
+
+            <!-- Navbar -->
+            <div class="navbar navbar-default" role="navigation">
+                <div class="container">
+                    <div class="">
+                        <!--Expend/Collaps Side Menue-->
+                        <div class="pull-left">
+                            <button class="button-menu-mobile open-left waves-effect">
+                                <i class="md md-menu"></i>
+                            </button>
+                            <span class="clearfix"></span>
+                        </div>
+
+                        <!-- LOGO -->
+                        <div class="pull-left">
+                            <div class="text-center">
+                                <a href="index.html" class="logo"><span>קסלסי סעדיה שירותי הובלה בע"מ</span>&nbsp&nbsp&nbsp<i class="ti-truck"></i>  </a>
+                            </div>
+                        </div>
+
+
+
+                        <!--Search-->
+                        <!--<form role="search" class="navbar-right app-search pull-right hidden-xs">
+                            <input type="text" placeholder="חיפוש..." class="form-control app-search-input">
+                            <a href=""><i class="fa fa-search"></i></a>
+                        </form>-->
+                    </div>
+                    <!--/.nav-collapse -->
+                </div>
+            </div>
+        </div>
+        <!-- Top Bar End -->
+        <!-- ========== Right Sidebar Start ========== -->
+        <div class="left side-menu">
+
+            <div class="sidebar-inner slimscrollleft">
+
+                <div id="sidebar-menu">
+
+                    <ul>
+
+                        <li>
+                            <a href="index.html" class="waves-effect waves-primary">
+                                <i class="md md-dashboard"></i><span> דף הבית </span>
+                            </a>
+                        </li>
+
+                        <li class="has_sub">
+                            <a href="javascript:void(0);" class="waves-effect waves-primary">
+                                <i class="md md-wallet-travel"></i> <span> ניהול הזמנות </span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <ul class="list-unstyled">
+                                <li><a href="viewOrders.html">הזמנות</a></li>
+                                <li><a href="viewDocuments.html">מסמכים</a></li>
+                                <li><a href="viewInvoices.html">חשבוניות</a></li>
+                                <li><a href="viewServices.html">מחירונים</a></li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="shiftOrganizer.html" class="waves-effect waves-primary">
+                                <i class="md md-today"></i><span> סידור עבודה</span>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="viewCustomers.html" class="waves-effect waves-primary">
+                                <i class="md md-recent-actors"></i><span> ניהול לקוחות</span>
+                            </a>
+                        </li>
+
+                        <li class="has_sub">
+                            <a href="javascript:void(0);" class="waves-effect waves-primary">
+                                <i class="md md-local-shipping"></i> <span> ניהול משאיות </span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <ul class="list-unstyled">
+                                <li><a href="viewTrucks.html">משאיות</a></li>
+                                <li><a href="viewHandlings.html">טיפולים</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="has_sub">
+                            <a href="javascript:void(0);" class="waves-effect waves-primary">
+                                <i class="md md-person"></i> <span> ניהול הנהגים </span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <ul class="list-unstyled">
+                                <li><a href="viewDrivers.html">נהגים</a></li>
+                                <li><a href="viewDriverConstrains.html">זמינות הנהגים</a></li>
+                            </ul>
+                        </li>
+
+
+                        <li>
+                            <a href="viewReports.html" class="waves-effect waves-primary">
+                                <i class="md md-poll"></i><span> דוחות</span>
+                            </a>
+                        </li>
+
+
+                    </ul>
+                    <div class="clearfix"></div>
+                </div>
+
+                <div class="clearfix"></div>
+            </div>
+
+        </div>
+        <!-- Right Sidebar End -->
+        <!-- ============================================================== -->
+        <!-- Start page Content here -->
+        <!-- ============================================================== -->
+        <div class="content-page">
+            <!-- Start content -->
+            <div class="content">
+                <div class="container">
+                    <!-- Page-Title -->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="page-title-box">
+                                <ol class="breadcrumb pull-right">
+                                    <li><a href="viewOrders.html">ניהול הזמנות</a></li>
+                                    <li class="active">הזמנה</li>
+                                </ol>
+                                <h4 class="page-title">הזמנה&nbsp&nbsp<i class="md md-wallet-travel"></i></h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="col-sm-12">
+                            <div class="card-box">
+                                <div class="row">
+                                    <h4 class="m-t-0 header-title"><b>טופס הזמנה חדשה</b></h4>
+                                    <p class="text-muted font-13 m-b-30">
+                                        יצירת, צפייה ועריכת הזמנה. לחץ על כפתור חזור בכדי לצפות בכל ההזמנות.
+                                    </p>
+                                    <div class="text-right m-b-30 m-r-15">
+                                        <button type="button" onclick="returnOrders()" class="btn btn-default waves-effect w-md m-b-5"><i class="ti-back-right m-r-5"></i>חזור</button>
+                                    </div>
+                                    <form class="form-horizontal" role="form" id="orderForm">
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">שם הזמנה</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="orderName" name="orderName" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-3">תאריך</label>
+                                                    <div class="col-sm-6">
+                                                        <input type="text" class="form-control" placeholder="dd/mm/yyyy" id="orderDate" name="orderDate">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">לקוח</label>
+                                                    <div class="col-sm-6" id="selectCustomer">
+                                                        <select id="customer" name="customer" class="form-control"></select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">שירות</label>
+                                                    <div class="col-sm-6" id="selectService">
+                                                        <select id="service" name="service" class="form-control"></select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">מוצא</label>
+                                                    <div class="col-sm-6" id="selectOrigin">
+                                                        <select id="origin" name="origin" class="form-control" disabled></select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">יעד</label>
+                                                    <div class="col-sm-6" id="selectDestination">
+                                                        <select id="destination" name="destination" class="form-control" disabled></select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">כמות</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="quantity" name="quantity" type="text" class="form-control" onblur="multiQuantity()">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">מספר מכולה</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="container" name="container" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">מחיר לפני מע"מ</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="price" name="price" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">מחיר כולל מע"מ</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="totalPrice" name="totalPrice" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">רישיון נדרש</label>
+                                                    <div class="col-sm-6" id="selectLicenseType">
+                                                        <select id="licenseType" name="licenseType" class="form-control"></select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">היתר נדרש</label>
+                                                    <div class="col-sm-6" id="selectCertificationType">
+                                                        <select id="certificationType" name="certificationType" class="form-control"></select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">זמן שינוע (בשעות)</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="deliveryTime" name="deliveryTime" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">תוספת זמן מוערכת (בשעות)</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="addTime" name="addTime" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">הערות</label>
+                                                    <div class="col-sm-6">
+                                                        <textarea id="comments" name="comments" type="text" class="form-control" rows="3"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <br />
+                                                <div class="col-md-6 checkbox checkbox-primary text-left">
+                                                    <input id="activeOrder" type="checkbox" disabled>
+                                                    <label for="activeOrder">
+                                                        הזמנה פעילה
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-right m-t-30 row ">
+                                            <button type="submit" id="saveOrder" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-save m-r-5"></i>שמור</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- end container -->
+            </div>
+            <!-- end content -->
+            <!-- FOOTER -->
+            <footer class="footer text-right">
+                2016 © KSmoving Management System Powered by Neta Reuveni, Hanan Ben Shitrit, Sharon Krepner
+            </footer>
+            <!-- End FOOTER -->
+        </div>
+        <!-- ============================================================== -->
+        <!-- End page content here -->
+        <!-- ============================================================== -->
+    </div>
+    <!-- END wrapper -->
+    <script>
+        var resizefunc = [];
+    </script>
+
+    <!--Validators-->
+    <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            
+            // DO NOT REMOVE : GLOBAL FUNCTIONS!
+            var errorClass = 'invalid';
+            var errorElement = 'em';
+            var $orderForm = $('#orderForm').validate({
+
+                highlight: function (element) {
+                    jQuery(element).closest('.form-group').addClass('has-error');
+                },
+                unhighlight: function (element) {
+                    jQuery(element).closest('.form-group').removeClass('has-error');
+                },
+                // Rules for form validation
+                rules: {
+                    customer: {
+                        required: true
+                    },
+                    service: {
+                        required: true
+                    },
+                    orderName: {
+                        required: true
+                    },
+                    orderDate: {
+                        required: true
+                    },
+                    totalPrice: {
+                        required: true,
+                        number: true
+                    },
+                    origin: {
+                        required: true
+                    },
+                    destination: {
+                        required: true
+                    },
+                    licenseType: {
+                        required: true
+                    },
+                    addTime: {
+                        number: true
+                    },
+                    deliveryTime: {
+                        number: true
+                    }
+                },
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    //START OF Insert Product Code
+                    var orderName = $("#orderName").val();
+                    var orderDate = $("#orderDate").val();
+                    var price = $("#price").val();
+                    var totalPrice = $("#totalPrice").val();
+                    var customerID = $("#customer").val();
+                    var comments = $("#comments").val();
+                    var serviceID = $("#service").val();
+
+                    if (RealQuantity > 0 && serviceID == 16 && arr_order.func == "new") {
+                        if (comments != "") {
+                            comments += ". " + RealQuantity + " משטחים";
+                        }
+                        else {
+                            comments += RealQuantity + " משטחים";
+                        }
+                       }
+
+                    var licenseTypeID = $("#licenseType").val();
+                    var certificationTypeID = $("#certificationType").val();
+                    var originID = $("#origin").val();
+                    var destinationID = $("#destination").val();
+                    var container = $("#container").val();
+                    var deliveryDuration = $("#deliveryTime").val();
+                    if (deliveryDuration == "") {
+                        deliveryDuration = 0;
+                    }
+                    
+                    var addTime = $("#addTime").val();
+                    if (addTime == "") {
+                        addTime = 0;
+                    }
+                    var func = arr_order.func;
+                    var orderID = arr_order.orderID;
+
+                    $.ajax({
+                        dataType: "json",
+                        url: "WebService.asmx/setOrder",
+                        contentType: "application/json; charset=utf-8",
+                        type: "POST",
+                        async: false,
+                        data: JSON.stringify({ orderID: orderID, orderName: orderName, customerID: customerID, orderDate: orderDate, orderStatusID: 1, comments: comments, orderServiceID: serviceID, shipFromID: originID, shipToID: destinationID, totalPrice: totalPrice, addTime: addTime, container: container, deliveryDuration: deliveryDuration, orderLicenseTypeID: licenseTypeID, orderCertificationTypeID: certificationTypeID, func: func }),
+                        success: function (data) {
+                            debugger;
+                            swal({
+                                title: "נשמר",
+                                type: "success",
+                                timer: 1000,
+                                showConfirmButton: false
+                            });
+                            setTimeout(function () { returnOrders() }, 1001);
+
+                        },
+                        error: function (err) {
+                            alert("Error");
+                        }
+                    });
+                    //END OF Insert Product Code
+
+                    return false;
+                },
+
+                // Messages for form validation
+                messages: {
+                    customer: {
+                        required: "אנא בחר לקוח"
+                    },
+                    service: {
+                        required: "אנא בחר שירות"
+                    },
+                    orderName: {
+                        required: "אנא הכנס שם הזמנה"
+                    },
+                    orderDate: {
+                        required: "אנא בחר תאריך"
+                    },
+                    totalPrice: {
+                        required: "אנא הכנס מחיר סופי לתשלום",
+                        number: "אנא הכנס מספר תקין"
+                    },
+                    origin: {
+                        required: "אנא בחר מוצא"
+                    },
+                    destination: {
+                        required: "אנא בחר יעד"
+                    },
+                    licenseType: {
+                        required: "אנא בחר דרגת רישיון נדרשת"
+                    },
+                    addTime: {
+                        number: "אנא הכנס מספר תקין"
+                    },
+                    deliveryTime: {
+                        number: "אנא הכנס מספר תקין"
+                    }
+                },
+
+
+            });
+        });
+    </script>
+
+    <!-- jQuery  -->
+    <script src="assets/js/bootstrap-rtl.min.js"></script>
+    <script src="assets/js/detect.js"></script>
+    <script src="assets/js/fastclick.js"></script>
+    <script src="assets/js/jquery.slimscroll.js"></script>
+    <script src="assets/js/jquery.blockUI.js"></script>
+    <script src="assets/js/waves.js"></script>
+    <script src="assets/js/wow.min.js"></script>
+    <script src="assets/js/jquery.nicescroll.js"></script>
+    <script src="assets/js/jquery.scrollTo.min.js"></script>
+    <script src="../plugins/switchery/switchery.min.js"></script>
+
+    <!-- Sweet Alert js -->
+    <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
+    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+
+    <script src="assets/js/jquery.core.js"></script>
+    <script src="assets/js/jquery.app.js"></script>
+
+    <script type="text/javascript">
+
+        //DatePicker
+        jQuery('#orderDate').datepicker({
+            toggleActive: true,
+            clearBtn: true,
+            autoclose: true,
+            format: 'dd/mm/yyyy'
+
+        });
+
+    </script>
+</body>
+</html>
