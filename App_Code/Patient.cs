@@ -32,7 +32,9 @@ public class Patient
     string history;//היסטוריה רפואית
     string status;//סטטוס
     string remarks;//הערות
+    int id;
 
+    public int Id { get; set; }
     public string DisplayName
     {
         get
@@ -432,13 +434,15 @@ public class Patient
     public Patient getPatient()
     {
         #region DB functions
-        string query = "select displayName, firstNameA, firstNameH, lastNameH, lastNameA, cellPhone, cellPhone2, homePhone, city, livingArea, statusPatient, birthdate, addition, history, department, barrier, hospital, gender, remarks from Patient where displayName ='" + displayName + "'";
+        displayName= displayName.Replace("'", "''");
+        string query = "select id,displayName, firstNameA, firstNameH, lastNameH, lastNameA, cellPhone, cellPhone2, homePhone, city, livingArea, statusPatient, birthdate, addition, history, department, barrier, hospital, gender, remarks from Patient where displayName ='" + displayName + "'";
         Patient p = new Patient();
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
 
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
+            p.Id = int.Parse(dr["id"].ToString());
             p.DisplayName = dr["displayName"].ToString();
             p.FirstNameA = dr["firstNameA"].ToString();
             p.FirstNameH = dr["firstNameH"].ToString();
@@ -499,9 +503,10 @@ public class Patient
     public List<Escorted> getescortedsList(string displayName)
     {
         #region DB functions
-        string query = "select * from Escorted e where patient='" + displayName+ "' or  patient1='" + displayName + "'";
+        displayName = displayName.Replace("'", "''");
+        string query = "select * from PatientEscortView where PatientName='" + displayName+"'";
 
-        query += " order by firstNameH";
+        query += " order by displayName";
 
         List<Escorted> list = new List<Escorted>();
         DbService db = new DbService();
@@ -510,7 +515,7 @@ public class Patient
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
             Escorted e = new Escorted();
-            e.Pat = new Patient(dr["patient"].ToString());
+            e.Pat = new Patient(dr["PatientName"].ToString()); //new Patient(dr["patient"].ToString());
             e.DisplayName = dr["displayName"].ToString();
             e.FirstNameA = dr["firstNameA"].ToString();
             e.FirstNameH = dr["firstNameH"].ToString();

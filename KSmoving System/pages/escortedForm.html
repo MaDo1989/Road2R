@@ -188,10 +188,11 @@
             if (JSON.parse(GENERAL.ESCORTED.getEscortedList()).length != 0) {
                 arr_customer = JSON.parse(GENERAL.ESCORTED.getEscortedList());
                 if (arr_customer.func == "edit" || arr_customer.func == "show") {
+                    $("#patientDisplayName").attr('disabled', 'disabled');
                     uploadData(arr_customer.displayName);
 
                     if (arr_customer.func == "show") {
-                        $("#patientDisplayName").attr('disabled', 'disabled');
+                        
                         $("#escortedName").attr('disabled', 'disabled');
                         $("#escortedFirstName").attr('disabled', 'disabled');
                         $("#escortedLastName").attr('disabled', 'disabled');
@@ -208,7 +209,7 @@
                     }
                 }
                 else {
-                    generateContactType1();
+                    //generateContactType1();
                     generateStatus1();
                     generateGender1();
                     arr_pat = JSON.parse(GENERAL.ESCORTED.getEscortedList());
@@ -229,11 +230,12 @@
                 data: JSON.stringify({ displayName: displayName }),
                 success: function (data) {
                     var escorted = JSON.parse(data.d);
+                    var patName = JSON.parse(GENERAL.ESCORTED.getEscortedList()).patientName;
                     GENERAL.ESCORTED.setEscortedList(JSON.stringify(escorted));
-                    generateContactType(escorted)
+                    //generateContactType(escorted)
                     generateStatus(escorted)
                     generateGender(escorted)
-                    $("#patientDisplayName").val(escorted.Pat.DisplayName);
+                    $("#patientDisplayName").val(patName);
                     $("#escortedName").val(escorted.DisplayName);
                     $("#escortedFirstName").val(escorted.FirstNameH);
                     $("#escortedLastName").val(escorted.LastNameH);
@@ -653,11 +655,12 @@
                     var contactType = $("#contactType").val();
                     var func = arr_customer.func;
                     if (cellphone2 == "") { cellphone2 = "0"; }
-                    var id = JSON.parse(GENERAL.ESCORTED.getEscortedList()).Id
+                    var Eid = JSON.parse(GENERAL.ESCORTED.getEscortedList()).Id
+                   var Pid = JSON.parse(GENERAL.PATIENTS.getPatientsList()).Id
 
-                    patient = { displayName: displayNamePat }
+                    patient = { displayName: displayNamePat,id:Pid}
                     escorted = {
-                        pat: patient, id: id, displayName: displayName, firstNameH: firstNameH, firstNameA: nameA, lastNameH: lastNameH, lastNameA: lastNameA, addrees: city, cellPhone: cellPhone, cellphone2: cellphone2, homePhone: homePhone,
+                        pat: patient, id: Eid, displayName: displayName, firstNameH: firstNameH, firstNameA: nameA, lastNameH: lastNameH, lastNameA: lastNameA, addrees: city, cellPhone: cellPhone, cellphone2: cellphone2, homePhone: homePhone,
                         status: status, contactType: contactType, gender: gender
                     }
                     $.ajax({

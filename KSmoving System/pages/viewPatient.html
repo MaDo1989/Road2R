@@ -93,7 +93,7 @@
 
                     }
 
-                    t.columns([1]).order('asc').draw();
+                    t.columns([0]).order('asc').draw();
 
                     $('#datatable-buttons tbody').on('click', '#edit', function () {
                         var data = t.row($(this).parents('tr')).data();

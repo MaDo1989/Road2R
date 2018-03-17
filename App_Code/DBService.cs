@@ -26,33 +26,43 @@ public class DbService
 
     public DataSet GetDataSetByQuery(string sqlQuery, CommandType cmdType = CommandType.Text, params SqlParameter[] parametersArray)
     {
-        con.Open();
-        cmd = new SqlCommand(sqlQuery, con);
-        cmd.CommandType = cmdType;
-        DataSet ds = new DataSet();
-        adp = new SqlDataAdapter(cmd);
-
-        foreach (SqlParameter s in parametersArray)
-        {
-            cmd.Parameters.AddWithValue(s.ParameterName, s.Value);
-
-        }
-
         try
         {
-            adp.Fill(ds);
+            con.Open();
+            cmd = new SqlCommand(sqlQuery, con);
+            cmd.CommandType = cmdType;
+            DataSet ds = new DataSet();
+            adp = new SqlDataAdapter(cmd);
+
+            foreach (SqlParameter s in parametersArray)
+            {
+                cmd.Parameters.AddWithValue(s.ParameterName, s.Value);
+
+            }
+
+            try
+            {
+                adp.Fill(ds);
+            }
+            catch (Exception)
+            {
+                //do something with the error
+                ds = null;
+            }
+            return ds;
         }
-        catch (Exception )
+        catch (Exception)
         {
-            //do something with the error
-            ds = null;
+
+            throw;
         }
+
         finally
         {
             con.Close();
         }
 
-        return ds;
+
     }
 
     public int ExecuteQuery(string sqlQuery, CommandType cmdType = CommandType.Text, params SqlParameter[] parametersArray)
@@ -77,7 +87,7 @@ public class DbService
                 row_affected = cmd.ExecuteNonQuery();
                 tran.Commit();
             }
-            catch (Exception )
+            catch (Exception)
             {
                 tran.Rollback();
             }
@@ -122,9 +132,9 @@ public class DbService
         try
         {
             adp = new SqlDataAdapter(cmdStr, con);
-            
+
             adp.Fill(ds, "RidePat");
-            
+
         }
         catch (Exception e)
         {
