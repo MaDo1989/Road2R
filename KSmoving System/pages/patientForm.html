@@ -326,7 +326,7 @@
                 data: JSON.stringify({ displayName: displayName }),
                 success: function (data) {
                     var patient = JSON.parse(data.d);
-                    GENERAL.PATIENTS.setPatientsList(patient);
+                    GENERAL.PATIENTS.setPatientsList(JSON.stringify(patient));
                     generateHospitalPat(patient);
                     generateBarrierPat(patient);
                     generateStatus(patient);
@@ -366,7 +366,7 @@
                 data: JSON.stringify({ displayName: displayName }),
                 success: function (data) {
                     var patient = JSON.parse(data.d);
-                    GENERAL.PATIENTS.setPatientsList(patient);
+                    GENERAL.PATIENTS.setPatientsList(JSON.stringify(patient));
                     generateHospitalPat(patient);
                     generateBarrierPat(patient);
                     generateStatus(patient);
@@ -448,18 +448,18 @@
 
                     }
 
-                    t.columns([1]).order('asc').draw();
+                    t.columns([0]).order('asc').draw();
 
                     $('#datatable-buttons tbody').on('click', '#edit', function () {
                         var data = t.row($(this).parents('tr')).data();
-                        arr_details = { displayName: data[0], func: "edit" };
+                        arr_details = { displayName: data[0], func: "edit", patientName:$("#PatientName").val()};
                         GENERAL.ESCORTED.setEscortedList(JSON.stringify(arr_details));
                         location.href = "escortedForm.html";
                     });
 
                     $('#datatable-buttons tbody').on('click', '#show', function () {
                         var data = t.row($(this).parents('tr')).data();
-                        arr_details = { displayName: data[0], func: "show" };
+                        arr_details = { displayName: data[0], func: "show", patientName: $("#PatientName").val() };
                         GENERAL.ESCORTED.setEscortedList(JSON.stringify(arr_details));
                         location.href = "escortedForm.html";
                     });
@@ -536,7 +536,7 @@
 
                     }
 
-                    t.columns([1]).order('asc').draw();
+                    t.columns([0]).order('asc').draw();
                 },
                 error: function (err) { alert("Error"); }
             });

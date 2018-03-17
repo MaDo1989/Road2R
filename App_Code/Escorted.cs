@@ -278,7 +278,8 @@ public class Escorted
     public Escorted getEscorted()
     {
         #region DB functions
-        string query = "select id,patient,displayName, firstNameH,firstNameA, lastNameH,lastNameA, cellPhone,cellPhone2,homePhone,city,statusEscorted, contactType,gender from Escorted where displayName ='" + displayName + "'";
+        displayName = displayName.Replace("'", "''");
+        string query = "select * from Escorted where displayName ='" + displayName + "'"; //id,patient,displayName, firstNameH,firstNameA, lastNameH,lastNameA, cellPhone,cellPhone2,homePhone,city,statusEscorted, contactType,gender
         Escorted p = new Escorted();
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
@@ -286,7 +287,7 @@ public class Escorted
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
             p.Id = int.Parse(dr["id"].ToString());
-            p.Pat = new Patient(dr["patient"].ToString());
+            //p.Pat = new Patient(dr["patient"].ToString());
             p.DisplayName = dr["displayName"].ToString();
             p.FirstNameA = dr["firstNameA"].ToString();
             p.FirstNameH = dr["firstNameH"].ToString();
@@ -310,23 +311,34 @@ public class Escorted
     {
         DbService db = new DbService();
         string query = "";
+        displayName = displayName.Replace("'", "''");
+        FirstNameH = FirstNameH.Replace("'", "''");
+        LastNameH = LastNameH.Replace("'", "''");
         if (func == "edit")
         {
-            query = "UPDATE Escorted SET patient = '" + Pat.DisplayName + "',displayName = '" + DisplayName + "', firstNameH = '" + FirstNameH + "', firstNameA = '" + FirstNameA + "', lastNameH = '" + LastNameH + "', lastNameA = '" + LastNameA + "', cellPhone = '" + CellPhone + "', cellPhone2 = " + CellPhone2 +
+            query = "UPDATE Escorted SET displayName = '" + DisplayName + "', firstNameH = '" + FirstNameH + "', firstNameA = '" + FirstNameA + "', lastNameH = '" + LastNameH + "', lastNameA = '" + LastNameA + "', cellPhone = '" + CellPhone + "', cellPhone2 = " + CellPhone2 +
             ", homePhone = '" + HomePhone + "', city = '" + Addrees + "', statusEscorted = '" + Status + "', contactType = '" + ContactType + "', gender = '" + Gender + "' WHERE id = '" + Id + "'";
         }
         else if (func == "new")
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat("Values('{0}', '{1}', '{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}', '{11}', '{12}')",
-                Pat.DisplayName,DisplayName, FirstNameH, FirstNameA, LastNameH, LastNameA,
+            sb.AppendFormat("Values('{0}', '{1}', '{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}', '{11}')",
+                DisplayName, FirstNameH, FirstNameA, LastNameH, LastNameA,
                 CellPhone, CellPhone2, HomePhone, Addrees, Status,
                 ContactType, Gender);
-            String prefix = "INSERT INTO Escorted " + "(patient,displayName, firstNameH,firstNameA, lastNameH,lastNameA, cellPhone,cellPhone2,homePhone,city,statusEscorted, contactType,gender)";
+            String prefix = "INSERT INTO Escorted " + "(displayName, firstNameH,firstNameA, lastNameH,lastNameA, cellPhone,cellPhone2,homePhone,city,statusEscorted, contactType,gender)";
             query = prefix + sb.ToString();
             //query = "insert into Customers values ('" + CustomerName + "','" + CustomerContactName + "','" + AccountID + "','Y','" + Phone1 + "','" + Phone2 + "','" + Email + "'," + PaymentType.PaymentTypeID + ",'" + Comments + "'," + PreferedDrivers.DriverID + ", '" + RegistrationNumber + "', '" + BillingAddress + "')";
         }
         db.ExecuteQuery(query);
+        string query2 = "select id from Escorted where displayName='" + displayName+"'";
+        DbService db2 = new DbService();
+        var Eid = db2.GetObjectScalarByQuery(query2);
+        var Pid = pat.Id;
+        DbService db3 = new DbService();
+        string query3 = "insert into PatientEscort (PatientId,EscortId) values ('" + Pid +"','"+Eid+"')";
+        db3.ExecuteQuery(query3);
+
     }
 
     //public DataTable read()
