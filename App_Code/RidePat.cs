@@ -29,6 +29,9 @@ public class RidePat
     string remark;//הערות
     string status;
     string area;
+    string shift;
+
+    public string Shift { get; set; }
 
     public RidePat()
     {
@@ -341,7 +344,7 @@ public class RidePat
             //rp.LeavingHour = row.ItemArray[6].ToString();
             rp.Addition = row.ItemArray[8].ToString();
             rp.Area = row.ItemArray[13].ToString();
-
+            rp.Shift = row.ItemArray[15].ToString();
             //if (row.ItemArray[13] != null)
             //{
             //    Escorted e = new Escorted();
