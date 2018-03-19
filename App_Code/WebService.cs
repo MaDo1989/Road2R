@@ -70,7 +70,7 @@ public class WebService : System.Web.Services.WebService
         p.setPatient(func);
 
     }
-    
+
     [WebMethod]
     public void setEscorted(Escorted escorted, string func)
     {
@@ -99,13 +99,13 @@ public class WebService : System.Web.Services.WebService
         return j.Serialize(patient);
     }
 
-    
+
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string getRidePat(string test)
-    {        
+    public string getRidePat()
+    {
         RidePat rp = new RidePat();
-       List<RidePat> r= rp.GetRidePat();
+        List<RidePat> r = rp.GetRidePat();
         JavaScriptSerializer j = new JavaScriptSerializer();
         return j.Serialize(r);
     }
@@ -192,7 +192,7 @@ public class WebService : System.Web.Services.WebService
     public string loginUser(string uName, string password)
     {
         JavaScriptSerializer j = new JavaScriptSerializer();
-        User u = new User(uName,password);
+        User u = new User(uName, password);
         bool userInDB = u.CheckLoginDetails();
         return j.Serialize(userInDB);
     }
@@ -209,7 +209,7 @@ public class WebService : System.Web.Services.WebService
 
     #region orders functions
 
-    
+
     [WebMethod]
     public string getOrderName()
     {
@@ -409,7 +409,7 @@ public class WebService : System.Web.Services.WebService
         //, inShift, shiftSort, noTruck, noDriver
         Orders o = new Orders(orderID, orderName, customer, dt, orderStatus, comments, orderService, shipFrom, shipTo, totalPrice, addTime, container, deliveryDuration, orderLicenseType, orderCertificationType);
         o.setOrder(func);
-   
+
     }
 
     [WebMethod]
@@ -725,7 +725,7 @@ public class WebService : System.Web.Services.WebService
 
         }
 
-        Trucks t = new Trucks(truckID, truckLicense, manufacturer, model, kmToDate, hand, purchaseCost, purchaseYear, new TruckTypes(truckTypeID,""), urea, dOnRoad, dInsurance);
+        Trucks t = new Trucks(truckID, truckLicense, manufacturer, model, kmToDate, hand, purchaseCost, purchaseYear, new TruckTypes(truckTypeID, ""), urea, dOnRoad, dInsurance);
         t.setTruck(func);
     }
 
@@ -798,7 +798,7 @@ public class WebService : System.Web.Services.WebService
     {
         JavaScriptSerializer j = new JavaScriptSerializer();
         TruckHandlings t = new TruckHandlings();
-        List<TruckHandlings> trucksHandlingsList = t.getTruckHandlingsPeriodList(active, selectedTruckID ,func);
+        List<TruckHandlings> trucksHandlingsList = t.getTruckHandlingsPeriodList(active, selectedTruckID, func);
         return j.Serialize(trucksHandlingsList);
     }
 
@@ -1071,7 +1071,7 @@ public class WebService : System.Web.Services.WebService
         {
             dtFinish = DateTime.ParseExact(enddate, "dd/MM/yyyy", CultureInfo.InvariantCulture);
         }
-        
+
         DateTime dt = dtStart;
         while (dt <= dtFinish)
         {
@@ -1152,7 +1152,7 @@ public class WebService : System.Web.Services.WebService
         return j.Serialize(document);
     }
 
-    
+
 
     [WebMethod]
     public void setDocumentApp(int documentID, string documentName, int imgID, float totalPrice, string comments, string date, int documentTypeID, int driverID, string containerID, int orderID, string func)
@@ -1174,7 +1174,7 @@ public class WebService : System.Web.Services.WebService
         order.OrderID = orderID;
         Orders relatedOrder = order.getOrder();
 
-        Documents d = new Documents(documentID, documentName,totalPrice, comments, containerID, dt, new DocumentTypes(documentTypeID, ""), sendBy, relatedOrder, imgID);
+        Documents d = new Documents(documentID, documentName, totalPrice, comments, containerID, dt, new DocumentTypes(documentTypeID, ""), sendBy, relatedOrder, imgID);
         d.setDocumentApp(func);
     }
 
@@ -1189,7 +1189,7 @@ public class WebService : System.Web.Services.WebService
         }
         else
         {
-            dt = DateTime.ParseExact(date, "dd/MM/yyyy", CultureInfo.InvariantCulture);    
+            dt = DateTime.ParseExact(date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
         }
         Drivers driver = new Drivers();
         driver.DriverID = driverID;
