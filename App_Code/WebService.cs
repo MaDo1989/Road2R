@@ -102,7 +102,7 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string getRidePat()
+    public string getRidePat(string test)
     {
         RidePat rp = new RidePat();
         List<RidePat> r = rp.GetRidePat();
