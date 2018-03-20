@@ -116,12 +116,20 @@ public class WebService : System.Web.Services.WebService
     public string CheckUser (string mobile)
     {
         Volunteer v = new Volunteer();
-        string id = v.getVolunteerId(mobile);
+        v = v.getVolunteerByMobile(mobile);
         JavaScriptSerializer j = new JavaScriptSerializer();
-        return j.Serialize(id);
+        return j.Serialize(v);
     }
 
-
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string SignDriver(int ridePatId, int ridePatId2, int driverId)
+    {
+        RidePat rp = new RidePat();
+        int res = rp.SignDriver(ridePatId, ridePatId2, driverId);
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        return j.Serialize(res);
+    }
 
 
     #region volunteers functions

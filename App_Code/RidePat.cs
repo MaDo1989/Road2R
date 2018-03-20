@@ -21,7 +21,7 @@ public class RidePat
     //string finishArea;
     string day;// יום
     DateTime date; //תאריך
-    //string leavingHour;//שעת יציאה
+    string leavingHour;//שעת יציאה
     //int quantity;//כמות מלווים
     string addition;//כלי עזר
     string rideType;//סוג הסעה
@@ -153,6 +153,38 @@ public class RidePat
         return rpl;
     }
 
+    public int SignDriver(int ridePatId,int ridePatId2, int driverId)
+    {
+        DbService db = new DbService();
+        string query = "select startPlace, finishPlace, dateRide from RidePat where ridePatNum=" + ridePatId;
+        DataSet ds = db.GetDataSetByQuery(query);
+        foreach (DataRow row in ds.Tables[0].Rows)
+        {
+            RidePatNum = ridePatId;
+            StartPlace = new Destination();
+            StartPlace.Name = row["startPlace"].ToString();
+            Target = new Destination();
+            Target.Name = row["finishPlace"].ToString();
+            Date = Convert.ToDateTime(row["dateRide"].ToString());
+            Day = Date.DayOfWeek.ToString();
+            LeavingHour = Date.ToShortTimeString();
+        }
+
+        query = "insert into Ride (startPlace, finishPlace, dayRide, DateRide, hourRide, statusRide, DriverId) output inserted.RideNum values ('"+StartPlace.Name+ "','" + Target.Name + "','" + Day + "','" + Date + "','" + LeavingHour + "','פעיל'," + driverId + ")";
+        int RideId = int.Parse(db.GetObjectScalarByQuery(query).ToString());
+
+        query = "update RidePat set RideId="+RideId+" where ridePatNum="+RidePatNum;
+        int res = db.ExecuteQuery(query);
+        if (ridePatId2.ToString()!="none")
+        {
+            query = "update RidePat set RideId=" + RideId + " where ridePatNum=" + ridePatId2;
+            DbService db2 = new DbService();
+            res += db2.ExecuteQuery(query);
+        }
+        return res;
+       
+    }
+
     //public Escorted Escorted1
     //{
     //    get
@@ -270,18 +302,18 @@ public class RidePat
         }
     }
 
-    //public string LeavingHour
-    //{
-    //    get
-    //    {
-    //        return leavingHour;
-    //    }
+    public string LeavingHour
+    {
+        get
+        {
+            return leavingHour;
+        }
 
-    //    set
-    //    {
-    //        leavingHour = value;
-    //    }
-    //}
+        set
+        {
+            leavingHour = value;
+        }
+    }
 
     //public int Quantity
     //{
