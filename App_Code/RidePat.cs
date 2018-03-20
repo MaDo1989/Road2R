@@ -116,7 +116,7 @@ public class RidePat
             exists = false;
             foreach (RidePat ride in rpl)
             {
-                if (ride.RidePatNum == int.Parse(dr.ItemArray[0].ToString()))
+                if (ride.RidePatNum == int.Parse(dr.ItemArray[0].ToString()) && dr.ItemArray[2].ToString() != "")
                 {
                     Escorted es = new Escorted();
                     es.DisplayName = dr.ItemArray[2].ToString();
@@ -131,11 +131,15 @@ public class RidePat
             rp.pat = new Patient();
             rp.pat.DisplayName = dr.ItemArray[1].ToString();
             rp.pat.EscortedList = new List<Escorted>();
-            Escorted e = new Escorted();
-            e.DisplayName = dr.ItemArray[2].ToString();
-            rp.pat.EscortedList.Add(e);
+            if (dr.ItemArray[2].ToString() != "")
+            {
+                Escorted e = new Escorted();
+                e.DisplayName = dr.ItemArray[2].ToString();
+                rp.pat.EscortedList.Add(e);
+            }
+
             Destination origin = new Destination();
-            origin.Name= dr.ItemArray[3].ToString();
+            origin.Name = dr.ItemArray[3].ToString();
             rp.StartPlace = origin;
             Destination dest = new Destination();
             dest.Name = dr.ItemArray[4].ToString();
