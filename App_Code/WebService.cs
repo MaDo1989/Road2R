@@ -105,7 +105,8 @@ public class WebService : System.Web.Services.WebService
     public string getRidePat(string test)
     {
         RidePat rp = new RidePat();
-        List<RidePat> r = rp.GetRidePat();
+        //List<RidePat> r = rp.GetRidePat();
+        List<RidePat> r = rp.GetRidePatView();
         JavaScriptSerializer j = new JavaScriptSerializer();
         return j.Serialize(r);
     }
