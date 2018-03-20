@@ -175,7 +175,7 @@ public class RidePat
 
         query = "update RidePat set RideId="+RideId+" where ridePatNum="+RidePatNum;
         int res = db.ExecuteQuery(query);
-        if (ridePatId2.ToString()!="none")
+        if (ridePatId2!=-1)
         {
             query = "update RidePat set RideId=" + RideId + " where ridePatNum=" + ridePatId2;
             DbService db2 = new DbService();
