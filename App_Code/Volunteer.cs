@@ -37,6 +37,10 @@ public class Volunteer
     string joinDate;//תאריך הצטרפות
     string status;//סטטוס
     string knowArabic;//יודע ערבית?
+    int id;
+
+
+    public int Id { get; set; }
 
     public string DisplayName
     {
@@ -220,11 +224,43 @@ public class Volunteer
         }
     }
 
-    public string getVolunteerId(string mobile)
+    public Volunteer getVolunteerByMobile(string mobile)
     {
         DbService db = new DbService();
-        string query = "select id from Volunteer where cellPhone = '" + mobile + "'";
-        return db.GetObjectScalarByQuery(query).ToString();
+        string query = "select * from Volunteer where cellPhone = '" + mobile + "'";
+        DataSet ds = db.GetDataSetByQuery(query);
+        Volunteer v = new Volunteer();
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+            v.Id = int.Parse(dr["id"].ToString());
+            v.DisplayName = dr["displayName"].ToString();
+            v.FirstNameA = dr["firstNameA"].ToString();
+            v.FirstNameH = dr["firstNameH"].ToString();
+            v.LastNameH = dr["lastNameH"].ToString();
+            v.LastNameA = dr["lastNameA"].ToString();
+            v.CellPhone = dr["cellPhone"].ToString();
+            v.CellPhone2 = dr["cellPhone2"].ToString();
+            v.HomePhone = dr["homePhone"].ToString();
+            v.City = dr["city"].ToString();
+            v.Address = dr["street"].ToString();
+            v.Email = dr["email"].ToString();
+            v.Birthdate = dr["birthdate"].ToString();
+            v.JoinDate = dr["joinDate"].ToString();
+            v.Status = dr["statusVolunteer"].ToString();
+            v.Gender = dr["gender"].ToString();
+            v.KnowArabic = dr["knowArabic"].ToString();
+            v.PreferRoute1 = dr["preferRoute1"].ToString();
+            v.PreferRoute2 = dr["preferRoute2"].ToString();
+            v.PreferRoute3 = dr["preferRoute3"].ToString();
+            v.Day1 = dr["preferDay1"].ToString();
+            v.Day2 = dr["preferDay2"].ToString();
+            v.Day3 = dr["preferDay3"].ToString();
+            v.Hour1 = dr["preferHour1"].ToString();
+            v.Hour2 = dr["preferHour2"].ToString();
+            v.Hour3 = dr["preferHour3"].ToString();
+            v.TypeVol = dr["typeVol"].ToString();
+        }            return v;
+
     }
 
     public string PreferRoute1
