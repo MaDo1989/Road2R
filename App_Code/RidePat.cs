@@ -104,6 +104,51 @@ public class RidePat
         }
     }
 
+    public List<RidePat> GetRidePatView()
+    {
+        string query = "select * from RidePatEscortView";
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        List<RidePat> rpl = new List<RidePat>();
+        bool exists;
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+            exists = false;
+            foreach (RidePat ride in rpl)
+            {
+                if (ride.RidePatNum == int.Parse(dr.ItemArray[0].ToString()))
+                {
+                    Escorted es = new Escorted();
+                    es.DisplayName = dr.ItemArray[2].ToString();
+                    ride.pat.EscortedList.Add(es);
+                    exists = true;
+                    break;
+                }
+            }
+            if (exists) continue;
+            RidePat rp = new RidePat();
+            rp.RidePatNum = int.Parse(dr.ItemArray[0].ToString());
+            rp.pat = new Patient();
+            rp.pat.DisplayName = dr.ItemArray[1].ToString();
+            rp.pat.EscortedList = new List<Escorted>();
+            Escorted e = new Escorted();
+            e.DisplayName = dr.ItemArray[2].ToString();
+            rp.pat.EscortedList.Add(e);
+            Destination origin = new Destination();
+            origin.Name= dr.ItemArray[3].ToString();
+            rp.StartPlace = origin;
+            Destination dest = new Destination();
+            dest.Name = dr.ItemArray[4].ToString();
+            rp.Target = dest;
+            rp.Area = dr.ItemArray[5].ToString();
+            rp.Shift = dr.ItemArray[6].ToString();
+            rp.Date = Convert.ToDateTime(dr.ItemArray[7].ToString());
+            rpl.Add(rp);
+        }
+
+        return rpl;
+    }
+
     //public Escorted Escorted1
     //{
     //    get
