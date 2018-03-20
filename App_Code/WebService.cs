@@ -111,7 +111,15 @@ public class WebService : System.Web.Services.WebService
         return j.Serialize(r);
     }
 
-
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string CheckUser (string mobile)
+    {
+        Volunteer v = new Volunteer();
+        string id = v.getVolunteerId(mobile);
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        return j.Serialize(id);
+    }
 
 
 
