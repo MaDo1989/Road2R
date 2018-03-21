@@ -223,6 +223,7 @@ public class RidePat
             StartPlace.Name = row["startPlace"].ToString();
             Target = new Destination();
             Target.Name = row["finishPlace"].ToString();
+            //row["dateRide"].ToString("MM-dd-yyyy"))
             Date = Convert.ToDateTime(row["dateRide"].ToString());
             Day = Date.DayOfWeek.ToString();
             LeavingHour = Date.ToShortTimeString();
@@ -231,7 +232,7 @@ public class RidePat
         int RideId;
         if (primary)
         {
-            query = "insert into Ride (startPlace, finishPlace, dayRide, DateRide, hourRide, statusRide, DriverId) output inserted.RideNum values ('" + StartPlace.Name + "','" + Target.Name + "','" + Day + "','" + Date + "','" + LeavingHour + "','שובץ נהג'," + driverId + ")";
+            query = "set dateformat dmy; insert into Ride (startPlace, finishPlace, dayRide, DateRide, hourRide, statusRide, DriverId) output inserted.RideNum values ('" + StartPlace.Name + "','" + Target.Name + "','" + Day + "','" + Date + "','" + LeavingHour + "','שובץ נהג'," + driverId + ")";
             RideId = int.Parse(db2.GetObjectScalarByQuery(query).ToString());
 
             DbService db3 = new DbService();
@@ -249,7 +250,9 @@ public class RidePat
             query = "select RideNum from RideView where ridePatNum=" + ridePatId;
             DbService db5 = new DbService();
             RideId = int.Parse(db5.GetObjectScalarByQuery(query).ToString());
-            query = "update Ride set statusRide='מלאה', BackupDriverId="+driverId;
+            query = "update Ride set statusRide='מלאה', BackupDriverId="+driverId +"where RideNum="+RideId;
+            DbService db6 = new DbService();
+            res = db6.ExecuteQuery(query);
         }
 
         return res;
