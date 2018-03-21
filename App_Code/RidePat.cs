@@ -153,6 +153,55 @@ public class RidePat
         return rpl;
     }
 
+    public List<RidePat> GetMyRides(int volunteerId)
+    {
+        string query = "select * from RideView where DriverId="+volunteerId;
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        List<RidePat> rpl = new List<RidePat>();
+        bool exists;
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+            exists = false;
+            foreach (RidePat ride in rpl)
+            {
+                if (ride.RidePatNum == int.Parse(dr["ridePAtNum"].ToString()) && dr["Escort"].ToString() != "")
+                {
+                    Escorted es = new Escorted();
+                    es.DisplayName = dr["Escort"].ToString();
+                    ride.pat.EscortedList.Add(es);
+                    exists = true;
+                    break;
+                }
+            }
+            if (exists) continue;
+            RidePat rp = new RidePat();
+            rp.RidePatNum = int.Parse(dr["ridePatNum"].ToString());
+            rp.pat = new Patient();
+            rp.pat.DisplayName = dr["patient"].ToString();
+            rp.pat.EscortedList = new List<Escorted>();
+            if (dr["Escort"].ToString() != "")
+            {
+                Escorted e = new Escorted();
+                e.DisplayName = dr["Escort"].ToString();
+                rp.pat.EscortedList.Add(e);
+            }
+
+            Destination origin = new Destination();
+            origin.Name = dr["RidePatOrigin"].ToString();
+            rp.StartPlace = origin;
+            Destination dest = new Destination();
+            dest.Name = dr["RidePatDestination"].ToString();
+            rp.Target = dest;
+            rp.Area = dr["RidePatArea"].ToString();
+            rp.Shift = dr["RidePatShift"].ToString();
+            rp.Date = Convert.ToDateTime(dr["RidePatDate"].ToString());
+            rpl.Add(rp);
+        }
+
+        return rpl;
+    }
+
     public int SignDriver(int ridePatId,int ridePatId2, int driverId)
     {
         DbService db = new DbService();
