@@ -100,14 +100,26 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string getRidePat(string test)
+    public string getRidePatEscortView(string test)
     {
         RidePat rp = new RidePat();
         //List<RidePat> r = rp.GetRidePat();
-        List<RidePat> r = rp.GetRidePatView();
+        List<RidePat> r = rp.GetRidePatEscortView();
         JavaScriptSerializer j = new JavaScriptSerializer();
         return j.Serialize(r);
     }
+
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetRidePatView(int volunteerId)
+    {
+        RidePat rp = new RidePat();
+        List<RidePat> r = rp.GetRidePatView(volunteerId);
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        return j.Serialize(r);
+    }
+
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -122,7 +134,18 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string CheckUser (string mobile)
+    public string DeleteRide(int RidePatId)
+    {
+        RidePat rp = new RidePat();
+        //List<RidePat> r = rp.GetRidePat();
+        // int res = rp.DeleteRide(RidePatId);
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        return j.Serialize("n");
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string CheckUser(string mobile)
     {
         Volunteer v = new Volunteer();
         v = v.getVolunteerByMobile(mobile);
@@ -132,10 +155,10 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string SignDriver(int ridePatId, int ridePatId2, int driverId)
+    public string SignDriver(int ridePatId, int ridePatId2, int driverId, bool primary)
     {
         RidePat rp = new RidePat();
-        int res = rp.SignDriver(ridePatId, ridePatId2, driverId);
+        int res = rp.SignDriver(ridePatId, ridePatId2, driverId, primary);
         JavaScriptSerializer j = new JavaScriptSerializer();
         return j.Serialize(res);
     }
@@ -157,7 +180,7 @@ public class WebService : System.Web.Services.WebService
         v.setVolunteer(func);
 
     }
-    
+
     [WebMethod]
     public string getVolunteers(bool active)
     {
@@ -166,7 +189,7 @@ public class WebService : System.Web.Services.WebService
         List<Volunteer> volunteersList = c.getVolunteersList(active);
         return j.Serialize(volunteersList);
     }
-    
+
     [WebMethod]
     public string getVolunteer(string displayName)
     {
