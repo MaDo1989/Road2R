@@ -249,7 +249,7 @@ public class RidePat
             query = "select RideNum from RideView where ridePatNum=" + ridePatId;
             DbService db5 = new DbService();
             RideId = int.Parse(db5.GetObjectScalarByQuery(query).ToString());
-            query = "update Ride set statusRide='מלאה'";
+            query = "update Ride set statusRide='מלאה', BackupDriverId="+driverId;
         }
 
         return res;
@@ -493,7 +493,7 @@ public class RidePat
 
     public List<RidePat> GetRidePatView(int volunteerId)
     {
-        string query = "select * from RidePatView where DriverId!=" + volunteerId+" or BackupDriverId!="+ volunteerId +" or statusRide!='מלאה'";
+        string query = "select * from RidePatView";
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         List<RidePat> rpl = new List<RidePat>();
@@ -503,6 +503,8 @@ public class RidePat
             exists = false;
             foreach (RidePat ride in rpl)
             {
+                if (int.Parse(dr["DriverId"].ToString()) == volunteerId || int.Parse(dr["BackupDriverId"].ToString()) == volunteerId || dr["statusRide"].ToString() == "מלאה" || dr["statusRide"].ToString() == "הסתיימה") continue;
+               
                 if (ride.RidePatNum == int.Parse(dr["ridePatNum"].ToString()) && dr["Escort"].ToString() != "")
                 {
                     Escorted es = new Escorted();
