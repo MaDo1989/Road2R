@@ -500,10 +500,19 @@ public class RidePat
         bool exists;
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
+            try
+            {
+                if (int.Parse(dr["DriverId"].ToString()) == volunteerId || int.Parse(dr["BackupDriverId"].ToString()) == volunteerId || dr["statusRide"].ToString() == "מלאה" || dr["statusRide"].ToString() == "הסתיימה") continue;
+            }
+            catch (Exception)
+            {
+            
+            }
+            
             exists = false;
             foreach (RidePat ride in rpl)
             {
-                if (int.Parse(dr["DriverId"].ToString()) == volunteerId || int.Parse(dr["BackupDriverId"].ToString()) == volunteerId || dr["statusRide"].ToString() == "מלאה" || dr["statusRide"].ToString() == "הסתיימה") continue;
+               
                
                 if (ride.RidePatNum == int.Parse(dr["ridePatNum"].ToString()) && dr["Escort"].ToString() != "")
                 {
