@@ -210,6 +210,63 @@ public class RidePat
         return rpl;
     }
 
+    public int DeleteDriver(int ridePatId, int driverId)
+    {
+        int res = -1;
+        bool primary = false;
+        int rideNum = -1;
+        int BackupDriver = -1;
+        DbService db = new DbService();
+        string query = "select * from RideView where RidePatNum=" + ridePatId;
+        DataSet ds = db.GetDataSetByQuery(query);
+
+        foreach (DataRow row in ds.Tables[0].Rows)
+        {
+            try
+            {
+                BackupDriver = int.Parse(row["BackupDriverId"].ToString());
+            }
+            catch (Exception)
+            {
+
+                BackupDriver = -1;
+            }
+            rideNum = int.Parse(row["RideNum"].ToString());
+            if (driverId == int.Parse(row["DriverId"].ToString()))
+            {
+                primary = true;
+            }
+            else if (driverId == BackupDriver)
+            {
+                primary = false;
+            }
+        }
+        if (primary && BackupDriver != -1)
+        {
+            query = "update Ride set DriverId=" + BackupDriver + ",BackupDriverId=null,statusRide= 'שובץ נהג' where RideNum=" + rideNum;
+            db = new DbService();
+            res = db.ExecuteQuery(query);
+        }
+        else if (primary && BackupDriver == -1)
+        {
+            query = "update Ride set DriverId=null,statusRide= 'לא פעילה' where RideNum=" + rideNum;
+            db = new DbService();
+            res = db.ExecuteQuery(query);
+            query = "update RidePat set RideId=null where ridePatNum=" + ridePatId;
+            res += db.ExecuteQuery(query);
+        }
+
+        else if (!primary)
+        {
+            query = "update Ride set BackupDriverId=null, statusRide='שובץ נהג' where RideNum=" + rideNum;
+            db = new DbService();
+
+            res = db.ExecuteQuery(query);
+        }
+
+        return res;
+    }
+
     public int SignDriver(int ridePatId, int ridePatId2, int driverId, bool primary)
     {
         DbService db = new DbService();
@@ -250,7 +307,7 @@ public class RidePat
             query = "select RideNum from RideView where ridePatNum=" + ridePatId;
             DbService db5 = new DbService();
             RideId = int.Parse(db5.GetObjectScalarByQuery(query).ToString());
-            query = "update Ride set statusRide='מלאה', BackupDriverId="+driverId +"where RideNum="+RideId;
+            query = "update Ride set statusRide='מלאה', BackupDriverId=" + driverId + "where RideNum=" + RideId;
             DbService db6 = new DbService();
             res = db6.ExecuteQuery(query);
         }
@@ -509,14 +566,14 @@ public class RidePat
             }
             catch (Exception)
             {
-            
+
             }
-            
+
             exists = false;
             foreach (RidePat ride in rpl)
             {
-               
-               
+
+
                 if (ride.RidePatNum == int.Parse(dr["ridePatNum"].ToString()) && dr["Escort"].ToString() != "")
                 {
                     Escorted es = new Escorted();
