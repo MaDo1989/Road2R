@@ -268,7 +268,7 @@ public class Escorted
         DisplayName = _displayname;
     }
 
-    public void deactivateEscorted(string active)
+    public void deactivateEscorted(string active)// change name to SetStatus
     {
         DbService db = new DbService();
         db.ExecuteQuery("UPDATE Escorted SET statusEscorted='" + active + "' WHERE displayName='" + DisplayName + "'");

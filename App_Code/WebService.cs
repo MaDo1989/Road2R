@@ -26,6 +26,8 @@ public class WebService : System.Web.Services.WebService
     //----------------------Road to decovery-----------------------------------------------
 
 
+        //GetFutureRides (Date)
+
 
     [WebMethod]
     public string getPatients(bool active)
@@ -46,7 +48,7 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod]
-    public void deactivateEscorted(string displayName, string active)
+    public void deactivateEscorted(string displayName, string active)// change name to SetStatus
     {
         Escorted c = new Escorted();
         c.DisplayName = displayName;
@@ -54,7 +56,7 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod]
-    public void deactivatePatient(string displayName, string active)
+    public void deactivatePatient(string displayName, string active)// change name to SetStatus
     {
         Patient c = new Patient();
         c.DisplayName = displayName;
@@ -100,7 +102,7 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string getRidePatEscortView(string test)
+    public string getRidePatEscortView(string test)//Insert into same method as getRides.
     {
         RidePat rp = new RidePat();
         //List<RidePat> r = rp.GetRidePat();
@@ -109,7 +111,7 @@ public class WebService : System.Web.Services.WebService
         return j.Serialize(r);
     }
 
-
+    //This method is used for שבץ אותי
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string GetRidePatView(int volunteerId)
@@ -134,23 +136,44 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string DeleteRide(int RidePatId)
+    public string GetRidesForNotify()
     {
-        RidePat rp = new RidePat();
+        Ride r = new Ride();
         //List<RidePat> r = rp.GetRidePat();
-        // int res = rp.DeleteRide(RidePatId);
+        List <Ride> rl = r.GetRidesForNotify();
         JavaScriptSerializer j = new JavaScriptSerializer();
-        return j.Serialize("n");
+        return j.Serialize(rl);
     }
+
+    //[WebMethod]
+    //[ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    //public string DeleteRide(int RidePatId)
+    //{
+    //    RidePat rp = new RidePat();
+    //    //List<RidePat> r = rp.GetRidePat();
+    //    // int res = rp.DeleteRide(RidePatId);
+    //    JavaScriptSerializer j = new JavaScriptSerializer();
+    //    return j.Serialize("n");
+    //}
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string CheckUser(string mobile)
     {
-        Volunteer v = new Volunteer();
-        v = v.getVolunteerByMobile(mobile);
-        JavaScriptSerializer j = new JavaScriptSerializer();
-        return j.Serialize(v);
+        try
+        {
+            Volunteer v = new Volunteer();
+            v = v.getVolunteerByMobile(mobile);
+            JavaScriptSerializer j = new JavaScriptSerializer();
+            return j.Serialize(v);
+        }
+        catch (Exception e)
+        {
+
+            throw new Exception("Error in CheckUser; " + e.Message);
+        }
+
+
     }
 
     [WebMethod]

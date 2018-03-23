@@ -51,10 +51,10 @@ public class DbService
             }
             return ds;
         }
-        catch (Exception)
+        catch (Exception e)
         {
-
-            throw;
+            //Write exception to log
+            throw e;
         }
 
         finally
@@ -125,5 +125,5 @@ public class DbService
         return res;
     }
 
-   
+
 }
