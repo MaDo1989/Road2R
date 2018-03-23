@@ -39,6 +39,7 @@ public class Volunteer
     string knowArabic;//יודע ערבית?
     int id;
 
+    public string DriverType { get; set; } //Primary or Secondary
 
     public int Id { get; set; }
 

@@ -31,6 +31,8 @@ public class RidePat
     string area;
     string shift;
 
+    public List<Volunteer> Drivers { get; set; }
+
     public string Shift { get; set; }
 
     public RidePat()
@@ -210,6 +212,8 @@ public class RidePat
         return rpl;
     }
 
+   
+
     public int DeleteDriver(int ridePatId, int driverId)
     {
         int res = -1;
@@ -273,7 +277,7 @@ public class RidePat
         string query = "select startPlace, finishPlace, dateRide from RidePat where ridePatNum=" + ridePatId;
         DataSet ds = db.GetDataSetByQuery(query);
         int res = -1;
-        foreach (DataRow row in ds.Tables[0].Rows)
+        foreach (DataRow row in ds.Tables[0].Rows)//Origin and Destination are the same for RidePat and Ride.
         {
             RidePatNum = ridePatId;
             StartPlace = new Destination();
@@ -551,9 +555,10 @@ public class RidePat
     //    return ds.Tables["RidePAt"];
     //}
 
-    public List<RidePat> GetRidePatView(int volunteerId)
+    //This method is used for שבץ אותי
+    public List<RidePat> GetRidePatView(int volunteerId)//In case of coordinator will send -1 as ID.
     {
-        string query = "select * from RidePatView";
+        string query = "select * from RidePatView"; //fix selection to show only relevant RidePats
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         List<RidePat> rpl = new List<RidePat>();
@@ -562,7 +567,10 @@ public class RidePat
         {
             try
             {
-                if (int.Parse(dr["DriverId"].ToString()) == volunteerId || int.Parse(dr["BackupDriverId"].ToString()) == volunteerId || dr["statusRide"].ToString() == "מלאה" || dr["statusRide"].ToString() == "הסתיימה") continue;
+                if (volunteerId != -1)
+                {
+                    if (int.Parse(dr["DriverId"].ToString()) == volunteerId || int.Parse(dr["BackupDriverId"].ToString()) == volunteerId || dr["statusRide"].ToString() == "מלאה" || dr["statusRide"].ToString() == "הסתיימה") continue;
+                }
             }
             catch (Exception)
             {
