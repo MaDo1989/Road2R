@@ -558,10 +558,12 @@ public class RidePat
     //This method is used for שבץ אותי
     public List<RidePat> GetRidePatView(int volunteerId)//In case of coordinator will send -1 as ID.
     {
-        string query = "select * from RidePatView"; //fix selection to show only relevant RidePats
+        string query = "select * from RidePatView where statusRide='שובץ נהג' or statusRide='פעילה' or statusRide='ממתינה לשיבוץ'"; //fix selection to show only relevant RidePats
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
-        List<RidePat> rpl = new List<RidePat>();
+        Ride ride = new Ride();
+        ride.RidePats = new List<RidePat>();
+        //List<RidePat> rpl = new List<RidePat>();
         bool exists;
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
@@ -569,7 +571,7 @@ public class RidePat
             {
                 if (volunteerId != -1)
                 {
-                    if (int.Parse(dr["DriverId"].ToString()) == volunteerId || int.Parse(dr["BackupDriverId"].ToString()) == volunteerId || dr["statusRide"].ToString() == "מלאה" || dr["statusRide"].ToString() == "הסתיימה") continue;
+                    if (int.Parse(dr["DriverId"].ToString()) == volunteerId || int.Parse(dr["BackupDriverId"].ToString()) == volunteerId ) continue; //|| dr["statusRide"].ToString() == "מלאה" || dr["statusRide"].ToString() == "הסתיימה"
                 }
             }
             catch (Exception)
@@ -578,15 +580,15 @@ public class RidePat
             }
 
             exists = false;
-            foreach (RidePat ride in rpl)
+            foreach (RidePat ridePat in ride.RidePats)
             {
 
 
-                if (ride.RidePatNum == int.Parse(dr["ridePatNum"].ToString()) && dr["Escort"].ToString() != "")
+                if (ridePat.RidePatNum == int.Parse(dr["ridePatNum"].ToString()) && dr["Escort"].ToString() != "")
                 {
                     Escorted es = new Escorted();
                     es.DisplayName = dr["Escort"].ToString();
-                    ride.pat.EscortedList.Add(es);
+                    ridePat.pat.EscortedList.Add(es);
                     exists = true;
                     break;
                 }
@@ -613,10 +615,11 @@ public class RidePat
             rp.Area = dr["RidePatArea"].ToString();
             rp.Shift = dr["RidePatShift"].ToString();
             rp.Date = Convert.ToDateTime(dr["RidePatDate"].ToString());
-            rpl.Add(rp);
+            ride.RidePats.Add(rp);
+            ride.Status = dr["statusRide"].ToString();
         }
 
-        return rpl;
+        return ride.RidePats;
         #region old
         //        DbService db = new DbService();
         //        string query = "select * from RidePat";
