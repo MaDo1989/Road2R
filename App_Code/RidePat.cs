@@ -557,9 +557,11 @@ public class RidePat
 
     //This method is used for שבץ אותי
     public List<RidePat> GetRidePatView(int volunteerId)//In case of coordinator will send -1 as ID.
-    {
-        string query = "select * from RidePatView where statusRide='שובץ נהג' or statusRide='פעילה' or statusRide='ממתינה לשיבוץ'"; //fix selection to show only relevant RidePats
-        DbService db = new DbService();
+    { string query = "";
+        if (volunteerId != -1)
+            query = "select * from RidePatView where (statusRide='שובץ נהג' or statusRide='פעילה' or statusRide='ממתינה לשיבוץ' or statusRide is null) and (DriverId <>" + volunteerId + " or DriverId is null)"; //fix selection to show only relevant RidePats
+        else query = "select * from RidePatView";
+         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         Ride ride = new Ride();
         ride.RidePats = new List<RidePat>();
@@ -567,17 +569,17 @@ public class RidePat
         bool exists;
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
-            try
-            {
-                if (volunteerId != -1)
-                {
-                    if (int.Parse(dr["DriverId"].ToString()) == volunteerId || int.Parse(dr["BackupDriverId"].ToString()) == volunteerId ) continue; //|| dr["statusRide"].ToString() == "מלאה" || dr["statusRide"].ToString() == "הסתיימה"
-                }
-            }
-            catch (Exception)
-            {
-
-            }
+            //try
+            //{
+            //    if (volunteerId != -1)
+            //    {
+            //        if (int.Parse(dr["DriverId"].ToString()) == volunteerId) continue; //|| dr["statusRide"].ToString() == "מלאה" || dr["statusRide"].ToString() == "הסתיימה"
+            //    }
+            //}
+            //catch (Exception)
+            //{
+            //    //No driver was aasigned to RidePat, continue to show RidePats
+            //}
 
             exists = false;
             foreach (RidePat ridePat in ride.RidePats)
