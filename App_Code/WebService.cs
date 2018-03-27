@@ -100,16 +100,16 @@ public class WebService : System.Web.Services.WebService
     }
 
 
-    [WebMethod]
-    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string getRidePatEscortView(string test)//Insert into same method as getRides.
-    {
-        RidePat rp = new RidePat();
-        //List<RidePat> r = rp.GetRidePat();
-        List<RidePat> r = rp.GetRidePatEscortView();
-        JavaScriptSerializer j = new JavaScriptSerializer();
-        return j.Serialize(r);
-    }
+    //[WebMethod]
+    //[ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    //public string getRidePatEscortView(string test)//Insert into same method as getRides.
+    //{
+    //    RidePat rp = new RidePat();
+    //    //List<RidePat> r = rp.GetRidePat();
+    //    List<RidePat> r = rp.GetRidePatEscortView();
+    //    JavaScriptSerializer j = new JavaScriptSerializer();
+    //    return j.Serialize(r);
+    //}
 
     //This method is used for שבץ אותי
     [WebMethod]
@@ -127,11 +127,12 @@ public class WebService : System.Web.Services.WebService
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string getMyRides(int volunteerId)
     {
-        RidePat rp = new RidePat();
+        //RidePat rp = new RidePat();
         //List<RidePat> r = rp.GetRidePat();
-        List<RidePat> r = rp.GetMyRides(volunteerId);
+        Ride r = new Ride();
+        List<Ride> rl = r.GetMyRides(volunteerId);
         JavaScriptSerializer j = new JavaScriptSerializer();
-        return j.Serialize(r);
+        return j.Serialize(rl);
     }
 
     [WebMethod]
