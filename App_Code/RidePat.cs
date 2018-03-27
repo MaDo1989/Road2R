@@ -249,9 +249,9 @@ public class RidePat
         else query = "select * from RidePatView";
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
-        Ride ride = new Ride();
-        ride.RidePats = new List<RidePat>();
-        //List<RidePat> rpl = new List<RidePat>();
+       // Ride ride = new Ride();
+       // ride.RidePats = new List<RidePat>();
+        List<RidePat> rpl = new List<RidePat>();
         bool exists;
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
@@ -268,7 +268,7 @@ public class RidePat
             //}
 
             exists = false;
-            foreach (RidePat ridePat in ride.RidePats)
+            foreach (RidePat ridePat in rpl)
             {
 
 
@@ -303,8 +303,9 @@ public class RidePat
             rp.Area = dr["RidePatArea"].ToString();
             rp.Shift = dr["RidePatShift"].ToString();
             rp.Date = Convert.ToDateTime(dr["RidePatDate"].ToString());
-            ride.RidePats.Add(rp);
-            ride.Status = dr["statusRide"].ToString();
+            rp.Status = dr["statusRidePat"].ToString();
+            rpl.Add(rp);
+            //ride.Status = dr["statusRide"].ToString();
         }
 
         return ride.RidePats;
