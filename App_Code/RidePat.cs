@@ -308,7 +308,7 @@ public class RidePat
             //ride.Status = dr["statusRide"].ToString();
         }
 
-        return ride.RidePats;
+        return rpl;
         #region old
         //        DbService db = new DbService();
         //        string query = "select * from RidePat";
