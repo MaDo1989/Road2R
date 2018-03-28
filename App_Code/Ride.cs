@@ -141,11 +141,13 @@ public class Ride
         v.DisplayName = "אסף סלוק";
         v.CellPhone = "052-1111111";
         v.DriverType = "ראשי";
+        v.pnRegId = "aaaaa";
         r1.Drivers.Add(v);
         Volunteer v2 = new Volunteer();
         v2.DisplayName = "מתן דורון";
         v2.CellPhone = "052-2222222";
         v2.DriverType = "גיבוי";
+        v2.pnRegId = "mmmmm";
         r1.Drivers.Add(v2);
 
        
@@ -161,12 +163,14 @@ public class Ride
         rp.Coordinator = new Volunteer();
         rp.Coordinator.DisplayName = "בני בורנפלד";
         rp.Coordinator.CellPhone = "050-0000000";
+        rp.Coordinator.pnRegId = "bbbbb";
 
         //Patient
         rp.Pat = new Patient();
         rp.Pat.DisplayName = "וואליד באדיר";
         rp.Pat.CellPhone = "050-9999999";
         rp.Pat.Id = 1;
+        rp.Pat.pnRegId = "wwwww";
 
         //Escort
         rp.Pat.EscortedList = new List<Escorted>();
@@ -198,11 +202,13 @@ public class Ride
         vv.DisplayName = "מסי";
         vv.CellPhone = "052-3333333";
         vv.DriverType = "ראשי";
+        vv.pnRegId = "lllll";
         r2.Drivers.Add(vv);
         Volunteer vv2 = new Volunteer();
         vv2.DisplayName = "רונאלדו";
         vv2.CellPhone = "052-4444444";
         vv2.DriverType = "גיבוי";
+        vv2.pnRegId = "cr7";
         r2.Drivers.Add(vv2);
 
 
@@ -218,23 +224,27 @@ public class Ride
         rp1.Coordinator = new Volunteer();
         rp1.Coordinator.DisplayName = "בני בורנפלד";
         rp1.Coordinator.CellPhone = "050-0000000";
+        rp1.Coordinator.pnRegId = "bbbbb";
 
         //Patient
         rp1.Pat = new Patient();
         rp1.Pat.DisplayName = "אדיר מילר";
         rp1.Pat.CellPhone = "050-7777777";
         rp1.Pat.Id = 2;
+        rp1.Pat.pnRegId = "amama";
 
         //Escort
         rp1.Pat.EscortedList = new List<Escorted>();
         Escorted ee = new Escorted();
         ee.DisplayName = "שחר חסון";
         ee.CellPhone = "050-6666666";
+       
 
         rp1.Pat.EscortedList = new List<Escorted>();
         Escorted ee2 = new Escorted();
         ee2.DisplayName = "קובי מימון";
         ee2.CellPhone = "050-5555555";
+        
 
         rp1.Pat.EscortedList.Add(ee);
         rp1.Pat.EscortedList.Add(ee2);
@@ -255,12 +265,14 @@ public class Ride
         rp2.Coordinator = new Volunteer();
         rp2.Coordinator.DisplayName = "בני בורנפלד";
         rp2.Coordinator.CellPhone = "050-0000000";
+        rp2.Coordinator.pnRegId = "bbbbb";
 
         //Patient
         rp2.Pat = new Patient();
         rp2.Pat.DisplayName = "שלמה ארצי";
         rp2.Pat.CellPhone = "050-1234567";
         rp2.Pat.Id = 3;
+        rp2.Pat.pnRegId = "sasas";
 
         //Escort
         rp2.Pat.EscortedList = new List<Escorted>();

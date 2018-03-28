@@ -35,6 +35,8 @@ public class Patient
     int id;
     List<string> equipment;
 
+    public string pnRegId { get; set; }
+
     public int Id { get; set; }
 
     public List<string> Equipment { get; set; }
