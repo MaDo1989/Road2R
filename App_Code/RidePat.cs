@@ -435,7 +435,7 @@ public class RidePat
         DataSet ds = db.GetDataSetByQuery(query);
         int res = -1;
         foreach (DataRow row in ds.Tables[0].Rows)//Origin and Destination are the same for RidePat and Ride.
-        {
+        { 
             RidePatNum = ridePatId;
             Origin = new Destination();
             Origin.Name = row["Origin"].ToString();
@@ -450,6 +450,8 @@ public class RidePat
         int RideId=-1;
         if (primary)
         {
+            Origin.Name = Origin.Name.Replace("'", "''");
+            Destination.Name = Destination.Name.Replace("'", "''");
             query = "set dateformat dmy; insert into Ride (Origin, Destination, Date, MainDriver) values ('" + Origin.Name + "','" + Destination.Name + "','" + Date + "', " + driverId + ") SELECT SCOPE_IDENTITY()";
             RideId = int.Parse(db2.GetObjectScalarByQuery(query).ToString()); //Insert and get the new RideId
             
