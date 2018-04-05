@@ -230,39 +230,40 @@ public class Volunteer
     public Volunteer getVolunteerByMobile(string mobile)
     {
         DbService db = new DbService();
-        string query = "select * from Volunteer where cellPhone = '" + mobile + "'";
+        string query = "select * from VolunteerView where cellPhone = '" + mobile + "'";
         DataSet ds = db.GetDataSetByQuery(query);
         Volunteer v = new Volunteer();
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
-            v.Id = int.Parse(dr["id"].ToString());
-            v.DisplayName = dr["displayName"].ToString();
-            v.FirstNameA = dr["firstNameA"].ToString();
-            v.FirstNameH = dr["firstNameH"].ToString();
-            v.LastNameH = dr["lastNameH"].ToString();
-            v.LastNameA = dr["lastNameA"].ToString();
-            v.CellPhone = dr["cellPhone"].ToString();
-            v.CellPhone2 = dr["cellPhone2"].ToString();
-            v.HomePhone = dr["homePhone"].ToString();
-            v.City = dr["city"].ToString();
-            v.Address = dr["street"].ToString();
-            v.Email = dr["email"].ToString();
-            v.Birthdate = dr["birthdate"].ToString();
-            v.JoinDate = dr["joinDate"].ToString();
-            v.Status = dr["statusVolunteer"].ToString();
-            v.Gender = dr["gender"].ToString();
-            v.KnowArabic = dr["knowArabic"].ToString();
-            v.PreferRoute1 = dr["preferRoute1"].ToString();
-            v.PreferRoute2 = dr["preferRoute2"].ToString();
-            v.PreferRoute3 = dr["preferRoute3"].ToString();
-            v.Day1 = dr["preferDay1"].ToString();
-            v.Day2 = dr["preferDay2"].ToString();
-            v.Day3 = dr["preferDay3"].ToString();
-            v.Hour1 = dr["preferHour1"].ToString();
-            v.Hour2 = dr["preferHour2"].ToString();
-            v.Hour3 = dr["preferHour3"].ToString();
-            v.TypeVol = dr["typeVol"].ToString();
-        }            return v;
+            v.Id = int.Parse(dr["Id"].ToString());
+            v.DisplayName = dr["DisplayName"].ToString();
+            v.FirstNameA = dr["FirstNameA"].ToString();
+            v.FirstNameH = dr["FirstNameH"].ToString();
+            v.LastNameH = dr["LastNameH"].ToString();
+            v.LastNameA = dr["LastNameA"].ToString();
+            v.CellPhone = dr["CellPhone"].ToString();
+            v.CellPhone2 = dr["CellPhone2"].ToString();
+            v.HomePhone = dr["HomePhone"].ToString();
+            v.City = dr["City"].ToString();
+            v.Address = dr["Address"].ToString();
+            v.Email = dr["Email"].ToString();
+            v.Birthdate = dr["BirthDate"].ToString();
+            v.JoinDate = dr["JoinDate"].ToString();
+            v.Status = dr["IsActive"].ToString();
+            v.Gender = dr["Gender"].ToString();
+            v.KnowArabic = dr["KnowsArabic"].ToString();
+            //v.PreferRoute1 = dr["preferRoute1"].ToString();
+            //v.PreferRoute2 = dr["preferRoute2"].ToString();
+            //v.PreferRoute3 = dr["preferRoute3"].ToString();
+            //v.Day1 = dr["preferDay1"].ToString();
+            //v.Day2 = dr["preferDay2"].ToString();
+            //v.Day3 = dr["preferDay3"].ToString();
+            //v.Hour1 = dr["preferHour1"].ToString();
+            //v.Hour2 = dr["preferHour2"].ToString();
+            //v.Hour3 = dr["preferHour3"].ToString();
+            v.TypeVol = dr["Type"].ToString();
+        }
+        return v;
 
     }
 
