@@ -197,6 +197,16 @@ public class WebService : System.Web.Services.WebService
         return j.Serialize(res);
     }
 
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string LeaveRidePat(int ridePatId, int driverId)
+    {
+        RidePat rp = new RidePat();
+        int res = rp.LeaveRidePat(ridePatId);
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        return j.Serialize(res);
+    }
+
     #region volunteers functions
     [WebMethod]
     public void deactivateVolunteer(string displayName, string active)

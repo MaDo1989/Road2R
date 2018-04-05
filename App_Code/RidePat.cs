@@ -371,6 +371,16 @@ public class RidePat
         #endregion
     }
 
+    public int LeaveRidePat(int ridePatId)
+    {
+        int res = -1;
+        string query = "update RidePat set RideId=null where RidePatNum="+ridePatId;
+        DbService db = new DbService();
+        res = db.ExecuteQuery(query);
+        return res;
+
+    }
+
     public int DeleteDriver(int ridePatId, int driverId)
     {
         int res = -1;
