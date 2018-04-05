@@ -75,10 +75,10 @@ public class Ride
                     // rp.Pat.EscortedList = new List<Escorted>();
                     Destination o = new Destination();
                     o.Name = dr["Origin"].ToString();
-                    rp.StartPlace = o;
+                    rp.Origin = o;
                     Destination destination = new Destination();
                     destination.Name = dr["Destination"].ToString();
-                    rp.Target = destination;
+                    rp.Destination = destination;
                     //rp.Area = dr["RidePatArea"].ToString();
                     //rp.Shift = dr["RidePatShift"].ToString();
                     rp.Date = Convert.ToDateTime(dr["dateRide"].ToString());
@@ -106,10 +106,10 @@ public class Ride
             // ridePat.Pat.EscortedList = new List<Escorted>();
             Destination origin = new Destination();
             origin.Name = dr["Origin"].ToString();
-            ridePat.StartPlace = origin;
+            ridePat.Origin = origin;
             Destination dest = new Destination();
             dest.Name = dr["Destination"].ToString();
-            ridePat.Target = dest;
+            ridePat.Destination = dest;
             //ridePat.Area = dr["RidePatArea"].ToString();
             //ridePat.Shift = dr["RidePatShift"].ToString();
             ridePat.Date = Convert.ToDateTime(dr["dateRide"].ToString());
@@ -156,10 +156,10 @@ public class Ride
         //RidePat
         RidePat rp = new RidePat();
         rp.Date = new DateTime(2018,4,1,6,0,0);
-        rp.StartPlace = new Destination();
-        rp.StartPlace.Name = "ארז";
-        rp.Target = new Destination();
-        rp.Target.Name = "הלל יפה";
+        rp.Origin = new Destination();
+        rp.Origin.Name = "ארז";
+        rp.Destination = new Destination();
+        rp.Destination.Name = "הלל יפה";
         rp.Coordinator = new Volunteer();
         rp.Coordinator.DisplayName = "בני בורנפלד";
         rp.Coordinator.CellPhone = "050-0000000";
@@ -217,10 +217,10 @@ public class Ride
         //RidePat 1
         RidePat rp1 = new RidePat();
         rp1.Date = new DateTime(2018, 4, 5, 11, 0, 0);
-        rp1.StartPlace = new Destination();
-        rp1.StartPlace.Name = "ג'למה";
-        rp1.Target = new Destination();
-        rp1.Target.Name = "רמבם";
+        rp1.Origin = new Destination();
+        rp1.Origin.Name = "ג'למה";
+        rp1.Destination = new Destination();
+        rp1.Destination.Name = "רמבם";
         rp1.Coordinator = new Volunteer();
         rp1.Coordinator.DisplayName = "בני בורנפלד";
         rp1.Coordinator.CellPhone = "050-0000000";
@@ -258,10 +258,10 @@ public class Ride
         //RidePat 2
         RidePat rp2 = new RidePat();
         rp2.Date = new DateTime(2018, 4, 5, 11, 0, 0);
-        rp2.StartPlace = new Destination();
-        rp2.StartPlace.Name = "ג'למה";
-        rp2.Target = new Destination();
-        rp2.Target.Name = "רמבם";
+        rp2.Origin = new Destination();
+        rp2.Origin.Name = "ג'למה";
+        rp2.Destination = new Destination();
+        rp2.Destination.Name = "רמבם";
         rp2.Coordinator = new Volunteer();
         rp2.Coordinator.DisplayName = "בני בורנפלד";
         rp2.Coordinator.CellPhone = "050-0000000";
@@ -346,10 +346,10 @@ public class Ride
 
                     Destination origin = new Destination();
                     origin.Name = dr["RidePatOrigin"].ToString();
-                    rp2.StartPlace = origin;
+                    rp2.Origin = origin;
                     Destination dest = new Destination();
                     dest.Name = dr["RidePatDestination"].ToString();
-                    rp2.Target = dest;
+                    rp2.Destination = dest;
                     rp2.Area = dr["RidePatArea"].ToString();
                     rp2.Shift = dr["RidePatShift"].ToString();
                     rp2.Date = Convert.ToDateTime(dr["RidePatPickupTime"].ToString());
@@ -384,10 +384,10 @@ r2.Status = "Primary";
 
             Destination origin2 = new Destination();
             origin2.Name = dr["RidePatOrigin"].ToString();
-            rp.StartPlace = origin2;
+            rp.Origin = origin2;
             Destination dest2 = new Destination();
             dest2.Name = dr["RidePatDestination"].ToString();
-            rp.Target = dest2;
+            rp.Destination = dest2;
             rp.Area = dr["RidePatArea"].ToString();
             rp.Shift = dr["RidePatShift"].ToString();
             rp.Date = Convert.ToDateTime(dr["RidePatPickupTime"].ToString());
