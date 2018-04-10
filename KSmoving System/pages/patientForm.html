@@ -546,7 +546,7 @@
             checkCookie();
             $.ajax({
                 dataType: "json",
-                url: "WebService.asmx/deactivatePatient",
+                url: "WebService.asmx/SetPatientStatus",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
                 data: JSON.stringify({ displayName: displayName, active: active }),

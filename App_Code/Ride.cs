@@ -18,9 +18,9 @@ public class Ride
 
     public int Id { get; set; }
 
-    public Destination Origin { get; set; }
+    public Location Origin { get; set; }
 
-    public Destination Destination { get; set; }
+    public Location Destination { get; set; }
 
     public List<RidePat> RidePats { get; set; }
 
@@ -73,10 +73,10 @@ public class Ride
                     rp.Pat = new Patient();
                     rp.Pat.DisplayName = dr["Patient"].ToString();
                     // rp.Pat.EscortedList = new List<Escorted>();
-                    Destination o = new Destination();
+                    Location o = new Location();
                     o.Name = dr["Origin"].ToString();
                     rp.Origin = o;
-                    Destination destination = new Destination();
+                    Location destination = new Location();
                     destination.Name = dr["Destination"].ToString();
                     rp.Destination = destination;
                     //rp.Area = dr["RidePatArea"].ToString();
@@ -104,10 +104,10 @@ public class Ride
             ridePat.Pat.CellPhone = dr["PatientCell"].ToString();
             ridePat.Pat.DisplayName = dr["Patient"].ToString();
             // ridePat.Pat.EscortedList = new List<Escorted>();
-            Destination origin = new Destination();
+            Location origin = new Location();
             origin.Name = dr["Origin"].ToString();
             ridePat.Origin = origin;
-            Destination dest = new Destination();
+            Location dest = new Location();
             dest.Name = dr["Destination"].ToString();
             ridePat.Destination = dest;
             //ridePat.Area = dr["RidePatArea"].ToString();
@@ -127,9 +127,9 @@ public class Ride
 
         //Ride 1
         Ride r1 = new Ride();
-        r1.Origin = new Destination();
+        r1.Origin = new Location();
         r1.Origin.Name = "ארז";
-        r1.Destination = new Destination();
+        r1.Destination = new Location();
         r1.Destination.Name = "הלל יפה";
         r1.RidePats = new List<RidePat>();
         r1.Drivers = new List<Volunteer>();
@@ -156,9 +156,9 @@ public class Ride
         //RidePat
         RidePat rp = new RidePat();
         rp.Date = new DateTime(2018,4,1,6,0,0);
-        rp.Origin = new Destination();
+        rp.Origin = new Location();
         rp.Origin.Name = "ארז";
-        rp.Destination = new Destination();
+        rp.Destination = new Location();
         rp.Destination.Name = "הלל יפה";
         rp.Coordinator = new Volunteer();
         rp.Coordinator.DisplayName = "בני בורנפלד";
@@ -190,9 +190,9 @@ public class Ride
 
         //Ride 2
         Ride r2 = new Ride();
-        r2.Origin = new Destination();
+        r2.Origin = new Location();
         r2.Origin.Name = "ג'למה";
-        r2.Destination = new Destination();
+        r2.Destination = new Location();
         r2.Destination.Name = "רמבם";
         r2.RidePats = new List<RidePat>();
         r2.Drivers = new List<Volunteer>();
@@ -217,9 +217,9 @@ public class Ride
         //RidePat 1
         RidePat rp1 = new RidePat();
         rp1.Date = new DateTime(2018, 4, 5, 11, 0, 0);
-        rp1.Origin = new Destination();
+        rp1.Origin = new Location();
         rp1.Origin.Name = "ג'למה";
-        rp1.Destination = new Destination();
+        rp1.Destination = new Location();
         rp1.Destination.Name = "רמבם";
         rp1.Coordinator = new Volunteer();
         rp1.Coordinator.DisplayName = "בני בורנפלד";
@@ -258,9 +258,9 @@ public class Ride
         //RidePat 2
         RidePat rp2 = new RidePat();
         rp2.Date = new DateTime(2018, 4, 5, 11, 0, 0);
-        rp2.Origin = new Destination();
+        rp2.Origin = new Location();
         rp2.Origin.Name = "ג'למה";
-        rp2.Destination = new Destination();
+        rp2.Destination = new Location();
         rp2.Destination.Name = "רמבם";
         rp2.Coordinator = new Volunteer();
         rp2.Coordinator.DisplayName = "בני בורנפלד";
@@ -344,10 +344,10 @@ public class Ride
                         rp2.Pat.EscortedList.Add(e);
                     }
 
-                    Destination origin = new Destination();
+                    Location origin = new Location();
                     origin.Name = dr["RidePatOrigin"].ToString();
                     rp2.Origin = origin;
-                    Destination dest = new Destination();
+                    Location dest = new Location();
                     dest.Name = dr["RidePatDestination"].ToString();
                     rp2.Destination = dest;
                     rp2.Area = dr["RidePatArea"].ToString();
@@ -382,10 +382,10 @@ r2.Status = "Primary";
                 rp.Pat.EscortedList.Add(e);
             }
 
-            Destination origin2 = new Destination();
+            Location origin2 = new Location();
             origin2.Name = dr["RidePatOrigin"].ToString();
             rp.Origin = origin2;
-            Destination dest2 = new Destination();
+            Location dest2 = new Location();
             dest2.Name = dr["RidePatDestination"].ToString();
             rp.Destination = dest2;
             rp.Area = dr["RidePatArea"].ToString();

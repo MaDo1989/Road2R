@@ -8,9 +8,9 @@ using System.Web.Script.Serialization;
 /// <summary>
 /// Summary description for Destination
 /// </summary>
-public class Destination
+public class Location
 {
-    public Destination()
+    public Location()
     {
         //
         // TODO: Add constructor logic here
@@ -27,6 +27,8 @@ public class Destination
     string managerLastName;//שם משפחה מנהל יעד
     string managerPhones;//טלפון מנהל יעד
     string managerPhones2;//טלפון מנהל יעד
+
+    public bool IsActive { get; set; }
 
     public string Type
     {
@@ -171,7 +173,7 @@ public class Destination
         }
     }
 
-    public Destination(string _type, string _name, string _area, string _direction, Volunteer _responsible, string _status,
+    public Location(string _type, string _name, string _area, string _direction, Volunteer _responsible, string _status,
         string _remarks, string _managerName, string _managerLastName, string _managerPhones, string _managerPhones2)
     {
         Type = _type;
@@ -188,7 +190,7 @@ public class Destination
 
     }
 
-    public Destination(string _name)
+    public Location(string _name)
     {
         Name = _name;
     }
@@ -208,20 +210,20 @@ public class Destination
     //    return listd;
     //}
 
-    public List<Destination> getDestinationsListForView(bool active)
+    public List<Location> getDestinationsListForView(bool active)
     {
         #region DB functions
         string query = "select * from Destination ";
         query += "order by name";
 
-        List<Destination> list = new List<Destination>();
+        List<Location> list = new List<Location>();
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
 
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
 
-            Destination tmp = new Destination();
+            Location tmp = new Location();
             tmp.Name = dr["name"].ToString();
             tmp.Type = dr["typeDestination"].ToString();
             tmp.Area = dr["area"].ToString();
@@ -241,31 +243,31 @@ public class Destination
 
     }
 
-    public List<Destination> getHospitalListForView(bool active)
+    public List<Location> getHospitalListForView(bool active)
     {
         #region DB functions
-        string query = "select * from Destination where typeDestination='בית חולים'";
+        string query = "select * from Location where Type='בית חולים'";
         query += "order by name";
 
-        List<Destination> list = new List<Destination>();
+        List<Location> list = new List<Location>();
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
 
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
 
-            Destination tmp = new Destination();
-            tmp.Name = dr["name"].ToString();
-            tmp.Type = dr["typeDestination"].ToString();
-            tmp.Area = dr["area"].ToString();
-            tmp.Direction = dr["direction"].ToString();
-            tmp.Responsible = new Volunteer(dr["responsible"].ToString());
-            tmp.Status = dr["statusDestination"].ToString();
-            tmp.Remarks = dr["remarks"].ToString();
-            tmp.ManagerName = dr["managerName"].ToString();
-            tmp.ManagerLastName = dr["managerLastName"].ToString();
-            tmp.ManagerPhones = dr["managerPhones1"].ToString();
-            tmp.ManagerPhones2 = dr["managerPhones2"].ToString();
+            Location tmp = new Location();
+            tmp.Name = dr["Name"].ToString();
+            tmp.Type = dr["Type"].ToString();
+            tmp.Area = dr["Area"].ToString();
+            //tmp.Direction = dr["direction"].ToString();
+            tmp.Responsible = new Volunteer(dr["Responsible"].ToString());
+            tmp.IsActive = Convert.ToBoolean( dr["IsActive"].ToString());
+            tmp.Remarks = dr["Remarks"].ToString();
+            //tmp.ManagerName = dr["managerName"].ToString();
+            //tmp.ManagerLastName = dr["managerLastName"].ToString();
+            //tmp.ManagerPhones = dr["managerPhones1"].ToString();
+            //tmp.ManagerPhones2 = dr["managerPhones2"].ToString();
             list.Add(tmp);
         }
         #endregion
@@ -274,33 +276,33 @@ public class Destination
 
     }
 
-    public List<Destination> getBarrierListForView(bool active)
+    public List<Location> getBarrierListForView(bool active)
     {
         #region DB functions
-        string query = "select * from Destination where typeDestination='מחסום'";
+        string query = "select * from Location where Type='מחסום'";
         query += "order by name";
 
-        List<Destination> list = new List<Destination>();
+        List<Location> list = new List<Location>();
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
 
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
 
-            Destination tmp = new Destination();
-            tmp.Name = dr["name"].ToString();
-            tmp.Type = dr["typeDestination"].ToString();
-            tmp.Area = dr["area"].ToString();
-            tmp.Direction = dr["direction"].ToString();
-            tmp.Responsible = new Volunteer(dr["responsible"].ToString());
-            tmp.Status = dr["statusDestination"].ToString();
-            tmp.Remarks = dr["remarks"].ToString();
-            tmp.ManagerName = dr["managerName"].ToString();
-            tmp.ManagerLastName = dr["managerLastName"].ToString();
+            Location tmp = new Location();
+            tmp.Name = dr["Name"].ToString();
+            tmp.Type = dr["Type"].ToString();
+            tmp.Area = dr["Area"].ToString();
+            //tmp.Direction = dr["direction"].ToString();
+            tmp.Responsible = new Volunteer(dr["Responsible"].ToString());
+            tmp.IsActive = Convert.ToBoolean( dr["IsActive"].ToString());
+            tmp.Remarks = dr["Remarks"].ToString();
+            //tmp.ManagerName = dr["managerName"].ToString();
+            //tmp.ManagerLastName = dr["managerLastName"].ToString();
             //tmp.ManagerPhones = (int)dr["managerPhones1"];
             //tmp.ManagerPhones2 = (int)dr["managerPhones2"];
-            tmp.ManagerPhones = dr["managerPhones1"].ToString();
-            tmp.ManagerPhones2 = dr["managerPhones2"].ToString();
+            //tmp.ManagerPhones = dr["managerPhones1"].ToString();
+            //tmp.ManagerPhones2 = dr["managerPhones2"].ToString();
             list.Add(tmp);
         }
         #endregion

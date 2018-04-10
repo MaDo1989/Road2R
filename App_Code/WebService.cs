@@ -56,11 +56,11 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod]
-    public void deactivatePatient(string displayName, string active)// change name to SetStatus
+    public void SetPatientStatus(string displayName, string active)
     {
         Patient c = new Patient();
         c.DisplayName = displayName;
-        c.deactivatePatient(active);
+        c.SetPatientStatus(active);
     }
 
     [WebMethod]
@@ -121,6 +121,8 @@ public class WebService : System.Web.Services.WebService
         JavaScriptSerializer j = new JavaScriptSerializer();
         return j.Serialize(r);
     }
+
+
 
 
     [WebMethod]
@@ -250,8 +252,8 @@ public class WebService : System.Web.Services.WebService
     public string getDestinationView(bool active)
     {
         JavaScriptSerializer j = new JavaScriptSerializer();
-        Destination d = new Destination();
-        List<Destination> destinationsList = d.getDestinationsListForView(active);
+        Location d = new Location();
+        List<Location> destinationsList = d.getDestinationsListForView(active);
         return j.Serialize(destinationsList);
     }
 
@@ -259,8 +261,8 @@ public class WebService : System.Web.Services.WebService
     public string getHospitalView(bool active)
     {
         JavaScriptSerializer j = new JavaScriptSerializer();
-        Destination d = new Destination();
-        List<Destination> hospitalList = d.getHospitalListForView(active);
+        Location d = new Location();
+        List<Location> hospitalList = d.getHospitalListForView(active);
         return j.Serialize(hospitalList);
     }
 
@@ -268,8 +270,8 @@ public class WebService : System.Web.Services.WebService
     public string getBarrierView(bool active)
     {
         JavaScriptSerializer j = new JavaScriptSerializer();
-        Destination d = new Destination();
-        List<Destination> hospitalList = d.getBarrierListForView(active);
+        Location d = new Location();
+        List<Location> hospitalList = d.getBarrierListForView(active);
         return j.Serialize(hospitalList);
     }
     #endregion

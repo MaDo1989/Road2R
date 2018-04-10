@@ -18,8 +18,8 @@ public class Patient
     string lastNameA;// שם משפחה בערבית
     string birthDate;// תאריך לידה
     string city;//יישוב
-    Destination barrier;//מחסום
-    Destination hospital;//בית חולים
+    Location barrier;//מחסום
+    Location hospital;//בית חולים
     string department;//מחלקה
     string gender;//מין
     string cellPhone;//טלפון נייד
@@ -34,6 +34,8 @@ public class Patient
     string remarks;//הערות
     int id;
     List<string> equipment;
+
+    public bool IsActive { get; set; }
 
     public string pnRegId { get; set; }
 
@@ -133,7 +135,7 @@ public class Patient
         }
     }
 
-    public Destination Barrier
+    public Location Barrier
     {
         get
         {
@@ -146,7 +148,7 @@ public class Patient
         }
     }
 
-    public Destination Hospital
+    public Location Hospital
     {
         get
         {
@@ -343,7 +345,7 @@ public class Patient
 
 
     public Patient(string _firstNameH, string _firstNameA, string _lastNameH, string _lastNameA, string _cellPhone, string _cellPhone1, string _homePhone,
-      string _city, string _gender, string _birthdate, Destination _barrier, Destination _hospital,
+      string _city, string _gender, string _birthdate, Location _barrier, Location _hospital,
       string _department, string _area, string _status, string _addition, string _history, string _remarks)
     {
         FirstNameH = _firstNameH;
@@ -367,7 +369,7 @@ public class Patient
     }
 
     public Patient(string _displayName, string _firstNameH, string _firstNameA, string _lastNameH, string _lastNameA, string _cellPhone,
-        string _cellPhone1, string _homePhone, string _city, string _gender, string _birthdate, Destination _barrier, Destination _hospital,
+        string _cellPhone1, string _homePhone, string _city, string _gender, string _birthdate, Location _barrier, Location _hospital,
       string _department, string _area, string _status, string _addition, string _history, string _remarks)
     {
         DisplayName = _displayName;
@@ -395,13 +397,13 @@ public class Patient
     public List<Patient> getPatientsList(bool active)
     {
         #region DB functions
-        string query = "select * from Patient p";
+        string query = "select * from Patient";
         if (active)
         {
-            query += " where p.statusPatient = 'פעיל'";
+            query += " where IsActive = 'true'";
         }
 
-        query += " order by firstNameH";
+        query += " order by FirstNameH";
 
         List<Patient> list = new List<Patient>();
         DbService db = new DbService();
@@ -410,25 +412,27 @@ public class Patient
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
             Patient p = new Patient();
-            p.DisplayName = dr["displayName"].ToString();
-            p.FirstNameA = dr["firstNameA"].ToString();
-            p.FirstNameH = dr["firstNameH"].ToString();
-            p.LastNameH = dr["lastNameH"].ToString();
-            p.LastNameA = dr["lastNameA"].ToString();
-            p.CellPhone = dr["cellPhone"].ToString();
-            p.CellPhone1 =dr["cellPhone2"].ToString();
-            p.HomePhone = dr["homePhone"].ToString();
-            p.City = dr["city"].ToString();
-            p.LivingArea = dr["livingArea"].ToString();
-            p.Status = dr["statusPatient"].ToString();
-            p.Addition = dr["addition"].ToString();
-            p.BirthDate = dr["birthdate"].ToString();
-            p.History = dr["history"].ToString();
-            p.Department = dr["department"].ToString();
-            p.Barrier = new Destination(dr["barrier"].ToString());
-            p.Hospital = new Destination(dr["hospital"].ToString());
-            p.Gender = dr["gender"].ToString();
-            p.Remarks = dr["remarks"].ToString();
+            p.DisplayName = dr["DisplayName"].ToString();
+            p.FirstNameA = dr["FirstNameA"].ToString();
+            p.FirstNameH = dr["FirstNameH"].ToString();
+            p.LastNameH = dr["LastNameH"].ToString();
+            p.LastNameA = dr["LastNameA"].ToString();
+            p.CellPhone = dr["CellPhone"].ToString();
+            p.CellPhone1 =dr["CellPhone2"].ToString();
+            p.HomePhone = dr["HomePhone"].ToString();
+            p.City = dr["CityCityName"].ToString();
+            p.LivingArea = dr["LivingArea"].ToString();
+            //p.Status = dr["statusPatient"].ToString();
+            p.IsActive = Convert.ToBoolean(dr["IsACtive"].ToString());
+            //p.Addition = dr["addition"].ToString();
+            
+            p.BirthDate = dr["BirthDate"].ToString();
+            p.History = dr["History"].ToString();
+            p.Department = dr["Department"].ToString();
+            p.Barrier = new Location(dr["Barrier"].ToString());
+            p.Hospital = new Location(dr["Hospital"].ToString());
+            p.Gender = dr["Gender"].ToString();
+            p.Remarks = dr["Remarks"].ToString();
 
             list.Add(p);
         }
@@ -441,33 +445,34 @@ public class Patient
     {
         #region DB functions
         displayName= displayName.Replace("'", "''");
-        string query = "select id,displayName, firstNameA, firstNameH, lastNameH, lastNameA, cellPhone, cellPhone2, homePhone, city, livingArea, statusPatient, birthdate, addition, history, department, barrier, hospital, gender, remarks from Patient where displayName ='" + displayName + "'";
+        string query = "select Id,DisplayName, FirstNameA, FirstNameH, LastNameH, LastNameA, CellPhone, CellPhone2, HomePhone, CityCityName, LivingArea, IsActive, BirthDate, History, Department, Barrier, Hospital, Gender, Remarks from Patient where displayName ='" + displayName + "'";
         Patient p = new Patient();
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
 
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
-            p.Id = int.Parse(dr["id"].ToString());
-            p.DisplayName = dr["displayName"].ToString();
-            p.FirstNameA = dr["firstNameA"].ToString();
-            p.FirstNameH = dr["firstNameH"].ToString();
-            p.LastNameH = dr["lastNameH"].ToString();
-            p.LastNameA = dr["lastNameA"].ToString();
-            p.CellPhone = dr["cellPhone"].ToString();
-            p.CellPhone1 = dr["cellPhone2"].ToString();
-            p.HomePhone = dr["homePhone"].ToString();
-            p.City = dr["city"].ToString();
-            p.LivingArea = dr["livingArea"].ToString();
-            p.Status = dr["statusPatient"].ToString();
-            p.Addition = dr["addition"].ToString();
-            p.BirthDate = dr["birthdate"].ToString();
-            p.History = dr["history"].ToString();
-            p.Department = dr["department"].ToString();
-            p.Barrier = new Destination(dr["barrier"].ToString());
-            p.Hospital = new Destination(dr["hospital"].ToString());
-            p.Gender = dr["gender"].ToString();
-            p.Remarks = dr["remarks"].ToString();
+            p.Id = int.Parse(dr["Id"].ToString());
+            p.DisplayName = dr["DisplayName"].ToString();
+            p.FirstNameA = dr["FirstNameA"].ToString();
+            p.FirstNameH = dr["FirstNameH"].ToString();
+            p.LastNameH = dr["LastNameH"].ToString();
+            p.LastNameA = dr["LastNameA"].ToString();
+            p.CellPhone = dr["CellPhone"].ToString();
+            p.CellPhone1 = dr["CellPhone2"].ToString();
+            p.HomePhone = dr["HomePhone"].ToString();
+            p.City = dr["CityCityName"].ToString();
+            p.LivingArea = dr["LivingArea"].ToString();
+            //p.Status = dr["statusPatient"].ToString();
+            p.IsActive = Convert.ToBoolean(dr["IsACtive"].ToString());
+            //p.Addition = dr["addition"].ToString();
+            p.BirthDate = dr["BirthDate"].ToString();
+            p.History = dr["History"].ToString();
+            p.Department = dr["Department"].ToString();
+            p.Barrier = new Location(dr["Barrier"].ToString());
+            p.Hospital = new Location(dr["Hospital"].ToString());
+            p.Gender = dr["Gender"].ToString();
+            p.Remarks = dr["Remarks"].ToString();
 
         }
         #endregion
@@ -475,10 +480,10 @@ public class Patient
         return p;
     }
 
-    public void deactivatePatient(string active)// change name to SetStatus
+    public void SetPatientStatus(string active)
     {
         DbService db = new DbService();
-        db.ExecuteQuery("UPDATE Patient SET statusPatient='" + active + "' WHERE displayName='" + DisplayName + "'");
+        db.ExecuteQuery("UPDATE Patient SET IsActive='" + active + "' WHERE DisplayName='" + DisplayName + "'");
     }
 
     public void setPatient(string func)
@@ -523,18 +528,18 @@ public class Patient
         {
             Escorted e = new Escorted();
             e.Pat = new Patient(dr["PatientName"].ToString()); //new Patient(dr["patient"].ToString());
-            e.DisplayName = dr["displayName"].ToString();
-            e.FirstNameA = dr["firstNameA"].ToString();
-            e.FirstNameH = dr["firstNameH"].ToString();
-            e.LastNameH = dr["lastNameH"].ToString();
-            e.LastNameA = dr["lastNameA"].ToString();
-            e.CellPhone = dr["cellPhone"].ToString();
-            e.CellPhone2 = dr["cellPhone2"].ToString();
-            e.HomePhone = dr["homePhone"].ToString();
-            e.Status = dr["statusEscorted"].ToString();
+            e.DisplayName = dr["DisplayName"].ToString();
+            e.FirstNameA = dr["FirstNameA"].ToString();
+            e.FirstNameH = dr["FirstNameH"].ToString();
+            e.LastNameH = dr["LastNameH"].ToString();
+            e.LastNameA = dr["LastNameA"].ToString();
+            e.CellPhone = dr["CellPhone"].ToString();
+            e.CellPhone2 = dr["CellPhone2"].ToString();
+            e.HomePhone = dr["HomePhone"].ToString();
+            e.IsActive = Convert.ToBoolean( dr["IsActive"].ToString());
             e.ContactType = dr["contactType"].ToString();
-            e.Gender = dr["gender"].ToString();
-            e.Addrees= dr["city"].ToString();
+            e.Gender = dr["Gender"].ToString();
+            e.Addrees= dr["City"].ToString();
 
             list.Add(e);
         }
