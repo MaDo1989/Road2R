@@ -92,7 +92,7 @@ public class User
     public bool CheckLoginDetails()
     {
         #region DB functions
-        string query = "select * from Users where UserName ='" + userName + "'";
+        string query = "select * from Volunteer where UserName ='" + userName + "'";
 
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
@@ -102,7 +102,7 @@ public class User
         if (dt != null && dt.Rows.Count > 0)
         {
             DataRow dr = dt.Rows[0];
-            if (dr["UserPassword"].ToString() == Password)
+            if (dr["Password"].ToString() == Password)
             {
                 userInDB = true;
             }

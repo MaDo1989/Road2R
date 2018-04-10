@@ -146,13 +146,18 @@
 
         function generateStatus(escorted) {
             var $select = $("#status");
-            if (escorted.Status != "") {
-                $('<option>', { value: escorted.Status, text: escorted.Status }).appendTo($select);
-            }
-            $('<option>', { value: "", text: "בחר " }).appendTo($select);
+            //if (escorted.IsActive != "") {
+                if (escorted.IsActive) 
+                   // $('<option>', { value: escorted.IsActive, text: "פעיל" }).appendTo($select);
+                    $("#status").val = "פעיל";
+                else
+                    //$('<option>', { value: escorted.IsActive, text: "לא פעיל" }).appendTo($select);
+                    $("#status").val = "לא פעיל";
+           // }
+            //$('<option>', { value: "", text: "בחר " }).appendTo($select);
 
-            $('<option>', { value: "פעיל", text: "פעיל " }).appendTo($select);
-            $('<option>', { value: "לא פעיל", text: "לא פעיל " }).appendTo($select);
+            //$('<option>', { value: "פעיל", text: "פעיל " }).appendTo($select);
+            //$('<option>', { value: "לא פעיל", text: "לא פעיל " }).appendTo($select);
         }
 
         function generateStatus1() {
@@ -233,7 +238,7 @@
                     var patName = JSON.parse(GENERAL.ESCORTED.getEscortedList()).patientName;
                     GENERAL.ESCORTED.setEscortedList(JSON.stringify(escorted));
                     //generateContactType(escorted)
-                    generateStatus(escorted)
+                    //generateStatus(escorted)
                     generateGender(escorted)
                     $("#patientDisplayName").val(patName);
                     $("#escortedName").val(escorted.DisplayName);
@@ -245,7 +250,10 @@
                     $("#phone2").val(escorted.CellPhone2);
                     $("#HomePhone").val(escorted.HomePhone);
                     $("#city").val(escorted.Addrees);
-                    $("#selectstatus").val(escorted.Status);
+                    if (escorted.IsActive)
+                        $("#selectstatus option[value=1]").attr('selected',true);
+                    else 
+                        $("#selectstatus option[value=0]").attr('selected', true);
                     $("#selectgender").val(escorted.Gender);
                     $("#selectcontactType").val(escorted.ContactType);
 
@@ -550,7 +558,10 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-3 control-label">סטטוס מלווה</label>
                                                     <div class="col-sm-6" id="selectstatus">
-                                                        <select id="status" name="status" class="form-control"></select>
+                                                        <select id="status" name="status" class="form-control">
+                                                            <option value="1">פעיל</option>
+                                                            <option value="0">לא פעיל</option>
+                                                        </select>
                                                     </div>
                                                 </div>
                                             </div>

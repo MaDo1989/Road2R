@@ -51,6 +51,15 @@
         }
     },
 
+    RIDEPAT: {
+        getRidePatList: function () {
+            return localStorage.ridePatList;
+        },
+        setRidePatList: function (ridePatList) {
+            localStorage.ridePatList = ridePatList;
+        }
+    },
+
     PATIENTS: {
         getPatientsList: function () {
             return localStorage.patientsList;

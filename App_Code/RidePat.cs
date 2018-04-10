@@ -15,8 +15,8 @@ public class RidePat
     //Escorted escorted1;//נלקח מהמלווים של החולה
     //Escorted escorted2;//נלקח מהמלווים של החולה
     //Escorted escorted3;//נלקח מהמלווים של החולה
-    Destination origin;//מקום התחלה
-    Destination destination;//מקום סיום
+    Location origin;//מקום התחלה
+    Location destination;//מקום סיום
     //string startArea;
     //string finishArea;
     string day;// יום
@@ -107,7 +107,7 @@ public class RidePat
         }
     }
 
-    public Destination Origin
+    public Location Origin
     {
         get
         {
@@ -120,7 +120,7 @@ public class RidePat
         }
     }
 
-    public Destination Destination
+    public Location Destination
     {
         get
         {
@@ -184,6 +184,11 @@ public class RidePat
             addition = value;
         }
     }
+
+    //public List<RidePat> GetAllRidePats()
+    //{
+      
+    //}
 
     public string RideType
     {
@@ -309,10 +314,10 @@ public class RidePat
                 rp.pat.EscortedList.Add(e);
             }
 
-            Destination origin = new Destination();
+            Location origin = new Location();
             origin.Name = dr["RidePatOrigin"].ToString();
             rp.Origin = origin;
-            Destination dest = new Destination();
+            Location dest = new Location();
             dest.Name = dr["RidePatDestination"].ToString();
             rp.Destination = dest;
             rp.Area = dr["RidePatArea"].ToString();
@@ -447,9 +452,9 @@ public class RidePat
         foreach (DataRow row in ds.Tables[0].Rows)//Origin and Destination are the same for RidePat and Ride.
         { 
             RidePatNum = ridePatId;
-            Origin = new Destination();
+            Origin = new Location();
             Origin.Name = row["Origin"].ToString();
-            Destination = new Destination();
+            Destination = new Location();
             Destination.Name = row["Destination"].ToString();
             //row["dateRide"].ToString("MM-dd-yyyy"))
             Date = Convert.ToDateTime(row["PickupTime"].ToString());

@@ -26,7 +26,10 @@ public class Escorted
     string gender;
     int id;
 
-        public int Id { get; set; }
+
+    public bool IsActive { get; set; }
+
+    public int Id { get; set; }
 
     public Patient Pat
     {
@@ -279,27 +282,28 @@ public class Escorted
     {
         #region DB functions
         displayName = displayName.Replace("'", "''");
-        string query = "select * from Escorted where displayName ='" + displayName + "'"; //id,patient,displayName, firstNameH,firstNameA, lastNameH,lastNameA, cellPhone,cellPhone2,homePhone,city,statusEscorted, contactType,gender
+        string query = "select * from Escorted where DisplayName ='" + displayName + "'"; //id,patient,displayName, firstNameH,firstNameA, lastNameH,lastNameA, cellPhone,cellPhone2,homePhone,city,statusEscorted, contactType,gender
         Escorted p = new Escorted();
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
 
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
-            p.Id = int.Parse(dr["id"].ToString());
+            p.Id = int.Parse(dr["Id"].ToString());
             //p.Pat = new Patient(dr["patient"].ToString());
-            p.DisplayName = dr["displayName"].ToString();
-            p.FirstNameA = dr["firstNameA"].ToString();
-            p.FirstNameH = dr["firstNameH"].ToString();
-            p.LastNameH = dr["lastNameH"].ToString();
-            p.LastNameA = dr["lastNameA"].ToString();
-            p.CellPhone = dr["cellPhone"].ToString();
-            p.CellPhone2 = dr["cellPhone2"].ToString();
-            p.HomePhone = dr["homePhone"].ToString();
-            p.Addrees = dr["city"].ToString();
-            p.Status = dr["statusEscorted"].ToString();
-            p.ContactType = dr["contactType"].ToString();
-            p.Gender = dr["gender"].ToString();
+            p.DisplayName = dr["DisplayName"].ToString();
+            p.FirstNameA = dr["FirstNameA"].ToString();
+            p.FirstNameH = dr["FirstNameH"].ToString();
+            p.LastNameH = dr["LastNameH"].ToString();
+            p.LastNameA = dr["LastNameA"].ToString();
+            p.CellPhone = dr["CellPhone"].ToString();
+            p.CellPhone2 = dr["CellPhone2"].ToString();
+            p.HomePhone = dr["HomePhone"].ToString();
+            p.Addrees = dr["City"].ToString();
+            //p.Status = dr["statusEscorted"].ToString();
+            p.IsActive = Convert.ToBoolean(dr["IsActive"].ToString());
+           // p.ContactType = dr["contactType"].ToString();
+            p.Gender = dr["Gender"].ToString();
 
         }
         #endregion
