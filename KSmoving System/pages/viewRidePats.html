@@ -56,6 +56,8 @@
         function refreshTable() {
             checkCookie();
             var active = $("#activeCustomers").prop('checked');
+            var today = $("#TodaysRidePats").prop('checked');
+            var unassigned = $("#UnassignedRidePats").prop('checked');
 
             t.clear().draw();
 
@@ -70,6 +72,38 @@
                     GENERAL.RIDEPAT.setRidePatList(arr_rides);
 
                     for (i in arr_rides) {
+
+                        //Change date format
+                        var temp = arr_rides[i].Date.substring(arr_rides[i].Date.indexOf("(") + 1);
+                        temp = temp.substring(0, temp.indexOf(")"));
+                        var date = new Date(parseInt(temp)).toLocaleString();
+
+                        if (unassigned) {
+                            $("#activeCustomers").prop('checked',false);
+                            if (arr_rides[i].Status != "ממתינה לשיבוץ") continue;
+                        }
+                        
+                        if (active) {
+                           // $("#UnassignedRidePats").prop('checked',false);
+                            if (arr_rides[i].Status == "בוטלה" || arr_rides[i].Status == "הסתיימה") continue;
+                        }
+
+                        if (today) {
+                            // Get the current date at midnight.  
+                            var now = new Date();
+                            var todayAtMidn = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+                            // Set specificDate to a specified date at midnight.  
+                            var specificDateTemp = new Date(new Date(parseInt(temp)));
+                            var specificDate = new Date(specificDateTemp.getFullYear(), specificDateTemp.getMonth(), specificDateTemp.getDate());
+
+                            // Compare the two dates by comparing the millisecond  
+                            // representations.  
+                            if (todayAtMidn.getTime() != specificDate.getTime()) continue;
+                        }
+
+                        
+                       
                         var btnStr = ""
                         var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='פרטים נוספים'><i class='fa fa-wpforms'></i></button>";
                         var editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='ערוך'><i class='ti-pencil'></i></button>";
@@ -93,10 +127,8 @@
                             var deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחק'><i class='fa fa-remove' ></i></button>";
                             btnStr += " " + deleteBtn;
                         }
-                        var temp = arr_rides[i].Date.substring(arr_rides[i].Date.indexOf("(") + 1);
-                        temp = temp.substring(0, temp.indexOf(")"));
-                        var date = new Date(parseInt(temp)).toLocaleString();
-                         t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date, arr_rides[i].Status, btnStr]).draw(false);
+                        
+                        t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date, arr_rides[i].Status, btnStr]).draw(false);
                     }
 
                     t.columns([3]).order('asc').draw();
@@ -318,14 +350,22 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-sm-3 checkbox checkbox-primary text-left">
+                                    <div class="col-sm-4 checkbox checkbox-primary text-left">
                                         <input id="activeCustomers" type="checkbox" onchange="refreshTable()" checked>
                                         <label for="activeCustomers">
-                                            הסעות חולים שלא בוצעו
+                                            דרישות פעילות בלבד
+                                        </label>
+                                        <input id="TodaysRidePats" type="checkbox" onchange="refreshTable()">
+                                        <label for="TodaysRidePats">
+                                            דרישות של היום בלבד
+                                        </label>
+                                        <input id="UnassignedRidePats" type="checkbox" onchange="refreshTable()">
+                                        <label for="UnassignedRidePats">
+                                            דרישות ממתינות לשיבוץ בלבד
                                         </label>
                                     </div>
 
-                                    <div class="col-sm-9 text-right ">
+                                    <div class="col-sm-8 text-right ">
                                         <button type="button" id="createCustomer" onclick="newRidePatForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>חדש</button>
                                     </div>
                                 </div>
@@ -340,6 +380,7 @@
                                             <th>סטטוס הנהגים בנסיעה</th>
                                             <th>ערוך דרישה</th>
                                         </tr>
+
                                     </thead>
                                     <tbody></tbody>
                                 </table>
