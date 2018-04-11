@@ -96,7 +96,7 @@
                         var temp = arr_rides[i].Date.substring(arr_rides[i].Date.indexOf("(") + 1);
                         temp = temp.substring(0, temp.indexOf(")"));
                         var date = new Date(parseInt(temp)).toLocaleString();
-                         t.row.add(arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date, arr_rides[i].Status, btnStr]).draw(false);
+                         t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date, arr_rides[i].Status, btnStr]).draw(false);
                     }
 
                     t.columns([3]).order('asc').draw();
