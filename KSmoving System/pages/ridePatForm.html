@@ -81,7 +81,7 @@
                         $('<option>', { value: arr_pat[i].DisplayName, text: arr_pat[i].DisplayName }).appendTo($select);
                     }
                 },
-                error: function (err) { alert("Error"); }
+                error: function (err) { alert("Error in generatePat"); }
             });
         }
 
@@ -105,7 +105,7 @@
                         $('<option>', { value: arr_pat[i].DisplayName, text: arr_pat[i].DisplayName }).appendTo($select);
                     }
                 },
-                error: function (err) { alert("Error"); }
+                error: function (err) { alert("Error in generatePat1"); }
             });
         }
         function generateCoor() {
@@ -124,7 +124,7 @@
                         $('<option>', { value: arr_coor[i].DisplayName, text: arr_coor[i].DisplayName }).appendTo($select);
                     }
                 },
-                error: function (err) { alert("Error"); }
+                error: function (err) { alert("Error generateCoor"); }
             });
         }
 
@@ -147,7 +147,7 @@
                         $('<option>', { value: arr_coor[i].DisplayName, text: arr_coor[i].DisplayName }).appendTo($select);
                     }
                 },
-                error: function (err) { alert("Error"); }
+                error: function (err) { alert("Error in generateCoor1"); }
             });
         }
 
@@ -174,7 +174,7 @@
                         $('<option>', { value: arr_esc[i].DisplayName, text: arr_esc[i].DisplayName }).appendTo($select3);
                     }
                 },
-                error: function (err) { alert("Error"); }
+                error: function (err) { alert("Error in generateEsc"); }
             });
         }
 
@@ -210,7 +210,7 @@
                         $('<option>', { value: arr_esc[i].DisplayName, text: arr_esc[i].DisplayName }).appendTo($select3);
                     }
                 },
-                error: function (err) { alert("Error"); }
+                error: function (err) { alert("Error in generateEsc1"); }
             });
         }
         function generateStatus(ridePat) {
@@ -282,7 +282,7 @@
 
                     }
                 },
-                error: function (err) { alert("Error"); }
+                error: function (err) { alert("Error in generateDestination"); }
             });
         }
 
@@ -315,7 +315,7 @@
                       //  $('<option>', { value: arr_drivers[i].Name, text: arr_drivers[i].Name }).appendTo($select2);
                     }
                 },
-                error: function (err) { alert("Error"); }
+                error: function (err) { alert("Error in generateDestination1"); }
             });
         }
 
@@ -363,7 +363,7 @@
                         $('<option>', { value: arr_hours[i].Hour, text: arr_hours[i].Hour }).appendTo($select);
                     }
                 },
-                error: function (err) { alert("Error"); }
+                error: function (err) { alert("Error in generateHour"); }
             });
         }
         function generateHour1(ridePat) {
@@ -386,7 +386,7 @@
                         $('<option>', { value: arr_hours[i].Hour, text: arr_hours[i].Hour }).appendTo($select);
                     }
                 },
-                error: function (err) { alert("Error"); }
+                error: function (err) { alert("Error in generateHour1"); }
             });
         }
 
@@ -549,7 +549,7 @@
 
 
                 },
-                error: function (err) { alert("Error"); }
+                error: function (err) { alert("Error in uploadData"); }
             });
         }
 
