@@ -76,10 +76,14 @@
                 data: JSON.stringify({ active: true }),
                 success: function (data) {
                     var arr_pat = JSON.parse(data.d);
-                    $('<option>', { value: "", text: "בחר" }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
+                    //$('<option>', { value: "", text: "בחר" }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
                     for (i in arr_pat) {
                         $('<option>', { value: arr_pat[i].DisplayName, text: arr_pat[i].DisplayName }).appendTo($select);
                     }
+
+
+                   
+
                 },
                 error: function (err) { alert("Error in generatePat"); }
             });
@@ -97,13 +101,15 @@
                 data: JSON.stringify({ active: true }),
                 success: function (data) {
                     var arr_pat = JSON.parse(data.d);
-                    if (ridePat.Pat.DisplayName != "") {
-                        $('<option>', { value: ridePat.Pat.DisplayName, text: ridePat.Pat.DisplayName }).appendTo($select);
-                    }
+                    //if (ridePat.Pat.DisplayName != "") {
+                    //  //  $('<option>', { value: ridePat.Pat.DisplayName, text: ridePat.Pat.DisplayName }).appendTo($select);
+                       
+                    //}
                     $('<option>', { value: "", text: "בחר" }).appendTo($select);
                     for (i in arr_pat) {
                         $('<option>', { value: arr_pat[i].DisplayName, text: arr_pat[i].DisplayName }).appendTo($select);
                     }
+                     $("#pat option[value='" + ridePat.Pat.DisplayName+"']").prop('selected', true);
                 },
                 error: function (err) { alert("Error in generatePat1"); }
             });
@@ -335,7 +341,7 @@
 
         function generateday1() {
             var $selectDay1 = $("#day");
-
+            
             $('<option>', { value: "", text: "בחר " }).appendTo($selectDay1);
             $('<option>', { value: "ראשון", text: "ראשון " }).appendTo($selectDay1);
             $('<option>', { value: "שני", text: "שני " }).appendTo($selectDay1);
@@ -489,7 +495,7 @@
                     generateStatus1();
                     generateDestination();
                     generateAdd();
-                    generateArea1();
+                  //  generateArea1();
                     generateday1();
                     generateQuantity1()
                     generateHour();
@@ -513,32 +519,46 @@
                     //generatePreferDestination(ridePat);
                     //generatePreferDayAndHour(ridePat);
                     //generateStatus(ridePat);
-                    //generateGender(ridePat);
-                    generateAdd1(ridePat)
-                    generatePat1(ridePat)
-                    generateCoor1(ridePat)
+                   // generateGender(ridePat);
+                    //generateAdd1(ridePat)
+                   // generatePat1(ridePat)
+                    //generateCoor1(ridePat)
                    // generateEsc1(ridePat)
-                    generateQuantity(ridePat)
-                    generateHour1(ridePat)
-                    generateStatus(ridePat)
-                    generateDestination1(ridePat)
-                    generateRideType(ridePat)
-                    generateArea(ridePat)
-                    generateday(ridePat)
+                    //generateQuantity(ridePat)
+                    //generateHour1(ridePat)
+                    //generateStatus(ridePat)
+                    //generateDestination1(ridePat)
+                    //generateRideType(ridePat)
+                  //  generateArea(ridePat)
+                    //generateday(ridePat)
+                    var temp = ridePat.Date.substring(ridePat.Date.indexOf("(")+1, ridePat.Date.indexOf(")"))
+                    var date = new Date(parseInt(temp));
+                    day = date.getDay(date);
+                    var dayArr = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+                    var dayName = dayArr[day];
+                    var hours = date.getHours(date);
+                    if (hours < 10) hours = "0" + hours;
+                    var minutes = date.getMinutes(date);
+                    if (minutes < 10) minutes = minutes + "0";
+                    var time = hours + ":" + minutes;
+                    
 
-                    $("#ridePatNum").attr('disabled', 'disabled');
                     $("#ridePatNum").val(ridePat.RidePatNum);
-                    $("#selectPat").val(ridePat.Pat.DisplayName);
-                    $("#selectStartPlace").val(ridePat.StartPlace.Name);
-                    $("#selectTarget").val(ridePat.Target.Name);
-                    $("#selectday1").val(ridePat.Day);
-                    $("#dateRide").val(ridePat.Date);
-                    $("#selecthour").val(ridePat.LeavingHour);
-                    $("#selectquantity").val(ridePat.Quantity);
-                    $("#selectaddition").val(ridePat.Pat.Addition);
-                    $("#selectrideType").val(ridePat.RideType);
-                    $("#selectCoordinator").val(ridePat.Coordinator.DisplayName);
+                    $("#pat").val(ridePat.Pat.DisplayName);
+                    $("#selectStartPlace").val(ridePat.Origin.Name);
+                    $("#selectTarget").val(ridePat.Destination.Name);
+                    $("#selectday1").val(dayName);
+                    $("#dateRide").val(date.toLocaleDateString());
+                    $("#hour").val(time);
+
+                 
+                    //$("#selectaddition").val(ridePat.Pat.Addition);
+
+                 
+                    $("#coordinator").val(ridePat.Coordinator.DisplayName);
+
                     $("#remark").val(ridePat.Remark);
+
                     $("#selectstatusRidePat").val(ridePat.Status);
                     //$("#selectEscorted1").val(ridePat.Escorted1.DisplayName);
                     //$("#selectEscorted2").val(ridePat.Escorted2.DisplayName);
@@ -688,7 +708,7 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-3 control-label">חולה</label>
                                                     <div class="col-sm-6" id="selectPat">
-                                                        <select id="pat" name="pat" class="form-control"></select>
+                                                        <input type="text" id="pat" name="pat" class="form-control"></input>
                                                     </div>
                                                 </div>
                                             </div>
@@ -760,25 +780,26 @@
                                             <div class="form-group">
                                                 <label class="col-sm-3 control-label">שעת הסעה</label>
                                                 <div class="col-sm-6" id="selecthour">
-                                                    <select id="hour" name="hour" class="form-control"></select>
+                                                    <!--<select id="hour" name="hour" class="form-control"></select>-->
+                                                    <input type="text" id="hour" name="hour" class="form-control"/>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="row m-l-10 m-r-10">
-                                        <div class="col-sm-6">
+                                        <!--<div class="col-sm-6">
                                             <div class="form-group">
                                                 <label class="col-sm-3 control-label">אזור</label>
                                                 <div class="col-sm-6" id="selectarea">
                                                     <select id="area" name="area" class="form-control"></select>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div>-->
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label class="col-sm-3 control-label">רכז</label>
                                                 <div class="col-sm-6" id="selectCoordinator">
-                                                    <select id="coordinator" name="coordinator" class="form-control"></select>
+                                                    <input type="text" id="coordinator" name="coordinator" class="form-control"></input>
                                                 </div>
                                             </div>
                                         </div>

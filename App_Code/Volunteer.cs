@@ -71,6 +71,24 @@ public class Volunteer
         }
     }
 
+    internal List<Volunteer> getCoorList()
+    {
+        string query = "select * from VolunteerTypeView where VolunTypeType='רכז' and IsActive='true'";
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        List<Volunteer> vl = new List<Volunteer>();
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+            Volunteer v = new Volunteer();
+            v.DisplayName = dr["DisplayName"].ToString();
+            v.CellPhone = dr["CellPhone"].ToString();
+            v.TypeVol = "רכז";
+            vl.Add(v);
+        }
+        return vl;
+
+    }
+
     public string FirstNameA
     {
         get

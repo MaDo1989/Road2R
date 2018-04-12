@@ -213,7 +213,7 @@ public class Location
     public List<Location> getDestinationsListForView(bool active)
     {
         #region DB functions
-        string query = "select * from Destination ";
+        string query = "select * from Location ";
         query += "order by name";
 
         List<Location> list = new List<Location>();
