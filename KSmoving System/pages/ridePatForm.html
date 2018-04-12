@@ -696,7 +696,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">מקום התחלה</label>
+                                                    <label class="col-sm-3 control-label">מוצא</label>
                                                     <div class="col-sm-6" id="selectStartPlace">
                                                         <select id="startPlace" name="startPlace" class="form-control"></select>
                                                     </div>
@@ -704,7 +704,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">מקום סיום</label>
+                                                    <label class="col-sm-3 control-label">יעד</label>
                                                     <div class="col-sm-6" id="selectTarget">
                                                         <select id="target" name="target" class="form-control"></select>
                                                     </div>
@@ -712,14 +712,14 @@
                                             </div>
                                         </div>
                                         <div class="row m-l-10 m-r-10">
-                                            <div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label class="col-sm-3 control-label">כמות נוסעים</label>
-                                                    <div class="col-sm-6" id="selectquantity">
-                                                        <select id="quantity" name="quantity" class="form-control"></select>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <!--<div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">כמות נוסעים</label>
+                                <div class="col-sm-6" id="selectquantity">
+                                    <select id="quantity" name="quantity" class="form-control"></select>
+                                </div>
+                            </div>
+                        </div>-->
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label class="col-sm-3 control-label">כלי עזר</label>
@@ -730,87 +730,88 @@
                                             </div>
                                         </div>
                                         <div class="row m-l-10 m-r-10">
-                                            <div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label class="col-sm-3 control-label">סוג הסעה</label>
-                                                    <div class="col-sm-6" id="selectrideType">
-                                                        <select id="rideType" name="rideType" class="form-control"></select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label class="col-sm-3 control-label">תאריך הסעה </label>
-                                                    <div class="col-sm-6">
-                                                        <input type="text" class="form-control" placeholder="dd/mm/yyyy" id="dateRide" name="dateRide">
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <!--<div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">סוג הסעה</label>
+                                <div class="col-sm-6" id="selectrideType">
+                                    <select id="rideType" name="rideType" class="form-control"></select>
+                                </div>
+                            </div>-->
                                         </div>
-                                        <div class="row m-l-10 m-r-10">
-                                            <div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label class="col-sm-3 control-label">יום </label>
-                                                    <div class="col-sm-6" id="selectday1">
-                                                        <select id="day" name="day" class="form-control"></select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label class="col-sm-3 control-label">שעת הסעה</label>
-                                                    <div class="col-sm-6" id="selecthour">
-                                                        <select id="hour" name="hour" class="form-control"></select>
-                                                    </div>
-                                                </div>
-                                            </div>                              
-                                        </div>
-                                        <div class="row m-l-10 m-r-10">
-                                            <div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label class="col-sm-3 control-label">אזור</label>
-                                                    <div class="col-sm-6" id="selectarea">
-                                                        <select id="area" name="area" class="form-control"></select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label class="col-sm-3 control-label">רכז</label>
-                                                    <div class="col-sm-6" id="selectCoordinator">
-                                                        <select id="coordinator" name="coordinator" class="form-control"></select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                            <div class="row m-l-10 m-r-10">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">תאריך הסעה </label>
                                                 <div class="col-sm-6">
-                                                    <div class="form-group">
-                                                        <label class="col-sm-3 control-label">סטטוס</label>
-                                                        <div class="col-sm-6" id="selectstatusRidePat">
-                                                            <select id="statusRidePat" name="statusRidePat" class="form-control"></select>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-6">
-                                                    <div class="form-group">
-                                                        <label class="col-sm-3 control-label">הערות</label>
-                                                        <div class="col-sm-6">
-                                                            <input id="remark" name="remark" type="text" class="form-control">
-                                                        </div>
-                                                    </div>
+                                                    <input type="text" class="form-control" placeholder="dd/mm/yyyy" id="dateRide" name="dateRide">
                                                 </div>
                                             </div>
+                                        </div>
+                                    </div>
+                                    <div class="row m-l-10 m-r-10">
+                                        <!--<div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">יום </label>
+                            <div class="col-sm-6" id="selectday1">
+                                <select id="day" name="day" class="form-control"></select>
+                            </div>
+                        </div>
+                    </div>-->
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">שעת הסעה</label>
+                                                <div class="col-sm-6" id="selecthour">
+                                                    <select id="hour" name="hour" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row m-l-10 m-r-10">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">אזור</label>
+                                                <div class="col-sm-6" id="selectarea">
+                                                    <select id="area" name="area" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">רכז</label>
+                                                <div class="col-sm-6" id="selectCoordinator">
+                                                    <select id="coordinator" name="coordinator" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row m-l-10 m-r-10">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">סטטוס</label>
+                                                <div class="col-sm-6" id="selectstatusRidePat">
+                                                    <select id="statusRidePat" name="statusRidePat" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">הערות</label>
+                                                <div class="col-sm-6">
+                                                    <input id="remark" name="remark" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div>
-            <hr />
-            <div class="text-right m-t-30 row">
-                <button type="submit" id="saveCustomer" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-save m-r-5"></i>שמור</button>
-            </div>
-        </div>
+                            </div>
+                            <div>
+                                <hr />
+                                <div class="text-right m-t-30 row">
+                                    <button type="submit" id="saveCustomer" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-save m-r-5"></i>שמור</button>
+                                </div>
                             </div>
                         </form>
+                            </div>
+                      
                     </div>
                 </div>
                 <!-- end container -->

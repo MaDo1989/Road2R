@@ -185,9 +185,49 @@ public class RidePat
         }
     }
 
+    public RidePat GetRidePat(int ridePatNum)
+    {
+        string query = "select * from RidePatView where RidePatNum=" + ridePatNum;
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        RidePat rp = new RidePat();
+        rp.pat = new Patient();
+        DataRow dr = ds.Tables[0].Rows[0];
+
+        rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
+
+        rp.pat.DisplayName = dr["Patient"].ToString();
+        rp.pat.EscortedList = new List<Escorted>();
+        Location origin = new Location();
+        origin.Name = dr["RidePatOrigin"].ToString();
+        rp.Origin = origin;
+        Location dest = new Location();
+        dest.Name = dr["RidePatDestination"].ToString();
+        rp.Destination = dest;
+        rp.Area = dr["RidePatArea"].ToString();
+        rp.Shift = dr["RidePatShift"].ToString();
+        rp.Date = Convert.ToDateTime(dr["RidePatPickupTime"].ToString());
+        rp.Status = dr["RidePatStatus"].ToString();
+
+        foreach (DataRow r in ds.Tables[0].Rows)
+        {
+            if (r["Escort"].ToString() != "")
+            {
+                Escorted e = new Escorted();
+                e.DisplayName = r["Escort"].ToString();
+                rp.pat.EscortedList.Add(e);
+            }
+        }
+
+
+
+        return rp;
+
+    }
+
     //public List<RidePat> GetAllRidePats()
     //{
-      
+
     //}
 
     public string RideType
@@ -379,7 +419,7 @@ public class RidePat
     public int LeaveRidePat(int ridePatId)
     {
         int res = -1;
-        string query = "update RidePat set RideId=null where RidePatNum="+ridePatId;
+        string query = "update RidePat set RideId=null where RidePatNum=" + ridePatId;
         DbService db = new DbService();
         res = db.ExecuteQuery(query);
         return res;
@@ -450,7 +490,7 @@ public class RidePat
         DataSet ds = db.GetDataSetByQuery(query);
         int res = -1;
         foreach (DataRow row in ds.Tables[0].Rows)//Origin and Destination are the same for RidePat and Ride.
-        { 
+        {
             RidePatNum = ridePatId;
             Origin = new Location();
             Origin.Name = row["Origin"].ToString();
@@ -459,18 +499,18 @@ public class RidePat
             //row["dateRide"].ToString("MM-dd-yyyy"))
             Date = Convert.ToDateTime(row["PickupTime"].ToString());
             Day = Date.DayOfWeek.ToString();
-           //LeavingHour = Date.ToShortTimeString();
+            //LeavingHour = Date.ToShortTimeString();
         }
         DbService db2 = new DbService();
-        int RideId=-1;
+        int RideId = -1;
         if (primary)
         {
             Origin.Name = Origin.Name.Replace("'", "''");
             Destination.Name = Destination.Name.Replace("'", "''");
             query = "set dateformat dmy; insert into Ride (Origin, Destination, Date, MainDriver) values ('" + Origin.Name + "','" + Destination.Name + "','" + Date + "', " + driverId + ") SELECT SCOPE_IDENTITY()";
             RideId = int.Parse(db2.GetObjectScalarByQuery(query).ToString()); //Insert and get the new RideId
-            
-            
+
+
 
             DbService db3 = new DbService();
             query = "update RidePat set RideId=" + RideId + " where ridePatNum=" + RidePatNum;

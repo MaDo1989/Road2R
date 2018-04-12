@@ -122,6 +122,16 @@ public class WebService : System.Web.Services.WebService
         return j.Serialize(r);
     }
 
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetRidePat(int RidePatNum)
+    {
+        RidePat rp = new RidePat();
+            rp = rp.GetRidePat(RidePatNum);
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        return j.Serialize(rp);
+    }
+
 
 
 

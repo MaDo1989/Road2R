@@ -105,8 +105,8 @@
                         
                        
                         var btnStr = ""
-                        var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='פרטים נוספים'><i class='fa fa-wpforms'></i></button>";
-                        var editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='ערוך'><i class='ti-pencil'></i></button>";
+                        var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' name='" + arr_rides[i].RidePatNum+"' title='פרטים נוספים'><i class='fa fa-wpforms'></i></button>";
+                        var editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' name='" + arr_rides[i].RidePatNum +"' title='ערוך'><i class='ti-pencil'></i></button>";
 
                         btnStr += showBtn + " " + editBtn;
 
@@ -134,15 +134,15 @@
                     t.columns([3]).order('asc').draw();
 
                     $('#datatable-buttons tbody').on('click', '#edit', function () {
-                        var data = t.row($(this).parents('tr')).data();
-                        arr_details = { displayName: data[0], func: "edit" };
+                        //var data = t.row($(this).parents('tr')).data();
+                        arr_details = { displayName: this.name, func: "edit" };
                         GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
                         location.href = "ridePatForm.html";
                     });
 
                     $('#datatable-buttons tbody').on('click', '#show', function () {
-                        var data = t.row($(this).parents('tr')).data();
-                        arr_details = { displayName: data[0], func: "show" };
+                       // var data = t.row($(this).parents('tr')).data();
+                        arr_details = { displayName: this.name, func: "show" };
                         GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
                         location.href = "ridePatForm.html";
                     });
