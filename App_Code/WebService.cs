@@ -39,6 +39,15 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod]
+    public string getCoorList()
+    {
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        Volunteer v = new Volunteer();
+        List<Volunteer> vl = v.getCoorList();
+        return j.Serialize(vl);
+    }
+
+    [WebMethod]
     public string getPatientEscorted(string displayName)
     {
         JavaScriptSerializer j = new JavaScriptSerializer();
@@ -124,10 +133,10 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetRidePat(int RidePatNum)
+    public string GetRidePat(int ridePatNum)
     {
         RidePat rp = new RidePat();
-            rp = rp.GetRidePat(RidePatNum);
+            rp = rp.GetRidePat(ridePatNum);
         JavaScriptSerializer j = new JavaScriptSerializer();
         return j.Serialize(rp);
     }

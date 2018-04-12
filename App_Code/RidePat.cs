@@ -208,7 +208,8 @@ public class RidePat
         rp.Shift = dr["RidePatShift"].ToString();
         rp.Date = Convert.ToDateTime(dr["RidePatPickupTime"].ToString());
         rp.Status = dr["RidePatStatus"].ToString();
-
+        rp.Coordinator = new Volunteer();
+        rp.Coordinator.DisplayName = dr["Coordinator"].ToString();
         foreach (DataRow r in ds.Tables[0].Rows)
         {
             if (r["Escort"].ToString() != "")
