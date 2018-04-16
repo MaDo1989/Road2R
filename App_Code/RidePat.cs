@@ -434,12 +434,12 @@ public class RidePat
     public int AssignRideToRidePat(int ridePatId, int userId)
     {
         int RideId = -1;
-        bool primary = false;
+       
         string query = "select RideNum,RidePatOrigin,RidePatDestination,RidePatPickupTime,RidePatStatus,MainDriver,secondaryDriver from RidePatView where RidePatNum=" + ridePatId;
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         DataRow dr = ds.Tables[0].Rows[0];
-        // if (dr["Status"].ToString() != "ממתינה לשיבוץ") return -1;
+       
         Origin = new Location();
         Origin.Name = dr["RidePatOrigin"].ToString();
         Destination = new Location();
