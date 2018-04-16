@@ -417,12 +417,27 @@ public class RidePat
         #endregion
     }
 
-    public int AssignRideToRidePat(int ridePatId, int userId)
+    public int CombineRideRidePat(int rideId, int ridePatId)
     {
-        string query = "select Origin,Destination,PickupTime from RidePat where RidePatNum=" +ridePatId;
+        string query = "select Status from RidePat where RidePatNum=" + ridePatId;
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         DataRow dr = ds.Tables[0].Rows[0];
+        if (dr["Status"].ToString() != "ממתינה לשיבוץ") return -1;
+
+        string query2 = "update RidePat set RideId="+rideId+" where RidePatNum="+ridePatId;
+        DbService db2 = new DbService();
+        int res = db2.ExecuteQuery(query2);
+        return res;
+    }
+
+    public int AssignRideToRidePat(int ridePatId, int userId)
+    {
+        string query = "select Origin,Destination,PickupTime,Status from RidePat where RidePatNum=" +ridePatId;
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        DataRow dr = ds.Tables[0].Rows[0];
+        if (dr["Status"].ToString() != "ממתינה לשיבוץ") return -1;
         Origin = new Location();
         Origin.Name = dr["Origin"].ToString();
         Destination = new Location();

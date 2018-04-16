@@ -220,10 +220,20 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string AssignRideToRidePat(int ridePatId, int userId)
+    public string AssignRideToRidePat(int ridePatId, int userId) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
     {
         RidePat rp = new RidePat();
         int res = rp.AssignRideToRidePat(ridePatId, userId);
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        return j.Serialize(res);
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string CombineRideRidePat(int rideId, int RidePatId) //Get RideId & RidePatId - combine them
+    {
+        RidePat rp = new RidePat();
+        int res = rp.CombineRideRidePat(rideId, RidePatId);
         JavaScriptSerializer j = new JavaScriptSerializer();
         return j.Serialize(res);
     }
