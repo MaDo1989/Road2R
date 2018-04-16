@@ -425,7 +425,7 @@ public class RidePat
         DataRow dr = ds.Tables[0].Rows[0];
         if (dr["Status"].ToString() != "ממתינה לשיבוץ") return -1;
 
-        string query2 = "update RidePat set RideId="+rideId+" where RidePatNum="+ridePatId;
+        string query2 = "update RidePat set RideId=" + rideId + " where RidePatNum=" + ridePatId;
         DbService db2 = new DbService();
         int res = db2.ExecuteQuery(query2);
         return res;
@@ -433,24 +433,47 @@ public class RidePat
 
     public int AssignRideToRidePat(int ridePatId, int userId)
     {
-        string query = "select Origin,Destination,PickupTime,Status from RidePat where RidePatNum=" +ridePatId;
+        int RideId = -1;
+        bool primary = false;
+        string query = "select RideNum,RidePatOrigin,RidePatDestination,RidePatPickupTime,RidePatStatus,MainDriver,secondaryDriver from RidePatView where RidePatNum=" + ridePatId;
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         DataRow dr = ds.Tables[0].Rows[0];
-        if (dr["Status"].ToString() != "ממתינה לשיבוץ") return -1;
+        // if (dr["Status"].ToString() != "ממתינה לשיבוץ") return -1;
         Origin = new Location();
-        Origin.Name = dr["Origin"].ToString();
+        Origin.Name = dr["RidePatOrigin"].ToString();
         Destination = new Location();
-        Destination.Name = dr["Destination"].ToString();
-        Date = Convert.ToDateTime(dr["PickUpTime"].ToString());
+        Destination.Name = dr["RidePatDestination"].ToString();
+        Date = Convert.ToDateTime(dr["RidePatPickupTime"].ToString());
+        if (dr["RidePatStatus"].ToString() == "שובץ נהג וגיבוי") return -1;
 
-        string query2 = "set dateformat dmy; insert into Ride (Origin,Destination,Date,MainDriver) values ('"+Origin.Name+"','"+Destination.Name+"','"+Date+ "',"+userId+") SELECT SCOPE_IDENTITY()"; ;
-        DbService db2 = new DbService();
-        int RideId = int.Parse(db2.GetObjectScalarByQuery(query2).ToString());
+        if (dr["RideNum"].ToString() != "")
+        {
+            RideId = int.Parse(dr["RideNum"].ToString());
 
-        string query3 = "update RidePat set RideId=" + RideId + " where RidePatNum=" + ridePatId;
-        DbService db3 = new DbService();
-        db3.ExecuteQuery(query3);
+           
+            if (dr["MainDriver"].ToString() == "")
+                query = "update Ride set MainDriver=" + userId + " where RideNum=" + RideId;
+            else query = "update Ride set secondaryDriver=" + userId + " where RideNum=" + RideId;
+
+            DbService db4 = new DbService();
+        int res =    db4.ExecuteQuery(query);
+            if (res <= 0) return -1;
+        }
+        else
+        {
+            string query2 = "set dateformat dmy; insert into Ride (Origin,Destination,Date,MainDriver) values ('" + Origin.Name + "','" + Destination.Name + "','" + Date + "'," + userId + ") SELECT SCOPE_IDENTITY()"; ;
+            DbService db2 = new DbService();
+            RideId = int.Parse(db2.GetObjectScalarByQuery(query2).ToString());
+            if (RideId <= 0) return -1;
+            string query3 = "update RidePat set RideId=" + RideId + " where RidePatNum=" + ridePatId;
+            DbService db3 = new DbService();
+            int res=db3.ExecuteQuery(query3);
+            if (res <= 0) return -1;
+        }
+
+
+
 
         return RideId;
 
