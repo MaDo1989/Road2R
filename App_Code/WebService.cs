@@ -220,6 +220,16 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string AssignRideToRidePat(int ridePatId, int userId)
+    {
+        RidePat rp = new RidePat();
+        int res = rp.AssignRideToRidePat(ridePatId, userId);
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        return j.Serialize(res);
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string LeaveRidePat(int ridePatId, int driverId)
     {
         RidePat rp = new RidePat();

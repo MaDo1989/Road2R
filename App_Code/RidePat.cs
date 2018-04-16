@@ -417,6 +417,30 @@ public class RidePat
         #endregion
     }
 
+    public int AssignRideToRidePat(int ridePatId, int userId)
+    {
+        string query = "select Origin,Destination,PickupTime from RidePat where RidePatNum=" +ridePatId;
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        DataRow dr = ds.Tables[0].Rows[0];
+        Origin = new Location();
+        Origin.Name = dr["Origin"].ToString();
+        Destination = new Location();
+        Destination.Name = dr["Destination"].ToString();
+        Date = Convert.ToDateTime(dr["PickUpTime"].ToString());
+
+        string query2 = "set dateformat dmy; insert into Ride (Origin,Destination,Date,MainDriver) values ('"+Origin.Name+"','"+Destination.Name+"','"+Date+ "',"+userId+") SELECT SCOPE_IDENTITY()"; ;
+        DbService db2 = new DbService();
+        int RideId = int.Parse(db2.GetObjectScalarByQuery(query2).ToString());
+
+        string query3 = "update RidePat set RideId=" + RideId + " where RidePatNum=" + ridePatId;
+        DbService db3 = new DbService();
+        db3.ExecuteQuery(query3);
+
+        return RideId;
+
+    }
+
     public int LeaveRidePat(int ridePatId)
     {
         int res = -1;
