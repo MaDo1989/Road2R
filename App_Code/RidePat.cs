@@ -498,9 +498,8 @@ public class RidePat
         DbService db = new DbService();
         string query = "select * from RidePatView where RidePatNum=" + ridePatId;
         DataSet ds = db.GetDataSetByQuery(query);
-
-        foreach (DataRow row in ds.Tables[0].Rows)
-        {
+        DataRow row = ds.Tables[0].Rows[0];
+        
             try
             {
                 BackupDriver = int.Parse(row["secondaryDriver"].ToString());
@@ -519,26 +518,16 @@ public class RidePat
             {
                 primary = false;
             }
-        }
+        
         if (primary)
         {
             query = "update Ride set MainDriver=null where RideNum=" + rideNum;
             DbService db2 = new DbService();
             res = db2.ExecuteQuery(query);
         }
-        //else if (primary && BackupDriver == -1)
-        //{
-        //    query = "update Ride set DriverId=null,statusRide= 'לא פעילה' where RideNum=" + rideNum;
-        //    DbService db3 = new DbService();
-        //    res = db3.ExecuteQuery(query);
-        //    query = "update RidePat set RideId=null where ridePatNum=" + ridePatId;
-        //    DbService db4 = new DbService();
-        //    res += db4.ExecuteQuery(query);
-        //}
-
-        else if (!primary)
+        else
         {
-            query = "update Ride set BackupDriverId=null where RideNum=" + rideNum;
+            query = "update Ride set secondaryDriver=null where RideNum=" + rideNum;
             DbService db5 = new DbService();
             res = db5.ExecuteQuery(query);
         }
