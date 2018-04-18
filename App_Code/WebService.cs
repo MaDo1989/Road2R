@@ -240,10 +240,10 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string LeaveRidePat(int ridePatId, int driverId)
+    public string LeaveRidePat(int ridePatId, int rideId)
     {
         RidePat rp = new RidePat();
-        int res = rp.LeaveRidePat(ridePatId);
+        int res = rp.LeaveRidePat(ridePatId,rideId);
         JavaScriptSerializer j = new JavaScriptSerializer();
         return j.Serialize(res);
     }
