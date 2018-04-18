@@ -479,12 +479,22 @@ public class RidePat
 
     }
 
-    public int LeaveRidePat(int ridePatId)
+    public int LeaveRidePat(int ridePatId,int rideId)
     {
         int res = -1;
         string query = "update RidePat set RideId=null where RidePatNum=" + ridePatId;
         DbService db = new DbService();
         res = db.ExecuteQuery(query);
+
+        string query2 = "select RidePatNum from RidePat where RideId=" + rideId;
+        DbService db2 = new DbService();
+        DataSet ds = db2.GetDataSetByQuery(query2);
+        if (ds.Tables[0].Rows.Count == 0)
+        {
+            string query3 = "update Ride set MainDriver=null, secondaryDriver=null where RideNum=" + rideId;
+            DbService db3 = new DbService();
+            res += db.ExecuteQuery(query3);
+        }
         return res;
 
     }
