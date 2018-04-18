@@ -479,10 +479,26 @@ public class RidePat
 
     }
 
-    public int LeaveRidePat(int ridePatId,int rideId)
+    public int LeaveRidePat(int ridePatId,int rideId,int driverId)
     {
         int res = -1;
-        string query = "update RidePat set RideId=null where RidePatNum=" + ridePatId;
+        string driver = "";
+        string query4 = "select MainDriver,secondaryDriver from Ride where RideNum=" + rideId;
+        DbService db4 = new DbService();
+        DataSet ds2 = db4.GetDataSetByQuery(query4);
+        DataRow dr = ds2.Tables[0].Rows[0];
+        if (dr["MainDriver"].ToString()==driverId.ToString())
+        {
+            driver = "MainDriver";
+        }
+        else if (dr["secondaryDriver"].ToString() == driverId.ToString())
+        {
+            driver = "secondaryDriver";
+        }
+
+
+
+        string query = "update RidePat set RideId=null where RidePatNum=" + ridePatId+"; update Ride set "+driver+" =null where RideNum="+rideId;
         DbService db = new DbService();
         res = db.ExecuteQuery(query);
 
