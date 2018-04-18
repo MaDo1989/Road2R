@@ -507,7 +507,7 @@ public class RidePat
         DataSet ds = db2.GetDataSetByQuery(query2);
         if (ds.Tables[0].Rows.Count == 0)
         {
-            string query3 = "update Ride set set " + driver + " =null where RideNum=" + rideId;
+            string query3 = "update Ride set " + driver + " =null where RideNum=" + rideId;
             DbService db3 = new DbService();
             res += db3.ExecuteQuery(query3);
         }
