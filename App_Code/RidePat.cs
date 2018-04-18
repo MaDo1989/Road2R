@@ -493,7 +493,7 @@ public class RidePat
         {
             string query3 = "update Ride set MainDriver=null, secondaryDriver=null where RideNum=" + rideId;
             DbService db3 = new DbService();
-            res += db.ExecuteQuery(query3);
+            res += db3.ExecuteQuery(query3);
         }
         return res;
 
