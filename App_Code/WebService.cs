@@ -48,6 +48,15 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod]
+    public string getCoor(string userName)
+    {
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        Volunteer v = new Volunteer();
+        v = v.getCoor(userName);
+        return j.Serialize(v);
+    }
+
+    [WebMethod]
     public string getPatientEscorted(string displayName)
     {
         JavaScriptSerializer j = new JavaScriptSerializer();
