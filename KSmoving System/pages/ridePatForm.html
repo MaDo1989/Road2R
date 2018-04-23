@@ -58,7 +58,26 @@
     <link href="../plugins/timepicker/bootstrap-timepicker.min.css" rel="stylesheet" />
     <script src="../plugins/timepicker/bootstrap-timepicker.min.js"></script>
 
-    
+    <!--Patient Autocomplete-->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <style>
+        .ui-autocomplete {
+            max-height: 100px;
+            overflow-y: auto;
+            /* prevent horizontal scrollbar */
+            overflow-x: hidden;
+        }
+        /* IE 6 doesn't support max-height
+        * we use height instead, but this forces the menu to always be this tall
+        */
+        * html .ui-autocomplete {
+            height: 100px;
+        }
+    </style>
+    <!--<script src="https://code.jquery.com/jquery-1.12.4.js"></script>-->
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
     <script>
         checkCookie();
         arr_addressRows = [];
@@ -76,13 +95,20 @@
                 data: JSON.stringify({ active: true }),
                 success: function (data) {
                     var arr_pat = JSON.parse(data.d);
-                    //$('<option>', { value: "", text: "בחר" }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
+                    ////$('<option>', { value: "", text: "בחר" }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
+                    //for (i in arr_pat) {
+                    //    $('<option>', { value: arr_pat[i].DisplayName, text: arr_pat[i].DisplayName }).appendTo($select);
+                    //}
+                    patients = [];
+
                     for (i in arr_pat) {
-                        $('<option>', { value: arr_pat[i].DisplayName, text: arr_pat[i].DisplayName }).appendTo($select);
+                        patients.push(arr_pat[i].DisplayName);
                     }
 
+                    $("#pat").autocomplete({
+                        source: patients
+                    });
 
-                   
 
                 },
                 error: function (err) { alert("Error in generatePat"); }
@@ -103,64 +129,97 @@
                     var arr_pat = JSON.parse(data.d);
                     //if (ridePat.Pat.DisplayName != "") {
                     //  //  $('<option>', { value: ridePat.Pat.DisplayName, text: ridePat.Pat.DisplayName }).appendTo($select);
-                       
+
                     //}
                     $('<option>', { value: "", text: "בחר" }).appendTo($select);
                     for (i in arr_pat) {
                         $('<option>', { value: arr_pat[i].DisplayName, text: arr_pat[i].DisplayName }).appendTo($select);
                     }
-                     $("#pat option[value='" + ridePat.Pat.DisplayName+"']").prop('selected', true);
+                    $("#pat option[value='" + ridePat.Pat.DisplayName + "']").prop('selected', true);
                 },
                 error: function (err) { alert("Error in generatePat1"); }
             });
         }
-        function generateCoor() {
-            var $select = $("#coordinator");
+
+        function getCoor() {
             $.ajax({
                 dataType: "json",
-                url: "WebService.asmx/getCoorList",
+                url: "WebService.asmx/getCoor",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                async: false,
-                data: JSON.stringify({}),
-                success: function (data) {
-                    var arr_coor = JSON.parse(data.d);
-                    $('<option>', { value: "", text: "בחר" }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
-                    for (i in arr_coor) {
-                        $('<option>', { value: arr_coor[i].DisplayName, text: arr_coor[i].DisplayName }).appendTo($select);
-                    }
-                },
-                error: function (err) { alert("Error generateCoor"); }
+                //async: false,
+                data: JSON.stringify({ userName: GENERAL.USER.getUserName() }),
+                success: getCoorSuccessCB,
+                error: getCoorErrorCB
             });
         }
 
-        function generateCoor1(ridePat) {
+        function getCoorSuccessCB(data) {
             var $select = $("#coordinator");
-            $.ajax({
-                dataType: "json",
-                url: "WebService.asmx/getCoorList",
-                contentType: "application/json; charset=utf-8",
-                type: "POST",
-                async: false,
-                data: JSON.stringify({}),
-                success: function (data) {
-                    var arr_coor = JSON.parse(data.d);
-                    if (ridePat.Coordinator.DisplayName != "") {
-                        $('<option>', { value: ridePat.Coordinator.DisplayName, text: ridePat.Coordinator.DisplayName }).appendTo($select);
-                    }
-                    $('<option>', { value: "", text: "בחר" }).appendTo($select);
-                    for (i in arr_coor) {
-                        $('<option>', { value: arr_coor[i].DisplayName, text: arr_coor[i].DisplayName }).appendTo($select);
-                    }
-                },
-                error: function (err) { alert("Error in generateCoor1"); }
-            });
+            var coor = JSON.parse(data.d);
+            //$('<option>', { value: "", text: "בחר" }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
+            //for (i in arr_coor)
+
+            //{
+            //    // $('<option>', { value: arr_coor[i].DisplayName, text: arr_coor[i].DisplayName }).appendTo($select);
+            //    //
+            //}
+
+            $select.val(coor.DisplayName);
         }
+
+        function getCoorErrorCB() {
+            alert("Error in getCoor");
+        }
+
+
+        //function generateCoor() {
+        //    var $select = $("#coordinator");
+        //    $.ajax({
+        //        dataType: "json",
+        //        url: "WebService.asmx/getCoorList",
+        //        contentType: "application/json; charset=utf-8",
+        //        type: "POST",
+        //        async: false,
+        //        data: JSON.stringify({}),
+        //        success: function (data) {
+        //            var arr_coor = JSON.parse(data.d);
+        //            $('<option>', { value: "", text: "בחר" }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
+        //            for (i in arr_coor) {
+        //                $('<option>', { value: arr_coor[i].DisplayName, text: arr_coor[i].DisplayName }).appendTo($select);
+        //            }
+        //        },
+        //        error: function (err) { alert("Error generateCoor"); }
+        //    });
+        //}
+
+        //function generateCoor1(ridePat) {
+        //    var $select = $("#coordinator");
+        //    $.ajax({
+        //        dataType: "json",
+        //        url: "WebService.asmx/getCoorList",
+        //        contentType: "application/json; charset=utf-8",
+        //        type: "POST",
+        //        async: false,
+        //        data: JSON.stringify({}),
+        //        success: function (data) {
+        //            var arr_coor = JSON.parse(data.d);
+        //            if (ridePat.Coordinator.DisplayName != "") {
+        //                $('<option>', { value: ridePat.Coordinator.DisplayName, text: ridePat.Coordinator.DisplayName }).appendTo($select);
+        //            }
+        //            $('<option>', { value: "", text: "בחר" }).appendTo($select);
+        //            for (i in arr_coor) {
+        //                $('<option>', { value: arr_coor[i].DisplayName, text: arr_coor[i].DisplayName }).appendTo($select);
+        //            }
+        //        },
+        //        error: function (err) { alert("Error in generateCoor1"); }
+        //    });
+        //}
 
         function generateEsc() {
             var $select = $("#escorted1");
             var $select2 = $("#escorted2");
-            var $select3= $("#escorted3");
+            var $select3 = $("#escorted3");
             var displayName = $("#pat").val();
             $.ajax({
                 dataType: "json",
@@ -168,7 +227,7 @@
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
                 async: false,
-                data: JSON.stringify({ displayName: displayName}),
+                data: JSON.stringify({ displayName: displayName }),
                 success: function (data) {
                     var arr_esc = JSON.parse(data.d);
                     $('<option>', { value: "", text: "בחר" }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
@@ -264,8 +323,8 @@
         }
 
         function generateDestination() {
-            var $select = $("#startPlace");
-            var $select1 = $("#target");
+            var $select = $("#Origin");
+            var $select1 = $("#Destination");
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/getDestinationView",
@@ -276,15 +335,15 @@
                 success: function (data) {
                     var arr_drivers = JSON.parse(data.d);
 
-                    $('<option>', { value: "", text: "בחר " }).appendTo($select);
-                    $('<option>', { value: "", text: "בחר " }).appendTo($select1);
-                   // $('<option>', { value: "", text: "בחר " }).appendTo($select2);
+                    //  $('<option>', { value: "", text: "בחר " }).appendTo($select);
+                    //  $('<option>', { value: "", text: "בחר " }).appendTo($select1);
+                    // $('<option>', { value: "", text: "בחר " }).appendTo($select2);
 
                     for (i in arr_drivers) {
 
                         $('<option>', { value: arr_drivers[i].Name, text: arr_drivers[i].Name }).appendTo($select);
                         $('<option>', { value: arr_drivers[i].Name, text: arr_drivers[i].Name }).appendTo($select1);
-                       // $('<option>', { value: arr_drivers[i].Name, text: arr_drivers[i].Name }).appendTo($select2);
+                        // $('<option>', { value: arr_drivers[i].Name, text: arr_drivers[i].Name }).appendTo($select2);
 
                     }
                 },
@@ -295,8 +354,8 @@
 
         function generateDestination1(ridePat) {
 
-            var $select = $("#startPlace");
-            var $select1 = $("#target");
+            var $select = $("#Origin");
+            var $select1 = $("#Destination");
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/getDestinationView",
@@ -318,83 +377,78 @@
                     for (i in arr_drivers) {
                         $('<option>', { value: arr_drivers[i].Name, text: arr_drivers[i].Name }).appendTo($select);
                         $('<option>', { value: arr_drivers[i].Name, text: arr_drivers[i].Name }).appendTo($select1);
-                      //  $('<option>', { value: arr_drivers[i].Name, text: arr_drivers[i].Name }).appendTo($select2);
+                        //  $('<option>', { value: arr_drivers[i].Name, text: arr_drivers[i].Name }).appendTo($select2);
                     }
                 },
                 error: function (err) { alert("Error in generateDestination1"); }
             });
         }
 
-        function generateday(ridePat) {
-            var $selectDay1 = $("#day");
-            if (ridePat.Day != "")
-                $('<option>', { value: ridePat.Day, text: ridePat.Day }).appendTo($selectDay1);
-            $('<option>', { value: "", text: "בחר " }).appendTo($selectDay1);
-            $('<option>', { value: "ראשון", text: "ראשון " }).appendTo($selectDay1);
-            $('<option>', { value: "שני", text: "שני " }).appendTo($selectDay1);
-            $('<option>', { value: "שלישי", text: "שלישי " }).appendTo($selectDay1);
-            $('<option>', { value: "רביעי", text: "רביעי " }).appendTo($selectDay1);
-            $('<option>', { value: "חמישי", text: "חמישי " }).appendTo($selectDay1);
-            $('<option>', { value: "שישי", text: "שישי " }).appendTo($selectDay1);
-            $('<option>', { value: "שבת", text: "שבת " }).appendTo($selectDay1);
-        }
+        //function generateday(ridePat) {
+        //    var $selectDay1 = $("#day");
+        //    if (ridePat.Day != "")
+        //        $('<option>', { value: ridePat.Day, text: ridePat.Day }).appendTo($selectDay1);
+        //    $('<option>', { value: "", text: "בחר " }).appendTo($selectDay1);
+        //    $('<option>', { value: "ראשון", text: "ראשון " }).appendTo($selectDay1);
+        //    $('<option>', { value: "שני", text: "שני " }).appendTo($selectDay1);
+        //    $('<option>', { value: "שלישי", text: "שלישי " }).appendTo($selectDay1);
+        //    $('<option>', { value: "רביעי", text: "רביעי " }).appendTo($selectDay1);
+        //    $('<option>', { value: "חמישי", text: "חמישי " }).appendTo($selectDay1);
+        //    $('<option>', { value: "שישי", text: "שישי " }).appendTo($selectDay1);
+        //    $('<option>', { value: "שבת", text: "שבת " }).appendTo($selectDay1);
+        //}
 
-        function generateday1() {
-            var $selectDay1 = $("#day");
-            
-            $('<option>', { value: "", text: "בחר " }).appendTo($selectDay1);
-            $('<option>', { value: "ראשון", text: "ראשון " }).appendTo($selectDay1);
-            $('<option>', { value: "שני", text: "שני " }).appendTo($selectDay1);
-            $('<option>', { value: "שלישי", text: "שלישי " }).appendTo($selectDay1);
-            $('<option>', { value: "רביעי", text: "רביעי " }).appendTo($selectDay1);
-            $('<option>', { value: "חמישי", text: "חמישי " }).appendTo($selectDay1);
-            $('<option>', { value: "שישי", text: "שישי " }).appendTo($selectDay1);
-            $('<option>', { value: "שבת", text: "שבת " }).appendTo($selectDay1);
-        }
+        //function generateday1() {
+        //    var $selectDay1 = $("#day");
+
+        //    $('<option>', { value: "", text: "בחר " }).appendTo($selectDay1);
+        //    $('<option>', { value: "ראשון", text: "ראשון " }).appendTo($selectDay1);
+        //    $('<option>', { value: "שני", text: "שני " }).appendTo($selectDay1);
+        //    $('<option>', { value: "שלישי", text: "שלישי " }).appendTo($selectDay1);
+        //    $('<option>', { value: "רביעי", text: "רביעי " }).appendTo($selectDay1);
+        //    $('<option>', { value: "חמישי", text: "חמישי " }).appendTo($selectDay1);
+        //    $('<option>', { value: "שישי", text: "שישי " }).appendTo($selectDay1);
+        //    $('<option>', { value: "שבת", text: "שבת " }).appendTo($selectDay1);
+        //}
 
         function generateHour() {
             var $select = $("#hour");
-            $.ajax({
-                dataType: "json",
-                url: "WebService.asmx/getHoursView",
-                contentType: "application/json; charset=utf-8",
-                type: "POST",
-                async: false,
-                data: JSON.stringify({}),
-                success: function (data) {
-                    var arr_hours = JSON.parse(data.d);
-                    $('<option>', { value: "", text: "בחר " }).appendTo($select);
-
-                    for (i in arr_hours) {
-                        $('<option>', { value: arr_hours[i].Hour, text: arr_hours[i].Hour }).appendTo($select);
-                    }
-                },
-                error: function (err) { alert("Error in generateHour"); }
-            });
+            for (var i = 0; i < 24; i++) {
+                if (i < 10) i = "0" + i;
+                $('<option>', { value: i, text: i }).appendTo($select);
+            }
         }
-        function generateHour1(ridePat) {
-            var $select = $("#hour");
-            $.ajax({
-                dataType: "json",
-                url: "WebService.asmx/getHoursView",
-                contentType: "application/json; charset=utf-8",
-                type: "POST",
-                async: false,
-                data: JSON.stringify({}),
-                success: function (data) {
-                    var arr_hours = JSON.parse(data.d);
-                    if (ridePat.LeavingHour != "") {
-                        $('<option>', { value: ridePat.LeavingHour, text: ridePat.LeavingHour }).appendTo($select);
-                    }
-                    $('<option>', { value: "", text: "בחר " }).appendTo($select);
 
-                    for (i in arr_hours) {
-                        $('<option>', { value: arr_hours[i].Hour, text: arr_hours[i].Hour }).appendTo($select);
-                    }
-                },
-                error: function (err) { alert("Error in generateHour1"); }
-            });
+        function generateMinute() {
+            var $select = $("#minute");
+            for (var i = 0; i < 60; i += 15) {
+                if (i < 10) var j = "0" + i; else j = i;
+                $('<option>', { value: j, text: j }).appendTo($select);
+            }
         }
+        //function generateHour1(ridePat) {
+        //    var $select = $("#hour");
+        //    $.ajax({
+        //        dataType: "json",
+        //        url: "WebService.asmx/getHoursView",
+        //        contentType: "application/json; charset=utf-8",
+        //        type: "POST",
+        //        async: false,
+        //        data: JSON.stringify({}),
+        //        success: function (data) {
+        //            var arr_hours = JSON.parse(data.d);
+        //            if (ridePat.LeavingHour != "") {
+        //                $('<option>', { value: ridePat.LeavingHour, text: ridePat.LeavingHour }).appendTo($select);
+        //            }
+        //            $('<option>', { value: "", text: "בחר " }).appendTo($select);
+
+        //            for (i in arr_hours) {
+        //                $('<option>', { value: arr_hours[i].Hour, text: arr_hours[i].Hour }).appendTo($select);
+        //            }
+        //        },
+        //        error: function (err) { alert("Error in generateHour1"); }
+        //    });
+        //}
 
         function generateAdd1(ridePat) {
             var $select = $("#addition");
@@ -419,45 +473,76 @@
             $('<option>', { value: "כיסא גלגלים+בוסטר", text: "כיסא גלגלים+בוסטר " }).appendTo($select);
         }
 
-        function generateRideType(ridePat) {
-            var $select = $("#rideType");
-            if (ridePat.RideType != "") {
-                $('<option>', { value: ridePat.RideType, text: ridePat.RideType }).appendTo($select);
+        //function generateRideType(ridePat) {
+        //    var $select = $("#rideType");
+        //    if (ridePat.RideType != "") {
+        //        $('<option>', { value: ridePat.RideType, text: ridePat.RideType }).appendTo($select);
+        //    }
+        //    $('<option>', { value: "", text: "בחר " }).appendTo($select);
+        //    $('<option>', { value: "ממחסום אל בית החולים", text: "ממחסום אל בית החולים " }).appendTo($select);
+        //    $('<option>', { value: "מבית החולים למחסום", text: "מבית החולים למחסום " }).appendTo($select);
+        //    $('<option>', { value: "אחר", text: "אחר " }).appendTo($select);
+        //}
+
+        //function generateRideType1() {
+        //    var $select = $("#rideType");
+        //    $('<option>', { value: "", text: "בחר " }).appendTo($select);
+        //    $('<option>', { value: "ממחסום אל בית החולים", text: "ממחסום אל בית החולים " }).appendTo($select);
+        //    $('<option>', { value: "מבית החולים למחסום", text: "מבית החולים למחסום " }).appendTo($select);
+        //    $('<option>', { value: "אחר", text: "אחר " }).appendTo($select);
+        //}
+
+        //function generateQuantity(ridePat) {
+        //    var $select = $("#quantity");
+        //    if (ridePat.RideType != "") {
+        //        $('<option>', { value: ridePat.Quantity, text: ridePat.Quantity }).appendTo($select);
+        //    }
+        //    $('<option>', { value: "1", text: "1" }).appendTo($select);
+        //    $('<option>', { value: "2", text: "2" }).appendTo($select);
+        //    $('<option>', { value: "3", text: "3" }).appendTo($select);
+        //    $('<option>', { value: "4", text: "4" }).appendTo($select);
+        //}
+
+        //function generateQuantity1() {
+        //    var $select = $("#quantity");
+        //    $('<option>', { value: "1", text: "1" }).appendTo($select);
+        //    $('<option>', { value: "2", text: "2" }).appendTo($select);
+        //    $('<option>', { value: "3", text: "3" }).appendTo($select);
+        //    $('<option>', { value: "4", text: "4" }).appendTo($select);
+        //}
+
+        function validateInputs() {
+
+            var patientExists = false;
+            var Origin = true;
+            var Dest = true;
+            var pat = document.forms["customerForm"]["pat"].value;
+            for (i in patients) {
+                if (pat == patients[i]) {
+                    patientExists = true;
+                    break;
+                }
             }
-            $('<option>', { value: "", text: "בחר " }).appendTo($select);
-            $('<option>', { value: "ממחסום אל בית החולים", text: "ממחסום אל בית החולים " }).appendTo($select);
-            $('<option>', { value: "מבית החולים למחסום", text: "מבית החולים למחסום " }).appendTo($select);
-            $('<option>', { value: "אחר", text: "אחר " }).appendTo($select);
-        }
-
-        function generateRideType1() {
-            var $select = $("#rideType");
-            $('<option>', { value: "", text: "בחר " }).appendTo($select);
-            $('<option>', { value: "ממחסום אל בית החולים", text: "ממחסום אל בית החולים " }).appendTo($select);
-            $('<option>', { value: "מבית החולים למחסום", text: "מבית החולים למחסום " }).appendTo($select);
-            $('<option>', { value: "אחר", text: "אחר " }).appendTo($select);
-        }
-
-        function generateQuantity(ridePat) {
-            var $select = $("#quantity");
-            if (ridePat.RideType != "") {
-                $('<option>', { value: ridePat.Quantity, text: ridePat.Quantity }).appendTo($select);
+            if (!patientExists) {
+                alert("עליכם לבחור חולה מתוך הרשימה");                
             }
-            $('<option>', { value: "1", text: "1" }).appendTo($select);
-            $('<option>', { value: "2", text: "2" }).appendTo($select);
-            $('<option>', { value: "3", text: "3" }).appendTo($select);
-            $('<option>', { value: "4", text: "4" }).appendTo($select);
-        }
 
-        function generateQuantity1() {
-            var $select = $("#quantity");
-            $('<option>', { value: "1", text: "1" }).appendTo($select);
-            $('<option>', { value: "2", text: "2" }).appendTo($select);
-            $('<option>', { value: "3", text: "3" }).appendTo($select);
-            $('<option>', { value: "4", text: "4" }).appendTo($select);
-        }
-        
+            var Origin = $("#Origin").val();
+            if (Origin == "בחר מוצא") {
+                Origin=false
+                alert("עליכם לבחור מוצא מתוך הרשימה");  
+            }
 
+            var Destination = $("#Destination").val();
+            if (Destination == "בחר יעד") {
+                Dest = false;
+                alert("עליכם לבחור יעד מתוך הרשימה");
+            }
+
+            if (!patientExists || !Origin || !Dest) {
+                return false;
+            } else return true;
+        }
         function loadPage() {
             if (JSON.parse(GENERAL.RIDEPAT.getRidePatList()).length != 0) {
                 arr_customer = JSON.parse(GENERAL.RIDEPAT.getRidePatList());
@@ -483,23 +568,25 @@
                         $("#dateRide").attr('disabled', 'disabled');
                         $("#hour").attr('disabled', 'disabled');
                         $("#day").attr('disabled', 'disabled');
-                        
+
                     }
                 }
                 else {
                     $("#ridePatNum").attr('disabled', 'disabled');
                     generatePat();
-                    generateCoor();
-                    generateRideType1()
+                    //generateCoor();
+                    getCoor();
+                    //generateRideType1()
                     //generateEsc()
                     generateStatus1();
                     generateDestination();
                     generateAdd();
-                  //  generateArea1();
-                    generateday1();
-                    generateQuantity1()
+                    //  generateArea1();
+                    //generateday1();
+                    //generateQuantity1()
                     generateHour();
-                    //initializeSelect2();   
+                    generateMinute();
+                    //initializeSelect2();
                     $("#activeridePat").prop('checked', 'checked');
                 }
             }
@@ -519,19 +606,19 @@
                     //generatePreferDestination(ridePat);
                     //generatePreferDayAndHour(ridePat);
                     //generateStatus(ridePat);
-                   // generateGender(ridePat);
+                    // generateGender(ridePat);
                     //generateAdd1(ridePat)
-                   // generatePat1(ridePat)
+                    // generatePat1(ridePat)
                     //generateCoor1(ridePat)
-                   // generateEsc1(ridePat)
+                    // generateEsc1(ridePat)
                     //generateQuantity(ridePat)
                     //generateHour1(ridePat)
                     //generateStatus(ridePat)
                     //generateDestination1(ridePat)
                     //generateRideType(ridePat)
-                  //  generateArea(ridePat)
+                    //  generateArea(ridePat)
                     //generateday(ridePat)
-                    var temp = ridePat.Date.substring(ridePat.Date.indexOf("(")+1, ridePat.Date.indexOf(")"))
+                    var temp = ridePat.Date.substring(ridePat.Date.indexOf("(") + 1, ridePat.Date.indexOf(")"))
                     var date = new Date(parseInt(temp));
                     day = date.getDay(date);
                     var dayArr = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
@@ -541,7 +628,7 @@
                     var minutes = date.getMinutes(date);
                     if (minutes < 10) minutes = minutes + "0";
                     var time = hours + ":" + minutes;
-                    
+
 
                     $("#ridePatNum").val(ridePat.RidePatNum);
                     $("#pat").val(ridePat.Pat.DisplayName);
@@ -551,10 +638,10 @@
                     $("#dateRide").val(date.toLocaleDateString());
                     $("#hour").val(time);
 
-                 
+
                     //$("#selectaddition").val(ridePat.Pat.Addition);
 
-                 
+
                     $("#coordinator").val(ridePat.Coordinator.DisplayName);
 
                     $("#remark").val(ridePat.Remark);
@@ -563,9 +650,9 @@
                     //$("#selectEscorted1").val(ridePat.Escorted1.DisplayName);
                     //$("#selectEscorted2").val(ridePat.Escorted2.DisplayName);
                     //$("#selectEscorted3").val(ridePat.Escorted3.DisplayName);
-                   // $("#selectday1").val(ridePat.Escorted3);
+                    // $("#selectday1").val(ridePat.Escorted3);
                     $("#selectarea").val(ridePat.StartArea);
-                   // $("#selectstatusRidePat").val(ridePat.Status);
+                    // $("#selectstatusRidePat").val(ridePat.Status);
 
 
                 },
@@ -586,6 +673,8 @@
         //        return [true, ""];
         //    }
         //};
+
+
 
     </script>
 </head>
@@ -707,7 +796,7 @@
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label class="col-sm-3 control-label">חולה</label>
-                                                    <div class="col-sm-6" id="selectPat">
+                                                    <div class="col-sm-6 ui-widget" id="selectPat">
                                                         <input type="text" id="pat" name="pat" class="form-control"></input>
                                                     </div>
                                                 </div>
@@ -718,7 +807,7 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-3 control-label">מוצא</label>
                                                     <div class="col-sm-6" id="selectStartPlace">
-                                                        <select id="startPlace" name="startPlace" class="form-control"></select>
+                                                        <select id="Origin" name="Origin" class="form-control"><option>בחר מוצא</option></select>
                                                     </div>
                                                 </div>
                                             </div>
@@ -726,20 +815,20 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-3 control-label">יעד</label>
                                                     <div class="col-sm-6" id="selectTarget">
-                                                        <select id="target" name="target" class="form-control"></select>
+                                                        <select id="Destination" name="Destination" class="form-control"><option>בחר יעד</option></select>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="row m-l-10 m-r-10">
                                             <!--<div class="col-sm-6">
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">כמות נוסעים</label>
-                                <div class="col-sm-6" id="selectquantity">
-                                    <select id="quantity" name="quantity" class="form-control"></select>
-                                </div>
-                            </div>
-                        </div>-->
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">כמות נוסעים</label>
+                                                    <div class="col-sm-6" id="selectquantity">
+                                                        <select id="quantity" name="quantity" class="form-control"></select>
+                                                    </div>
+                                                </div>
+                                            </div>-->
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label class="col-sm-3 control-label">כלי עזר</label>
@@ -751,12 +840,12 @@
                                         </div>
                                         <div class="row m-l-10 m-r-10">
                                             <!--<div class="col-sm-6">
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">סוג הסעה</label>
-                                <div class="col-sm-6" id="selectrideType">
-                                    <select id="rideType" name="rideType" class="form-control"></select>
-                                </div>
-                            </div>-->
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">סוג הסעה</label>
+                                                <div class="col-sm-6" id="selectrideType">
+                                                    <select id="rideType" name="rideType" class="form-control"></select>
+                                                </div>
+                                            </div>-->
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="form-group">
@@ -769,19 +858,25 @@
                                     </div>
                                     <div class="row m-l-10 m-r-10">
                                         <!--<div class="col-sm-6">
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">יום </label>
-                            <div class="col-sm-6" id="selectday1">
-                                <select id="day" name="day" class="form-control"></select>
-                            </div>
-                        </div>
-                    </div>-->
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">יום </label>
+                                                <div class="col-sm-6" id="selectday1">
+                                                    <select id="day" name="day" class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>-->
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label class="col-sm-3 control-label">שעת הסעה</label>
                                                 <div class="col-sm-6" id="selecthour">
-                                                    <!--<select id="hour" name="hour" class="form-control"></select>-->
-                                                    <input type="text" id="hour" name="hour" class="form-control"/>
+                                                    <select id="minute" name="minute" class="form-control" style="width:20%;display:inline"><option>דקות</option></select>
+                                                    <p style="display:inline;">:</p>
+                                                    <select id="hour" name="hour" class="form-control" style="width:20%; display:inline;"><option>שעות</option></select>
+
+
+
+                                                    <!-- <input type="time" id="hour" name="hour" class="form-control" min="00:00" max="23:59" step="900" required/ >-->
+
                                                 </div>
                                             </div>
                                         </div>
@@ -831,22 +926,22 @@
                                 </div>
                             </div>
                         </form>
-                            </div>
-                      
                     </div>
+
                 </div>
-                <!-- end container -->
             </div>
-            <!-- end content -->
-            <!-- FOOTER -->
-            <footer class="footer text-right">
-                2018 © Road To Decovery Management System Powered by Sufa Ben-Horin
-            </footer>
-            <!-- End FOOTER -->
+            <!-- end container -->
         </div>
-        <!-- ============================================================== -->
-        <!-- End page content here -->
-        <!-- ============================================================== -->
+        <!-- end content -->
+        <!-- FOOTER -->
+        <footer class="footer text-right">
+            2018 © Road To Decovery Management System Powered by Sufa Ben-Horin
+        </footer>
+        <!-- End FOOTER -->
+    </div>
+    <!-- ============================================================== -->
+    <!-- End page content here -->
+    <!-- ============================================================== -->
     </div>
     <!-- END wrapper -->
     <script>
@@ -892,6 +987,14 @@
                     event.preventDefault();
                     debugger;
 
+                    var valid = validateInputs();
+                    if (!valid) return false;
+
+                    
+
+
+
+
                     var ridePatNum = $("#ridePatNum").val();
                     var pat = $("#pat").val();
                     var startPlace1 = $("#startPlace").val();
@@ -916,12 +1019,12 @@
 
                     patient = { displayName: pat }
                     coordinator = { displayName: coor }
-                    startPlace = { name: startPlace1}
+                    startPlace = { name: startPlace1 }
                     target = { name: target1 }
 
                     if (func == "new") {
                         ridePat = {
-                            pat: patient, startPlace: startPlace, target: target, startArea:area,
+                            pat: patient, startPlace: startPlace, target: target, startArea: area,
                             day: day, date: dateRide, leavingHour: hour, quantity: quantity, addition: addition, rideType: rideType, coordinator: coordinator, remark: remark,
                             status: statusRidePat
                         }
@@ -933,7 +1036,7 @@
                             status: statusRidePat
                         }
                     }
-                    
+
                     $.ajax({
                         dataType: "json",
                         url: "WebService.asmx/setRidePat",
@@ -954,29 +1057,29 @@
 
                         },
                         error: function (err) {
-                            alert("Error");
+                            alert("Error in setRidePat");
                         }
                     });
-                    
+
                     return false;
                 },
 
                 // Messages for form validation
                 messages: {
                     dateRide: {
-                        required: " הזן תאריך הסעה"
+                        required: "עליכם להזין תאריך"
                     },
                     pat: {
-                        required: "בחר חולה"
+                        required: "עליכם לבחור חולה"
                     },
                     startPlace: {
-                        required: "בחר מקום התחלת נסיעה"
+                        required: "עליכם לבחור מוצא"
                     },
                     target: {
-                        required: "בחר מקום סיום נסיעה"
+                        required: "עליכם לבחור יעד"
                     },
                     coordinator: {
-                        required: "בחר רכז אחראי"
+                        required: "עליכם לבחור רכז אחראי"
                     },
                 },
 
@@ -1014,16 +1117,16 @@
             format: 'dd/mm/yyyy'
 
         });
-        
-       
+
+
         $(document).ready(function () {
 
 
-            if (JSON.parse(GENERAL.RIDEPAT.getRidePatList()).length != 0) {
-                arr_customer = JSON.parse(GENERAL.RIDEPAT.getRidePatList());
-                if (arr_customer.func != "show") {
-                }
-            }
+            //if (JSON.parse(GENERAL.RIDEPAT.getRidePatList()).length != 0) {
+            //    arr_customer = JSON.parse(GENERAL.RIDEPAT.getRidePatList());
+            //    if (arr_customer.func != "show") {
+            //    }
+            //}
 
 
             loadPage();

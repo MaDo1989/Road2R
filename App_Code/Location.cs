@@ -223,19 +223,19 @@ public class Location
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
 
-            Location tmp = new Location();
-            tmp.Name = dr["name"].ToString();
-            tmp.Type = dr["typeDestination"].ToString();
-            tmp.Area = dr["area"].ToString();
-            tmp.Direction = dr["direction"].ToString();
-            tmp.Responsible =new Volunteer(dr["responsible"].ToString());
-            tmp.Status = dr["statusDestination"].ToString();
-            tmp.Remarks = dr["remarks"].ToString();
-            tmp.ManagerName = dr["managerName"].ToString();
-            tmp.ManagerLastName = dr["managerLastName"].ToString();
-            tmp.ManagerPhones = dr["managerPhones1"].ToString();
-            tmp.ManagerPhones2 = dr["managerPhones2"].ToString();
-            list.Add(tmp);
+            Location l = new Location();
+            l.Name = dr["Name"].ToString();
+            l.Type = dr["Type"].ToString();
+            l.Area = dr["Area"].ToString();
+            //tmp.Direction = dr["direction"].ToString();
+            l.Responsible = new Volunteer(dr["Responsible"].ToString());
+            l.IsActive =Convert.ToBoolean( dr["IsActive"].ToString());
+            l.Remarks = dr["Remarks"].ToString();
+            //l.ManagerName = dr["DestinationManager"].ToString();
+            //l.ManagerLastName = dr["managerLastName"].ToString();
+            //l.ManagerPhones = dr["managerPhones1"].ToString();
+            //l.ManagerPhones2 = dr["managerPhones2"].ToString();
+            list.Add(l);
         }
         #endregion
 
@@ -262,7 +262,7 @@ public class Location
             tmp.Area = dr["Area"].ToString();
             //tmp.Direction = dr["direction"].ToString();
             tmp.Responsible = new Volunteer(dr["Responsible"].ToString());
-            tmp.IsActive = Convert.ToBoolean( dr["IsActive"].ToString());
+            tmp.IsActive = Convert.ToBoolean(dr["IsActive"].ToString());
             tmp.Remarks = dr["Remarks"].ToString();
             //tmp.ManagerName = dr["managerName"].ToString();
             //tmp.ManagerLastName = dr["managerLastName"].ToString();
@@ -295,7 +295,7 @@ public class Location
             tmp.Area = dr["Area"].ToString();
             //tmp.Direction = dr["direction"].ToString();
             tmp.Responsible = new Volunteer(dr["Responsible"].ToString());
-            tmp.IsActive = Convert.ToBoolean( dr["IsActive"].ToString());
+            tmp.IsActive = Convert.ToBoolean(dr["IsActive"].ToString());
             tmp.Remarks = dr["Remarks"].ToString();
             //tmp.ManagerName = dr["managerName"].ToString();
             //tmp.ManagerLastName = dr["managerLastName"].ToString();
