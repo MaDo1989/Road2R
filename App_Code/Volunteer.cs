@@ -89,6 +89,28 @@ public class Volunteer
 
     }
 
+    public Volunteer getCoor(string userName)
+    {
+        string query = "select * from Volunteer where UserName='" + userName + "'";
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        Volunteer v = new Volunteer();
+        try
+        {
+            DataRow dr = ds.Tables[0].Rows[0];
+            
+            v.DisplayName = dr["DisplayName"].ToString();
+        }
+        catch (Exception)
+        {
+
+        }
+
+
+
+        return v;
+    }
+
     public string FirstNameA
     {
         get
