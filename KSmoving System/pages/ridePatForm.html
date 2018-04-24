@@ -217,9 +217,7 @@
         //}
 
         function generateEsc() {
-            var $select = $("#escorted1");
-            var $select2 = $("#escorted2");
-            var $select3 = $("#escorted3");
+
             var displayName = $("#pat").val();
             $.ajax({
                 dataType: "json",
@@ -228,19 +226,25 @@
                 type: "POST",
                 async: false,
                 data: JSON.stringify({ displayName: displayName }),
-                success: function (data) {
-                    var arr_esc = JSON.parse(data.d);
-                    $('<option>', { value: "", text: "בחר" }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
-                    $('<option>', { value: "", text: "בחר" }).attr({ 'selected': '', 'disabled': '' }).appendTo($select2);
-                    $('<option>', { value: "", text: "בחר" }).attr({ 'selected': '', 'disabled': '' }).appendTo($select3);
-                    for (i in arr_esc) {
-                        $('<option>', { value: arr_esc[i].DisplayName, text: arr_esc[i].DisplayName }).appendTo($select);
-                        $('<option>', { value: arr_esc[i].DisplayName, text: arr_esc[i].DisplayName }).appendTo($select2);
-                        $('<option>', { value: arr_esc[i].DisplayName, text: arr_esc[i].DisplayName }).appendTo($select3);
-                    }
-                },
-                error: function (err) { alert("Error in generateEsc"); }
+                success: generateEscSuccessCB,
+                error: generateEscErrorCB
             });
+        }
+
+        function generateEscSuccessCB(data) {
+            var arr_escort = JSON.parse(data.d);
+            var str = "";
+
+            for (i in arr_escort) {
+                var escort = arr_escort[i].DisplayName;
+                str += "<input id='" + escort + "' type=checkbox value='" + escort + "'>&nbsp";
+                str += "<label for='" + escort + "'>" + escort + "</label>&nbsp&nbsp";
+            }
+            $("#selectEscort").html(str);
+        }
+
+        function generateEscErrorCB() {
+            alert("Error in generateEsc");
         }
 
         function generateEsc1(ridePat) {
@@ -278,49 +282,75 @@
                 error: function (err) { alert("Error in generateEsc1"); }
             });
         }
-        function generateStatus(ridePat) {
-            var $select = $("#statusRidePat");
-            if (ridePat.Status != "") {
-                $('<option>', { value: ridePat.Status, text: ridePat.Status }).appendTo($select);
+
+        //function generateStatus1(ridePat) {
+        //    var $select = $("#statusRidePat");
+        //    if (ridePat.Status != "") {
+        //        $('<option>', { value: ridePat.Status, text: ridePat.Status }).appendTo($select);
+        //    }
+        //    //$('<option>', { value: "", text: "בחר " }).appendTo($select);
+
+        //    $('<option>', { value: "ממתינה לשיבוץ", text: "ממתינה לשיבוץ " }).appendTo($select);
+        //    $('<option>', { value: "משובצת", text: "משובצת " }).appendTo($select);
+        //    $('<option>', { value: "מוקפאת", text: "מוקפאת " }).appendTo($select);
+        //    $('<option>', { value: "בוצעה", text: "בוצעה " }).appendTo($select);
+        //    $('<option>', { value: "בדרך", text: "בדרך " }).appendTo($select);
+        //}
+
+        function generateStatus() {
+            
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getAllStatus",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                //async: false,
+                //data: JSON.stringify({ patient: dataString }),
+                success: generateStatusSuccessCB,
+                error: generateStatusErrorCB
+            });
+
+            function generateStatusSuccessCB(data) {
+                var $select = $("#statusRidePat");
+                var arr_status = JSON.parse(data.d);
+                for (i in arr_status) {
+                    var status = arr_status[i].Name;
+                    $('<option>', { value: status, text: status }).appendTo($select);
+                }
+
             }
-            //$('<option>', { value: "", text: "בחר " }).appendTo($select);
 
-            $('<option>', { value: "ממתינה לשיבוץ", text: "ממתינה לשיבוץ " }).appendTo($select);
-            $('<option>', { value: "משובצת", text: "משובצת " }).appendTo($select);
-            $('<option>', { value: "מוקפאת", text: "מוקפאת " }).appendTo($select);
-            $('<option>', { value: "בוצעה", text: "בוצעה " }).appendTo($select);
-            $('<option>', { value: "בדרך", text: "בדרך " }).appendTo($select);
-        }
-
-        function generateStatus1() {
-            var $select = $("#statusRidePat");
-            //$('<option>', { value: "", text: "בחר " }).appendTo($select);
-            $('<option>', { value: "ממתינה לשיבוץ", text: "ממתינה לשיבוץ " }).appendTo($select);
-            $('<option>', { value: "משובצת", text: "משובצת " }).appendTo($select);
-            $('<option>', { value: "מוקפאת", text: "מוקפאת " }).appendTo($select);
-            $('<option>', { value: "בוצעה", text: "בוצעה " }).appendTo($select);
-            $('<option>', { value: "בדרך", text: "בדרך " }).appendTo($select);
-        }
-
-        function generateArea(ridePat) {
-            var $select = $("#area");
-            if (ridePat.StartArea != " ") {
-                $('<option>', { value: ridePat.StartArea, text: ridePat.StartArea }).appendTo($select);
+            function generateStatusErrorCB() {
+                alert("Error in generateStatus");
             }
-            $('<option>', { value: "", text: "בחר " }).appendTo($select);
 
-            $('<option>', { value: "צפון", text: "צפון " }).appendTo($select);
-            $('<option>', { value: "מרכז", text: "מרכז " }).appendTo($select);
-            $('<option>', { value: "דרום", text: "דרום " }).appendTo($select);
+            ////$('<option>', { value: "", text: "בחר " }).appendTo($select);
+            //$('<option>', { value: "ממתינה לשיבוץ", text: "ממתינה לשיבוץ " }).appendTo($select);
+            //$('<option>', { value: "משובצת", text: "משובצת " }).appendTo($select);
+            //$('<option>', { value: "מוקפאת", text: "מוקפאת " }).appendTo($select);
+            //$('<option>', { value: "בוצעה", text: "בוצעה " }).appendTo($select);
+            //$('<option>', { value: "בדרך", text: "בדרך " }).appendTo($select);
         }
 
-        function generateArea1() {
-            var $select = $("#area");
-            $('<option>', { value: "", text: "בחר " }).appendTo($select);
-            $('<option>', { value: "צפון", text: "צפון " }).appendTo($select);
-            $('<option>', { value: "מרכז", text: "מרכז " }).appendTo($select);
-            $('<option>', { value: "דרום", text: "דרום " }).appendTo($select);
-        }
+        //function generateArea(ridePat) {
+        //    var $select = $("#area");
+        //    if (ridePat.StartArea != " ") {
+        //        $('<option>', { value: ridePat.StartArea, text: ridePat.StartArea }).appendTo($select);
+        //    }
+        //    $('<option>', { value: "", text: "בחר " }).appendTo($select);
+
+        //    $('<option>', { value: "צפון", text: "צפון " }).appendTo($select);
+        //    $('<option>', { value: "מרכז", text: "מרכז " }).appendTo($select);
+        //    $('<option>', { value: "דרום", text: "דרום " }).appendTo($select);
+        //}
+
+        //function generateArea1() {
+        //    var $select = $("#area");
+        //    $('<option>', { value: "", text: "בחר " }).appendTo($select);
+        //    $('<option>', { value: "צפון", text: "צפון " }).appendTo($select);
+        //    $('<option>', { value: "מרכז", text: "מרכז " }).appendTo($select);
+        //    $('<option>', { value: "דרום", text: "דרום " }).appendTo($select);
+        //}
 
         function generateDestination() {
             var $select = $("#Origin");
@@ -450,28 +480,28 @@
         //    });
         //}
 
-        function generateAdd1(ridePat) {
-            var $select = $("#addition");
-            if (ridePat.Addition != "") {
-                $('<option>', { value: ridePat.Addition, text: ridePat.Addition }).appendTo($select);
-            }
-            $('<option>', { value: "", text: "בחר " }).appendTo($select);
+        //function generateAdd1(ridePat) {
+        //    var $select = $("#Equipment");
+        //    if (ridePat.Addition != "") {
+        //        $('<option>', { value: ridePat.Addition, text: ridePat.Addition }).appendTo($select);
+        //    }
+        //    $('<option>', { value: "", text: "בחר " }).appendTo($select);
 
-            $('<option>', { value: "כיסא גלגלים", text: "כיסא גלגלים " }).appendTo($select);
-            $('<option>', { value: "בוסטר", text: "בוסטר " }).appendTo($select);
-            $('<option>', { value: "כיסא תינוק", text: "כיסא תינוק " }).appendTo($select);
-            $('<option>', { value: "כיסא גלגלים+בוסטר", text: "כיסא גלגלים+בוסטר " }).appendTo($select);
-        }
+        //    $('<option>', { value: "כיסא גלגלים", text: "כיסא גלגלים " }).appendTo($select);
+        //    $('<option>', { value: "בוסטר", text: "בוסטר " }).appendTo($select);
+        //    $('<option>', { value: "כיסא תינוק", text: "כיסא תינוק " }).appendTo($select);
+        //    $('<option>', { value: "כיסא גלגלים+בוסטר", text: "כיסא גלגלים+בוסטר " }).appendTo($select);
+        //}
 
-        function generateAdd() {
-            var $select = $("#addition");
-            $('<option>', { value: "", text: "בחר " }).appendTo($select);
+        //function generateAdd() {
+        //    var $select = $("#Equipment");
+        //    $('<option>', { value: "", text: "בחר " }).appendTo($select);
 
-            $('<option>', { value: "כיסא גלגלים", text: "כיסא גלגלים " }).appendTo($select);
-            $('<option>', { value: "בוסטר", text: "בוסטר " }).appendTo($select);
-            $('<option>', { value: "כיסא תינוק", text: "כיסא תינוק " }).appendTo($select);
-            $('<option>', { value: "כיסא גלגלים+בוסטר", text: "כיסא גלגלים+בוסטר " }).appendTo($select);
-        }
+        //    $('<option>', { value: "כיסא גלגלים", text: "כיסא גלגלים " }).appendTo($select);
+        //    $('<option>', { value: "בוסטר", text: "בוסטר " }).appendTo($select);
+        //    $('<option>', { value: "כיסא תינוק", text: "כיסא תינוק " }).appendTo($select);
+        //    $('<option>', { value: "כיסא גלגלים+בוסטר", text: "כיסא גלגלים+בוסטר " }).appendTo($select);
+        //}
 
         //function generateRideType(ridePat) {
         //    var $select = $("#rideType");
@@ -559,11 +589,52 @@
             try {
                 $("#Origin option[value ='" + arr_pat[i].Barrier.Name + "']").prop('selected', true);
                 $("#Destination option[value ='" + arr_pat[i].Hospital.Name + "']").prop('selected', true);
+                getEquipmentForPatient();
+                generateEsc();
             } catch (e) {
 
             }
 
 
+        }
+
+        function getEquipmentForPatient() {
+
+            var dataString = document.forms["customerForm"]["pat"].value;
+
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getEquipmentForPatient",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                //async: false,
+                data: JSON.stringify({ patient: dataString }),
+                success: getEquipmentForPatientSuccessCB,
+                error: getEquipmentForPatientErrorCB
+            });
+        }
+
+        function getEquipmentForPatientSuccessCB(data) {
+            var arr_equipment = JSON.parse(data.d)
+            var str = "";
+            for (i in arr_equipment) {
+                str += arr_equipment[i] + ", ";
+            }
+            str = str.substring(0, str.lastIndexOf(", "));
+            if (str == "") str = "אין";
+            $("#Equipment").val(str);
+        }
+
+        function getEquipmentForPatientErrorCB() {
+            alert("Error in getEquipmentForPatient");
+        }
+
+        function switchDir() {
+            var a = $("#Origin").val();
+            var b = $("#Destination").val()
+
+            $("#Origin option[value ='" + b + "']").prop('selected', true);
+            $("#Destination option[value ='" + a + "']").prop('selected', true);
         }
 
 
@@ -583,7 +654,7 @@
                         $("#remark").attr('disabled', 'disabled');
                         //$("#escorted1").attr('disabled', 'disabled');
                         $("#statusRidePat").attr('disabled', 'disabled');
-                        $("#addition").attr('disabled', 'disabled');
+                        $("#Equipment").attr('disabled', 'disabled');
                         $("#rideType").attr('disabled', 'disabled');
                         //$("#escorted2").attr('disabled', 'disabled');
                         //$("#escorted3").attr('disabled', 'disabled');
@@ -602,9 +673,9 @@
                     getCoor();
                     //generateRideType1()
                     //generateEsc()
-                    generateStatus1();
+                   generateStatus();
                     generateDestination();
-                    generateAdd();
+                    //generateAdd();
                     //  generateArea1();
                     //generateday1();
                     //generateQuantity1()
@@ -626,7 +697,7 @@
                 data: JSON.stringify({ ridePatNum: ridePatNum }),
                 success: function (data) {
                     var ridePat = JSON.parse(data.d);
-                    GENERAL.RIDEPAT.setRidePatList(ridePat);
+                    GENERAL.RIDEPAT.setRidePatList(JSON.stringify(ridePat));
                     //generatePreferDestination(ridePat);
                     //generatePreferDayAndHour(ridePat);
                     //generateStatus(ridePat);
@@ -637,7 +708,7 @@
                     // generateEsc1(ridePat)
                     //generateQuantity(ridePat)
                     //generateHour1(ridePat)
-                    //generateStatus(ridePat)
+                    //generateStatus1(ridePat)
                     //generateDestination1(ridePat)
                     //generateRideType(ridePat)
                     //  generateArea(ridePat)
@@ -832,6 +903,7 @@
                                                     <label class="col-sm-3 control-label">מוצא</label>
                                                     <div class="col-sm-6" id="selectStartPlace">
                                                         <select id="Origin" name="Origin" class="form-control"><option>בחר מוצא</option></select>
+                                                        <input id="dirBTN" type="button" value="שינוי כיוון" onclick="switchDir()" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -845,19 +917,19 @@
                                             </div>
                                         </div>
                                         <div class="row m-l-10 m-r-10">
-                                            <!--<div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label class="col-sm-3 control-label">כמות נוסעים</label>
-                                                    <div class="col-sm-6" id="selectquantity">
-                                                        <select id="quantity" name="quantity" class="form-control"></select>
-                                                    </div>
-                                                </div>
-                                            </div>-->
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">כלי עזר</label>
+                                                    <label class="col-sm-3 control-label">מלווים</label>
+                                                    <div class="col-sm-6" id="selectEscort">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">ציוד נלווה</label>
                                                     <div class="col-sm-6" id="selectaddition">
-                                                        <select id="addition" name="addition" class="form-control"></select>
+                                                        <!--<select id="Equipment" name="Equipment" class="form-control"></select>-->
+                                                        <input type="text" id="Equipment" name="Equipment" class="form-control" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -928,7 +1000,7 @@
                                             <div class="form-group">
                                                 <label class="col-sm-3 control-label">סטטוס</label>
                                                 <div class="col-sm-6" id="selectstatusRidePat">
-                                                    <select id="statusRidePat" name="statusRidePat" class="form-control"></select>
+                                                    <select id="statusRidePat" name="statusRidePat" class="form-control"><option>בחר סטטוס נסיעה</option></select>
                                                 </div>
                                             </div>
                                         </div>
@@ -1041,7 +1113,7 @@
                     //var esc2 = $("#escorted2").val();
                     //var esc3 = $("#escorted3").val();
                     var area = $("#area").val();
-                    var addition = $("#addition").val();
+                    var addition = $("#Equipment").val();
                     var dateRide = $("#dateRide").val();
                     var hour = $("#hour").val();
                     var day = $("#day").val();
