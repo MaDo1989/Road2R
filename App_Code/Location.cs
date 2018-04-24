@@ -214,7 +214,7 @@ public class Location
     {
         #region DB functions
         string query = "select * from Location ";
-        query += "order by name";
+        query += "order by Name";
 
         List<Location> list = new List<Location>();
         DbService db = new DbService();
