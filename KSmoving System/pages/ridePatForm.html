@@ -94,7 +94,7 @@
                 async: false,
                 data: JSON.stringify({ active: true }),
                 success: function (data) {
-                    var arr_pat = JSON.parse(data.d);
+                    arr_pat = JSON.parse(data.d);
                     ////$('<option>', { value: "", text: "בחר" }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
                     //for (i in arr_pat) {
                     //    $('<option>', { value: arr_pat[i].DisplayName, text: arr_pat[i].DisplayName }).appendTo($select);
@@ -333,16 +333,16 @@
                 async: false,
                 data: JSON.stringify({ active: true }),
                 success: function (data) {
-                    var arr_drivers = JSON.parse(data.d);
+                    var arr_locations = JSON.parse(data.d);
 
                     //  $('<option>', { value: "", text: "בחר " }).appendTo($select);
                     //  $('<option>', { value: "", text: "בחר " }).appendTo($select1);
                     // $('<option>', { value: "", text: "בחר " }).appendTo($select2);
 
-                    for (i in arr_drivers) {
+                    for (i in arr_locations) {
 
-                        $('<option>', { value: arr_drivers[i].Name, text: arr_drivers[i].Name }).appendTo($select);
-                        $('<option>', { value: arr_drivers[i].Name, text: arr_drivers[i].Name }).appendTo($select1);
+                        $('<option>', { value: arr_locations[i].Name, text: arr_locations[i].Name }).appendTo($select);
+                        $('<option>', { value: arr_locations[i].Name, text: arr_locations[i].Name }).appendTo($select1);
                         // $('<option>', { value: arr_drivers[i].Name, text: arr_drivers[i].Name }).appendTo($select2);
 
                     }
@@ -524,13 +524,13 @@
                 }
             }
             if (!patientExists) {
-                alert("עליכם לבחור חולה מתוך הרשימה");                
+                alert("עליכם לבחור חולה מתוך הרשימה");
             }
 
             var Origin = $("#Origin").val();
             if (Origin == "בחר מוצא") {
-                Origin=false
-                alert("עליכם לבחור מוצא מתוך הרשימה");  
+                Origin = false
+                alert("עליכם לבחור מוצא מתוך הרשימה");
             }
 
             var Destination = $("#Destination").val();
@@ -539,10 +539,34 @@
                 alert("עליכם לבחור יעד מתוך הרשימה");
             }
 
-            if (!patientExists || !Origin || !Dest) {
+            var Date = $("#dateRide").val();
+            var reg = new RegExp("[0-9]{2}\/[0-9]{2}\/[0-9]{4}");
+            var dateMatch = reg.test(Date);
+            if (!dateMatch) alert("התאריך שהוזן אינו חוקי");
+
+            var Time = $("#hour").val() + ":" + $("#minute").val();
+            var reg = new RegExp("[0-9]{2}\:[0-9]{2}");
+            var timeMatch = reg.test(Time);
+            if (!timeMatch) alert("השעה שהוזנה אינה חוקית");
+
+            if (!patientExists || !Origin || !Dest || !dateMatch || !timeMatch) {
                 return false;
             } else return true;
         }
+
+        function fillData() {
+            var i = patients.indexOf($("#pat").val());
+            try {
+                $("#Origin option[value ='" + arr_pat[i].Barrier.Name + "']").prop('selected', true);
+                $("#Destination option[value ='" + arr_pat[i].Hospital.Name + "']").prop('selected', true);
+            } catch (e) {
+
+            }
+
+
+        }
+
+
         function loadPage() {
             if (JSON.parse(GENERAL.RIDEPAT.getRidePatList()).length != 0) {
                 arr_customer = JSON.parse(GENERAL.RIDEPAT.getRidePatList());
@@ -952,6 +976,15 @@
     <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
     <script>
         $(document).ready(function () {
+
+            datePicker();
+            loadPage();
+
+            $("#pat").blur(function () {
+                fillData();
+            });
+
+
             // DO NOT REMOVE : GLOBAL FUNCTIONS!
             var errorClass = 'invalid';
             var errorElement = 'em';
@@ -990,7 +1023,7 @@
                     var valid = validateInputs();
                     if (!valid) return false;
 
-                    
+
 
 
 
@@ -1106,17 +1139,10 @@
 
     <script src="assets/js/jquery.core.js"></script>
     <script src="assets/js/jquery.app.js"></script>
-
-    <script type="text/javascript">
+    <script src="lib/datepicker-he.js"></script>
+    <!--<script type="text/javascript">
         //DatePicker
 
-        jQuery('#dateRide').datepicker({
-            toggleActive: true,
-            clearBtn: true,
-            autoclose: true,
-            format: 'dd/mm/yyyy'
-
-        });
 
 
         $(document).ready(function () {
@@ -1129,8 +1155,7 @@
             //}
 
 
-            loadPage();
         });
-    </script>
+    </script>-->
 </body>
 </html>
