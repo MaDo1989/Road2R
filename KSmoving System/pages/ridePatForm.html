@@ -100,13 +100,19 @@
                     //    $('<option>', { value: arr_pat[i].DisplayName, text: arr_pat[i].DisplayName }).appendTo($select);
                     //}
                     patients = [];
+                    arr_arabNames = [];
 
                     for (i in arr_pat) {
                         patients.push(arr_pat[i].DisplayName);
+                        arr_arabNames.push(arr_pat[i].FirstNameA + " " + arr_pat[i].LastNameA);
                     }
 
                     $("#pat").autocomplete({
                         source: patients
+                    });
+
+                    $("#patArabic").autocomplete({
+                        source: arr_arabNames
                     });
 
 
@@ -544,6 +550,7 @@
         function validateInputs() {
 
             var patientExists = false;
+            var patientAExists = false;
             var Origin = true;
             var Dest = true;
             var pat = document.forms["customerForm"]["pat"].value;
@@ -553,8 +560,21 @@
                     break;
                 }
             }
+
+            var patA = document.forms["customerForm"]["patArabic"].value;
+            for (i in arr_arabNames) {
+                if (patA == arr_arabNames[i]) {
+                    patientAExists = true;
+                    break;
+                }
+            }
+
             if (!patientExists) {
                 alert("עליכם לבחור חולה מתוך הרשימה");
+            }
+
+            if (!patientAExists) {
+                alert("يجب عليك اختيار مريض من القائمة");
             }
 
             var Origin = $("#Origin").val();
@@ -585,12 +605,20 @@
         }
 
         function fillData() {
-            var i = patients.indexOf($("#pat").val());
+
+            if ($("#pat").val() != "")
+                var i = patients.indexOf($("#pat").val());
+            else if ($("#patArabic").val() != "") {
+                var i = arr_arabNames.indexOf($("#patArabic").val());
+                $("#pat").val(patients[i]);
+            }
+            
             try {
                 $("#Origin option[value ='" + arr_pat[i].Barrier.Name + "']").prop('selected', true);
                 $("#Destination option[value ='" + arr_pat[i].Hospital.Name + "']").prop('selected', true);
                 getEquipmentForPatient();
                 generateEsc();
+                $("#patArabic").val(arr_arabNames[i]);
             } catch (e) {
 
             }
@@ -890,12 +918,13 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">חולה</label>
+                                                    <label class="col-sm-3 control-label">שם החולה</label>
                                                     <div class="col-sm-6 ui-widget" id="selectPat">
                                                         <input type="text" id="pat" name="pat" class="form-control"></input>
                                                     </div>
                                                 </div>
                                             </div>
+                                            
                                         </div>
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
@@ -904,6 +933,14 @@
                                                     <div class="col-sm-6" id="selectStartPlace">
                                                         <select id="Origin" name="Origin" class="form-control"><option>בחר מוצא</option></select>
                                                         <input id="dirBTN" type="button" value="שינוי כיוון" onclick="switchDir()" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">اسم المريض</label>
+                                                    <div class="col-sm-6 ui-widget" id="selectPat">
+                                                        <input type="text" id="patArabic" name="patArabic" class="form-control"></input>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1046,6 +1083,7 @@
 
     <!--Validators-->
     <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
+   
     <script>
         $(document).ready(function () {
 
@@ -1054,6 +1092,18 @@
 
             $("#pat").blur(function () {
                 fillData();
+            });
+
+            $("#pat").keyup(function () {
+                $("#patArabic").val("");
+            });
+
+            $("#patArabic").blur(function () {
+                fillData();
+            });
+
+            $("#patArabic").keyup(function () {
+                $("#pat").val("");
             });
 
 
@@ -1077,6 +1127,9 @@
                     pat: {
                         required: true
                     },
+                    patArabic: {
+                        required: true
+                    },
                     startPlace: {
                         required: true
                     },
@@ -1095,13 +1148,9 @@
                     var valid = validateInputs();
                     if (!valid) return false;
 
-
-
-
-
-
                     var ridePatNum = $("#ridePatNum").val();
                     var pat = $("#pat").val();
+                   // var patArabic = $("#patArabic").val();
                     var startPlace1 = $("#startPlace").val();
                     var target1 = $("#target").val();
                     var quantity = $("#quantity").val();
@@ -1176,6 +1225,9 @@
                     },
                     pat: {
                         required: "עליכם לבחור חולה"
+                    },
+                    patArabic: {
+                        required: "يجب عليك اختيار مريض"
                     },
                     startPlace: {
                         required: "עליכם לבחור מוצא"
