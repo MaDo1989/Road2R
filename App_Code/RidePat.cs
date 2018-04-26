@@ -454,7 +454,7 @@ public class RidePat
            
             if (dr["MainDriver"].ToString() == "")
                 query = "update Ride set MainDriver=" + userId + " where RideNum=" + RideId;
-            else query = "update Ride set secondaryDriver=" + userId + " where RideNum=" + RideId;
+            else if(dr["MainDriver"].ToString() != userId.ToString()) query = "update Ride set secondaryDriver=" + userId + " where RideNum=" + RideId;
 
             DbService db4 = new DbService();
         int res =    db4.ExecuteQuery(query);
