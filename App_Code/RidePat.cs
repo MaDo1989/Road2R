@@ -31,6 +31,8 @@ public class RidePat
     string area;
     string shift;
 
+    public int RideNum { get; set; }
+
     public List<Volunteer> Drivers { get; set; }
 
     public string Shift { get; set; }
@@ -345,6 +347,15 @@ public class RidePat
             if (exists) continue;
             RidePat rp = new RidePat();
             rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
+            try
+            {
+                rp.RideNum = int.Parse(dr["RideNum"].ToString());
+            }
+            catch (Exception)
+            {
+
+            }
+
             rp.pat = new Patient();
             rp.pat.DisplayName = dr["Patient"].ToString();
             rp.pat.EscortedList = new List<Escorted>();
@@ -434,12 +445,12 @@ public class RidePat
     public int AssignRideToRidePat(int ridePatId, int userId)
     {
         int RideId = -1;
-       
+
         string query = "select RideNum,RidePatOrigin,RidePatDestination,RidePatPickupTime,RidePatStatus,MainDriver,secondaryDriver from RidePatView where RidePatNum=" + ridePatId;
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         DataRow dr = ds.Tables[0].Rows[0];
-       
+
         Origin = new Location();
         Origin.Name = dr["RidePatOrigin"].ToString();
         Destination = new Location();
@@ -451,13 +462,13 @@ public class RidePat
         {
             RideId = int.Parse(dr["RideNum"].ToString());
 
-           
+
             if (dr["MainDriver"].ToString() == "")
                 query = "update Ride set MainDriver=" + userId + " where RideNum=" + RideId;
-            else if(dr["MainDriver"].ToString() != userId.ToString()) query = "update Ride set secondaryDriver=" + userId + " where RideNum=" + RideId;
+            else if (dr["MainDriver"].ToString() != userId.ToString()) query = "update Ride set secondaryDriver=" + userId + " where RideNum=" + RideId;
 
             DbService db4 = new DbService();
-        int res =    db4.ExecuteQuery(query);
+            int res = db4.ExecuteQuery(query);
             if (res <= 0) return -1;
         }
         else
@@ -468,7 +479,7 @@ public class RidePat
             if (RideId <= 0) return -1;
             string query3 = "update RidePat set RideId=" + RideId + " where RidePatNum=" + ridePatId;
             DbService db3 = new DbService();
-            int res=db3.ExecuteQuery(query3);
+            int res = db3.ExecuteQuery(query3);
             if (res <= 0) return -1;
         }
 
@@ -479,7 +490,7 @@ public class RidePat
 
     }
 
-    public int LeaveRidePat(int ridePatId,int rideId,int driverId)
+    public int LeaveRidePat(int ridePatId, int rideId, int driverId)
     {
         int res = -1;
         string driver = "";
@@ -487,7 +498,7 @@ public class RidePat
         DbService db4 = new DbService();
         DataSet ds2 = db4.GetDataSetByQuery(query4);
         DataRow dr = ds2.Tables[0].Rows[0];
-        if (dr["MainDriver"].ToString()==driverId.ToString())
+        if (dr["MainDriver"].ToString() == driverId.ToString())
         {
             driver = "MainDriver";
         }
@@ -525,26 +536,26 @@ public class RidePat
         string query = "select * from RidePatView where RidePatNum=" + ridePatId;
         DataSet ds = db.GetDataSetByQuery(query);
         DataRow row = ds.Tables[0].Rows[0];
-        
-            try
-            {
-                BackupDriver = int.Parse(row["secondaryDriver"].ToString());
-            }
-            catch (Exception)
-            {
 
-                BackupDriver = -1;
-            }
-            rideNum = int.Parse(row["RideNum"].ToString());
-            if (driverId == int.Parse(row["MainDriver"].ToString()))
-            {
-                primary = true;
-            }
-            else if (driverId == BackupDriver)
-            {
-                primary = false;
-            }
-        
+        try
+        {
+            BackupDriver = int.Parse(row["secondaryDriver"].ToString());
+        }
+        catch (Exception)
+        {
+
+            BackupDriver = -1;
+        }
+        rideNum = int.Parse(row["RideNum"].ToString());
+        if (driverId == int.Parse(row["MainDriver"].ToString()))
+        {
+            primary = true;
+        }
+        else if (driverId == BackupDriver)
+        {
+            primary = false;
+        }
+
         if (primary)
         {
             query = "update Ride set MainDriver=null where RideNum=" + rideNum;
