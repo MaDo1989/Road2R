@@ -78,7 +78,7 @@
                         temp = temp.substring(0, temp.indexOf(")"));
                         var date = new Date(parseInt(temp));//.toLocaleString();
                         var day = date.getDate();
-                        var month = date.getMonth()+1;
+                        var month = date.getMonth() + 1;
                         var year = date.getFullYear();
                         var hours = date.getHours();
                         var minutes = date.getMinutes();
@@ -138,7 +138,19 @@
                             btnStr += " " + deleteBtn;
                         }
 
-                        t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date, arr_rides[i].Status, btnStr]).draw(false);
+                        if (arr_rides[i].Status == "ממתינה לשיבוץ")
+                            t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date, arr_rides[i].Status, btnStr]).draw(false);
+                        else {
+                            for (j in arr_rides[i].Drivers) {
+                                if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName;
+                                else secondary = arr_rides[i].Drivers[j].DisplayName;
+                            }
+                            if (arr_rides[i].Drivers.length == 1)
+                                var drivers = "ראשי: " + primary;
+                            if (arr_rides[i].Drivers.length == 2)
+                                var drivers = "ראשי: " + primary + ", "+"גיבוי: " + secondary;
+                            t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date, drivers, btnStr]).draw(false);
+                        }
                     }
 
                     t.columns([3]).order('asc').draw();

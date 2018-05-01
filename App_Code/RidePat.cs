@@ -303,14 +303,14 @@ public class RidePat
         // Ride ride = new Ride();
         // ride.RidePats = new List<RidePat>();
         List<RidePat> rpl = new List<RidePat>();
-        bool exists;
+        int numOfDrivers = 0;
 
         string query2 = "select * from RidePatEscortView";
         DbService db2 = new DbService();
         try
         {
             DataSet ds2 = db2.GetDataSetByQuery(query2);
-            
+
             foreach (DataRow dr2 in ds2.Tables[0].Rows)
             {
                 Escorted e = new Escorted();
@@ -330,53 +330,47 @@ public class RidePat
 
             if (dr["MainDriver"].ToString() == "" && dr["secondaryDriver"].ToString() == "")
             {
-
+                numOfDrivers = 0;
             }
             else if (dr["MainDriver"].ToString() != "" && dr["secondaryDriver"].ToString() == "")
             {
+                numOfDrivers = 1;
                 if (int.Parse(dr["MainDriver"].ToString()) == volunteerId)
                     continue;
             }
-
-
-
-
-
-            //try
-            //{
-            //    if (volunteerId != -1)
-            //    {
-            //        if (int.Parse(dr["DriverId"].ToString()) == volunteerId) continue; //|| dr["statusRide"].ToString() == "מלאה" || dr["statusRide"].ToString() == "הסתיימה"
-            //    }
-            //}
-            //catch (Exception)
-            //{
-            //    //No driver was aasigned to RidePat, continue to show RidePats
-            //}
-
-
-            //exists = false;
-            //foreach (RidePat ridePat in rpl)
-            //{
-
-            //    if (ridePat.RidePatNum == int.Parse(dr["RidePatNum"].ToString()) && dr["Escort"].ToString() != "")
-            //    {
-            //        Escorted es = new Escorted();
-            //        es.DisplayName = dr["Escort"].ToString();
-            //        ridePat.pat.EscortedList.Add(es);
-            //        exists = true;
-            //        break;
-            //    }
-            //}
-            //if (exists) continue;
+            else numOfDrivers = 2;
 
             RidePat rp = new RidePat();
+
+
+            if (numOfDrivers != 0)
+            {
+                rp.Drivers = new List<Volunteer>();
+                Volunteer primary = new Volunteer();
+                primary.DriverType = "Primary";
+                primary.Id = int.Parse(dr["MainDriver"].ToString());
+                string query3 = "select DisplayName from Volunteer where Id=" + primary.Id;
+                DbService db3 = new DbService();
+                primary.DisplayName = db3.GetObjectScalarByQuery(query3).ToString();
+                rp.Drivers.Add(primary);
+                if (numOfDrivers > 1)
+                {
+                    Volunteer secondary = new Volunteer();
+                    secondary.DriverType = "secondary";
+                    secondary.Id = int.Parse(dr["secondaryDriver"].ToString());
+                    string query4 = "select DisplayName from Volunteer where Id=" + secondary.Id;
+                    DbService db4 = new DbService();
+                    secondary.DisplayName = db4.GetObjectScalarByQuery(query4).ToString();
+                    rp.Drivers.Add(secondary);
+                }
+            }
+
             rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
             try
             {
                 rp.RideNum = int.Parse(dr["RideNum"].ToString());
             }
-            catch (Exception)
+            catch (Exception e)
             {
 
             }
@@ -386,13 +380,13 @@ public class RidePat
             rp.pat.EscortedList = new List<Escorted>();
             foreach (Escorted e in el)
             {
-                if (e.Id==rp.RidePatNum)
+                if (e.Id == rp.RidePatNum)
                 {
                     rp.pat.EscortedList.Add(e);
                 }
             }
-            
-            
+
+
             Location origin = new Location();
             origin.Name = dr["Origin"].ToString();
             rp.Origin = origin;
