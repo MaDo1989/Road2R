@@ -122,30 +122,30 @@
         }
 
 
-        function generatePat1(ridePat) {
-            var $select = $("#pat");
-            $.ajax({
-                dataType: "json",
-                url: "WebService.asmx/getPatients",
-                contentType: "application/json; charset=utf-8",
-                type: "POST",
-                async: false,
-                data: JSON.stringify({ active: true }),
-                success: function (data) {
-                    var arr_pat = JSON.parse(data.d);
-                    //if (ridePat.Pat.DisplayName != "") {
-                    //  //  $('<option>', { value: ridePat.Pat.DisplayName, text: ridePat.Pat.DisplayName }).appendTo($select);
+        //function generatePat1(ridePat) {
+        //    var $select = $("#pat");
+        //    $.ajax({
+        //        dataType: "json",
+        //        url: "WebService.asmx/getPatients",
+        //        contentType: "application/json; charset=utf-8",
+        //        type: "POST",
+        //        async: false,
+        //        data: JSON.stringify({ active: true }),
+        //        success: function (data) {
+        //            var arr_pat = JSON.parse(data.d);
+        //            //if (ridePat.Pat.DisplayName != "") {
+        //            //  //  $('<option>', { value: ridePat.Pat.DisplayName, text: ridePat.Pat.DisplayName }).appendTo($select);
 
-                    //}
-                    $('<option>', { value: "", text: "בחר" }).appendTo($select);
-                    for (i in arr_pat) {
-                        $('<option>', { value: arr_pat[i].DisplayName, text: arr_pat[i].DisplayName }).appendTo($select);
-                    }
-                    $("#pat option[value='" + ridePat.Pat.DisplayName + "']").prop('selected', true);
-                },
-                error: function (err) { alert("Error in generatePat1"); }
-            });
-        }
+        //            //}
+        //            $('<option>', { value: "", text: "בחר" }).appendTo($select);
+        //            for (i in arr_pat) {
+        //                $('<option>', { value: arr_pat[i].DisplayName, text: arr_pat[i].DisplayName }).appendTo($select);
+        //            }
+        //            $("#pat option[value='" + ridePat.Pat.DisplayName + "']").prop('selected', true);
+        //        },
+        //        error: function (err) { alert("Error in generatePat1"); }
+        //    });
+        //}
 
         function getCoor() {
             $.ajax({
@@ -238,14 +238,18 @@
         }
 
         function generateEscSuccessCB(data) {
-            var arr_escort = JSON.parse(data.d);
+            arr_escort = JSON.parse(data.d);
+
             var str = "";
 
             for (i in arr_escort) {
-                var escort = arr_escort[i].DisplayName;
-                str += "<input id='" + escort + "' type=checkbox value='" + escort + "'>&nbsp";
-                str += "<label for='" + escort + "'>" + escort + "</label>&nbsp&nbsp";
+                var escort1 = arr_escort[i].DisplayName;
+                var escort = arr_escort[i].DisplayName.replace("'", "");
+                var id = arr_escort[i].Id;
+                str += "<input id='escort" + id + "' type=checkbox name='" + escort + "'>&nbsp";
+                str += "<label for='escort" + id + "'>" + escort1 + "</label>&nbsp&nbsp";
             }
+            if (arr_escort.length==0) str="<label>אין מלווים</label>";
             $("#selectEscort").html(str);
         }
 
@@ -253,41 +257,42 @@
             alert("Error in generateEsc");
         }
 
-        function generateEsc1(ridePat) {
-            var $select = $("#escorted1");
-            var $select2 = $("#escorted2");
-            var $select3 = $("#escorted3");
-            var displayName = $("#pat").val();
-            $.ajax({
-                dataType: "json",
-                url: "WebService.asmx/getPatientEscorted",
-                contentType: "application/json; charset=utf-8",
-                type: "POST",
-                async: false,
-                data: JSON.stringify({ displayName: displayName }),
-                success: function (data) {
-                    var arr_esc = JSON.parse(data.d);
-                    if (ridePat.Escorted1.DisplayName != "") {
-                        $('<option>', { value: ridePat.Escorted1.DisplayName, text: ridePat.Escorted1.DisplayName }).appendTo($select);
-                    }
-                    if (ridePat.Escorted2.DisplayName != "") {
-                        $('<option>', { value: ridePat.Escorted2.DisplayName, text: ridePat.Escorted2.DisplayName }).appendTo($select2);
-                    }
-                    if (ridePat.Escorted3.DisplayName != "") {
-                        $('<option>', { value: ridePat.Escorted3.DisplayName, text: ridePat.Escorted3.DisplayName }).appendTo($select3);
-                    }
-                    $('<option>', { value: "", text: "בחר" }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
-                    $('<option>', { value: "", text: "בחר" }).attr({ 'selected': '', 'disabled': '' }).appendTo($select2);
-                    $('<option>', { value: "", text: "בחר" }).attr({ 'selected': '', 'disabled': '' }).appendTo($select3);
-                    for (i in arr_esc) {
-                        $('<option>', { value: arr_esc[i].DisplayName, text: arr_esc[i].DisplayName }).appendTo($select);
-                        $('<option>', { value: arr_esc[i].DisplayName, text: arr_esc[i].DisplayName }).appendTo($select2);
-                        $('<option>', { value: arr_esc[i].DisplayName, text: arr_esc[i].DisplayName }).appendTo($select3);
-                    }
-                },
-                error: function (err) { alert("Error in generateEsc1"); }
-            });
-        }
+        //function generateEsc1(ridePat) {
+        //    var $select = $("#escorted1");
+        //    var $select2 = $("#escorted2");
+        //    var $select3 = $("#escorted3");
+        //    var displayName = $("#pat").val();
+
+        //    $.ajax({
+        //        dataType: "json",
+        //        url: "WebService.asmx/getPatientEscorted",
+        //        contentType: "application/json; charset=utf-8",
+        //        type: "POST",
+        //        async: false,
+        //        data: JSON.stringify({ displayName: displayName }),
+        //        success: function (data) {
+        //            var arr_esc = JSON.parse(data.d);
+        //            if (ridePat.Escorted1.DisplayName != "") {
+        //                $('<option>', { value: ridePat.Escorted1.DisplayName, text: ridePat.Escorted1.DisplayName }).appendTo($select);
+        //            }
+        //            if (ridePat.Escorted2.DisplayName != "") {
+        //                $('<option>', { value: ridePat.Escorted2.DisplayName, text: ridePat.Escorted2.DisplayName }).appendTo($select2);
+        //            }
+        //            if (ridePat.Escorted3.DisplayName != "") {
+        //                $('<option>', { value: ridePat.Escorted3.DisplayName, text: ridePat.Escorted3.DisplayName }).appendTo($select3);
+        //            }
+        //            $('<option>', { value: "", text: "בחר" }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
+        //            $('<option>', { value: "", text: "בחר" }).attr({ 'selected': '', 'disabled': '' }).appendTo($select2);
+        //            $('<option>', { value: "", text: "בחר" }).attr({ 'selected': '', 'disabled': '' }).appendTo($select3);
+        //            for (i in arr_esc) {
+        //                $('<option>', { value: arr_esc[i].DisplayName, text: arr_esc[i].DisplayName }).appendTo($select);
+        //                $('<option>', { value: arr_esc[i].DisplayName, text: arr_esc[i].DisplayName }).appendTo($select2);
+        //                $('<option>', { value: arr_esc[i].DisplayName, text: arr_esc[i].DisplayName }).appendTo($select3);
+        //            }
+        //        },
+        //        error: function (err) { alert("Error in generateEsc1"); }
+        //    });
+        //}
 
         //function generateStatus1(ridePat) {
         //    var $select = $("#statusRidePat");
@@ -304,7 +309,7 @@
         //}
 
         function generateStatus() {
-            
+
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/getAllStatus",
@@ -322,6 +327,9 @@
                 for (i in arr_status) {
                     var status = arr_status[i].Name;
                     $('<option>', { value: status, text: status }).appendTo($select);
+                }
+                if (arr_customer.func = "new") {
+                    $("#statusRidePat option[value='ממתינה לשיבוץ']").prop('selected', true);
                 }
 
             }
@@ -358,7 +366,7 @@
         //    $('<option>', { value: "דרום", text: "דרום " }).appendTo($select);
         //}
 
-        function generateDestination() {
+        function generateLocation() {
             var $select = $("#Origin");
             var $select1 = $("#Destination");
             $.ajax({
@@ -383,42 +391,42 @@
 
                     }
                 },
-                error: function (err) { alert("Error in generateDestination"); }
+                error: function (err) { alert("Error in generateLocation"); }
             });
         }
 
 
-        function generateDestination1(ridePat) {
+        //function generateDestination1(ridePat) {
 
-            var $select = $("#Origin");
-            var $select1 = $("#Destination");
-            $.ajax({
-                dataType: "json",
-                url: "WebService.asmx/getDestinationView",
-                contentType: "application/json; charset=utf-8",
-                type: "POST",
-                async: false,
-                data: JSON.stringify({ active: true }),
-                success: function (data) {
-                    var arr_drivers = JSON.parse(data.d);
-                    if (ridePat.StartPlace != "") {
-                        $('<option>', { value: ridePat.StartPlace.Name, text: ridePat.StartPlace.Name }).appendTo($select);
-                    }
-                    if (ridePat.Target != "") {
-                        $('<option>', { value: ridePat.Target.Name, text: ridePat.Target.Name }).appendTo($select1);
-                    }
-                    $('<option>', { value: "", text: "בחר " }).appendTo($select);
-                    $('<option>', { value: "", text: "בחר " }).appendTo($select1);
+        //    var $select = $("#Origin");
+        //    var $select1 = $("#Destination");
+        //    $.ajax({
+        //        dataType: "json",
+        //        url: "WebService.asmx/getDestinationView",
+        //        contentType: "application/json; charset=utf-8",
+        //        type: "POST",
+        //        async: false,
+        //        data: JSON.stringify({ active: true }),
+        //        success: function (data) {
+        //            var arr_drivers = JSON.parse(data.d);
+        //            if (ridePat.StartPlace != "") {
+        //                $('<option>', { value: ridePat.StartPlace.Name, text: ridePat.StartPlace.Name }).appendTo($select);
+        //            }
+        //            if (ridePat.Target != "") {
+        //                $('<option>', { value: ridePat.Target.Name, text: ridePat.Target.Name }).appendTo($select1);
+        //            }
+        //            $('<option>', { value: "", text: "בחר " }).appendTo($select);
+        //            $('<option>', { value: "", text: "בחר " }).appendTo($select1);
 
-                    for (i in arr_drivers) {
-                        $('<option>', { value: arr_drivers[i].Name, text: arr_drivers[i].Name }).appendTo($select);
-                        $('<option>', { value: arr_drivers[i].Name, text: arr_drivers[i].Name }).appendTo($select1);
-                        //  $('<option>', { value: arr_drivers[i].Name, text: arr_drivers[i].Name }).appendTo($select2);
-                    }
-                },
-                error: function (err) { alert("Error in generateDestination1"); }
-            });
-        }
+        //            for (i in arr_drivers) {
+        //                $('<option>', { value: arr_drivers[i].Name, text: arr_drivers[i].Name }).appendTo($select);
+        //                $('<option>', { value: arr_drivers[i].Name, text: arr_drivers[i].Name }).appendTo($select1);
+        //                //  $('<option>', { value: arr_drivers[i].Name, text: arr_drivers[i].Name }).appendTo($select2);
+        //            }
+        //        },
+        //        error: function (err) { alert("Error in generateDestination1"); }
+        //    });
+        //}
 
         //function generateday(ridePat) {
         //    var $selectDay1 = $("#day");
@@ -612,7 +620,7 @@
                 var i = arr_arabNames.indexOf($("#patArabic").val());
                 $("#pat").val(patients[i]);
             }
-            
+
             try {
                 $("#Origin option[value ='" + arr_pat[i].Barrier.Name + "']").prop('selected', true);
                 $("#Destination option[value ='" + arr_pat[i].Hospital.Name + "']").prop('selected', true);
@@ -622,7 +630,6 @@
             } catch (e) {
 
             }
-
 
         }
 
@@ -696,13 +703,16 @@
                 }
                 else {
                     $("#ridePatNum").attr('disabled', 'disabled');
+                    generateStatus();
+
+                    $("#statusRidePat").attr('disabled', 'disabled');
                     generatePat();
                     //generateCoor();
                     getCoor();
                     //generateRideType1()
                     //generateEsc()
-                   generateStatus();
-                    generateDestination();
+
+                    generateLocation();
                     //generateAdd();
                     //  generateArea1();
                     //generateday1();
@@ -717,6 +727,12 @@
 
         //function to fill form for edit
         function uploadData(ridePatNum) {
+            generatePat();
+            generateLocation();
+            generateHour();
+            generateMinute();
+            generateStatus();
+
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/getRidePat",
@@ -741,6 +757,8 @@
                     //generateRideType(ridePat)
                     //  generateArea(ridePat)
                     //generateday(ridePat)
+
+
                     var temp = ridePat.Date.substring(ridePat.Date.indexOf("(") + 1, ridePat.Date.indexOf(")"))
                     var date = new Date(parseInt(temp));
                     day = date.getDay(date);
@@ -753,14 +771,28 @@
                     var time = hours + ":" + minutes;
 
 
+                    //$("#pat option[value='" + ridePat.Pat.DisplayName + "']").prop('selected', true);
+
                     $("#ridePatNum").val(ridePat.RidePatNum);
                     $("#pat").val(ridePat.Pat.DisplayName);
-                    $("#selectStartPlace").val(ridePat.Origin.Name);
-                    $("#selectTarget").val(ridePat.Destination.Name);
-                    $("#selectday1").val(dayName);
-                    $("#dateRide").val(date.toLocaleDateString());
-                    $("#hour").val(time);
+                    $("#pat").blur();
+                    if (typeof arr_escort !== "undefined") {
 
+                        for (i in arr_escort) {
+                            for (j in ridePat.Pat.EscortedList) {
+                                if (arr_escort[i].DisplayName == ridePat.Pat.EscortedList[j].DisplayName) {
+                                    $("#escort" + arr_escort[i].Id).prop('checked', true);
+                                }
+                            }
+                        }
+                    } else ($("#selectEscort").html("<label>אין מלווים</label>"));
+
+                    $("#selectStartPlace option[value='" + ridePat.Origin.Name + "']").prop('selected', true);
+                    $("#selectTarget option[value='" + ridePat.Destination.Name + "']").prop('selected', true);
+
+                    $("#dateRide").val(date.toLocaleDateString());
+                    $("#hour option[value='" + hours + "']").prop('selected', true);
+                    $("#minute option[value='" + minutes + "']").prop('selected', true);
 
                     //$("#selectaddition").val(ridePat.Pat.Addition);
 
@@ -769,12 +801,12 @@
 
                     $("#remark").val(ridePat.Remark);
 
-                    $("#selectstatusRidePat").val(ridePat.Status);
+                    $("#statusRidePat option[value='" + ridePat.Status + "']").prop('selected', true);
                     //$("#selectEscorted1").val(ridePat.Escorted1.DisplayName);
                     //$("#selectEscorted2").val(ridePat.Escorted2.DisplayName);
                     //$("#selectEscorted3").val(ridePat.Escorted3.DisplayName);
                     // $("#selectday1").val(ridePat.Escorted3);
-                    $("#selectarea").val(ridePat.StartArea);
+                    // $("#selectarea").val(ridePat.StartArea);
                     // $("#selectstatusRidePat").val(ridePat.Status);
 
 
@@ -924,7 +956,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            
+
                                         </div>
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
@@ -1083,7 +1115,7 @@
 
     <!--Validators-->
     <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
-   
+
     <script>
         $(document).ready(function () {
 
@@ -1150,25 +1182,40 @@
 
                     var ridePatNum = $("#ridePatNum").val();
                     var pat = $("#pat").val();
-                   // var patArabic = $("#patArabic").val();
+                    // var patArabic = $("#patArabic").val();
                     var startPlace1 = $("#startPlace").val();
                     var target1 = $("#target").val();
-                    var quantity = $("#quantity").val();
+                    //var quantity = $("#quantity").val();
                     var coor = $("#coordinator").val();
                     var remark = $("#remark").val();
                     //var esc1 = $("#escorted1").val();
                     var statusRidePat = $("#statusRidePat").val();
-                    var rideType = $("#rideType").val();
+                    // var rideType = $("#rideType").val();
                     //var esc2 = $("#escorted2").val();
                     //var esc3 = $("#escorted3").val();
-                    var area = $("#area").val();
-                    var addition = $("#Equipment").val();
+                    // var area = $("#area").val();
+                    var Equipment = $("#Equipment").val();
                     var dateRide = $("#dateRide").val();
-                    var hour = $("#hour").val();
-                    var day = $("#day").val();
+                    var hours = $("#hour").val();
+                    var minutes = $("#minutes").val();
+                    //var day = $("#day").val();
                     var func = arr_customer.func;
-                    if (quantity == "") {
-                        quantity = 0;
+                    //if (quantity == "") {
+                    //    quantity = 0;
+                    //}
+
+                    var selected = [];
+                    $('#selectEscort input:checked').each(function () {
+                        selected.push($(this).attr('name'));
+                    });
+
+                    var arr_validEscort = [];
+                    for (i in arr_escort) {
+                        for (j in selected) {
+                            if (arr_escort[i].DisplayName.replace("'", "") == selected[j]) {
+                                arr_validEscort.push(arr_escort[i]);
+                            }
+                        }
                     }
 
                     patient = { displayName: pat }
