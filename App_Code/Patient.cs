@@ -541,7 +541,8 @@ public class Patient
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
             Escorted e = new Escorted();
-           // e.Pat = new Patient(dr["PatientName"].ToString()); //new Patient(dr["patient"].ToString());
+            // e.Pat = new Patient(dr["PatientName"].ToString()); //new Patient(dr["patient"].ToString());
+            e.Id = int.Parse(dr["EscortId"].ToString());            
             e.DisplayName = dr["EscortName"].ToString();
             e.FirstNameA = dr["FirstNameA"].ToString();
             e.FirstNameH = dr["FirstNameH"].ToString();
