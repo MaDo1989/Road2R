@@ -104,7 +104,7 @@
 
                     for (i in arr_pat) {
                         patients.push(arr_pat[i].DisplayName);
-                        arr_arabNames.push(arr_pat[i].FirstNameA + " " + arr_pat[i].LastNameA);
+                        arr_arabNames.push(arr_pat[i].DisplayNameA);
                     }
 
                     $("#pat").autocomplete({
@@ -761,16 +761,27 @@
 
                     var temp = ridePat.Date.substring(ridePat.Date.indexOf("(") + 1, ridePat.Date.indexOf(")"))
                     var date = new Date(parseInt(temp));
-                    day = date.getDay(date);
-                    var dayArr = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
-                    var dayName = dayArr[day];
                     var hours = date.getHours(date);
                     if (hours < 10) hours = "0" + hours;
                     var minutes = date.getMinutes(date);
                     if (minutes < 10) minutes = minutes + "0";
                     var time = hours + ":" + minutes;
 
+                    day = date.getDay(date);
+                    var dayArr = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+                    var dayName = dayArr[day];                    
+                    var day = date.getDate();
+                    var month = date.getMonth() + 1;
+                    var year = date.getFullYear();
+                    var hours = date.getHours();
+                    var minutes = date.getMinutes();
+                    if (hours < 10) hours = "0" + hours;
+                    if (minutes < 10) minutes = minutes + "0";
+                    if (day < 10) day = "0" + day;
+                    if (month < 10) month = "0" + month;
+                    date = day + "/" + month + "/" + year
 
+                    
                     //$("#pat option[value='" + ridePat.Pat.DisplayName + "']").prop('selected', true);
 
                     $("#ridePatNum").val(ridePat.RidePatNum);
@@ -790,7 +801,7 @@
                     $("#selectStartPlace option[value='" + ridePat.Origin.Name + "']").prop('selected', true);
                     $("#selectTarget option[value='" + ridePat.Destination.Name + "']").prop('selected', true);
 
-                    $("#dateRide").val(date.toLocaleDateString());
+                    $("#dateRide").val(date);
                     $("#hour option[value='" + hours + "']").prop('selected', true);
                     $("#minute option[value='" + minutes + "']").prop('selected', true);
 

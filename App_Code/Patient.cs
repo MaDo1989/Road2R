@@ -43,6 +43,8 @@ public class Patient
 
     public List<string> Equipment { get; set; }
 
+    public string DisplayNameA { get; set; }
+
     public string DisplayName
     {
         get
@@ -427,6 +429,7 @@ public class Patient
         {
             Patient p = new Patient();
             p.DisplayName = dr["DisplayName"].ToString();
+            p.DisplayNameA= dr["DisplayNameA"].ToString();
             p.FirstNameA = dr["FirstNameA"].ToString();
             p.FirstNameH = dr["FirstNameH"].ToString();
             p.LastNameH = dr["LastNameH"].ToString();
@@ -459,7 +462,7 @@ public class Patient
     {
         #region DB functions
         displayName = displayName.Replace("'", "''");
-        string query = "select Id,DisplayName, FirstNameA, FirstNameH, LastNameH, LastNameA, CellPhone, CellPhone2, HomePhone, CityCityName, LivingArea, IsActive, BirthDate, History, Department, Barrier, Hospital, Gender, Remarks from Patient where displayName ='" + displayName + "'";
+        string query = "select * from Patient where displayName ='" + displayName + "'";
         Patient p = new Patient();
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
