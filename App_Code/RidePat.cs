@@ -31,6 +31,8 @@ public class RidePat
     string area;
     string shift;
 
+    public List<Escorted> Escorts { get; set; }
+
     public int RideNum { get; set; }
 
     public List<Volunteer> Drivers { get; set; }
@@ -42,6 +44,40 @@ public class RidePat
         //
         // TODO: Add constructor logic here
         //
+    }
+
+    public void setRidePat(Dictionary<string, object> d, string func)
+    {
+        Pat = new Patient();
+        Pat.DisplayName = d["pat"].ToString();
+        Location origin = new Location();
+        origin.Name = d["Origin"].ToString();
+        Location destination = new Location();
+        destination.Name = d["Destination"].ToString();
+        int day = int.Parse(d["date"].ToString().Substring(0, 2));
+        int month = int.Parse(d["date"].ToString().Substring(3, 2));
+        int year = int.Parse(d["date"].ToString().Substring(6, 4));
+        int hours = int.Parse(d["leavingHour"].ToString().Substring(0, 2));
+        int minutes = int.Parse(d["leavingHour"].ToString().Substring(3, 2));
+        Date = new DateTime(year, month, day, hours, minutes, 0);
+        Coordinator = new Volunteer();
+        Coordinator.DisplayName = d["coordinator"].ToString();
+        Remark = d["remark"].ToString();
+        Escorts = new List<Escorted>();
+        foreach (object obj in (object[])d["Escort"])    ////Trying to get Escorts out of Dictionary
+        {
+
+        }
+
+        string query = "";
+
+        
+        if (func == "new")
+        {
+            query = String.Format("insert into RidePat (Patient,Origin,Destination,PickupTime,Coordinator,Remark) values ({0},{1},{2},{3},{4},{5})", Pat.DisplayName, origin.Name, destination.Name, Date, Coordinator.DisplayName, Remark);
+            DbService db = new DbService();
+            int ridePatNum = int.Parse(db.GetObjectScalarByQuery(query).ToString());
+        }
     }
 
     //public RidePat(Patient _pat, Escorted _escorted1, Destination _startPlace, Destination _target,
@@ -341,7 +377,8 @@ public class RidePat
             else numOfDrivers = 2;
 
             RidePat rp = new RidePat();
-
+            rp.Coordinator = new Volunteer();
+            rp.Coordinator.DisplayName = dr["Coordinator"].ToString();
 
             if (numOfDrivers != 0)
             {

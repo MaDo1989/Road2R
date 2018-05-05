@@ -39,6 +39,8 @@ public class Volunteer
     string knowArabic;//יודע ערבית?
     int id;
 
+    public string UserName { get; set; }
+
     public string pnRegId { get; set; }
 
     public string DriverType { get; set; } //Primary or Secondary
@@ -83,6 +85,7 @@ public class Volunteer
             v.DisplayName = dr["DisplayName"].ToString();
             v.CellPhone = dr["CellPhone"].ToString();
             v.TypeVol = "רכז";
+            v.UserName = dr["UserName"].ToString();
             vl.Add(v);
         }
         return vl;
@@ -105,9 +108,7 @@ public class Volunteer
         {
 
         }
-
-
-
+        
         return v;
     }
 
