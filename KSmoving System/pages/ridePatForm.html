@@ -246,10 +246,10 @@
                 var escort1 = arr_escort[i].DisplayName;
                 var escort = arr_escort[i].DisplayName.replace("'", "");
                 var id = arr_escort[i].Id;
-                str += "<input id='escort" + id + "' type=checkbox name='" + escort + "'>&nbsp";
-                str += "<label for='escort" + id + "'>" + escort1 + "</label>&nbsp&nbsp";
+                str += "<input id='escortCB" + id + "' type=checkbox name='" + escort + "'>&nbsp";
+                str += "<label for='escortCB" + id + "'>" + escort1 + "</label>&nbsp&nbsp";
             }
-            if (arr_escort.length==0) str="<label>אין מלווים</label>";
+            if (arr_escort.length == 0) str = "<label>אין מלווים</label>";
             $("#selectEscort").html(str);
         }
 
@@ -412,8 +412,8 @@
         //            if (ridePat.StartPlace != "") {
         //                $('<option>', { value: ridePat.StartPlace.Name, text: ridePat.StartPlace.Name }).appendTo($select);
         //            }
-        //            if (ridePat.Target != "") {
-        //                $('<option>', { value: ridePat.Target.Name, text: ridePat.Target.Name }).appendTo($select1);
+        //            if (ridePat.Destination != "") {
+        //                $('<option>', { value: ridePat.Destination.Name, text: ridePat.Destination.Name }).appendTo($select1);
         //            }
         //            $('<option>', { value: "", text: "בחר " }).appendTo($select);
         //            $('<option>', { value: "", text: "בחר " }).appendTo($select1);
@@ -657,7 +657,7 @@
             }
             str = str.substring(0, str.lastIndexOf(", "));
             if (str == "") str = "אין";
-            $("#Equipment").val(str);
+            $("#Equipment").text(str);
         }
 
         function getEquipmentForPatientErrorCB() {
@@ -676,51 +676,52 @@
         function loadPage() {
             if (JSON.parse(GENERAL.RIDEPAT.getRidePatList()).length != 0) {
                 arr_customer = JSON.parse(GENERAL.RIDEPAT.getRidePatList());
+                $("#ridePatNum").attr('disabled', 'disabled');
+                $("#coordinator").attr('disabled', 'disabled');
+                $("#statusRidePat").attr('disabled', 'disabled');
+                $("#Equipment").attr('disabled', 'disabled');
                 if (arr_customer.func == "edit" || arr_customer.func == "show") {
                     uploadData(arr_customer.displayName);
 
                     if (arr_customer.func == "show") {
 
-                        $("#ridePatNum").attr('disabled', 'disabled');
+
                         $("#pat").attr('disabled', 'disabled');
-                        $("#startPlace").attr('disabled', 'disabled');
-                        $("#quantity").attr('disabled', 'disabled');
-                        $("#coordinator").attr('disabled', 'disabled');
+                        $("#Origin").attr('disabled', 'disabled');
                         $("#remark").attr('disabled', 'disabled');
-                        //$("#escorted1").attr('disabled', 'disabled');
-                        $("#statusRidePat").attr('disabled', 'disabled');
-                        $("#Equipment").attr('disabled', 'disabled');
-                        $("#rideType").attr('disabled', 'disabled');
-                        //$("#escorted2").attr('disabled', 'disabled');
-                        //$("#escorted3").attr('disabled', 'disabled');
-                        $("#area").attr('disabled', 'disabled');
-                        $("#target").attr('disabled', 'disabled');
+                        $("#Destination").attr('disabled', 'disabled');
                         $("#dateRide").attr('disabled', 'disabled');
                         $("#hour").attr('disabled', 'disabled');
-                        $("#day").attr('disabled', 'disabled');
+                        $("#minute").attr('disabled', 'disabled');
+                        $("#dirBTN").attr('disabled', 'disabled');
+                        $("#patArabic").attr('disabled', 'disabled');
+                        $("#saveCustomer").attr('disabled', 'disabled');
+                        // $("input:checkbox").attr('disabled', 'disabled'); //Find out how to catch and disable all CB at once.
+                        //});
 
                     }
                 }
                 else {
-                    $("#ridePatNum").attr('disabled', 'disabled');
+                    // $("#ridePatNum").attr('disabled', 'disabled');
                     generateStatus();
-
-                    $("#statusRidePat").attr('disabled', 'disabled');
                     generatePat();
-                    //generateCoor();
                     getCoor();
+                    generateLocation();
+                    generateHour();
+                    generateMinute();
+                    // $("#statusRidePat").attr('disabled', 'disabled');
+
+                    //generateCoor();
                     //generateRideType1()
                     //generateEsc()
 
-                    generateLocation();
                     //generateAdd();
                     //  generateArea1();
                     //generateday1();
                     //generateQuantity1()
-                    generateHour();
-                    generateMinute();
+
                     //initializeSelect2();
-                    $("#activeridePat").prop('checked', 'checked');
+                    //$("#activeridePat").prop('checked', 'checked');
                 }
             }
         }
@@ -769,7 +770,7 @@
 
                     day = date.getDay(date);
                     var dayArr = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
-                    var dayName = dayArr[day];                    
+                    var dayName = dayArr[day];
                     var day = date.getDate();
                     var month = date.getMonth() + 1;
                     var year = date.getFullYear();
@@ -781,7 +782,7 @@
                     if (month < 10) month = "0" + month;
                     date = day + "/" + month + "/" + year
 
-                    
+
                     //$("#pat option[value='" + ridePat.Pat.DisplayName + "']").prop('selected', true);
 
                     $("#ridePatNum").val(ridePat.RidePatNum);
@@ -798,8 +799,8 @@
                         }
                     } else ($("#selectEscort").html("<label>אין מלווים</label>"));
 
-                    $("#selectStartPlace option[value='" + ridePat.Origin.Name + "']").prop('selected', true);
-                    $("#selectTarget option[value='" + ridePat.Destination.Name + "']").prop('selected', true);
+                    $("#selectOrigin option[value='" + ridePat.Origin.Name + "']").prop('selected', true);
+                    $("#selectDestination option[value='" + ridePat.Destination.Name + "']").prop('selected', true);
 
                     $("#dateRide").val(date);
                     $("#hour option[value='" + hours + "']").prop('selected', true);
@@ -973,7 +974,7 @@
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label class="col-sm-3 control-label">מוצא</label>
-                                                    <div class="col-sm-6" id="selectStartPlace">
+                                                    <div class="col-sm-6" id="selectOrigin">
                                                         <select id="Origin" name="Origin" class="form-control"><option>בחר מוצא</option></select>
                                                         <input id="dirBTN" type="button" value="שינוי כיוון" onclick="switchDir()" />
                                                     </div>
@@ -990,7 +991,7 @@
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label class="col-sm-3 control-label">יעד</label>
-                                                    <div class="col-sm-6" id="selectTarget">
+                                                    <div class="col-sm-6" id="selectDestination">
                                                         <select id="Destination" name="Destination" class="form-control"><option>בחר יעד</option></select>
                                                     </div>
                                                 </div>
@@ -1009,7 +1010,7 @@
                                                     <label class="col-sm-3 control-label">ציוד נלווה</label>
                                                     <div class="col-sm-6" id="selectaddition">
                                                         <!--<select id="Equipment" name="Equipment" class="form-control"></select>-->
-                                                        <input type="text" id="Equipment" name="Equipment" class="form-control" />
+                                                        <label id="Equipment" name="Equipment" class="control-label" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -1173,10 +1174,10 @@
                     patArabic: {
                         required: true
                     },
-                    startPlace: {
+                    Origin: {
                         required: true
                     },
-                    target: {
+                    Destination: {
                         required: true
                     },
                     coordinator: {
@@ -1192,29 +1193,20 @@
                     if (!valid) return false;
 
                     var ridePatNum = $("#ridePatNum").val();
-                    var pat = $("#pat").val();
-                    // var patArabic = $("#patArabic").val();
-                    var startPlace1 = $("#startPlace").val();
-                    var target1 = $("#target").val();
-                    //var quantity = $("#quantity").val();
-                    var coor = $("#coordinator").val();
+                    var patient = $("#pat").val();
+                    var Origin = $("#Origin").val();
+                    var Destination = $("#Destination").val();
                     var remark = $("#remark").val();
-                    //var esc1 = $("#escorted1").val();
-                    var statusRidePat = $("#statusRidePat").val();
-                    // var rideType = $("#rideType").val();
-                    //var esc2 = $("#escorted2").val();
-                    //var esc3 = $("#escorted3").val();
-                    // var area = $("#area").val();
-                    var Equipment = $("#Equipment").val();
                     var dateRide = $("#dateRide").val();
                     var hours = $("#hour").val();
-                    var minutes = $("#minutes").val();
-                    //var day = $("#day").val();
+                    var minutes = $("#minute").val();
                     var func = arr_customer.func;
-                    //if (quantity == "") {
-                    //    quantity = 0;
-                    //}
+                    //patient = { displayName: pat }
+                    var coordinator = $("#coordinator").val();
+                   // Origin = { name: Origin1 }
+                   // Destination = { name: Destination1 }
 
+                    //set Escorts
                     var selected = [];
                     $('#selectEscort input:checked').each(function () {
                         selected.push($(this).attr('name'));
@@ -1229,23 +1221,16 @@
                         }
                     }
 
-                    patient = { displayName: pat }
-                    coordinator = { displayName: coor }
-                    startPlace = { name: startPlace1 }
-                    target = { name: target1 }
-
+                    
                     if (func == "new") {
                         ridePat = {
-                            pat: patient, startPlace: startPlace, target: target, startArea: area,
-                            day: day, date: dateRide, leavingHour: hour, quantity: quantity, addition: addition, rideType: rideType, coordinator: coordinator, remark: remark,
-                            status: statusRidePat
+                            pat: patient, Origin: Origin, Destination: Destination, date: dateRide, leavingHour: hours + ":" + minutes, coordinator: coordinator, remark: remark, Escort: arr_validEscort
                         }
                     }
                     else {
                         ridePat = {
-                            ridePatNum: ridePatNum, pat: patient, startPlace: startPlace, target: target, startArea: area,
-                            day: day, date: dateRide, leavingHour: hour, quantity: quantity, addition: addition, rideType: rideType, coordinator: coordinator, remark: remark,
-                            status: statusRidePat
+                            ridePatNum: ridePatNum, pat: patient, Origin: Origin, Destination: Destination, date: dateRide, leavingHour: hours + ":" + minutes,remark: remark,
+                            status: statusRidePat, Escort: arr_validEscort
                         }
                     }
 
@@ -1287,10 +1272,10 @@
                     patArabic: {
                         required: "يجب عليك اختيار مريض"
                     },
-                    startPlace: {
+                    Origin: {
                         required: "עליכם לבחור מוצא"
                     },
-                    target: {
+                    Destination: {
                         required: "עליכם לבחור יעד"
                     },
                     coordinator: {

@@ -48,9 +48,37 @@
         $(document).ready(function () {
             //Create a DataTable from the Table
             t = $('#datatable-buttons').DataTable();
-
+            getCoors();
             refreshTable();
         });
+
+        function getCoors() {
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getCoorList",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                async: false,
+                //data: JSON.stringify({}),
+                success: getCoorsSuccessCB,
+                error: getCoorsErrorCB
+            });
+        }
+
+        function getCoorsSuccessCB(data) {
+            var arr_coor = JSON.parse(data.d);
+            var user = GENERAL.USER.getUserName();
+            for (i in arr_coor) {
+                if (user == arr_coor[i].UserName)
+                    currentCoor = arr_coor[i].DisplayName;
+            }
+
+        }
+
+        function getCoorsErrorCB()
+        {
+            alert("Error in getCoors");
+        }
 
 
         function refreshTable() {
@@ -60,6 +88,8 @@
             var unassigned = $("#UnassignedRidePats").prop('checked');
 
             t.clear().draw();
+
+           
 
             $.ajax({
                 dataType: "json",
@@ -112,11 +142,14 @@
                             if (todayAtMidn.getTime() != specificDate.getTime()) continue;
                         }
 
-
-
-                        var btnStr = ""
+                        
+                        var btnStr = "";
+                        var editBtn = "";
                         var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' name='" + arr_rides[i].RidePatNum + "' title='פרטים נוספים'><i class='fa fa-wpforms'></i></button>";
-                        var editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' name='" + arr_rides[i].RidePatNum + "' title='ערוך'><i class='ti-pencil'></i></button>";
+
+                        if (arr_rides[i].Status == 'ממתינה לשיבוץ' && arr_rides[i].Coordinator.DisplayName==currentCoor) {
+                            editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' name='" + arr_rides[i].RidePatNum + "' title='ערוך'><i class='ti-pencil'></i></button>";
+                        }
 
                         btnStr += showBtn + " " + editBtn;
 
@@ -139,7 +172,7 @@
                         }
 
                         if (arr_rides[i].Status == "ממתינה לשיבוץ")
-                            t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date, arr_rides[i].Status, btnStr]).draw(false);
+                            t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date, arr_rides[i].Status, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
                         else {
                             for (j in arr_rides[i].Drivers) {
                                 if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName;
@@ -148,8 +181,8 @@
                             if (arr_rides[i].Drivers.length == 1)
                                 var drivers = "ראשי: " + primary;
                             if (arr_rides[i].Drivers.length == 2)
-                                var drivers = "ראשי: " + primary + ", "+"גיבוי: " + secondary;
-                            t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date, drivers, btnStr]).draw(false);
+                                var drivers = "ראשי: " + primary + ", " + "גיבוי: " + secondary;
+                            t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date, drivers, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
                         }
                     }
 
@@ -399,7 +432,8 @@
                                             <th>מוצא</th>
                                             <th>יעד</th>
                                             <th>תאריך ושעה</th>
-                                            <th>סטטוס הנהגים בנסיעה</th>
+                                            <th>נהגים בנסיעה</th>
+                                            <th>רכז</th>
                                             <th>ערוך דרישה</th>
                                         </tr>
 
