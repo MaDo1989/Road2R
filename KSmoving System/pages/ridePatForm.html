@@ -912,8 +912,8 @@
                         $("#dirBTN").attr('disabled', 'disabled');
                         $("#patArabic").attr('disabled', 'disabled');
                         $("#saveCustomer").attr('disabled', 'disabled');
-                        // $("input:checkbox").attr('disabled', 'disabled'); //Find out how to catch and disable all CB at once.
-                        //});
+                        $("#escortDiv").children().prop('disabled', true); //onlyEscort
+                        $("#onlyEscort").prop('disabled', true);
 
                     }
                 }
@@ -1000,7 +1000,7 @@
 
 
                     //$("#pat option[value='" + ridePat.Pat.DisplayName + "']").prop('selected', true);
-
+                    if (ridePat.OnlyEscort) $("#onlyEscort").prop('checked', true);
                     $("#ridePatNum").val(ridePat.RidePatNum);
                     $("#pat").val(ridePat.Pat.DisplayName);
                     $("#pat").blur();
@@ -1186,7 +1186,7 @@
                                                     </div>
                                                     <div class="col-sm-6">
                                                         <input type="checkbox" id="onlyEscort" />
-                                                        <label for="onlyEscort">נסיעה רק למלווים</label>
+                                                        <label for="onlyEscort">נסיעה למלווים בלבד</label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1221,11 +1221,10 @@
                                         </div>
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
-                                                <div class="form-group">
+                                                <div class="form-group" id="escortDiv">
                                                     <label class="col-sm-3 control-label">מלווים</label>
                                                     <div class="col-sm-6" id="selectEscort">
                                                     </div>
-
                                                 </div>
                                             </div>
                                             <div class="col-sm-6">
