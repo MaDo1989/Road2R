@@ -912,7 +912,8 @@
                         $("#dirBTN").attr('disabled', 'disabled');
                         $("#patArabic").attr('disabled', 'disabled');
                         $("#saveCustomer").attr('disabled', 'disabled');
-                        $("#escortDiv").children().prop('disabled', true); //onlyEscort
+                        $("#escortDiv").children().prop('disabled', true); //Doesn't work in Chrome
+                        //$("#selectEscort :checkbox").attr('disabled', true)
                         $("#onlyEscort").prop('disabled', true);
 
                     }
