@@ -428,6 +428,7 @@ public class Patient
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
             Patient p = new Patient();
+            p.Id = int.Parse(dr["Id"].ToString());
             p.DisplayName = dr["DisplayName"].ToString();
             p.DisplayNameA= dr["DisplayNameA"].ToString();
             p.FirstNameA = dr["FirstNameA"].ToString();
