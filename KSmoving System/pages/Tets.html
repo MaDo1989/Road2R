@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <meta charset="utf-8" />
+    <title></title>
+    <script>
+        function go() {
+            var m = new Object();
+            var i = new Object();
+            var a = new Object();
+            m.Id = 1;
+            m.DisplayName = "Moshe";
+            
+            i.Id = 2;
+            i.DisplayName = "Itzik";
+
+            a.Id = 3;
+            a.DisplayName = "Avi";
+            var arr = [m, i, a];
+
+            var n = "Matan";
+
+            t = { Escorts: arr, Name: n };
+
+            var func = "New";
+            var myList = [m, i, a];
+            var c = { DisplayName: "Moshe", Id: 1,myList:myList };
+            var request = { c: c };
+            var dataString = JSON.stringify(request)
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/test",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                async: true,
+                data: dataString,
+                success: getCoorsSuccessCB,
+                error: getCoorsErrorCB
+            });
+        }
+
+        function getCoorsSuccessCB(data) {
+            
+        }
+
+        function getCoorsErrorCB() {
+            alert("Error in go" );
+        }
+    </script>
+
+</head>
+<body onload="go()">
+
+</body>
+</html>

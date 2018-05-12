@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
 using System.Web.Script.Serialization;
@@ -31,6 +32,8 @@ public class RidePat
     string area;
     string shift;
 
+    public bool OnlyEscort { get; set; }
+
     public List<Escorted> Escorts { get; set; }
 
     public int RideNum { get; set; }
@@ -38,86 +41,6 @@ public class RidePat
     public List<Volunteer> Drivers { get; set; }
 
     public string Shift { get; set; }
-
-    public RidePat()
-    {
-        //
-        // TODO: Add constructor logic here
-        //
-    }
-
-    public void setRidePat(Dictionary<string, object> d, string func)
-    {
-        Pat = new Patient();
-        Pat.DisplayName = d["pat"].ToString();
-        Location origin = new Location();
-        origin.Name = d["Origin"].ToString();
-        Location destination = new Location();
-        destination.Name = d["Destination"].ToString();
-        int day = int.Parse(d["date"].ToString().Substring(0, 2));
-        int month = int.Parse(d["date"].ToString().Substring(3, 2));
-        int year = int.Parse(d["date"].ToString().Substring(6, 4));
-        int hours = int.Parse(d["leavingHour"].ToString().Substring(0, 2));
-        int minutes = int.Parse(d["leavingHour"].ToString().Substring(3, 2));
-        Date = new DateTime(year, month, day, hours, minutes, 0);
-        Coordinator = new Volunteer();
-        Coordinator.DisplayName = d["coordinator"].ToString();
-        Remark = d["remark"].ToString();
-        Escorts = new List<Escorted>();
-        foreach (object obj in (object[])d["Escort"])    ////Trying to get Escorts out of Dictionary
-        {
-
-        }
-
-        string query = "";
-
-        
-        if (func == "new")
-        {
-            query = String.Format("insert into RidePat (Patient,Origin,Destination,PickupTime,Coordinator,Remark) values ({0},{1},{2},{3},{4},{5})", Pat.DisplayName, origin.Name, destination.Name, Date, Coordinator.DisplayName, Remark);
-            DbService db = new DbService();
-            int ridePatNum = int.Parse(db.GetObjectScalarByQuery(query).ToString());
-        }
-    }
-
-    //public RidePat(Patient _pat, Escorted _escorted1, Destination _startPlace, Destination _target,
-    //   string _day, string _date, string _leavingHour, int _quantity, string _addition, string _rideType,
-    //   Volunteer _coordinator, string _remark, string _status)
-    //{
-    //    Pat = _pat;
-    //    Escorted1 = _escorted1;
-    //    StartPlace = _startPlace;
-    //    Target = _target;
-    //    Day = _day;
-    //    Date = _date;
-    //    LeavingHour = _leavingHour;
-    //    Quantity = _quantity;
-    //    Addition = _addition;
-    //    RideType = _rideType;
-    //    Coordinator = _coordinator;
-    //    Remark = _remark;
-    //    Status = _status;
-    //}
-    //public RidePat(int _ridePatNum, Escorted _escorted1, Escorted _escorted2, Escorted _escorted3, Destination _startPlace, Destination _target,
-    //   string _day, string _date, string _leavingHour, int _quantity, string _addition, string _rideType,
-    //   Volunteer _coordinator, string _remark, string _status)
-    //{
-    //    RidePatNum = _ridePatNum;
-    //    Escorted1 = _escorted1;
-    //    Escorted2 = _escorted2;
-    //    Escorted3 = _escorted3;
-    //    StartPlace = _startPlace;
-    //    Target = _target;
-    //    Day = _day;
-    //    Date = _date;
-    //    LeavingHour = _leavingHour;
-    //    Quantity = _quantity;
-    //    Addition = _addition;
-    //    RideType = _rideType;
-    //    Coordinator = _coordinator;
-    //    Remark = _remark;
-    //    Status = _status;
-    //}
 
     public int RidePatNum
     {
@@ -223,54 +146,6 @@ public class RidePat
         }
     }
 
-    public RidePat GetRidePat(int ridePatNum)
-    {
-        string query = "select * from RPView where RidePatNum=" + ridePatNum;
-        DbService db = new DbService();
-        DataSet ds = db.GetDataSetByQuery(query);
-        RidePat rp = new RidePat();
-        rp.pat = new Patient();
-        DataRow dr = ds.Tables[0].Rows[0];
-
-        rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
-
-        rp.pat.DisplayName = dr["DisplayName"].ToString();
-        rp.pat.EscortedList = new List<Escorted>();
-        Location origin = new Location();
-        origin.Name = dr["Origin"].ToString();
-        rp.Origin = origin;
-        Location dest = new Location();
-        dest.Name = dr["Destination"].ToString();
-        rp.Destination = dest;
-        rp.Area = dr["Area"].ToString();
-        rp.Shift = dr["Shift"].ToString();
-        rp.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
-        rp.Status = dr["Status"].ToString();
-        rp.Coordinator = new Volunteer();
-        rp.Coordinator.DisplayName = dr["Coordinator"].ToString();
-
-        string query2 = "select DisplayName from RidePatEscortView where RidePatNum=" + ridePatNum;
-        DbService db2 = new DbService();
-        DataSet ds2 = db2.GetDataSetByQuery(query2);
-        foreach (DataRow r in ds2.Tables[0].Rows)
-        {
-            if (r["DisplayName"].ToString() != "")
-            {
-                Escorted e = new Escorted();
-                e.DisplayName = r["DisplayName"].ToString();
-                rp.pat.EscortedList.Add(e);
-            }
-        }
-
-        return rp;
-
-    }
-
-    //public List<RidePat> GetAllRidePats()
-    //{
-
-    //}
-
     public string RideType
     {
         get
@@ -324,6 +199,165 @@ public class RidePat
     }
 
     public string Area { get; set; }
+
+    public RidePat()
+    {
+        //
+        // TODO: Add constructor logic here
+        //
+    }
+
+    public int setRidePat(RidePat ridePat, string func)
+    {
+        Pat = ridePat.Pat;
+        //Pat.DisplayName = ridePat.Pat.DisplayName;
+        Location origin = new Location();
+        origin.Name = ridePat.Origin.Name;
+        Location destination = new Location();
+        destination.Name = ridePat.Destination.Name;
+        //int day = int.Parse(d["date"].ToString().Substring(0, 2));
+        //int month = int.Parse(d["date"].ToString().Substring(3, 2));
+        //int year = int.Parse(d["date"].ToString().Substring(6, 4));
+        //int hours = int.Parse(d["leavingHour"].ToString().Substring(0, 2));
+        //int minutes = int.Parse(d["leavingHour"].ToString().Substring(3, 2));
+        Date = ridePat.Date;
+        Coordinator = new Volunteer();
+        Coordinator.DisplayName = ridePat.Coordinator.DisplayName;
+        Remark = ridePat.Remark;
+        Escorts = ridePat.Escorts;
+
+        string query = "";
+
+
+        if (func == "new")
+        {
+            DbService db = new DbService();
+            SqlCommand cmd = new SqlCommand();
+            SqlParameter[] cmdParams = new SqlParameter[7];
+            cmdParams[0] = cmd.Parameters.AddWithValue("@pat", Pat.DisplayName);
+            cmdParams[1] = cmd.Parameters.AddWithValue("@origin", origin.Name);
+            cmdParams[2] = cmd.Parameters.AddWithValue("@destination", destination.Name);
+            cmdParams[3] = cmd.Parameters.AddWithValue("@date", Date);
+            cmdParams[4] = cmd.Parameters.AddWithValue("@coordinator", Coordinator.DisplayName);
+            cmdParams[5] = cmd.Parameters.AddWithValue("@remark", Remark);
+            cmdParams[6] = cmd.Parameters.AddWithValue("@onlyEscort", OnlyEscort);
+
+            cmd.CommandType = CommandType.Text;
+            RidePatNum = int.Parse(db.GetObjectScalarByQuery("insert into RidePat (Patient,Origin,Destination,PickupTime,Coordinator,Remark,OnlyEscort) values (@pat,@origin,@destination,@date,@coordinator,@remark,@onlyEscort);SELECT SCOPE_IDENTITY();", cmd.CommandType, cmdParams).ToString());
+
+            if (Escorts.Count > 0)
+            {
+                string query2 = "";
+                foreach (Escorted e in Escorts)
+                {
+                    query2 += "insert into [PatientEscort_PatientInRide (RidePat)] ([PatientEscortPatientId],[PatientEscortEscortId],[PatientInRide (RidePat)RidePatNum]) values (" + Pat.Id + "," + e.Id + "," + RidePatNum + ");";
+                }
+                DbService db2 = new DbService();
+                try
+                {
+                    db2.ExecuteQuery(query2);
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                    
+                }
+            }
+        }
+
+        return RidePatNum;
+    }
+
+    //public RidePat(Patient _pat, Escorted _escorted1, Destination _startPlace, Destination _target,
+    //   string _day, string _date, string _leavingHour, int _quantity, string _addition, string _rideType,
+    //   Volunteer _coordinator, string _remark, string _status)
+    //{
+    //    Pat = _pat;
+    //    Escorted1 = _escorted1;
+    //    StartPlace = _startPlace;
+    //    Target = _target;
+    //    Day = _day;
+    //    Date = _date;
+    //    LeavingHour = _leavingHour;
+    //    Quantity = _quantity;
+    //    Addition = _addition;
+    //    RideType = _rideType;
+    //    Coordinator = _coordinator;
+    //    Remark = _remark;
+    //    Status = _status;
+    //}
+    //public RidePat(int _ridePatNum, Escorted _escorted1, Escorted _escorted2, Escorted _escorted3, Destination _startPlace, Destination _target,
+    //   string _day, string _date, string _leavingHour, int _quantity, string _addition, string _rideType,
+    //   Volunteer _coordinator, string _remark, string _status)
+    //{
+    //    RidePatNum = _ridePatNum;
+    //    Escorted1 = _escorted1;
+    //    Escorted2 = _escorted2;
+    //    Escorted3 = _escorted3;
+    //    StartPlace = _startPlace;
+    //    Target = _target;
+    //    Day = _day;
+    //    Date = _date;
+    //    LeavingHour = _leavingHour;
+    //    Quantity = _quantity;
+    //    Addition = _addition;
+    //    RideType = _rideType;
+    //    Coordinator = _coordinator;
+    //    Remark = _remark;
+    //    Status = _status;
+    //}
+
+
+
+    public RidePat GetRidePat(int ridePatNum)
+    {
+        string query = "select * from RPView where RidePatNum=" + ridePatNum;
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        RidePat rp = new RidePat();
+        rp.pat = new Patient();
+        DataRow dr = ds.Tables[0].Rows[0];
+
+        rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
+
+        rp.pat.DisplayName = dr["DisplayName"].ToString();
+        rp.pat.EscortedList = new List<Escorted>();
+        Location origin = new Location();
+        origin.Name = dr["Origin"].ToString();
+        rp.Origin = origin;
+        Location dest = new Location();
+        dest.Name = dr["Destination"].ToString();
+        rp.Destination = dest;
+        rp.Area = dr["Area"].ToString();
+        rp.Shift = dr["Shift"].ToString();
+        rp.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
+        rp.Status = dr["Status"].ToString();
+        rp.Coordinator = new Volunteer();
+        rp.Coordinator.DisplayName = dr["Coordinator"].ToString();
+
+        string query2 = "select DisplayName from RidePatEscortView where RidePatNum=" + ridePatNum;
+        DbService db2 = new DbService();
+        DataSet ds2 = db2.GetDataSetByQuery(query2);
+        foreach (DataRow r in ds2.Tables[0].Rows)
+        {
+            if (r["DisplayName"].ToString() != "")
+            {
+                Escorted e = new Escorted();
+                e.DisplayName = r["DisplayName"].ToString();
+                rp.pat.EscortedList.Add(e);
+            }
+        }
+
+        return rp;
+
+    }
+
+    //public List<RidePat> GetAllRidePats()
+    //{
+
+    //}
+
+
 
 
     //This method is used for שבץ אותי

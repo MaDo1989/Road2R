@@ -113,9 +113,9 @@ public class DbService
             con.Open();
             res = cmd.ExecuteScalar();
         }
-        catch
+        catch (Exception e)
         {
-            //do something with the error
+            throw e;
         }
         finally
         {

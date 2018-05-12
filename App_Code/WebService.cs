@@ -24,19 +24,34 @@ public class WebService : System.Web.Services.WebService
     }
 
     //----------------------Road to decovery-----------------------------------------------
+    //[WebMethod]
+    //[ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    //public void test(Class1 c)
+    //{
+    //  //  Test test = t;
 
+    //    //Dictionary<string, object> d = (Dictionary<string, object>)ridePat;
+    //    // d = (Dictionary<string, object>)ridePat;
+    //    // JavaScriptSerializer j = new JavaScriptSerializer();
+    //    // Object[] o = j.Deserialize<object[]>(ridePat);
+    //    // RidePat rp = new RidePat();
+    //    //rp.setRidePat(d, func);
+    //    // return j.Serialize(rp);
+    //    var a = 0;
+    //}
 
 
 
     [WebMethod]
-    public void setRidePat(object ridePat,string func)
+    public int setRidePat(RidePat RidePat,string func)
     {
-      Dictionary<string, object> d = (Dictionary<string, object>)ridePat;
+        //Dictionary<string, object> d = (Dictionary<string, object>)ridePat;
         // d = (Dictionary<string, object>)ridePat;
-       // JavaScriptSerializer j = new JavaScriptSerializer();
-       // Object[] o = j.Deserialize<object[]>(ridePat);
+        // JavaScriptSerializer j = new JavaScriptSerializer();
+        // Object[] o = j.Deserialize<object[]>(ridePat);
         RidePat rp = new RidePat();
-        rp.setRidePat(d, func);
+       return rp.setRidePat(RidePat, func);
+       // rp.setRidePat(d, func);
        // return j.Serialize(rp);
 
     }

@@ -12,7 +12,7 @@
 
     <title>הסעת חולה</title>
 
-    <link href="../plugins/switchery/switchery.min.css" rel="stylesheet" />
+    <link href="../plugins/switchery/swiFtchery.min.css" rel="stylesheet" />
     <link href="assets/css/bootstrap-rtl.min.css" rel="stylesheet" type="text/css">
     <link href="assets/css/core.css" rel="stylesheet" type="text/css">
     <link href="assets/css/icons.css" rel="stylesheet" type="text/css">
@@ -79,10 +79,215 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
     <script>
+        var resizefunc = [];
+    </script>
+
+    <!--Validators-->
+    <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
+
+
+    <!-- jQuery  -->
+    <script src="assets/js/bootstrap-rtl.min.js"></script>
+    <script src="assets/js/detect.js"></script>
+    <script src="assets/js/fastclick.js"></script>
+    <script src="assets/js/jquery.slimscroll.js"></script>
+    <script src="assets/js/jquery.blockUI.js"></script>
+    <script src="assets/js/waves.js"></script>
+    <script src="assets/js/wow.min.js"></script>
+    <script src="assets/js/jquery.nicescroll.js"></script>
+    <script src="assets/js/jquery.scrollTo.min.js"></script>
+    <script src="../plugins/switchery/switchery.min.js"></script>
+
+    <!-- Sweet Alert js -->
+    <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
+    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+
+    <script src="assets/js/jquery.core.js"></script>
+    <script src="assets/js/jquery.app.js"></script>
+    <script src="lib/datepicker-he.js"></script>
+
+    <script>
         checkCookie();
         arr_addressRows = [];
         $.jgrid.defaults.responsive = true;
         $.jgrid.defaults.styleUI = 'Bootstrap';
+
+        $(document).ready(function () {
+
+            datePicker();
+            loadPage();
+
+            $("#pat").blur(function () {
+                fillData();
+            });
+
+            $("#pat").keyup(function () {
+                $("#patArabic").val("");
+            });
+
+            $("#patArabic").blur(function () {
+                fillData();
+            });
+
+            $("#patArabic").keyup(function () {
+                $("#pat").val("");
+            });
+
+
+            // DO NOT REMOVE : GLOBAL FUNCTIONS!
+            var errorClass = 'invalid';
+            var errorElement = 'em';
+            var $serviceForm = $('#customerForm').validate({
+
+                highlight: function (element) {
+                    jQuery(element).closest('.form-group').addClass('has-error');
+                },
+                unhighlight: function (element) {
+                    jQuery(element).closest('.form-group').removeClass('has-error');
+                },
+
+                // Rules for form validation
+                rules: {
+                    dateRide: {
+                        required: true
+                    },
+                    pat: {
+                        required: true
+                    },
+                    patArabic: {
+                        required: true
+                    },
+                    Origin: {
+                        required: true
+                    },
+                    Destination: {
+                        required: true
+                    },
+                    coordinator: {
+                        required: true
+                    },
+                },
+
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    debugger;
+
+                    var valid = validateInputs();
+                    if (!valid) return false;
+
+                    var RidePatNum = $("#ridePatNum").val();
+                    var Pat = new Object();
+                    Pat.DisplayName = $("#pat").val();
+                    Pat.Id = localStorage.PatID;
+                    var Origin = new Object();
+                    Origin.Name = $("#Origin").val();
+                    var Destination = new Object();
+                    Destination.Name = $("#Destination").val();
+                    var Remark = $("#remark").val();
+                    var dateRide = $("#dateRide").val();
+                    var hours = $("#hour").val();
+                    var minutes = $("#minute").val();
+                    //dateRide + " " + hours + ":" + minutes;
+                    var Day = parseInt(dateRide.substring(0, 2));
+                    var Month = parseInt(dateRide.substring(3, 5)) - 1;
+                    var Year = parseInt(dateRide.substring(6));
+                    var Hour = parseInt(hours);
+                    var Minute = parseInt(minutes);
+                    var date = new Date(Year, Month, Day, Hour, Minute);
+                    var func = arr_customer.func;
+                    var Coordinator = new Object();
+                    Coordinator.DisplayName = $("#coordinator").val();
+                    var OnlyEscort = false;
+                    if ($("#onlyEscort").is(':checked')) {
+                        OnlyEscort = true;
+                    }
+
+
+                    //set Escorts
+                    var selected = [];
+                    $('#selectEscort input:checked').each(function () {
+                        selected.push($(this).attr('name'));
+                    });
+
+                    var Escorts = [];
+                    for (i in arr_escort) {
+                        for (j in selected) {
+                            if (arr_escort[i].DisplayName.replace("'", "") == selected[j]) {
+                                var Escorted = new Object();
+                                Escorted = arr_escort[i];
+                                Escorts.push(Escorted);
+                            }
+                        }
+                    }
+
+
+
+                    if (func == "new") {
+                        RidePat = {
+                            Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Remark: Remark, Escorts: Escorts, Date: date, OnlyEscort: OnlyEscort
+                        }
+                    }
+                    else {
+                        RidePat = {
+                            RidePatNum: RidePatNum, Pat: Pat, Origin: Origin, Destination: Destination, Date: date, Remark: Remark,
+                            Escorts: Escorts, OnlyEscort: OnlyEscort
+                        }
+                    }
+                    var request = { RidePat: RidePat, func: func }
+                    var dataString = JSON.stringify(request);
+                    $.ajax({
+                        dataType: "json",
+                        url: "WebService.asmx/setRidePat",
+                        contentType: "application/json; charset=utf-8",
+                        type: "POST",
+                        async: false,
+                        data: dataString,
+                        success: function (data) {
+                            //SaveAddresses(0, numberOfRecords, customerID);
+
+                            swal({
+                                title: "נשמר",
+                                type: "success",
+                                timer: 1000,
+                                showConfirmButton: false
+                            });
+                            setTimeout(function () { returnRidePat() }, 1001);
+
+                        },
+                        error: function (err) {
+                            alert("Error in setRidePat");
+                        }
+                    });
+
+                    return false;
+                },
+
+                // Messages for form validation
+                messages: {
+                    dateRide: {
+                        required: "עליכם להזין תאריך"
+                    },
+                    pat: {
+                        required: "עליכם לבחור חולה"
+                    },
+                    patArabic: {
+                        required: "يجب عليك اختيار مريض"
+                    },
+                    Origin: {
+                        required: "עליכם לבחור מוצא"
+                    },
+                    Destination: {
+                        required: "עליכם לבחור יעד"
+                    },
+                    coordinator: {
+                        required: "עליכם לבחור רכז אחראי"
+                    },
+                },
+
+
+            });
+        });
+
 
         function generatePat() {
             var $select = $("#pat");
@@ -607,18 +812,29 @@
             var timeMatch = reg.test(Time);
             if (!timeMatch) alert("השעה שהוזנה אינה חוקית");
 
-            if (!patientExists || !Origin || !Dest || !dateMatch || !timeMatch) {
+            //var atLeastOneIsChecked = $('input[name="selectEscort"]:checked').length > 0;
+            if ($("#onlyEscort").is(':checked')) {
+                var atLeastOneIsChecked = 0;
+                $('#selectEscort input:checked').each(function () {
+                    atLeastOneIsChecked++;
+                });
+                if (atLeastOneIsChecked == 0) alert("בנסיעה למלווים בלבד, יש לבחור לפחות מלווה אחד");
+            }
+            if (!patientExists || !Origin || !Dest || !dateMatch || !timeMatch || atLeastOneIsChecked == 0) {
                 return false;
             } else return true;
         }
 
         function fillData() {
 
-            if ($("#pat").val() != "")
+            if ($("#pat").val() != "") {
                 var i = patients.indexOf($("#pat").val());
+                localStorage.PatID = arr_pat[i].Id;
+            }
             else if ($("#patArabic").val() != "") {
                 var i = arr_arabNames.indexOf($("#patArabic").val());
                 $("#pat").val(patients[i]);
+                localStorage.PatID = arr_pat[i].Id;
             }
 
             try {
@@ -793,7 +1009,7 @@
                         for (i in arr_escort) {
                             for (j in ridePat.Pat.EscortedList) {
                                 if (arr_escort[i].DisplayName == ridePat.Pat.EscortedList[j].DisplayName) {
-                                    $("#escort" + arr_escort[i].Id).prop('checked', true);
+                                    $("#escortCB" + arr_escort[i].Id).prop('checked', true);
                                 }
                             }
                         }
@@ -840,6 +1056,8 @@
         //        return [true, ""];
         //    }
         //};
+
+
 
 
 
@@ -966,6 +1184,10 @@
                                                     <div class="col-sm-6 ui-widget" id="selectPat">
                                                         <input type="text" id="pat" name="pat" class="form-control"></input>
                                                     </div>
+                                                    <div class="col-sm-6">
+                                                        <input type="checkbox" id="onlyEscort" />
+                                                        <label for="onlyEscort">נסיעה רק למלווים</label>
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -1003,6 +1225,7 @@
                                                     <label class="col-sm-3 control-label">מלווים</label>
                                                     <div class="col-sm-6" id="selectEscort">
                                                     </div>
+
                                                 </div>
                                             </div>
                                             <div class="col-sm-6">
@@ -1121,192 +1344,6 @@
     <!-- ============================================================== -->
     </div>
     <!-- END wrapper -->
-    <script>
-        var resizefunc = [];
-    </script>
-
-    <!--Validators-->
-    <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
-
-    <script>
-        $(document).ready(function () {
-
-            datePicker();
-            loadPage();
-
-            $("#pat").blur(function () {
-                fillData();
-            });
-
-            $("#pat").keyup(function () {
-                $("#patArabic").val("");
-            });
-
-            $("#patArabic").blur(function () {
-                fillData();
-            });
-
-            $("#patArabic").keyup(function () {
-                $("#pat").val("");
-            });
-
-
-            // DO NOT REMOVE : GLOBAL FUNCTIONS!
-            var errorClass = 'invalid';
-            var errorElement = 'em';
-            var $serviceForm = $('#customerForm').validate({
-
-                highlight: function (element) {
-                    jQuery(element).closest('.form-group').addClass('has-error');
-                },
-                unhighlight: function (element) {
-                    jQuery(element).closest('.form-group').removeClass('has-error');
-                },
-
-                // Rules for form validation
-                rules: {
-                    dateRide: {
-                        required: true
-                    },
-                    pat: {
-                        required: true
-                    },
-                    patArabic: {
-                        required: true
-                    },
-                    Origin: {
-                        required: true
-                    },
-                    Destination: {
-                        required: true
-                    },
-                    coordinator: {
-                        required: true
-                    },
-                },
-
-                submitHandler: function (form, event) {
-                    event.preventDefault();
-                    debugger;
-
-                    var valid = validateInputs();
-                    if (!valid) return false;
-
-                    var ridePatNum = $("#ridePatNum").val();
-                    var patient = $("#pat").val();
-                    var Origin = $("#Origin").val();
-                    var Destination = $("#Destination").val();
-                    var remark = $("#remark").val();
-                    var dateRide = $("#dateRide").val();
-                    var hours = $("#hour").val();
-                    var minutes = $("#minute").val();
-                    var func = arr_customer.func;
-                    //patient = { displayName: pat }
-                    var coordinator = $("#coordinator").val();
-                   // Origin = { name: Origin1 }
-                   // Destination = { name: Destination1 }
-
-                    //set Escorts
-                    var selected = [];
-                    $('#selectEscort input:checked').each(function () {
-                        selected.push($(this).attr('name'));
-                    });
-
-                    var arr_validEscort = [];
-                    for (i in arr_escort) {
-                        for (j in selected) {
-                            if (arr_escort[i].DisplayName.replace("'", "") == selected[j]) {
-                                arr_validEscort.push(arr_escort[i]);
-                            }
-                        }
-                    }
-
-                    
-                    if (func == "new") {
-                        ridePat = {
-                            pat: patient, Origin: Origin, Destination: Destination, date: dateRide, leavingHour: hours + ":" + minutes, coordinator: coordinator, remark: remark, Escort: arr_validEscort
-                        }
-                    }
-                    else {
-                        ridePat = {
-                            ridePatNum: ridePatNum, pat: patient, Origin: Origin, Destination: Destination, date: dateRide, leavingHour: hours + ":" + minutes,remark: remark,
-                            status: statusRidePat, Escort: arr_validEscort
-                        }
-                    }
-
-                    $.ajax({
-                        dataType: "json",
-                        url: "WebService.asmx/setRidePat",
-                        contentType: "application/json; charset=utf-8",
-                        type: "POST",
-                        async: false,
-                        data: JSON.stringify({ ridePat: ridePat, func: func }),
-                        success: function (data) {
-                            //SaveAddresses(0, numberOfRecords, customerID);
-
-                            swal({
-                                title: "נשמר",
-                                type: "success",
-                                timer: 1000,
-                                showConfirmButton: false
-                            });
-                            setTimeout(function () { returnRidePat() }, 1001);
-
-                        },
-                        error: function (err) {
-                            alert("Error in setRidePat");
-                        }
-                    });
-
-                    return false;
-                },
-
-                // Messages for form validation
-                messages: {
-                    dateRide: {
-                        required: "עליכם להזין תאריך"
-                    },
-                    pat: {
-                        required: "עליכם לבחור חולה"
-                    },
-                    patArabic: {
-                        required: "يجب عليك اختيار مريض"
-                    },
-                    Origin: {
-                        required: "עליכם לבחור מוצא"
-                    },
-                    Destination: {
-                        required: "עליכם לבחור יעד"
-                    },
-                    coordinator: {
-                        required: "עליכם לבחור רכז אחראי"
-                    },
-                },
-
-
-            });
-        });
-    </script>
-
-    <!-- jQuery  -->
-    <script src="assets/js/bootstrap-rtl.min.js"></script>
-    <script src="assets/js/detect.js"></script>
-    <script src="assets/js/fastclick.js"></script>
-    <script src="assets/js/jquery.slimscroll.js"></script>
-    <script src="assets/js/jquery.blockUI.js"></script>
-    <script src="assets/js/waves.js"></script>
-    <script src="assets/js/wow.min.js"></script>
-    <script src="assets/js/jquery.nicescroll.js"></script>
-    <script src="assets/js/jquery.scrollTo.min.js"></script>
-    <script src="../plugins/switchery/switchery.min.js"></script>
-
-    <!-- Sweet Alert js -->
-    <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
-    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
-
-    <script src="assets/js/jquery.core.js"></script>
-    <script src="assets/js/jquery.app.js"></script>
-    <script src="lib/datepicker-he.js"></script>
     <!--<script type="text/javascript">
         //DatePicker
 
