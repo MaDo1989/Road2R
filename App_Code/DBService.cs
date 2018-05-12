@@ -13,15 +13,13 @@ public class DbService
 {
     SqlTransaction tran;
     SqlCommand cmd;
-    SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+    SqlConnection con= new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
 
     SqlDataAdapter adp;
 
     public DbService()
     {
-        //
-        // TODO: Add constructor logic here
-        //
+     
     }
 
     public DataSet GetDataSetByQuery(string sqlQuery, CommandType cmdType = CommandType.Text, params SqlParameter[] parametersArray)
