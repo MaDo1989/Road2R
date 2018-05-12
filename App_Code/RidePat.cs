@@ -368,7 +368,7 @@ public class RidePat
         DataRow dr = ds.Tables[0].Rows[0];
 
         rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
-
+        rp.OnlyEscort = Convert.ToBoolean(dr["OnlyEscort"].ToString());
         rp.pat.DisplayName = dr["DisplayName"].ToString();
         rp.pat.EscortedList = new List<Escorted>();
         Location origin = new Location();
