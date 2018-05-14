@@ -78,6 +78,14 @@ public class Volunteer
 
         foreach (string location in PrefLocation) //insert Location Preferences to DB
         {
+            //Delete previous preferences in DB
+            db = new DbService();
+            query = "delete from PreferedDay_Volunteer where VolunteerId=" + id+";";
+            query += "delete from PreferredArea_Volunteer where VolunteerId = " + id + ";";
+            query+= "delete from PreferredLocation_Volunteer where VolunteerId = " + id + ";";
+            db.ExecuteQuery(query);
+
+
             db = new DbService();
             cmd = new SqlCommand();
             cmd.CommandType = CommandType.Text;
