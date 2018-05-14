@@ -69,7 +69,7 @@ public class Volunteer
         }
     }
 
-    public int setVolunteerPrefs(int Id,List<string> PrefLocation,List<string> PrefArea,List<string[]> PrefTime,int AvailableSeats)
+    public int setVolunteerPrefs(int Id,List<string> PrefLocation,List<string> PrefArea,List<string> PrefTime,int AvailableSeats)
     {
         string query = "";
         int res=0;
@@ -100,8 +100,11 @@ public class Volunteer
             res += db.ExecuteQuery(query, cmd.CommandType, AreaParams);
         }
 
-        foreach (string[] shift in PrefTime) //insert Day&Shift Preferences to DB
+        foreach (string shift in PrefTime) //insert Day&Shift Preferences to DB
         {
+          string finalShift = shift.Substring(shift.Length - 2);
+            string day = shift.Substring(0,shift.Length - 1);
+
             db = new DbService();
             cmd = new SqlCommand();
             cmd.CommandType = CommandType.Text;
