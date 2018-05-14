@@ -69,13 +69,13 @@ public class Volunteer
         }
     }
 
-    public int setVolunteerPrefs(int Id,List<string> PrefLocation,List<string> PrefArea,List<string> PrefTime,int AvailableSeats)
+    public int setVolunteerPrefs(int Id, List<string> PrefLocation, List<string> PrefArea, List<string> PrefTime, int AvailableSeats)
     {
         string query = "";
-        int res=0;
+        int res = 0;
         DbService db;
         SqlCommand cmd;
-        
+
         foreach (string location in PrefLocation) //insert Location Preferences to DB
         {
             db = new DbService();
@@ -102,15 +102,48 @@ public class Volunteer
 
         foreach (string shift in PrefTime) //insert Day&Shift Preferences to DB
         {
-          string finalShift = shift.Substring(shift.Length - 2);
-            string day = shift.Substring(0,shift.Length - 1);
+            string day = shift.Substring(shift.Length - 1);
+            string finalShift = shift.Substring(0, shift.Length - 1);
+            if (finalShift=="morning")
+            {
+                finalShift = "בוקר";
+            }
+            else
+            {
+                finalShift = "אחהצ";
+            }
+            switch (day)
+            {
+                case "A":
+                    day = "ראשון";
+                    break;
+                case "B":
+                    day = "שני";
+                    break;
+                case "C":
+                    day = "שלישי";
+                    break;
+                case "D":
+                    day = "רביעי";
+                    break;
+                case "E":
+                    day = "חמישי";
+                    break;
+                case "F":
+                    day = "שישי";
+                    break;
+                case "G":
+                    day = "שבת";
+                    break;
+            }
+
 
             db = new DbService();
             cmd = new SqlCommand();
             cmd.CommandType = CommandType.Text;
             SqlParameter[] shiftParams = new SqlParameter[3];
-            shiftParams[0] = cmd.Parameters.AddWithValue("@day", shift[0]);
-            shiftParams[1] = cmd.Parameters.AddWithValue("@shift", shift[1]);
+            shiftParams[0] = cmd.Parameters.AddWithValue("@day", day);
+            shiftParams[1] = cmd.Parameters.AddWithValue("@shift", finalShift);
             shiftParams[2] = cmd.Parameters.AddWithValue("@Id", Id);
             query = "insert into PreferedDay_Volunteer (PreferedDayDayInWeek,VolunteerId,Shift) values (@day,@Id,@shift);";
             res += db.ExecuteQuery(query, cmd.CommandType, shiftParams);
@@ -118,7 +151,7 @@ public class Volunteer
 
         db = new DbService();
         cmd = new SqlCommand();
-        query = "insert into Volunteer (AvailableSeats) values("+AvailableSeats+") where Id="+Id;
+        query = "insert into Volunteer (AvailableSeats) values(" + AvailableSeats + ") where Id=" + Id;
 
         return res;
     }
