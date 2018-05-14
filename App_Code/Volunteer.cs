@@ -151,8 +151,8 @@ public class Volunteer
 
         db = new DbService();
         cmd = new SqlCommand();
-        query = "insert into Volunteer (AvailableSeats) values(" + AvailableSeats + ") where Id=" + Id;
-
+        query = "update Volunteer set AvailableSeats=" + AvailableSeats + " where Id=" + Id;
+        res += db.ExecuteQuery(query);
         return res;
     }
 
