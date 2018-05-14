@@ -42,7 +42,7 @@ public class WebService : System.Web.Services.WebService
 
 
     [WebMethod]
-    public int setVolunteerPrefs(int Id, List<string> PrefLocation, List<string> PrefArea,List<string[]> PrefTime,int AvailableSeats)
+    public int setVolunteerPrefs(int Id, List<string> PrefLocation, List<string> PrefArea,List<string> PrefTime,int AvailableSeats)
     {
         Volunteer v = new Volunteer();
         return v.setVolunteerPrefs(Id, PrefLocation, PrefArea, PrefTime, AvailableSeats);
