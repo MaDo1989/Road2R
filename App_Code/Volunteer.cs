@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Web;
@@ -39,6 +40,14 @@ public class Volunteer
     string knowArabic;//יודע ערבית?
     int id;
 
+    public List<string> PrefArea { get; set; }
+
+    public List<string> PrefLocation { get; set; }
+
+    public List<string[]> PrefTime { get; set; }
+
+    public int AvailableSeats { get; set; }
+
     public string UserName { get; set; }
 
     public string pnRegId { get; set; }
@@ -60,6 +69,68 @@ public class Volunteer
         }
     }
 
+    public int setVolunteerPrefs(int Id,List<string> PrefLocation,List<string> PrefArea,List<string[]> PrefTime,int AvailableSeats)
+    {
+        string query = "";
+        int res=0;
+        DbService db;
+        SqlCommand cmd;
+        
+        foreach (string location in PrefLocation) //insert Location Preferences to DB
+        {
+            db = new DbService();
+            cmd = new SqlCommand();
+            cmd.CommandType = CommandType.Text;
+            SqlParameter[] locationParams = new SqlParameter[2];
+            locationParams[0] = cmd.Parameters.AddWithValue("@location", location);
+            locationParams[1] = cmd.Parameters.AddWithValue("@Id", Id);
+            query = "insert into PreferredLocation_Volunteer (PreferredLocation,VolunteerId) values (@location,@Id);";
+            res += db.ExecuteQuery(query, cmd.CommandType, locationParams);
+        }
+
+        foreach (string area in PrefArea) //insert Area Preferences to DB
+        {
+            db = new DbService();
+            cmd = new SqlCommand();
+            cmd.CommandType = CommandType.Text;
+            SqlParameter[] AreaParams = new SqlParameter[2];
+            AreaParams[0] = cmd.Parameters.AddWithValue("@area", area);
+            AreaParams[1] = cmd.Parameters.AddWithValue("@Id", Id);
+            query = "insert into PreferredArea_Volunteer (PreferredArea,VolunteerId) values (@area,@Id);";
+            res += db.ExecuteQuery(query, cmd.CommandType, AreaParams);
+        }
+
+        foreach (string[] shift in PrefTime) //insert Day&Shift Preferences to DB
+        {
+            db = new DbService();
+            cmd = new SqlCommand();
+            cmd.CommandType = CommandType.Text;
+            SqlParameter[] shiftParams = new SqlParameter[3];
+            shiftParams[0] = cmd.Parameters.AddWithValue("@day", shift[0]);
+            shiftParams[1] = cmd.Parameters.AddWithValue("@shift", shift[1]);
+            shiftParams[2] = cmd.Parameters.AddWithValue("@Id", Id);
+            query = "insert into PreferedDay_Volunteer (PreferedDayDayInWeek,VolunteerId,Shift) values (@day,@Id,@shift);";
+            res += db.ExecuteQuery(query, cmd.CommandType, shiftParams);
+        }
+
+        db = new DbService();
+        cmd = new SqlCommand();
+        query = "insert into Volunteer (AvailableSeats) values("+AvailableSeats+") where Id="+Id;
+
+        return res;
+    }
+
+    public void getVolunteerPrefs(int id)
+    {
+        string query = "select PreferedDayDayInWeek,Shift from PreferedDay_Volunteer where VolunteerId=" + id;
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+
+        }
+    }
+
     public string FirstNameH
     {
         get
@@ -71,45 +142,6 @@ public class Volunteer
         {
             firstNameH = value;
         }
-    }
-
-    internal List<Volunteer> getCoorList()
-    {
-        string query = "select * from VolunteerTypeView where VolunTypeType='רכז' and IsActive='true'";
-        DbService db = new DbService();
-        DataSet ds = db.GetDataSetByQuery(query);
-        List<Volunteer> vl = new List<Volunteer>();
-        foreach (DataRow dr in ds.Tables[0].Rows)
-        {
-            Volunteer v = new Volunteer();
-            v.DisplayName = dr["DisplayName"].ToString();
-            v.CellPhone = dr["CellPhone"].ToString();
-            v.TypeVol = "רכז";
-            v.UserName = dr["UserName"].ToString();
-            vl.Add(v);
-        }
-        return vl;
-
-    }
-
-    public Volunteer getCoor(string userName)
-    {
-        string query = "select * from Volunteer where UserName='" + userName + "'";
-        DbService db = new DbService();
-        DataSet ds = db.GetDataSetByQuery(query);
-        Volunteer v = new Volunteer();
-        try
-        {
-            DataRow dr = ds.Tables[0].Rows[0];
-            
-            v.DisplayName = dr["DisplayName"].ToString();
-        }
-        catch (Exception)
-        {
-
-        }
-        
-        return v;
     }
 
     public string FirstNameA
@@ -268,46 +300,6 @@ public class Volunteer
         }
     }
 
-    public Volunteer getVolunteerByMobile(string mobile)
-    {
-        DbService db = new DbService();
-        string query = "select * from VolunteerView where cellPhone = '" + mobile + "'";
-        DataSet ds = db.GetDataSetByQuery(query);
-        Volunteer v = new Volunteer();
-        foreach (DataRow dr in ds.Tables[0].Rows)
-        {
-            v.Id = int.Parse(dr["Id"].ToString());
-            v.DisplayName = dr["DisplayName"].ToString();
-            v.FirstNameA = dr["FirstNameA"].ToString();
-            v.FirstNameH = dr["FirstNameH"].ToString();
-            v.LastNameH = dr["LastNameH"].ToString();
-            v.LastNameA = dr["LastNameA"].ToString();
-            v.CellPhone = dr["CellPhone"].ToString();
-            v.CellPhone2 = dr["CellPhone2"].ToString();
-            v.HomePhone = dr["HomePhone"].ToString();
-            v.City = dr["City"].ToString();
-            v.Address = dr["Address"].ToString();
-            v.Email = dr["Email"].ToString();
-            v.Birthdate = dr["BirthDate"].ToString();
-            v.JoinDate = dr["JoinDate"].ToString();
-            v.Status = dr["IsActive"].ToString();
-            v.Gender = dr["Gender"].ToString();
-            v.KnowArabic = dr["KnowsArabic"].ToString();
-            //v.PreferRoute1 = dr["preferRoute1"].ToString();
-            //v.PreferRoute2 = dr["preferRoute2"].ToString();
-            //v.PreferRoute3 = dr["preferRoute3"].ToString();
-            //v.Day1 = dr["preferDay1"].ToString();
-            //v.Day2 = dr["preferDay2"].ToString();
-            //v.Day3 = dr["preferDay3"].ToString();
-            //v.Hour1 = dr["preferHour1"].ToString();
-            //v.Hour2 = dr["preferHour2"].ToString();
-            //v.Hour3 = dr["preferHour3"].ToString();
-            v.TypeVol = dr["Type"].ToString();
-        }
-        return v;
-
-    }
-
     public string PreferRoute1
     {
         get
@@ -425,6 +417,88 @@ public class Volunteer
         }
     }
 
+    internal List<Volunteer> getCoorList()
+    {
+        string query = "select * from VolunteerTypeView where VolunTypeType='רכז' and IsActive='true'";
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        List<Volunteer> vl = new List<Volunteer>();
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+            Volunteer v = new Volunteer();
+            v.DisplayName = dr["DisplayName"].ToString();
+            v.CellPhone = dr["CellPhone"].ToString();
+            v.TypeVol = "רכז";
+            v.UserName = dr["UserName"].ToString();
+            vl.Add(v);
+        }
+        return vl;
+
+    }
+
+    public Volunteer getCoor(string userName)
+    {
+        string query = "select * from Volunteer where UserName='" + userName + "'";
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        Volunteer v = new Volunteer();
+        try
+        {
+            DataRow dr = ds.Tables[0].Rows[0];
+
+            v.DisplayName = dr["DisplayName"].ToString();
+        }
+        catch (Exception)
+        {
+
+        }
+
+        return v;
+    }
+
+
+    public Volunteer getVolunteerByMobile(string mobile)
+    {
+        DbService db = new DbService();
+        string query = "select * from VolunteerView where cellPhone = '" + mobile + "'";
+        DataSet ds = db.GetDataSetByQuery(query);
+        Volunteer v = new Volunteer();
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+            v.Id = int.Parse(dr["Id"].ToString());
+            v.DisplayName = dr["DisplayName"].ToString();
+            v.FirstNameA = dr["FirstNameA"].ToString();
+            v.FirstNameH = dr["FirstNameH"].ToString();
+            v.LastNameH = dr["LastNameH"].ToString();
+            v.LastNameA = dr["LastNameA"].ToString();
+            v.CellPhone = dr["CellPhone"].ToString();
+            v.CellPhone2 = dr["CellPhone2"].ToString();
+            v.HomePhone = dr["HomePhone"].ToString();
+            v.City = dr["City"].ToString();
+            v.Address = dr["Address"].ToString();
+            v.Email = dr["Email"].ToString();
+            v.Birthdate = dr["BirthDate"].ToString();
+            v.JoinDate = dr["JoinDate"].ToString();
+            v.Status = dr["IsActive"].ToString();
+            v.Gender = dr["Gender"].ToString();
+            v.KnowArabic = dr["KnowsArabic"].ToString();
+            //v.PreferRoute1 = dr["preferRoute1"].ToString();
+            //v.PreferRoute2 = dr["preferRoute2"].ToString();
+            //v.PreferRoute3 = dr["preferRoute3"].ToString();
+            //v.Day1 = dr["preferDay1"].ToString();
+            //v.Day2 = dr["preferDay2"].ToString();
+            //v.Day3 = dr["preferDay3"].ToString();
+            //v.Hour1 = dr["preferHour1"].ToString();
+            //v.Hour2 = dr["preferHour2"].ToString();
+            //v.Hour3 = dr["preferHour3"].ToString();
+            v.TypeVol = dr["Type"].ToString();
+        }
+        return v;
+
+    }
+
+
+
     public string JoinDate
     {
         get
@@ -471,70 +545,70 @@ public class Volunteer
         //
     }
 
-    public Volunteer(string _firstNameH, string __firstNameA, string _lastNameH, string _lastNameA, string _cellPhone, string _cellPhone2, string _homePhone,
-        string _city, string _address, string _email, string _birthdate, string _joindate, string _status, string _gender, string _knowArabic,
-        string _preferRoute1, string _preferRoute2, string _preferRoute3, string _day1, string _day2, string _day3,
-        string _hour1, string _hour2, string _hour3, string _typeVol)
-    {
-        FirstNameH = _firstNameH;
-        FirstNameA = __firstNameA;
-        LastNameH = _lastNameH;
-        LastNameA = _lastNameA;
-        CellPhone = _cellPhone;
-        CellPhone2 = _cellPhone2;
-        HomePhone = _homePhone;
-        City = _city;
-        Address = _address;
-        Email = _email;
-        Birthdate = _birthdate;
-        JoinDate = _joindate;
-        Status = _status;
-        Gender = _gender;
-        PreferRoute1 = _preferRoute1;
-        PreferRoute2 = _preferRoute2;
-        PreferRoute3 = _preferRoute3;
-        Day1 = _day1;
-        Hour1 = _hour1;
-        Day2 = _day2;
-        Hour2 = _hour2;
-        Day3 = _day3;
-        Hour3 = _hour3;
-        TypeVol = _typeVol;
-        KnowArabic = _knowArabic;
-    }
+    //public Volunteer(string _firstNameH, string __firstNameA, string _lastNameH, string _lastNameA, string _cellPhone, string _cellPhone2, string _homePhone,
+    //    string _city, string _address, string _email, string _birthdate, string _joindate, string _status, string _gender, string _knowArabic,
+    //    string _preferRoute1, string _preferRoute2, string _preferRoute3, string _day1, string _day2, string _day3,
+    //    string _hour1, string _hour2, string _hour3, string _typeVol)
+    //{
+    //    FirstNameH = _firstNameH;
+    //    FirstNameA = __firstNameA;
+    //    LastNameH = _lastNameH;
+    //    LastNameA = _lastNameA;
+    //    CellPhone = _cellPhone;
+    //    CellPhone2 = _cellPhone2;
+    //    HomePhone = _homePhone;
+    //    City = _city;
+    //    Address = _address;
+    //    Email = _email;
+    //    Birthdate = _birthdate;
+    //    JoinDate = _joindate;
+    //    Status = _status;
+    //    Gender = _gender;
+    //    //PreferRoute1 = _preferRoute1;
+    //    //PreferRoute2 = _preferRoute2;
+    //    //PreferRoute3 = _preferRoute3;
+    //    //Day1 = _day1;
+    //    //Hour1 = _hour1;
+    //    //Day2 = _day2;
+    //    //Hour2 = _hour2;
+    //    //Day3 = _day3;
+    //    //Hour3 = _hour3;
+    //    TypeVol = _typeVol;
+    //    KnowArabic = _knowArabic;
+    //}
 
-    public Volunteer(string _displayName, string _firstNameA, string _firstNameH, string _lastNameH, string _lastNameA,
-    string _cellPhone, string _cellPhone2, string _homePhone, string _city, string _street, string _typeVol, string _email, string _preferDay1,
-    string _preferHour1, string _preferDay2, string _preferHour2, string _preferDay3, string _preferHour3, string _preferRoute1, string _preferRoute2,
-    string _preferRoute3, string _joinDate, string _statusVolunteer, string _knowArabic, string _birthdate, string _gender)
-    {
-        DisplayName = _displayName;
-        FirstNameH = _firstNameH;
-        FirstNameA = _firstNameA;
-        LastNameH = _lastNameH;
-        LastNameA = _lastNameA;
-        CellPhone = _cellPhone;
-        CellPhone2 = _cellPhone2;
-        HomePhone = _homePhone;
-        City = _city;
-        Address = _street;
-        Email = _email;
-        Birthdate = _birthdate;
-        JoinDate = _joinDate;
-        Status = _statusVolunteer;
-        Gender = _gender;
-        PreferRoute1 = _preferRoute1;
-        PreferRoute2 = _preferRoute2;
-        PreferRoute3 = _preferRoute3;
-        Day1 = _preferDay1;
-        Hour1 = _preferHour1;
-        Day2 = _preferDay2;
-        Hour2 = _preferHour2;
-        Day3 = _preferDay3;
-        Hour3 = _preferHour3;
-        TypeVol = _typeVol;
-        KnowArabic = _knowArabic;
-    }
+    //public Volunteer(string _displayName, string _firstNameA, string _firstNameH, string _lastNameH, string _lastNameA,
+    //string _cellPhone, string _cellPhone2, string _homePhone, string _city, string _street, string _typeVol, string _email, string _preferDay1,
+    //string _preferHour1, string _preferDay2, string _preferHour2, string _preferDay3, string _preferHour3, string _preferRoute1, string _preferRoute2,
+    //string _preferRoute3, string _joinDate, string _statusVolunteer, string _knowArabic, string _birthdate, string _gender)
+    //{
+    //    DisplayName = _displayName;
+    //    FirstNameH = _firstNameH;
+    //    FirstNameA = _firstNameA;
+    //    LastNameH = _lastNameH;
+    //    LastNameA = _lastNameA;
+    //    CellPhone = _cellPhone;
+    //    CellPhone2 = _cellPhone2;
+    //    HomePhone = _homePhone;
+    //    City = _city;
+    //    Address = _street;
+    //    Email = _email;
+    //    Birthdate = _birthdate;
+    //    JoinDate = _joinDate;
+    //    Status = _statusVolunteer;
+    //    Gender = _gender;
+    //    //PreferRoute1 = _preferRoute1;
+    //    //PreferRoute2 = _preferRoute2;
+    //    //PreferRoute3 = _preferRoute3;
+    //    //Day1 = _preferDay1;
+    //    //Hour1 = _preferHour1;
+    //    //Day2 = _preferDay2;
+    //    //Hour2 = _preferHour2;
+    //    //Day3 = _preferDay3;
+    //    //Hour3 = _preferHour3;
+    //    TypeVol = _typeVol;
+    //    KnowArabic = _knowArabic;
+    //}
 
     public Volunteer(string _firstNameH, string _lastNameH, string _cellPhone)
     {

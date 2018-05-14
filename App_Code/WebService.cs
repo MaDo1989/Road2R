@@ -41,18 +41,31 @@ public class WebService : System.Web.Services.WebService
     //}
 
 
+    [WebMethod]
+    public int setVolunteerPrefs(int Id, List<string> PrefLocation, List<string> PrefArea,List<string[]> PrefTime,int AvailableSeats)
+    {
+        Volunteer v = new Volunteer();
+        return v.setVolunteerPrefs(Id, PrefLocation, PrefArea, PrefTime, AvailableSeats);
+    }
 
     [WebMethod]
-    public int setRidePat(RidePat RidePat,string func)
+    public void getVolunteerPrefs(int Id)
+    {
+        Volunteer v = new Volunteer();
+        v.getVolunteerPrefs(Id);
+    }
+
+    [WebMethod]
+    public int setRidePat(RidePat RidePat, string func)
     {
         //Dictionary<string, object> d = (Dictionary<string, object>)ridePat;
         // d = (Dictionary<string, object>)ridePat;
         // JavaScriptSerializer j = new JavaScriptSerializer();
         // Object[] o = j.Deserialize<object[]>(ridePat);
         RidePat rp = new RidePat();
-       return rp.setRidePat(RidePat, func);
-       // rp.setRidePat(d, func);
-       // return j.Serialize(rp);
+        return rp.setRidePat(RidePat, func);
+        // rp.setRidePat(d, func);
+        // return j.Serialize(rp);
 
     }
 

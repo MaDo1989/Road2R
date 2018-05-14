@@ -6,31 +6,23 @@
     <title></title>
     <script>
         function go() {
-            var m = new Object();
-            var i = new Object();
-            var a = new Object();
-            m.Id = 1;
-            m.DisplayName = "Moshe";
-            
-            i.Id = 2;
-            i.DisplayName = "Itzik";
+            var Id = 7;
+            var location1 = "רמבם";
+            var location2 = "הדסה";
+            var PrefLocation = [location1, location2];
+            var area1 = "צפון";
+            var area2 = "מרכז";
+            var PrefArea = [area1, area2];
+            var Shift1 = ["ראשון", "בוקר"];
+            var Shift2 = ["שלישי", "אחהצ"];
+            var PrefTime = [Shift1, Shift2];
+            var AvailableSeats = 4;
 
-            a.Id = 3;
-            a.DisplayName = "Avi";
-            var arr = [m, i, a];
-
-            var n = "Matan";
-
-            t = { Escorts: arr, Name: n };
-
-            var func = "New";
-            var myList = [m, i, a];
-            var c = { DisplayName: "Moshe", Id: 1,myList:myList };
-            var request = { c: c };
+            var request = { Id: Id, PrefLocation: PrefLocation, PrefArea: PrefArea, PrefTime: PrefTime, AvailableSeats: AvailableSeats};
             var dataString = JSON.stringify(request)
             $.ajax({
                 dataType: "json",
-                url: "WebService.asmx/test",
+                url: "WebService.asmx/setVolunteerPrefs",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
                 async: true,
@@ -44,8 +36,8 @@
             
         }
 
-        function getCoorsErrorCB() {
-            alert("Error in go" );
+        function getCoorsErrorCB(e) {
+            alert("Error in go: " + e.responseText);
         }
     </script>
 
