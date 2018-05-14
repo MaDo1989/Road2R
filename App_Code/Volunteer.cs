@@ -69,29 +69,23 @@ public class Volunteer
         }
     }
 
-    public int setVolunteerPrefs(int Id, List<string> PrefLocation, List<string> PrefArea, List<string> PrefTime, int AvailableSeats)
+    public int setVolunteerPrefs(int id, List<string> PrefLocation, List<string> PrefArea, List<string> PrefTime, int AvailableSeats)
     {
         string query = "";
         int res = 0;
         DbService db;
         SqlCommand cmd;
 
+
+        //Delete previous preferences in DB
+        db = new DbService();
+        query = "delete from PreferedDay_Volunteer where VolunteerId=" + id + "; ";
+        query += "delete from PreferredArea_Volunteer where VolunteerId = " + id + "; ";
+        query += "delete from PreferredLocation_Volunteer where VolunteerId = " + id + "; ";
+        db.ExecuteQuery(query);
+
         foreach (string location in PrefLocation) //insert Location Preferences to DB
         {
-            //Delete previous preferences in DB
-            db = new DbService();
-            query = "delete from PreferedDay_Volunteer where VolunteerId=" + id+";";
-            db.ExecuteQuery(query);
-
-            db = new DbService();
-            query = "delete from PreferredArea_Volunteer where VolunteerId = " + id + ";";
-            db.ExecuteQuery(query);
-
-            db = new DbService();
-            query = "delete from PreferredLocation_Volunteer where VolunteerId = " + id + ";";
-            db.ExecuteQuery(query);
-
-
             db = new DbService();
             cmd = new SqlCommand();
             cmd.CommandType = CommandType.Text;
@@ -118,7 +112,7 @@ public class Volunteer
         {
             string day = shift.Substring(shift.Length - 1);
             string finalShift = shift.Substring(0, shift.Length - 1);
-            if (finalShift=="morning")
+            if (finalShift == "morning")
             {
                 finalShift = "בוקר";
             }
