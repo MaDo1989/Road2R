@@ -457,13 +457,13 @@
             if (arr_escort.length == 0) str = "<label>אין מלווים</label>";
             $("#selectEscort").html(str);
 
-            if (arr_customer.func=="show") {
+            if (arr_customer.func == "show") {
                 var select = $("#selectEscort input");
                 for (var i = 0; i < select.length; i++) {
                     $("#selectEscort input").eq(i).prop('disabled', true);
                 }
             }
-            
+
         }
 
         function generateEscErrorCB() {
@@ -920,15 +920,6 @@
                         $("#dirBTN").attr('disabled', 'disabled');
                         $("#patArabic").attr('disabled', 'disabled');
                         $("#saveCustomer").attr('disabled', 'disabled');
-                        //var arr = $("#escortDiv").children();
-                       // alert(arr[0]);
-                       // $("#escortDiv").children().prop('disabled', true); //Doesn't work in Chrome
-                        //$("#selectEscort :checkbox").attr('disabled', true)
-                        //var select = $("#selectEscort input");
-                        //for (var i = 0; i < select.length; i++) {
-                        //    $("#selectEscort input").eq(i).prop('disabled', true);
-                        //}
-                        
                         $("#onlyEscort").prop('disabled', true);
 
                     }
