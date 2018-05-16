@@ -255,7 +255,7 @@
 
                         },
                         error: function (err) {
-                            alert("Error in setRidePat");
+                            alert("Error in setRidePat: "+err);
                         }
                     });
 
@@ -905,7 +905,7 @@
                 $("#statusRidePat").attr('disabled', 'disabled');
                 $("#Equipment").attr('disabled', 'disabled');
                 if (arr_customer.func == "edit" || arr_customer.func == "show") {
-                    uploadData(arr_customer.displayName);
+                    uploadData(arr_customer.RidePatNum);
 
                     if (arr_customer.func == "show") {
 
@@ -1014,8 +1014,8 @@
                     if (typeof arr_escort !== "undefined") {
 
                         for (i in arr_escort) {
-                            for (j in ridePat.Pat.EscortedList) {
-                                if (arr_escort[i].DisplayName == ridePat.Pat.EscortedList[j].DisplayName) {
+                            for (j in ridePat.Escorts) {
+                                if (arr_escort[i].DisplayName == ridePat.Escorts[j].DisplayName) {
                                     $("#escortCB" + arr_escort[i].Id).prop('checked', true);
                                 }
                             }

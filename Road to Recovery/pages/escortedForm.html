@@ -147,13 +147,13 @@
         function generateStatus(escorted) {
             var $select = $("#status");
             //if (escorted.IsActive != "") {
-                if (escorted.IsActive) 
-                   // $('<option>', { value: escorted.IsActive, text: "פעיל" }).appendTo($select);
-                    $("#status").val = "פעיל";
-                else
-                    //$('<option>', { value: escorted.IsActive, text: "לא פעיל" }).appendTo($select);
-                    $("#status").val = "לא פעיל";
-           // }
+            if (escorted.IsActive)
+                // $('<option>', { value: escorted.IsActive, text: "פעיל" }).appendTo($select);
+                $("#status").val = "פעיל";
+            else
+                //$('<option>', { value: escorted.IsActive, text: "לא פעיל" }).appendTo($select);
+                $("#status").val = "לא פעיל";
+            // }
             //$('<option>', { value: "", text: "בחר " }).appendTo($select);
 
             //$('<option>', { value: "פעיל", text: "פעיל " }).appendTo($select);
@@ -197,7 +197,7 @@
                     uploadData(arr_customer.displayName);
 
                     if (arr_customer.func == "show") {
-                        
+
                         $("#escortedName").attr('disabled', 'disabled');
                         $("#escortedFirstName").attr('disabled', 'disabled');
                         $("#escortedLastName").attr('disabled', 'disabled');
@@ -251,8 +251,8 @@
                     $("#HomePhone").val(escorted.HomePhone);
                     $("#city").val(escorted.Addrees);
                     if (escorted.IsActive)
-                        $("#selectstatus option[value=1]").attr('selected',true);
-                    else 
+                        $("#selectstatus option[value=1]").attr('selected', true);
+                    else
                         $("#selectstatus option[value=0]").attr('selected', true);
                     $("#selectgender").val(escorted.Gender);
                     $("#selectcontactType").val(escorted.ContactType);
@@ -343,19 +343,6 @@
                             </a>
                         </li>
 
-                        <!--<li class="has_sub">
-                            <a href="javascript:void(0);" class="waves-effect waves-primary">
-                                <i class="md md-wallet-travel"></i> <span> ניהול הזמנות </span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <ul class="list-unstyled">
-                                <li><a href="viewOrders.html">הזמנות</a></li>
-                                <li><a href="viewDocuments.html">מסמכים</a></li>
-                                <li><a href="viewInvoices.html">חשבוניות</a></li>
-                                <li><a href="viewServices.html">מחירונים</a></li>
-                            </ul>
-                        </li>-->
-
                         <li>
                             <a href="viewVolunteer.html" class="waves-effect waves-primary">
                                 <i class="md md-today"></i><span> ניהול מתנדבים</span>
@@ -367,34 +354,11 @@
                                 <i class="md md-recent-actors"></i><span> ניהול חולים</span>
                             </a>
                         </li>
-
-                        <!--<li class="has_sub">
-                            <a href="javascript:void(0);" class="waves-effect waves-primary">
-                                <i class="md md-local-shipping"></i> <span> ניהול משאיות </span>
-                                <span class="menu-arrow"></span>
+                        <li>
+                            <a href="viewRidePats.html" class="waves-effect waves-primary">
+                                <i class="md md-today"></i><span> ניהול הסעות</span>
                             </a>
-                            <ul class="list-unstyled">
-                                <li><a href="viewTrucks.html">משאיות</a></li>
-                                <li><a href="viewHandlings.html">טיפולים</a></li>
-                            </ul>
-                        </li>-->
-                        <!--<li class="has_sub">
-                            <a href="javascript:void(0);" class="waves-effect waves-primary">
-                                <i class="md md-person"></i> <span> ניהול הנהגים </span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <ul class="list-unstyled">
-                                <li><a href="viewDrivers.html">נהגים</a></li>
-                                <li><a href="viewDriverConstrains.html">זמינות הנהגים</a></li>
-                            </ul>
-                        </li>-->
-                        <!--<li>
-                            <a href="viewReports.html" class="waves-effect waves-primary">
-                                <i class="md md-poll"></i><span> דוחות</span>
-                            </a>
-                        </li>-->
-
-
+                        </li>
                     </ul>
                     <div class="clearfix"></div>
                 </div>
@@ -667,9 +631,9 @@
                     var func = arr_customer.func;
                     if (cellphone2 == "") { cellphone2 = "0"; }
                     var Eid = JSON.parse(GENERAL.ESCORTED.getEscortedList()).Id
-                   var Pid = JSON.parse(GENERAL.PATIENTS.getPatientsList()).Id
+                    var Pid = JSON.parse(GENERAL.PATIENTS.getPatientsList()).Id
 
-                    patient = { displayName: displayNamePat,id:Pid}
+                    patient = { displayName: displayNamePat, id: Pid }
                     escorted = {
                         pat: patient, id: Eid, displayName: displayName, firstNameH: firstNameH, firstNameA: nameA, lastNameH: lastNameH, lastNameA: lastNameA, addrees: city, cellPhone: cellPhone, cellphone2: cellphone2, homePhone: homePhone,
                         status: status, contactType: contactType, gender: gender
