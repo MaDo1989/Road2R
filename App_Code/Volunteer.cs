@@ -40,6 +40,8 @@ public class Volunteer
     string knowArabic;//יודע ערבית?
     int id;
 
+    public bool IsActive { get; set; }
+
     public List<string> PrefArea { get; set; }
 
     public List<string> PrefLocation { get; set; }
@@ -68,113 +70,6 @@ public class Volunteer
             displayName = value;
         }
     }
-
-    public int setVolunteerPrefs(int id, List<string> PrefLocation, List<string> PrefArea, List<string> PrefTime, int AvailableSeats)
-    {
-        string query = "";
-        int res = 0;
-        DbService db;
-        SqlCommand cmd;
-
-
-        //Delete previous preferences in DB
-        db = new DbService();
-        query = "delete from PreferedDay_Volunteer where VolunteerId=" + id + "; ";
-        query += "delete from PreferredArea_Volunteer where VolunteerId = " + id + "; ";
-        query += "delete from PreferredLocation_Volunteer where VolunteerId = " + id + "; ";
-        db.ExecuteQuery(query);
-
-        foreach (string location in PrefLocation) //insert Location Preferences to DB
-        {
-            db = new DbService();
-            cmd = new SqlCommand();
-            cmd.CommandType = CommandType.Text;
-            SqlParameter[] locationParams = new SqlParameter[2];
-            locationParams[0] = cmd.Parameters.AddWithValue("@location", location);
-            locationParams[1] = cmd.Parameters.AddWithValue("@Id", Id);
-            query = "insert into PreferredLocation_Volunteer (PreferredLocation,VolunteerId) values (@location,@Id);";
-            res += db.ExecuteQuery(query, cmd.CommandType, locationParams);
-        }
-
-        foreach (string area in PrefArea) //insert Area Preferences to DB
-        {
-            db = new DbService();
-            cmd = new SqlCommand();
-            cmd.CommandType = CommandType.Text;
-            SqlParameter[] AreaParams = new SqlParameter[2];
-            AreaParams[0] = cmd.Parameters.AddWithValue("@area", area);
-            AreaParams[1] = cmd.Parameters.AddWithValue("@Id", Id);
-            query = "insert into PreferredArea_Volunteer (PreferredArea,VolunteerId) values (@area,@Id);";
-            res += db.ExecuteQuery(query, cmd.CommandType, AreaParams);
-        }
-
-        foreach (string shift in PrefTime) //insert Day&Shift Preferences to DB
-        {
-            string day = shift.Substring(shift.Length - 1);
-            string finalShift = shift.Substring(0, shift.Length - 1);
-            if (finalShift == "morning")
-            {
-                finalShift = "בוקר";
-            }
-            else
-            {
-                finalShift = "אחהצ";
-            }
-            switch (day)
-            {
-                case "A":
-                    day = "ראשון";
-                    break;
-                case "B":
-                    day = "שני";
-                    break;
-                case "C":
-                    day = "שלישי";
-                    break;
-                case "D":
-                    day = "רביעי";
-                    break;
-                case "E":
-                    day = "חמישי";
-                    break;
-                case "F":
-                    day = "שישי";
-                    break;
-                case "G":
-                    day = "שבת";
-                    break;
-            }
-
-
-            db = new DbService();
-            cmd = new SqlCommand();
-            cmd.CommandType = CommandType.Text;
-            SqlParameter[] shiftParams = new SqlParameter[3];
-            shiftParams[0] = cmd.Parameters.AddWithValue("@day", day);
-            shiftParams[1] = cmd.Parameters.AddWithValue("@shift", finalShift);
-            shiftParams[2] = cmd.Parameters.AddWithValue("@Id", Id);
-            query = "insert into PreferedDay_Volunteer (PreferedDayDayInWeek,VolunteerId,Shift) values (@day,@Id,@shift);";
-            res += db.ExecuteQuery(query, cmd.CommandType, shiftParams);
-        }
-
-        db = new DbService();
-        cmd = new SqlCommand();
-        query = "update Volunteer set AvailableSeats=" + AvailableSeats + " where Id=" + Id;
-        res += db.ExecuteQuery(query);
-        return res;
-    }
-
-    public void getVolunteerPrefs(int id)
-    {
-        string query = "select PreferedDayDayInWeek,Shift from PreferedDay_Volunteer where VolunteerId=" + id;
-        DbService db = new DbService();
-        DataSet ds = db.GetDataSetByQuery(query);
-        foreach (DataRow dr in ds.Tables[0].Rows)
-        {
-
-        }
-    }
-
     public string FirstNameH
     {
         get
@@ -460,6 +355,113 @@ public class Volunteer
             hour3 = value;
         }
     }
+    public int setVolunteerPrefs(int id, List<string> PrefLocation, List<string> PrefArea, List<string> PrefTime, int AvailableSeats)
+    {
+        string query = "";
+        int res = 0;
+        DbService db;
+        SqlCommand cmd;
+
+
+        //Delete previous preferences in DB
+        db = new DbService();
+        query = "delete from PreferedDay_Volunteer where VolunteerId=" + id + "; ";
+        query += "delete from PreferredArea_Volunteer where VolunteerId = " + id + "; ";
+        query += "delete from PreferredLocation_Volunteer where VolunteerId = " + id + "; ";
+        db.ExecuteQuery(query);
+
+        foreach (string location in PrefLocation) //insert Location Preferences to DB
+        {
+            db = new DbService();
+            cmd = new SqlCommand();
+            cmd.CommandType = CommandType.Text;
+            SqlParameter[] locationParams = new SqlParameter[2];
+            locationParams[0] = cmd.Parameters.AddWithValue("@location", location);
+            locationParams[1] = cmd.Parameters.AddWithValue("@Id", Id);
+            query = "insert into PreferredLocation_Volunteer (PreferredLocation,VolunteerId) values (@location,@Id);";
+            res += db.ExecuteQuery(query, cmd.CommandType, locationParams);
+        }
+
+        foreach (string area in PrefArea) //insert Area Preferences to DB
+        {
+            db = new DbService();
+            cmd = new SqlCommand();
+            cmd.CommandType = CommandType.Text;
+            SqlParameter[] AreaParams = new SqlParameter[2];
+            AreaParams[0] = cmd.Parameters.AddWithValue("@area", area);
+            AreaParams[1] = cmd.Parameters.AddWithValue("@Id", Id);
+            query = "insert into PreferredArea_Volunteer (PreferredArea,VolunteerId) values (@area,@Id);";
+            res += db.ExecuteQuery(query, cmd.CommandType, AreaParams);
+        }
+
+        foreach (string shift in PrefTime) //insert Day&Shift Preferences to DB
+        {
+            string day = shift.Substring(shift.Length - 1);
+            string finalShift = shift.Substring(0, shift.Length - 1);
+            if (finalShift == "morning")
+            {
+                finalShift = "בוקר";
+            }
+            else
+            {
+                finalShift = "אחהצ";
+            }
+            switch (day)
+            {
+                case "A":
+                    day = "ראשון";
+                    break;
+                case "B":
+                    day = "שני";
+                    break;
+                case "C":
+                    day = "שלישי";
+                    break;
+                case "D":
+                    day = "רביעי";
+                    break;
+                case "E":
+                    day = "חמישי";
+                    break;
+                case "F":
+                    day = "שישי";
+                    break;
+                case "G":
+                    day = "שבת";
+                    break;
+            }
+
+
+            db = new DbService();
+            cmd = new SqlCommand();
+            cmd.CommandType = CommandType.Text;
+            SqlParameter[] shiftParams = new SqlParameter[3];
+            shiftParams[0] = cmd.Parameters.AddWithValue("@day", day);
+            shiftParams[1] = cmd.Parameters.AddWithValue("@shift", finalShift);
+            shiftParams[2] = cmd.Parameters.AddWithValue("@Id", Id);
+            query = "insert into PreferedDay_Volunteer (PreferedDayDayInWeek,VolunteerId,Shift) values (@day,@Id,@shift);";
+            res += db.ExecuteQuery(query, cmd.CommandType, shiftParams);
+        }
+
+        db = new DbService();
+        cmd = new SqlCommand();
+        query = "update Volunteer set AvailableSeats=" + AvailableSeats + " where Id=" + Id;
+        res += db.ExecuteQuery(query);
+        return res;
+    }
+
+    public void getVolunteerPrefs(int id)
+    {
+        string query = "select PreferedDayDayInWeek,Shift from PreferedDay_Volunteer where VolunteerId=" + id;
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+
+        }
+    }
+
+
 
     internal List<Volunteer> getCoorList()
     {
@@ -686,10 +688,10 @@ v.AvailableSeats = int.Parse(dr["AvailableSeats"].ToString());
     public List<Volunteer> getVolunteersList(bool active)
     {
         #region DB functions
-        string query = "select * from Volunteer v";
+        string query = "select * from VolunteerTypeView";
         if (active)
         {
-            query += " where v.statusVolunteer = 'פעיל'";
+            query += " where IsActive = 'True'";
         }
 
         query += " order by firstNameH";
@@ -701,32 +703,32 @@ v.AvailableSeats = int.Parse(dr["AvailableSeats"].ToString());
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
             Volunteer v = new Volunteer();
-            v.DisplayName = dr["displayName"].ToString();
-            v.FirstNameA = dr["firstNameA"].ToString();
-            v.FirstNameH = dr["firstNameH"].ToString();
-            v.LastNameH = dr["lastNameH"].ToString();
-            v.LastNameA = dr["lastNameA"].ToString();
-            v.CellPhone = dr["cellPhone"].ToString();
-            v.CellPhone2 = dr["cellPhone2"].ToString();
-            v.HomePhone = dr["homePhone"].ToString();
-            v.City = dr["city"].ToString();
-            v.Address = dr["street"].ToString();
-            v.TypeVol = dr["typeVol"].ToString();
-            v.Email = dr["email"].ToString();
-            v.Day1 = dr["preferDay1"].ToString();
-            v.Hour1 = dr["preferHour1"].ToString();
-            v.Day2 = dr["preferDay2"].ToString();
-            v.Hour2 = dr["preferHour2"].ToString();
-            v.Day3 = dr["preferDay3"].ToString();
-            v.Hour3 = dr["preferHour3"].ToString();
-            v.PreferRoute1 = dr["preferRoute1"].ToString();
-            v.preferRoute2 = dr["preferRoute2"].ToString();
-            v.PreferRoute3 = dr["preferRoute3"].ToString();
-            v.JoinDate = dr["joinDate"].ToString();
-            v.Status = dr["statusVolunteer"].ToString();
-            v.KnowArabic = dr["knowArabic"].ToString();
-            v.Birthdate = dr["birthdate"].ToString();
-            v.Gender = dr["gender"].ToString();
+            v.DisplayName = dr["DisplayName"].ToString();
+            v.FirstNameA = dr["FirstNameA"].ToString();
+            v.FirstNameH = dr["FirstNameH"].ToString();
+            v.LastNameH = dr["LastNameH"].ToString();
+            v.LastNameA = dr["LastNameA"].ToString();
+            v.CellPhone = dr["CellPhone"].ToString();
+            v.CellPhone2 = dr["CellPhone2"].ToString();
+            v.HomePhone = dr["HomePhone"].ToString();
+            v.City = dr["CityCityName"].ToString();
+            v.Address = dr["Address"].ToString();
+            v.TypeVol = dr["VolunTypeType"].ToString();
+            v.Email = dr["Email"].ToString();
+            //v.Day1 = dr["preferDay1"].ToString();
+            //v.Hour1 = dr["preferHour1"].ToString();
+            //v.Day2 = dr["preferDay2"].ToString();
+            //v.Hour2 = dr["preferHour2"].ToString();
+            //v.Day3 = dr["preferDay3"].ToString();
+            //v.Hour3 = dr["preferHour3"].ToString();
+            //v.PreferRoute1 = dr["preferRoute1"].ToString();
+            //v.preferRoute2 = dr["preferRoute2"].ToString();
+            //v.PreferRoute3 = dr["preferRoute3"].ToString();
+            v.JoinDate = dr["JoinDate"].ToString();
+            v.Status = dr["IsActive"].ToString();
+            v.KnowArabic = dr["KnowsArabic"].ToString();
+            v.Birthdate = dr["BirthDate"].ToString();
+            v.Gender = dr["Gender"].ToString();
 
 
             list.Add(v);
@@ -739,40 +741,39 @@ v.AvailableSeats = int.Parse(dr["AvailableSeats"].ToString());
     public Volunteer getVolunteer()
     {
         #region DB functions
-        string query = "select displayName, firstNameA, firstNameH, lastNameH, lastNameA, cellPhone, cellPhone2, homePhone, city, street, email, birthdate, joinDate, statusVolunteer, gender, knowArabic, preferRoute1, preferRoute2, preferRoute3, preferDay1, preferDay2, preferDay3, preferHour1, preferHour2, preferHour3, typeVol from Volunteer where displayName ='" + displayName + "'";
+        string query = "select * from VolunteerTypeView where displayName ='" + displayName + "'";
         Volunteer v = new Volunteer();
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
 
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
-            v.DisplayName = dr["displayName"].ToString();
-            v.FirstNameA = dr["firstNameA"].ToString();
-            v.FirstNameH = dr["firstNameH"].ToString();
-            v.LastNameH = dr["lastNameH"].ToString();
-            v.LastNameA = dr["lastNameA"].ToString();
-            v.CellPhone = dr["cellPhone"].ToString();
-            v.CellPhone2 = dr["cellPhone2"].ToString();
-            v.HomePhone = dr["homePhone"].ToString();
-            v.City = dr["city"].ToString();
-            v.Address = dr["street"].ToString();
-            v.Email = dr["email"].ToString();
-
-            v.Birthdate = dr["birthdate"].ToString();
-            v.JoinDate = dr["joinDate"].ToString();
-            v.Status = dr["statusVolunteer"].ToString();
-            v.Gender = dr["gender"].ToString();
-            v.KnowArabic = dr["knowArabic"].ToString();
-            v.PreferRoute1 = dr["preferRoute1"].ToString();
-            v.PreferRoute2 = dr["preferRoute2"].ToString();
-            v.PreferRoute3 = dr["preferRoute3"].ToString();
-            v.Day1 = dr["preferDay1"].ToString();
-            v.Day2 = dr["preferDay2"].ToString();
-            v.Day3 = dr["preferDay3"].ToString();
-            v.Hour1 = dr["preferHour1"].ToString();
-            v.Hour2 = dr["preferHour2"].ToString();
-            v.Hour3 = dr["preferHour3"].ToString();
-            v.TypeVol = dr["typeVol"].ToString();
+            v.DisplayName = dr["DisplayName"].ToString();
+            v.FirstNameA = dr["FirstNameA"].ToString();
+            v.FirstNameH = dr["FirstNameH"].ToString();
+            v.LastNameH = dr["LastNameH"].ToString();
+            v.LastNameA = dr["LastNameA"].ToString();
+            v.CellPhone = dr["CellPhone"].ToString();
+            v.CellPhone2 = dr["CellPhone2"].ToString();
+            v.HomePhone = dr["HomePhone"].ToString();
+            v.City = dr["CityCityName"].ToString();
+            v.Address = dr["Address"].ToString();
+            v.Email = dr["Email"].ToString();
+            v.Birthdate = dr["BirthDate"].ToString();
+            v.JoinDate = dr["JoinDate"].ToString();
+            v.IsActive = Convert.ToBoolean(dr["IsActive"].ToString());
+            v.Gender = dr["Gender"].ToString();
+            v.KnowArabic = dr["KnowsArabic"].ToString();
+            //v.PreferRoute1 = dr["preferRoute1"].ToString();
+            //v.PreferRoute2 = dr["preferRoute2"].ToString();
+            //v.PreferRoute3 = dr["preferRoute3"].ToString();
+            //v.Day1 = dr["preferDay1"].ToString();
+            //v.Day2 = dr["preferDay2"].ToString();
+            //v.Day3 = dr["preferDay3"].ToString();
+            //v.Hour1 = dr["preferHour1"].ToString();
+            //v.Hour2 = dr["preferHour2"].ToString();
+            //v.Hour3 = dr["preferHour3"].ToString();
+            v.TypeVol = dr["VolunTypeType"].ToString();
 
         }
         #endregion
