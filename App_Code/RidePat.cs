@@ -209,40 +209,43 @@ public class RidePat
 
     public int setRidePat(RidePat ridePat, string func)
     {
-        Pat = ridePat.Pat;
-        //Pat.DisplayName = ridePat.Pat.DisplayName;
-        Location origin = new Location();
-        origin.Name = ridePat.Origin.Name;
-        Location destination = new Location();
-        destination.Name = ridePat.Destination.Name;
-        //int day = int.Parse(d["date"].ToString().Substring(0, 2));
-        //int month = int.Parse(d["date"].ToString().Substring(3, 2));
-        //int year = int.Parse(d["date"].ToString().Substring(6, 4));
-        //int hours = int.Parse(d["leavingHour"].ToString().Substring(0, 2));
-        //int minutes = int.Parse(d["leavingHour"].ToString().Substring(3, 2));
-        Date = ridePat.Date;
-        if (ridePat.Coordinator != null)
-        {
-            Coordinator = new Volunteer();
-            Coordinator.DisplayName = ridePat.Coordinator.DisplayName;
-        }
-
-        Remark = ridePat.Remark;
-        Escorts = ridePat.Escorts;
-        OnlyEscort = ridePat.OnlyEscort;
-
         DbService db = new DbService();
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
         SqlParameter[] cmdParams = new SqlParameter[7];
-        cmdParams[0] = cmd.Parameters.AddWithValue("@pat", Pat.DisplayName);
-        cmdParams[1] = cmd.Parameters.AddWithValue("@origin", origin.Name);
-        cmdParams[2] = cmd.Parameters.AddWithValue("@destination", destination.Name);
-        cmdParams[3] = cmd.Parameters.AddWithValue("@date", Date);
-        cmdParams[4] = cmd.Parameters.AddWithValue("@remark", Remark);
-        cmdParams[5] = cmd.Parameters.AddWithValue("@onlyEscort", OnlyEscort);
+        try
+        {
+            Pat = ridePat.Pat;
+            Location origin = new Location();
+            origin.Name = ridePat.Origin.Name;
+            Location destination = new Location();
+            destination.Name = ridePat.Destination.Name;
+            Date = ridePat.Date;
+            Coordinator = new Volunteer();
+            Coordinator.DisplayName = ridePat.Coordinator.DisplayName;
+            Remark = ridePat.Remark;
+            Escorts = ridePat.Escorts;
+            OnlyEscort = ridePat.OnlyEscort;
+            
+            cmdParams[0] = cmd.Parameters.AddWithValue("@pat", Pat.DisplayName);
+            cmdParams[1] = cmd.Parameters.AddWithValue("@origin", origin.Name);
+            cmdParams[2] = cmd.Parameters.AddWithValue("@destination", destination.Name);
+            cmdParams[3] = cmd.Parameters.AddWithValue("@date", Date);
+            cmdParams[4] = cmd.Parameters.AddWithValue("@remark", Remark);
+            cmdParams[5] = cmd.Parameters.AddWithValue("@onlyEscort", OnlyEscort);
+        }
+        catch (Exception)
+        {
 
-        if (func == "new")
+        }
+
+
+
+
+
+
+
+        if (func == "new") //Insert new RidePat to DB
         {
             cmdParams[6] = cmd.Parameters.AddWithValue("@coordinator", Coordinator.DisplayName);
 
@@ -274,19 +277,24 @@ public class RidePat
 
                 }
             }
-        } //Insert new RidePat to DB
-        else //Edit existing RidePat in DB
+        }
+        else if (func == "edit") //Edit existing RidePat in DB
         {
             RidePatNum = ridePat.RidePatNum;
             cmdParams[6] = cmd.Parameters.AddWithValue("@ridePatNum", RidePatNum);
             string query = "update RidePat set Patient=@pat,Origin=@origin,Destination=@destination,PickupTime=@date,Remark=@remark,OnlyEscort=@onlyEscort where RidePatNum=@ridePatNum";
             int res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
 
-            if (Escorts.Count > 0 && res > 0)
+            if (res > 0)
             {
                 string query3 = "delete from [PatientEscort_PatientInRide (RidePat)] where [PatientInRide (RidePat)RidePatNum]=" + RidePatNum;
                 DbService db3 = new DbService();
                 res += db3.ExecuteQuery(query3);
+            }
+
+            if (Escorts.Count > 0 && res > 0)
+            {
+
 
                 string query2 = "";
                 SqlCommand cmd2 = new SqlCommand();
@@ -303,7 +311,7 @@ public class RidePat
                     try
                     {
                         // db2.ExecuteQuery(query2);
-                        db2.ExecuteQuery(query2, cmd2.CommandType, cmdParams2);
+                        res += db2.ExecuteQuery(query2, cmd2.CommandType, cmdParams2);
                     }
                     catch (Exception ex)
                     {
@@ -311,7 +319,23 @@ public class RidePat
 
                     }
                 }
+
             }
+            return res;
+        }
+        else if (func == "delete")
+        {
+            RidePatNum = ridePat.RidePatNum;
+            db = new DbService();
+            string query = "delete from [PatientEscort_PatientInRide (RidePat)] where [PatientInRide (RidePat)RidePatNum]=" + RidePatNum;
+            int res = db.ExecuteQuery(query);
+
+            db = new DbService();
+            query = "delete from RidePat where RidePatNum=" + RidePatNum;
+            res += db.ExecuteQuery(query);
+
+            return res;
+
         }
         return RidePatNum;
 
@@ -370,7 +394,8 @@ public class RidePat
         rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
         rp.OnlyEscort = Convert.ToBoolean(dr["OnlyEscort"].ToString());
         rp.pat.DisplayName = dr["DisplayName"].ToString();
-        rp.pat.EscortedList = new List<Escorted>();
+        //rp.pat.EscortedList = new List<Escorted>();
+        rp.Escorts = new List<Escorted>();
         Location origin = new Location();
         origin.Name = dr["Origin"].ToString();
         rp.Origin = origin;
@@ -393,7 +418,9 @@ public class RidePat
             {
                 Escorted e = new Escorted();
                 e.DisplayName = r["DisplayName"].ToString();
-                rp.pat.EscortedList.Add(e);
+                //rp.pat.EscortedList.Add(e);
+
+                rp.Escorts.Add(e);
             }
         }
 
