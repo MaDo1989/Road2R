@@ -92,25 +92,43 @@
             });
         }
 
+        function generatePaymentType() {
+            var $select = $("#paymentType");
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getPaymentTypes",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                async: false,
+                data: JSON.stringify({}),
+                success: function (data) {
+                    var arr_paymentTypes = JSON.parse(data.d);
+                    $('<option>', { value: -1, text: "בחר" }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
+                    for (i in arr_paymentTypes) {
+                        $('<option>', { value: arr_paymentTypes[i].PaymentTypeID, text: arr_paymentTypes[i].PaymentType }).appendTo($select);
+                    }
+                },
+                error: function (err) { alert("Error"); }
+            });
+        }
 
+        function generateStatus(volunteer) {
+            var $select = $("#statusVolunteer");
+            if (volunteer.Status != "") {
+                $('<option>', { value: volunteer.Status, text: volunteer.Status }).appendTo($select);
+            }
+            $('<option>', { value: "", text: "בחר " }).appendTo($select);
 
-        //function generateStatus(volunteer) {
-        //    var $select = $("#statusVolunteer");
-        //    if (volunteer.Status != "") {
-        //        $('<option>', { value: volunteer.Status, text: volunteer.Status }).appendTo($select);
-        //    }
-        //    $('<option>', { value: "", text: "בחר " }).appendTo($select);
+            $('<option>', { value: "פעיל", text: "פעיל " }).appendTo($select);
+            $('<option>', { value: "לא פעיל", text: "לא פעיל " }).appendTo($select);
+        }
 
-        //    $('<option>', { value: "פעיל", text: "פעיל " }).appendTo($select);
-        //    $('<option>', { value: "לא פעיל", text: "לא פעיל " }).appendTo($select);
-        //}
-
-        //function generateStatus1() {
-        //    var $select = $("#statusVolunteer");
-        //    $('<option>', { value: "", text: "בחר " }).appendTo($select);
-        //    $('<option>', { value: "פעיל", text: "פעיל " }).appendTo($select);
-        //    $('<option>', { value: "לא פעיל", text: "לא פעיל " }).appendTo($select);
-        //}
+        function generateStatus1() {
+            var $select = $("#statusVolunteer");
+            $('<option>', { value: "", text: "בחר " }).appendTo($select);
+            $('<option>', { value: "פעיל", text: "פעיל " }).appendTo($select);
+            $('<option>', { value: "לא פעיל", text: "לא פעיל " }).appendTo($select);
+        }
 
         function generateGender(volunteer) {
             var $select = $("#gender");
@@ -295,6 +313,37 @@
         }
 
 
+
+        //function generatePreferedDrivers() {
+        //    var $select = $("#preferedDrivers");
+        //    $.ajax({
+        //        dataType: "json",
+        //        url: "WebService.asmx/getDriversView",
+        //        contentType: "application/json; charset=utf-8",
+        //        type: "POST",
+        //        async: false,
+        //        data: JSON.stringify({ active: true }),
+        //        success: function (data) {
+        //            var arr_drivers = JSON.parse(data.d);
+
+        //            $('<option>', { value: 5, text: "בחר " }).appendTo($select);
+
+        //            for (i in arr_drivers) {
+        //                if (i != 5) {
+        //                    $('<option>', { value: arr_drivers[i].DriverID, text: arr_drivers[i].FirstName + " " + arr_drivers[i].LastName }).appendTo($select);
+        //                }
+        //            }
+        //        },
+        //        error: function (err) { alert("Error"); }
+        //    });
+        //}
+
+        function initializeSelect2() {
+            //    arrSelectors = ['paymentType', 'preferRoute'];
+            //    for (var i in arrSelectors) {
+            //        $('#' + arrSelectors[i]).select2();
+            //    }
+        }
 
         function loadPage() {
             //generate select options
@@ -520,26 +569,19 @@
                                         <h4 class="m-t-0 header-title"><b>טופס מתנדב</b></h4>
                                         <p class="text-muted font-13 m-b-30">
                                             יצירת, צפייה ועריכת מתנדב. לחץ על כפתור חזור בכדי לצפות בכל הלקוחות.
-                                        </p><div class="col-md-6 checkbox checkbox-primary text-left">
-    <input id="activeVolunteer" type="checkbox">
-    <label for="activeVolunteer">
-        מתנדב פעיל
-    </label>
-</div>
+                                        </p>
                                         <div class="text-right m-b-30 m-r-15">
                                             <button type="button" onclick="returnVolunteers()" class="btn btn-default waves-effect w-md m-b-5"><i class="ti-back-right m-r-5"></i>חזור</button>
                                         </div>
-                                        
                                         <div class="row m-l-10 m-r-10">
-                                            
-                                            <!--<div class="col-sm-6">-->
-                                                <!--<div class="form-group">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
                                                     <label class="col-sm-3 control-label">שם מלא מתנדב</label>
                                                     <div class="col-sm-6">
                                                         <input id="volunteerName" name="volunteerName" type="text" class="form-control">
                                                     </div>
-                                                </div>-->
-                                            <!--</div>-->
+                                                </div>
+                                            </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label class="col-sm-3 control-label">שם פרטי</label>
@@ -560,7 +602,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">טלפון ראשי</label>
+                                                    <label class="col-sm-3 control-label">טלפון 1</label>
                                                     <div class="col-sm-6">
                                                         <input id="phone1" name="phone1" type="text" class="form-control">
                                                     </div>
@@ -570,7 +612,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">اسم شخصي</label>
+                                                    <label class="col-sm-3 control-label">שם פרטי ערבית</label>
                                                     <div class="col-sm-6">
                                                         <input id="firstA" name="firstA" type="text" class="form-control">
                                                     </div>
@@ -578,7 +620,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">اسم عائلة</label>
+                                                    <label class="col-sm-3 control-label">שם משפחה ערבית</label>
                                                     <div class="col-sm-6">
                                                         <input id="lastA" name="lastA" type="text" class="form-control">
                                                     </div>
@@ -614,10 +656,9 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label"></label>
+                                                    <label class="col-sm-3 control-label">האם יודע ערבית?</label>
                                                     <div class="col-sm-6">
-                                                        <input id="ArabSpeaking" name="know" type="checkbox">
-                                                        <label for="ArabSpeaking">דובר ערבית?</label>
+                                                        <input id="know" name="know" type="text" class="form-control">
                                                     </div>
                                                 </div>
                                             </div>
@@ -780,7 +821,12 @@
                                     <div class="row m-l-10 m-r-10">
                                         <div class="col-sm-6">
                                             <br />
-                                            
+                                            <div class="col-md-6 checkbox checkbox-primary text-left">
+                                                <input id="activeVolunteer" type="checkbox" disabled>
+                                                <label for="activeVolunteer">
+                                                    מתנדב פעיל
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

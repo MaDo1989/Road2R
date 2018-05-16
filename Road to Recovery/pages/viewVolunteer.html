@@ -70,7 +70,7 @@
                 data: JSON.stringify({active: active}),
                 success: function (data) {
                     var arr_volunteers = JSON.parse(data.d);
-                    //GENERAL.VOLUNTEERS.setvolunteersList(arr_volunteers);
+                    GENERAL.VOLUNTEERS.setVolunteersList(JSON.stringify(arr_volunteers));
 
                     for (i in arr_volunteers) {
                         var btnStr = ""
