@@ -504,7 +504,7 @@ public class Volunteer
     public Volunteer getVolunteerByMobile(string mobile)
     {
         DbService db = new DbService();
-        string query = "select * from VolunteerView where cellPhone = '" + mobile + "'";
+        string query = "select * from VolunteerTypeView where cellPhone = '" + mobile + "'";
         DataSet ds = db.GetDataSetByQuery(query);
         Volunteer v = new Volunteer();
         foreach (DataRow dr in ds.Tables[0].Rows)
@@ -518,7 +518,7 @@ public class Volunteer
             v.CellPhone = dr["CellPhone"].ToString();
             v.CellPhone2 = dr["CellPhone2"].ToString();
             v.HomePhone = dr["HomePhone"].ToString();
-            v.City = dr["City"].ToString();
+            v.City = dr["CityCityName"].ToString();
             v.Address = dr["Address"].ToString();
             v.Email = dr["Email"].ToString();
             v.Birthdate = dr["BirthDate"].ToString();
@@ -526,6 +526,15 @@ public class Volunteer
             v.Status = dr["IsActive"].ToString();
             v.Gender = dr["Gender"].ToString();
             v.KnowArabic = dr["KnowsArabic"].ToString();
+            try
+            {
+v.AvailableSeats = int.Parse(dr["AvailableSeats"].ToString());
+            }
+            catch (Exception)
+            {
+
+            }
+            
             //v.PreferRoute1 = dr["preferRoute1"].ToString();
             //v.PreferRoute2 = dr["preferRoute2"].ToString();
             //v.PreferRoute3 = dr["preferRoute3"].ToString();
@@ -535,7 +544,7 @@ public class Volunteer
             //v.Hour1 = dr["preferHour1"].ToString();
             //v.Hour2 = dr["preferHour2"].ToString();
             //v.Hour3 = dr["preferHour3"].ToString();
-            v.TypeVol = dr["Type"].ToString();
+            v.TypeVol = dr["VolunTypeType"].ToString();
         }
         return v;
 
