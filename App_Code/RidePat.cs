@@ -614,17 +614,17 @@ public class RidePat
     {
         int RideId = -1;
 
-        string query = "select RideNum,RidePatOrigin,RidePatDestination,RidePatPickupTime,RidePatStatus,MainDriver,secondaryDriver from RidePatView where RidePatNum=" + ridePatId;
+        string query = "select RideNum,Origin,Destination,PickupTime,Status,MainDriver,secondaryDriver from RPView where RidePatNum=" + ridePatId;
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         DataRow dr = ds.Tables[0].Rows[0];
 
         Origin = new Location();
-        Origin.Name = dr["RidePatOrigin"].ToString();
+        Origin.Name = dr["Origin"].ToString();
         Destination = new Location();
-        Destination.Name = dr["RidePatDestination"].ToString();
-        Date = Convert.ToDateTime(dr["RidePatPickupTime"].ToString());
-        if (dr["RidePatStatus"].ToString() == "שובץ נהג וגיבוי") return -1;
+        Destination.Name = dr["Destination"].ToString();
+        Date = Convert.ToDateTime(dr["PickupTime"].ToString());
+        if (dr["Status"].ToString() == "שובץ נהג וגיבוי") return -1;
 
         if (dr["RideNum"].ToString() != "")
         {

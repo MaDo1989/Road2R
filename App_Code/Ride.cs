@@ -133,8 +133,8 @@ public class Ride
         r1.Destination.Name = "הלל יפה";
         r1.RidePats = new List<RidePat>();
         r1.Drivers = new List<Volunteer>();
-        
-        
+
+
 
         //Volunteers-Drivers
         Volunteer v = new Volunteer();
@@ -150,12 +150,12 @@ public class Ride
         v2.pnRegId = "mmmmm";
         r1.Drivers.Add(v2);
 
-       
+
         r1.RidePats = new List<RidePat>();
 
         //RidePat
         RidePat rp = new RidePat();
-        rp.Date = new DateTime(2018,4,1,6,0,0);
+        rp.Date = new DateTime(2018, 4, 1, 6, 0, 0);
         rp.Origin = new Location();
         rp.Origin.Name = "ארז";
         rp.Destination = new Location();
@@ -213,7 +213,7 @@ public class Ride
 
 
         r2.RidePats = new List<RidePat>();
-        
+
         //RidePat 1
         RidePat rp1 = new RidePat();
         rp1.Date = new DateTime(2018, 4, 5, 11, 0, 0);
@@ -238,13 +238,13 @@ public class Ride
         Escorted ee = new Escorted();
         ee.DisplayName = "שחר חסון";
         ee.CellPhone = "050-6666666";
-       
+
 
         rp1.Pat.EscortedList = new List<Escorted>();
         Escorted ee2 = new Escorted();
         ee2.DisplayName = "קובי מימון";
         ee2.CellPhone = "050-5555555";
-        
+
 
         rp1.Pat.EscortedList.Add(ee);
         rp1.Pat.EscortedList.Add(ee2);
@@ -287,9 +287,9 @@ public class Ride
 
         rp2.Pat.EscortedList.Add(ee3);
         rp2.Pat.EscortedList.Add(ee4);
-        
 
-        
+
+
         r2.RidePats.Add(rp2);
 
         lr.Add(r2);
@@ -299,15 +299,21 @@ public class Ride
 
     public List<Ride> GetMyRides(int volunteerId)
     {
-        string query = "select * from RidePatView where MainDriver=" + volunteerId + " or secondaryDriver=" + volunteerId;
+        string query = "select * from RPView where MainDriver=" + volunteerId + " or secondaryDriver=" + volunteerId;
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
+        DataSet EscortDS = new DataSet(); ;
         Ride r = new Ride();
         List<Ride> rl = new List<Ride>();
         r.RidePats = new List<RidePat>();
+        RidePat rp2 = new RidePat();
         //List<RidePat> rpl = r.RidePats;
         bool RidePatexists;
         bool RideExists;
+        try
+        {
+
+        
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
             RideExists = false;
@@ -323,78 +329,102 @@ public class Ride
                         if (ridePat.RidePatNum == int.Parse(dr["RidePatNum"].ToString())) RidePatexists = true;
                         if (RidePatexists && dr["Escort"].ToString() != "")
                         {
-                            Escorted es = new Escorted();
-                            es.DisplayName = dr["Escort"].ToString();
-                            ridePat.Pat.EscortedList.Add(es);
-
+                            if (EscortDS.Tables[0].Rows.Count > 0)
+                            {
+                                foreach (DataRow row in EscortDS.Tables[0].Rows)
+                                {
+                                    Escorted e = new Escorted();
+                                    e.DisplayName = row["DisplayName"].ToString();
+                                    rp2.Pat.EscortedList.Add(e);
+                                }
+                            }
                             break;
                         }
                     }
                     if (RidePatexists) continue;
-                    RidePat rp2 = new RidePat();
+                    rp2 = new RidePat();
                     //ride.RidePats = new List<RidePat>();
                     rp2.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
                     rp2.Pat = new Patient();
-                    rp2.Pat.DisplayName = dr["Patient"].ToString();
+                    rp2.Pat.DisplayName = dr["DisplayName"].ToString();
+                    db = new DbService();
+                    query = "select DisplayName from RidePatEscortView where RidePatNum=" + rp2.RidePatNum;
+                    EscortDS = db.GetDataSetByQuery(query);
                     rp2.Pat.EscortedList = new List<Escorted>();
-                    if (dr["Escort"].ToString() != "")
+                    if (EscortDS.Tables[0].Rows.Count > 0)
                     {
-                        Escorted e = new Escorted();
-                        e.DisplayName = dr["Escort"].ToString();
-                        rp2.Pat.EscortedList.Add(e);
+                        foreach (DataRow row in EscortDS.Tables[0].Rows)
+                        {
+                            Escorted e = new Escorted();
+                            e.DisplayName = row["DisplayName"].ToString();
+                            rp2.Pat.EscortedList.Add(e);
+                        }
                     }
 
                     Location origin = new Location();
-                    origin.Name = dr["RidePatOrigin"].ToString();
+                    origin.Name = dr["Origin"].ToString();
                     rp2.Origin = origin;
                     Location dest = new Location();
-                    dest.Name = dr["RidePatDestination"].ToString();
+                    dest.Name = dr["Destination"].ToString();
                     rp2.Destination = dest;
-                    rp2.Area = dr["RidePatArea"].ToString();
-                    rp2.Shift = dr["RidePatShift"].ToString();
-                    rp2.Date = Convert.ToDateTime(dr["RidePatPickupTime"].ToString());
+                    rp2.Area = dr["Area"].ToString();
+                    rp2.Shift = dr["Shift"].ToString();
+                    rp2.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
                     ride.RidePats.Add(rp2);
                 }
             }
             if (RideExists) continue;
             Ride r2 = new Ride();
-            if (dr["Maindriver"].ToString()==volunteerId.ToString())
+            if (dr["Maindriver"].ToString() == volunteerId.ToString())
             {
-r2.Status = "Primary";
+                r2.Status = "Primary";
             }
             else
             {
                 r2.Status = "Secondary";
             }
-            
+
             r2.Id = int.Parse(dr["RideNum"].ToString());
-           // r2.Status = dr["RidePatStatus"].ToString();
+            // r2.Status = dr["RidePatStatus"].ToString();
             RidePat rp = new RidePat();
             r2.RidePats = new List<RidePat>();
             rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
             rp.Pat = new Patient();
-            rp.Pat.DisplayName = dr["Patient"].ToString();
+            rp.Pat.DisplayName = dr["DisplayName"].ToString();
             rp.Pat.EscortedList = new List<Escorted>();
-            if (dr["Escort"].ToString() != "")
+            db = new DbService();
+            query = "select DisplayName from RidePatEscortView where RidePatNum=" + rp.RidePatNum;
+            EscortDS = db.GetDataSetByQuery(query);
+            rp.Pat.EscortedList = new List<Escorted>();
+            if (EscortDS.Tables[0].Rows.Count > 0)
             {
-                Escorted e = new Escorted();
-                e.DisplayName = dr["Escort"].ToString();
-                rp.Pat.EscortedList.Add(e);
+                foreach (DataRow row in EscortDS.Tables[0].Rows)
+                {
+                    Escorted e = new Escorted();
+                    e.DisplayName = row["DisplayName"].ToString();
+                    rp.Pat.EscortedList.Add(e);
+                }
             }
 
             Location origin2 = new Location();
-            origin2.Name = dr["RidePatOrigin"].ToString();
+            origin2.Name = dr["Origin"].ToString();
             rp.Origin = origin2;
             Location dest2 = new Location();
-            dest2.Name = dr["RidePatDestination"].ToString();
+            dest2.Name = dr["Destination"].ToString();
             rp.Destination = dest2;
-            rp.Area = dr["RidePatArea"].ToString();
-            rp.Shift = dr["RidePatShift"].ToString();
-            rp.Date = Convert.ToDateTime(dr["RidePatPickupTime"].ToString());
+            rp.Area = dr["Area"].ToString();
+            rp.Shift = dr["Shift"].ToString();
+            rp.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
             r2.RidePats.Add(rp);
             rl.Add(r2);
         }
 
         return rl;
+        }
+        catch (Exception e)
+        {
+
+            throw e;
+        }
     }
 }
