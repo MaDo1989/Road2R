@@ -450,15 +450,50 @@ public class Volunteer
         return res;
     }
 
-    public void getVolunteerPrefs(int id)
+    public Volunteer getVolunteerPrefs(int id)
     {
+        PrefTime = new List<string[]>();
+        PrefArea = new List<string>();
+        PrefLocation = new List<string>();
+
+        //Get Preferred Day & Shift for Volunteer
         string query = "select PreferedDayDayInWeek,Shift from PreferedDay_Volunteer where VolunteerId=" + id;
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
-
+            string[] DayShift = new string[2];
+            DayShift[0] = dr["PreferedDayDayInWeek"].ToString();
+            DayShift[1] = dr["Shift"].ToString();
+            PrefTime.Add(DayShift);
         }
+
+        //Get Preferred Area for Volunteer
+        query = "select PreferredArea from PreferredArea_Volunteer where VolunteerId=" + id;
+        db = new DbService();
+        ds = db.GetDataSetByQuery(query);
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+            string area = dr["PreferredArea"].ToString();
+            PrefArea.Add(area);
+        }
+
+        //Get Preferred Location for Volunteer
+        query = "select PreferredLocation from PreferredLocation_Volunteer where VolunteerId=" + id;
+        db = new DbService();
+        ds = db.GetDataSetByQuery(query);
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+            string location = dr["PreferredLocation"].ToString();
+            PrefLocation.Add(location);
+        }
+
+        //Get AvailabeSeats for Volunteer
+        query = "select AvailableSeats from Volunteer where Id=" + id;
+        db = new DbService();
+        AvailableSeats = int.Parse(db.GetObjectScalarByQuery(query).ToString());
+
+        return this;
     }
 
 
@@ -530,13 +565,13 @@ public class Volunteer
             v.KnowArabic = dr["KnowsArabic"].ToString();
             try
             {
-v.AvailableSeats = int.Parse(dr["AvailableSeats"].ToString());
+                v.AvailableSeats = int.Parse(dr["AvailableSeats"].ToString());
             }
             catch (Exception)
             {
 
             }
-            
+
             //v.PreferRoute1 = dr["preferRoute1"].ToString();
             //v.PreferRoute2 = dr["preferRoute2"].ToString();
             //v.PreferRoute3 = dr["preferRoute3"].ToString();
