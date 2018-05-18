@@ -48,11 +48,14 @@ public class WebService : System.Web.Services.WebService
         return v.setVolunteerPrefs(Id, PrefLocation, PrefArea, PrefTime, AvailableSeats);
     }
 
+
     [WebMethod]
-    public void getVolunteerPrefs(int Id)
+    public string getVolunteerPrefs(int Id)
     {
         Volunteer v = new Volunteer();
-        v.getVolunteerPrefs(Id);
+        v = v.getVolunteerPrefs(Id);
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        return j.Serialize(v);
     }
 
     [WebMethod]
