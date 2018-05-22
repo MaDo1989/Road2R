@@ -6,17 +6,13 @@ function datePicker() {
         autoclose: true
     });
  
-
-
     jQuery('#joinDate').datepicker({
         toggleActive: true,
         clearBtn: true,
         autoclose: true
     });
    // $.datepicker.setDefaults($.datepicker.regional[""]);
-
-
-
+    
     jQuery('#birthDate').datepicker({
         toggleActive: true,
         clearBtn: true,
@@ -26,7 +22,11 @@ function datePicker() {
 
     $.datepicker.setDefaults($.datepicker.regional[""]);
     $("dateRide").datepicker($.datepicker.regional["he"]);
+
+    $.datepicker.setDefaults($.datepicker.regional[""]);
     $("birthDate").datepicker($.datepicker.regional["he"]);
+
+    $.datepicker.setDefaults($.datepicker.regional[""]);
     $("joinDate").datepicker($.datepicker.regional["he"]);
 
 

@@ -71,14 +71,12 @@
     <script src="../plugins/moment/moment.js"></script>
     <script src="../plugins/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
     <script src="../plugins/bootstrap-daterangepicker/daterangepicker.js"></script>
-    <script src="lib/datepicker-he.js"></script>
 
     <script>
         checkCookie();
         arr_addressRows = [];
         $.jgrid.defaults.responsive = true;
         $.jgrid.defaults.styleUI = 'Bootstrap';
-
 
         function generateCities() {
 
@@ -959,6 +957,7 @@
     <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
     <script>
         $(document).ready(function () {
+            datePicker();
             generateCities();
             generateVolTypes();
             // DO NOT REMOVE : GLOBAL FUNCTIONS!
@@ -1247,6 +1246,7 @@
 
     <script src="assets/js/jquery.core.js"></script>
     <script src="assets/js/jquery.app.js"></script>
+    <script src="lib/datepicker-he.js"></script>
 
     <script type="text/javascript">
 
