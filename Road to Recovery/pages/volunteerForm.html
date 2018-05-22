@@ -448,10 +448,21 @@
                 success: function (data) {
                     var volunteer = JSON.parse(data.d);
                     GENERAL.VOLUNTEERS.setVolunteersList(volunteer);
-                    //generatePreferDestination(volunteer);
-                    //generatePreferDayAndHour(volunteer);
-                    //generateStatus(volunteer);
-                    //generateGender(volunteer);
+                    var location = "";
+                    for (i in volunteer.PrefLocation)
+                    {
+                        location += volunteer.PrefLocation[i] + ", ";
+                    }
+                    location = location.substring(0, location.length - 2);
+                    $("#PrefLocation").val(location);
+                    var shift = "";
+                    for (i in volunteer.PrefTime) {
+                        
+                        shift += volunteer.PrefTime[i][0] + "-" + volunteer.PrefTime[i][1] + ", ";
+                        
+                    }
+                    shift = shift.substring(0, shift.length - 2);
+                    $("#PrefShift").val(shift);
                     $("#volunteerName").val(volunteer.DisplayName);
                     $("#volunteerFirstName").val(volunteer.FirstNameH);
                     $("#volunteerLastName").val(volunteer.LastNameH);
@@ -749,6 +760,15 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-3 control-label">משמרות מועדפות</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="PrefShift" name="PrefShift" type="text" class="form-control" disabled="disabled">
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="form-group">
@@ -784,14 +804,14 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <!--<div class="col-sm-6">
+                                        <div class="col-sm-6">
                                             <div class="form-group">
-                                                <label class="col-sm-3 control-label">יעד מועדף 1</label>
+                                                <label class="col-sm-3 control-label">מקומות מועדפים</label>
                                                 <div class="col-sm-6" id="selectPreferRoute1">
-                                                    <select id="preferRoute1" name="preferRoute1" class="form-control"></select>
+                                                    <input id="PrefLocation" name="PrefLocation" class="form-control" disabled="disabled">
                                                 </div>
                                             </div>
-                                        </div>-->
+                                        </div>
                                     </div>
                                     <div class="row m-l-10 m-r-10">
                                         <div class="col-sm-6">
