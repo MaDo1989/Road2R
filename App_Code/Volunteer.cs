@@ -804,6 +804,7 @@ public class Volunteer
 
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
+            v.Id = int.Parse(dr["Id"].ToString());
             v.DisplayName = dr["DisplayName"].ToString();
             v.FirstNameA = dr["FirstNameA"].ToString();
             v.FirstNameH = dr["FirstNameH"].ToString();
@@ -831,8 +832,15 @@ public class Volunteer
             //v.Hour2 = dr["preferHour2"].ToString();
             //v.Hour3 = dr["preferHour3"].ToString();
             v.TypeVol = dr["VolunTypeType"].ToString();
+            
 
         }
+        Volunteer temp = new Volunteer();
+        temp = getVolunteerPrefs(v.Id);
+
+        v.PrefArea = temp.PrefArea;
+        v.PrefTime = temp.PrefTime;
+        v.PrefLocation = temp.PrefLocation;
         #endregion
 
         return v;
