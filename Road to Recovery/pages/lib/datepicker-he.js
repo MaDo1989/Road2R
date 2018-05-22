@@ -5,9 +5,30 @@ function datePicker() {
         clearBtn: true,
         autoclose: true
     });
-    $.datepicker.setDefaults($.datepicker.regional[""]);
+ 
 
+
+    jQuery('#joinDate').datepicker({
+        toggleActive: true,
+        clearBtn: true,
+        autoclose: true
+    });
+   // $.datepicker.setDefaults($.datepicker.regional[""]);
+
+
+
+    jQuery('#birthDate').datepicker({
+        toggleActive: true,
+        clearBtn: true,
+        autoclose: true
+    });
+  //  $.datepicker.setDefaults($.datepicker.regional[""]);
+
+    $.datepicker.setDefaults($.datepicker.regional[""]);
     $("dateRide").datepicker($.datepicker.regional["he"]);
+    $("birthDate").datepicker($.datepicker.regional["he"]);
+    $("joinDate").datepicker($.datepicker.regional["he"]);
+
 
     /* Hebrew initialisation for the UI Datepicker extension. */
     /* Written by Amir Hardon (ahardon at gmail dot com). */

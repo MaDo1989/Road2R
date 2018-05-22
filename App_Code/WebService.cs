@@ -322,17 +322,16 @@ public class WebService : System.Web.Services.WebService
     [WebMethod]
     public void deactivateVolunteer(string displayName, string active)
     {
-        Volunteer c = new Volunteer();
-        c.DisplayName = displayName;
-        c.deactivateCustomer(active);
+        Volunteer v = new Volunteer();
+        v.DisplayName = displayName;
+        v.deactivateCustomer(active);
     }
 
     [WebMethod]
     public void setVolunteer(Volunteer volunteer, string func)
     {
-        Volunteer v = new Volunteer();
-        v = volunteer;
-        v.setVolunteer(func);
+        Volunteer v = volunteer;
+       v.setVolunteer(v,func);
 
     }
 
@@ -353,6 +352,16 @@ public class WebService : System.Web.Services.WebService
         v.DisplayName = displayName;
         Volunteer volunteer = v.getVolunteer();
         return j.Serialize(volunteer);
+    }
+
+    [WebMethod]
+    public string getVolunteerTypes()
+    {
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        Volunteer v = new Volunteer();
+        
+        List<string> types = v.getVolunteerTypes();
+        return j.Serialize(types);
     }
     #endregion
 
@@ -1154,14 +1163,14 @@ public class WebService : System.Web.Services.WebService
     //#endregion
 
     //#region cities functions
-    //[WebMethod]
-    //public string getCities()
-    //{
-    //    JavaScriptSerializer j = new JavaScriptSerializer();
-    //    City c = new City();
-    //    List<City> citiesList = c.getCitiesList();
-    //    return j.Serialize(citiesList);
-    //}
+    [WebMethod]
+    public string getCities()
+    {
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        City c = new City();
+        List<City> citiesList = c.getCitiesList();
+        return j.Serialize(citiesList);
+    }
 
     //#endregion
 

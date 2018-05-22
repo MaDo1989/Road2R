@@ -239,12 +239,6 @@ public class RidePat
 
         }
 
-
-
-
-
-
-
         if (func == "new") //Insert new RidePat to DB
         {
             cmdParams[6] = cmd.Parameters.AddWithValue("@coordinator", Coordinator.DisplayName);

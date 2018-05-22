@@ -37,8 +37,15 @@ public class Volunteer
     string hour3;
     string joinDate;//תאריך הצטרפות
     string status;//סטטוס
-    string knowArabic;//יודע ערבית?
     int id;
+
+    public string Remarks { get; set; }
+
+    public DateTime BirthDate { get; set; }
+
+    public DateTime JoinDate { get; set; }
+
+    public bool KnowsArabic { get; set; }
 
     public bool IsActive { get; set; }
 
@@ -226,18 +233,18 @@ public class Volunteer
         }
     }
 
-    public string Birthdate
-    {
-        get
-        {
-            return birthdate;
-        }
+    //public string Birthdate
+    //{
+    //    get
+    //    {
+    //        return birthdate;
+    //    }
 
-        set
-        {
-            birthdate = value;
-        }
-    }
+    //    set
+    //    {
+    //        birthdate = value;
+    //    }
+    //}
 
     public string PreferRoute1
     {
@@ -517,6 +524,19 @@ public class Volunteer
 
     }
 
+    public List<string> getVolunteerTypes()
+    {
+        List<string> tl = new List<string>();
+        string query = "select * from VolunType";
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+            tl.Add(dr["Type"].ToString());
+        }
+        return tl;
+    }
+
     public Volunteer getCoor(string userName)
     {
         string query = "select * from Volunteer where UserName='" + userName + "'";
@@ -558,11 +578,11 @@ public class Volunteer
             v.City = dr["CityCityName"].ToString();
             v.Address = dr["Address"].ToString();
             v.Email = dr["Email"].ToString();
-            v.Birthdate = dr["BirthDate"].ToString();
-            v.JoinDate = dr["JoinDate"].ToString();
+            v.BirthDate = Convert.ToDateTime(dr["BirthDate"].ToString());
+            v.JoinDate = Convert.ToDateTime(dr["JoinDate"].ToString());
             v.Status = dr["IsActive"].ToString();
             v.Gender = dr["Gender"].ToString();
-            v.KnowArabic = dr["KnowsArabic"].ToString();
+            v.KnowsArabic = Convert.ToBoolean(dr["KnowsArabic"].ToString());
             try
             {
                 v.AvailableSeats = int.Parse(dr["AvailableSeats"].ToString());
@@ -589,18 +609,18 @@ public class Volunteer
 
 
 
-    public string JoinDate
-    {
-        get
-        {
-            return joinDate;
-        }
+    //public string JoinDate
+    //{
+    //    get
+    //    {
+    //        return joinDate;
+    //    }
 
-        set
-        {
-            joinDate = value;
-        }
-    }
+    //    set
+    //    {
+    //        joinDate = value;
+    //    }
+    //}
 
     public string Status
     {
@@ -615,18 +635,18 @@ public class Volunteer
         }
     }
 
-    public string KnowArabic
-    {
-        get
-        {
-            return knowArabic;
-        }
+    //public string KnowsArabic
+    //{
+    //    get
+    //    {
+    //        return KnowsArabic;
+    //    }
 
-        set
-        {
-            knowArabic = value;
-        }
-    }
+    //    set
+    //    {
+    //        KnowsArabic = value;
+    //    }
+    //}
 
     public Volunteer()
     {
@@ -636,7 +656,7 @@ public class Volunteer
     }
 
     //public Volunteer(string _firstNameH, string __firstNameA, string _lastNameH, string _lastNameA, string _cellPhone, string _cellPhone2, string _homePhone,
-    //    string _city, string _address, string _email, string _birthdate, string _joindate, string _status, string _gender, string _knowArabic,
+    //    string _city, string _address, string _email, string _birthdate, string _joindate, string _status, string _gender, string _KnowsArabic,
     //    string _preferRoute1, string _preferRoute2, string _preferRoute3, string _day1, string _day2, string _day3,
     //    string _hour1, string _hour2, string _hour3, string _typeVol)
     //{
@@ -664,13 +684,13 @@ public class Volunteer
     //    //Day3 = _day3;
     //    //Hour3 = _hour3;
     //    TypeVol = _typeVol;
-    //    KnowArabic = _knowArabic;
+    //    KnowsArabic = _KnowsArabic;
     //}
 
     //public Volunteer(string _displayName, string _firstNameA, string _firstNameH, string _lastNameH, string _lastNameA,
     //string _cellPhone, string _cellPhone2, string _homePhone, string _city, string _street, string _typeVol, string _email, string _preferDay1,
     //string _preferHour1, string _preferDay2, string _preferHour2, string _preferDay3, string _preferHour3, string _preferRoute1, string _preferRoute2,
-    //string _preferRoute3, string _joinDate, string _statusVolunteer, string _knowArabic, string _birthdate, string _gender)
+    //string _preferRoute3, string _joinDate, string _statusVolunteer, string _KnowsArabic, string _birthdate, string _gender)
     //{
     //    DisplayName = _displayName;
     //    FirstNameH = _firstNameH;
@@ -697,7 +717,7 @@ public class Volunteer
     //    //Day3 = _preferDay3;
     //    //Hour3 = _preferHour3;
     //    TypeVol = _typeVol;
-    //    KnowArabic = _knowArabic;
+    //    KnowsArabic = _KnowsArabic;
     //}
 
     public Volunteer(string _firstNameH, string _lastNameH, string _cellPhone)
@@ -738,6 +758,7 @@ public class Volunteer
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
             Volunteer v = new Volunteer();
+            v.Id = int.Parse(dr["Id"].ToString());
             v.DisplayName = dr["DisplayName"].ToString();
             v.FirstNameA = dr["FirstNameA"].ToString();
             v.FirstNameH = dr["FirstNameH"].ToString();
@@ -759,10 +780,10 @@ public class Volunteer
             //v.PreferRoute1 = dr["preferRoute1"].ToString();
             //v.preferRoute2 = dr["preferRoute2"].ToString();
             //v.PreferRoute3 = dr["preferRoute3"].ToString();
-            v.JoinDate = dr["JoinDate"].ToString();
-            v.Status = dr["IsActive"].ToString();
-            v.KnowArabic = dr["KnowsArabic"].ToString();
-            v.Birthdate = dr["BirthDate"].ToString();
+            v.JoinDate = Convert.ToDateTime(dr["JoinDate"].ToString());
+            v.IsActive = Convert.ToBoolean(dr["IsActive"].ToString());
+            v.KnowsArabic = Convert.ToBoolean(dr["KnowsArabic"].ToString());
+            v.BirthDate = Convert.ToDateTime(dr["BirthDate"].ToString());
             v.Gender = dr["Gender"].ToString();
 
 
@@ -794,11 +815,12 @@ public class Volunteer
             v.City = dr["CityCityName"].ToString();
             v.Address = dr["Address"].ToString();
             v.Email = dr["Email"].ToString();
-            v.Birthdate = dr["BirthDate"].ToString();
-            v.JoinDate = dr["JoinDate"].ToString();
+            v.BirthDate = Convert.ToDateTime(dr["BirthDate"].ToString());
+            v.JoinDate = Convert.ToDateTime(dr["JoinDate"].ToString());
             v.IsActive = Convert.ToBoolean(dr["IsActive"].ToString());
             v.Gender = dr["Gender"].ToString();
-            v.KnowArabic = dr["KnowsArabic"].ToString();
+            v.KnowsArabic = Convert.ToBoolean(dr["KnowsArabic"].ToString());
+            v.AvailableSeats = int.Parse(dr["AvailableSeats"].ToString());
             //v.PreferRoute1 = dr["preferRoute1"].ToString();
             //v.PreferRoute2 = dr["preferRoute2"].ToString();
             //v.PreferRoute3 = dr["preferRoute3"].ToString();
@@ -817,36 +839,71 @@ public class Volunteer
     }
 
 
-    public void setVolunteer(string func)
+    public void setVolunteer(Volunteer v, string func)
     {
+        int res = 0;
         DbService db = new DbService();
+        SqlCommand cmd = new SqlCommand();
+        cmd.CommandType = CommandType.Text;
+        SqlParameter[] cmdParams = new SqlParameter[18];
+
+        cmdParams[0] = cmd.Parameters.AddWithValue("@address", v.Address);
+        cmdParams[1] = cmd.Parameters.AddWithValue("@bDay", v.BirthDate);
+        cmdParams[2] = cmd.Parameters.AddWithValue("@cell", v.CellPhone);
+        cmdParams[3] = cmd.Parameters.AddWithValue("@cell2", v.CellPhone2);
+        cmdParams[4] = cmd.Parameters.AddWithValue("@city", v.City);
+        cmdParams[5] = cmd.Parameters.AddWithValue("@email", v.Email);
+        cmdParams[6] = cmd.Parameters.AddWithValue("@firstNameA", v.FirstNameA);
+        cmdParams[7] = cmd.Parameters.AddWithValue("@firstNameH", v.FirstNameH);
+        cmdParams[8] = cmd.Parameters.AddWithValue("@gender", v.Gender);
+        cmdParams[9] = cmd.Parameters.AddWithValue("@phone", v.HomePhone);
+        cmdParams[10] = cmd.Parameters.AddWithValue("@IsActive", v.IsActive);
+        cmdParams[11] = cmd.Parameters.AddWithValue("@jDate", v.JoinDate);
+        cmdParams[12] = cmd.Parameters.AddWithValue("@knowsArabic", v.KnowsArabic);
+        cmdParams[13] = cmd.Parameters.AddWithValue("@lastNameA", v.LastNameA);
+        cmdParams[14] = cmd.Parameters.AddWithValue("@lastNameH", v.LastNameH);
+        cmdParams[15] = cmd.Parameters.AddWithValue("@volType", v.TypeVol);
+        cmdParams[16] = cmd.Parameters.AddWithValue("@remarks", v.Remarks);
+        cmdParams[17] = cmd.Parameters.AddWithValue("@displayName", v.DisplayName);
+
+
         string query = "";
         if (func == "edit")
         {
-            query = "UPDATE Volunteer SET displayName = '" + DisplayName + "', firstNameH = '" + FirstNameH + "', firstNameA = '" + FirstNameA + "', lastNameH = '" + LastNameH + "', lastNameA = '" + LastNameA + "', cellPhone = '" + CellPhone + "', cellPhone2 = '" + CellPhone2 +
-            "', homePhone = '" + HomePhone + "', city = '" + City + "', street = '" + Address + "', email = '" + Email + "', birthdate = '" + Birthdate + "', joinDate = '" + JoinDate + "', statusVolunteer = '" + Status + "', gender = '" + Gender + "', knowArabic = '" + KnowArabic +
-            "', preferRoute1 = '" + PreferRoute1 + "', preferRoute2 = '" + PreferRoute2 + "', preferRoute3 = '" + PreferRoute3 + "', preferDay1 = '" + Day1 + "', preferDay2 = '" + Day2 +
-            "', preferDay3 = '" + Day3 + "', preferHour1 = '" + Hour1 + "', preferHour2 = '" + Hour2 + "', preferHour3 = '" + Hour3 + "', typeVol = '" + TypeVol + "' WHERE displayName = '" + DisplayName + "'";
+            query = "update Volunteer set Address=@address, BirthDate=@bDay, CellPhone=@cell,";
+            query += "CellPhone2=@cell2, CityCityName=@city, Email=@email, FirstNameA=@firstNameA, FirstNameH=@firstNameH, ";
+            query += "Gender=@gender, HomePhone=@phone, IsActive=@IsActive, JoinDate=@jDate, KnowsArabic=@knowsArabic, LastNameA=@lastNameA, ";
+            query += "LastNameH=@lastNameH, Remarks=@remarks where DisplayName=@displayName";
+
+            res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+
+
+            db = new DbService();
+            query = "select Id from Volunteer where DisplayName='" + DisplayName+"'";
+            Id = int.Parse(db.GetObjectScalarByQuery(query).ToString());
+
+            db = new DbService();
+            query = "update VolunType_Volunteer set VolunTypeType=@volType where VolunteerId="+Id;
+            res += db.ExecuteQuery(query,cmd.CommandType,cmdParams);
+
         }
         else if (func == "new")
         {
-            StringBuilder sb = new StringBuilder();
-            sb.AppendFormat("Values('{0}', '{1}', '{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}', '{11}', '{12}','{13}','{14}','{15}','{16}','{17}','{18}','{19}','{20}','{21}','{22}','{23}','{24}','{25}')",
-                DisplayName, FirstNameH, FirstNameA, LastNameH, LastNameA,
-                CellPhone, CellPhone2, HomePhone, City, Address,
-                Email, Birthdate, JoinDate, Status, Gender,
-                KnowArabic, PreferRoute1, PreferRoute2, PreferRoute3, Day1,
-                Day2, Day3, Hour1, Hour2, Hour3, TypeVol);
-            String prefix = "INSERT INTO Volunteer " + "(displayName, firstNameH,firstNameA, lastNameH,lastNameA, cellPhone,cellPhone2,homePhone,city,street, email,birthdate ,joinDate ,statusVolunteer,gender,knowArabic,preferRoute1,preferRoute2,preferRoute3,preferDay1,preferDay2,preferDay3,preferHour1,preferHour2,preferHour3,typeVol)";
-            query = prefix + sb.ToString();
-            //query = "insert into Customers values ('" + CustomerName + "','" + CustomerContactName + "','" + AccountID + "','Y','" + Phone1 + "','" + Phone2 + "','" + Email + "'," + PaymentType.PaymentTypeID + ",'" + Comments + "'," + PreferedDrivers.DriverID + ", '" + RegistrationNumber + "', '" + BillingAddress + "')";
+            query = "insert into Volunteer (Address, BirthDate, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, HomePhone, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks)";
+            query += " values (@address,@bDay,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@phone,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks);SELECT SCOPE_IDENTITY();";
+            db = new DbService();
+            Id = int.Parse(db.GetObjectScalarByQuery(query,cmd.CommandType,cmdParams).ToString());
+
+            query = "insert into VolunType_Volunteer (VolunTypeType,VolunteerId) values (@volType,"+Id+")";
+            db = new DbService();
+            db.ExecuteQuery(query,cmd.CommandType,cmdParams);
         }
-        db.ExecuteQuery(query);
+        
     }
 
     public void deactivateCustomer(string active)
     {
         DbService db = new DbService();
-        db.ExecuteQuery("UPDATE Volunteer SET statusVolunteer='" + active + "' WHERE displayName='" + DisplayName + "'");
+        db.ExecuteQuery("UPDATE Volunteer SET IsActive='" + active + "' WHERE displayName='" + DisplayName + "'");
     }
 }
