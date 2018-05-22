@@ -498,7 +498,15 @@ public class Volunteer
         //Get AvailabeSeats for Volunteer
         query = "select AvailableSeats from Volunteer where Id=" + id;
         db = new DbService();
+        try
+        {
         AvailableSeats = int.Parse(db.GetObjectScalarByQuery(query).ToString());
+
+        }
+        catch (Exception)
+        {
+
+        }
 
         return this;
     }
@@ -821,7 +829,14 @@ public class Volunteer
             v.IsActive = Convert.ToBoolean(dr["IsActive"].ToString());
             v.Gender = dr["Gender"].ToString();
             v.KnowsArabic = Convert.ToBoolean(dr["KnowsArabic"].ToString());
+            try
+            {
             v.AvailableSeats = int.Parse(dr["AvailableSeats"].ToString());
+            }
+            catch (Exception)
+            {
+
+            }
             //v.PreferRoute1 = dr["preferRoute1"].ToString();
             //v.PreferRoute2 = dr["preferRoute2"].ToString();
             //v.PreferRoute3 = dr["preferRoute3"].ToString();
