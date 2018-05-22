@@ -523,7 +523,9 @@ public class RidePat
             }
 
             rp.pat = new Patient();
+            
             rp.pat.DisplayName = dr["DisplayName"].ToString();
+            rp.pat.Equipment = rp.Pat.getEquipmentForPatient(rp.pat.DisplayName);
             rp.pat.EscortedList = new List<Escorted>();
             foreach (Escorted e in el)
             {
