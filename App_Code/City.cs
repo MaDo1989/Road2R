@@ -85,7 +85,7 @@ public class City
     public List<City> getCitiesList()
     {
         #region DB functions
-        string query = "select * from City order by City";
+        string query = "select * from City order by CityName";
 
         List<City> list = new List<City>();
         DbService db = new DbService();
@@ -93,9 +93,9 @@ public class City
 
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
-            //לשנות ל-zone
-            City tmp = new City((int)dr["CityID"], dr["City"].ToString(), dr["Area"].ToString(), (int)dr["Zone"]);
-            list.Add(tmp);
+            City c = new City();
+            c.CityName = dr["CityName"].ToString();
+            list.Add(c);
         }
         #endregion
 

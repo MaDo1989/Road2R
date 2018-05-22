@@ -79,7 +79,7 @@
 
                         btnStr += showBtn + " " + editBtn;
 
-                        if (arr_volunteers[i].Status == "לא פעיל") {
+                        if (arr_volunteers[i].IsActive == false) {
                             var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזר'><i class='fa fa-undo' ></i></button>";
                             btnStr += " " + reactiveBtn;
                         }
@@ -111,16 +111,16 @@
                     $('#datatable-buttons tbody').on('click', '#remove', function () {
                         var data = t.row($(this).parents('tr')).data();
                         swal({
-                            title: "אתה בטוח שברצונך למחוק את המתנדב:",
+                            title: "האם אתם בטוחים?",
                             type: "warning",
-                            text: data[1],
+                            text: "הפיכת המתנדב " + data[0]+" ללא פעיל",
                             showCancelButton: true,
                             cancelButtonText: "בטל",
                             confirmButtonClass: 'btn-warning',
                             confirmButtonText: "מחק",
                             closeOnConfirm: false
                         }, function () {
-                            deactivateVolunteer(data[0], 'לא פעיל');
+                            deactivateVolunteer(data[0], 'false');
                             swal({
                                 title: "המתנדב הפך ללא פעיל",
                                 timer: 1000,
@@ -134,16 +134,16 @@
                     $('#datatable-buttons tbody').on('click', '#reactive', function () {
                         var data = t.row($(this).parents('tr')).data();
                         swal({
-                            title: "אתה בטוח שברצונך לשחזר את המתנדב:",
+                            title: "האם אתם בטוחים?",
                             type: "warning",
-                            text: data[1],
+                            text: "שחזור המתנדב "+data[0],
                             showCancelButton: true,
                             cancelButtonText: "בטל",
                             confirmButtonClass: 'btn-warning',
                             confirmButtonText: "שחזר",
                             closeOnConfirm: false
                         }, function () {
-                            deactivateVolunteer(data[0], 'פעיל');
+                            deactivateVolunteer(data[0], 'true');
                             swal({
                                 title: "הלקוח הפך לפעיל",
                                 timer: 1000,
