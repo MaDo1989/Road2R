@@ -384,8 +384,8 @@ public class Volunteer
             cmd.CommandType = CommandType.Text;
             SqlParameter[] locationParams = new SqlParameter[2];
             locationParams[0] = cmd.Parameters.AddWithValue("@location", location);
-            locationParams[1] = cmd.Parameters.AddWithValue("@Id", Id);
-            query = "insert into PreferredLocation_Volunteer (PreferredLocation,VolunteerId) values (@location,@Id);";
+            locationParams[1] = cmd.Parameters.AddWithValue("@Id", id);
+            query = "insert into PreferredLocation_Volunteer (PreferredLocation,VolunteerId) values (@location,@id);";
             res += db.ExecuteQuery(query, cmd.CommandType, locationParams);
         }
 
@@ -396,8 +396,8 @@ public class Volunteer
             cmd.CommandType = CommandType.Text;
             SqlParameter[] AreaParams = new SqlParameter[2];
             AreaParams[0] = cmd.Parameters.AddWithValue("@area", area);
-            AreaParams[1] = cmd.Parameters.AddWithValue("@Id", Id);
-            query = "insert into PreferredArea_Volunteer (PreferredArea,VolunteerId) values (@area,@Id);";
+            AreaParams[1] = cmd.Parameters.AddWithValue("@Id", id);
+            query = "insert into PreferredArea_Volunteer (PreferredArea,VolunteerId) values (@area,@id);";
             res += db.ExecuteQuery(query, cmd.CommandType, AreaParams);
         }
 
@@ -445,14 +445,14 @@ public class Volunteer
             SqlParameter[] shiftParams = new SqlParameter[3];
             shiftParams[0] = cmd.Parameters.AddWithValue("@day", day);
             shiftParams[1] = cmd.Parameters.AddWithValue("@shift", finalShift);
-            shiftParams[2] = cmd.Parameters.AddWithValue("@Id", Id);
-            query = "insert into PreferedDay_Volunteer (PreferedDayDayInWeek,VolunteerId,Shift) values (@day,@Id,@shift);";
+            shiftParams[2] = cmd.Parameters.AddWithValue("@Id", id);
+            query = "insert into PreferedDay_Volunteer (PreferedDayDayInWeek,VolunteerId,Shift) values (@day,@id,@shift);";
             res += db.ExecuteQuery(query, cmd.CommandType, shiftParams);
         }
 
         db = new DbService();
         cmd = new SqlCommand();
-        query = "update Volunteer set AvailableSeats=" + AvailableSeats + " where Id=" + Id;
+        query = "update Volunteer set AvailableSeats=" + AvailableSeats + " where Id=" + id;
         res += db.ExecuteQuery(query);
         return res;
     }
