@@ -675,6 +675,8 @@ public class RidePat
         if (driver == "secondaryDriver")
         {
             string query = "update Ride set secondaryDriver=null where RideNum=" + rideId;
+            DbService db = new DbService();
+            res = db.ExecuteQuery(query);
         }
         else
         {
