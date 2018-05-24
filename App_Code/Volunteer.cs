@@ -500,7 +500,7 @@ public class Volunteer
         db = new DbService();
         try
         {
-        AvailableSeats = int.Parse(db.GetObjectScalarByQuery(query).ToString());
+            AvailableSeats = int.Parse(db.GetObjectScalarByQuery(query).ToString());
 
         }
         catch (Exception)
@@ -599,17 +599,12 @@ public class Volunteer
             {
 
             }
-
-            //v.PreferRoute1 = dr["preferRoute1"].ToString();
-            //v.PreferRoute2 = dr["preferRoute2"].ToString();
-            //v.PreferRoute3 = dr["preferRoute3"].ToString();
-            //v.Day1 = dr["preferDay1"].ToString();
-            //v.Day2 = dr["preferDay2"].ToString();
-            //v.Day3 = dr["preferDay3"].ToString();
-            //v.Hour1 = dr["preferHour1"].ToString();
-            //v.Hour2 = dr["preferHour2"].ToString();
-            //v.Hour3 = dr["preferHour3"].ToString();
             v.TypeVol = dr["VolunTypeType"].ToString();
+            Volunteer v2 = new Volunteer();
+            v2 = v2.getVolunteerPrefs(v.Id);
+            v.PrefArea = v2.PrefArea;
+            v.PrefTime = v2.PrefTime;
+            v.PrefLocation = v2.PrefLocation;
         }
         return v;
 
@@ -831,7 +826,7 @@ public class Volunteer
             v.KnowsArabic = Convert.ToBoolean(dr["KnowsArabic"].ToString());
             try
             {
-            v.AvailableSeats = int.Parse(dr["AvailableSeats"].ToString());
+                v.AvailableSeats = int.Parse(dr["AvailableSeats"].ToString());
             }
             catch (Exception)
             {
@@ -847,7 +842,7 @@ public class Volunteer
             //v.Hour2 = dr["preferHour2"].ToString();
             //v.Hour3 = dr["preferHour3"].ToString();
             v.TypeVol = dr["VolunTypeType"].ToString();
-            
+
 
         }
         Volunteer temp = new Volunteer();
@@ -902,12 +897,12 @@ public class Volunteer
 
 
             db = new DbService();
-            query = "select Id from Volunteer where DisplayName='" + DisplayName+"'";
+            query = "select Id from Volunteer where DisplayName='" + DisplayName + "'";
             Id = int.Parse(db.GetObjectScalarByQuery(query).ToString());
 
             db = new DbService();
-            query = "update VolunType_Volunteer set VolunTypeType=@volType where VolunteerId="+Id;
-            res += db.ExecuteQuery(query,cmd.CommandType,cmdParams);
+            query = "update VolunType_Volunteer set VolunTypeType=@volType where VolunteerId=" + Id;
+            res += db.ExecuteQuery(query, cmd.CommandType, cmdParams);
 
         }
         else if (func == "new")
@@ -915,13 +910,13 @@ public class Volunteer
             query = "insert into Volunteer (Address, BirthDate, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, HomePhone, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks)";
             query += " values (@address,@bDay,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@phone,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks);SELECT SCOPE_IDENTITY();";
             db = new DbService();
-            Id = int.Parse(db.GetObjectScalarByQuery(query,cmd.CommandType,cmdParams).ToString());
+            Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
 
-            query = "insert into VolunType_Volunteer (VolunTypeType,VolunteerId) values (@volType,"+Id+")";
+            query = "insert into VolunType_Volunteer (VolunTypeType,VolunteerId) values (@volType," + Id + ")";
             db = new DbService();
-            db.ExecuteQuery(query,cmd.CommandType,cmdParams);
+            db.ExecuteQuery(query, cmd.CommandType, cmdParams);
         }
-        
+
     }
 
     public void deactivateCustomer(string active)
