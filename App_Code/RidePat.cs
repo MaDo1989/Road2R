@@ -226,7 +226,7 @@ public class RidePat
             Remark = ridePat.Remark;
             Escorts = ridePat.Escorts;
             OnlyEscort = ridePat.OnlyEscort;
-            
+
             cmdParams[0] = cmd.Parameters.AddWithValue("@pat", Pat.DisplayName);
             cmdParams[1] = cmd.Parameters.AddWithValue("@origin", origin.Name);
             cmdParams[2] = cmd.Parameters.AddWithValue("@destination", destination.Name);
@@ -517,7 +517,7 @@ public class RidePat
             }
 
             rp.pat = new Patient();
-            
+
             rp.pat.DisplayName = dr["DisplayName"].ToString();
             rp.pat.Equipment = rp.Pat.getEquipmentForPatient(rp.pat.DisplayName);
             rp.pat.EscortedList = new List<Escorted>();
@@ -672,20 +672,26 @@ public class RidePat
         }
 
 
-
-        string query = "update RidePat set RideId=null where RidePatNum=" + ridePatId; //+"; update Ride set "+driver+" =null where RideNum="+rideId;
-        DbService db = new DbService();
-        res = db.ExecuteQuery(query);
-
-        string query2 = "select RidePatNum from RidePat where RideId=" + rideId;
-        DbService db2 = new DbService();
-        DataSet ds = db2.GetDataSetByQuery(query2);
-        if (ds.Tables[0].Rows.Count == 0)
+        if (driver == "secondaryDriver")
         {
-            string query3 = "update Ride set " + driver + " =null where RideNum=" + rideId;
-            DbService db3 = new DbService();
-            res += db3.ExecuteQuery(query3);
+            string query = "update Ride set secondaryDriver=null where RideNum=" + rideId;
         }
+        else
+        {
+            string query = "update RidePat set RideId=null where RidePatNum=" + ridePatId; //+"; update Ride set "+driver+" =null where RideNum="+rideId;
+            DbService db = new DbService();
+            res = db.ExecuteQuery(query);
+        }
+
+        //string query2 = "select RidePatNum from RidePat where RideId=" + rideId;
+        //DbService db2 = new DbService();
+        //DataSet ds = db2.GetDataSetByQuery(query2);
+        //if (ds.Tables[0].Rows.Count == 0)
+        //{
+        //    string query3 = "update Ride set " + driver + " =null where RideNum=" + rideId;
+        //    DbService db3 = new DbService();
+        //    res += db3.ExecuteQuery(query3);
+        //}
         return res;
 
     }
