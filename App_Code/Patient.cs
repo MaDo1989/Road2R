@@ -491,11 +491,26 @@ public class Patient
             p.Hospital = new Location(dr["Hospital"].ToString());
             p.Gender = dr["Gender"].ToString();
             p.Remarks = dr["Remarks"].ToString();
+        p.Equipment = p.getEquipmentForPatient(p.displayName);
 
         }
         #endregion
+        
 
         return p;
+    }
+
+    public List<string> getAllEquipment()
+    {
+        List<string> ls = new List<string>();
+        string query = "select * from Equipment";
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+            ls.Add(dr["Name"].ToString());
+        }
+        return ls;
     }
 
     public void SetPatientStatus(string active)
