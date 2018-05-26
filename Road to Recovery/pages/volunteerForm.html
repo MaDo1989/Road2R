@@ -64,6 +64,7 @@
         }
     </style>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <!--City Autocomplete-->
 
     <!--DatePicker css+js-->
     <link href="../plugins/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" rel="stylesheet">
@@ -111,7 +112,7 @@
         }
 
         function generateCitiesErrorCB(e) {
-            alert("Error in generateCities: " + e);
+            alert("Error in generateCities: " + e.responseMessage);
         }
 
         function generateVolTypes() {
@@ -816,7 +817,7 @@
                                     <div class="row m-l-10 m-r-10">
                                         <div class="col-sm-6">
                                             <div class="form-group">
-                                                <label class="col-sm-3 control-label">תאריך לידה </label>
+                                                <label class="col-sm-3 control-label">תאריך לידה</label>
                                                 <div class="col-sm-6">
                                                     <input id="birthDate" name="birthDate" type="text" class="form-control">
                                                 </div>

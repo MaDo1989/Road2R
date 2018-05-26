@@ -318,6 +318,16 @@ public class WebService : System.Web.Services.WebService
         return j.Serialize(sl);
     }
 
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string getAllEquipment()
+    {
+        Patient p = new Patient();
+        List<string> el= p.getAllEquipment();
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        return j.Serialize(el);
+    }
+
     #region volunteers functions
     [WebMethod]
     public void deactivateVolunteer(string displayName, string active)

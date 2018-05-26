@@ -18,6 +18,8 @@ function datePicker() {
         clearBtn: true,
         autoclose: true
     });
+
+
   //  $.datepicker.setDefaults($.datepicker.regional[""]);
 
     $.datepicker.setDefaults($.datepicker.regional[""]);
