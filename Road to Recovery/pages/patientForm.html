@@ -175,7 +175,7 @@
         }
 
         function generateEquipmentErrorCB(e) {
-            alert("Error in generateEquipment: " + e.responseMessage);
+            alert("Error in generateEquipment: " + e.responseText);
         }
 
         function generateCities() {
@@ -209,7 +209,7 @@
         }
 
         function generateCitiesErrorCB(e) {
-            alert("Error in generateCities: " + e.responseMessage);
+            alert("Error in generateCities: " + e.responseText);
         }
 
         // function generatePaymentType() {
@@ -277,53 +277,53 @@
         }
 
 
-        function generateBarrierPat(patient) {
-            var $select = $("#barrier");
-            $.ajax({
-                dataType: "json",
-                url: "WebService.asmx/getBarrierView",
-                contentType: "application/json; charset=utf-8",
-                type: "POST",
-                async: false,
-                data: JSON.stringify({ active: true }),
-                success: function (data) {
-                    var arr_barrier = JSON.parse(data.d);
-                    if (patient.Barrier.Name != "") {
-                        $('<option>', { value: patient.Barrier.Name, text: patient.Barrier.Name }).appendTo($select);
-                    }
-                    $('<option>', { value: "", text: "בחר " }).appendTo($select);
+        //function generateBarrierPat(patient) {
+        //    var $select = $("#barrier");
+        //    $.ajax({
+        //        dataType: "json",
+        //        url: "WebService.asmx/getBarrierView",
+        //        contentType: "application/json; charset=utf-8",
+        //        type: "POST",
+        //        async: false,
+        //        data: JSON.stringify({ active: true }),
+        //        success: function (data) {
+        //            var arr_barrier = JSON.parse(data.d);
+        //            if (patient.Barrier.Name != "") {
+        //                $('<option>', { value: patient.Barrier.Name, text: patient.Barrier.Name }).appendTo($select);
+        //            }
+        //            $('<option>', { value: "", text: "בחר " }).appendTo($select);
 
-                    for (i in arr_barrier) {
-                        $('<option>', { value: arr_barrier[i].Name, text: arr_barrier[i].Name }).appendTo($select);
-                    }
-                },
-                error: function (err) { alert("Error"); }
-            });
-        }
+        //            for (i in arr_barrier) {
+        //                $('<option>', { value: arr_barrier[i].Name, text: arr_barrier[i].Name }).appendTo($select);
+        //            }
+        //        },
+        //        error: function (err) { alert("Error"); }
+        //    });
+        //}
 
-        function generateHospitalPat(patient) {
-            var $select = $("#hospital");
-            $.ajax({
-                dataType: "json",
-                url: "WebService.asmx/getHospitalView",
-                contentType: "application/json; charset=utf-8",
-                type: "POST",
-                async: false,
-                data: JSON.stringify({ active: true }),
-                success: function (data) {
-                    var arr_hospitals = JSON.parse(data.d);
-                    if (patient.Hospital != "") {
-                        $('<option>', { value: patient.Hospital.Name, text: patient.Hospital.Name }).appendTo($select);
-                    }
-                    $('<option>', { value: "", text: "בחר " }).appendTo($select);
+        //function generateHospitalPat(patient) {
+        //    var $select = $("#hospital");
+        //    $.ajax({
+        //        dataType: "json",
+        //        url: "WebService.asmx/getHospitalView",
+        //        contentType: "application/json; charset=utf-8",
+        //        type: "POST",
+        //        async: false,
+        //        data: JSON.stringify({ active: true }),
+        //        success: function (data) {
+        //            var arr_hospitals = JSON.parse(data.d);
+        //            if (patient.Hospital != "") {
+        //                $('<option>', { value: patient.Hospital.Name, text: patient.Hospital.Name }).appendTo($select);
+        //            }
+        //            $('<option>', { value: "", text: "בחר " }).appendTo($select);
 
-                    for (i in arr_hospitals) {
-                        $('<option>', { value: arr_hospitals[i].Name, text: arr_hospitals[i].Name }).appendTo($select);
-                    }
-                },
-                error: function (err) { alert("Error"); }
-            });
-        }
+        //            for (i in arr_hospitals) {
+        //                $('<option>', { value: arr_hospitals[i].Name, text: arr_hospitals[i].Name }).appendTo($select);
+        //            }
+        //        },
+        //        error: function (err) { alert("Error"); }
+        //    });
+        //}
 
         //function generateStatus(patient) {
         //    var $select = $("#statusPatient");
@@ -374,7 +374,7 @@
                     document.getElementById("escorted").style.visibility = "visible";
                     uploadData(arr_patient.displayName);
                     //if (arr_patient.func == "edit") {
-                       
+
                     //}
                     if (arr_patient.func == "show") {
                         //uploadData1(arr_patient.displayName);
@@ -386,7 +386,7 @@
                         document.getElementById("createCustomer").disabled = true;
                         document.getElementById("datatable-buttons").disabled = true;
 
-
+                        $("#activepatient").attr('disabled', 'disabled');
                         $("#PatientName").attr('disabled', 'disabled');
                         $("#patientFirstName").attr('disabled', 'disabled');
                         $("#patientLastName").attr('disabled', 'disabled');
@@ -397,7 +397,7 @@
                         $("#gender").attr('disabled', 'disabled');
                         $("#statusPatient").attr('disabled', 'disabled');
                         $("#birthDate").attr('disabled', 'disabled');
-                        $("#livingArea").attr('disabled', 'disabled');
+                        $("#selectBarrier").attr('disabled', 'disabled');
                         $("#selectAddition").attr('disabled', 'disabled');
                         $("#phone2").attr('disabled', 'disabled');
                         $("#HomePhone").attr('disabled', 'disabled');
@@ -437,8 +437,8 @@
                     generateEquipment();
                     generateHospital();
                     generateBarrier();
-                   // generateHospitalPat(patient);
-                   // generateBarrierPat(patient);
+                    // generateHospitalPat(patient);
+                    // generateBarrierPat(patient);
                     //generateStatus(patient);
                     //generateGender(patient);
                     $("#PatientName").val(patient.DisplayName);
@@ -450,16 +450,16 @@
                     $("#phone2").val(patient.CellPhone1);
                     $("#HomePhone").val(patient.HomePhone);
                     $("#city").val(patient.City);
-                    $("#livingArea").val(patient.LivingArea);
-                   // $("#statusPatient").val(patient.Status);
-                   // $("#selectAddition").val(patient.Addition);
+                    // $("#livingArea").val(patient.LivingArea);
+                    // $("#statusPatient").val(patient.Status);
+                    // $("#selectAddition").val(patient.Addition);
                     $("#history").val(patient.History);
                     $("#department").val(patient.Department);
                     $("#barrier").val(patient.Barrier.Name);
                     $("#hospital").val(patient.Hospital.Name);
                     $("#remarks").val(patient.Remarks);
-                   $("#gender").val(patient.Gender);
-                    $("#birthDate").val(patient.Birthdate);
+                    $("#gender").val(patient.Gender);
+                    $("#birthDate").val(patient.BirthDate.substring(0,10));
 
                     if (typeof arr_equipment !== "undefined") {
 
@@ -481,45 +481,45 @@
             });
         }
 
-        function uploadData1(displayName) {
-            $.ajax({
-                dataType: "json",
-                url: "WebService.asmx/getPatient",
-                contentType: "application/json; charset=utf-8",
-                type: "POST",
-                data: JSON.stringify({ displayName: displayName }),
-                success: function (data) {
-                    var patient = JSON.parse(data.d);
-                    GENERAL.PATIENTS.setPatientsList(JSON.stringify(patient));
-                    generateHospitalPat(patient);
-                    generateBarrierPat(patient);
-                   // generateStatus(patient);
-                    //generateGender(patient);
-                    $("#PatientName").val(patient.DisplayName);
-                    $("#patientFirstName").val(patient.FirstNameH);
-                    $("#patientLastName").val(patient.LastNameH);
-                    $("#firstA").val(patient.FirstNameA);
-                    $("#lastA").val(patient.LastNameA);
-                    $("#phone1").val(patient.CellPhone);
-                    $("#phone2").val(patient.CellPhone1);
-                    $("#HomePhone").val(patient.HomePhone);
-                    $("#city").val(patient.City);
-                    $("#livingArea").val(patient.LivingArea);
-                    $("#statusPatient").val(patient.Status);
-                    $("#selectAddition").val(patient.Addition);
-                    $("#history").val(patient.History);
-                    $("#department").val(patient.Department);
-                    $("#selectBarrier").val(patient.Barrier);
-                    $("#selectHospital").val(patient.Hospital);
-                    $("#remarks").val(patient.Remarks);
-                    $("#gender").val(patient.Gender);
-                    $("#birthDate").val(patient.Birthdate);
-                    refreshTable1(patient.DisplayName)
+        //function uploadData1(displayName) {
+        //    $.ajax({
+        //        dataType: "json",
+        //        url: "WebService.asmx/getPatient",
+        //        contentType: "application/json; charset=utf-8",
+        //        type: "POST",
+        //        data: JSON.stringify({ displayName: displayName }),
+        //        success: function (data) {
+        //            var patient = JSON.parse(data.d);
+        //            GENERAL.PATIENTS.setPatientsList(JSON.stringify(patient));
+        //            generateHospitalPat(patient);
+        //            generateBarrierPat(patient);
+        //            // generateStatus(patient);
+        //            //generateGender(patient);
+        //            $("#PatientName").val(patient.DisplayName);
+        //            $("#patientFirstName").val(patient.FirstNameH);
+        //            $("#patientLastName").val(patient.LastNameH);
+        //            $("#firstA").val(patient.FirstNameA);
+        //            $("#lastA").val(patient.LastNameA);
+        //            $("#phone1").val(patient.CellPhone);
+        //            $("#phone2").val(patient.CellPhone1);
+        //            $("#HomePhone").val(patient.HomePhone);
+        //            $("#city").val(patient.City);
+        //            $("#livingArea").val(patient.LivingArea);
+        //            $("#statusPatient").val(patient.Status);
+        //            $("#selectAddition").val(patient.Addition);
+        //            $("#history").val(patient.History);
+        //            $("#department").val(patient.Department);
+        //            $("#selectBarrier").val(patient.Barrier);
+        //            $("#selectHospital").val(patient.Hospital);
+        //            $("#remarks").val(patient.Remarks);
+        //            $("#gender").val(patient.Gender);
+        //            $("#birthDate").val(patient.Birthdate);
+        //            refreshTable1(patient.DisplayName)
 
-                },
-                error: function (err) { alert("Error"); }
-            });
-        }
+        //        },
+        //        error: function (err) { alert("Error"); }
+        //    });
+        //}
 
         function returnpatients() {
             location.href = "viewPatient.html"
@@ -591,9 +591,9 @@
                     $('#datatable-buttons tbody').on('click', '#remove', function () {
                         var data = t.row($(this).parents('tr')).data();
                         swal({
-                            title: "אתה בטוח שברצונך למחוק את המלווה:",
+                            title: "האם אתם בטוחים?",
                             type: "warning",
-                            text: data[0],
+                            text: "הפיכת המלווה "+data[0]+" ללא פעיל",
                             showCancelButton: true,
                             cancelButtonText: "בטל",
                             confirmButtonClass: 'btn-warning',
@@ -614,9 +614,9 @@
                     $('#datatable-buttons tbody').on('click', '#reactive', function () {
                         var data = t.row($(this).parents('tr')).data();
                         swal({
-                            title: "אתה בטוח שברצונך לשחזר את המלווה:",
+                            title: "האם אתם בטוחים?",
                             type: "warning",
-                            text: data[0],
+                            text: "שחזור המלווה "+data[0],
                             showCancelButton: true,
                             cancelButtonText: "בטל",
                             confirmButtonClass: 'btn-warning',
@@ -926,7 +926,7 @@
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label class="col-sm-3 control-label">מחסום</label>
-                                                <div class="col-sm-6" id="livingArea">
+                                                <div class="col-sm-6" id="selectBarrier">
                                                     <select id="barrier" name="barrier" class="form-control"></select>
                                                 </div>
                                             </div>
@@ -985,14 +985,14 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <!--<div class="col-sm-6">
+                                        <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label class="col-sm-3 control-label">היסטוריה</label>
                                                 <div class="col-sm-6">
                                                     <input id="history" name="history" type="text" class="form-control">
                                                 </div>
                                             </div>
-                                        </div>-->
+                                        </div>
                                     </div>
                                     <div class="row m-l-10 m-r-10">
                                         <div class="col-sm-6">
@@ -1144,34 +1144,54 @@
                 submitHandler: function (form, event) {
                     event.preventDefault();
                     debugger;
-                    var displayName = $("#PatientName").val();
                     var name = $("#patientFirstName").val();
                     var lastName = $("#patientLastName").val();
                     var phone = $("#phone1").val();
                     var city = $("#city").val();
-                    var barrier = $("#barrier").val();
-                    var status = $("#selectstatusPatient").val();
+                    var barrier = new Object();
+                    barrier.Name = $("#barrier").val();
                     var gender = $("#gender").val();
                     var birthDate = $("#birthDate").val();
+                    var Day = parseInt(birthDate.substring(0, 2));
+                    var Month = parseInt(birthDate.substring(3, 5)) - 1;
+                    var Year = parseInt(birthDate.substring(6));
+                    var Bdate = new Date(Year, Month, Day);
                     var phone1 = $("#phone2").val();
                     var homePhone = $("#HomePhone").val();
-                    var livingArea = $("#livingArea").val();
                     var addition = $("#selectAddition").val();
                     var history = $("#history").val();
                     var department = $("#department").val();
-                    var hospital = $("#hospital").val();
+                    var hospital = new Object();
+                    hospital.Name = $("#hospital").val();
                     var remarks = $("#remarks").val();
                     var nameA = $("#firstA").val();
                     var lastNameA = $("#lastA").val();
                     var func = arr_customer.func;
-
-                    if (phone1 == "") { phone1 = "0"; }
-                    barrier = { Name: barrier }
-                    hospital = { Name: hospital }
+                    var IsActive = false;
+                    if ($("#activepatient").is(':checked')) {
+                        IsActive = true;
+                    }
+                    //set Equipment
+                    var selected = [];
+                    $('#selectEquipment input:checked').each(function () {
+                        var i = $(this).attr('id');
+                        selected.push($('label[for="' + i + '"]')[0].innerText);
+                    });
+                    var EquipmentArr = [];
+                    for (i in arr_equipment) {
+                        for (j in selected) {
+                            if (arr_equipment[i] == selected[j]) {
+                                var Equipment = new Object();
+                                Equipment = parseInt(i)+1;
+                                EquipmentArr.push(Equipment);
+                            }
+                        }
+                    }
+                    
                     patient = {
-                        displayName: displayName, firstNameH: name, firstNameA: nameA, lastNameH: lastName, lastNameA: lastNameA, cellPhone: phone, cellPhone1: phone1,
-                        homePhone: homePhone, city: city, gender: gender, birthDate: birthDate, barrier: barrier, hospital: hospital,
-                        department: department, livingArea: livingArea, status: status, addition: addition, history: history, remarks: remarks
+                        firstNameH: name, firstNameA: nameA, lastNameH: lastName, lastNameA: lastNameA, cellPhone: phone, cellPhone1: phone1,
+                        homePhone: homePhone, city: city, gender: gender, birthDate: Bdate, barrier: barrier, hospital: hospital,
+                        department: department, Equipment: EquipmentArr, history: history, remarks: remarks, IsActive: IsActive
                     }
                     $.ajax({
                         dataType: "json",
@@ -1193,7 +1213,7 @@
 
                         },
                         error: function (err) {
-                            alert("Error");
+                            alert("Error in setPatient: " + err.responseText);
                         }
                     });
                     //END OF Insert Product Code
