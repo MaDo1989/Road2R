@@ -134,7 +134,7 @@
 
                     numberOfRecords = $("#jqGrid").getGridParam("records");
                 },
-                error: function (err) { alert("Error"); }
+                error: function (err) { alert("Error in getCustomerAddresses:"+err.responseText); }
             });
         }
 
@@ -251,7 +251,7 @@
                         $('<option>', { value: arr_hospitals[i].Name, text: arr_hospitals[i].Name }).appendTo($select);
                     }
                 },
-                error: function (err) { alert("Error"); }
+                error: function (err) { alert("Error in getHospitalView: "+err.responseText); }
             });
         }
 
@@ -273,7 +273,7 @@
                         $('<option>', { value: arr_barriers[i].Name, text: arr_barriers[i].Name }).appendTo($select);
                     }
                 },
-                error: function (err) { alert("Error"); }
+                error: function (err) { alert("Error in getBarrierView: "+err.responseText); }
             });
         }
 
@@ -482,7 +482,7 @@
                     refreshTable(patient.DisplayName)
 
                 },
-                error: function (err) { alert("Error"); }
+                error: function (err) { alert("Error in getPatient: "+err.responseText); }
             });
         }
 
@@ -540,7 +540,7 @@
             }
         };
 
-        function refreshTable(displayName) {
+        function refreshTable(patientName) {
             checkCookie();
             // var active = $("#activePatient").prop('checked');
 
@@ -551,19 +551,19 @@
                 url: "WebService.asmx/getPatientEscorted",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                data: JSON.stringify({ displayName: displayName }),
+                data: JSON.stringify({ displayName: patientName }),
                 success: function (data) {
-                    var arr_patients = JSON.parse(data.d);
+                    var arr_escorts = JSON.parse(data.d);
                     //GENERAL.VOLUNTEERS.setvolunteersList(arr_volunteers);
 
-                    for (i in arr_patients) {
+                    for (i in arr_escorts) {
                         var btnStr = ""
                         var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='פרטים נוספים'><i class='fa fa-wpforms'></i></button>";
                         var editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='ערוך'><i class='ti-pencil'></i></button>";
 
                         btnStr += showBtn + " " + editBtn;
 
-                        if (arr_patients[i].Status == "לא פעיל") {
+                        if (arr_escorts[i].IsActive == false) {
                             var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזר'><i class='fa fa-undo' ></i></button>";
                             btnStr += " " + reactiveBtn;
                         }
@@ -573,7 +573,7 @@
                         }
 
 
-                        t.row.add([arr_patients[i].DisplayName, arr_patients[i].CellPhone, arr_patients[i].Addrees, arr_patients[i].ContactType, arr_patients[i].Gender, btnStr]).draw(false);
+                        t.row.add([arr_escorts[i].DisplayName, arr_escorts[i].CellPhone, arr_escorts[i].City, arr_escorts[i].ContactType, arr_escorts[i].Gender, btnStr]).draw(false);
 
                     }
 
@@ -605,14 +605,14 @@
                             confirmButtonText: "מחק",
                             closeOnConfirm: false
                         }, function () {
-                            deactivateEscorted(data[0], 'לא פעיל');
+                            setEscortedStatus(data[0], false);
                             swal({
                                 title: "המלווה הפך ללא פעיל",
                                 timer: 1000,
                                 type: "success",
                                 showConfirmButton: false
                             });
-                            setTimeout(function () { refreshTable(data[0]) }, 1001);
+                            setTimeout(function () { refreshTable(patientName) }, 1001);
                         });
                     });
 
@@ -628,72 +628,73 @@
                             confirmButtonText: "שחזר",
                             closeOnConfirm: false
                         }, function () {
-                            deactivateEscorted(data[0], 'פעיל');
+                            setEscortedStatus(data[0], true);
                             swal({
                                 title: "המלווה הפך לפעיל",
                                 timer: 1000,
                                 type: "success",
                                 showConfirmButton: false
                             });
-                            setTimeout(function () { refreshTable(data[0]) }, 1001);
+                            setTimeout(function () { refreshTable(patientName) }, 1001);
                         });
 
                     });
                 },
-                error: function (err) { alert("Error"); }
+                error: function (err) { alert("Error in getPatientEscorted: "+err.responseText); }
             });
         }
 
-        function refreshTable1(displayName) {
+        //function refreshTable1(displayName) {
+        //    checkCookie();
+        //    // var active = $("#activePatient").prop('checked');
+
+        //    t.clear().draw();
+
+        //    $.ajax({
+        //        dataType: "json",
+        //        url: "WebService.asmx/getPatientEscorted",
+        //        contentType: "application/json; charset=utf-8",
+        //        type: "POST",
+        //        data: JSON.stringify({ displayName: displayName }),
+        //        success: function (data) {
+        //            var arr_patients = JSON.parse(data.d);
+        //            //GENERAL.VOLUNTEERS.setvolunteersList(arr_volunteers);
+
+        //            for (i in arr_patients) {
+        //                t.row.add([arr_patients[i].DisplayName, arr_patients[i].CellPhone, arr_patients[i].City, arr_patients[i].ContactType, arr_patients[i].Gender, ""]).draw(false);
+
+        //            }
+
+        //            t.columns([0]).order('asc').draw();
+        //        },
+        //        error: function (err) { alert("Error in getPatientEscorted:"+err.responseText); }
+        //    });
+        //}
+
+        //function deactivatePatient(displayName, active) {
+        //    checkCookie();
+        //    $.ajax({
+        //        dataType: "json",
+        //        url: "WebService.asmx/SetPatientStatus",
+        //        contentType: "application/json; charset=utf-8",
+        //        type: "POST",
+        //        data: JSON.stringify({ displayName: displayName, active: active }),
+        //        success: function (data) { },
+        //        error: function (err) { alert("Error in SetPatientStatus: "+err.responseText); }
+        //    });
+
+        //}
+
+        function setEscortedStatus(displayName, active) {
             checkCookie();
-            // var active = $("#activePatient").prop('checked');
-
-            t.clear().draw();
-
             $.ajax({
                 dataType: "json",
-                url: "WebService.asmx/getPatientEscorted",
-                contentType: "application/json; charset=utf-8",
-                type: "POST",
-                data: JSON.stringify({ displayName: displayName }),
-                success: function (data) {
-                    var arr_patients = JSON.parse(data.d);
-                    //GENERAL.VOLUNTEERS.setvolunteersList(arr_volunteers);
-
-                    for (i in arr_patients) {
-                        t.row.add([arr_patients[i].DisplayName, arr_patients[i].CellPhone, arr_patients[i].City, arr_patients[i].ContactType, arr_patients[i].Gender, ""]).draw(false);
-
-                    }
-
-                    t.columns([0]).order('asc').draw();
-                },
-                error: function (err) { alert("Error"); }
-            });
-        }
-
-        function deactivatePatient(displayName, active) {
-            checkCookie();
-            $.ajax({
-                dataType: "json",
-                url: "WebService.asmx/SetPatientStatus",
+                url: "WebService.asmx/setEscortedStatus",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
                 data: JSON.stringify({ displayName: displayName, active: active }),
                 success: function (data) { },
-                error: function (err) { alert("Error"); }
-            });
-
-        }
-        function deactivateEscorted(displayName, active) {
-            checkCookie();
-            $.ajax({
-                dataType: "json",
-                url: "WebService.asmx/deactivateEscorted",
-                contentType: "application/json; charset=utf-8",
-                type: "POST",
-                data: JSON.stringify({ displayName: displayName, active: active }),
-                success: function (data) { },
-                error: function (err) { alert("Error"); }
+                error: function (err) { alert("Error in setEscortedStatus: "+err.responseText); }
             });
 
         }

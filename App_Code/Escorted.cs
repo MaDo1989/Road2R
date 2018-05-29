@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Web;
@@ -25,6 +26,8 @@ public class Escorted
     string contactType;//קרבה לחולה
     string gender;
     int id;
+
+    public string City { get; set; }
 
 
     public bool IsActive { get; set; }
@@ -200,7 +203,7 @@ public class Escorted
         }
     }
 
-    public Escorted(Patient _pat,string _displayName, string _firstNameH, string _firstNameA, string _lastNameH, string _lastNameA,
+    public Escorted(Patient _pat, string _displayName, string _firstNameH, string _firstNameA, string _lastNameH, string _lastNameA,
      string _addrees, string _cellPhone, string _cellPhone2, string _homePhone, string _status, string _contactType, string _gender)
     {
         Pat = _pat;
@@ -234,8 +237,8 @@ public class Escorted
         ContactType = _contactType;
         Gender = _gender;
     }
-         public Escorted(string _displayName, string _firstNameH, string _firstNameA, string _lastNameH, string _lastNameA,
-         string _cellPhone, string _cellPhone2, string _homePhone, string _addrees, string _status, string _contactType, string _gender)
+    public Escorted(string _displayName, string _firstNameH, string _firstNameA, string _lastNameH, string _lastNameA,
+    string _cellPhone, string _cellPhone2, string _homePhone, string _addrees, string _status, string _contactType, string _gender)
     {
 
         DisplayName = _displayName;
@@ -258,7 +261,7 @@ public class Escorted
         //
     }
 
-    public Escorted(string _displayname,string _firstNameH,string _lastNameH,string _cellPhone)
+    public Escorted(string _displayname, string _firstNameH, string _lastNameH, string _cellPhone)
     {
         DisplayName = _displayname;
         FirstNameH = _firstNameH;
@@ -271,78 +274,157 @@ public class Escorted
         DisplayName = _displayname;
     }
 
-    public void deactivateEscorted(string active)// change name to SetStatus
+    public void setEscortedStatus(string active)// change name to SetStatus
     {
         DbService db = new DbService();
-        db.ExecuteQuery("UPDATE Escorted SET statusEscorted='" + active + "' WHERE displayName='" + DisplayName + "'");
+        SqlCommand cmd = new SqlCommand();
+        cmd.CommandType = CommandType.Text;
+        SqlParameter[] cmdParams = new SqlParameter[2];
+        cmdParams[0] = cmd.Parameters.AddWithValue("@displayName", DisplayName);
+        cmdParams[1] = cmd.Parameters.AddWithValue("@status", active);
+        string query = "UPDATE Escorted SET IsActive=@status WHERE displayName=@displayName";
+        db.ExecuteQuery(query, cmd.CommandType, cmdParams);
     }
 
-
-    public Escorted getEscorted()
+    public List<string> getContactType()
     {
-        #region DB functions
-        displayName = displayName.Replace("'", "''");
-        string query = "select * from Escorted where DisplayName ='" + displayName + "'"; //id,patient,displayName, firstNameH,firstNameA, lastNameH,lastNameA, cellPhone,cellPhone2,homePhone,city,statusEscorted, contactType,gender
-        Escorted p = new Escorted();
+        List<string> cl = new List<string>();
+        string query = "select Name from ContactType";
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+            ContactType = dr["Name"].ToString();
+            cl.Add(ContactType);
+        }
+        return cl;
+    }
+
+    public Escorted getEscorted(string patientName)
+    {
+        #region DB functions
+        SqlCommand cmd;
+        SqlParameter[] cmdParams;
+        // displayName = displayName.Replace("'", "''");
+        string query = "select * from Escorted where DisplayName =@displayName"; //id,patient,displayName, firstNameH,firstNameA, lastNameH,lastNameA, cellPhone,cellPhone2,homePhone,city,statusEscorted, contactType,gender
+        Escorted e = new Escorted();
+        DbService db = new DbService();
+        cmd = new SqlCommand();
+        cmd.CommandType = CommandType.Text;
+        cmdParams = new SqlParameter[1];
+        cmdParams[0] = cmd.Parameters.AddWithValue("@displayName", displayName);
+        DataSet ds = db.GetDataSetByQuery(query, cmd.CommandType, cmdParams);
 
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
-            p.Id = int.Parse(dr["Id"].ToString());
+            e.Id = int.Parse(dr["Id"].ToString());
             //p.Pat = new Patient(dr["patient"].ToString());
-            p.DisplayName = dr["DisplayName"].ToString();
-            p.FirstNameA = dr["FirstNameA"].ToString();
-            p.FirstNameH = dr["FirstNameH"].ToString();
-            p.LastNameH = dr["LastNameH"].ToString();
-            p.LastNameA = dr["LastNameA"].ToString();
-            p.CellPhone = dr["CellPhone"].ToString();
-            p.CellPhone2 = dr["CellPhone2"].ToString();
-            p.HomePhone = dr["HomePhone"].ToString();
-            p.Addrees = dr["City"].ToString();
+            e.DisplayName = dr["DisplayName"].ToString();
+            e.FirstNameA = dr["FirstNameA"].ToString();
+            e.FirstNameH = dr["FirstNameH"].ToString();
+            e.LastNameH = dr["LastNameH"].ToString();
+            e.LastNameA = dr["LastNameA"].ToString();
+            e.CellPhone = dr["CellPhone"].ToString();
+            e.CellPhone2 = dr["CellPhone2"].ToString();
+            e.HomePhone = dr["HomePhone"].ToString();
+            e.City = dr["City"].ToString();
             //p.Status = dr["statusEscorted"].ToString();
-            p.IsActive = Convert.ToBoolean(dr["IsActive"].ToString());
-           // p.ContactType = dr["contactType"].ToString();
-            p.Gender = dr["Gender"].ToString();
-
+            e.IsActive = Convert.ToBoolean(dr["IsActive"].ToString());
+            // p.ContactType = dr["contactType"].ToString();
+            e.Gender = dr["Gender"].ToString();
         }
+
+        db = new DbService();
+        cmd = new SqlCommand();
+        cmd.CommandType = CommandType.Text;
+        cmdParams = new SqlParameter[2];
+        cmdParams[0] = cmd.Parameters.AddWithValue("@patient", patientName);
+        cmdParams[1] = cmd.Parameters.AddWithValue("@escort", e.DisplayName);
+        query = "select Relationship from RelationshipView where Patient=@patient and Escort=@escort";
+        DataRow dr2 = db.GetDataSetByQuery(query, cmd.CommandType, cmdParams).Tables[0].Rows[0];
+        e.ContactType = dr2["Relationship"].ToString();
         #endregion
 
-        return p;
+        return e;
     }
 
     public void setEscorted(string func)
     {
         DbService db = new DbService();
         string query = "";
-        displayName = displayName.Replace("'", "''");
-        FirstNameH = FirstNameH.Replace("'", "''");
-        LastNameH = LastNameH.Replace("'", "''");
+        SqlCommand cmd = new SqlCommand();
+        cmd.CommandType = CommandType.Text;
+        SqlParameter[] cmdParams = new SqlParameter[14];
+        cmdParams[0] = cmd.Parameters.AddWithValue("@FirstNameH", FirstNameH);
+        cmdParams[1] = cmd.Parameters.AddWithValue("@FirstNameA", FirstNameA);
+        cmdParams[2] = cmd.Parameters.AddWithValue("@LastNameH", LastNameH);
+        cmdParams[3] = cmd.Parameters.AddWithValue("@LastNameA", LastNameA);
+        cmdParams[4] = cmd.Parameters.AddWithValue("@CellPhone", CellPhone);
+        cmdParams[5] = cmd.Parameters.AddWithValue("@CellPhone2", CellPhone2);
+        cmdParams[6] = cmd.Parameters.AddWithValue("@HomePhone", HomePhone);
+        cmdParams[7] = cmd.Parameters.AddWithValue("@City", City);
+        cmdParams[8] = cmd.Parameters.AddWithValue("@IsActive", IsActive);
+        cmdParams[9] = cmd.Parameters.AddWithValue("@ContactType", ContactType);
+        cmdParams[10] = cmd.Parameters.AddWithValue("@Gender", Gender);
+        cmdParams[11] = cmd.Parameters.AddWithValue("@Id", Id);
+        cmdParams[12] = cmd.Parameters.AddWithValue("@PatientId", Pat.Id);
+        cmdParams[13] = cmd.Parameters.AddWithValue("@Relationship", 0);
+
+        db = new DbService();
+        query = "select Id from ContactType where Name=@ContactType";
+        int Relationship = 0;
+        Relationship = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
+        cmdParams[13] = cmd.Parameters.AddWithValue("@Relationship", Relationship);
+
         if (func == "edit")
         {
-            query = "UPDATE Escorted SET displayName = '" + DisplayName + "', firstNameH = '" + FirstNameH + "', firstNameA = '" + FirstNameA + "', lastNameH = '" + LastNameH + "', lastNameA = '" + LastNameA + "', cellPhone = '" + CellPhone + "', cellPhone2 = " + CellPhone2 +
-            ", homePhone = '" + HomePhone + "', city = '" + Addrees + "', statusEscorted = '" + Status + "', contactType = '" + ContactType + "', gender = '" + Gender + "' WHERE id = '" + Id + "'";
+            query = "update Escorted set FirstNameH=@FirstNameH,LastNameH=@LastNameH,FirstNameA=@FirstNameA,";
+            query += "LastNameA=@LastNameA,CellPhone=@CellPhone,CellPhone2=@CellPhone2,HomePhone=@HomePhone,";
+            query += "City=@City,IsActive=@IsActive,Gender=@Gender where Id=@Id";
+            db = new DbService();
+            int res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+
+            //if (res > 0)
+            //{
+            //    query = "delete from PatientEscort where PatientId=@PatientId and EscortId=@Id";
+            //    db = new DbService();
+            //    res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+            //}
+
+            if (res > 0)
+            {
+                query = "update PatientEscort set ContactTypeId=@Relationship where PatientId=@PatientId and EscortId=@Id";
+                db = new DbService();
+                try
+                {
+                    db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+            }
         }
         else if (func == "new")
         {
-            StringBuilder sb = new StringBuilder();
-            sb.AppendFormat("Values('{0}', '{1}', '{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}', '{11}')",
-                DisplayName, FirstNameH, FirstNameA, LastNameH, LastNameA,
-                CellPhone, CellPhone2, HomePhone, Addrees, Status,
-                ContactType, Gender);
-            String prefix = "INSERT INTO Escorted " + "(displayName, firstNameH,firstNameA, lastNameH,lastNameA, cellPhone,cellPhone2,homePhone,city,statusEscorted, contactType,gender)";
-            query = prefix + sb.ToString();
-            //query = "insert into Customers values ('" + CustomerName + "','" + CustomerContactName + "','" + AccountID + "','Y','" + Phone1 + "','" + Phone2 + "','" + Email + "'," + PaymentType.PaymentTypeID + ",'" + Comments + "'," + PreferedDrivers.DriverID + ", '" + RegistrationNumber + "', '" + BillingAddress + "')";
+            query = "INSERT INTO Escorted (FirstNameH,LastNameH, CellPhone,CellPhone2,HomePhone,";
+            query += "City,IsActive,Gender,FirstNameA,LastNameA)";
+            query += " values (@FirstNameH,@LastNameH,@CellPhone,@CellPhone2,@HomePhone,@City,@IsActive,@Gender,@FirstNameA,@LastNameA); select SCOPE_IDENTITY()";
+            db = new DbService();
+            Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
+            cmdParams[11] = cmd.Parameters.AddWithValue("@Id",Id);
+            query = "insert into PatientEscort (PatientId,EscortId,ContactTypeId) values (@PatientId,@Id,@Relationship)";
+            db = new DbService();
+            try
+            {
+               int res= db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+                if (res == 0) throw new Exception();
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
         }
-        db.ExecuteQuery(query);
-        string query2 = "select id from Escorted where displayName='" + displayName+"'";
-        DbService db2 = new DbService();
-        var Eid = db2.GetObjectScalarByQuery(query2);
-        var Pid = pat.Id;
-        DbService db3 = new DbService();
-        string query3 = "insert into PatientEscort (PatientId,EscortId) values ('" + Pid +"','"+Eid+"')";
-        db3.ExecuteQuery(query3);
-
     }
 
     //public DataTable read()

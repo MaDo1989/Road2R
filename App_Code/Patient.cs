@@ -645,9 +645,10 @@ public class Patient
             e.CellPhone2 = dr["CellPhone2"].ToString();
             e.HomePhone = dr["HomePhone"].ToString();
             e.IsActive = Convert.ToBoolean(dr["IsActive"].ToString());
-            e.ContactType = dr["ContactType"].ToString();
+           // e.ContactType = dr["ContactType"].ToString();
             e.Gender = dr["Gender"].ToString();
-            e.Addrees = dr["City"].ToString();
+            e.City = dr["City"].ToString();
+            e.ContactType = dr["Relationship"].ToString();
 
             list.Add(e);
         }

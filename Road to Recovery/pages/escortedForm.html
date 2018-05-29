@@ -46,6 +46,26 @@
     <link href="assets/css/select2.css" rel="stylesheet" />
     <script src="assets/js/select2.min.js"></script>
 
+    <!--City Autocomplete-->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <style>
+        .ui-autocomplete {
+            max-height: 100px;
+            overflow-y: auto;
+            /* prevent horizontal scrollbar */
+            overflow-x: hidden;
+        }
+        /* IE 6 doesn't support max-height
+        * we use height instead, but this forces the menu to always be this tall
+        */
+        * html .ui-autocomplete {
+            height: 100px;
+        }
+    </style>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <!--City Autocomplete-->
+
     <script>
         checkCookie();
         arr_addressRows = [];
@@ -88,18 +108,18 @@
 
                     numberOfRecords = $("#jqGrid").getGridParam("records");
                 },
-                error: function (err) { alert("Error"); }
+                error: function (err) { alert("Error in getCustomerAddresses:" + err.responseText); }
             });
         }
 
 
-        function initializeSelect2() {
-            //    arrSelectors = ['paymentType', 'preferRoute'];
-            //    for (var i in arrSelectors) {
-            //        $('#' + arrSelectors[i]).select2();
-            //    }
-        }
-        function generateContactType1() {
+        //function initializeSelect2() {
+        //    //    arrSelectors = ['paymentType', 'preferRoute'];
+        //    //    for (var i in arrSelectors) {
+        //    //        $('#' + arrSelectors[i]).select2();
+        //    //    }
+        //}
+        function generateContactType() {
             var $select = $("#contactType");
             $.ajax({
                 dataType: "json",
@@ -107,83 +127,115 @@
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
                 async: false,
-                data: JSON.stringify({ active: true }),
                 success: function (data) {
                     var ContactType = JSON.parse(data.d);
-                    $('<option>', { value: "", text: "בחר " }).appendTo($select);
+                    // $('<option>', { value: "", text: "בחר " }).appendTo($select);
 
                     for (i in ContactType) {
-                        $('<option>', { value: ContactType[i].Name, text: ContactType[i].Name }).appendTo($select);
+                        $('<option>', { value: ContactType[i], text: ContactType[i] }).appendTo($select);
                     }
                 },
-                error: function (err) { alert("Error"); }
+                error: function (err) { alert("Error in getContactType: " + err.responseText); }
             });
         }
 
-        function generateContactType(escorted) {
-            var $select = $("#contactType");
+        //function generateContactType(escorted) {
+        //    var $select = $("#contactType");
+        //    $.ajax({
+        //        dataType: "json",
+        //        url: "WebService.asmx/getContactType",
+        //        contentType: "application/json; charset=utf-8",
+        //        type: "POST",
+        //        async: false,
+        //        data: JSON.stringify({ active: true }),
+        //        success: function (data) {
+        //            var ContactType = JSON.parse(data.d);
+        //            if (escorted.ContactType != "") {
+        //                $('<option>', { value: escorted.ContactType, text: escorted.ContactType }).appendTo($select);
+        //            }
+        //            $('<option>', { value: "", text: "בחר " }).appendTo($select);
+
+        //            for (i in ContactType) {
+        //                $('<option>', { value: ContactType[i].Name, text: ContactType[i].Name }).appendTo($select);
+        //            }
+        //        },
+        //        error: function (err) { alert("Error"); }
+        //    });
+        //}
+
+        function generateCities() {
+
             $.ajax({
                 dataType: "json",
-                url: "WebService.asmx/getContactType",
+                url: "WebService.asmx/getCities",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
                 async: false,
                 data: JSON.stringify({ active: true }),
-                success: function (data) {
-                    var ContactType = JSON.parse(data.d);
-                    if (escorted.ContactType != "") {
-                        $('<option>', { value: escorted.ContactType, text: escorted.ContactType }).appendTo($select);
-                    }
-                    $('<option>', { value: "", text: "בחר " }).appendTo($select);
-
-                    for (i in ContactType) {
-                        $('<option>', { value: ContactType[i].Name, text: ContactType[i].Name }).appendTo($select);
-                    }
-                },
-                error: function (err) { alert("Error"); }
+                success: generateCitiesSuccessCB,
+                error: generateCitiesErrorCB
             });
         }
 
-        function generateStatus(escorted) {
-            var $select = $("#status");
-            //if (escorted.IsActive != "") {
-            if (escorted.IsActive)
-                // $('<option>', { value: escorted.IsActive, text: "פעיל" }).appendTo($select);
-                $("#status").val = "פעיל";
-            else
-                //$('<option>', { value: escorted.IsActive, text: "לא פעיל" }).appendTo($select);
-                $("#status").val = "לא פעיל";
-            // }
-            //$('<option>', { value: "", text: "בחר " }).appendTo($select);
+        function generateCitiesSuccessCB(data) {
+            var arr_cities = JSON.parse(data.d);
 
-            //$('<option>', { value: "פעיל", text: "פעיל " }).appendTo($select);
-            //$('<option>', { value: "לא פעיל", text: "לא פעיל " }).appendTo($select);
-        }
+            cities = [];
 
-        function generateStatus1() {
-            var $select = $("#status");
-            $('<option>', { value: "", text: "בחר " }).appendTo($select);
-            $('<option>', { value: "פעיל", text: "פעיל " }).appendTo($select);
-            $('<option>', { value: "לא פעיל", text: "לא פעיל " }).appendTo($select);
-        }
-
-        function generateGender(escorted) {
-            var $select = $("#gender");
-            if (escorted.Gender != "") {
-                $('<option>', { value: escorted.Gender, text: escorted.Gender }).appendTo($select);
+            for (i in arr_cities) {
+                cities.push(arr_cities[i].CityName);
             }
-            $('<option>', { value: "", text: "בחר " }).appendTo($select);
 
-            $('<option>', { value: "זכר", text: "זכר " }).appendTo($select);
-            $('<option>', { value: "נקבה", text: "נקבה " }).appendTo($select);
+            $("#city").autocomplete({
+                source: cities
+            });
+
         }
 
-        function generateGender1() {
-            var $select = $("#gender");
-            $('<option>', { value: "", text: "בחר " }).appendTo($select);
-            $('<option>', { value: "זכר", text: "זכר " }).appendTo($select);
-            $('<option>', { value: "נקבה", text: "נקבה " }).appendTo($select);
+        function generateCitiesErrorCB(e) {
+            alert("Error in generateCities: " + e.responseText);
         }
+
+        //function generateStatus(escorted) {
+        //    var $select = $("#status");
+        //    //if (escorted.IsActive != "") {
+        //    if (escorted.IsActive)
+        //        // $('<option>', { value: escorted.IsActive, text: "פעיל" }).appendTo($select);
+        //        $("#status").val = "פעיל";
+        //    else
+        //        //$('<option>', { value: escorted.IsActive, text: "לא פעיל" }).appendTo($select);
+        //        $("#status").val = "לא פעיל";
+        //    // }
+        //    //$('<option>', { value: "", text: "בחר " }).appendTo($select);
+
+        //    //$('<option>', { value: "פעיל", text: "פעיל " }).appendTo($select);
+        //    //$('<option>', { value: "לא פעיל", text: "לא פעיל " }).appendTo($select);
+        //}
+
+        //function generateStatus1() {
+        //    var $select = $("#status");
+        //    $('<option>', { value: "", text: "בחר " }).appendTo($select);
+        //    $('<option>', { value: "פעיל", text: "פעיל " }).appendTo($select);
+        //    $('<option>', { value: "לא פעיל", text: "לא פעיל " }).appendTo($select);
+        //}
+
+        //function generateGender(escorted) {
+        //    var $select = $("#gender");
+        //    if (escorted.Gender != "") {
+        //        $('<option>', { value: escorted.Gender, text: escorted.Gender }).appendTo($select);
+        //    }
+        //    $('<option>', { value: "", text: "בחר " }).appendTo($select);
+
+        //    $('<option>', { value: "זכר", text: "זכר " }).appendTo($select);
+        //    $('<option>', { value: "נקבה", text: "נקבה " }).appendTo($select);
+        //}
+
+        //function generateGender1() {
+        //    var $select = $("#gender");
+        //    $('<option>', { value: "", text: "בחר " }).appendTo($select);
+        //    $('<option>', { value: "זכר", text: "זכר " }).appendTo($select);
+        //    $('<option>', { value: "נקבה", text: "נקבה " }).appendTo($select);
+        //}
 
         function loadPage() {
             //generate select options
@@ -192,12 +244,11 @@
 
             if (JSON.parse(GENERAL.ESCORTED.getEscortedList()).length != 0) {
                 arr_customer = JSON.parse(GENERAL.ESCORTED.getEscortedList());
+                $("#patientDisplayName").attr('disabled', 'disabled');
                 if (arr_customer.func == "edit" || arr_customer.func == "show") {
-                    $("#patientDisplayName").attr('disabled', 'disabled');
                     uploadData(arr_customer.displayName);
 
                     if (arr_customer.func == "show") {
-
                         $("#escortedName").attr('disabled', 'disabled');
                         $("#escortedFirstName").attr('disabled', 'disabled');
                         $("#escortedLastName").attr('disabled', 'disabled');
@@ -205,43 +256,46 @@
                         $("#contactType").attr('disabled', 'disabled');
                         $("#city").attr('disabled', 'disabled');
                         $("#gender").attr('disabled', 'disabled');
-                        $("#statusEscorted").attr('disabled', 'disabled');
+                        $("#activeescorted").attr('disabled', 'disabled');
                         $("#phone2").attr('disabled', 'disabled');
                         $("#HomePhone").attr('disabled', 'disabled');
                         $("#firstA").attr('disabled', 'disabled');
                         $("#lastA").attr('disabled', 'disabled');
-                        initializeSelect2();
+                        // initializeSelect2();
                     }
                 }
                 else {
-                    //generateContactType1();
-                    generateStatus1();
-                    generateGender1();
-                    arr_pat = JSON.parse(GENERAL.ESCORTED.getEscortedList());
-                    uploadDataNew(arr_pat.displayName);
-                    initializeSelect2();
-                    $("#activeEscorted").prop('checked', 'checked');
+
+                    generateCities();
+                    generateContactType();
+                    arr_pat = JSON.parse(GENERAL.PATIENTS.getPatientsList());
+                    uploadDataNew(arr_pat.DisplayName);
+                    //initializeSelect2();
+                    $("#activeescorted").prop('checked', 'checked');
                 }
             }
         }
 
         //function to fill form for edit
         function uploadData(displayName) {
+            generateContactType();
+
+            var patName = JSON.parse(GENERAL.PATIENTS.getPatientsList()).DisplayName;
+
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/getEscorted",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                data: JSON.stringify({ displayName: displayName }),
+                data: JSON.stringify({ displayName: displayName, patientName:patName }),
                 success: function (data) {
                     var escorted = JSON.parse(data.d);
-                    var patName = JSON.parse(GENERAL.ESCORTED.getEscortedList()).patientName;
                     GENERAL.ESCORTED.setEscortedList(JSON.stringify(escorted));
                     //generateContactType(escorted)
                     //generateStatus(escorted)
-                    generateGender(escorted)
+                    //generateGender(escorted)
                     $("#patientDisplayName").val(patName);
-                    $("#escortedName").val(escorted.DisplayName);
+                    //  $("#escortedName").val(escorted.DisplayName);
                     $("#escortedFirstName").val(escorted.FirstNameH);
                     $("#escortedLastName").val(escorted.LastNameH);
                     $("#firstA").val(escorted.FirstNameA);
@@ -249,27 +303,29 @@
                     $("#phone1").val(escorted.CellPhone);
                     $("#phone2").val(escorted.CellPhone2);
                     $("#HomePhone").val(escorted.HomePhone);
-                    $("#city").val(escorted.Addrees);
+                    $("#city").val(escorted.City);
                     if (escorted.IsActive)
-                        $("#selectstatus option[value=1]").attr('selected', true);
+                        $("#activeescorted").prop('checked', true);
                     else
-                        $("#selectstatus option[value=0]").attr('selected', true);
-                    $("#selectgender").val(escorted.Gender);
-                    $("#selectcontactType").val(escorted.ContactType);
+                        $("#activeescorted").prop('checked', false);
+                    $("#gender").val(escorted.Gender);
+                    $("#contactType").val(escorted.ContactType);
 
                 },
-                error: function (err) { alert("Error"); }
+                error: function (err) { alert("Error in getEscorted: " + err.responseText); }
             });
         }
 
         //function to fill form for edit
         function uploadDataNew(displayName) {
             $("#patientDisplayName").val(displayName);
+            $("#activeescorted").prop('checked', true);
+
         }
 
         function returnPatient() {
             var displayNamePat = $("#patientDisplayName").val();
-            arr_details = { displayName: displayNamePat, func: "edit" };
+            arr_details = { displayName: displayNamePat, func: "show" };
             GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
             location.href = "patientForm.html"
         }
@@ -396,6 +452,17 @@
                                         <p class="text-muted font-13 m-b-30">
                                             יצירת, צפייה ועריכת מלווה. לחץ על כפתור חזור בכדי לצפות בכל החולים.
                                         </p>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <br />
+                                                <div class="col-md-6 checkbox checkbox-primary text-left">
+                                                    <input id="activeescorted" type="checkbox">
+                                                    <label for="activeescorted">
+                                                        מלווה פעיל
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <div class="text-right m-b-30 m-r-15">
                                             <button type="button" onclick="returnPatient()" class="btn btn-default waves-effect w-md m-b-5"><i class="ti-back-right m-r-5"></i>חזור</button>
                                         </div>
@@ -410,14 +477,14 @@
                                             </div>
                                         </div>
                                         <div class="row m-l-10 m-r-10">
-                                            <div class="col-sm-6">
+                                            <!--<div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label class="col-sm-3 control-label">שם מלא מלווה</label>
                                                     <div class="col-sm-6">
                                                         <input id="escortedName" name="escortedName" type="text" class="form-control">
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </div>-->
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label class="col-sm-3 control-label">שם פרטי</label>
@@ -438,7 +505,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">טלפון 1</label>
+                                                    <label class="col-sm-3 control-label">טלפון ראשי</label>
                                                     <div class="col-sm-6">
                                                         <input id="phone1" name="phone1" type="text" class="form-control">
                                                     </div>
@@ -448,7 +515,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">שם פרטי ערבית</label>
+                                                    <label class="col-sm-3 control-label">اسم شخصي</label>
                                                     <div class="col-sm-6">
                                                         <input id="firstA" name="firstA" type="text" class="form-control">
                                                     </div>
@@ -456,7 +523,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">שם משפחה ערבית</label>
+                                                    <label class="col-sm-3 control-label">اسم عائلة</label>
                                                     <div class="col-sm-6">
                                                         <input id="lastA" name="lastA" type="text" class="form-control">
                                                     </div>
@@ -485,7 +552,11 @@
                                             <div class="form-group">
                                                 <label class="col-sm-3 control-label">מין</label>
                                                 <div class="col-sm-6" id="selectgender">
-                                                    <select id="gender" name="gender" class="form-control"></select>
+                                                    <select id="gender" name="gender" class="form-control">
+                                                        <option>בחר</option>
+                                                        <option>זכר</option>
+                                                        <option>נקבה</option>
+                                                    </select>
                                                 </div>
                                             </div>
                                         </div>
@@ -514,11 +585,13 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-3 control-label">סוג קרבה</label>
                                                     <div class="col-sm-6" id="selectcontactType">
-                                                        <select id="contactType" name="contactType" class="form-control"></select>
+                                                        <select id="contactType" name="contactType" class="form-control">
+                                                            <option>בחר</option>
+                                                        </select>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-sm-6">
+                                            <!--<div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label class="col-sm-3 control-label">סטטוס מלווה</label>
                                                     <div class="col-sm-6" id="selectstatus">
@@ -528,19 +601,9 @@
                                                         </select>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </div>-->
                                         </div>
-                                        <div class="row m-l-10 m-r-10">
-                                            <div class="col-sm-6">
-                                                <br />
-                                                <div class="col-md-6 checkbox checkbox-primary text-left">
-                                                    <input id="activeescorted" type="checkbox" disabled>
-                                                    <label for="activeescorted">
-                                                        מלווה פעיל
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
+
                                         <div id="addressesForm">
                                             <hr />
                                             <!--<table id="jqGrid" class="table table-striped table-bordered text-right"></table>
@@ -615,13 +678,17 @@
                 submitHandler: function (form, event) {
                     event.preventDefault();
                     debugger;
+                    var IsActive = false;
+                    if ($("#activeescorted").is(':checked')) {
+                        IsActive = true;
+                    }
                     var displayNamePat = $("#patientDisplayName").val();
-                    var displayName = $("#escortedName").val();
+                   // var displayName = $("#escortedName").val();
                     var firstNameH = $("#escortedFirstName").val();
                     var lastNameH = $("#escortedLastName").val();
                     var cellPhone = $("#phone1").val();
                     var city = $("#city").val();
-                    var status = $("#statusEscorted").val();
+                  //  var status = $("#statusEscorted").val();
                     var gender = $("#gender").val();
                     var cellphone2 = $("#phone2").val();
                     var homePhone = $("#HomePhone").val();
@@ -629,14 +696,14 @@
                     var lastNameA = $("#lastA").val();
                     var contactType = $("#contactType").val();
                     var func = arr_customer.func;
-                    if (cellphone2 == "") { cellphone2 = "0"; }
+                    //if (cellphone2 == "") { cellphone2 = "0"; }
                     var Eid = JSON.parse(GENERAL.ESCORTED.getEscortedList()).Id
                     var Pid = JSON.parse(GENERAL.PATIENTS.getPatientsList()).Id
 
                     patient = { displayName: displayNamePat, id: Pid }
                     escorted = {
-                        pat: patient, id: Eid, displayName: displayName, firstNameH: firstNameH, firstNameA: nameA, lastNameH: lastNameH, lastNameA: lastNameA, addrees: city, cellPhone: cellPhone, cellphone2: cellphone2, homePhone: homePhone,
-                        status: status, contactType: contactType, gender: gender
+                        pat: patient, id: Eid, firstNameH: firstNameH, firstNameA: nameA, lastNameH: lastNameH, lastNameA: lastNameA, city: city, cellPhone: cellPhone, cellphone2: cellphone2, homePhone: homePhone,
+                        contactType: contactType, gender: gender,IsActive:IsActive
                     }
                     $.ajax({
                         dataType: "json",
@@ -658,7 +725,7 @@
 
                         },
                         error: function (err) {
-                            alert("Error");
+                            alert("Error in setEscorted: " + err.responseText);
                         }
                     });
                     return false;

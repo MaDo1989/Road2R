@@ -113,17 +113,17 @@ public class WebService : System.Web.Services.WebService
     public string getPatientEscorted(string displayName)
     {
         JavaScriptSerializer j = new JavaScriptSerializer();
-        Patient c = new Patient();
-        List<Escorted> escortedsList = c.getescortedsList(displayName);
+        Patient p = new Patient();
+        List<Escorted> escortedsList = p.getescortedsList(displayName);
         return j.Serialize(escortedsList);
     }
 
     [WebMethod]
-    public void deactivateEscorted(string displayName, string active)// change name to SetStatus
+    public void setEscortedStatus(string displayName, string active)// change name to SetStatus
     {
         Escorted c = new Escorted();
         c.DisplayName = displayName;
-        c.deactivateEscorted(active);
+        c.setEscortedStatus(active);
     }
 
     [WebMethod]
@@ -151,12 +151,12 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod]
-    public string getEscorted(string displayName)
+    public string getEscorted(string displayName, string patientName)
     {
         JavaScriptSerializer j = new JavaScriptSerializer();
         Escorted p = new Escorted();
         p.DisplayName = displayName;
-        Escorted escorted = p.getEscorted();
+        Escorted escorted = p.getEscorted(patientName);
         return j.Serialize(escorted);
     }
 
@@ -168,6 +168,15 @@ public class WebService : System.Web.Services.WebService
         p.DisplayName = displayName;
         Patient patient = p.getPatient();
         return j.Serialize(patient);
+    }
+
+    [WebMethod]
+    public string getContactType()
+    {
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        Escorted e = new Escorted();
+        List<string> cl = e.getContactType();
+        return j.Serialize(cl);
     }
 
 
@@ -251,7 +260,7 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception e)
         {
-            throw new Exception("Error in CheckUser; " + e.Message);
+            throw new Exception("Error in CheckUser: " + e.Message);
         }
 
 
