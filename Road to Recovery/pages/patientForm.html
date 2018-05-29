@@ -95,6 +95,7 @@
 
             //Create a DataTable from the Table
             t = $('#datatable-buttons').DataTable();
+
         });
 
 
@@ -370,6 +371,9 @@
         function loadPage() {
             if (JSON.parse(GENERAL.PATIENTS.getPatientsList()).length != 0) {
                 arr_patient = JSON.parse(GENERAL.PATIENTS.getPatientsList());
+                if (arr_customer.func == "new") {
+                    document.getElementById("newEscort").disabled = true;
+                }
                 if (arr_patient.func == "edit" || arr_patient.func == "show") {
                     document.getElementById("escorted").style.visibility = "visible";
                     uploadData(arr_patient.displayName);
@@ -383,7 +387,7 @@
                         document.getElementById("remove").disabled = true;
                         document.getElementById("reactive").disabled = true;
                         document.getElementById("show").disabled = true;
-                        document.getElementById("createCustomer").disabled = true;
+                        document.getElementById("newEscort").disabled = true;
                         document.getElementById("datatable-buttons").disabled = true;
 
                         $("#activepatient").attr('disabled', 'disabled');
@@ -408,17 +412,18 @@
                         $("#remarks").attr('disabled', 'disabled');
                         //initializeSelect2();
                     }
-                }
-                else {
-                    generateBarrier();
-                    generateHospital();
-                    generateEquipment();
-                    generateCities();
-                    //  generateStatus1();
-                    // generateGender1();
-                    //  initializeSelect2();
-                    document.getElementById("escorted").style.visibility = "hidden";
-                    $("#activepatient").prop('checked', 'checked');
+
+                    else {
+                        generateBarrier();
+                        generateHospital();
+                        generateEquipment();
+                        generateCities();
+                        //  generateStatus1();
+                        // generateGender1();
+                        //  initializeSelect2();
+                        //document.getElementById("escorted").style.visibility = "hidden";
+                        $("#activepatient").prop('checked', 'checked');
+                    }
                 }
             }
         }
@@ -459,7 +464,7 @@
                     $("#hospital").val(patient.Hospital.Name);
                     $("#remarks").val(patient.Remarks);
                     $("#gender").val(patient.Gender);
-                    $("#birthDate").val(patient.BirthDate.substring(0,10));
+                    $("#birthDate").val(patient.BirthDate.substring(0, 10));
 
                     if (typeof arr_equipment !== "undefined") {
 
@@ -593,7 +598,7 @@
                         swal({
                             title: "האם אתם בטוחים?",
                             type: "warning",
-                            text: "הפיכת המלווה "+data[0]+" ללא פעיל",
+                            text: "הפיכת המלווה " + data[0] + " ללא פעיל",
                             showCancelButton: true,
                             cancelButtonText: "בטל",
                             confirmButtonClass: 'btn-warning',
@@ -616,7 +621,7 @@
                         swal({
                             title: "האם אתם בטוחים?",
                             type: "warning",
-                            text: "שחזור המלווה "+data[0],
+                            text: "שחזור המלווה " + data[0],
                             showCancelButton: true,
                             cancelButtonText: "בטל",
                             confirmButtonClass: 'btn-warning',
@@ -1005,8 +1010,14 @@
                                         </div>
                                     </div>
 
-
                                 </div>
+                                <div>
+                                    <div class="text-right m-t-30 row">
+                                        <button type="submit" id="saveCustomer" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-save m-r-5"></i>שמור</button>
+                                    </div>
+                                </div>
+                                <hr />
+
                                 <div class="row" id="escorted">
                                     <div class="col-sm-12">
                                         <div class="card-box table-responsive">
@@ -1033,7 +1044,7 @@
                                                     </label>
                                                 </div>-->
                                                 <!--<div class="col-sm-9 text-right ">
-                                                        <button type="button" id="createCustomer" onclick="newEscortedForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>חדש</button>
+                                                        <button type="button" id="newEscort" onclick="newEscortedForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>חדש</button>
                                                     </div>
                                                 </div>
                                                 <table id="datatable-buttons" class="table table-striped table-bordered">
@@ -1051,7 +1062,7 @@
                                                 <!--</table>-->
 
                                                 <div class="col-sm-9 text-right ">
-                                                    <button type="button" id="createCustomer" onclick="newEscortedForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>חדש</button>
+                                                    <button type="button" id="newEscort" onclick="newEscortedForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>חדש</button>
                                                 </div>
                                             </div>
                                             <table id="datatable-buttons" class="table table-striped table-bordered">
@@ -1070,14 +1081,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div id="addressesForm">
-                                    <hr />
-                                    <!--<table id="jqGrid" class="table table-striped table-bordered text-right"></table>
-                                    <div id="jqGridPager"></div>-->
-                                    <div class="text-right m-t-30 row">
-                                        <button type="submit" id="saveCustomer" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-save m-r-5"></i>שמור</button>
-                                    </div>
-                                </div>
+
                             </div>
 
                         </form>
@@ -1171,6 +1175,10 @@
                     if ($("#activepatient").is(':checked')) {
                         IsActive = true;
                     }
+
+                    var Pat = JSON.parse(GENERAL.PATIENTS.getPatientsList());
+                    var Id = Pat.Id;
+
                     //set Equipment
                     var selected = [];
                     $('#selectEquipment input:checked').each(function () {
@@ -1182,16 +1190,16 @@
                         for (j in selected) {
                             if (arr_equipment[i] == selected[j]) {
                                 var Equipment = new Object();
-                                Equipment = parseInt(i)+1;
+                                Equipment = parseInt(i) + 1;
                                 EquipmentArr.push(Equipment);
                             }
                         }
                     }
-                    
+
                     patient = {
                         firstNameH: name, firstNameA: nameA, lastNameH: lastName, lastNameA: lastNameA, cellPhone: phone, cellPhone1: phone1,
                         homePhone: homePhone, city: city, gender: gender, birthDate: Bdate, barrier: barrier, hospital: hospital,
-                        department: department, Equipment: EquipmentArr, history: history, remarks: remarks, IsActive: IsActive
+                        department: department, Equipment: EquipmentArr, history: history, remarks: remarks, IsActive: IsActive, Id: Id
                     }
                     $.ajax({
                         dataType: "json",
