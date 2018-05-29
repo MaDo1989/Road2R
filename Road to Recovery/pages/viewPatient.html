@@ -62,6 +62,13 @@
                     //GENERAL.VOLUNTEERS.setvolunteersList(arr_volunteers);
 
                     for (i in arr_patients) {
+                        var equip = "";
+                        for (j in arr_patients[i].Equipment)
+                        {
+                            equip += arr_patients[i].Equipment[j] + ", ";
+                        }
+                        equip = equip.substring(0, equip.length - 2);
+                        if (arr_patients[i].Equipment.length==0) equip = "אין";
                         var btnStr = ""
                         var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='פרטים נוספים'><i class='fa fa-wpforms'></i></button>";
                         var editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='ערוך'><i class='ti-pencil'></i></button>";
@@ -78,7 +85,7 @@
                         }
 
 
-                        t.row.add([arr_patients[i].DisplayName, arr_patients[i].CellPhone, arr_patients[i].Barrier.Name, arr_patients[i].Hospital.Name, arr_patients[i].BirthDate, arr_patients[i].Addition, btnStr]).draw(false);
+                        t.row.add([arr_patients[i].DisplayName, arr_patients[i].CellPhone, arr_patients[i].Barrier.Name, arr_patients[i].Hospital.Name, arr_patients[i].BirthDate.substring(0,10), equip, btnStr]).draw(false);
 
                     }
 

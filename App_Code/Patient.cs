@@ -453,6 +453,21 @@ public class Patient
             p.Gender = dr["Gender"].ToString();
             p.Remarks = dr["Remarks"].ToString();
 
+            //set equipment
+            List<string> el = new List<string>();
+            db = new DbService();
+            SqlCommand cmd= new SqlCommand();
+            cmd.Parameters.AddWithValue("@displayName", p.DisplayName);
+            cmd.CommandType = CommandType.Text;
+            query = "select EquipmentName from EquipmentForPatientView where PatientName=@displayName";
+            DataSet ds2 = db.GetDataSetByQuery(query,cmd.CommandType,cmd.Parameters[0]);
+            foreach (DataRow row in ds2.Tables[0].Rows)
+            {
+                string e = row["EquipmentName"].ToString();
+                el.Add(e);
+            }
+            p.Equipment = el;
+
             list.Add(p);
         }
         #endregion
@@ -522,7 +537,7 @@ public class Patient
 
     public void setPatient(string func)
     {
-        //int res = 0;
+        int res = 0;
         DbService db;
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
@@ -546,9 +561,32 @@ public class Patient
         string query = "";
         if (func == "edit")
         {
-            query = "UPDATE Patient SET displayName = '" + DisplayName + "', firstNameH = '" + FirstNameH + "', firstNameA = '" + FirstNameA + "', lastNameH = '" + LastNameH + "', lastNameA = '" + LastNameA + "', cellPhone = '" + CellPhone + "', cellPhone2 = '" + CellPhone1 +
-            "', homePhone = '" + HomePhone + "', city = '" + City + "', livingArea = '" + LivingArea + "', statusPatient = '" + Status + "', addition = '" + Addition + "', birthdate = '" + BirthDate + "', history = '" + History + "', department = '" + Department + "', barrier = '" + Barrier.Name +
-            "', hospital = '" + Hospital.Name + "', gender = '" + Gender + "', remarks = '" + Remarks + "' WHERE displayName = '" + DisplayName + "'";
+            query = "UPDATE Patient SET FirstNameH=@firstNameH,FirstNameA=@firstNameA,LastNameH=@lastNameH,";
+            query += "CellPhone =@cellPhone,CellPhone2=@cellPhone2,HomePhone=@homePhone,CityCityName=@city,IsActive=@IsActive,BirthDate=@birthDate,";
+            query += "History=@history,Department=@department,Barrier=@barrier,Hospital=@hospital,Gender=@gender,Remarks=@remarks Where Id=" + Id;
+            db = new DbService();
+            res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+            if (res > 0)
+            {
+                query = "delete from Equipment_Patient where PatientId=" + Id;
+                db = new DbService();
+                db.ExecuteQuery(query);
+            }
+            if (Equipment.Count > 0)
+            {
+                foreach (string e in Equipment)
+                {
+                    SqlParameter[] cmdParams2 = new SqlParameter[2];
+                    cmdParams2[0] = cmd.Parameters.AddWithValue("@equipment", e);
+                    cmdParams2[1] = cmd.Parameters.AddWithValue("@id", Id);
+                    query = "insert into Equipment_Patient (EquipmentId,PatientId) values (@equipment,@id)";
+                    db = new DbService();
+                    db.ExecuteQuery(query, cmd.CommandType, cmdParams2);
+                }
+
+            }
+
+
         }
         else if (func == "new")
         {
