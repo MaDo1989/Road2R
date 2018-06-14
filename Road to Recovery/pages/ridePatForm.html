@@ -115,6 +115,7 @@
         $(document).ready(function () {
 
             datePicker();
+
             loadPage();
 
             $("#pat").blur(function () {
@@ -193,6 +194,10 @@
                     var Year = parseInt(dateRide.substring(6));
                     var Hour = parseInt(hours);
                     var Minute = parseInt(minutes);
+                    if ($("#afterNoon").is(':checked')) {
+                        Hour = 22;
+                        Minute = 14;
+                    } 
                     var date = new Date(Year, Month, Day, Hour, Minute);
                     var func = arr_customer.func;
                     var Coordinator = new Object();
@@ -255,7 +260,7 @@
 
                         },
                         error: function (err) {
-                            alert("Error in setRidePat: "+err);
+                            alert("Error in setRidePat: "+err.responseText);
                         }
                     });
 
@@ -674,6 +679,7 @@
                 if (i < 10) i = "0" + i;
                 $('<option>', { value: i, text: i }).appendTo($select);
             }
+            $select.val("06");
         }
 
         function generateMinute() {
@@ -682,6 +688,7 @@
                 if (i < 10) var j = "0" + i; else j = i;
                 $('<option>', { value: j, text: j }).appendTo($select);
             }
+            $select.val("00");
         }
         //function generateHour1(ridePat) {
         //    var $select = $("#hour");
@@ -815,10 +822,15 @@
             var dateMatch = reg.test(Date);
             if (!dateMatch) alert("התאריך שהוזן אינו חוקי");
 
-            var Time = $("#hour").val() + ":" + $("#minute").val();
-            var reg = new RegExp("[0-9]{2}\:[0-9]{2}");
-            var timeMatch = reg.test(Time);
-            if (!timeMatch) alert("השעה שהוזנה אינה חוקית");
+            //var Time = $("#hour").val() + ":" + $("#minute").val();
+            //var reg = new RegExp("[0-9]{2}\:[0-9]{2}");
+            //var timeMatch = reg.test(Time);
+            var timeMatch = true;
+            if ($("#hour").val()=="שעות" || $("#minute").val()=="דקות") {
+                alert("השעה שהוזנה אינה חוקית");
+                timeMatch = false;
+            }
+            
 
             //var atLeastOneIsChecked = $('input[name="selectEscort"]:checked').length > 0;
             if ($("#onlyEscort").is(':checked')) {
@@ -898,6 +910,13 @@
 
 
         function loadPage() {
+            var userType = GENERAL.USER.getUserType();
+            if (userType!="מנהל") {
+                $("#coorDiv").hide();
+            } else {
+                $("#coorDiv").show();
+
+            }
             if (JSON.parse(GENERAL.RIDEPAT.getRidePatList()).length != 0) {
                 arr_customer = JSON.parse(GENERAL.RIDEPAT.getRidePatList());
                 $("#ridePatNum").attr('disabled', 'disabled');
@@ -909,7 +928,7 @@
 
                     if (arr_customer.func == "show") {
 
-
+                        $("#afterNoon").attr('disabled', 'disabled');
                         $("#pat").attr('disabled', 'disabled');
                         $("#Origin").attr('disabled', 'disabled');
                         $("#remark").attr('disabled', 'disabled');
@@ -1027,8 +1046,15 @@
                     $("#selectDestination option[value='" + ridePat.Destination.Name + "']").prop('selected', true);
 
                     $("#dateRide").val(date);
-                    $("#hour option[value='" + hours + "']").prop('selected', true);
-                    $("#minute option[value='" + minutes + "']").prop('selected', true);
+                    if (hours+":"+minutes=="22:14") {
+                        $("#afterNoon").attr('checked', 'checked');
+                        checkAfternoon();
+
+                    } else {
+                        $("#hour option[value='" + hours + "']").prop('selected', true);
+                        $("#minute option[value='" + minutes + "']").prop('selected', true);
+                    }
+                    
 
                     //$("#selectaddition").val(ridePat.Pat.Addition);
 
@@ -1059,12 +1085,19 @@
         //function checkCity(value) {
         //    if (value == "-1") {
         //        // validate the fields here
-        //        return [false, "אנא בחר עיר"];
+        //        return [false, "אנא בחר יישוב"];
         //    } else {
         //        return [true, ""];
         //    }
         //};
-
+        function checkAfternoon() {
+            if ($("#afterNoon").is(':checked')) {
+                $("#hour").val("");
+                $("#minute").val("");
+                $("#hour").attr('disabled', 'disabled');
+                $("#minute").attr('disabled', 'disabled');
+            }
+        }
 
 
 
@@ -1279,7 +1312,8 @@
                                                     <select id="minute" name="minute" class="form-control" style="width:20%;display:inline"><option>דקות</option></select>
                                                     <p style="display:inline;">:</p>
                                                     <select id="hour" name="hour" class="form-control" style="width:20%; display:inline;"><option>שעות</option></select>
-
+                                                    <input type="checkbox" id="afterNoon" onchange="checkAfternoon()"/>
+                                                    <label for="afterNoon">אחה"צ</label>
 
 
                                                     <!-- <input type="time" id="hour" name="hour" class="form-control" min="00:00" max="23:59" step="900" required/ >-->
@@ -1297,11 +1331,11 @@
                                                 </div>
                                             </div>
                                         </div>-->
-                                        <div class="col-sm-6">
+                                        <div class="col-sm-6" id="coorDiv">
                                             <div class="form-group">
                                                 <label class="col-sm-3 control-label">רכז</label>
                                                 <div class="col-sm-6" id="selectCoordinator">
-                                                    <input type="text" id="coordinator" name="coordinator" class="form-control"></input>
+                                                    <input type="text" id="coordinator" name="coordinator" class="form-control">
                                                 </div>
                                             </div>
                                         </div>

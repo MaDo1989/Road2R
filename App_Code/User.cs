@@ -112,5 +112,18 @@ public class User
 
         return userInDB;
     }
-    
+
+    public string getUserType(string userName)
+    {
+        SqlCommand cmd = new SqlCommand();
+        cmd.CommandType = CommandType.Text;
+        SqlParameter[] cmdParams = new SqlParameter[1];
+        cmdParams[0] = cmd.Parameters.AddWithValue("@user", userName);
+        string query = "select VolunTypeType from VolunteerTypeView where UserName =@user";
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query, cmd.CommandType, cmdParams);
+        DataRow dr = ds.Tables[0].Rows[0];
+        string type = dr["VolunTypeType"].ToString();
+        return type;
+    }
 }

@@ -12,6 +12,12 @@
         },
         setPassword: function (password) {
             localStorage.password = password;
+        },
+        getUserType: function () {
+            return localStorage.userType;
+        },
+        setUserType: function (userType) {
+            localStorage.userType = userType;
         }
 
     },
