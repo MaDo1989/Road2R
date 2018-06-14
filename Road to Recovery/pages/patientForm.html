@@ -534,7 +534,7 @@
         function checkCity(value) {
             if (value == "-1") {
                 // validate the fields here
-                return [false, "אנא בחר עיר"];
+                return [false, "אנא בחר יישוב"];
             } else {
                 return [true, ""];
             }
@@ -900,7 +900,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">טלפון בית</label>
+                                                    <label class="col-sm-3 control-label">טלפון נוסף</label>
                                                     <div class="col-sm-6">
                                                         <input id="HomePhone" name="HomePhone" type="text" class="form-control">
                                                     </div>
@@ -923,7 +923,7 @@
                                     <div class="row m-l-10 m-r-10">
                                         <div class="col-sm-6">
                                             <div class="form-group">
-                                                <label class="col-sm-3 control-label">עיר</label>
+                                                <label class="col-sm-3 control-label">יישוב</label>
                                                 <div class="col-sm-6">
                                                     <input id="city" name="city" type="text" class="form-control">
                                                 </div>
@@ -939,14 +939,14 @@
                                         </div>
                                     </div>
                                     <div class="row m-l-10 m-r-10">
-                                        <div class="col-sm-6">
+                                        <!--<div class="col-sm-6">
                                             <div class="form-group">
                                                 <label class="col-sm-3 control-label">תאריך לידה</label>
                                                 <div class="col-sm-6">
                                                     <input id="birthDate" name="birthDate" type="text" class="form-control">
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div>-->
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label class="col-sm-3 control-label">הערות</label>
@@ -1056,7 +1056,7 @@
                                                             <th>יישוב</th>
                                                             <th>סוג קרבה</th>
                                                             <th>מין</th>
-                                                            <th>ערוך מלווה</th>
+                                                            <th>אפשרויותמלווה</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>tbody>
@@ -1074,7 +1074,7 @@
                                                         <th>יישוב</th>
                                                         <th>סוג קרבה</th>
                                                         <th>מין</th>
-                                                        <th>ערוך מלווה</th>
+                                                        <th>אפשרויות</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody></tbody>
@@ -1160,7 +1160,7 @@
                     var Day = parseInt(birthDate.substring(0, 2));
                     var Month = parseInt(birthDate.substring(3, 5)) - 1;
                     var Year = parseInt(birthDate.substring(6));
-                    var Bdate = new Date(Year, Month, Day);
+                    //var Bdate = new Date(Year, Month, Day);
                     var phone1 = $("#phone2").val();
                     var homePhone = $("#HomePhone").val();
                     var addition = $("#selectAddition").val();
@@ -1199,8 +1199,8 @@
 
                     patient = {
                         firstNameH: name, firstNameA: nameA, lastNameH: lastName, lastNameA: lastNameA, cellPhone: phone, cellPhone1: phone1,
-                        homePhone: homePhone, city: city, gender: gender, birthDate: Bdate, barrier: barrier, hospital: hospital,
-                        department: department, Equipment: EquipmentArr, history: history, remarks: remarks, IsActive: IsActive, Id: Id
+                        homePhone: homePhone, city: city, gender: gender, barrier: barrier, hospital: hospital,
+                            department: department, Equipment: EquipmentArr, history: history, remarks: remarks, IsActive: IsActive, Id: Id // birthDate: Bdate
                     }
                     $.ajax({
                         dataType: "json",

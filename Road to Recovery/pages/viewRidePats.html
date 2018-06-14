@@ -48,9 +48,9 @@
         checkCookie();
         $(document).ready(function () {
             //Create a DataTable from the Table
-           // $.fn.dataTable.moment('MM-DD-YY HH:mm');
+            // $.fn.dataTable.moment('MM-DD-YY HH:mm');
             t = $('#datatable-buttons').DataTable();
-                        getCoors();
+            getCoors();
             refreshTable();
         });
 
@@ -71,8 +71,12 @@
             var arr_coor = JSON.parse(data.d);
             var user = GENERAL.USER.getUserName();
             for (i in arr_coor) {
-                if (user == arr_coor[i].UserName)
+                if (user == arr_coor[i].UserName) {
                     currentCoor = arr_coor[i].DisplayName;
+                    GENERAL.USER.setUserType(arr_coor[i].TypeVol)
+                    break;
+                }
+
             }
 
         }
@@ -87,6 +91,7 @@
             var active = $("#activeCustomers").prop('checked');
             var today = $("#TodaysRidePats").prop('checked');
             var unassigned = $("#UnassignedRidePats").prop('checked');
+            var myRidePats = $("#MyRidePats").prop('checked');
 
             t.clear().draw();
 
@@ -107,9 +112,13 @@
                         //Change date format
                         var temp = arr_rides[i].Date.substring(arr_rides[i].Date.indexOf("(") + 1);
                         temp = temp.substring(0, temp.indexOf(")"));
-                        var date = new Date(parseInt(temp)).toLocaleString();
-                       // var dateString = moment(date, "MM-DD-YY HH:mm");
-
+                        var date = new Date(parseInt(temp));
+                        date2 = date.toLocaleString().substring(0, date.toLocaleString().length - 4);
+                        // var dateString = moment(date, "MM-DD-YY HH:mm");
+                        if (date.getHours() == 22 && date.getMinutes() == 14) {
+                            date2 = date2.substring(0, date2.length - 9);
+                            date2 += " אחה\"צ";
+                        }
                         if (unassigned) {
                             $("#activeCustomers").prop('checked', false);
                             if (arr_rides[i].Status != "ממתינה לשיבוץ") continue;
@@ -132,6 +141,10 @@
                             // Compare the two dates by comparing the millisecond
                             // representations.
                             if (todayAtMidn.getTime() != specificDate.getTime()) continue;
+                        }
+
+                        if (myRidePats) {
+                            if (arr_rides[i].Coordinator.DisplayName != currentCoor) continue;
                         }
 
 
@@ -165,7 +178,7 @@
                         }
 
                         if (arr_rides[i].Status == "ממתינה לשיבוץ")
-                            t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date, arr_rides[i].Status, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
+                            t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, arr_rides[i].Status, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
                         else {
                             for (j in arr_rides[i].Drivers) {
                                 if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName;
@@ -394,10 +407,10 @@
                                         </p>
                                     </div>
                                     <div class="col-sm-5 text-right">
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='פרטים נוספים'><i class='fa fa-wpforms'></i></button> צפייה
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='ערוך'><i class='ti-pencil'></i></button> ערוך
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחק'><i class='fa fa-remove'></i></button> מחק
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזר'><i class='fa fa-undo'></i></button> שחזר
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button> צפייה
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='ערוך'><i class='ti-pencil'></i></button> עריכה
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחק'><i class='fa fa-remove'></i></button> מחיקה
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo'></i></button> שחזור
                                         <button type='button' class='btn btn-icon waves-effect waves-light btn-default btn-sm m-b-5' id='reactive' title='הסעה בוצעה'><i class='fa fa-check'></i></button> בוצעה
                                         <button type='button' class='btn btn-icon waves-effect waves-light btn-info btn-sm m-b-5' id='reactive' title='משובצת'><i class='fa fa-check'></i></button>משובצת
                                     </div>
@@ -408,13 +421,17 @@
                                         <label for="activeCustomers">
                                             דרישות פעילות בלבד
                                         </label>
-                                        <input id="TodaysRidePats" type="checkbox" onchange="refreshTable()">
+                                        <input id="TodaysRidePats" type="checkbox" onchange="refreshTable()" checked="checked">
                                         <label for="TodaysRidePats">
                                             דרישות של היום בלבד
                                         </label>
                                         <input id="UnassignedRidePats" type="checkbox" onchange="refreshTable()">
                                         <label for="UnassignedRidePats">
                                             דרישות ממתינות לשיבוץ בלבד
+                                        </label>
+                                        <input id="MyRidePats" type="checkbox" onchange="refreshTable()" checked="checked">
+                                        <label for="MyRidePats">
+                                            דרישות שלי בלבד
                                         </label>
                                     </div>
 
@@ -432,7 +449,7 @@
                                             <th>תאריך ושעה</th>
                                             <th>נהגים בנסיעה</th>
                                             <th>רכז</th>
-                                            <th>ערוך דרישה</th>
+                                            <th>אפשרויות</th>
                                         </tr>
 
                                     </thead>

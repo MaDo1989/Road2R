@@ -1,43 +1,35 @@
 ﻿<!DOCTYPE html>
 <html lang="en" dir="rtl">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width,initial-scale=1">
-        <meta name="description" content="KSMoving">
-        <meta name="author" content="Coderthemes">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="KSMoving">
+    <meta name="author" content="Coderthemes">
+    <link rel="shortcut icon" href="assets/images/favicon_1.ico">
+    <title>RoadToDecovery-Login</title>
+    <link href="../plugins/switchery/switchery.min.css" rel="stylesheet" />
+    <link href="assets/css/bootstrap-rtl.min.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/core.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/icons.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/components.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/pages.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/menu.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/responsive.css" rel="stylesheet" type="text/css">
+    <script src="lib/master.js"></script>
+    <style type="text/css">
+        .wrapper-page {
+            background-color: #3bafda;
+            max-width: 450px;
+        }
+    </style>
 
-        <link rel="shortcut icon" href="assets/images/favicon_1.ico">
+    <script src="assets/js/CookiesFunctions.js"></script>
+    <script src="assets/js/modernizr.min.js"></script>
+    <!-- Sweet Alert css -->
+    <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
+    <script src="assets/js/jquery.min.js"></script>
 
-        <title>RoadToDecovery-Login</title>
-
-        <link href="../plugins/switchery/switchery.min.css" rel="stylesheet" />
-        <link href="assets/css/bootstrap-rtl.min.css" rel="stylesheet" type="text/css">
-        <link href="assets/css/core.css" rel="stylesheet" type="text/css">
-        <link href="assets/css/icons.css" rel="stylesheet" type="text/css">
-        <link href="assets/css/components.css" rel="stylesheet" type="text/css">
-        <link href="assets/css/pages.css" rel="stylesheet" type="text/css">
-        <link href="assets/css/menu.css" rel="stylesheet" type="text/css">
-        <link href="assets/css/responsive.css" rel="stylesheet" type="text/css">
-        <script src="lib/master.js"></script>
-        <style type="text/css">
-            .wrapper-page {
-                background-color: #3bafda;
-                max-width: 450px;
-            }
-        </style>
-        
-        <script src="assets/js/CookiesFunctions.js"></script>
-
-        <script src="assets/js/modernizr.min.js"></script>
-
-        <!-- Sweet Alert css -->
-        <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
-
-        <script src="assets/js/jquery.min.js"></script>
-
-
-
-        <script>
+    <script>
 
 
 
@@ -84,86 +76,75 @@
             //    });
             //}
 
-        </script>
+    </script>
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
 
-        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-        <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-        <![endif]-->
-
-    </head>
-    <body>
-
-
-        <div class="wrapper-page">
-            <div class="card-box">
-                <div class="text-center">
-                    <img src="../../Media/R2R Logo.png" />
-                </div>
-
-                <form id="loginForm" class="form-horizontal m-t-20" role="form">
-
-                    <div class="form-group">
-                        <div class="col-xs-12">
-                            <input id="userName" name="userName" class="form-control" type="text"  placeholder="שם משתמש">
-                            <i class="md md-account-circle form-control-feedback l-h-34"></i>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="col-xs-12">
-                            <input id="password" name="password" class="form-control" type="password"  placeholder="סיסמה">
-                            <i class="md md-vpn-key form-control-feedback l-h-34"></i>
-                        </div>
-                    </div>
-
-                    <!--<div class="form-group">
-                        <div class="col-xs-12">
-                            <div class="checkbox checkbox-primary">
-                                <input id="checkbox-signup" type="checkbox">
-                                <label for="checkbox-signup">
-                                    זכור אותי
-                                </label>
-                            </div>
-
-                        </div>
-                    </div>-->
-
-                    <div class="form-group text-center m-t-20">
-                        <div class="col-xs-12">
-                            <button class="btn btn-primary btn-custom w-md waves-effect waves-light" type="submit" id="loginBTN">
-                                כניסה
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- future options start-->
-                    <!--<div class="form-group m-t-30">
-
-              <div class="col-sm-7">
-                    <a href="pages-recoverpw.html" class="text-muted"><i class="fa fa-lock m-r-5"></i> Forgot your
-                        password?</a>
-                </div>
-
-                <div class="col-sm-5 text-right">
-                    <a href="pages-register.html" class="text-muted">Create an account</a>
-                </div>
-
-            </div>-->
-                    <!-- future options end-->
-                </form>
+    <div class="wrapper-page">
+        <div class="card-box">
+            <div class="text-center">
+                <img src="../../Media/R2R Logo.png" />
             </div>
+            <form id="loginForm" class="form-horizontal m-t-20" role="form">
+                <div class="form-group">
+                    <div class="col-xs-12">
+                        <input id="userName" name="userName" class="form-control" type="text" placeholder="שם משתמש">
+                        <i class="md md-account-circle form-control-feedback l-h-34"></i>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-12">
+                        <input id="password" name="password" class="form-control" type="password" placeholder="סיסמה">
+                        <i class="md md-vpn-key form-control-feedback l-h-34"></i>
+                    </div>
+                </div>
+                <!--<div class="form-group">
+                    <div class="col-xs-12">
+                        <div class="checkbox checkbox-primary">
+                            <input id="checkbox-signup" type="checkbox">
+                            <label for="checkbox-signup">
+                                זכור אותי
+                            </label>
+                        </div>
+
+                    </div>
+                </div>-->
+                <div class="form-group text-center m-t-20">
+                    <div class="col-xs-12">
+                        <button class="btn btn-primary btn-custom w-md waves-effect waves-light" type="submit" id="loginBTN">
+                            כניסה
+                        </button>
+                    </div>
+                </div>
+                <!-- future options start-->
+                <!--<div class="form-group m-t-30">
+
+                  <div class="col-sm-7">
+                        <a href="pages-recoverpw.html" class="text-muted"><i class="fa fa-lock m-r-5"></i> Forgot your
+                            password?</a>
+                    </div>
+
+                    <div class="col-sm-5 text-right">
+                        <a href="pages-register.html" class="text-muted">Create an account</a>
+                    </div>
+
+                </div>-->
+                <!-- future options end-->
+            </form>
         </div>
+    </div>
 
-        
-    	<script>
-            var resizefunc = [];
-        </script>
-
-        <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
-        <script>
+    <script>
+        var resizefunc = [];
+    </script>
+    <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script>
         $(document).ready(function () {
 
             // DO NOT REMOVE : GLOBAL FUNCTIONS!
@@ -204,7 +185,7 @@
                     //START OF Insert Product Code
                     userName = $("#userName").val();
                     password = $("#password").val();
-                    setCookie("username", userName, 1/24);
+                    setCookie("username", userName, 1 / 24);
                     //save = $("#checkbox-signup").prop('checked');
                     $.ajax({
                         dataType: "json",
@@ -223,11 +204,12 @@
                                     timer: 1000,
                                     showConfirmButton: false
                                 });
-                                
+
                                 setTimeout(function () {
                                     location.href = "index.html";
                                 }, 1001);
                                 GENERAL.USER.setUserName(userName);
+                               // getUserType(userName);
                             }
                             else {
                                 swal({
@@ -239,7 +221,7 @@
                             }
                         },
                         error: function (err) {
-                            alert("Error");
+                            alert("Error in loginUser: "+err.responseText);
                         }
                     });
                     //END OF Insert Product Code
@@ -259,27 +241,46 @@
             });
         });
 
-       
-        </script>
-        
-        <!-- jQuery  -->
-        <script src="assets/js/bootstrap-rtl.min.js"></script>
-        <script src="assets/js/detect.js"></script>
-        <script src="assets/js/fastclick.js"></script>
-        <script src="assets/js/jquery.slimscroll.js"></script>
-        <script src="assets/js/jquery.blockUI.js"></script>
-        <script src="assets/js/waves.js"></script>
-        <script src="assets/js/wow.min.js"></script>
-        <script src="assets/js/jquery.nicescroll.js"></script>
-        <script src="assets/js/jquery.scrollTo.min.js"></script>
-        <script src="../plugins/switchery/switchery.min.js"></script>
+        //function getUserType(user) {
+        //    $.ajax({
+        //        dataType: "json",
+        //        url: "WebService.asmx/getUserType",
+        //        contentType: "application/json; charset=utf-8",
+        //        type: "POST",
+        //        data: JSON.stringify({user: user }),
+        //        success: getUserTypeSuccessCB,
+        //        error: getUserTypeErrorCB
+        //    });
+        //}
 
-        <!-- Sweet Alert js -->
-        <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
-        <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+        //function getUserTypeSuccessCB(data)
+        //{
+        //  var userType = JSON.parse(data.d);
+        //    GENERAL.USER.setUserType(userType);
+        //}
 
-        <script src="assets/js/jquery.core.js"></script>
-        <script src="assets/js/jquery.app.js"></script>
+        //function getUserTypeErrorCB(e)
+        //{
+        //    alert("Error in getUserType: " + e.responseText);
+        //}
 
-	</body>
+    </script>
+
+    <!-- jQuery  -->
+    <script src="assets/js/bootstrap-rtl.min.js"></script>
+    <script src="assets/js/detect.js"></script>
+    <script src="assets/js/fastclick.js"></script>
+    <script src="assets/js/jquery.slimscroll.js"></script>
+    <script src="assets/js/jquery.blockUI.js"></script>
+    <script src="assets/js/waves.js"></script>
+    <script src="assets/js/wow.min.js"></script>
+    <script src="assets/js/jquery.nicescroll.js"></script>
+    <script src="assets/js/jquery.scrollTo.min.js"></script>
+    <script src="../plugins/switchery/switchery.min.js"></script>
+    <!-- Sweet Alert js -->
+    <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
+    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+    <script src="assets/js/jquery.core.js"></script>
+    <script src="assets/js/jquery.app.js"></script>
+</body>
 </html>

@@ -426,6 +426,18 @@ public class WebService : System.Web.Services.WebService
         return j.Serialize(userInDB);
     }
 
+    //[WebMethod]
+    //public string getUserType(string user)
+    //{
+    //    JavaScriptSerializer j = new JavaScriptSerializer();
+    //    User u = new User();
+    //    u.UserName = user;
+    //    u.UserType = u.getUserType(u.UserName);
+    //    return j.Serialize(u.UserType);
+    //}
+
+
+
     [WebMethod]
     public string loginDriver(string uName, string password)
     {

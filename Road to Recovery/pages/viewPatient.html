@@ -85,7 +85,7 @@
                         }
 
 
-                        t.row.add([arr_patients[i].DisplayName, arr_patients[i].CellPhone, arr_patients[i].Barrier.Name, arr_patients[i].Hospital.Name, arr_patients[i].BirthDate.substring(0,10), equip, btnStr]).draw(false);
+                        t.row.add([arr_patients[i].DisplayName, arr_patients[i].CellPhone, arr_patients[i].Barrier.Name, arr_patients[i].Hospital.Name, equip, btnStr]).draw(false); // arr_patients[i].BirthDate.substring(0,10),
 
                     }
 
@@ -286,10 +286,10 @@
                                         </p>
                                     </div>
                                     <div class="col-sm-4 text-right">
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='פרטים נוספים'><i class='fa fa-wpforms'></i></button> צפייה
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='ערוך'><i class='ti-pencil'></i></button> ערוך
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחק'><i class='fa fa-remove'></i></button> מחק
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזר'><i class='fa fa-undo'></i></button> שחזר
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button> צפייה
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button> ערכיה
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button> מחיקה
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo'></i></button> שחזור
                                     </div>
                                 </div>
                                 <div class="row">
@@ -310,9 +310,9 @@
                                             <th>טלפון</th>
                                             <th>מחסום</th>
                                             <th>בית חולים</th>
-                                            <th>תאריך לידה</th>
+                                            <!--<th>תאריך לידה</th>-->
                                             <th>כלי עזר</th>
-                                            <th>ערוך חולה</th>
+                                            <th>אפשרויות</th>
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
