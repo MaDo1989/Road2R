@@ -94,7 +94,9 @@
             //$('#menu').load('menu.html');
 
             //Create a DataTable from the Table
-            t = $('#datatable-buttons').DataTable();
+            t = $('#datatable-buttons').DataTable(
+                { "ordering": false }
+            );
 
         });
 
@@ -134,7 +136,7 @@
 
                     numberOfRecords = $("#jqGrid").getGridParam("records");
                 },
-                error: function (err) { alert("Error in getCustomerAddresses:"+err.responseText); }
+                error: function (err) { alert("Error in getCustomerAddresses:" + err.responseText); }
             });
         }
 
@@ -251,7 +253,7 @@
                         $('<option>', { value: arr_hospitals[i].Name, text: arr_hospitals[i].Name }).appendTo($select);
                     }
                 },
-                error: function (err) { alert("Error in getHospitalView: "+err.responseText); }
+                error: function (err) { alert("Error in getHospitalView: " + err.responseText); }
             });
         }
 
@@ -273,7 +275,7 @@
                         $('<option>', { value: arr_barriers[i].Name, text: arr_barriers[i].Name }).appendTo($select);
                     }
                 },
-                error: function (err) { alert("Error in getBarrierView: "+err.responseText); }
+                error: function (err) { alert("Error in getBarrierView: " + err.responseText); }
             });
         }
 
@@ -482,7 +484,7 @@
                     refreshTable(patient.DisplayName)
 
                 },
-                error: function (err) { alert("Error in getPatient: "+err.responseText); }
+                error: function (err) { alert("Error in getPatient: " + err.responseText); }
             });
         }
 
@@ -558,17 +560,17 @@
 
                     for (i in arr_escorts) {
                         var btnStr = ""
-                        var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='פרטים נוספים'><i class='fa fa-wpforms'></i></button>";
-                        var editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='ערוך'><i class='ti-pencil'></i></button>";
+                        var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button>";
+                        var editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button>";
 
                         btnStr += showBtn + " " + editBtn;
 
                         if (arr_escorts[i].IsActive == false) {
-                            var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזר'><i class='fa fa-undo' ></i></button>";
+                            var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo' ></i></button>";
                             btnStr += " " + reactiveBtn;
                         }
                         else {
-                            var deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחק'><i class='fa fa-remove' ></i></button>";
+                            var deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove' ></i></button>";
                             btnStr += " " + deleteBtn;
                         }
 
@@ -640,7 +642,7 @@
 
                     });
                 },
-                error: function (err) { alert("Error in getPatientEscorted: "+err.responseText); }
+                error: function (err) { alert("Error in getPatientEscorted: " + err.responseText); }
             });
         }
 
@@ -694,7 +696,7 @@
                 type: "POST",
                 data: JSON.stringify({ displayName: displayName, active: active }),
                 success: function (data) { },
-                error: function (err) { alert("Error in setEscortedStatus: "+err.responseText); }
+                error: function (err) { alert("Error in setEscortedStatus: " + err.responseText); }
             });
 
         }
@@ -759,11 +761,11 @@
 
                     <ul>
 
-                        <li>
+                        <!--<li>
                             <a href="index.html" class="waves-effect waves-primary">
                                 <i class="md md-dashboard"></i><span> דף הבית </span>
                             </a>
-                        </li>
+                        </li>-->
 
 
 
@@ -818,9 +820,9 @@
                                 <div class="card-box">
                                     <div class="row">
                                         <h4 class="m-t-0 header-title"><b>טופס חולה</b></h4>
-                                        <p class="text-muted font-13 m-b-30">
+                                        <!--<p class="text-muted font-13 m-b-30">
                                             יצירת, צפייה ועריכת חולה. לחץ על כפתור חזור בכדי לצפות בכל החולים.
-                                        </p>
+                                        </p>-->
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <br />
@@ -1023,7 +1025,7 @@
                                     <div class="col-sm-12">
                                         <div class="card-box table-responsive">
 
-                                            <div class="row">
+                                            <!--<div class="row">
                                                 <div class="col-sm-8">
                                                     <h4 class="m-t-0 header-title"><b>טבלת מלווים</b></h4>
                                                     <p class="text-muted font-13 m-b-30">
@@ -1036,7 +1038,7 @@
                                                     <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחק'><i class='fa fa-remove'></i></button> מחק
                                                     <button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזר'><i class='fa fa-undo'></i></button> שחזר
                                                 </div>
-                                            </div>
+                                            </div>-->
                                             <div class="row">
                                                 <!--<div class="col-sm-3 checkbox checkbox-primary text-left">
                                                     <input id="activeCustomers" type="checkbox" onchange="refreshTable()" checked>
@@ -1093,7 +1095,7 @@
             <!-- end content -->
             <!-- FOOTER -->
             <footer class="footer text-right">
-                2016 © KSmoving Management System Powered by Neta Reuveni, Hanan Ben Shitrit, Sharon Krepner
+                2018 © Road to Recovery Management System by Matan Doron
             </footer>
             <!-- End FOOTER -->
         </div>
@@ -1200,7 +1202,7 @@
                     patient = {
                         firstNameH: name, firstNameA: nameA, lastNameH: lastName, lastNameA: lastNameA, cellPhone: phone, cellPhone1: phone1,
                         homePhone: homePhone, city: city, gender: gender, barrier: barrier, hospital: hospital,
-                            department: department, Equipment: EquipmentArr, history: history, remarks: remarks, IsActive: IsActive, Id: Id // birthDate: Bdate
+                        department: department, Equipment: EquipmentArr, history: history, remarks: remarks, IsActive: IsActive, Id: Id // birthDate: Bdate
                     }
                     $.ajax({
                         dataType: "json",

@@ -23,7 +23,7 @@ public class WebService : System.Web.Services.WebService
         //InitializeComponent(); 
     }
 
-    //----------------------Road to decovery-----------------------------------------------
+    //----------------------Road to Recovery-----------------------------------------------
     //[WebMethod]
     //[ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     //public void test(Class1 c)
@@ -192,10 +192,12 @@ public class WebService : System.Web.Services.WebService
     //}
 
     //This method is used for שבץ אותי
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string GetRidePatView(int volunteerId)
     {
+        string test = (string)HttpContext.Current.Session["userSession"];
+
         RidePat rp = new RidePat();
         List<RidePat> r = rp.GetRidePatView(volunteerId);
         JavaScriptSerializer j = new JavaScriptSerializer();
@@ -414,12 +416,13 @@ public class WebService : System.Web.Services.WebService
     #endregion
 
 
-    ///--------------------finish Road to decovery----------------------------------------
+    ///--------------------finish Road to Recovery----------------------------------------
 
     #region login functions
-    [WebMethod]
+    [WebMethod(EnableSession =true)]
     public string loginUser(string uName, string password)
     {
+        HttpContext.Current.Session["userSession"] = uName;
         JavaScriptSerializer j = new JavaScriptSerializer();
         User u = new User(uName, password);
         bool userInDB = u.CheckLoginDetails();

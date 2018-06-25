@@ -1096,6 +1096,11 @@
                 $("#minute").val("");
                 $("#hour").attr('disabled', 'disabled');
                 $("#minute").attr('disabled', 'disabled');
+            } else {
+                $("#hour").val("06");
+                $("#minute").val("00");
+                $("#hour").attr('disabled', false);
+                $("#minute").attr('disabled', false);
             }
         }
 
@@ -1147,11 +1152,11 @@
 
                     <ul>
 
-                        <li>
+                        <!--<li>
                             <a href="index.html" class="waves-effect waves-primary">
                                 <i class="md md-dashboard"></i><span> דף הבית </span>
                             </a>
-                        </li>
+                        </li>-->
 
                         <li>
                             <a href="viewVolunteer.html" class="waves-effect waves-primary">
@@ -1376,7 +1381,7 @@
         <!-- end content -->
         <!-- FOOTER -->
         <footer class="footer text-right">
-            2018 © Road To Decovery Management System Powered by Sufa Ben-Horin
+            2018 © Road to Recovery Management System by Matan Doron
         </footer>
         <!-- End FOOTER -->
     </div>

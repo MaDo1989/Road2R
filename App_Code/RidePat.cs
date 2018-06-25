@@ -437,7 +437,7 @@ public class RidePat
         string query = "";
         if (volunteerId != -1)
             query = "select * from RPView where (Status='שובץ נהג' or Status='ממתינה לשיבוץ')";
-        else query = "select * from RPView";
+        else query = "select * from RPView where PickupTime>= getdate()";
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         // Ride ride = new Ride();
@@ -465,86 +465,96 @@ public class RidePat
         {
 
         }
-        foreach (DataRow dr in ds.Tables[0].Rows)
+        try
         {
 
-            if (dr["MainDriver"].ToString() == "" && dr["secondaryDriver"].ToString() == "")
-            {
-                numOfDrivers = 0;
-            }
-            else if (dr["MainDriver"].ToString() != "" && dr["secondaryDriver"].ToString() == "")
-            {
-                numOfDrivers = 1;
-                if (int.Parse(dr["MainDriver"].ToString()) == volunteerId)
-                    continue;
-            }
-            else numOfDrivers = 2;
 
-            RidePat rp = new RidePat();
-            rp.Coordinator = new Volunteer();
-            rp.Coordinator.DisplayName = dr["Coordinator"].ToString();
 
-            if (numOfDrivers != 0)
+            foreach (DataRow dr in ds.Tables[0].Rows)
             {
-                rp.Drivers = new List<Volunteer>();
-                Volunteer primary = new Volunteer();
-                primary.DriverType = "Primary";
-                primary.Id = int.Parse(dr["MainDriver"].ToString());
-                string query3 = "select DisplayName from Volunteer where Id=" + primary.Id;
-                DbService db3 = new DbService();
-                primary.DisplayName = db3.GetObjectScalarByQuery(query3).ToString();
-                rp.Drivers.Add(primary);
-                if (numOfDrivers > 1)
+
+                if (dr["MainDriver"].ToString() == "" && dr["secondaryDriver"].ToString() == "")
                 {
-                    Volunteer secondary = new Volunteer();
-                    secondary.DriverType = "secondary";
-                    secondary.Id = int.Parse(dr["secondaryDriver"].ToString());
-                    string query4 = "select DisplayName from Volunteer where Id=" + secondary.Id;
-                    DbService db4 = new DbService();
-                    secondary.DisplayName = db4.GetObjectScalarByQuery(query4).ToString();
-                    rp.Drivers.Add(secondary);
+                    numOfDrivers = 0;
                 }
-            }
-
-            rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
-            try
-            {
-                rp.RideNum = int.Parse(dr["RideNum"].ToString());
-            }
-            catch (Exception e)
-            {
-
-            }
-
-            rp.pat = new Patient();
-
-            rp.pat.DisplayName = dr["DisplayName"].ToString();
-            rp.pat.Equipment = rp.Pat.getEquipmentForPatient(rp.pat.DisplayName);
-            rp.pat.EscortedList = new List<Escorted>();
-            foreach (Escorted e in el)
-            {
-                if (e.Id == rp.RidePatNum)
+                else if (dr["MainDriver"].ToString() != "" && dr["secondaryDriver"].ToString() == "")
                 {
-                    rp.pat.EscortedList.Add(e);
+                    numOfDrivers = 1;
+                    if (int.Parse(dr["MainDriver"].ToString()) == volunteerId)
+                        continue;
                 }
+                else numOfDrivers = 2;
+
+                RidePat rp = new RidePat();
+                rp.Coordinator = new Volunteer();
+                rp.Coordinator.DisplayName = dr["Coordinator"].ToString();
+
+                if (numOfDrivers != 0)
+                {
+                    rp.Drivers = new List<Volunteer>();
+                    Volunteer primary = new Volunteer();
+                    primary.DriverType = "Primary";
+                    primary.Id = int.Parse(dr["MainDriver"].ToString());
+                    string query3 = "select DisplayName from Volunteer where Id=" + primary.Id;
+                    DbService db3 = new DbService();
+                    primary.DisplayName = db3.GetObjectScalarByQuery(query3).ToString();
+                    rp.Drivers.Add(primary);
+                    if (numOfDrivers > 1)
+                    {
+                        Volunteer secondary = new Volunteer();
+                        secondary.DriverType = "secondary";
+                        secondary.Id = int.Parse(dr["secondaryDriver"].ToString());
+                        string query4 = "select DisplayName from Volunteer where Id=" + secondary.Id;
+                        DbService db4 = new DbService();
+                        secondary.DisplayName = db4.GetObjectScalarByQuery(query4).ToString();
+                        rp.Drivers.Add(secondary);
+                    }
+                }
+
+                rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
+                try
+                {
+                    rp.RideNum = int.Parse(dr["RideNum"].ToString());
+                }
+                catch (Exception )
+                {
+
+                }
+
+                rp.pat = new Patient();
+
+                rp.pat.DisplayName = dr["DisplayName"].ToString();
+                rp.pat.Equipment = rp.Pat.getEquipmentForPatient(rp.pat.DisplayName);
+                rp.pat.EscortedList = new List<Escorted>();
+                foreach (Escorted e in el)
+                {
+                    if (e.Id == rp.RidePatNum)
+                    {
+                        rp.pat.EscortedList.Add(e);
+                    }
+                }
+
+
+                Location origin = new Location();
+                origin.Name = dr["Origin"].ToString();
+                rp.Origin = origin;
+                Location dest = new Location();
+                dest.Name = dr["Destination"].ToString();
+                rp.Destination = dest;
+                rp.Area = dr["Area"].ToString();
+                rp.Shift = dr["Shift"].ToString();
+                rp.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
+                rp.Status = dr["Status"].ToString();
+                rpl.Add(rp);
+                //ride.Status = dr["statusRide"].ToString();
             }
 
-
-            Location origin = new Location();
-            origin.Name = dr["Origin"].ToString();
-            rp.Origin = origin;
-            Location dest = new Location();
-            dest.Name = dr["Destination"].ToString();
-            rp.Destination = dest;
-            rp.Area = dr["Area"].ToString();
-            rp.Shift = dr["Shift"].ToString();
-            rp.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
-            rp.Status = dr["Status"].ToString();
-            rpl.Add(rp);
-            //ride.Status = dr["statusRide"].ToString();
+            return rpl;
         }
-
-        return rpl;
+        catch (Exception)
+        {
+            throw;
+        }
         #region old
         //        DbService db = new DbService();
         //        string query = "select * from RidePat";
