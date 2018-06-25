@@ -41,15 +41,30 @@
     <!-- Select2 css+js -->
     <link href="assets/css/select2.css" rel="stylesheet" />
     <script src="assets/js/select2.min.js"></script>
-    <script src="lib/moment.js"></script>
+    <!--<script src="lib/moment.js"></script>-->
+    <!--<script src="../plugins/moment/moment.js"></script>-->
     <!--<script src="lib/sorting.js"></script>-->
+
 
     <script>
         checkCookie();
         $(document).ready(function () {
+            //$.fn.dataTable.moment('DD/MM/YYYY HH:MM');
+            //$('#example').DataTable();
+            // $.fn.dataTable.moment('DD/MM/YYYY HH:MM');//'' DD/MM/YYYY HH:MM
+
+
             //Create a DataTable from the Table
-            // $.fn.dataTable.moment('MM-DD-YY HH:mm');
-            t = $('#datatable-buttons').DataTable();
+            t = $('#datatable-buttons').DataTable({ "paging": false }, { "visible": false, "targets": [1] }, {
+                "createdRow": function (row, data, dataIndex) {
+                    if (data[4] == "A") {
+                        $(row).addClass('important');
+                    }
+                }
+            
+            });
+
+
             getCoors();
             refreshTable();
         });
@@ -113,6 +128,8 @@
                         var temp = arr_rides[i].Date.substring(arr_rides[i].Date.indexOf("(") + 1);
                         temp = temp.substring(0, temp.indexOf(")"));
                         var date = new Date(parseInt(temp));
+
+
                         date2 = date.toLocaleString().substring(0, date.toLocaleString().length - 4);
                         // var dateString = moment(date, "MM-DD-YY HH:mm");
                         if (date.getHours() == 22 && date.getMinutes() == 14) {
@@ -150,11 +167,11 @@
 
                         var btnStr = "";
                         var editBtn = "";
-                        var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' name='" + arr_rides[i].RidePatNum + "' title='פרטים נוספים'><i class='fa fa-wpforms'></i></button>";
+                        var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' name='" + arr_rides[i].RidePatNum + "' title='צפייה'><i class='fa fa-wpforms'></i></button>";
                         var deleteBtn = "";
                         if (arr_rides[i].Status == 'ממתינה לשיבוץ' && arr_rides[i].Coordinator.DisplayName == currentCoor) {
-                            editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' name='" + arr_rides[i].RidePatNum + "' title='ערוך'><i class='ti-pencil'></i></button>";
-                            deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' name='" + arr_rides[i].RidePatNum + "' title='מחק'><i class='fa fa-remove' ></i></button>";
+                            editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' name='" + arr_rides[i].RidePatNum + "' title='עריכה'><i class='ti-pencil'></i></button>";
+                            deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' name='" + arr_rides[i].RidePatNum + "' title='מחיקה'><i class='fa fa-remove' ></i></button>";
                             // btnStr += " " + deleteBtn;
                         }
 
@@ -178,7 +195,7 @@
                         }
 
                         if (arr_rides[i].Status == "ממתינה לשיבוץ")
-                            t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, arr_rides[i].Status, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
+                            t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date, arr_rides[i].Status, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
                         else {
                             for (j in arr_rides[i].Drivers) {
                                 if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName;
@@ -191,8 +208,11 @@
                             t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date, drivers, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
                         }
                     }
+                    //$.fn.dataTable.moment('DD/MM/YYYY HH:MM');
+                    //$('#datatable-buttons').DataTable();
+                    t.columns([0]).order('asc').draw();
+                   // t.createdRow();
 
-                    t.columns([3]).order('asc').draw();
 
                     $('#datatable-buttons tbody').on('click', '#edit', function () {
                         //var data = t.row($(this).parents('tr')).data();
@@ -341,11 +361,11 @@
 
                     <ul>
 
-                        <li>
+                        <!--<li>
                             <a href="index.html" class="waves-effect waves-primary">
                                 <i class="md md-dashboard"></i><span> דף הבית </span>
                             </a>
-                        </li>
+                        </li>-->
                         <li>
                             <a href="viewVolunteer.html" class="waves-effect waves-primary">
                                 <i class="md md-person"></i><span> ניהול מתנדבים</span>
@@ -399,7 +419,7 @@
                         <div class="col-sm-12">
                             <div class="card-box table-responsive">
 
-                                <div class="row">
+                                <!--<div class="row">
                                     <div class="col-sm-8">
                                         <h4 class="m-t-0 header-title"><b>טבלת הסעות חולים</b></h4>
                                         <p class="text-muted font-13 m-b-30">
@@ -408,34 +428,34 @@
                                     </div>
                                     <div class="col-sm-5 text-right">
                                         <button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button> צפייה
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='ערוך'><i class='ti-pencil'></i></button> עריכה
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחק'><i class='fa fa-remove'></i></button> מחיקה
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button> עריכה
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button> מחיקה
                                         <button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo'></i></button> שחזור
                                         <button type='button' class='btn btn-icon waves-effect waves-light btn-default btn-sm m-b-5' id='reactive' title='הסעה בוצעה'><i class='fa fa-check'></i></button> בוצעה
                                         <button type='button' class='btn btn-icon waves-effect waves-light btn-info btn-sm m-b-5' id='reactive' title='משובצת'><i class='fa fa-check'></i></button>משובצת
                                     </div>
-                                </div>
+                                </div>-->
                                 <div class="row">
-                                    <div class="col-sm-4 checkbox checkbox-primary text-left">
+                                    <div class="col-sm-8 checkbox checkbox-primary text-left">
                                         <input id="activeCustomers" type="checkbox" onchange="refreshTable()" checked>
                                         <label for="activeCustomers">
-                                            דרישות פעילות בלבד
+                                            דרישות פעילות בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
                                         </label>
                                         <input id="TodaysRidePats" type="checkbox" onchange="refreshTable()" checked="checked">
                                         <label for="TodaysRidePats">
-                                            דרישות של היום בלבד
+                                            דרישות של היום בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
                                         </label>
                                         <input id="UnassignedRidePats" type="checkbox" onchange="refreshTable()">
                                         <label for="UnassignedRidePats">
-                                            דרישות ממתינות לשיבוץ בלבד
+                                            דרישות ממתינות לשיבוץ בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
                                         </label>
                                         <input id="MyRidePats" type="checkbox" onchange="refreshTable()" checked="checked">
                                         <label for="MyRidePats">
-                                            דרישות שלי בלבד
+                                            דרישות שלי בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
                                         </label>
                                     </div>
 
-                                    <div class="col-sm-8 text-right ">
+                                    <div class="col-sm-4 text-right ">
                                         <button type="button" id="createCustomer" onclick="newRidePatForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>חדש</button>
                                     </div>
                                 </div>
@@ -469,7 +489,7 @@
             <!-- end content -->
             <!-- FOOTER -->
             <footer class="footer text-right">
-                2018 © Road To Decovery Management System Powered by Sufa Ben-Horin
+                2018 © Road to Recovery Management System by Matan Doron
             </footer>
             <!-- End FOOTER -->
 
@@ -524,12 +544,16 @@
 
     <script src="assets/js/jquery.core.js"></script>
     <script src="assets/js/jquery.app.js"></script>
-
+    <!--<script src="cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+    <script src="cdn.datatables.net/plug-ins/1.10.19/sorting/datetime-moment.js"></script>-->
+    <!--<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>-->
+    <!--<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+    <script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+    <script src="//cdn.datatables.net/plug-ins/1.10.12/sorting/datetime-moment.js"></script>-->
     <script type="text/javascript">
 
         TableManageButtons.init();
 
     </script>
-
 </body>
 </html>

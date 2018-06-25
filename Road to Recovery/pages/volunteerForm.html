@@ -455,7 +455,7 @@
                         location += volunteer.PrefLocation[i] + ", ";
                     }
                     location = location.substring(0, location.length - 2);
-                    $("#PrefLocation").val(location);
+                    $("#PrefLocation").text(location);
                     var shift = "";
                     for (i in volunteer.PrefTime) {
                         
@@ -463,7 +463,7 @@
                         
                     }
                     shift = shift.substring(0, shift.length - 2);
-                    $("#PrefShift").val(shift);
+                    $("#PrefShift").text(shift);
                     $("#volunteerName").val(volunteer.DisplayName);
                     $("#volunteerFirstName").val(volunteer.FirstNameH);
                     $("#volunteerLastName").val(volunteer.LastNameH);
@@ -582,11 +582,11 @@
 
                     <ul>
 
-                        <li>
+                        <!--<li>
                             <a href="index.html" class="waves-effect waves-primary">
                                 <i class="md md-dashboard"></i><span> דף הבית </span>
                             </a>
-                        </li>
+                        </li>-->
 
                         <li>
                             <a href="viewVolunteer.html" class="waves-effect waves-primary">
@@ -753,7 +753,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">סוג מתנדב</label>
+                                                    <label class="col-sm-3 control-label">סוג משתמש</label>
                                                     <div class="col-sm-6">
                                                         <select id="typeVolunteer" name="typeVolunteer" type="text" class="form-control">
                                                             <option>בחר</option>
@@ -765,7 +765,8 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-3 control-label">משמרות מועדפות</label>
                                                     <div class="col-sm-6">
-                                                        <input id="PrefShift" name="PrefShift" type="text" class="form-control" disabled="disabled">
+                                                        <!--<input id="PrefShift" name="PrefShift" type="text" class="form-control" disabled="disabled">-->
+                                                        <label id="PrefShift" name="PrefShift"></label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -809,7 +810,8 @@
                                             <div class="form-group">
                                                 <label class="col-sm-3 control-label">מקומות מועדפים</label>
                                                 <div class="col-sm-6" id="selectPreferRoute1">
-                                                    <input id="PrefLocation" name="PrefLocation" class="form-control" disabled="disabled">
+                                                    <!--<input id="PrefLocation" name="PrefLocation" class="form-control" disabled="disabled">-->
+                                                    <label id="PrefLocation" name="PrefLocation"></label>
                                                 </div>
                                             </div>
                                         </div>
@@ -943,7 +945,7 @@
             <!-- end content -->
             <!-- FOOTER -->
             <footer class="footer text-right">
-                2016 © KSmoving Management System Powered by Neta Reuveni, Hanan Ben Shitrit, Sharon Krepner
+                2018 © Road to Recovery Management System by Matan Doron
             </footer>
             <!-- End FOOTER -->
         </div>
@@ -1192,7 +1194,7 @@
             var volType = $("#typeVolunteer").val();
             if (volType == "בחר") {
                 volType = false
-                alert("עליכם לבחור סוג מתנדב מתוך הרשימה");
+                alert("עליכם לבחור סוג משתמש מתוך הרשימה");
             }
 
             var gender = $("#gender").val();

@@ -84,17 +84,17 @@
 
                     for (i in arr_volunteers) {
                         var btnStr = ""
-                        var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='פרטים נוספים'><i class='fa fa-wpforms'></i></button>";
-                        var editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='ערוך'><i class='ti-pencil'></i></button>";
+                        var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button>";
+                        var editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button>";
 
                         btnStr += showBtn + " " + editBtn;
 
                         if (arr_volunteers[i].IsActive == false) {
-                            var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזר'><i class='fa fa-undo' ></i></button>";
+                            var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo' ></i></button>";
                             btnStr += " " + reactiveBtn;
                         }
                         else {
-                            var deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחק'><i class='fa fa-remove' ></i></button>";
+                            var deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove' ></i></button>";
                             btnStr += " " + deleteBtn;
                         }
 
@@ -263,16 +263,16 @@
 
                     <ul>
 
-                        <li>
+                        <!--<li>
                             <a href="index.html" class="waves-effect waves-primary">
                                 <i class="md md-dashboard"></i><span> דף הבית </span>
                             </a>
-                        </li>
+                        </li>-->
 
 
                         <li>
                             <a href="viewVolunteer.html" class="waves-effect waves-primary">
-                                <i class="md md-today"></i><span> ניהול מתנדבים</span>
+                                <i class="md md-person"></i><span> ניהול מתנדבים</span>
                             </a>
                         </li>
 
@@ -323,7 +323,7 @@
                         <div class="col-sm-12">
                             <div class="card-box table-responsive">
 
-                                <div class="row">
+                                <!--<div class="row">
                                     <div class="col-sm-8">
                                         <h4 class="m-t-0 header-title"><b>טבלת מתנדבים</b></h4>
                                         <p class="text-muted font-13 m-b-30">
@@ -336,7 +336,7 @@
                                         <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button> מחיקה
                                         <button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo'></i></button> שחזור
                                     </div>
-                                </div>
+                                </div>-->
                                 <div class="row">
                                     <div class="col-sm-3 checkbox checkbox-primary text-left">
                                         <input id="activeCustomers" type="checkbox" onchange="refreshTable()" checked>
@@ -353,7 +353,7 @@
                                     <thead>
                                         <tr>
                                             <th>שם מתנדב/ת</th>
-                                            <th>סוג מתנדב/ת</th>
+                                            <th>סוג משתמש/ת</th>
                                             <th>טלפון</th>
                                             <th>טלפון נוסף</th>
                                             <th>יישוב</th>
@@ -377,7 +377,7 @@
             <!-- end content -->
             <!-- FOOTER -->
             <footer class="footer text-right">
-                2016 © KSmoving Management System Powered by Neta Reuveni, Hanan Ben Shitrit, Sharon Krepner
+                2018 © Road to Recovery Management System by Matan Doron
             </footer>
             <!-- End FOOTER -->
 
