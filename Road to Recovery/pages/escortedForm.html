@@ -287,7 +287,7 @@
                 url: "WebService.asmx/getEscorted",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                data: JSON.stringify({ displayName: displayName, patientName:patName }),
+                data: JSON.stringify({ displayName: displayName, patientName: patName }),
                 success: function (data) {
                     var escorted = JSON.parse(data.d);
                     GENERAL.ESCORTED.setEscortedList(JSON.stringify(escorted));
@@ -393,7 +393,8 @@
 
                     <ul>
 
-                        <<!--li>
+                        <
+                        <!--li>
                             <a href="index.html" class="waves-effect waves-primary">
                                 <i class="md md-dashboard"></i><span> דף הבית </span>
                             </a>
@@ -477,14 +478,6 @@
                                             </div>
                                         </div>
                                         <div class="row m-l-10 m-r-10">
-                                            <!--<div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label class="col-sm-3 control-label">שם מלא מלווה</label>
-                                                    <div class="col-sm-6">
-                                                        <input id="escortedName" name="escortedName" type="text" class="form-control">
-                                                    </div>
-                                                </div>
-                                            </div>-->
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label class="col-sm-3 control-label">שם פרטי</label>
@@ -493,21 +486,11 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label class="col-sm-3 control-label">שם משפחה</label>
                                                     <div class="col-sm-6">
                                                         <input id="escortedLastName" name="escortedLastName" type="text" class="form-control">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label class="col-sm-3 control-label">טלפון ראשי</label>
-                                                    <div class="col-sm-6">
-                                                        <input id="phone1" name="phone1" type="text" class="form-control">
                                                     </div>
                                                 </div>
                                             </div>
@@ -533,30 +516,28 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
+                                                    <label class="col-sm-3 control-label">טלפון ראשי</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="phone1" name="phone1" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
                                                     <label class="col-sm-3 control-label">טלפון 2</label>
                                                     <div class="col-sm-6">
                                                         <input id="phone2" name="phone2" type="text" class="form-control">
                                                     </div>
                                                 </div>
                                             </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label class="col-sm-3 control-label">טלפון נוסף</label>
                                                     <div class="col-sm-6">
                                                         <input id="HomePhone" name="HomePhone" type="text" class="form-control">
                                                     </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label class="col-sm-3 control-label">מין</label>
-                                                <div class="col-sm-6" id="selectgender">
-                                                    <select id="gender" name="gender" class="form-control">
-                                                        <option>בחר</option>
-                                                        <option>זכר</option>
-                                                        <option>נקבה</option>
-                                                    </select>
                                                 </div>
                                             </div>
                                         </div>
@@ -570,17 +551,19 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <!--<div class="row m-l-10 m-r-10">
+                                        <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">סוג קרבה</label>
-                                                    <div class="col-sm-6">
-                                                        <input id="contactType" name="contactType" type="text" class="form-control">
+                                                    <label class="col-sm-3 control-label">מין</label>
+                                                    <div class="col-sm-6" id="selectgender">
+                                                        <select id="gender" name="gender" class="form-control">
+                                                            <option>בחר</option>
+                                                            <option>זכר</option>
+                                                            <option>נקבה</option>
+                                                        </select>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>-->
-                                        <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label class="col-sm-3 control-label">סוג קרבה</label>
@@ -591,17 +574,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <!--<div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label class="col-sm-3 control-label">סטטוס מלווה</label>
-                                                    <div class="col-sm-6" id="selectstatus">
-                                                        <select id="status" name="status" class="form-control">
-                                                            <option value="1">פעיל</option>
-                                                            <option value="0">לא פעיל</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>-->
                                         </div>
 
                                         <div id="addressesForm">
@@ -683,12 +655,12 @@
                         IsActive = true;
                     }
                     var displayNamePat = $("#patientDisplayName").val();
-                   // var displayName = $("#escortedName").val();
+                    // var displayName = $("#escortedName").val();
                     var firstNameH = $("#escortedFirstName").val();
                     var lastNameH = $("#escortedLastName").val();
                     var cellPhone = $("#phone1").val();
                     var city = $("#city").val();
-                  //  var status = $("#statusEscorted").val();
+                    //  var status = $("#statusEscorted").val();
                     var gender = $("#gender").val();
                     var cellphone2 = $("#phone2").val();
                     var homePhone = $("#HomePhone").val();
@@ -703,7 +675,7 @@
                     patient = { displayName: displayNamePat, id: Pid }
                     escorted = {
                         pat: patient, id: Eid, firstNameH: firstNameH, firstNameA: nameA, lastNameH: lastNameH, lastNameA: lastNameA, city: city, cellPhone: cellPhone, cellphone2: cellphone2, homePhone: homePhone,
-                        contactType: contactType, gender: gender,IsActive:IsActive
+                        contactType: contactType, gender: gender, IsActive: IsActive
                     }
                     $.ajax({
                         dataType: "json",
