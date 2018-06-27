@@ -197,7 +197,7 @@
                     if ($("#afterNoon").is(':checked')) {
                         Hour = 22;
                         Minute = 14;
-                    } 
+                    }
                     var date = new Date(Year, Month, Day, Hour, Minute);
                     var func = arr_customer.func;
                     var Coordinator = new Object();
@@ -260,7 +260,7 @@
 
                         },
                         error: function (err) {
-                            alert("Error in setRidePat: "+err.responseText);
+                            alert("Error in setRidePat: " + err.responseText);
                         }
                     });
 
@@ -826,11 +826,11 @@
             //var reg = new RegExp("[0-9]{2}\:[0-9]{2}");
             //var timeMatch = reg.test(Time);
             var timeMatch = true;
-            if ($("#hour").val()=="שעות" || $("#minute").val()=="דקות") {
+            if ($("#hour").val() == "שעות" || $("#minute").val() == "דקות") {
                 alert("השעה שהוזנה אינה חוקית");
                 timeMatch = false;
             }
-            
+
 
             //var atLeastOneIsChecked = $('input[name="selectEscort"]:checked').length > 0;
             if ($("#onlyEscort").is(':checked')) {
@@ -911,11 +911,12 @@
 
         function loadPage() {
             var userType = GENERAL.USER.getUserType();
-            if (userType!="מנהל") {
+            if (userType != "מנהל") {
                 $("#coorDiv").hide();
+                $("#ph").show();
             } else {
                 $("#coorDiv").show();
-
+                $("#ph").hide();
             }
             if (JSON.parse(GENERAL.RIDEPAT.getRidePatList()).length != 0) {
                 arr_customer = JSON.parse(GENERAL.RIDEPAT.getRidePatList());
@@ -1046,7 +1047,7 @@
                     $("#selectDestination option[value='" + ridePat.Destination.Name + "']").prop('selected', true);
 
                     $("#dateRide").val(date);
-                    if (hours+":"+minutes=="22:14") {
+                    if (hours + ":" + minutes == "22:14") {
                         $("#afterNoon").attr('checked', 'checked');
                         checkAfternoon();
 
@@ -1054,7 +1055,7 @@
                         $("#hour option[value='" + hours + "']").prop('selected', true);
                         $("#minute option[value='" + minutes + "']").prop('selected', true);
                     }
-                    
+
 
                     //$("#selectaddition").val(ridePat.Pat.Addition);
 
@@ -1208,27 +1209,17 @@
                             <div class="col-sm-12">
                                 <div class="card-box">
                                     <div class="row">
-                                        <h4 class="m-t-0 header-title"><b>טופס הסעת חולה</b></h4>
-                                        <p class="text-muted font-13 m-b-30">
-                                            יצירת, צפייה ועריכת הסעת חולה. לחץ על כפתור חזור בכדי לצפות בכל ההסעות חולים.
-                                        </p>
+                                        <h4 class="m-t-0 header-title"><b>הסעת חולה</b></h4>
+
                                         <div class="text-right m-b-30 m-r-15">
                                             <button type="button" onclick="returnRidePat()" class="btn btn-default waves-effect w-md m-b-5"><i class="ti-back-right m-r-5"></i>חזור</button>
                                         </div>
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">מספר הסעה</label>
-                                                    <div class="col-sm-6">
-                                                        <input id="ridePatNum" name="ridePatNum" type="text" class="form-control">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label class="col-sm-3 control-label">שם החולה</label>
+                                                    <label class="col-sm-2 control-label">שם החולה</label>
                                                     <div class="col-sm-6 ui-widget" id="selectPat">
-                                                        <input type="text" id="pat" name="pat" class="form-control"></input>
+                                                        <input type="text" id="pat" name="pat" class="form-control">
                                                     </div>
                                                     <div class="col-sm-6">
                                                         <input type="checkbox" id="onlyEscort" />
@@ -1236,21 +1227,19 @@
                                                     </div>
                                                 </div>
                                             </div>
-
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">סטטוס</label>
+                                                    <div class="col-sm-6" id="selectstatusRidePat">
+                                                        <select id="statusRidePat" name="statusRidePat" class="form-control"><option>בחר סטטוס נסיעה</option></select>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">מוצא</label>
-                                                    <div class="col-sm-6" id="selectOrigin">
-                                                        <select id="Origin" name="Origin" class="form-control"><option>בחר מוצא</option></select>
-                                                        <input id="dirBTN" type="button" value="שינוי כיוון" onclick="switchDir()" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label class="col-sm-3 control-label">اسم المريض</label>
+                                                    <label class="col-sm-2 control-label">اسم المريض</label>
                                                     <div class="col-sm-6 ui-widget" id="selectPat">
                                                         <input type="text" id="patArabic" name="patArabic" class="form-control"></input>
                                                     </div>
@@ -1258,7 +1247,26 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">יעד</label>
+                                                    <label class="col-sm-2 control-label">מוצא</label>
+                                                    <div class="col-sm-6" id="selectOrigin">
+                                                        <select id="Origin" name="Origin" class="form-control"><option>בחר מוצא</option></select>
+                                                        <input id="dirBTN" type="button" value="שינוי כיוון" onclick="switchDir()" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group" id="escortDiv">
+                                                    <label class="col-sm-2 control-label">מלווים</label>
+                                                    <div class="col-sm-6" id="selectEscort">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">יעד</label>
                                                     <div class="col-sm-6" id="selectDestination">
                                                         <select id="Destination" name="Destination" class="form-control"><option>בחר יעד</option></select>
                                                     </div>
@@ -1267,110 +1275,80 @@
                                         </div>
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
-                                                <div class="form-group" id="escortDiv">
-                                                    <label class="col-sm-3 control-label">מלווים</label>
-                                                    <div class="col-sm-6" id="selectEscort">
-                                                    </div>
-                                                </div>
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">ציוד נלווה</label>
+                                                    <label class="col-sm-2 control-label">ציוד נלווה</label>
                                                     <div class="col-sm-6" id="selectaddition">
-                                                        <!--<select id="Equipment" name="Equipment" class="form-control"></select>-->
                                                         <label id="Equipment" name="Equipment" class="control-label" />
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="row m-l-10 m-r-10">
-                                            <!--<div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label class="col-sm-3 control-label">סוג הסעה</label>
-                                                <div class="col-sm-6" id="selectrideType">
-                                                    <select id="rideType" name="rideType" class="form-control"></select>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">הערות</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="remark" name="remark" type="text" class="form-control">
+                                                    </div>
                                                 </div>
-                                            </div>-->
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label class="col-sm-3 control-label">תאריך הסעה </label>
-                                                <div class="col-sm-6">
-                                                    <input type="text" class="form-control" placeholder="dd/mm/yyyy" id="dateRide" name="dateRide">
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">שעת הסעה</label>
+                                                    <div class="col-sm-6" id="selecthour">
+                                                        <select id="minute" name="minute" class="form-control" style="width:20%;display:inline"><option>דקות</option></select>
+                                                        <p style="display:inline;">:</p>
+                                                        <select id="hour" name="hour" class="form-control" style="width:20%; display:inline;"><option>שעות</option></select>
+                                                        <input type="checkbox" id="afterNoon" onchange="checkAfternoon()" />
+                                                        <label for="afterNoon">אחה"צ</label>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="row m-l-10 m-r-10">
-                                        <!--<div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label class="col-sm-3 control-label">יום </label>
-                                                <div class="col-sm-6" id="selectday1">
-                                                    <select id="day" name="day" class="form-control"></select>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6" id="ph">
+                                            </div>
+                                            <div class="col-sm-6" id="coorDiv">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">רכז</label>
+                                                    <div class="col-sm-6" id="selectCoordinator">
+                                                        <input type="text" id="coordinator" name="coordinator" class="form-control">
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>-->
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label class="col-sm-3 control-label">שעת הסעה</label>
-                                                <div class="col-sm-6" id="selecthour">
-                                                    <select id="minute" name="minute" class="form-control" style="width:20%;display:inline"><option>דקות</option></select>
-                                                    <p style="display:inline;">:</p>
-                                                    <select id="hour" name="hour" class="form-control" style="width:20%; display:inline;"><option>שעות</option></select>
-                                                    <input type="checkbox" id="afterNoon" onchange="checkAfternoon()"/>
-                                                    <label for="afterNoon">אחה"צ</label>
-
-
-                                                    <!-- <input type="time" id="hour" name="hour" class="form-control" min="00:00" max="23:59" step="900" required/ >-->
-
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">תאריך הסעה </label>
+                                                    <div class="col-sm-6">
+                                                        <input type="text" class="form-control" placeholder="dd/mm/yyyy" id="dateRide" name="dateRide">
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="row m-l-10 m-r-10">
-                                        <!--<div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label class="col-sm-3 control-label">אזור</label>
-                                                <div class="col-sm-6" id="selectarea">
-                                                    <select id="area" name="area" class="form-control"></select>
-                                                </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
                                             </div>
-                                        </div>-->
-                                        <div class="col-sm-6" id="coorDiv">
-                                            <div class="form-group">
-                                                <label class="col-sm-3 control-label">רכז</label>
-                                                <div class="col-sm-6" id="selectCoordinator">
-                                                    <input type="text" id="coordinator" name="coordinator" class="form-control">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row m-l-10 m-r-10">
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label class="col-sm-3 control-label">סטטוס</label>
-                                                <div class="col-sm-6" id="selectstatusRidePat">
-                                                    <select id="statusRidePat" name="statusRidePat" class="form-control"><option>בחר סטטוס נסיעה</option></select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label class="col-sm-3 control-label">הערות</label>
-                                                <div class="col-sm-6">
-                                                    <input id="remark" name="remark" type="text" class="form-control">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">מספר הסעה</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="ridePatNum" name="ridePatNum" type="text" class="form-control">
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div>
-                                <hr />
-                                <div class="text-right m-t-30 row">
-                                    <button type="submit" id="saveCustomer" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-save m-r-5"></i>שמור</button>
+
+                                <div>
+                                    <hr />
+                                    <div class="text-right m-t-30 row">
+                                        <button type="submit" id="saveCustomer" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-save m-r-5"></i>שמור</button>
+                                    </div>
                                 </div>
-                            </div>
                         </form>
                     </div>
 
