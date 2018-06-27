@@ -65,7 +65,6 @@
     </style>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <!--City Autocomplete-->
-
     <!--DatePicker css+js-->
     <link href="../plugins/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" rel="stylesheet">
     <link href="../plugins/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
@@ -138,7 +137,7 @@
         }
 
         function generateVolTypesErrorCB(e) {
-            alert("Error in generateVolTypes: "+e.responseText);
+            alert("Error in generateVolTypes: " + e.responseText);
         }
 
         function loadAddresses(customerID) {
@@ -450,17 +449,16 @@
                     var volunteer = JSON.parse(data.d);
                     GENERAL.VOLUNTEERS.setVolunteersList(volunteer);
                     var location = "";
-                    for (i in volunteer.PrefLocation)
-                    {
+                    for (i in volunteer.PrefLocation) {
                         location += volunteer.PrefLocation[i] + ", ";
                     }
                     location = location.substring(0, location.length - 2);
                     $("#PrefLocation").text(location);
                     var shift = "";
                     for (i in volunteer.PrefTime) {
-                        
+
                         shift += volunteer.PrefTime[i][0] + "-" + volunteer.PrefTime[i][1] + ", ";
-                        
+
                     }
                     shift = shift.substring(0, shift.length - 2);
                     $("#PrefShift").text(shift);
@@ -502,7 +500,7 @@
                     var bdate = new Date(parseInt(temp));
                     var bday = bdate.getDate();
                     var bmonth = bdate.getMonth() + 1;
-                    var byear = bdate.getFullYear();       
+                    var byear = bdate.getFullYear();
                     if (bday < 10) bday = "0" + bday;
                     if (bmonth < 10) bmonth = "0" + bmonth;
                     bdate = bday + "/" + bmonth + "/" + byear
@@ -649,48 +647,28 @@
                                         <div class="text-right m-b-30 m-r-15">
                                             <button type="button" onclick="returnVolunteers()" class="btn btn-default waves-effect w-md m-b-5"><i class="ti-back-right m-r-5"></i>חזור</button>
                                         </div>
-
                                         <div class="row m-l-10 m-r-10">
-
-                                            <!--<div class="col-sm-6">-->
-                                            <!--<div class="form-group">
-                                                <label class="col-sm-3 control-label">שם מלא מתנדב</label>
-                                                <div class="col-sm-6">
-                                                    <input id="volunteerName" name="volunteerName" type="text" class="form-control">
-                                                </div>
-                                            </div>-->
-                                            <!--</div>-->
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">שם פרטי</label>
+                                                    <label class="col-sm-2 control-label">שם פרטי</label>
                                                     <div class="col-sm-6">
                                                         <input id="volunteerFirstName" name="volunteerFirstName" type="text" class="form-control">
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">שם משפחה</label>
+                                                    <label class="col-sm-2 control-label">שם משפחה</label>
                                                     <div class="col-sm-6">
                                                         <input id="volunteerLastName" name="volunteerLastName" type="text" class="form-control">
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label class="col-sm-3 control-label">טלפון ראשי</label>
-                                                    <div class="col-sm-6">
-                                                        <input id="phone1" name="phone1" type="text" class="form-control">
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">اسم شخصي</label>
+                                                    <label class="col-sm-2 control-label">اسم شخصي</label>
                                                     <div class="col-sm-6">
                                                         <input id="firstA" name="firstA" type="text" class="form-control">
                                                     </div>
@@ -698,7 +676,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">اسم عائلة</label>
+                                                    <label class="col-sm-2 control-label">اسم عائلة</label>
                                                     <div class="col-sm-6">
                                                         <input id="lastA" name="lastA" type="text" class="form-control">
                                                     </div>
@@ -708,33 +686,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">טלפון 2</label>
-                                                    <div class="col-sm-6">
-                                                        <input id="phone2" name="phone2" type="text" class="form-control">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label class="col-sm-3 control-label">טלפון נוסף</label>
-                                                    <div class="col-sm-6">
-                                                        <input id="HomePhone" name="HomePhone" type="text" class="form-control">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row m-l-10 m-r-10">
-                                            <div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label class="col-sm-3 control-label">תאריך הצטרפות </label>
-                                                    <div class="col-sm-6">
-                                                        <input id="joinDate" name="joinDate" type="text" placeholder="dd/mm/yyyy" class="form-control">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label class="col-sm-3 control-label"></label>
+                                                    <label class="col-sm-2 control-label"></label>
                                                     <div class="col-sm-6">
                                                         <input id="ArabSpeaking" name="know" type="checkbox">
                                                         <label for="ArabSpeaking">דובר ערבית?</label>
@@ -745,15 +697,102 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">Email</label>
+                                                    <label class="col-sm-2 control-label">טלפון ראשי</label>
                                                     <div class="col-sm-6">
-                                                        <input id="email" name="email" type="text" class="form-control" style="text-align:left;">
+                                                        <input id="phone1" name="phone1" type="text" class="form-control">
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">סוג משתמש</label>
+                                                    <label class="col-sm-2 control-label">טלפון 2</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="phone2" name="phone2" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">טלפון נוסף</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="HomePhone" name="HomePhone" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">יישוב</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="city" name="city" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">כתובת</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="address" name="address" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">מין</label>
+                                                    <div class="col-sm-6" id="selectgender">
+                                                        <select id="gender" name="gender" class="form-control">
+                                                            <option>בחר</option>
+                                                            <option>זכר</option>
+                                                            <option>נקבה</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">Email</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="email" name="email" type="text" class="form-control" style="text-align:left;">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">משמרות מועדפות</label>
+                                                    <div class="col-sm-6">
+                                                        <label id="PrefShift" name="PrefShift"></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">מקומות מועדפים</label>
+                                                    <div class="col-sm-6" id="selectPreferRoute1">
+                                                        <label id="PrefLocation" name="PrefLocation"></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">תאריך הצטרפות </label>
+                                                    <div class="col-sm-6">
+                                                        <input id="joinDate" name="joinDate" type="text" placeholder="dd/mm/yyyy" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">סוג משתמש</label>
                                                     <div class="col-sm-6">
                                                         <select id="typeVolunteer" name="typeVolunteer" type="text" class="form-control">
                                                             <option>בחר</option>
@@ -761,172 +800,17 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">משמרות מועדפות</label>
+                                                    <label class="col-sm-2 control-label">הערות</label>
                                                     <div class="col-sm-6">
-                                                        <!--<input id="PrefShift" name="PrefShift" type="text" class="form-control" disabled="disabled">-->
-                                                        <label id="PrefShift" name="PrefShift"></label>
+                                                        <input id="remarks" name="remarks" type="text" class="form-control">
                                                     </div>
                                                 </div>
                                             </div>
-
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <!--<label class="col-sm-3 control-label">מין</label>
-                                                <div class="col-sm-6">
-                                                    <input id="gender" name="gender" type="text" class="form-control">
-                                                </div>-->
-                                                <label class="col-sm-3 control-label">מין</label>
-                                                <div class="col-sm-6" id="selectgender">
-                                                    <select id="gender" name="gender" class="form-control">
-                                                        <option>בחר</option>
-                                                        <option>זכר</option>
-                                                        <option>נקבה</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row m-l-10 m-r-10">
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label class="col-sm-3 control-label">יישוב</label>
-                                                <div class="col-sm-6">
-                                                    <input id="city" name="city" type="text" class="form-control">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label class="col-sm-3 control-label">כתובת</label>
-                                                <div class="col-sm-6">
-                                                    <input id="address" name="address" type="text" class="form-control">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label class="col-sm-3 control-label">מקומות מועדפים</label>
-                                                <div class="col-sm-6" id="selectPreferRoute1">
-                                                    <!--<input id="PrefLocation" name="PrefLocation" class="form-control" disabled="disabled">-->
-                                                    <label id="PrefLocation" name="PrefLocation"></label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row m-l-10 m-r-10">
-                                        <!--<div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label class="col-sm-3 control-label">תאריך לידה</label>
-                                                <div class="col-sm-6">
-                                                    <input id="birthDate" name="birthDate" type="text" class="form-control">
-                                                </div>
-                                            </div>
-                                        </div>-->
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label class="col-sm-3 control-label">הערות</label>
-                                                <div class="col-sm-6">
-                                                    <input id="remarks" name="remarks" type="text" class="form-control">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!--<div class="row m-l-10 m-r-10">-->
-                                    <!--<div class="col-sm-6">
-                                        <div class="form-group">
-                                            <label class="col-sm-3 control-label">יעד מועדף 3</label>
-                                            <div class="col-sm-6" id="selectPreferedDrivers1">
-                                                <select id="PreferedDrivers3" name="PreferedDrivers3" class="form-control"></select>
-                                            </div>
-                                        </div>
-                                    </div>-->
-                                    <!--<div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label class="col-sm-3 control-label">יעד מועדף 2</label>
-                                                <div class="col-sm-6" id="selectPreferedDrivers2">
-                                                    <select id="preferedDrivers2" name="preferedDrivers2" class="form-control"></select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>-->
-                                    <!--<div class="row m-l-10 m-r-10">
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label class="col-sm-3 control-label">יום 3</label>
-                                                <div class="col-sm-6" id="selsectday3">
-                                                    <select id="day3" name="day3" class="form-control"></select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label class="col-sm-3 control-label">יום 2</label>
-                                                <div class="col-sm-6" id="selectday2">
-                                                    <select id="day2" name="day2" class="form-control"></select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>-->
-                                    <!--<div class="row m-l-10 m-r-10">
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label class="col-sm-3 control-label">יום 1</label>
-                                                <div class="col-sm-6" id="selectday1">
-                                                    <select id="day1" name="day1" class="form-control"></select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label class="col-sm-3 control-label">שעה 1</label>
-                                                <div class="col-sm-6" id="selecthour1">
-                                                    <select id="hour1" name="hour1" class="form-control"></select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>-->
-                                    <!--<div class="row m-l-10 m-r-10">
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label class="col-sm-3 control-label">שעה 2</label>
-                                                <div class="col-sm-6" id="selectHour2">
-                                                    <select id="hour2" name="hour2" class="form-control"></select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label class="col-sm-3 control-label">שעה 3</label>
-                                                <div class="col-sm-6" id="selecthour3">
-                                                    <select id="hour3" name="hour3" class="form-control"></select>
-
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>-->
-                                    <!--<div class="row m-l-10 m-r-10">
-                                        <div class="col-sm-6">
-                                            <div class="form-group">-->
-                                    <!--<label class="col-sm-3 control-label">סטטוס</label>
-                                    <div class="col-sm-6">
-                                        <textarea id="statusVolunteer" name="statusVolunteer" class="form-control" rows="3"></textarea>
-                                    </div>-->
-                                    <!--<label class="col-sm-3 control-label">סטטוס</label>
-                                                <div class="col-sm-6" id="selectstatusVolunteer">
-                                                    <select id="statusVolunteer" name="statusVolunteer" class="form-control"></select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>-->
-                                    <!--<div class="row m-l-10 m-r-10">
-                                        <div class="col-sm-6">
-                                            <br />
-
-                                        </div>
-                                    </div>-->
+                                        </div>                                        
                                 </div>
                                 <div id="addressesForm">
                                     <hr />
@@ -1055,7 +939,7 @@
                     //if (cellphone2 == "") { cellphone2 = "0"; }
                     volunteer = {
                         firstNameH: firstNameH, firstNameA: nameA, lastNameH: lastNameH, lastNameA: lastNameA, cellPhone: cellPhone, cellphone2: cellphone2, homePhone: homePhone,
-                        city: city, address: address, email: email,joinDate: jdate, gender: gender, KnowsArabic: knowsArabic,
+                        city: city, address: address, email: email, joinDate: jdate, gender: gender, KnowsArabic: knowsArabic,
                         typeVol: typeVol, IsActive: active, Remarks: remark, DisplayName: displayName //birthdate: bdate,
                     }
                     $.ajax({
@@ -1078,7 +962,7 @@
 
                         },
                         error: function (err) {
-                            alert("Error in setVolunteer: "+ err.responseText);
+                            alert("Error in setVolunteer: " + err.responseText);
                         }
                     });
                     //END OF Insert Product Code
