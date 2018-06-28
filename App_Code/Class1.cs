@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-
+using log4net;
 /// <summary>
 /// Summary description for Class1
 /// </summary>
@@ -15,9 +15,4 @@ public class Class1
         //
     }
 
-    public string DisplayName { get; set; }
-
-    public int Id { get; set; }
-
-  public   List<Class2> myList { get; set; }
 }
