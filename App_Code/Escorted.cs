@@ -373,8 +373,16 @@ public class Escorted
         db = new DbService();
         query = "select Id from ContactType where Name=@ContactType";
         int Relationship = 0;
-        Relationship = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
-        cmdParams[13] = cmd.Parameters.AddWithValue("@Relationship", Relationship);
+        try
+        {
+            Relationship = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
+            cmdParams[13] = cmd.Parameters.AddWithValue("@Relationship", Relationship);
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+
 
         if (func == "edit")
         {
@@ -412,12 +420,12 @@ public class Escorted
             query += " values (@FirstNameH,@LastNameH,@CellPhone,@CellPhone2,@HomePhone,@City,@IsActive,@Gender,@FirstNameA,@LastNameA); select SCOPE_IDENTITY()";
             db = new DbService();
             Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
-            cmdParams[11] = cmd.Parameters.AddWithValue("@Id",Id);
+            cmdParams[11] = cmd.Parameters.AddWithValue("@Id", Id);
             query = "insert into PatientEscort (PatientId,EscortId,ContactTypeId) values (@PatientId,@Id,@Relationship)";
             db = new DbService();
             try
             {
-               int res= db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+                int res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
                 if (res == 0) throw new Exception();
             }
             catch (Exception e)
