@@ -1,2 +1,3 @@
-﻿2018-06-28 09:52:46,629 ERROR [14] test2.Page_Load - this is an error message
-2018-06-28 09:55:29,746 ERROR [31] test2.Page_Load - this is a new error message
+﻿2018-07-01 15:25:20,333 ERROR [7] test2.Page_Load - this is a new error message
+2018-07-01 16:09:01,310 ERROR [5] test2.Page_Load - this is a new error message
+2018-07-01 16:09:16,171 ERROR [5] test2.Page_Load - this is a new error message

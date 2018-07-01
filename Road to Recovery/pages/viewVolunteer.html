@@ -174,7 +174,7 @@
 
                     });
                 },
-                error: function (err) { alert("Error"); }
+                error: function (err) { alert("Error in getVolunteers: "+ err.responseText); }
             });
         }
 
@@ -187,7 +187,7 @@
                 type: "POST",
                 data: JSON.stringify({ displayName: displayName, active: active }),
                 success: function (data) { },
-                error: function (err) { alert("Error"); }
+                error: function (err) { alert("Error in deactivateVolunteer: "+err.responseText); }
             });
 
         }
