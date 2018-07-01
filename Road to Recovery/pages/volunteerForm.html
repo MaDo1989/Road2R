@@ -175,7 +175,7 @@
 
                     numberOfRecords = $("#jqGrid").getGridParam("records");
                 },
-                error: function (err) { alert("Error"); }
+                error: function (err) { alert("Error in getCustomerAddresses: "+err.responseText); }
             });
         }
 
@@ -405,7 +405,7 @@
                         $("#preferRoute1").attr('disabled', 'disabled');
                         $("#address").attr('disabled', 'disabled');
                         $("#gender").attr('disabled', 'disabled');
-                        $("#birthDate").attr('disabled', 'disabled');
+                       // $("#birthDate").attr('disabled', 'disabled');
                         $("#addAddress").attr('disabled', 'disabled');
                         $("#saveCustomer").attr('disabled', 'disabled');
                         $("#phone2").attr('disabled', 'disabled');
@@ -485,31 +485,13 @@
                     $("#gender").val(volunteer.Gender);
                     $("#city").val(volunteer.City);
                     $("#address").val(volunteer.Address);
-                    //$("#selectPreferRoute1").val(volunteer.PreferRoute1);
-                    //$("#selectPreferedDrivers2").val(volunteer.PreferRoute2);
-                    //$("#selectPreferedDrivers1").val(volunteer.PreferRoute3);
-                    //$("#selectday1").val(volunteer.Day1);
-                    //$("#selectday2").val(volunteer.Day2);
-                    //$("#selsectday3").val(volunteer.Day3);
-                    //$("#selecthour1").val(volunteer.Hour1);
-                    //$("#selectHour2").val(volunteer.Hour2);
-                    //$("#selecthour3").val(volunteer.Hour3);
-                    // $("#selectstatusVolunteer").val(volunteer.Status);
-                    $("#selectgender").val(volunteer.Gender);
-                    var temp = volunteer.BirthDate.substring(volunteer.BirthDate.indexOf("(") + 1, volunteer.BirthDate.indexOf(")"))
-                    var bdate = new Date(parseInt(temp));
-                    var bday = bdate.getDate();
-                    var bmonth = bdate.getMonth() + 1;
-                    var byear = bdate.getFullYear();
-                    if (bday < 10) bday = "0" + bday;
-                    if (bmonth < 10) bmonth = "0" + bmonth;
-                    bdate = bday + "/" + bmonth + "/" + byear
-                    $("#birthDate").val(bdate);
+                                        $("#selectgender").val(volunteer.Gender);
+                   
                     if (volunteer.KnowsArabic == true) $("#ArabSpeaking").prop('checked', true);
                     if (volunteer.IsActive == true) $("#activeVolunteer").prop('checked', true);
 
                 },
-                error: function (err) { alert("Error"); }
+                error: function (err) { alert("Error in getVolunteer: "+err.responseText); }
             });
         }
 
@@ -638,6 +620,8 @@
                                         <h4 class="m-t-0 header-title"><b>טופס מתנדב</b></h4>
                                         <p class="text-muted font-13 m-b-30">
                                             יצירת, צפייה ועריכת מתנדב. לחץ על כפתור חזור בכדי לצפות בכל הלקוחות.
+                                            <br />
+                                            <p class="required">* שדה חובה</p>
                                         </p><div class="col-md-6 checkbox checkbox-primary text-left">
                                             <input id="activeVolunteer" type="checkbox">
                                             <label for="activeVolunteer">
@@ -650,7 +634,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">שם פרטי</label>
+                                                    <label class="col-sm-2 control-label">שם פרטי&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="volunteerFirstName" name="volunteerFirstName" type="text" class="form-control">
                                                     </div>
@@ -658,7 +642,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">שם משפחה</label>
+                                                    <label class="col-sm-2 control-label">שם משפחה&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="volunteerLastName" name="volunteerLastName" type="text" class="form-control">
                                                     </div>
@@ -668,7 +652,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">اسم شخصي</label>
+                                                    <label class="col-sm-2 control-label">اسم شخصي&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="firstA" name="firstA" type="text" class="form-control">
                                                     </div>
@@ -676,7 +660,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">اسم عائلة</label>
+                                                    <label class="col-sm-2 control-label">اسم عائلة&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="lastA" name="lastA" type="text" class="form-control">
                                                     </div>
@@ -697,9 +681,9 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">טלפון ראשי</label>
+                                                    <label class="col-sm-2 control-label">טלפון ראשי&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
-                                                        <input id="phone1" name="phone1" type="text" class="form-control">
+                                                        <input id="phone1" name="phone1" type="text" class="form-control" >
                                                     </div>
                                                 </div>
                                             </div>
@@ -722,11 +706,11 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        
+
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">יישוב</label>
+                                                    <label class="col-sm-2 control-label">יישוב&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="city" name="city" type="text" class="form-control">
                                                     </div>
@@ -744,7 +728,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">מין</label>
+                                                    <label class="col-sm-2 control-label">מין&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6" id="selectgender">
                                                         <select id="gender" name="gender" class="form-control">
                                                             <option>בחר</option>
@@ -792,7 +776,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">סוג משתמש</label>
+                                                    <label class="col-sm-2 control-label">סוג משתמש&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <select id="typeVolunteer" name="typeVolunteer" type="text" class="form-control">
                                                             <option>בחר</option>
@@ -810,17 +794,17 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>                                        
-                                </div>
-                                <div id="addressesForm">
-                                    <hr />
-                                    <!--<table id="jqGrid" class="table table-striped table-bordered text-right"></table>-->
-                                    <!--<div id="jqGridPager"></div>-->
-                                    <div class="text-right m-t-30 row">
-                                        <button type="submit" id="saveCustomer" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-save m-r-5"></i>שמור</button>
+                                        </div>
+                                    </div>
+                                    <div id="addressesForm">
+                                        <hr />
+                                        <!--<table id="jqGrid" class="table table-striped table-bordered text-right"></table>-->
+                                        <!--<div id="jqGridPager"></div>-->
+                                        <div class="text-right m-t-30 row">
+                                            <button type="submit" id="saveCustomer" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-save m-r-5"></i>שמור</button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
                         </form>
                     </div>
                 </div>
@@ -863,9 +847,7 @@
 
                 // Rules for form validation
                 rules: {
-                    volunteerName: {
-                        required: true
-                    },
+                    
                     volunteerFirstName: {
                         required: true
                     },
@@ -875,13 +857,15 @@
                     phone1: {
                         required: true
                     },
-                    email: {
-                        required: true,
-                        email: true
+                    firstA: {
+                        required: true
                     },
-                    typeVolunteer: {
+                    lastA: {
+                        required: true
+                    }, city: {
                         required: true
                     }
+                    
                 },
 
                 submitHandler: function (form, event) {
@@ -890,43 +874,26 @@
 
                     var valid = validateVolunteerInputs();
                     if (!valid) return false;
-
-
-                    // var displayName = $("#volunteerName").val();
+                    
                     var firstNameH = $("#volunteerFirstName").val();
                     var lastNameH = $("#volunteerLastName").val();
                     var cellPhone = $("#phone1").val();
                     var email = $("#email").val();
                     var typeVol = $("#typeVolunteer").val();
-                    var city = $("#city").val();
-                    // var preferRoute1 = $("#preferRoute1").val();
-                    //  var status = $("#statusVolunteer").val();
-                    //if ($("#activeVolunteer").is(':checked')) var IsActive = true;
+                    var city = $("#city").val();                    
                     var gender = $("#gender").val();
-                    //var birthDate = $("#birthDate").val();
-                    //var bDay = parseInt(birthDate.substring(0, 2));
-                    //var bMonth = parseInt(birthDate.substring(3, 5)) - 1;
-                    //var bYear = parseInt(birthDate.substring(6));
-                    //var bdate = new Date(bYear, bMonth, bDay);
-                    var cellphone2 = $("#phone2").val();
-                    var homePhone = $("#HomePhone").val();
-                    //var preferRoute3 = $("#PreferedDrivers3").val();
-                    //var preferRoute2 = $("#preferedDrivers2").val();
-                    //var day1 = $("#day1").val();
-                    //var day2 = $("#day2").val();
-                    //var day3 = $("#day3").val();
-                    //var hour1 = $("#hour1").val();
-                    //var hour2 = $("#hour2").val();
-                    //var hour3 = $("#hour3").val();
+                                        var cellphone2 = $("#phone2").val();
+                    var homePhone = $("#HomePhone").val();                    
                     var nameA = $("#firstA").val();
                     var lastNameA = $("#lastA").val();
                     var joinDate = $("#joinDate").val();
-                    var joinDay = parseInt(joinDate.substring(0, 2));
-                    var joinMonth = parseInt(joinDate.substring(3, 5)) - 1;
-                    var joinYear = parseInt(joinDate.substring(6));
-                    var jdate = new Date(joinYear, joinMonth, joinDay);
-
-                    //var KnowArabic = $("#know").val();
+                    if (joinDate != "") {
+                        var joinDay = parseInt(joinDate.substring(0, 2));
+                        var joinMonth = parseInt(joinDate.substring(3, 5)) - 1;
+                        var joinYear = parseInt(joinDate.substring(6));
+                        var jdate = new Date(joinYear, joinMonth, joinDay);
+                    } else var jdate = new Date();
+                                       
                     if ($("#ArabSpeaking").is(':checked')) var knowsArabic = true;
                     else knowsArabic = false;
                     if ($("#activeVolunteer").is(':checked')) var active = true;
@@ -936,7 +903,7 @@
                     var remark = $("#remarks").val();;
                     var displayName = arr_volunteer.displayName;
 
-                    //if (cellphone2 == "") { cellphone2 = "0"; }
+                    
                     volunteer = {
                         firstNameH: firstNameH, firstNameA: nameA, lastNameH: lastNameH, lastNameA: lastNameA, cellPhone: cellPhone, cellphone2: cellphone2, homePhone: homePhone,
                         city: city, address: address, email: email, joinDate: jdate, gender: gender, KnowsArabic: knowsArabic,
@@ -967,77 +934,30 @@
                     });
                     //END OF Insert Product Code
 
-                    //for (i = 1; i <= (numberOfRecords) ; i++) {
-                    //    var rowId = $("#jqGrid").getRowData(i);
-                    //    arr_addressRows.push(rowId);
-                    //}
-                    //for (var i = 1; i <= addRowCount; i++) {
-                    //    var rowId = $("#jqGrid").getRowData("jqg" + i);
-                    //    arr_addressRows.push(rowId);
-                    //}
-
-                    //var addressList = [];
-                    //for (i in arr_addressRows) {
-                    //    var addID = -1;
-                    //    if (arr_addressRows[i].ID != "") {
-                    //        addID = arr_addressRows[i].ID;
-                    //    }
-
-                    //    addressList[i] = {
-                    //        "AddressID": addID,
-                    //        "CustomerCity": {
-                    //            "CityID": -1,
-                    //            "CityName": arr_addressRows[i].City,
-                    //            "Area": ""
-                    //        },
-                    //        "AddressName": arr_addressRows[i].AddressName,
-                    //        "Street": arr_addressRows[i].Street,
-                    //        "Number": arr_addressRows[i].Number,
-                    //        "ContactPerson": arr_addressRows[i].ContactPerson,
-                    //        "ContactPhone": arr_addressRows[i].ContactPhone,
-                    //        "Comments": arr_addressRows[i].Comments
-                    //    }
-                    //}
-
-                    ////create an array of all IDs of addresses that were loaded to the form
-                    //var arr_inputeAddresses = []
-                    //for (i in addressesArrayData) {
-                    //    arr_inputeAddresses[i] = addressesArrayData[i].ID
-                    //}
-
                     return false;
                 },
 
                 // Messages for form validation
                 messages: {
-                    volunteerName: {
-                        required: "אנא הכנס שם תצוגה מתנדב"
-                    },
+
                     volunteerFirstName: {
-                        required: "אנא הכנס שם פרטי"
+                        required: "יש להכניס שם פרטי"
+                    },
+                    volunteerLastName: {
+                        required: "יש להכניס שם משפחה"
                     },
                     phone1: {
-                        required: "אנא הכנס טלפון"
+                        required: "יש להכניס טלפון"
+                    }, firstA: {
+                        required: "أدخل الاسم الأول"
                     },
-                    phone2: {
-                    },
-                    email: {
-                        required: "אנא הכנס כתובת Email ",
-                        email: "אנא הכנס כתובת תקינה"
-                    },
-                    //accountID: {
-                    //    required: "אנא הכנס מספר חשבון"
-                    //},
-                    //registrationNumber: {
-                    //    required: "אנא הכנס מספר עסק"
-                    //},
-                    //paymentType: {
-                    //    required: "אנא בחר סוג תשלום"
-                    //},
-                    //preferedDrivers: {
-                    //},
-                    //comments: {
-                    //}
+                    lastA: {
+                        required: "أدخل اسم العائلة"
+                    }, city: {
+                        required: "יש להכניס יישוב"
+                    }
+                    
+
                 },
 
 
@@ -1049,9 +969,7 @@
             var CityExists = false;
             var volType = true;
             var gender = true;
-            // var Origin = true;
-            // var Dest = true;
-            var city = $("#city").val(); //document.forms["customerForm"]["pat"].value;
+            var city = $("#city").val();
             for (i in cities) {
                 if (city == cities[i]) {
                     CityExists = true;
@@ -1059,21 +977,10 @@
                 }
             }
 
-            //var patA = document.forms["customerForm"]["patArabic"].value;
-            //for (i in arr_arabNames) {
-            //    if (patA == arr_arabNames[i]) {
-            //        patientAExists = true;
-            //        break;
-            //    }
-            //}
 
             if (!CityExists) {
                 alert("עליכם לבחור יישוב מתוך הרשימה");
             }
-
-            //if (!patientAExists) {
-            //    alert("يجب عليك اختيار مريض من القائمة");
-            //}
 
             var volType = $("#typeVolunteer").val();
             if (volType == "בחר") {
@@ -1088,30 +995,34 @@
             }
 
             var jDate = $("#joinDate").val();
-            var reg = new RegExp("[0-9]{2}\/[0-9]{2}\/[0-9]{4}");
-            var jdateMatch = reg.test(jDate);
-            if (!jdateMatch) alert("תאריך ההצטרפות שהוזן אינו חוקי");
+            if (jDate != "") {
+                var reg = new RegExp("[0-9]{2}\/[0-9]{2}\/[0-9]{4}");
+                var jdateMatch = reg.test(jDate);
+                if (!jdateMatch) alert("תאריך ההצטרפות שהוזן אינו חוקי");
+            } else (jdateMatch = true);
+            
 
-            //var bDate = $("#birthDate").val();
-            //var reg = new RegExp("[0-9]{2}\/[0-9]{2}\/[0-9]{4}");
-            //var bdateMatch = reg.test(bDate);
-            //if (!bdateMatch) alert("תאריך הלידה שהוזן אינו חוקי");
+            var checkPhone1 = $("#phone1").val();
+            var phoneReg = new RegExp("0\\d{2}-\\d{7}$|0\\d{1}-\\d{7}$");
+            var phoneMatch = phoneReg.test(checkPhone1);
+            if (!phoneMatch) alert("הטלפון הראשי שהוזן אינו חוקי");
 
+            if ($("#phone2").val() != "") {
+                var checkPhone2 = $("#phone2").val();
+                var phoneReg2 = new RegExp("0\\d{2}-\\d{7}$|0\\d{1}-\\d{7}$");
+                var phoneMatch2 = phoneReg2.test(checkPhone2);
+                if (!phoneMatch2) alert("טלפון 2 שהוזן אינו חוקי");
+            } else phoneMatch2 = true;
+            
+            if ($("#HomePhone").val() != "") {
+                var checkPhone3 = $("#HomePhone").val();
+                var phoneReg3 = new RegExp("0\\d{2}-\\d{7}$|0\\d{1}-\\d{7}$");
+                var phoneMatch3 = phoneReg3.test(checkPhone3);
+                if (!phoneMatch3) alert("הטלפון הנוסף שהוזן אינו חוקי");
+            } else phoneMatch3 = true;
+          
 
-            //var Time = $("#hour").val() + ":" + $("#minute").val();
-            //var reg = new RegExp("[0-9]{2}\:[0-9]{2}");
-            //var timeMatch = reg.test(Time);
-            //if (!timeMatch) alert("השעה שהוזנה אינה חוקית");
-
-            ////var atLeastOneIsChecked = $('input[name="selectEscort"]:checked').length > 0;
-            //if ($("#onlyEscort").is(':checked')) {
-            //    var atLeastOneIsChecked = 0;
-            //    $('#selectEscort input:checked').each(function () {
-            //        atLeastOneIsChecked++;
-            //    });
-            //    if (atLeastOneIsChecked == 0) alert("בנסיעה למלווים בלבד, יש לבחור לפחות מלווה אחד");
-            //}
-            if (!CityExists || !volType || !gender || !jdateMatch) { //!bdateMatch
+            if (!CityExists || !volType || !gender || !jdateMatch || !phoneMatch || !phoneMatch2 || !phoneMatch3) {
                 return false;
             } else return true;
         }
@@ -1187,33 +1098,7 @@
                         },
                         editrules: { custom: true, custom_func: checkCity }
                     },
-                    //            //{
-                    //            //    label: 'עיר',
-                    //            //    name: 'City',
-                    //            //    width: "10%",
-                    //            //    editable: true,
-                    //            //    edittype: "select",
-                    //            //    editoptions: {
-                    //            //        dataUrl: "WebService.asmx/getCities",
-                    //            //        buildSelect: function (data) {
-                    //            //            var retValue = $.parseJSON(data);
-                    //            //            var arr_cities = $.parseJSON(retValue.d);
-                    //            //            var select = "<select>";
-                    //            //            select += "<option value='-1' selected='' disabled=''>בחר</option>";
 
-                    //            //            if (arr_cities && arr_cities.length) {
-                    //            //                for (i in arr_cities) {
-                    //            //                    select += "<option value='" + arr_cities[i].CityID + "'>" + arr_cities[i].CityName + "</option>";
-                    //            //                }
-                    //            //            }
-                    //            //            select += "</select>";
-                    //            return select;
-                    //        }
-
-                    //    },
-                    //    editrules: { custom: true, custom_func: checkCity }
-
-                    //},
                     {
                         label: 'יעד סיום',
                         name: 'Street',

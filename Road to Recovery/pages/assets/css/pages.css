@@ -23,6 +23,9 @@
 /* ===========
   Timeline
  =============*/
+
+.required{  color:red;}
+
 .timeline {
   border-collapse: collapse;
   border-spacing: 0;

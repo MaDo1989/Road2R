@@ -41,7 +41,7 @@ public class Volunteer
 
     public string Remarks { get; set; }
 
-    public DateTime BirthDate { get; set; }
+   // public DateTime BirthDate { get; set; }
 
     public DateTime JoinDate { get; set; }
 
@@ -586,7 +586,7 @@ public class Volunteer
             v.City = dr["CityCityName"].ToString();
             v.Address = dr["Address"].ToString();
             v.Email = dr["Email"].ToString();
-            v.BirthDate = Convert.ToDateTime(dr["BirthDate"].ToString());
+           // v.BirthDate = Convert.ToDateTime(dr["BirthDate"].ToString());
             v.JoinDate = Convert.ToDateTime(dr["JoinDate"].ToString());
             v.Status = dr["IsActive"].ToString();
             v.Gender = dr["Gender"].ToString();
@@ -786,7 +786,7 @@ public class Volunteer
             v.JoinDate = Convert.ToDateTime(dr["JoinDate"].ToString());
             v.IsActive = Convert.ToBoolean(dr["IsActive"].ToString());
             v.KnowsArabic = Convert.ToBoolean(dr["KnowsArabic"].ToString());
-            v.BirthDate = Convert.ToDateTime(dr["BirthDate"].ToString());
+           // v.BirthDate = Convert.ToDateTime(dr["BirthDate"].ToString());
             v.Gender = dr["Gender"].ToString();
 
 
@@ -819,7 +819,7 @@ public class Volunteer
             v.City = dr["CityCityName"].ToString();
             v.Address = dr["Address"].ToString();
             v.Email = dr["Email"].ToString();
-            v.BirthDate = Convert.ToDateTime(dr["BirthDate"].ToString());
+           // v.BirthDate = Convert.ToDateTime(dr["BirthDate"].ToString());
             v.JoinDate = Convert.ToDateTime(dr["JoinDate"].ToString());
             v.IsActive = Convert.ToBoolean(dr["IsActive"].ToString());
             v.Gender = dr["Gender"].ToString();
@@ -912,8 +912,8 @@ public class Volunteer
         }
         else if (func == "new")
         {
-            query = "insert into Volunteer (Address, BirthDate, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, HomePhone, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks)";
-            query += " values (@address,@bDay,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@phone,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks);SELECT SCOPE_IDENTITY();";
+            query = "insert into Volunteer (Address, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, HomePhone, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks)";
+            query += " values (@address,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@phone,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks);SELECT SCOPE_IDENTITY();";
             db = new DbService();
             Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
 
