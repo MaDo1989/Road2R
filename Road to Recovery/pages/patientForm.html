@@ -375,6 +375,10 @@
                 arr_patient = JSON.parse(GENERAL.PATIENTS.getPatientsList());
                 if (arr_customer.func == "new") {
                     document.getElementById("newEscort").disabled = true;
+                    generateBarrier();
+                    generateHospital();
+                    generateEquipment();
+                    generateCities();
                 }
                 if (arr_patient.func == "edit" || arr_patient.func == "show") {
                     document.getElementById("escorted").style.visibility = "visible";
@@ -819,12 +823,12 @@
                             <div class="col-sm-12">
                                 <div class="card-box">
                                     <div class="row">
-                                        <h4 class="m-t-0 header-title"><b>טופס חולה</b></h4>                                        
+                                        <h4 class="m-t-0 header-title"><b>טופס חולה</b></h4>
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <br />
                                                 <div class="col-md-6 checkbox checkbox-primary text-left">
-                                                    <input id="activepatient" type="checkbox">
+                                                    <input id="activepatient" type="checkbox" checked="checked">
                                                     <label for="activepatient">
                                                         חולה פעיל
                                                     </label>
@@ -834,11 +838,13 @@
                                         <div class="text-right m-b-30 m-r-15">
                                             <button type="button" onclick="returnpatients()" class="btn btn-default waves-effect w-md m-b-5"><i class="ti-back-right m-r-5"></i>חזור</button>
                                         </div>
+                                        <p class="required">* שדה חובה</p>
+
                                         <div class="row m-l-10 m-r-10">
 
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">שם פרטי</label>
+                                                    <label class="col-sm-2 control-label">שם פרטי&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="patientFirstName" name="patientFirstName" type="text" class="form-control">
                                                     </div>
@@ -846,7 +852,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">שם משפחה</label>
+                                                    <label class="col-sm-2 control-label">שם משפחה&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="patientLastName" name="patientLastName" type="text" class="form-control">
                                                     </div>
@@ -856,7 +862,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">اسم شخصي</label>
+                                                    <label class="col-sm-2 control-label">اسم شخصي&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="firstA" name="firstA" type="text" class="form-control">
                                                     </div>
@@ -864,7 +870,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">اسم عائلة</label>
+                                                    <label class="col-sm-2 control-label">اسم عائلة&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="lastA" name="lastA" type="text" class="form-control">
                                                     </div>
@@ -874,7 +880,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">יישוב</label>
+                                                    <label class="col-sm-2 control-label">יישוב&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="city" name="city" type="text" class="form-control">
                                                     </div>
@@ -884,9 +890,9 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">טלפון ראשי</label>
+                                                    <label class="col-sm-2 control-label">טלפון ראשי&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
-                                                        <input id="phone1" name="phone1" type="text" class="form-control">
+                                                        <input id="phone1" name="phone1" type="text" class="form-control" placeholder="0xx-xxxxxxx או 0x-xxxxxxx">
                                                     </div>
                                                 </div>
                                             </div>
@@ -894,7 +900,7 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">טלפון 2</label>
                                                     <div class="col-sm-6">
-                                                        <input id="phone2" name="phone2" type="text" class="form-control">
+                                                        <input id="phone2" name="phone2" type="text" class="form-control" placeholder="0xx-xxxxxxx או 0x-xxxxxxx">
                                                     </div>
                                                 </div>
                                             </div>
@@ -904,7 +910,7 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">טלפון נוסף</label>
                                                     <div class="col-sm-6">
-                                                        <input id="HomePhone" name="HomePhone" type="text" class="form-control">
+                                                        <input id="HomePhone" name="HomePhone" type="text" class="form-control" placeholder="0xx-xxxxxxx או 0x-xxxxxxx">
                                                     </div>
                                                 </div>
                                             </div>
@@ -921,7 +927,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">מין</label>
+                                                    <label class="col-sm-2 control-label">מין&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6" id="selectgender">
                                                         <select id="gender" name="gender" class="form-control">
                                                             <option>בחר</option>
@@ -935,7 +941,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">מחסום</label>
+                                                    <label class="col-sm-2 control-label">מחסום&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6" id="selectBarrier">
                                                         <select id="barrier" name="barrier" class="form-control"></select>
                                                     </div>
@@ -945,7 +951,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">בית חולים</label>
+                                                    <label class="col-sm-2 control-label">בית חולים&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6" id="selectHospital">
                                                         <select id="hospital" name="hospital" class="form-control"></select>
                                                     </div>
@@ -990,7 +996,7 @@
                                 <div class="row" id="escorted">
                                     <div class="col-sm-12">
                                         <div class="card-box table-responsive">
-                                            <div class="row">                                              
+                                            <div class="row">
 
                                                 <div class="col-sm-9 text-right ">
                                                     <button type="button" id="newEscort" onclick="newEscortedForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>חדש</button>
@@ -1053,9 +1059,6 @@
 
                 // Rules for form validation
                 rules: {
-                    PatientName: {
-                        required: true
-                    },
                     patientFirstName: {
                         required: true
                     },
@@ -1065,18 +1068,24 @@
                     phone1: {
                         required: true
                     },
-                    //email: {
-                    //    required: true,
-                    //    email: true
-                    //},
-                    //typeVolunteer: {
-                    //    required: true
-                    //}
+                    firstA: {
+                        required: true
+                    },
+                    lastA: {
+                        required: true
+                    },
+                    city: {
+                        required: true
+                    }
                 },
 
                 submitHandler: function (form, event) {
                     event.preventDefault();
                     debugger;
+
+                    var valid = validatePatientInputs();
+                    if (!valid) return false;
+
                     var name = $("#patientFirstName").val();
                     var lastName = $("#patientLastName").val();
                     var phone = $("#phone1").val();
@@ -1155,82 +1164,98 @@
                     });
                     //END OF Insert Product Code
 
-                    //for (i = 1; i <= (numberOfRecords) ; i++) {
-                    //    var rowId = $("#jqGrid").getRowData(i);
-                    //    arr_addressRows.push(rowId);
-                    //}
-                    //for (var i = 1; i <= addRowCount; i++) {
-                    //    var rowId = $("#jqGrid").getRowData("jqg" + i);
-                    //    arr_addressRows.push(rowId);
-                    //}
-
-                    //var addressList = [];
-                    //for (i in arr_addressRows) {
-                    //    var addID = -1;
-                    //    if (arr_addressRows[i].ID != "") {
-                    //        addID = arr_addressRows[i].ID;
-                    //    }
-
-                    //    addressList[i] = {
-                    //        "AddressID": addID,
-                    //        "CustomerCity": {
-                    //            "CityID": -1,
-                    //            "CityName": arr_addressRows[i].City,
-                    //            "Area": ""
-                    //        },
-                    //        "AddressName": arr_addressRows[i].AddressName,
-                    //        "Street": arr_addressRows[i].Street,
-                    //        "Number": arr_addressRows[i].Number,
-                    //        "ContactPerson": arr_addressRows[i].ContactPerson,
-                    //        "ContactPhone": arr_addressRows[i].ContactPhone,
-                    //        "Comments": arr_addressRows[i].Comments
-                    //    }
-                    //}
-
-                    ////create an array of all IDs of addresses that were loaded to the form
-                    //var arr_inputeAddresses = []
-                    //for (i in addressesArrayData) {
-                    //    arr_inputeAddresses[i] = addressesArrayData[i].ID
-                    //}
-
+                    
                     return false;
                 },
 
                 // Messages for form validation
                 messages: {
-                    PatientName: {
-                        required: "אנא הכנס שם תצוגת חולה"
-                    },
                     patientFirstName: {
-                        required: "אנא הכנס שם פרטי"
+                        required: "יש להכניס שם פרטי"
                     },
                     patientLastName: {
-                        required: "אנא הכנס שם משפחה"
+                        required: "יש להכניס שם משפחה"
                     },
                     phone1: {
+                        required: "יש להכניס טלפון ראשי"
                     },
-                    //email: {
-                    //    required: "אנא הכנס כתובת Email ",
-                    //    email: "אנא הכנס כתובת תקינה"
-                    //},
-                    //accountID: {
-                    //    required: "אנא הכנס מספר חשבון"
-                    //},
-                    //registrationNumber: {
-                    //    required: "אנא הכנס מספר עסק"
-                    //},
-                    //paymentType: {
-                    //    required: "אנא בחר סוג תשלום"
-                    //},
-                    //preferedDrivers: {
-                    //},
-                    //comments: {
-                    //}
+                    firstA: {
+                        required: "أدخل الاسم الأول"
+                    },
+                    lastA: {
+                        required: "أدخل اسم العائلة"
+                    },
+                    city: {
+                        required: "יש להכניס יישוב"
+                    }
                 },
 
 
             });
         });
+
+        function validatePatientInputs() {
+
+            var CityExists = false;
+            var barrier = true;
+            var hospital = true;
+            var gender = true;
+            var city = $("#city").val();
+            for (i in cities) {
+                if (city == cities[i]) {
+                    CityExists = true;
+                    break;
+                }
+            }
+
+
+            if (!CityExists) {
+                alert("עליכם לבחור יישוב מתוך הרשימה");
+            }
+
+            var barrier = $("#barrier").val();
+            if (barrier == "") {
+                barrier = false
+                alert("עליכם לבחור מחסום מתוך הרשימה");
+            }
+
+            var hospital = $("#hospital").val();
+            if (hospital == "") {
+                hospital = false
+                alert("עליכם לבחור בית חולים מתוך הרשימה");
+            }
+
+            var gender = $("#gender").val();
+            if (gender == "בחר") {
+                gender = false
+                alert("עליכם לבחור מין מתוך הרשימה");
+            }
+
+
+            var checkPhone1 = $("#phone1").val();
+            var phoneReg = new RegExp("0\\d{2}-\\d{7}$|0\\d{1}-\\d{7}$");
+            var phoneMatch = phoneReg.test(checkPhone1);
+            if (!phoneMatch) alert("הטלפון הראשי שהוזן אינו חוקי");
+
+            if ($("#phone2").val() != "") {
+                var checkPhone2 = $("#phone2").val();
+                var phoneReg2 = new RegExp("0\\d{2}-\\d{7}$|0\\d{1}-\\d{7}$");
+                var phoneMatch2 = phoneReg2.test(checkPhone2);
+                if (!phoneMatch2) alert("טלפון 2 שהוזן אינו חוקי");
+            } else phoneMatch2 = true;
+
+            if ($("#HomePhone").val() != "") {
+                var checkPhone3 = $("#HomePhone").val();
+                var phoneReg3 = new RegExp("0\\d{2}-\\d{7}$|0\\d{1}-\\d{7}$");
+                var phoneMatch3 = phoneReg3.test(checkPhone3);
+                if (!phoneMatch3) alert("הטלפון הנוסף שהוזן אינו חוקי");
+            } else phoneMatch3 = true;
+
+
+            if (!CityExists || !barrier || !hospital || !gender  || !phoneMatch || !phoneMatch2 || !phoneMatch3) {
+                return false;
+            } else return true;
+        }
     </script>
 
     <!-- jQuery  -->

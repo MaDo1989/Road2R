@@ -467,6 +467,7 @@
                                         <div class="text-right m-b-30 m-r-15">
                                             <button type="button" onclick="returnPatient()" class="btn btn-default waves-effect w-md m-b-5"><i class="ti-back-right m-r-5"></i>חזור</button>
                                         </div>
+                                        <p class="required">* שדה חובה</p>
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
@@ -480,7 +481,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">שם פרטי<span style="color:red;">&nbsp;*</span></label>
+                                                    <label class="col-sm-3 control-label">שם פרטי&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="escortedFirstName" name="escortedFirstName" type="text" class="form-control">
                                                     </div>
@@ -488,7 +489,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">שם משפחה</label>
+                                                    <label class="col-sm-3 control-label">שם משפחה&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="escortedLastName" name="escortedLastName" type="text" class="form-control">
                                                     </div>
@@ -498,7 +499,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">اسم شخصي</label>
+                                                    <label class="col-sm-3 control-label">اسم شخصي&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="firstA" name="firstA" type="text" class="form-control">
                                                     </div>
@@ -506,7 +507,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">اسم عائلة</label>
+                                                    <label class="col-sm-3 control-label">اسم عائلة&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="lastA" name="lastA" type="text" class="form-control">
                                                     </div>
@@ -516,7 +517,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">טלפון ראשי</label>
+                                                    <label class="col-sm-3 control-label">טלפון ראשי&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="phone1" name="phone1" type="text" class="form-control">
                                                     </div>
@@ -544,7 +545,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">יישוב</label>
+                                                    <label class="col-sm-3 control-label">יישוב&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="city" name="city" type="text" class="form-control">
                                                     </div>
@@ -554,7 +555,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">מין</label>
+                                                    <label class="col-sm-3 control-label">מין&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6" id="selectgender">
                                                         <select id="gender" name="gender" class="form-control">
                                                             <option>בחר</option>
@@ -566,7 +567,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">סוג קרבה</label>
+                                                    <label class="col-sm-3 control-label">סוג קרבה&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6" id="selectcontactType">
                                                         <select id="contactType" name="contactType" class="form-control">
                                                             <option>בחר</option>
@@ -626,9 +627,7 @@
 
                 // Rules for form validation
                 rules: {
-                    escortedName: {
-                        required: true
-                    },
+
                     escortedFirstName: {
                         required: true
                     },
@@ -638,18 +637,22 @@
                     phone1: {
                         required: true
                     },
-                    //email: {
-                    //    required: true,
-                    //    email: true
-                    //},
-                    //typeescorted: {
-                    //    required: true
-                    //}
+                    firstA: {
+                        required: true
+                    },
+                    lastA: {
+                        required: true
+                    },
+
                 },
 
                 submitHandler: function (form, event) {
                     event.preventDefault();
                     debugger;
+
+                    var valid = validateEscortInputs();
+                    if (!valid) return false;
+
                     var IsActive = false;
                     if ($("#activeescorted").is(':checked')) {
                         IsActive = true;
@@ -661,12 +664,16 @@
                     var cellPhone = $("#phone1").val();
                     var city = $("#city").val();
                     //  var status = $("#statusEscorted").val();
+
                     var gender = $("#gender").val();
+
                     var cellphone2 = $("#phone2").val();
                     var homePhone = $("#HomePhone").val();
                     var nameA = $("#firstA").val();
                     var lastNameA = $("#lastA").val();
+
                     var contactType = $("#contactType").val();
+
                     var func = arr_customer.func;
                     //if (cellphone2 == "") { cellphone2 = "0"; }
                     var Eid = JSON.parse(GENERAL.ESCORTED.getEscortedList()).Id
@@ -705,40 +712,91 @@
 
                 // Messages for form validation
                 messages: {
-                    escortedName: {
-                        required: "אנא הכנס שם תצוגת מלווה"
-                    },
                     escortedFirstName: {
-                        required: "אנא הכנס שם פרטי מלווה "
+                        required: "יש להכניס שם פרטי"
                     },
                     escortedLastName: {
-                        required: "אנא הכנס שם משפחה מלווה "
+                        required: "יש להכניס שם משפחה"
                     },
                     phone1: {
-                        required: "אנא הכנס מספר טלפון מלווה "
+                        required: "יש להכניס טלפון ראשי"
                     },
-                    //email: {
-                    //    required: "אנא הכנס כתובת Email ",
-                    //    email: "אנא הכנס כתובת תקינה"
-                    //},
-                    //accountID: {
-                    //    required: "אנא הכנס מספר חשבון"
-                    //},
-                    //registrationNumber: {
-                    //    required: "אנא הכנס מספר עסק"
-                    //},
-                    //paymentType: {
-                    //    required: "אנא בחר סוג תשלום"
-                    //},
-                    //preferedDrivers: {
-                    //},
-                    //comments: {
-                    //}
+                    firstA: {
+                        required: "أدخل الاسم الأول"
+                    },
+                    lastA: {
+                        required: "أدخل اسم العائلة"
+                    }
                 },
 
 
             });
         });
+
+        function validateEscortInputs() {
+
+            var CityExists = false;
+            var barrier = true;
+            var hospital = true;
+            var gender = true;
+            var relationship = true;
+
+            var city = $("#city").val();
+            for (i in cities) {
+                if (city == cities[i]) {
+                    CityExists = true;
+                    break;
+                }
+            }
+            if (!CityExists) {
+                alert("עליכם לבחור יישוב מתוך הרשימה");
+            }
+
+
+
+
+            //var gender = $("#gender").val();
+            //if (gender == "בחר") {
+            //    $("#gender").val(null);
+            //}
+
+
+            var checkPhone1 = $("#phone1").val();
+            var phoneReg = new RegExp("0\\d{2}-\\d{7}$|0\\d{1}-\\d{7}$");
+            var phoneMatch = phoneReg.test(checkPhone1);
+            if (!phoneMatch) alert("הטלפון הראשי שהוזן אינו חוקי");
+
+            if ($("#phone2").val() != "") {
+                var checkPhone2 = $("#phone2").val();
+                var phoneReg2 = new RegExp("0\\d{2}-\\d{7}$|0\\d{1}-\\d{7}$");
+                var phoneMatch2 = phoneReg2.test(checkPhone2);
+                if (!phoneMatch2) alert("טלפון 2 שהוזן אינו חוקי");
+            } else phoneMatch2 = true;
+
+            if ($("#HomePhone").val() != "") {
+                var checkPhone3 = $("#HomePhone").val();
+                var phoneReg3 = new RegExp("0\\d{2}-\\d{7}$|0\\d{1}-\\d{7}$");
+                var phoneMatch3 = phoneReg3.test(checkPhone3);
+                if (!phoneMatch3) alert("הטלפון הנוסף שהוזן אינו חוקי");
+            } else phoneMatch3 = true;
+
+            var gender = $("#gender").val();
+            if (gender == "בחר") {
+                gender = false
+                alert("עליכם לבחור מין מתוך הרשימה");
+            }
+
+            var contactType = $("#contactType").val();
+            if (contactType == "בחר") {
+                relationship = false
+                alert("עליכם לבחור סוג קרבה מתוך הרשימה");
+            }
+
+
+            if (!CityExists || !phoneMatch || !phoneMatch2 || !phoneMatch3 || !gender || !relationship) {
+                return false;
+            } else return true;
+        }
     </script>
 
     <!-- jQuery  -->
