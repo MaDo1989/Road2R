@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="KSMoving">
+    <meta name="author" content="Coderthemes">
+
+    <link rel="shortcut icon" href="assets/images/favicon_1.ico">
+
+    <title>הסעות חולים</title>
+
+    <!-- DataTables -->
+    <link href="../plugins/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/buttons.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/fixedHeader.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/responsive.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/scroller.bootstrap.min.css" rel="stylesheet" type="text/css" />
+
+    <!-- Sweet Alert css -->
+    <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
+
+    <link href="../plugins/switchery/switchery.min.css" rel="stylesheet" />
+    <link href="assets/css/bootstrap-rtl.min.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/core.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/icons.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/components.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/pages.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/menu.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/responsive.css" rel="stylesheet" type="text/css">
+
+    <script src="assets/js/CookiesFunctions.js"></script>
+
+    <script src="assets/js/modernizr.min.js"></script>
+
+    <!--GENERAL object and additional functions-->
+    <script src="lib/master.js"></script>
+
+    <script src="assets/js/jquery.min.js"></script>
+
+    <script src="dataTables.js"></script>
+    <script src="moment.js"></script>
+    <script src="datetime-moment.js"></script>
+
+
+    <!-- Select2 css+js -->
+    <link href="assets/css/select2.css" rel="stylesheet" />
+    <script src="assets/js/select2.min.js"></script>
+    <!--<script src="lib/moment.js"></script>-->
+    <!--<script src="../plugins/moment/moment.js"></script>-->
+    <script src="lib/sorting.js"></script>
+
+
+
+    <script>
+        checkCookie();
+        $(document).ready(function () {
+            $.fn.dataTable.moment('DD/MM/YY');
+
+            //Create a DataTable from the Table
+            t = $('#datatable-buttons').DataTable({ "paging": false }//, { "visible": false, "targets": [1] }, {
+            );
+
+            refreshTable();
+        });
+
+
+
+        function refreshTable() {
+
+            arr = ["13/01/17"];
+            arr2 = ["13/05/17"];
+            arr3 = ["13/02/17"];
+            t.row.add(arr).draw(false);
+            t.row.add(arr2).draw(false);
+            t.row.add(arr3).draw(false);
+
+            t.draw();
+        }
+
+
+
+
+    </script>
+
+
+</head>
+
+
+<body class="fixed-left">
+
+    <!-- Begin page -->
+    <div id="wrapper">
+
+        <table id="datatable-buttons" class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>תאריך ושעה</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+    </div>
+    <!-- END wrapper -->
+    <!-- jQuery  -->
+    <script src="assets/js/bootstrap-rtl.min.js"></script>
+    <script src="assets/js/detect.js"></script>
+    <script src="assets/js/fastclick.js"></script>
+    <script src="assets/js/jquery.slimscroll.js"></script>
+    <script src="assets/js/jquery.blockUI.js"></script>
+    <script src="assets/js/waves.js"></script>
+    <script src="assets/js/wow.min.js"></script>
+    <script src="assets/js/jquery.nicescroll.js"></script>
+    <script src="assets/js/jquery.scrollTo.min.js"></script>
+    <script src="../plugins/switchery/switchery.min.js"></script>
+
+    <!-- Datatables-->
+    <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="../plugins/datatables/dataTables.bootstrap.js"></script>
+    <script src="../plugins/datatables/dataTables.buttons.min.js"></script>
+    <script src="../plugins/datatables/buttons.bootstrap.min.js"></script>
+    <script src="../plugins/datatables/jszip.min.js"></script>
+    <script src="../plugins/datatables/pdfmake.min.js"></script>
+    <script src="../plugins/datatables/vfs_fonts.js"></script>
+    <script src="../plugins/datatables/buttons.html5.min.js"></script>
+    <script src="../plugins/datatables/buttons.print.min.js"></script>
+    <script src="../plugins/datatables/dataTables.fixedHeader.min.js"></script>
+    <script src="../plugins/datatables/dataTables.keyTable.min.js"></script>
+    <script src="../plugins/datatables/dataTables.responsive.min.js"></script>
+    <script src="../plugins/datatables/responsive.bootstrap.min.js"></script>
+    <script src="../plugins/datatables/dataTables.scroller.min.js"></script>
+
+    <!-- Datatable init js -->
+    <script src="assets/pages/datatables.init.js"></script>
+
+    <!-- Sweet Alert js -->
+    <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
+    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+
+    <script src="assets/js/jquery.core.js"></script>
+    <script src="assets/js/jquery.app.js"></script>
+    <script type="text/javascript">
+
+        TableManageButtons.init();
+
+    </script>
+</body>
+</html>
