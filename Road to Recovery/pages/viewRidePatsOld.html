@@ -37,7 +37,7 @@
     <script src="lib/master.js"></script>
 
     <script src="assets/js/jquery.min.js"></script>
-    
+
     <script src="dataTables.js"></script>
     <script src="moment.js"></script>
     <script src="datetime-moment.js"></script>
@@ -67,7 +67,7 @@
                         $(row).addClass('important');
                     }
                 }
-            
+
             });
 
 
@@ -127,109 +127,194 @@
                 success: function (data) {
                     var arr_rides = JSON.parse(data.d);
                     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
+                    oren = 0;
 
+                    totalArr = [];
                     for (i in arr_rides) {
+
+                        //while (false) {
+
+
+
+
+
+
 
                         //Change date format
                         var temp = arr_rides[i].Date.substring(arr_rides[i].Date.indexOf("(") + 1);
                         temp = temp.substring(0, temp.indexOf(")"));
                         var date = new Date(parseInt(temp));
 
+
+                        //date2 = date.toLocaleString()//.substring(0, date.toLocaleString().length - 16);//-4
+                        
                         if (date.getDate() < 10) {
                             day = "0" + date.getDate();
                         } else day = date.getDate();
 
-
+                        
                         if (date.getMonth() + 1 < 10) {
-                            month = "0" + (date.getMonth() + 1);
-                        } else month = date.getMonth() + 1;
-
-                        date2 = day + "/" + month + "/" + date.getUTCFullYear() % 2000;
-                       // date3 = date2;
+                            month = "0" + (date.getMonth()+1);
+                        } else month = date.getMonth()+1;
 
 
-                        //date2 = date.toLocaleString()//.substring(0, date.toLocaleString().length - 16);//-4
-                        //date3 = date2.substr(0, 3) + "/" + date2.substr(5, 3) + "/" + date2.substr(13, 3);
+                        date2 = day + "/" + month + "/" + date.getUTCFullYear()%2000;
+                        date3 = date2;
+                        if (date3 === "‎03/‎08/18‎") {
+                            a = 0;
+                        }
+                        a = 0;
+                        //dateArr = [date3];
                         //if (date.getHours() == 22 && date.getMinutes() == 14) {
                         //    date2 = date2.substring(0, date2.length - 9);
                         //   date2 += " אחה\"צ";
                         //}
-                        if (unassigned) {
-                            $("#activeCustomers").prop('checked', false);
-                            if (arr_rides[i].Status != "ממתינה לשיבוץ") continue;
-                        }
+                        //if (unassigned) {
+                        //    $("#activeCustomers").prop('checked', false);
+                        //    if (arr_rides[i].Status != "ממתינה לשיבוץ") continue;
+                        //}
 
-                        if (active) {
-                            // $("#UnassignedRidePats").prop('checked',false);
-                            if (arr_rides[i].Status == "בוטלה" || arr_rides[i].Status == "הסתיימה") continue;
-                        }
+                        //if (active) {
+                        //    // $("#UnassignedRidePats").prop('checked',false);
+                        //    if (arr_rides[i].Status == "בוטלה" || arr_rides[i].Status == "הסתיימה") continue;
+                        //}
 
-                        if (today) {
-                            // Get the current date at midnight.
-                            var now = new Date();
-                            var todayAtMidn = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                        //if (today) {
+                        //    // Get the current date at midnight.
+                        //    var now = new Date();
+                        //    var todayAtMidn = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-                            // Set specificDate to a specified date at midnight.
-                            var specificDateTemp = new Date(new Date(parseInt(temp)));
-                            var specificDate = new Date(specificDateTemp.getFullYear(), specificDateTemp.getMonth(), specificDateTemp.getDate());
+                        //    // Set specificDate to a specified date at midnight.
+                        //    var specificDateTemp = new Date(new Date(parseInt(temp)));
+                        //    var specificDate = new Date(specificDateTemp.getFullYear(), specificDateTemp.getMonth(), specificDateTemp.getDate());
 
-                            // Compare the two dates by comparing the millisecond
-                            // representations.
-                            if (todayAtMidn.getTime() != specificDate.getTime()) continue;
-                        }
+                        //    // Compare the two dates by comparing the millisecond
+                        //    // representations.
+                        //    if (todayAtMidn.getTime() != specificDate.getTime()) continue;
+                        //}
 
-                        if (myRidePats) {
-                            if (arr_rides[i].Coordinator.DisplayName != currentCoor) continue;
-                        }
+                        //if (myRidePats) {
+                        //    if (arr_rides[i].Coordinator.DisplayName != currentCoor) continue;
+                        //}
 
 
-                        var btnStr = "";
-                        var editBtn = "";
-                        var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' name='" + arr_rides[i].RidePatNum + "' title='צפייה'><i class='fa fa-wpforms'></i></button>";
-                        var deleteBtn = "";
-                        if (arr_rides[i].Status == 'ממתינה לשיבוץ' && arr_rides[i].Coordinator.DisplayName == currentCoor) {
-                            editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' name='" + arr_rides[i].RidePatNum + "' title='עריכה'><i class='ti-pencil'></i></button>";
-                            deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' name='" + arr_rides[i].RidePatNum + "' title='מחיקה'><i class='fa fa-remove' ></i></button>";
-                            // btnStr += " " + deleteBtn;
-                        }
+                        //var btnStr = "";
+                        //var editBtn = "";
+                        //var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' name='" + arr_rides[i].RidePatNum + "' title='צפייה'><i class='fa fa-wpforms'></i></button>";
+                        //var deleteBtn = "";
+                        //if (arr_rides[i].Status == 'ממתינה לשיבוץ' && arr_rides[i].Coordinator.DisplayName == currentCoor) {
+                        //    editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' name='" + arr_rides[i].RidePatNum + "' title='עריכה'><i class='ti-pencil'></i></button>";
+                        //    deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' name='" + arr_rides[i].RidePatNum + "' title='מחיקה'><i class='fa fa-remove' ></i></button>";
+                        //    // btnStr += " " + deleteBtn;
+                        //}
 
-                        btnStr += showBtn + " " + editBtn + " " + deleteBtn;
+                        //btnStr += showBtn + " " + editBtn + " " + deleteBtn;
 
                         //if (arr_rides[i].Status == "בוטלה") {
                         //    var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזר'><i class='fa fa-undo' ></i></button>";
                         //    btnStr += " " + reactiveBtn;
                         //}
-                        if (arr_rides[i].Status == "הסתיימה") {
-                            var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-default btn-sm m-b-5' id='reactive' title='הסתיימה'><i class='fa fa-check' ></i></button>";
-                            btnStr += " " + reactiveBtn;
-                        }
+                        //if (arr_rides[i].Status == "הסתיימה") {
+                        //    var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-default btn-sm m-b-5' id='reactive' title='הסתיימה'><i class='fa fa-check' ></i></button>";
+                        //    btnStr += " " + reactiveBtn;
+                        //}
 
                         // else if (arr_rides[i].Status == "משובצת") {
                         //       var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-info btn-sm m-b-5' id='reactive' title='משובצת'><i class='fa fa-check' ></i></button>";
                         // btnStr += " " + reactiveBtn;
                         // }
-                        else {
+                        //else {
 
-                        }
+                        //}
 
-                        if (arr_rides[i].Status == "ממתינה לשיבוץ")
-                            t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, arr_rides[i].Status, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
-                        else {
-                            for (j in arr_rides[i].Drivers) {
-                                if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName;
-                                else secondary = arr_rides[i].Drivers[j].DisplayName;
-                            }
-                            if (arr_rides[i].Drivers.length == 1)
-                                var drivers = "ראשי: " + primary;
-                            if (arr_rides[i].Drivers.length == 2)
-                                var drivers = "ראשי: " + primary + ", " + "גיבוי: " + secondary;
-                            t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, drivers, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
+
+
+                        //t.row.add("2").draw(false);
+                        //t.row.add("3").draw(false);
+                        //t.row.add("4").draw(false);
+                        // t.draw();
+
+                        //    if (arr_rides[i].Status == "ממתינה לשיבוץ") {
+
+                        //   alert(date3);
+                        arrInsert = [date3];
+                        totalArr[oren] = arrInsert;
+                        //t.row.add(arrInsert);//.draw(false);
+                        oren++;
+
+                        //    }
+                        //    else {
+                        //        for (j in arr_rides[i].Drivers) {
+                        //            if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName;
+                        //            else secondary = arr_rides[i].Drivers[j].DisplayName;
+                        //        }
+                        //        if (arr_rides[i].Drivers.length == 1)
+                        //            var drivers = "ראשי: " + primary;
+                        //        if (arr_rides[i].Drivers.length == 2)
+                        //            var drivers = "ראשי: " + primary + ", " + "גיבוי: " + secondary;
+                        //  arrInsert2 = [date3];
+
+                        //t.row.add(arrInsert2).draw(false);
+                        //    }
+                        //}
+                        //$.fn.dataTable.moment('DD/MM/YYYY HH:MM');
+                        //$('#datatable-buttons').DataTable();
+                    }
+                    totalArr1 = [];
+                    totalArr1[0] = ["25/07/18"];
+                    totalArr1[1] = ["25/07/18"];
+                    totalArr1[2] = ["03/08/18"];
+                    totalArr1[3] = ["03/08/18"];
+                    totalArr1[4] = ["16/07/18"];
+                    totalArr1[5] = ["16/07/18"];
+                    totalArr1[6] = ["30/08/18"];
+                    totalArr1[7] = ["30/08/18"];
+                    totalArr1[8] = ["17/07/18"];
+
+                    counter = 0;
+                    for (i in totalArr) {
+                        if (totalArr[i]===totalArr1[i]) {
+                            counter++;
                         }
                     }
-                    //$.fn.dataTable.moment('DD/MM/YYYY HH:MM');
-                    //$('#datatable-buttons').DataTable();
+                    alert("counter= " + counter);
+
+
+                    for (i in totalArr) {
+                        t.row.add(totalArr[i]).draw(false);
+                    }
+
+
+
+                    //t.row.add(arr);
+
+                    //arr = ["03/08/18"];
+                    //t.row.add(arr);
+
+                    //arr = ["16/07/18"];
+                    //t.row.add(arr);
+
+                    //arr = ["16/07/18"];
+                    //t.row.add(arr);
+
+                    //arr = ["17/07/18"];
+                    //t.row.add(arr);
+
+                    //arr = ["25/07/18"];
+                    //t.row.add(arr);
+
+                    //arr = ["25/07/18"];
+                    //t.row.add(arr);
+
+                    //arr = ["30/08/18"];
+                    //t.row.add(arr);
+
+                    //arr = ["30/08/18"];
+                    //t.row.add(arr);
+
+                    // t.row.add("Norman Gonzales","13/01/17","41489","26789984999").draw(false);
                     t.columns([0]).order('asc').draw();
-                   // t.createdRow();
+                    // t.createdRow();
 
 
                     $('#datatable-buttons tbody').on('click', '#edit', function () {
@@ -481,13 +566,13 @@
                                     <thead>
                                         <tr>
                                             <!--<th>מספר הסעה</th>-->
-                                            <th>שם החולה</th>
-                                            <th>מוצא</th>
-                                            <th>יעד</th>
+                                            <!--<th>שם החולה</th>-->
+                                            <!--<th>מוצא</th>
+                                            <th>יעד</th>-->
                                             <th>תאריך ושעה</th>
-                                            <th>נהגים בנסיעה</th>
-                                            <th>רכז</th>
-                                            <th>אפשרויות</th>
+                                            <!--<th>נהגים בנסיעה</th>-->
+                                            <!--<th>רכז</th>-->
+                                            <!--<th>אפשרויות</th>-->
                                         </tr>
 
                                     </thead>
