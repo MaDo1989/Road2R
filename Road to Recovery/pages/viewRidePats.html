@@ -37,7 +37,7 @@
     <script src="lib/master.js"></script>
 
     <script src="assets/js/jquery.min.js"></script>
-    
+
     <script src="dataTables.js"></script>
     <script src="moment.js"></script>
     <script src="datetime-moment.js"></script>
@@ -55,24 +55,25 @@
     <script>
         checkCookie();
         $(document).ready(function () {
-            $.fn.dataTable.moment('DD/MM/YY');
+            $.fn.dataTable.moment('DD/MM/YYTHH:MM');
             //$('#example').DataTable();
             // $.fn.dataTable.moment('DD/MM/YYYY HH:MM');//'' DD/MM/YYYY HH:MM
 
 
             //Create a DataTable from the Table
-            t = $('#datatable-buttons').DataTable({ "paging": false }, { "visible": false, "targets": [1] }, {
-                "createdRow": function (row, data, dataIndex) {
-                    if (data[4] == "A") {
-                        $(row).addClass('important');
-                    }
-                }
-            
-            });
+            t = $('#datatable-buttons').DataTable({ "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] }
+                //{
+                //"createdRow": function (row, data, dataIndex) {
+                //    if (data[4] == "A") {
+                //        $(row).addClass('important');
+                //    }
+                //},         
+        //    }
+        );
 
 
-            getCoors();
-            refreshTable();
+        getCoors();
+        refreshTable();
         });
 
         function getCoors() {
@@ -144,16 +145,21 @@
                             month = "0" + (date.getMonth() + 1);
                         } else month = date.getMonth() + 1;
 
-                        date2 = day + "/" + month + "/" + date.getUTCFullYear() % 2000;
-                       // date3 = date2;
+                        if (date.getHours() < 10) {
+                            hours = "0" + date.getHours();
+                        } else hours = date.getHours();
+
+                        if (date.getMinutes() < 10) {
+                            minutes = "0" + date.getMinutes();
+                        } else minutes = date.getMinutes();
 
 
-                        //date2 = date.toLocaleString()//.substring(0, date.toLocaleString().length - 16);//-4
-                        //date3 = date2.substr(0, 3) + "/" + date2.substr(5, 3) + "/" + date2.substr(13, 3);
-                        //if (date.getHours() == 22 && date.getMinutes() == 14) {
-                        //    date2 = date2.substring(0, date2.length - 9);
-                        //   date2 += " אחה\"צ";
-                        //}
+                        date2 = day + "/" + month + "/" + date.getUTCFullYear() % 2000 + " " + hours + ":" + minutes;
+
+                        if (date.getHours() == 22 && date.getMinutes() == 14) {
+                            date2 = day + "/" + month + "/" + date.getUTCFullYear() % 2000;
+                           date2 += " אחה\"צ";
+                       }
                         if (unassigned) {
                             $("#activeCustomers").prop('checked', false);
                             if (arr_rides[i].Status != "ממתינה לשיבוץ") continue;
@@ -229,7 +235,7 @@
                     //$.fn.dataTable.moment('DD/MM/YYYY HH:MM');
                     //$('#datatable-buttons').DataTable();
                     t.columns([0]).order('asc').draw();
-                   // t.createdRow();
+                    // t.createdRow();
 
 
                     $('#datatable-buttons tbody').on('click', '#edit', function () {
