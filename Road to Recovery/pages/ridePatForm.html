@@ -194,7 +194,7 @@
                     var Year = parseInt(dateRide.substring(6));
                     var Hour = parseInt(hours);
                     var Minute = parseInt(minutes);
-                    if ($("#afterNoon").is(':checked')) {
+                    if ($("#afterNoon").is(':checked')) { //22:14 is the default time that means afternoon אחה''צ
                         Hour = 22;
                         Minute = 14;
                     }
@@ -384,8 +384,8 @@
             $select.val(coor.DisplayName);
         }
 
-        function getCoorErrorCB() {
-            alert("Error in getCoor");
+        function getCoorErrorCB(e) {
+            alert("Error in getCoor: "+e.responseText);
         }
 
 
@@ -441,7 +441,7 @@
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
                 async: false,
-                data: JSON.stringify({ displayName: displayName }),
+                data: JSON.stringify({ displayName: displayName, caller:"ridePatForm" }),
                 success: generateEscSuccessCB,
                 error: generateEscErrorCB
             });

@@ -55,7 +55,20 @@
     <script>
         checkCookie();
         $(document).ready(function () {
-            $.fn.dataTable.moment('DD/MM/YYTHH:MM');
+
+          //  document.getElementById("Numbers").checked = localStorage.numbers === 'true';
+
+
+            document.getElementById("activeRidePats").checked = localStorage.active === 'true';
+            document.getElementById("TodaysRidePats").checked = localStorage.today === 'true';
+            document.getElementById("UnassignedRidePats").checked = localStorage.unassigned === 'true';
+            document.getElementById("MyRidePats").checked = localStorage.myRidePats === 'true';
+            //$("#activeRidePats").prop('checked', localStorage.active);
+            //$("#TodaysRidePats").prop('checked', localStorage.today);
+            //$("#UnassignedRidePats").prop('checked', localStorage.unassigned);
+            //$("#MyRidePats").prop('checked', localStorage.myRidePats);
+
+            $.fn.dataTable.moment('DD/MM/YY HH:mm');
             //$('#example').DataTable();
             // $.fn.dataTable.moment('DD/MM/YYYY HH:MM');//'' DD/MM/YYYY HH:MM
 
@@ -67,14 +80,23 @@
                 //    if (data[4] == "A") {
                 //        $(row).addClass('important');
                 //    }
-                //},         
-        //    }
-        );
+                //},
+                //    }
+            );
 
 
-        getCoors();
-        refreshTable();
+            getCoors();
+            refreshTable();
         });
+
+        function saveFilters() {
+
+            localStorage.active = $("#activeRidePats").prop('checked');
+            localStorage.today = $("#TodaysRidePats").prop('checked');
+            localStorage.unassigned = $("#UnassignedRidePats").prop('checked');
+            localStorage.myRidePats = $("#MyRidePats").prop('checked');
+            refreshTable();
+        }
 
         function getCoors() {
             $.ajax({
@@ -103,17 +125,17 @@
 
         }
 
-        function getCoorsErrorCB() {
-            alert("Error in getCoors");
+        function getCoorsErrorCB(e) {
+            alert("Error in getCoors: " + e.responseText);
         }
 
 
         function refreshTable() {
             checkCookie();
-            var active = $("#activeCustomers").prop('checked');
-            var today = $("#TodaysRidePats").prop('checked');
-            var unassigned = $("#UnassignedRidePats").prop('checked');
-            var myRidePats = $("#MyRidePats").prop('checked');
+            var active = localStorage.active;//$("#activeRidePats").prop('checked');
+            var today = localStorage.today;//$("#TodaysRidePats").prop('checked');
+            var unassigned = localStorage.unassigned;//$("#UnassignedRidePats").prop('checked');
+            var myRidePats = localStorage.myRidePats;//$("#MyRidePats").prop('checked');
 
             t.clear().draw();
 
@@ -156,12 +178,12 @@
 
                         date2 = day + "/" + month + "/" + date.getUTCFullYear() % 2000 + " " + hours + ":" + minutes;
 
-                        if (date.getHours() == 22 && date.getMinutes() == 14) {
+                        if (date.getHours() == 22 && date.getMinutes() == 14) { //22:14 is the default time to show afternoon אחה''צ
                             date2 = day + "/" + month + "/" + date.getUTCFullYear() % 2000;
-                           date2 += " אחה\"צ";
-                       }
+                            date2 += " אחה\"צ";
+                        }
                         if (unassigned) {
-                            $("#activeCustomers").prop('checked', false);
+                           // $("#activeRidePats").prop('checked', false);
                             if (arr_rides[i].Status != "ממתינה לשיבוץ") continue;
                         }
 
@@ -236,7 +258,14 @@
                     //$('#datatable-buttons').DataTable();
                     t.columns([0]).order('asc').draw();
                     // t.createdRow();
-
+                    table1 = document.getElementById("datatable-buttons");//$('#datatable-buttons');
+                    tdarr = table1.getElementsByTagName("td");
+                    for (var j = 0; j < tdarr.length; j++) {
+                        //str = tdarr[j].innerHTML;
+                        if (tdarr[j].innerHTML.indexOf("08:00") !== -1) {
+                            tdarr[j].innerHTML = "אחהצ";
+                        }
+                    }
 
                     $('#datatable-buttons tbody').on('click', '#edit', function () {
                         //var data = t.row($(this).parents('tr')).data();
@@ -317,7 +346,7 @@
                     });
                     setTimeout(function () { refreshTable() }, 1001);
                 },
-                error: function (err) { alert("Error in deleteRidePat"); }
+                error: function (err) { alert("Error in deleteRidePat:" + err.responseText); }
             });
 
         }
@@ -461,19 +490,19 @@
                                 </div>-->
                                 <div class="row">
                                     <div class="col-sm-8 checkbox checkbox-primary text-left">
-                                        <input id="activeCustomers" type="checkbox" onchange="refreshTable()" checked>
-                                        <label for="activeCustomers">
+                                        <input id="activeRidePats" type="checkbox" onchange="saveFilters()">
+                                        <label for="activeRidePats">
                                             דרישות פעילות בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
                                         </label>
-                                        <input id="TodaysRidePats" type="checkbox" onchange="refreshTable()" checked="checked">
+                                        <input id="TodaysRidePats" type="checkbox" onchange="saveFilters()">
                                         <label for="TodaysRidePats">
                                             דרישות של היום בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
                                         </label>
-                                        <input id="UnassignedRidePats" type="checkbox" onchange="refreshTable()">
+                                        <input id="UnassignedRidePats" type="checkbox" onchange="saveFilters()">
                                         <label for="UnassignedRidePats">
                                             דרישות ממתינות לשיבוץ בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
                                         </label>
-                                        <input id="MyRidePats" type="checkbox" onchange="refreshTable()" checked="checked">
+                                        <input id="MyRidePats" type="checkbox" onchange="saveFilters()">
                                         <label for="MyRidePats">
                                             דרישות שלי בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
                                         </label>

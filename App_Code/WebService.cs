@@ -110,11 +110,11 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod]
-    public string getPatientEscorted(string displayName)
+    public string getPatientEscorted(string displayName, string caller)
     {
         JavaScriptSerializer j = new JavaScriptSerializer();
         Patient p = new Patient();
-        List<Escorted> escortedsList = p.getescortedsList(displayName);
+        List<Escorted> escortedsList = p.getescortedsList(displayName,caller);
         return j.Serialize(escortedsList);
     }
 
