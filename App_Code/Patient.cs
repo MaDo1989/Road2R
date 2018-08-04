@@ -619,12 +619,12 @@ public class Patient
     }
 
     //By Sufa & Matan --Get a list of all Escorts for Patient.
-    public List<Escorted> getescortedsList(string displayName)
+    public List<Escorted> getescortedsList(string displayName, string caller)
     {
         #region DB functions
         displayName = displayName.Replace("'", "''");
         string query = "select * from PatientEscortView where PatientName='" + displayName + "'";
-
+        if (caller == "ridePatForm") query += " and IsActive = 'True'";
         query += " order by EscortName";
 
         List<Escorted> list = new List<Escorted>();
