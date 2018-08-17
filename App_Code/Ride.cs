@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
 
@@ -119,6 +120,19 @@ public class Ride
         }
 
         return rides;
+    }
+
+    public int setStatus(int rideId, string status)
+    {
+        SqlCommand cmd = new SqlCommand();
+        cmd.CommandType = CommandType.Text;
+        SqlParameter[] cmdParams = new SqlParameter[3];
+        cmdParams[0] = cmd.Parameters.AddWithValue("@rideId", rideId);
+        cmdParams[1] = cmd.Parameters.AddWithValue("@status", status);
+        cmdParams[2] = cmd.Parameters.AddWithValue("@time", DateTime.Now);
+        string query = "insert into status_Ride (statusStatusName,RideRideNum,Timestamp) values (@status,@rideId,@time)";
+        DbService db = new DbService();
+        return db.ExecuteQuery(query, cmd.CommandType, cmdParams);
     }
 
     public List<Ride> GetRidesForNotify()
@@ -347,6 +361,7 @@ public class Ride
                         rp2.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
                         rp2.Pat = new Patient();
                         rp2.Pat.DisplayName = dr["DisplayName"].ToString();
+                        rp2.Pat.CellPhone = dr["CellPhone"].ToString();
                         rp2.Pat.Equipment = rp2.Pat.getEquipmentForPatient(rp2.Pat.DisplayName);
                         db = new DbService();
                         query = "select DisplayName from RidePatEscortView where RidePatNum=" + rp2.RidePatNum;
@@ -392,6 +407,7 @@ public class Ride
                 rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
                 rp.Pat = new Patient();
                 rp.Pat.DisplayName = dr["DisplayName"].ToString();
+                rp.Pat.CellPhone = dr["CellPhone"].ToString();
                 rp.Pat.Equipment = rp.Pat.getEquipmentForPatient(rp.Pat.DisplayName);
                 rp.Pat.EscortedList = new List<Escorted>();
                 db = new DbService();

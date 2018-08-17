@@ -42,7 +42,7 @@ public class WebService : System.Web.Services.WebService
 
 
     [WebMethod]
-    public int setVolunteerPrefs(int Id, List<string> PrefLocation, List<string> PrefArea,List<string> PrefTime,int AvailableSeats)
+    public int setVolunteerPrefs(int Id, List<string> PrefLocation, List<string> PrefArea, List<string> PrefTime, int AvailableSeats)
     {
         Volunteer v = new Volunteer();
         return v.setVolunteerPrefs(Id, PrefLocation, PrefArea, PrefTime, AvailableSeats);
@@ -61,15 +61,15 @@ public class WebService : System.Web.Services.WebService
     [WebMethod]
     public int setRidePat(RidePat RidePat, string func)
     {
-        //Dictionary<string, object> d = (Dictionary<string, object>)ridePat;
-        // d = (Dictionary<string, object>)ridePat;
-        // JavaScriptSerializer j = new JavaScriptSerializer();
-        // Object[] o = j.Deserialize<object[]>(ridePat);
         RidePat rp = new RidePat();
         return rp.setRidePat(RidePat, func);
-        // rp.setRidePat(d, func);
-        // return j.Serialize(rp);
+    }
 
+    [WebMethod]
+    public int setRideStatus(int rideId, string status)
+    {
+        Ride r = new Ride();
+      return r.setStatus(rideId, status);
     }
 
 
@@ -114,7 +114,7 @@ public class WebService : System.Web.Services.WebService
     {
         JavaScriptSerializer j = new JavaScriptSerializer();
         Patient p = new Patient();
-        List<Escorted> escortedsList = p.getescortedsList(displayName,caller);
+        List<Escorted> escortedsList = p.getescortedsList(displayName, caller);
         return j.Serialize(escortedsList);
     }
 
@@ -334,7 +334,7 @@ public class WebService : System.Web.Services.WebService
     public string getAllEquipment()
     {
         Patient p = new Patient();
-        List<string> el= p.getAllEquipment();
+        List<string> el = p.getAllEquipment();
         JavaScriptSerializer j = new JavaScriptSerializer();
         return j.Serialize(el);
     }
@@ -352,7 +352,7 @@ public class WebService : System.Web.Services.WebService
     public void setVolunteer(Volunteer volunteer, string func)
     {
         Volunteer v = volunteer;
-       v.setVolunteer(v,func);
+        v.setVolunteer(v, func);
 
     }
 
@@ -380,7 +380,7 @@ public class WebService : System.Web.Services.WebService
     {
         JavaScriptSerializer j = new JavaScriptSerializer();
         Volunteer v = new Volunteer();
-        
+
         List<string> types = v.getVolunteerTypes();
         return j.Serialize(types);
     }
@@ -419,7 +419,7 @@ public class WebService : System.Web.Services.WebService
     ///--------------------finish Road to Recovery----------------------------------------
 
     #region login functions
-    [WebMethod(EnableSession =true)]
+    [WebMethod(EnableSession = true)]
     public string loginUser(string uName, string password)
     {
         HttpContext.Current.Session["userSession"] = uName;
