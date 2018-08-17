@@ -786,7 +786,7 @@
                         </li>
                         <li>
                             <a href="viewRidePats.html" class="waves-effect waves-primary">
-                                <i class="md md-today"></i><span> ניהול הסעות</span>
+                                <i class="md md-today"></i><span> רישום הסעות</span>
                             </a>
                         </li>
 
@@ -1010,7 +1010,7 @@
                                                         <th>יישוב</th>
                                                         <th>סוג קרבה</th>
                                                         <th>מין</th>
-                                                        <th>אפשרויות</th>
+                                                        <th>פעולות</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody></tbody>
@@ -1210,25 +1210,25 @@
 
 
             if (!CityExists) {
-                alert("עליכם לבחור יישוב מתוך הרשימה");
+                alert("יש לבחור יישוב מתוך הרשימה");
             }
 
             var barrier = $("#barrier").val();
             if (barrier == "") {
                 barrier = false
-                alert("עליכם לבחור מחסום מתוך הרשימה");
+                alert("יש לבחור מחסום מתוך הרשימה");
             }
 
             var hospital = $("#hospital").val();
             if (hospital == "") {
                 hospital = false
-                alert("עליכם לבחור בית חולים מתוך הרשימה");
+                alert("יש לבחור בית חולים מתוך הרשימה");
             }
 
             var gender = $("#gender").val();
             if (gender == "בחר") {
                 gender = false
-                alert("עליכם לבחור מין מתוך הרשימה");
+                alert("יש לבחור מין מתוך הרשימה");
             }
 
 

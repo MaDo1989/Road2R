@@ -581,7 +581,7 @@
                         </li>
                         <li>
                             <a href="viewRidePats.html" class="waves-effect waves-primary">
-                                <i class="md md-today"></i><span> ניהול הסעות</span>
+                                <i class="md md-today"></i><span>רישום הסעות</span>
                             </a>
                         </li>
                     </ul>
@@ -618,8 +618,8 @@
                                 <div class="card-box">
                                     <div class="row">
                                         <h4 class="m-t-0 header-title"><b>טופס מתנדב</b></h4>
-                                        <p class="text-muted font-13 m-b-30">
-                                            יצירת, צפייה ועריכת מתנדב. לחץ על כפתור חזור בכדי לצפות בכל הלקוחות.
+                                        <!--<p class="text-muted font-13 m-b-30">
+                                            יצירת, צפייה ועריכת מתנדב. לחץ על כפתור חזור בכדי לצפות בכל הלקוחות.-->
                                             <br />
 
                                             <div class="col-md-6 checkbox checkbox-primary text-left">
@@ -980,19 +980,19 @@
 
 
             if (!CityExists) {
-                alert("עליכם לבחור יישוב מתוך הרשימה");
+                alert("יש לבחור יישוב מתוך הרשימה");
             }
 
             var volType = $("#typeVolunteer").val();
             if (volType == "בחר") {
                 volType = false
-                alert("עליכם לבחור סוג משתמש מתוך הרשימה");
+                alert("יש לבחור סוג משתמש מתוך הרשימה");
             }
 
             var gender = $("#gender").val();
             if (gender == "בחר") {
                 gender = false
-                alert("עליכם לבחור מין מתוך הרשימה");
+                alert("יש לבחור מין מתוך הרשימה");
             }
 
             var jDate = $("#joinDate").val();
