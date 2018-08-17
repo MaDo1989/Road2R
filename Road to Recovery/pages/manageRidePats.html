@@ -8,7 +8,7 @@
 
     <link rel="shortcut icon" href="assets/images/favicon_1.ico">
 
-    <title>הסעות חולים</title>
+    <title>ניהול הסעות</title>
 
     <!-- DataTables -->
     <link href="../plugins/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
@@ -59,10 +59,10 @@
           //  document.getElementById("Numbers").checked = localStorage.numbers === 'true';
 
 
-            document.getElementById("activeRidePats").checked = localStorage.active === 'true';
-            document.getElementById("TodaysRidePats").checked = localStorage.today === 'true';
-            document.getElementById("UnassignedRidePats").checked = localStorage.unassigned === 'true';
-            document.getElementById("MyRidePats").checked = localStorage.myRidePats === 'true';
+            //document.getElementById("activeRidePats").checked = localStorage.active === 'true';
+            //document.getElementById("TodaysRidePats").checked = localStorage.today === 'true';
+            //document.getElementById("UnassignedRidePats").checked = localStorage.unassigned === 'true';
+            //document.getElementById("MyRidePats").checked = localStorage.myRidePats === 'true';
             //$("#activeRidePats").prop('checked', localStorage.active);
             //$("#TodaysRidePats").prop('checked', localStorage.today);
             //$("#UnassignedRidePats").prop('checked', localStorage.unassigned);
@@ -150,9 +150,8 @@
                 success: function (data) {
                     var arr_rides = JSON.parse(data.d);
                     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
-
                     for (i in arr_rides) {
-
+                        if (arr_rides[i].Coordinator.DisplayName != currentCoor) continue; //let the function run only for logged coordinator 
                         //Change date format
                         var temp = arr_rides[i].Date.substring(arr_rides[i].Date.indexOf("(") + 1);
                         temp = temp.substring(0, temp.indexOf(")"));
@@ -254,11 +253,9 @@
                             t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, drivers, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
                         }
                     }
-                    //$.fn.dataTable.moment('DD/MM/YYYY HH:MM');
-                    //$('#datatable-buttons').DataTable();
+                   
                     t.columns([0]).order('asc').draw();
-                    // t.createdRow();
-                    table1 = document.getElementById("datatable-buttons");//$('#datatable-buttons');
+                    table1 = document.getElementById("datatable-buttons");
                     tdarr = table1.getElementsByTagName("td");
                     for (var j = 0; j < tdarr.length; j++) {
                         //str = tdarr[j].innerHTML;
@@ -459,37 +456,17 @@
                             <div class="page-title-box">
                                 <ol class="breadcrumb pull-right">
 
-                                    <li class="active">רישום הסעות חולים</li>
+                                    <li class="active">ניהול הסעות חולים</li>
                                 </ol>
-                                <h4 class="page-title">רישום הסעות חולים&nbsp&nbsp<i class="md md-recent-actors"></i></h4>
+                                <h4 class="page-title">ניהול הסעות חולים&nbsp&nbsp<i class="md md-recent-actors"></i></h4>
                             </div>
                         </div>
                     </div>
-
-
-
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="card-box table-responsive">
-
-                                <!--<div class="row">
-                                    <div class="col-sm-8">
-                                        <h4 class="m-t-0 header-title"><b>טבלת הסעות חולים</b></h4>
-                                        <p class="text-muted font-13 m-b-30">
-                                            מבט כללי על ההסעות חולים שבוצעו, ניתן לצפות בפרטים נוספים בלחיצה על כפתור ההרחבה.
-                                        </p>
-                                    </div>
-                                    <div class="col-sm-5 text-right">
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button> צפייה
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button> עריכה
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button> מחיקה
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo'></i></button> שחזור
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-default btn-sm m-b-5' id='reactive' title='הסעה בוצעה'><i class='fa fa-check'></i></button> בוצעה
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-info btn-sm m-b-5' id='reactive' title='משובצת'><i class='fa fa-check'></i></button>משובצת
-                                    </div>
-                                </div>-->
                                 <div class="row">
-                                    <div class="col-sm-8 checkbox checkbox-primary text-left">
+                                    <!--<div class="col-sm-8 checkbox checkbox-primary text-left">
                                         <input id="activeRidePats" type="checkbox" onchange="saveFilters()">
                                         <label for="activeRidePats">
                                             דרישות פעילות בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
@@ -506,35 +483,63 @@
                                         <label for="MyRidePats">
                                             דרישות שלי בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
                                         </label>
-                                    </div>
+                                    </div>-->
 
                                     <div class="col-sm-4 text-right ">
                                         <button type="button" id="createCustomer" onclick="newRidePatForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>חדש</button>
                                     </div>
                                 </div>
-                                <table id="datatable-buttons" class="table table-striped table-bordered">
+                                <h4>נסיעות לבוקר</h4>
+                                <table id="datatable-morning" class="table table-striped table-bordered">
                                     <thead>
                                         <tr>
-                                            <!--<th>מספר הסעה</th>-->
-                                            <th>החולה</th>
+                                            <th>תאריך</th>
+                                            <th>שעה</th>
                                             <th>מוצא</th>
                                             <th>יעד</th>
-                                            <th>תאריך ושעה</th>
-                                            <th>נהגים בנסיעה</th>
-                                            <th>רכז</th>
+                                            <th>החולה</th>
+                                            <th>המסיע</th>                                            
+                                            <th>סטטוס ההסעה</th>
                                             <th>פעולות</th>
                                         </tr>
-
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                                <h4>נסיעות לאחה"צ</h4>
+                                <table id="datatable-afternoon" class="table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>תאריך</th>
+                                            <th>שעה</th>
+                                            <th>מוצא</th>
+                                            <th>יעד</th>
+                                            <th>החולה</th>
+                                            <th>המסיע</th>
+                                            <th>סטטוס ההסעה</th>
+                                            <th>פעולות</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                                <h4>נסיעות עתידיות</h4>
+                                <table id="datatable-future" class="table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>תאריך</th>
+                                            <th>שעה</th>
+                                            <th>מוצא</th>
+                                            <th>יעד</th>
+                                            <th>החולה</th>
+                                            <th>המסיע</th>
+                                            <th>סטטוס ההסעה</th>
+                                            <th>פעולות</th>
+                                        </tr>
                                     </thead>
                                     <tbody></tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
-
-
-
-
                 </div>
                 <!-- end container -->
 
