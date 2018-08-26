@@ -177,14 +177,15 @@
 
                         //date2 = date.getDate() + "/" + date.getMonth() + 1 + "/" + date.getUTCFullYear() % 2000 + " " + date.getHours() + ":" + minutes;
                         date2 = date.toLocaleDateString();                       
-                        if (date.getHours() == 22 && date.getMinutes() == 14) { //22:14 is the default time to show afternoon אחה''צ
-                         //   date2 = day + "/" + month + "/" + date.getUTCFullYear() % 2000;
-                            date2 += " אחה\"צ";
-                        }
+                        //if (date.getHours() == 22 && date.getMinutes() == 14) { //22:14 is the default time to show afternoon אחה''צ
+                        // //   date2 = day + "/" + month + "/" + date.getUTCFullYear() % 2000;
+                        //    date2 += " אחה\"צ";
+                        //}
 
-                        hours = date.toLocaleTimeString();;
-                        hours = hours.substring(0, hours.length - 4)
-                        if (hours == "22:14") hours= "אחה''צ";
+                        hours = date.getHours();
+                        //hours = hours.substring(0, hours.length - 4)
+                        time = hours + ":" + minutes;
+                        if (hours == "22" && minutes == "14") time= "אחה''צ";
                         //if (unassigned) {
                         //    // $("#activeRidePats").prop('checked', false);
                         //    if (arr_rides[i].Status != "ממתינה לשיבוץ") continue;
@@ -215,7 +216,7 @@
                             if (date.getHours() < splitHour) //morning rides
                             {
                                 if (arr_rides[i].Status == "ממתינה לשיבוץ")
-                                    tMorning.row.add([hours, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "!אין", arr_rides[i].Status, btnStr])
+                                    tMorning.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "!אין", arr_rides[i].Status, btnStr])
                                 //tFuture.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, arr_rides[i].Status, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
                                 else {
                                     ///שעה מוצא יעד חולה מסיע סטטוס בטן
@@ -227,14 +228,14 @@
                                         var drivers = "ראשי: " + primary;
                                     if (arr_rides[i].Drivers.length == 2)
                                         var drivers = "ראשי: " + primary + ", " + "גיבוי: " + secondary;
-                                    tMorning.row.add([hours, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr])
+                                    tMorning.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr])
                                     //tFuture.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, drivers, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
                                 }
                             }
                             else //afternoon rides
                             {
                                 if (arr_rides[i].Status == "ממתינה לשיבוץ")
-                                    tAfternoon.row.add([hours, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "!אין", arr_rides[i].Status, btnStr])
+                                    tAfternoon.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "!אין", arr_rides[i].Status, btnStr])
                                 //tFuture.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, arr_rides[i].Status, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
                                 else {
                                     ///שעה מוצא יעד חולה מסיע סטטוס בטן
@@ -246,7 +247,7 @@
                                         var drivers = "ראשי: " + primary;
                                     if (arr_rides[i].Drivers.length == 2)
                                         var drivers = "ראשי: " + primary + ", " + "גיבוי: " + secondary;
-                                    tAfternoon.row.add([hours, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr])
+                                    tAfternoon.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr])
                                     //tFuture.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, drivers, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
                                 }
                             }
@@ -254,7 +255,7 @@
                         else //futrue rides
                         {
                             if (arr_rides[i].Status == "ממתינה לשיבוץ")
-                                tFuture.row.add([date2,hours, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "!אין", arr_rides[i].Status,btnStr])
+                                tFuture.row.add([date2,time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "!אין", arr_rides[i].Status,btnStr])
                                 //tFuture.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, arr_rides[i].Status, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
                             else {
                                 ///שעה מוצא יעד חולה מסיע סטטוס בטן
@@ -266,7 +267,7 @@
                                     var drivers = "ראשי: " + primary;
                                 if (arr_rides[i].Drivers.length == 2)
                                     var drivers = "ראשי: " + primary + ", " + "גיבוי: " + secondary;
-                                tFuture.row.add([date2,hours, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr])
+                                tFuture.row.add([date2,time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr])
                                 //tFuture.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, drivers, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
                             }
                         }
