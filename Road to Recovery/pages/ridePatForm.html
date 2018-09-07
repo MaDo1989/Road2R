@@ -385,7 +385,7 @@
         }
 
         function getCoorErrorCB(e) {
-            alert("Error in getCoor: "+e.responseText);
+            alert("Error in getCoor: " + e.responseText);
         }
 
 
@@ -441,7 +441,7 @@
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
                 async: false,
-                data: JSON.stringify({ displayName: displayName, caller:"ridePatForm" }),
+                data: JSON.stringify({ displayName: displayName, caller: "ridePatForm" }),
                 success: generateEscSuccessCB,
                 error: generateEscErrorCB
             });
@@ -833,16 +833,16 @@
                     timeMatch = false;
                 }
             }
-            
 
 
-           // if ($("#onlyEscort").is(':checked')) {
-                var atLeastOneIsChecked = 0;
-                $('#selectEscort input:checked').each(function () {
-                    atLeastOneIsChecked++;
-                });
-                if (atLeastOneIsChecked == 0) alert("יש לבחור לפחות מלווה אחד");
-          //  }
+
+            // if ($("#onlyEscort").is(':checked')) {
+            var atLeastOneIsChecked = 0;
+            $('#selectEscort input:checked').each(function () {
+                atLeastOneIsChecked++;
+            });
+            if (atLeastOneIsChecked == 0) alert("יש לבחור לפחות מלווה אחד");
+            //  }
 
             if (!patientExists || !Origin || !Dest || !dateMatch || !timeMatch || atLeastOneIsChecked == 0) {
                 return false;
@@ -862,13 +862,13 @@
             }
 
             try {
-                $("#Origin option[value ='" + arr_pat[i].Barrier.Name + "']").prop('selected', true);
-                $("#Destination option[value ='" + arr_pat[i].Hospital.Name + "']").prop('selected', true);
+                $("#Origin option[value ='" + arr_pat[i].Barrier.Name.replace("'", "\\'") + "']").prop('selected', true);
+                $("#Destination option[value ='" + arr_pat[i].Hospital.Name.replace("'", "\\'") + "']").prop('selected', true);
                 getEquipmentForPatient();
                 generateEsc();
                 $("#patArabic").val(arr_arabNames[i]);
             } catch (e) {
-
+                alert(e.responseText);
             }
 
         }
@@ -1353,12 +1353,12 @@
                                 </div>
                             </div>
 
-                                <div>
-                                    <hr />
-                                    <div class="text-right m-t-30 row">
-                                        <button type="submit" id="saveCustomer" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-save m-r-5"></i>שמור</button>
-                                    </div>
+                            <div>
+                                <hr />
+                                <div class="text-right m-t-30 row">
+                                    <button type="submit" id="saveCustomer" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-save m-r-5"></i>שמור</button>
                                 </div>
+                            </div>
                         </form>
                     </div>
 
