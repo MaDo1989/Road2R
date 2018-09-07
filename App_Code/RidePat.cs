@@ -431,14 +431,15 @@ public class RidePat
 
 
     //This method is used for שבץ אותי
-    public List<RidePat> GetRidePatView(int volunteerId)//In case of coordinator will send -1 as ID.
+    public List<RidePat> GetRidePatView(int volunteerId)//In case of coordinator will send -1 as ID to receive all RidePats.
     {
         List<Escorted> el = new List<Escorted>();
         string query = "";
         if (volunteerId != -1)
-            query = "select * from RPView where (Status='שובץ נהג' or Status='ממתינה לשיבוץ')";
+           
+            query = "select * from RPView where (Status<>'הסתיימה' or Status<>'בוטלה')"; //Get all active RidePats
         else
-            query = "select * from RPView where PickupTime>= getdate()";
+            query = "select * from RPView where PickupTime>= getdate()"; // Get all future RidePats, even if cancelled
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         // Ride ride = new Ride();
@@ -545,8 +546,14 @@ public class RidePat
                 rp.Shift = dr["Shift"].ToString();
                 rp.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
                 rp.Status = dr["Status"].ToString();
+                if (rp.RideNum>0) // if RidePat is assigned to a Ride - Take the Ride's status
+                {
+                    query = "select top 1 statusStatusName from status_Ride where RideRideNum="+rp.RideNum + "order by Timestamp desc";
+                    db = new DbService();
+                    rp.Status = db.GetObjectScalarByQuery(query).ToString();
+                }
                 rpl.Add(rp);
-                //ride.Status = dr["statusRide"].ToString();
+                
             }
 
             return rpl;

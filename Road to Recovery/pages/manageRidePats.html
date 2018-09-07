@@ -149,7 +149,7 @@
                     var arr_rides = JSON.parse(data.d);
                     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
                     for (i in arr_rides) {
-                        if (arr_rides[i].Coordinator.DisplayName != currentCoor) continue; //let the function run only for logged coordinator 
+                        if (arr_rides[i].Coordinator.DisplayName != currentCoor) continue; //let the function run only for logged-in coordinator 
 
                         //Change date format
                         var temp = arr_rides[i].Date.substring(arr_rides[i].Date.indexOf("(") + 1);
@@ -408,7 +408,7 @@
                     });
 
                 },
-                error: function (err) { alert("Error in GetRidePatView"); }
+                error: function (err) { alert("Error in GetRidePatView: " + err.responseText); }
             });
         }
 
