@@ -541,7 +541,7 @@ public class Patient
         DbService db;
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
-        SqlParameter[] cmdParams = new SqlParameter[16];
+        SqlParameter[] cmdParams = new SqlParameter[15];
         cmdParams[0] = cmd.Parameters.AddWithValue("@firstNameH", FirstNameH);
         cmdParams[1] = cmd.Parameters.AddWithValue("@lastNameH", LastNameH);
         cmdParams[2] = cmd.Parameters.AddWithValue("@firstNameA", FirstNameA);
@@ -551,18 +551,18 @@ public class Patient
         cmdParams[6] = cmd.Parameters.AddWithValue("@homePhone", HomePhone);
         cmdParams[7] = cmd.Parameters.AddWithValue("@city", City);
         cmdParams[8] = cmd.Parameters.AddWithValue("@IsActive", IsActive);
-        cmdParams[9] = cmd.Parameters.AddWithValue("@birthDate", BirthDate);
-        cmdParams[10] = cmd.Parameters.AddWithValue("@history", History);
-        cmdParams[11] = cmd.Parameters.AddWithValue("@department", Department);
-        cmdParams[12] = cmd.Parameters.AddWithValue("@barrier", Barrier.Name);
-        cmdParams[13] = cmd.Parameters.AddWithValue("@hospital", Hospital.Name);
-        cmdParams[14] = cmd.Parameters.AddWithValue("@gender", Gender);
-        cmdParams[15] = cmd.Parameters.AddWithValue("@remarks", Remarks);
+      //  cmdParams[9] = cmd.Parameters.AddWithValue("@birthDate", BirthDate);
+        cmdParams[9] = cmd.Parameters.AddWithValue("@history", History);
+        cmdParams[10] = cmd.Parameters.AddWithValue("@department", Department);
+        cmdParams[11] = cmd.Parameters.AddWithValue("@barrier", Barrier.Name);
+        cmdParams[12] = cmd.Parameters.AddWithValue("@hospital", Hospital.Name);
+        cmdParams[13] = cmd.Parameters.AddWithValue("@gender", Gender);
+        cmdParams[14] = cmd.Parameters.AddWithValue("@remarks", Remarks);
         string query = "";
         if (func == "edit")
         {
             query = "UPDATE Patient SET FirstNameH=@firstNameH,FirstNameA=@firstNameA,LastNameH=@lastNameH,";
-            query += "CellPhone =@cellPhone,CellPhone2=@cellPhone2,HomePhone=@homePhone,CityCityName=@city,IsActive=@IsActive,BirthDate=@birthDate,";
+            query += "CellPhone =@cellPhone,CellPhone2=@cellPhone2,HomePhone=@homePhone,CityCityName=@city,IsActive=@IsActive,";//BirthDate=@birthDate,";
             query += "History=@history,Department=@department,Barrier=@barrier,Hospital=@hospital,Gender=@gender,Remarks=@remarks Where Id=" + Id;
             db = new DbService();
             res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
@@ -591,9 +591,9 @@ public class Patient
         else if (func == "new")
         {
             query = "insert into Patient (FirstNameH,FirstNameA,LastNameH,LastNameA,CellPhone,CellPhone2,";
-            query += "HomePhone,CityCityName,IsActive,BirthDate,History,Department,Barrier,Hospital,Gender,Remarks)";
+            query += "HomePhone,CityCityName,IsActive,History,Department,Barrier,Hospital,Gender,Remarks)"; //BirthDate
             query += " values (@firstNameH,@firstNameA,@lastNameH,@lastNameA,";
-            query += "@cellPhone,@cellPhone2,@homePhone,@city,@IsActive,@birthDate,";
+            query += "@cellPhone,@cellPhone2,@homePhone,@city,@IsActive,"; //,@birthDate
             query += "@history,@department,@barrier,@hospital,@gender,@remarks); select SCOPE_IDENTITY()";
             db = new DbService();
             Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
