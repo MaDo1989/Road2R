@@ -319,7 +319,15 @@ public class RidePat
         }
         else if (func == "delete")
         {
+           
+
             RidePatNum = ridePat.RidePatNum;
+            Ride r = new Ride();
+            RidePat rp = GetRidePat(ridePatNum);
+
+           // rp.RideNum
+            Message m = new Message();
+          //  m.cancelRide(ridePatNum, dr);
             db = new DbService();
             string query = "delete from [PatientEscort_PatientInRide (RidePat)] where [PatientInRide (RidePat)RidePatNum]=" + RidePatNum;
             int res = db.ExecuteQuery(query);
@@ -327,6 +335,9 @@ public class RidePat
             db = new DbService();
             query = "delete from RidePat where RidePatNum=" + RidePatNum;
             res += db.ExecuteQuery(query);
+
+              
+            
 
             return res;
 
