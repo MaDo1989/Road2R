@@ -59,7 +59,7 @@ public class Volunteer
 
     public string UserName { get; set; }
 
-    public string pnRegId { get; set; }
+    public string RegId { get; set; }
 
     public string DriverType { get; set; } //Primary or Secondary
 

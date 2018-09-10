@@ -29,6 +29,8 @@ public class Ride
 
     public string Status { get; set; }
 
+    public string DriverType { get; set; }
+
     public List<Ride> GetRidesForNotifyfull()
     {
         string query = "select * from RideViewForNotify where statusRide='שובץ נהג' or statusRide='מלאה'";
@@ -155,13 +157,13 @@ public class Ride
         v.DisplayName = "אסף סלוק";
         v.CellPhone = "052-1111111";
         v.DriverType = "ראשי";
-        v.pnRegId = "aaaaa";
+        v.RegId = "aaaaa";
         r1.Drivers.Add(v);
         Volunteer v2 = new Volunteer();
         v2.DisplayName = "מתן דורון";
         v2.CellPhone = "052-2222222";
         v2.DriverType = "גיבוי";
-        v2.pnRegId = "mmmmm";
+        v2.RegId = "mmmmm";
         r1.Drivers.Add(v2);
 
 
@@ -177,7 +179,7 @@ public class Ride
         rp.Coordinator = new Volunteer();
         rp.Coordinator.DisplayName = "בני בורנפלד";
         rp.Coordinator.CellPhone = "050-0000000";
-        rp.Coordinator.pnRegId = "bbbbb";
+        rp.Coordinator.RegId = "bbbbb";
 
         //Patient
         rp.Pat = new Patient();
@@ -216,13 +218,13 @@ public class Ride
         vv.DisplayName = "מסי";
         vv.CellPhone = "052-3333333";
         vv.DriverType = "ראשי";
-        vv.pnRegId = "lllll";
+        vv.RegId = "lllll";
         r2.Drivers.Add(vv);
         Volunteer vv2 = new Volunteer();
         vv2.DisplayName = "רונאלדו";
         vv2.CellPhone = "052-4444444";
         vv2.DriverType = "גיבוי";
-        vv2.pnRegId = "cr7";
+        vv2.RegId = "cr7";
         r2.Drivers.Add(vv2);
 
 
@@ -238,7 +240,7 @@ public class Ride
         rp1.Coordinator = new Volunteer();
         rp1.Coordinator.DisplayName = "בני בורנפלד";
         rp1.Coordinator.CellPhone = "050-0000000";
-        rp1.Coordinator.pnRegId = "bbbbb";
+        rp1.Coordinator.RegId = "bbbbb";
 
         //Patient
         rp1.Pat = new Patient();
@@ -279,7 +281,7 @@ public class Ride
         rp2.Coordinator = new Volunteer();
         rp2.Coordinator.DisplayName = "בני בורנפלד";
         rp2.Coordinator.CellPhone = "050-0000000";
-        rp2.Coordinator.pnRegId = "bbbbb";
+        rp2.Coordinator.RegId = "bbbbb";
 
         //Patient
         rp2.Pat = new Patient();
@@ -389,19 +391,23 @@ public class Ride
                         ride.RidePats.Add(rp2);
                     }
                 }
+
                 if (RideExists) continue;
                 Ride r2 = new Ride();
+
                 if (dr["Maindriver"].ToString() == volunteerId.ToString())
                 {
-                    r2.Status = "Primary";
+                    r2.DriverType = "Primary";
                 }
                 else
                 {
-                    r2.Status = "Secondary";
+                    r2.DriverType = "Secondary";
                 }
 
                 r2.Id = int.Parse(dr["RideNum"].ToString());
-                // r2.Status = dr["RidePatStatus"].ToString();
+                query = "select top 1 statusStatusName from status_Ride where RideRideNum=" + r2.Id + "order by Timestamp desc";
+                db = new DbService();
+                r2.Status = db.GetObjectScalarByQuery(query).ToString();
                 RidePat rp = new RidePat();
                 r2.RidePats = new List<RidePat>();
                 rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());

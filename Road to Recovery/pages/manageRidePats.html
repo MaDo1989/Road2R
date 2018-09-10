@@ -389,7 +389,7 @@
 
                     $('#datatable-future tbody').on('click', '#remove', function () {
                         arr_details = { RidePatNum: this.name, func: "show" };//attribute name=RidePatNum
-                        var data = t.row($(this).parents('tr')).data();
+                        var data = tFuture.row($(this).parents('tr')).data();
                         swal({
                             title: "האם אתם בטוחים?",
                             type: "warning",
