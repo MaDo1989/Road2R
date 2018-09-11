@@ -788,7 +788,7 @@ public class Volunteer
             v.KnowsArabic = Convert.ToBoolean(dr["KnowsArabic"].ToString());
            // v.BirthDate = Convert.ToDateTime(dr["BirthDate"].ToString());
             v.Gender = dr["Gender"].ToString();
-
+            v.RegId = dr["pnRegId"].ToString();
 
             list.Add(v);
         }
