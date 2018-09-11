@@ -320,13 +320,16 @@ public class RidePat
         else if (func == "delete")
         {
            
-
+            
             RidePatNum = ridePat.RidePatNum;
             Ride r = new Ride();
             RidePat rp = GetRidePat(ridePatNum);
-
-           // rp.RideNum
-            Message m = new Message();
+            foreach (Volunteer driver in rp.Drivers)
+            {
+Message m = new Message();
+                m.cancelRide(RidePatNum, driver);
+            }
+            
           //  m.cancelRide(ridePatNum, dr);
             db = new DbService();
             string query = "delete from [PatientEscort_PatientInRide (RidePat)] where [PatientInRide (RidePat)RidePatNum]=" + RidePatNum;
@@ -399,6 +402,19 @@ public class RidePat
         rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
         rp.OnlyEscort = Convert.ToBoolean(dr["OnlyEscort"].ToString());
         rp.pat.DisplayName = dr["DisplayName"].ToString();
+        if (dr["MainDriver"].ToString() != "" )
+        {
+            rp.Drivers = new List<Volunteer>();
+            Volunteer v1 = new Volunteer();
+            v1.Id = int.Parse(dr["MainDriver"].ToString());
+            rp.Drivers.Add(v1);
+            if (dr["secondaryDriver"].ToString() != "")
+            {
+                Volunteer v2 = new Volunteer();
+                v2.Id = int.Parse(dr["secondaryDriver"].ToString());
+                rp.Drivers.Add(v2);
+            }
+        }
         //rp.pat.EscortedList = new List<Escorted>();
         rp.Escorts = new List<Escorted>();
         Location origin = new Location();

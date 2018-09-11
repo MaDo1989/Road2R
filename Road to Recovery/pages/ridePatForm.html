@@ -1046,6 +1046,7 @@
                         }
                     } else ($("#selectEscort").html("<label>אין מלווים</label>"));
 
+                    ridePat.Origin.Name = ridePat.Origin.Name.replace("'", "\\'");
                     $("#selectOrigin option[value='" + ridePat.Origin.Name + "']").prop('selected', true);
                     ridePat.Destination.Name = ridePat.Destination.Name.replace("'", "\\'");
                     $("#selectDestination option[value='" + ridePat.Destination.Name + "']").prop('selected', true);
