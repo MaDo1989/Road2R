@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿ <!DOCTYPE html>
 <html lang="en" dir="rtl">
 <head>
     <meta charset="utf-8">
@@ -58,11 +58,6 @@
 
           //  document.getElementById("Numbers").checked = localStorage.numbers === 'true';
 
-
-            document.getElementById("activeRidePats").checked = localStorage.active === 'true';
-            document.getElementById("TodaysRidePats").checked = localStorage.today === 'true';
-            document.getElementById("UnassignedRidePats").checked = localStorage.unassigned === 'true';
-            document.getElementById("MyRidePats").checked = localStorage.myRidePats === 'true';
             //$("#activeRidePats").prop('checked', localStorage.active);
             //$("#TodaysRidePats").prop('checked', localStorage.today);
             //$("#UnassignedRidePats").prop('checked', localStorage.unassigned);
@@ -132,10 +127,10 @@
 
         function refreshTable() {
             checkCookie();
-            var active = localStorage.active;//$("#activeRidePats").prop('checked');
-            var today = localStorage.today;//$("#TodaysRidePats").prop('checked');
-            var unassigned = localStorage.unassigned;//$("#UnassignedRidePats").prop('checked');
-            var myRidePats = localStorage.myRidePats;//$("#MyRidePats").prop('checked');
+            var active = JSON.parse(localStorage.active);//$("#activeRidePats").prop('checked');
+            var today = JSON.parse(localStorage.today);//$("#TodaysRidePats").prop('checked');
+            var unassigned = JSON.parse(localStorage.unassigned);//$("#UnassignedRidePats").prop('checked');
+            var myRidePats = JSON.parse(localStorage.myRidePats);//$("#MyRidePats").prop('checked');
 
             t.clear().draw();
 
@@ -258,14 +253,7 @@
                     //$('#datatable-buttons').DataTable();
                     t.columns([0]).order('asc').draw();
                     // t.createdRow();
-                    table1 = document.getElementById("datatable-buttons");//$('#datatable-buttons');
-                    tdarr = table1.getElementsByTagName("td");
-                    for (var j = 0; j < tdarr.length; j++) {
-                        //str = tdarr[j].innerHTML;
-                        if (tdarr[j].innerHTML.indexOf("08:00") !== -1) {
-                            tdarr[j].innerHTML = "אחהצ";
-                        }
-                    }
+                    
 
                     $('#datatable-buttons tbody').on('click', '#edit', function () {
                         //var data = t.row($(this).parents('tr')).data();
@@ -327,6 +315,18 @@
                 },
                 error: function (err) { alert("Error in GetRidePatView"); }
             });
+        }
+
+        function manipulateTable()
+        {
+            table1 = document.getElementById("datatable-buttons");//$('#datatable-buttons');
+            tdarr = table1.getElementsByTagName("td");
+            for (var j = 0; j < tdarr.length; j++) {
+                //str = tdarr[j].innerHTML;
+                if (tdarr[j].innerHTML.indexOf("08:00") !== -1) {
+                    tdarr[j].innerHTML = "אחהצ";
+                }
+            }
         }
 
         function deleteRidePat(RidePat, func) {
@@ -432,13 +432,13 @@
                         </li>
                         <li>
                             <a href="viewRidePats.html" class="waves-effect waves-primary">
-                                <i class="md md-today"></i><span> רישום הסעות</span>
+                                <i class="md md-today"></i><span> כל ההסעות</span>
                             </a>
                         </li>
 
                         <li>
                             <a href="manageRidePats.html" class="waves-effect waves-primary">
-                                <i class="md md-today"></i><span> ניהול הסעות</span>
+                                <i class="md md-today"></i><span> ניהול ההסעות שלי</span>
                             </a>
                         </li>
 
@@ -465,9 +465,9 @@
                             <div class="page-title-box">
                                 <ol class="breadcrumb pull-right">
 
-                                    <li class="active">רישום הסעות חולים</li>
+                                    <li class="active">כל ההסעות</li>
                                 </ol>
-                                <h4 class="page-title">רישום הסעות חולים&nbsp&nbsp<i class="md md-recent-actors"></i></h4>
+                                <h4 class="page-title">כל הסעות&nbsp&nbsp<i class="md md-recent-actors"></i></h4>
                             </div>
                         </div>
                     </div>
