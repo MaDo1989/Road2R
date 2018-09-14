@@ -32,6 +32,7 @@ public class RidePat
     string area;
     string shift;
 
+
     public bool OnlyEscort { get; set; }
 
     public List<Escorted> Escorts { get; set; }
@@ -41,6 +42,8 @@ public class RidePat
     public List<Volunteer> Drivers { get; set; }
 
     public string Shift { get; set; }
+
+    public List<string> Statuses { get; set; }
 
     public int RidePatNum
     {
@@ -509,10 +512,12 @@ public class RidePat
                 else if (dr["MainDriver"].ToString() != "" && dr["secondaryDriver"].ToString() == "")
                 {
                     numOfDrivers = 1;
-                    if (int.Parse(dr["MainDriver"].ToString()) == volunteerId)
-                        continue;
+
                 }
                 else numOfDrivers = 2;
+
+                if ((dr["MainDriver"].ToString() != "" && int.Parse(dr["MainDriver"].ToString()) == volunteerId) || (dr["secondaryDriver"].ToString() != "" && int.Parse(dr["secondaryDriver"].ToString()) == volunteerId))
+                    continue;
 
                 RidePat rp = new RidePat();
                 rp.Coordinator = new Volunteer();
@@ -577,9 +582,15 @@ public class RidePat
                 rp.Status = dr["Status"].ToString();
                 if (rp.RideNum > 0) // if RidePat is assigned to a Ride - Take the Ride's status
                 {
-                    query = "select top 1 statusStatusName from status_Ride where RideRideNum=" + rp.RideNum + "order by Timestamp desc";
+                    query = "select statusStatusName from status_Ride where RideRideNum=" + rp.RideNum + " order by Timestamp desc";
                     db = new DbService();
-                    rp.Status = db.GetObjectScalarByQuery(query).ToString();
+                    rp.Statuses = new List<string>();
+                    foreach (DataRow status in db.GetDataSetByQuery(query).Tables[0].Rows)
+                    {
+                        rp.Statuses.Add(status.ItemArray[0].ToString());
+                    }
+                    rp.Status = rp.Statuses[0];
+
                 }
                 rpl.Add(rp);
 

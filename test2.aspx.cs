@@ -14,8 +14,8 @@ public partial class test2 : System.Web.UI.Page
     {
         try
         {
-
-            Log.Error("this is a new error message");
+            string user = (string)HttpContext.Current.Session["userSession"];
+            Log.Error("this is a new error message, user: "+user);
 
         }
         catch (Exception ex)
