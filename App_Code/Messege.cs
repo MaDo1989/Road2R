@@ -76,7 +76,7 @@ public class Message
         RidePat rp = new RidePat();
         var abc = rp.GetRidePat(ridePatID);
         var msg = "בוטלה נסיעה מ" + abc.Origin.Name + " ל" + abc.Destination.Name + " בתאריך " + abc.Date.ToShortDateString() + ", בשעה " + abc.Date.ToShortTimeString();
-
+        if (abc.Date.ToShortTimeString() == "22:14") msg = "בוטלה נסיעה מ" + abc.Origin.Name + " ל" + abc.Destination.Name + " בתאריך " + abc.Date.ToShortDateString() + "אחה\"צ";
         //insert msg to db
         int msgID = insertMsg(0, "Cancel", "נסיעה בוטלה", msg, ridePatID, DateTime.Now, user.Id, "", true, false, false);
 

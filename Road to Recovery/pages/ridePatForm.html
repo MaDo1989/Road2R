@@ -836,13 +836,13 @@
 
 
 
-            // if ($("#onlyEscort").is(':checked')) {
+             if ($("#onlyEscort").is(':checked')) {
             var atLeastOneIsChecked = 0;
             $('#selectEscort input:checked').each(function () {
                 atLeastOneIsChecked++;
             });
             if (atLeastOneIsChecked == 0) alert("יש לבחור לפחות מלווה אחד");
-            //  }
+              }
 
             if (!patientExists || !Origin || !Dest || !dateMatch || !timeMatch || atLeastOneIsChecked == 0) {
                 return false;
@@ -1177,13 +1177,13 @@
                         </li>
                         <li>
                             <a href="viewRidePats.html" class="waves-effect waves-primary">
-                                <i class="md md-today"></i><span> רישום הסעות</span>
+                                <i class="md md-today"></i><span> כל ההסעות</span>
                             </a>
                         </li>
 
                         <li>
                             <a href="manageRidePats.html" class="waves-effect waves-primary">
-                                <i class="md md-today"></i><span> ניהול הסעות</span>
+                                <i class="md md-today"></i><span> ניהול ההסעות שלי</span>
                             </a>
                         </li>
                     </ul>
@@ -1207,7 +1207,7 @@
                         <div class="col-sm-12">
                             <div class="page-title-box">
                                 <ol class="breadcrumb pull-right">
-                                    <li><a href="viewRidePats.html">רישום הסעות</a></li>
+                                    <li><a href="viewRidePats.html">כל ההסעות</a></li>
                                     <li class="active">הסעת חולה</li>
                                 </ol>
                                 <h4 class="page-title">הסעת חולה&nbsp&nbsp<i class="md md-recent-actors"></i></h4>

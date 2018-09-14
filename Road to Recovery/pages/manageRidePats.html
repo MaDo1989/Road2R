@@ -8,7 +8,7 @@
 
     <link rel="shortcut icon" href="assets/images/favicon_1.ico">
 
-    <title>ניהול הסעות</title>
+    <title>ניהול ההסעות שלי</title>
 
     <!-- DataTables -->
     <link href="../plugins/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
@@ -56,7 +56,7 @@
         checkCookie();
         $(document).ready(function () {
 
-            splitHour = 12;
+            splitHour = 12; //The hourthat seperates morning and afternoon ridepats
 
             //  document.getElementById("Numbers").checked = localStorage.numbers === 'true';
 
@@ -79,8 +79,8 @@
             tMorning = $('#datatable-morning').DataTable({ "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
             tAfternoon = $('#datatable-afternoon').DataTable({ "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
             tFuture = $('#datatable-future').DataTable({ "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
-        
-             
+
+
             getCoors();
             refreshTable();
         });
@@ -149,7 +149,7 @@
                     var arr_rides = JSON.parse(data.d);
                     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
                     for (i in arr_rides) {
-                        if (arr_rides[i].Coordinator.DisplayName != currentCoor) continue; //let the function run only for logged-in coordinator 
+                        if (arr_rides[i].Coordinator.DisplayName != currentCoor) continue; //let the function run only for logged-in coordinator
 
                         //Change date format
                         var temp = arr_rides[i].Date.substring(arr_rides[i].Date.indexOf("(") + 1);
@@ -176,7 +176,7 @@
 
 
                         //date2 = date.getDate() + "/" + date.getMonth() + 1 + "/" + date.getUTCFullYear() % 2000 + " " + date.getHours() + ":" + minutes;
-                        date2 = date.toLocaleDateString();                       
+                        date2 = date.toLocaleDateString();
                         //if (date.getHours() == 22 && date.getMinutes() == 14) { //22:14 is the default time to show afternoon אחה''צ
                         // //   date2 = day + "/" + month + "/" + date.getUTCFullYear() % 2000;
                         //    date2 += " אחה\"צ";
@@ -185,7 +185,7 @@
                         hours = date.getHours();
                         //hours = hours.substring(0, hours.length - 4)
                         time = hours + ":" + minutes;
-                        if (hours == "22" && minutes == "14") time= "אחה''צ";
+                        if (hours == "22" && minutes == "14") time = "אחה''צ";
                         //if (unassigned) {
                         //    // $("#activeRidePats").prop('checked', false);
                         //    if (arr_rides[i].Status != "ממתינה לשיבוץ") continue;
@@ -203,11 +203,11 @@
                         var editBtn = "";
                         var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' name='" + arr_rides[i].RidePatNum + "' title='צפייה'><i class='fa fa-wpforms'></i></button>";
                         var deleteBtn = "";
-                      //  if (arr_rides[i].Status == 'ממתינה לשיבוץ') {
-                            editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' name='" + arr_rides[i].RidePatNum + "' title='עריכה'><i class='ti-pencil'></i></button>";
-                            deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' name='" + arr_rides[i].RidePatNum + "' title='מחיקה'><i class='fa fa-remove' ></i></button>";
-                            // btnStr += " " + deleteBtn;
-                      //  }
+                        //  if (arr_rides[i].Status == 'ממתינה לשיבוץ') {
+                        editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' name='" + arr_rides[i].RidePatNum + "' title='עריכה'><i class='ti-pencil'></i></button>";
+                        deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' name='" + arr_rides[i].RidePatNum + "' title='מחיקה'><i class='fa fa-remove' ></i></button>";
+                        // btnStr += " " + deleteBtn;
+                        //  }
 
                         btnStr += showBtn + " " + editBtn + " " + deleteBtn;
 
@@ -216,10 +216,10 @@
                             if (date.getHours() < splitHour) //morning rides
                             {
                                 if (arr_rides[i].Status == "ממתינה לשיבוץ")
-                                    tMorning.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "!אין", arr_rides[i].Status, btnStr])
+                                    tMorning.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!", arr_rides[i].Status, btnStr])
                                 //tFuture.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, arr_rides[i].Status, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
                                 else {
-                                    
+
                                     for (j in arr_rides[i].Drivers) {
                                         if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName;
                                         else secondary = arr_rides[i].Drivers[j].DisplayName;
@@ -235,7 +235,7 @@
                             else //afternoon rides
                             {
                                 if (arr_rides[i].Status == "ממתינה לשיבוץ")
-                                    tAfternoon.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "!אין", arr_rides[i].Status, btnStr])
+                                    tAfternoon.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!", arr_rides[i].Status, btnStr])
                                 //tFuture.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, arr_rides[i].Status, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
                                 else {
                                     ///שעה מוצא יעד חולה מסיע סטטוס בטן
@@ -255,8 +255,8 @@
                         else //futrue rides
                         {
                             if (arr_rides[i].Status == "ממתינה לשיבוץ")
-                                tFuture.row.add([date2,time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "!אין", arr_rides[i].Status,btnStr])
-                                //tFuture.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, arr_rides[i].Status, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
+                                tFuture.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!", arr_rides[i].Status, btnStr])
+                            //tFuture.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, arr_rides[i].Status, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
                             else {
                                 ///שעה מוצא יעד חולה מסיע סטטוס בטן
                                 for (j in arr_rides[i].Drivers) {
@@ -267,7 +267,7 @@
                                     var drivers = "ראשי: " + primary;
                                 if (arr_rides[i].Drivers.length == 2)
                                     var drivers = "ראשי: " + primary + ", " + "גיבוי: " + secondary;
-                                tFuture.row.add([date2,time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr])
+                                tFuture.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr])
                                 //tFuture.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, drivers, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
                             }
                         }
@@ -290,9 +290,9 @@
 
                         //}
 
-                     
+
                     }
-                   
+
                     tMorning.columns([0]).order('asc').draw();
                     tAfternoon.columns([0]).order('asc').draw();
                     tFuture.columns([0]).order('asc').draw();
@@ -321,7 +321,7 @@
 
                     $('#datatable-morning tbody').on('click', '#remove', function () {
                         arr_details = { RidePatNum: this.name, func: "show" };//attribute name=RidePatNum
-                        var data = t.row($(this).parents('tr')).data();
+                        var data = tMorning.row($(this).parents('tr')).data();
                         swal({
                             title: "האם אתם בטוחים?",
                             type: "warning",
@@ -339,6 +339,8 @@
                         });
                     });
 
+                    $('#datatable-morning tbody').on('draw', manipulateTables());
+
                     $('#datatable-afternoon tbody').on('click', '#edit', function () {
                         //var data = t.row($(this).parents('tr')).data();
                         arr_details = { RidePatNum: this.name, func: "edit" }; //attribute name=RidePatNum
@@ -355,7 +357,7 @@
 
                     $('#datatable-afternoon tbody').on('click', '#remove', function () {
                         arr_details = { RidePatNum: this.name, func: "show" };//attribute name=RidePatNum
-                        var data = t.row($(this).parents('tr')).data();
+                        var data = tAfternoon.row($(this).parents('tr')).data();
                         swal({
                             title: "האם אתם בטוחים?",
                             type: "warning",
@@ -410,6 +412,34 @@
                 },
                 error: function (err) { alert("Error in GetRidePatView: " + err.responseText); }
             });
+
+            //
+
+        }
+
+
+        function manipulateTables() {
+
+
+            tableMorning = document.getElementById("datatable-morning");
+            tableAfternoon = document.getElementById("datatable-afternoon");
+            tableFuture = document.getElementById("datatable-future");
+
+            tdarr = tableMorning.getElementsByTagName("td");
+
+            for (var j = 0; j < tdarr.length; j++) {
+                if (tdarr[j].innerHTML.indexOf("אין!") !== -1) {
+                    tdarr[j].style.backgroundColor = "red";
+                }
+            }
+
+            tdarr = tableAfternoon.getElementsByTagName("td");
+
+            for (var j = 0; j < tdarr.length; j++) {
+                if (tdarr[j].innerHTML.indexOf("אין!") !== -1) {
+                    tdarr[j].style.backgroundColor = "orange";
+                }
+            }
         }
 
         function deleteRidePat(RidePat, func) {
@@ -515,13 +545,13 @@
                         </li>
                         <li>
                             <a href="viewRidePats.html" class="waves-effect waves-primary">
-                                <i class="md md-today"></i><span> רישום הסעות</span>
+                                <i class="md md-today"></i><span> כל ההסעות</span>
                             </a>
                         </li>
 
                         <li>
                             <a href="manageRidePats.html" class="waves-effect waves-primary">
-                                <i class="md md-today"></i><span> ניהול הסעות</span>
+                                <i class="md md-today"></i><span> ניהול ההסעות שלי</span>
                             </a>
                         </li>
 
@@ -548,9 +578,9 @@
                             <div class="page-title-box">
                                 <ol class="breadcrumb pull-right">
 
-                                    <li class="active">ניהול הסעות חולים</li>
+                                    <li class="active">ניהול ההסעות שלי</li>
                                 </ol>
-                                <h4 class="page-title">ניהול הסעות חולים&nbsp&nbsp<i class="md md-recent-actors"></i></h4>
+                                <h4 class="page-title">ניהול ההסעות שלי&nbsp&nbsp<i class="md md-recent-actors"></i></h4>
                             </div>
                         </div>
                     </div>
@@ -581,52 +611,79 @@
                                         <button type="button" id="createCustomer" onclick="newRidePatForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>חדש</button>
                                     </div>
                                 </div>
-                                <h4>נסיעות לבוקר</h4>
-                                <table id="datatable-morning" class="table table-striped table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>שעה</th>
-                                            <th>מוצא</th>
-                                            <th>יעד</th>
-                                            <th>החולה</th>
-                                            <th>המסיע</th>                                            
-                                            <th>סטטוס ההסעה</th>
-                                            <th>פעולות</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
-                                <h4>נסיעות לאחה"צ</h4>
-                                <table id="datatable-afternoon" class="table table-striped table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>שעה</th>
-                                            <th>מוצא</th>
-                                            <th>יעד</th>
-                                            <th>החולה</th>
-                                            <th>המסיע</th>
-                                            <th>סטטוס ההסעה</th>
-                                            <th>פעולות</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
-                                <h4>נסיעות עתידיות</h4>
-                                <table id="datatable-future" class="table table-striped table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>תאריך</th>
-                                            <th>שעה</th>
-                                            <th>מוצא</th>
-                                            <th>יעד</th>
-                                            <th>החולה</th>
-                                            <th>המסיע</th>
-                                            <th>סטטוס ההסעה</th>
-                                            <th>פעולות</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
+
+                                <div id="accordion" class="panel-group">
+                                    <div class="panel panel-primary">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title"> <a href="#collapse1" data-parent="#accordion" data-toggle="collapse">נסיעות לבוקר</a></h4>
+                                        </div>
+                                        <div class="panel-collapse collapse in" id="collapse1">
+                                            <div class="panel-body">
+                                                <table id="datatable-morning" class="table table-striped table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>שעה</th>
+                                                            <th>מוצא</th>
+                                                            <th>יעד</th>
+                                                            <th>החולה</th>
+                                                            <th>המסיע</th>
+                                                            <th>סטטוס ההסעה</th>
+                                                            <th>פעולות</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel panel-primary">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title"> <a href="#collapse2" data-parent="#accordion" data-toggle="collapse">נסיעות לאחה"צ</a></h4>
+                                        </div>
+                                        <div class="panel-collapse collapse" id="collapse2">
+                                            <div class="panel-body">
+                                                <table id="datatable-afternoon" class="table table-striped table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>שעה</th>
+                                                            <th>מוצא</th>
+                                                            <th>יעד</th>
+                                                            <th>החולה</th>
+                                                            <th>המסיע</th>
+                                                            <th>סטטוס ההסעה</th>
+                                                            <th>פעולות</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel panel-primary">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title"> <a href="#collapse3" data-parent="#accordion" data-toggle="collapse"></a>נסיעות עתידיות</h4>
+                                        </div>
+                                        <div class="panel-collapse collapse" id="collapse3">
+                                            <div class="panel-body">
+                                                <table id="datatable-future" class="table table-striped table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>תאריך</th>
+                                                            <th>שעה</th>
+                                                            <th>מוצא</th>
+                                                            <th>יעד</th>
+                                                            <th>החולה</th>
+                                                            <th>המסיע</th>
+                                                            <th>סטטוס ההסעה</th>
+                                                            <th>פעולות</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
