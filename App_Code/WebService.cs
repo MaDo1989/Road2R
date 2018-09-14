@@ -6,6 +6,7 @@ using System.Web.Script.Serialization;
 using System.Web.Services;
 using System.Globalization;
 using System.Web.Script.Services;
+using log4net;
 
 /// <summary>
 /// Summary description for WebService
@@ -16,6 +17,8 @@ using System.Web.Script.Services;
 [System.Web.Script.Services.ScriptService]
 public class WebService : System.Web.Services.WebService
 {
+    private static readonly ILog Log =
+             LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
     public WebService()
     {
@@ -420,15 +423,22 @@ public class WebService : System.Web.Services.WebService
 
     #region login functions
     [WebMethod(EnableSession = true)]
+
     public string loginUser(string uName, string password)
     {
         HttpContext.Current.Session["userSession"] = uName;
         JavaScriptSerializer j = new JavaScriptSerializer();
         User u = new User(uName, password);
         bool userInDB = u.CheckLoginDetails();
+        writeToLog("Successful login");
         return j.Serialize(userInDB);
     }
 
+    public void writeToLog (string str)
+    {
+        string user = (string)HttpContext.Current.Session["userSession"];
+        Log.Error(str + " ;for user: "+user);
+    }
     //[WebMethod]
     //public string getUserType(string user)
     //{
