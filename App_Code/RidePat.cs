@@ -327,11 +327,15 @@ public class RidePat
             RidePatNum = ridePat.RidePatNum;
             Ride r = new Ride();
             RidePat rp = GetRidePat(ridePatNum);
-            foreach (Volunteer driver in rp.Drivers)
+            if (rp.Drivers != null)
             {
-                Message m = new Message();
-                m.cancelRide(RidePatNum, driver);
+                foreach (Volunteer driver in rp.Drivers)
+                {
+                    Message m = new Message();
+                    m.cancelRide(RidePatNum, driver);
+                }
             }
+
 
             //  m.cancelRide(ridePatNum, dr);
             db = new DbService();
@@ -663,13 +667,18 @@ public class RidePat
         return res;
     }
 
-    public int AssignRideToRidePat(int ridePatId, int userId)
+    public int AssignRideToRidePat(int ridePatId, int userId, string driverType)
     {
         int RideId = -1;
-
+        
         string query = "select RideNum,Origin,Destination,PickupTime,Status,MainDriver,secondaryDriver from RPView where RidePatNum=" + ridePatId;
-        DbService db = new DbService();
+                DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
+        if (ds.Tables[0].Rows.Count==0)
+        {
+            //There is no RidePat with that ID
+            throw new Exception("הנסיעה אליה נרשמתם בוטלה");
+        }
         DataRow dr = ds.Tables[0].Rows[0];
 
         Origin = new Location();
@@ -677,26 +686,43 @@ public class RidePat
         Destination = new Location();
         Destination.Name = dr["Destination"].ToString();
         Date = Convert.ToDateTime(dr["PickupTime"].ToString());
-        if (dr["Status"].ToString() == "שובץ נהג וגיבוי") return -1;
+        if (dr["Status"].ToString() == "שובץ נהג וגיבוי") throw new Exception ("הנסיעה אליה נרשמתם כבר מלאה");
 
-        if (dr["RideNum"].ToString() != "")
+        if (dr["RideNum"].ToString() != "") //Ride aleady exists
         {
             RideId = int.Parse(dr["RideNum"].ToString());
 
 
-            if (dr["MainDriver"].ToString() == "")
-                query = "update Ride set MainDriver=" + userId + " where RideNum=" + RideId;
-            else if (dr["MainDriver"].ToString() != userId.ToString()) query = "update Ride set secondaryDriver=" + userId + " where RideNum=" + RideId;
+            if (dr["MainDriver"].ToString() == "") //No main driver is assigned to this ride
+            { 
+                if (driverType == "primary")
+                    query = "update Ride set MainDriver=" + userId + " where RideNum=" + RideId; //assign a main driver to this ride
+            }
+            //A main driver IS assigned to this ride
+            else //if (dr["MainDriver"].ToString() != userId.ToString()) //Check that the current user is not already assigned as primary to this ride
+            {
+                if (driverType == "primary") throw new Exception("לנסיעה זו כבר שובץ נהג ראשי. באפשרותכם להירשם אליה כגיבוי"); //The driver asked to be assigned as primary and there already is a primary
 
+                if (dr["secondaryDriver"].ToString() != "") throw new Exception("הנסיעה אליה נרשמתם כבר מלאה"); //The driver asked to be assigned as secondary and there already is a secondary
+
+                query = "update Ride set secondaryDriver=" + userId + " where RideNum=" + RideId; //Assign a secondary driver to this ride
+            }
             DbService db4 = new DbService();
             int res = db4.ExecuteQuery(query);
             if (res <= 0) return -1;
         }
-        else
+        else // New ride
         {
-            string query2 = "set dateformat dmy; insert into Ride (Origin,Destination,Date,MainDriver) values ('" + Origin.Name + "','" + Destination.Name + "','" + Date + "'," + userId + ") SELECT SCOPE_IDENTITY()"; ;
+            SqlCommand cmd = new SqlCommand();
+            SqlParameter[] cmdparams = new SqlParameter[4];
+            cmdparams[0] = cmd.Parameters.AddWithValue("@origin", Origin.Name);
+            cmdparams[1] = cmd.Parameters.AddWithValue("@dest", Destination.Name);
+            cmdparams[2] = cmd.Parameters.AddWithValue("@date", Date);
+            cmdparams[3] = cmd.Parameters.AddWithValue("@mainDriver",userId);
+           
+            string query2 = "set dateformat dmy; insert into Ride (Origin,Destination,Date,MainDriver) values (@origin,@dest,@date,@mainDriver) SELECT SCOPE_IDENTITY()";
             DbService db2 = new DbService();
-            RideId = int.Parse(db2.GetObjectScalarByQuery(query2).ToString());
+            RideId = int.Parse(db2.GetObjectScalarByQuery(query2,cmd.CommandType,cmdparams).ToString());
             if (RideId <= 0) return -1;
             string query3 = "update RidePat set RideId=" + RideId + " where RidePatNum=" + ridePatId;
             DbService db3 = new DbService();
