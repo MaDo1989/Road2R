@@ -293,10 +293,10 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string AssignRideToRidePat(int ridePatId, int userId) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
+    public string AssignRideToRidePat(int ridePatId, int userId, string driverType) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
     {
         RidePat rp = new RidePat();
-        int res = rp.AssignRideToRidePat(ridePatId, userId);
+        int res = rp.AssignRideToRidePat(ridePatId, userId, driverType);
         JavaScriptSerializer j = new JavaScriptSerializer();
         return j.Serialize(res);
     }
@@ -426,10 +426,21 @@ public class WebService : System.Web.Services.WebService
 
     public string loginUser(string uName, string password)
     {
-        HttpContext.Current.Session["userSession"] = uName;
         JavaScriptSerializer j = new JavaScriptSerializer();
-        User u = new User(uName, password);
-        bool userInDB = u.CheckLoginDetails();
+        bool userInDB;
+        try
+        {
+           
+            User u = new User(uName, password);
+            userInDB = u.CheckLoginDetails();
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+        HttpContext.Current.Session["userSession"] = uName;
+        
         writeToLog("Successful login");
         return j.Serialize(userInDB);
     }
