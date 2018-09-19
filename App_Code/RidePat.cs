@@ -481,7 +481,7 @@ public class RidePat
         // Ride ride = new Ride();
         // ride.RidePats = new List<RidePat>();
         List<RidePat> rpl = new List<RidePat>();
-       // int numOfDrivers = 0;
+        // int numOfDrivers = 0;
 
         string query2 = "select * from RidePatEscortView";
         DbService db2 = new DbService();
@@ -527,12 +527,12 @@ public class RidePat
                 RidePat rp = new RidePat();
                 rp.Coordinator = new Volunteer();
                 rp.Coordinator.DisplayName = dr["Coordinator"].ToString();
-rp.Drivers = new List<Volunteer>();
+                rp.Drivers = new List<Volunteer>();
                 // if (numOfDrivers != 0)
                 //  {
                 if (dr["MainDriver"].ToString() != "")
                 {
-                    
+
                     Volunteer primary = new Volunteer();
                     primary.DriverType = "Primary";
 
@@ -603,7 +603,7 @@ rp.Drivers = new List<Volunteer>();
                     {
                         rp.Statuses.Add(status.ItemArray[0].ToString());
                     }
-                    rp.Status = rp.Statuses[0];
+                    //rp.Status = rp.Statuses[0];
 
                 }
                 rpl.Add(rp);
