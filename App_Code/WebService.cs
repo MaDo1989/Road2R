@@ -254,12 +254,12 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string CheckUser(string mobile)
+    public string CheckUser(string mobile, string regId)
     {
         try
         {
             Volunteer v = new Volunteer();
-            v = v.getVolunteerByMobile(mobile);
+            v = v.getVolunteerByMobile(mobile, regId);
             JavaScriptSerializer j = new JavaScriptSerializer();
             return j.Serialize(v);
         }
@@ -415,6 +415,16 @@ public class WebService : System.Web.Services.WebService
         Location d = new Location();
         List<Location> hospitalList = d.getBarrierListForView(active);
         return j.Serialize(hospitalList);
+    }
+
+    [WebMethod]
+    public string confirmPush(int userId, int msgId, string status)
+    {
+        Message m = new Message();
+        m.insertMsg(msgId, "", status, "", 0, DateTime.Now, userId, "", true, false, false);
+
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        return j.Serialize("ok");
     }
     #endregion
 

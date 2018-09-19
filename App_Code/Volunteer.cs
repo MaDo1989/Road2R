@@ -38,6 +38,20 @@ public class Volunteer
     string joinDate;//תאריך הצטרפות
     string status;//סטטוס
     int id;
+    string regId;
+
+    public List<RideStatus> Statusim { get; set; }
+
+    public class RideStatus
+    {
+        string name;
+        int id;
+
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    public string RegId { get; set; }
 
     public string Remarks { get; set; }
 
@@ -58,8 +72,6 @@ public class Volunteer
     public int AvailableSeats { get; set; }
 
     public string UserName { get; set; }
-
-    public string RegId { get; set; }
 
     public string DriverType { get; set; } //Primary or Secondary
 
@@ -566,10 +578,10 @@ public class Volunteer
     }
 
 
-    public Volunteer getVolunteerByMobile(string mobile)
+    public Volunteer getVolunteerByMobile(string mobile, string regId)
     {
         DbService db = new DbService();
-        string query = "select * from VolunteerTypeView where cellPhone = '" + mobile + "'";
+        string query = "select  from VolunteerTypeView where cellPhone = '" + mobile + "'";
         DataSet ds = db.GetDataSetByQuery(query);
         Volunteer v = new Volunteer();
         foreach (DataRow dr in ds.Tables[0].Rows)
@@ -586,6 +598,10 @@ public class Volunteer
             v.City = dr["CityCityName"].ToString();
             v.Address = dr["Address"].ToString();
             v.Email = dr["Email"].ToString();
+            //if (dr["BirthDate"].ToString() != "")
+            //{
+            //    v.BirthDate = Convert.ToDateTime(dr["BirthDate"].ToString());
+            //}
             // v.BirthDate = Convert.ToDateTime(dr["BirthDate"].ToString());
             v.JoinDate = Convert.ToDateTime(dr["JoinDate"].ToString());
             v.Status = dr["IsActive"].ToString();
@@ -605,11 +621,37 @@ public class Volunteer
             v.PrefArea = v2.PrefArea;
             v.PrefTime = v2.PrefTime;
             v.PrefLocation = v2.PrefLocation;
+
+            DbService db2 = new DbService();
+            string query2 = "select  from status where StatusId > 99 and StatusId < 1000";
+            DataSet ds2 = db2.GetDataSetByQuery(query2);
+            v.Statusim = new List<RideStatus>();
+            foreach (DataRow dr2 in ds2.Tables[0].Rows)
+            {
+                var stat = new RideStatus();
+                stat.Id = int.Parse(dr2.ItemArray[1].ToString());
+                stat.Name = dr2.ItemArray[0].ToString();
+                v.Statusim.Add(stat);
+            }
         }
+
+        db = new DbService();
+        var updateRegid = "update Volunteer set pnRegId=@REGID where Id=@ID";
+
+        SqlCommand cmd = new SqlCommand();
+        cmd.CommandType = CommandType.Text;
+
+        SqlParameter[] cmdParams = new SqlParameter[2];
+        cmdParams[0] = cmd.Parameters.AddWithValue("@REGID", regId);
+        cmdParams[1] = cmd.Parameters.AddWithValue("@ID", v.Id);
+
+        int result = db.ExecuteQuery(updateRegid, cmd.CommandType, cmdParams);
+
+
+
         return v;
 
     }
-
 
 
     //public string JoinDate
