@@ -581,7 +581,7 @@ public class Volunteer
     public Volunteer getVolunteerByMobile(string mobile, string regId)
     {
         DbService db = new DbService();
-        string query = "select  from VolunteerTypeView where cellPhone = '" + mobile + "'";
+        string query = "select * from VolunteerTypeView where CellPhone = '" + mobile + "'";
         DataSet ds = db.GetDataSetByQuery(query);
         Volunteer v = new Volunteer();
         foreach (DataRow dr in ds.Tables[0].Rows)
@@ -623,7 +623,7 @@ public class Volunteer
             v.PrefLocation = v2.PrefLocation;
 
             DbService db2 = new DbService();
-            string query2 = "select  from status where StatusId > 99 and StatusId < 1000";
+            string query2 = "select * from status where StatusId > 99 and StatusId < 1000";
             DataSet ds2 = db2.GetDataSetByQuery(query2);
             v.Statusim = new List<RideStatus>();
             foreach (DataRow dr2 in ds2.Tables[0].Rows)
