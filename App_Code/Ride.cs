@@ -31,6 +31,8 @@ public class Ride
 
     public string DriverType { get; set; }
 
+    public List<string> Statuses { get; set; }
+
     public List<Ride> GetRidesForNotifyfull()
     {
         string query = "select * from RideViewForNotify where statusRide='שובץ נהג' or statusRide='מלאה'";
@@ -405,8 +407,14 @@ public class Ride
                 }
 
                 r2.Id = int.Parse(dr["RideNum"].ToString());
-                query = "select top 1 statusStatusName from status_Ride where RideRideNum=" + r2.Id + "order by Timestamp desc";
+                query = "select statusStatusName from status_Ride where RideRideNum=" + r2.Id + " order by Timestamp desc";
                 db = new DbService();
+                r2.Statuses = new List<string>();
+                foreach (DataRow status in db.GetDataSetByQuery(query).Tables[0].Rows)
+                {
+                    r2.Statuses.Add(status.ItemArray[0].ToString());
+                }
+                r2.Status = r2.Statuses[0]; db = new DbService();
                 r2.Status = db.GetObjectScalarByQuery(query).ToString();
                 RidePat rp = new RidePat();
                 r2.RidePats = new List<RidePat>();
