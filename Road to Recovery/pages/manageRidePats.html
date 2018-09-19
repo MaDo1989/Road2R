@@ -82,7 +82,9 @@
 
 
             getCoors();
+
             refreshTable();
+            //  setInterval("refreshTable()", 20000);
         });
 
         function saveFilters() {
@@ -127,6 +129,7 @@
 
 
         function refreshTable() {
+
             checkCookie();
             var active = localStorage.active;//$("#activeRidePats").prop('checked');
             var today = localStorage.today;//$("#TodaysRidePats").prop('checked');
@@ -219,14 +222,18 @@
                                     tMorning.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!", arr_rides[i].Status, btnStr])
                                 //tFuture.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, arr_rides[i].Status, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
                                 else {
-
                                     for (j in arr_rides[i].Drivers) {
                                         if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName;
                                         else secondary = arr_rides[i].Drivers[j].DisplayName;
                                     }
-                                    if (arr_rides[i].Drivers.length == 1)
-                                        var drivers = "ראשי: " + primary;
-                                    if (arr_rides[i].Drivers.length == 2)
+                                    if (arr_rides[i].Drivers.length == 1) {
+                                        if (primary != undefined)
+                                            var drivers = "ראשי: " + primary;
+                                        else
+                                            drivers = "גיבוי בלבד: " + secondary;
+                                    }
+
+                                    else if (arr_rides[i].Drivers.length == 2)
                                         var drivers = "ראשי: " + primary + ", " + "גיבוי: " + secondary;
                                     tMorning.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr])
                                     //tFuture.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, drivers, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
@@ -238,14 +245,20 @@
                                     tAfternoon.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!", arr_rides[i].Status, btnStr])
                                 //tFuture.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, arr_rides[i].Status, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
                                 else {
-                                    ///שעה מוצא יעד חולה מסיע סטטוס בטן
+
                                     for (j in arr_rides[i].Drivers) {
                                         if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName;
                                         else secondary = arr_rides[i].Drivers[j].DisplayName;
                                     }
                                     if (arr_rides[i].Drivers.length == 1)
-                                        var drivers = "ראשי: " + primary;
-                                    if (arr_rides[i].Drivers.length == 2)
+                                    {
+                                        if (primary != undefined)
+                                            var drivers = "ראשי: " + primary;
+                                        else
+                                            drivers = "גיבוי בלבד: " + secondary;
+                                    }
+
+                                    else if (arr_rides[i].Drivers.length == 2)
                                         var drivers = "ראשי: " + primary + ", " + "גיבוי: " + secondary;
                                     tAfternoon.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr])
                                     //tFuture.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, drivers, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
@@ -258,14 +271,18 @@
                                 tFuture.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!", arr_rides[i].Status, btnStr])
                             //tFuture.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, arr_rides[i].Status, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
                             else {
-                                ///שעה מוצא יעד חולה מסיע סטטוס בטן
                                 for (j in arr_rides[i].Drivers) {
                                     if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName;
                                     else secondary = arr_rides[i].Drivers[j].DisplayName;
                                 }
-                                if (arr_rides[i].Drivers.length == 1)
-                                    var drivers = "ראשי: " + primary;
-                                if (arr_rides[i].Drivers.length == 2)
+                                if (arr_rides[i].Drivers.length == 1) {
+                                    if (primary != undefined)
+                                        var drivers = "ראשי: " + primary;
+                                    else
+                                        drivers = "גיבוי בלבד: " + secondary;
+                                }
+
+                                else if (arr_rides[i].Drivers.length == 2)
                                     var drivers = "ראשי: " + primary + ", " + "גיבוי: " + secondary;
                                 tFuture.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr])
                                 //tFuture.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, drivers, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
@@ -432,11 +449,21 @@
                     tdarr[j].style.backgroundColor = "red";
                 }
             }
+            for (var j = 0; j < tdarr.length; j++) {
+                if (tdarr[j].innerHTML.indexOf("גיבוי בלבד") !== -1) {
+                    tdarr[j].style.backgroundColor = "red";
+                }
+            }
 
             tdarr = tableAfternoon.getElementsByTagName("td");
 
             for (var j = 0; j < tdarr.length; j++) {
                 if (tdarr[j].innerHTML.indexOf("אין!") !== -1) {
+                    tdarr[j].style.backgroundColor = "orange";
+                }
+            }
+            for (var j = 0; j < tdarr.length; j++) {
+                if (tdarr[j].innerHTML.indexOf("גיבוי בלבד") !== -1) {
                     tdarr[j].style.backgroundColor = "orange";
                 }
             }

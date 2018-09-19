@@ -481,7 +481,7 @@ public class RidePat
         // Ride ride = new Ride();
         // ride.RidePats = new List<RidePat>();
         List<RidePat> rpl = new List<RidePat>();
-        int numOfDrivers = 0;
+       // int numOfDrivers = 0;
 
         string query2 = "select * from RidePatEscortView";
         DbService db2 = new DbService();
@@ -503,22 +503,23 @@ public class RidePat
         {
 
         }
+        int counter = 0;
         try
         {
 
             foreach (DataRow dr in ds.Tables[0].Rows)
             {
+                counter++;
+                //if (dr["MainDriver"].ToString() == "" && dr["secondaryDriver"].ToString() == "")
+                //{
+                //    numOfDrivers = 0;
+                //}
+                //else if (dr["MainDriver"].ToString() != "" && dr["secondaryDriver"].ToString() == "")
+                //{
+                //    numOfDrivers = 1;
 
-                if (dr["MainDriver"].ToString() == "" && dr["secondaryDriver"].ToString() == "")
-                {
-                    numOfDrivers = 0;
-                }
-                else if (dr["MainDriver"].ToString() != "" && dr["secondaryDriver"].ToString() == "")
-                {
-                    numOfDrivers = 1;
-
-                }
-                else numOfDrivers = 2;
+                //}
+                //else numOfDrivers = 2;
 
                 if ((dr["MainDriver"].ToString() != "" && int.Parse(dr["MainDriver"].ToString()) == volunteerId) || (dr["secondaryDriver"].ToString() != "" && int.Parse(dr["secondaryDriver"].ToString()) == volunteerId))
                     continue;
@@ -526,28 +527,37 @@ public class RidePat
                 RidePat rp = new RidePat();
                 rp.Coordinator = new Volunteer();
                 rp.Coordinator.DisplayName = dr["Coordinator"].ToString();
-
-                if (numOfDrivers != 0)
+rp.Drivers = new List<Volunteer>();
+                // if (numOfDrivers != 0)
+                //  {
+                if (dr["MainDriver"].ToString() != "")
                 {
-                    rp.Drivers = new List<Volunteer>();
+                    
                     Volunteer primary = new Volunteer();
                     primary.DriverType = "Primary";
+
                     primary.Id = int.Parse(dr["MainDriver"].ToString());
                     string query3 = "select DisplayName from Volunteer where Id=" + primary.Id;
                     DbService db3 = new DbService();
                     primary.DisplayName = db3.GetObjectScalarByQuery(query3).ToString();
                     rp.Drivers.Add(primary);
-                    if (numOfDrivers > 1)
-                    {
-                        Volunteer secondary = new Volunteer();
-                        secondary.DriverType = "secondary";
-                        secondary.Id = int.Parse(dr["secondaryDriver"].ToString());
-                        string query4 = "select DisplayName from Volunteer where Id=" + secondary.Id;
-                        DbService db4 = new DbService();
-                        secondary.DisplayName = db4.GetObjectScalarByQuery(query4).ToString();
-                        rp.Drivers.Add(secondary);
-                    }
                 }
+
+
+                // if (numOfDrivers > 1)
+                // {
+                if (dr["secondaryDriver"].ToString() != "")
+                {
+                    Volunteer secondary = new Volunteer();
+                    secondary.DriverType = "secondary";
+                    secondary.Id = int.Parse(dr["secondaryDriver"].ToString());
+                    string query4 = "select DisplayName from Volunteer where Id=" + secondary.Id;
+                    DbService db4 = new DbService();
+                    secondary.DisplayName = db4.GetObjectScalarByQuery(query4).ToString();
+                    rp.Drivers.Add(secondary);
+                }
+                //  }
+                //    }
 
                 rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
                 try
@@ -670,11 +680,11 @@ public class RidePat
     public int AssignRideToRidePat(int ridePatId, int userId, string driverType)
     {
         int RideId = -1;
-        
+
         string query = "select RideNum,Origin,Destination,PickupTime,Status,MainDriver,secondaryDriver from RPView where RidePatNum=" + ridePatId;
-                DbService db = new DbService();
+        DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
-        if (ds.Tables[0].Rows.Count==0)
+        if (ds.Tables[0].Rows.Count == 0)
         {
             //There is no RidePat with that ID
             throw new Exception("הנסיעה אליה נרשמתם בוטלה");
@@ -686,7 +696,7 @@ public class RidePat
         Destination = new Location();
         Destination.Name = dr["Destination"].ToString();
         Date = Convert.ToDateTime(dr["PickupTime"].ToString());
-        if (dr["Status"].ToString() == "שובץ נהג וגיבוי") throw new Exception ("הנסיעה אליה נרשמתם כבר מלאה");
+        if (dr["Status"].ToString() == "שובץ נהג וגיבוי") throw new Exception("הנסיעה אליה נרשמתם כבר מלאה");
 
         if (dr["RideNum"].ToString() != "") //Ride aleady exists
         {
@@ -694,7 +704,7 @@ public class RidePat
 
 
             if (dr["MainDriver"].ToString() == "") //No main driver is assigned to this ride
-            { 
+            {
                 if (driverType == "primary")
                     query = "update Ride set MainDriver=" + userId + " where RideNum=" + RideId; //assign a main driver to this ride
             }
@@ -718,11 +728,11 @@ public class RidePat
             cmdparams[0] = cmd.Parameters.AddWithValue("@origin", Origin.Name);
             cmdparams[1] = cmd.Parameters.AddWithValue("@dest", Destination.Name);
             cmdparams[2] = cmd.Parameters.AddWithValue("@date", Date);
-            cmdparams[3] = cmd.Parameters.AddWithValue("@mainDriver",userId);
-           
+            cmdparams[3] = cmd.Parameters.AddWithValue("@mainDriver", userId);
+
             string query2 = "set dateformat dmy; insert into Ride (Origin,Destination,Date,MainDriver) values (@origin,@dest,@date,@mainDriver) SELECT SCOPE_IDENTITY()";
             DbService db2 = new DbService();
-            RideId = int.Parse(db2.GetObjectScalarByQuery(query2,cmd.CommandType,cmdparams).ToString());
+            RideId = int.Parse(db2.GetObjectScalarByQuery(query2, cmd.CommandType, cmdparams).ToString());
             if (RideId <= 0) return -1;
             string query3 = "update RidePat set RideId=" + RideId + " where RidePatNum=" + ridePatId;
             DbService db3 = new DbService();
@@ -763,7 +773,8 @@ public class RidePat
         }
         else
         {
-            string query = "update RidePat set RideId=null where RidePatNum=" + ridePatId; //+"; update Ride set "+driver+" =null where RideNum="+rideId;
+            // string query = "update RidePat set RideId=null where RidePatNum=" + ridePatId; //+"; update Ride set "+driver+" =null where RideNum="+rideId;
+            string query = "update Ride set MainDriver=null where RideNum=" + rideId;
             DbService db = new DbService();
             res = db.ExecuteQuery(query);
         }
