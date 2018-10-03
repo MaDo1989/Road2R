@@ -118,9 +118,7 @@
                     GENERAL.USER.setUserType(arr_coor[i].TypeVol)
                     break;
                 }
-
             }
-
         }
 
         function getCoorsErrorCB(e) {
@@ -160,48 +158,18 @@
                         var date = new Date(parseInt(temp));
 
 
-                        //if (date.getDate() < 10) {
-                        //    day = "0" + date.getDate();
-                        //} else day = date.getDate();
-
-
-                        //if (date.getMonth() + 1 < 10) {
-                        //    month = "0" + (date.getMonth() + 1);
-                        //} else month = date.getMonth() + 1;
-
-                        //if (date.getHours() < 10) {
-                        //    hours = "0" + date.getHours();
-                        //} else hours = date.getHours();
-
                         if (date.getMinutes() < 10) {
                             minutes = "0" + date.getMinutes();
                         } else minutes = date.getMinutes();
 
 
-                        //date2 = date.getDate() + "/" + date.getMonth() + 1 + "/" + date.getUTCFullYear() % 2000 + " " + date.getHours() + ":" + minutes;
                         date2 = date.toLocaleDateString();
-                        //if (date.getHours() == 22 && date.getMinutes() == 14) { //22:14 is the default time to show afternoon אחה''צ
-                        // //   date2 = day + "/" + month + "/" + date.getUTCFullYear() % 2000;
-                        //    date2 += " אחה\"צ";
-                        //}
+                        
 
                         hours = date.getHours();
-                        //hours = hours.substring(0, hours.length - 4)
                         time = hours + ":" + minutes;
-                        if (hours == "22" && minutes == "14") time = "אחה''צ";
-                        //if (unassigned) {
-                        //    // $("#activeRidePats").prop('checked', false);
-                        //    if (arr_rides[i].Status != "ממתינה לשיבוץ") continue;
-                        //}
-
-                        //if (active) {
-                        //    // $("#UnassignedRidePats").prop('checked',false);
-                        //    if (arr_rides[i].Status == "בוטלה" || arr_rides[i].Status == "הסתיימה") continue;
-                        //}
-
-
-
-
+                        if (hours == "22" && minutes == "14") time = "אחה''צ"; //22:14 means afternoon
+                       
                         btnStr = "";
                         showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' name='" + arr_rides[i].RidePatNum + "' title='צפייה'><i class='fa fa-wpforms'></i></button>";
                         editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' name='" + arr_rides[i].RidePatNum + "' title='עריכה'><i class='ti-pencil'></i></button>";
@@ -210,7 +178,7 @@
                         btnStr += showBtn;
 
                         if (arr_rides[i].Status == 'ממתינה לשיבוץ')
-                            btnStr += " " + editBtn;
+                            btnStr += " " + editBtn; //allow editing a ridepat if no drivers are assigned to it
 
                         btnStr += " " + deleteBtn;
 
@@ -219,71 +187,16 @@
                         {
                             if (date.getHours() < splitHour) //morning rides
                             {
-                                buildTables(tMorning);
-                                //if (arr_rides[i].Status == "ממתינה לשיבוץ")
-                                //    tMorning.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!", arr_rides[i].Status, btnStr])
-                                //else {
-                                //    for (j in arr_rides[i].Drivers) {
-                                //        if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName;
-                                //        else secondary = arr_rides[i].Drivers[j].DisplayName;
-                                //    }
-                                //    if (arr_rides[i].Drivers.length == 1) {
-                                //        if (primary != undefined)
-                                //            var drivers = "ראשי: " + primary;
-                                //        else
-                                //            drivers = "גיבוי בלבד: " + secondary;
-                                //    }
-
-                                //    else if (arr_rides[i].Drivers.length == 2)
-                                //        var drivers = "ראשי: " + primary + ", " + "גיבוי: " + secondary;
-                                //    tMorning.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr])
-                                //}
+                                buildTables(tMorning);                               
                             }
                             else //afternoon rides
                             {
-                                buildTables(tAfternoon);
-                                //if (arr_rides[i].Status == "ממתינה לשיבוץ")
-                                //    tAfternoon.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!", arr_rides[i].Status, btnStr])
-                                //else {
-
-                                //    for (j in arr_rides[i].Drivers) {
-                                //        if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName;
-                                //        else secondary = arr_rides[i].Drivers[j].DisplayName;
-                                //    }
-                                //    if (arr_rides[i].Drivers.length == 1) {
-                                //        if (primary != undefined)
-                                //            var drivers = "ראשי: " + primary;
-                                //        else
-                                //            drivers = "גיבוי בלבד: " + secondary;
-                                //    }
-
-                                //    else if (arr_rides[i].Drivers.length == 2)
-                                //        var drivers = "ראשי: " + primary + ", " + "גיבוי: " + secondary;
-                                //    tAfternoon.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr])
-                                //}
+                                buildTables(tAfternoon);                               
                             }
                         }
                         else //futrue rides
                         {
-                            buildTables(tFuture);
-                            //if (arr_rides[i].Status == "ממתינה לשיבוץ")
-                            //    tFuture.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!", arr_rides[i].Status, btnStr])
-                            //else {
-                            //    for (j in arr_rides[i].Drivers) {
-                            //        if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName;
-                            //        else secondary = arr_rides[i].Drivers[j].DisplayName;
-                            //    }
-                            //    if (arr_rides[i].Drivers.length == 1) {
-                            //        if (primary != undefined)
-                            //            var drivers = "ראשי: " + primary;
-                            //        else
-                            //            drivers = "גיבוי בלבד: " + secondary;
-                            //    }
-
-                            //    else if (arr_rides[i].Drivers.length == 2)
-                            //        var drivers = "ראשי: " + primary + ", " + "גיבוי: " + secondary;
-                            //    tFuture.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr])
-                            //}
+                            buildTables(tFuture);                            
                         }
                     }
 
@@ -291,7 +204,10 @@
                     tAfternoon.columns([0]).order('asc').draw();
                     tFuture.columns([0]).order('asc').draw();
 
+                    $('#datatable-morning tbody').on('draw', manipulateTables());
 
+
+                    //manage button clicks on tables
                     $('#datatable-morning tbody').on('click', '#edit', function () {
                         editButton(this);
                     });
@@ -303,8 +219,6 @@
                     $('#datatable-morning tbody').on('click', '#remove', function () {
                         confirmDelete(this);
                     });
-
-                    $('#datatable-morning tbody').on('draw', manipulateTables());
 
                     $('#datatable-afternoon tbody').on('click', '#edit', function () {
                         editButton(this);
@@ -327,7 +241,6 @@
                     });
 
                     $('#datatable-future tbody').on('click', '#remove', function () {
-
                         confirmDelete(this);
                     });
 

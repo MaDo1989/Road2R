@@ -278,8 +278,11 @@ public class RidePat
         else if (func == "edit") //Edit existing RidePat in DB
         {
             RidePatNum = ridePat.RidePatNum;
+            string query = "select Status from RidePat where RidePatNum="+RidePatNum;
+            Status =  db.GetObjectScalarByQuery(query).ToString();
+            if (Status != "ממתינה לשיבוץ") throw new Exception("נסיעה זו כבר הוקצתה לנהג ואין אפשרות לערוך אותה");
             cmdParams[6] = cmd.Parameters.AddWithValue("@ridePatNum", RidePatNum);
-            string query = "update RidePat set Patient=@pat,Origin=@origin,Destination=@destination,PickupTime=@date,Remark=@remark,OnlyEscort=@onlyEscort where RidePatNum=@ridePatNum";
+            query = "update RidePat set Patient=@pat,Origin=@origin,Destination=@destination,PickupTime=@date,Remark=@remark,OnlyEscort=@onlyEscort where RidePatNum=@ridePatNum";
             int res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
 
             if (res > 0)
