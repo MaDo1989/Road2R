@@ -59,9 +59,9 @@
             //  document.getElementById("Numbers").checked = localStorage.numbers === 'true';
 
             //$("#activeRidePats").prop('checked', localStorage.active);
-            //$("#TodaysRidePats").prop('checked', localStorage.today);
-            //$("#UnassignedRidePats").prop('checked', localStorage.unassigned);
-            //$("#MyRidePats").prop('checked', localStorage.myRidePats);
+           // $("#TodaysRidePats").prop('checked', localStorage.today);
+           // $("#UnassignedRidePats").prop('checked', localStorage.unassigned);
+           // $("#MyRidePats").prop('checked', localStorage.myRidePats);
 
             $.fn.dataTable.moment('DD/MM/YY HH:mm');
             //$('#example').DataTable();
@@ -128,9 +128,13 @@
         function refreshTable() {
             checkCookie();
             var active = JSON.parse(localStorage.active);//$("#activeRidePats").prop('checked');
+            $("#activeRidePats").prop('checked',active);
             var today = JSON.parse(localStorage.today);//$("#TodaysRidePats").prop('checked');
+            $("#TodaysRidePats").prop('checked',today);
             var unassigned = JSON.parse(localStorage.unassigned);//$("#UnassignedRidePats").prop('checked');
+            $("#UnassignedRidePats").prop('checked', unassigned)
             var myRidePats = JSON.parse(localStorage.myRidePats);//$("#MyRidePats").prop('checked');
+            $("#MyRidePats").prop('checked', myRidePats)
 
             t.clear().draw();
 
