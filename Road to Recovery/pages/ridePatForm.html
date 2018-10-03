@@ -234,7 +234,7 @@
                     }
                     else {
                         RidePat = {
-                            RidePatNum: RidePatNum, Pat: Pat, Origin: Origin, Destination: Destination, Date: date, Remark: Remark,
+                            RidePatNum: RidePatNum, Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Date: date, Remark: Remark,
                             Escorts: Escorts, OnlyEscort: OnlyEscort
                         }
                     }
@@ -829,10 +829,6 @@
             if (!futureDate) alert("יש לבחור תאריך עתידי");
 
 
-            //var Time = $("#hour").val() + ":" + $("#minute").val();
-            //var reg = new RegExp("[0-9]{2}\:[0-9]{2}");
-            //var timeMatch = reg.test(Time);
-
 
             var timeMatch = true;
             var aN = $("#afterNoon").is(':checked');
@@ -884,12 +880,12 @@
 
         function checkFutureDate(date) {
 
-            checkDate = Date.parse(date); //parameter date to compare with today
-            var d2 = new Date(); //today
+            checkDate = Date.parse(date); //parameter datetime to compare with today
+            var d2 = new Date(); //now
             currentDate = Date.parse(d2);
 
-            if (checkDate < currentDate) return false
-            else return true;
+            if (checkDate < currentDate) return false //past datetime
+            else return true; //future datetime
         }
 
         function getEquipmentForPatient() {
