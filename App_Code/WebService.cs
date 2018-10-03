@@ -230,16 +230,16 @@ public class WebService : System.Web.Services.WebService
         return j.Serialize(rl);
     }
 
-    [WebMethod]
-    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetRidesForNotify()
-    {
-        Ride r = new Ride();
-        //List<RidePat> r = rp.GetRidePat();
-        List<Ride> rl = r.GetRidesForNotify();
-        JavaScriptSerializer j = new JavaScriptSerializer();
-        return j.Serialize(rl);
-    }
+    //[WebMethod]
+    //[ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    //public string GetRidesForNotify()
+    //{
+    //    Ride r = new Ride();
+    //    //List<RidePat> r = rp.GetRidePat();
+    //    List<Ride> rl = r.GetRidesForNotify();
+    //    JavaScriptSerializer j = new JavaScriptSerializer();
+    //    return j.Serialize(rl);
+    //}
 
     //[WebMethod]
     //[ScriptMethod(ResponseFormat = ResponseFormat.Json)]
