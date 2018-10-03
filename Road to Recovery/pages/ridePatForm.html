@@ -817,14 +817,23 @@
                 alert("יש לבחור יעד מתוך הרשימה");
             }
 
-            var Date = $("#dateRide").val();
+            var date = $("#dateRide").val();
             var reg = new RegExp("[0-9]{2}\/[0-9]{2}\/[0-9]{4}");
-            var dateMatch = reg.test(Date);
+            var dateMatch = reg.test(date);
             if (!dateMatch) alert("התאריך שהוזן אינו חוקי");
+            var Day = parseInt(date.substring(0, 2));
+            var Month = parseInt(date.substring(3, 5)) - 1;
+            var Year = parseInt(date.substring(6));
+            date = new Date(Year, Month, Day, $("#hour").val(), $("#minute").val());
+            futureDate = checkFutureDate(date); 
+            if (!futureDate) alert("יש לבחור תאריך עתידי");
+
 
             //var Time = $("#hour").val() + ":" + $("#minute").val();
             //var reg = new RegExp("[0-9]{2}\:[0-9]{2}");
             //var timeMatch = reg.test(Time);
+
+
             var timeMatch = true;
             var aN = $("#afterNoon").is(':checked');
             if (!aN) {
@@ -836,15 +845,15 @@
 
 
 
-             if ($("#onlyEscort").is(':checked')) {
-            var atLeastOneIsChecked = 0;
-            $('#selectEscort input:checked').each(function () {
-                atLeastOneIsChecked++;
-            });
-            if (atLeastOneIsChecked == 0) alert("יש לבחור לפחות מלווה אחד");
-              }
+            if ($("#onlyEscort").is(':checked')) {
+                var atLeastOneIsChecked = 0;
+                $('#selectEscort input:checked').each(function () {
+                    atLeastOneIsChecked++;
+                });
+                if (atLeastOneIsChecked == 0) alert("יש לבחור לפחות מלווה אחד");
+            }
 
-            if (!patientExists || !Origin || !Dest || !dateMatch || !timeMatch || atLeastOneIsChecked == 0) {
+            if (!patientExists || !Origin || !Dest || !dateMatch || !timeMatch || atLeastOneIsChecked == 0 || !futureDate) {
                 return false;
             } else return true;
         }
@@ -871,6 +880,16 @@
                 alert(e.responseText);
             }
 
+        }
+
+        function checkFutureDate(date) {
+
+            checkDate = Date.parse(date); //parameter date to compare with today
+            var d2 = new Date(); //today
+            currentDate = Date.parse(d2);
+
+            if (checkDate < currentDate) return false
+            else return true;
         }
 
         function getEquipmentForPatient() {
