@@ -70,7 +70,7 @@
             //$("#UnassignedRidePats").prop('checked', localStorage.unassigned);
             //$("#MyRidePats").prop('checked', localStorage.myRidePats);
 
-            $.fn.dataTable.moment('DD/MM/YY HH:mm');
+            $.fn.dataTable.moment('DD/MM/YYYY');
             //$('#example').DataTable();
             // $.fn.dataTable.moment('DD/MM/YYYY HH:MM');//'' DD/MM/YYYY HH:MM
 
@@ -163,7 +163,8 @@
                         } else minutes = date.getMinutes();
 
 
-                        date2 = date.toLocaleDateString();
+                       // date2 = date.toLocaleDateString();
+                        date2 = date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getUTCFullYear();
                         
 
                         hours = date.getHours();
@@ -253,10 +254,10 @@
 
             if (arr_rides[i].Status == "ממתינה לשיבוץ") {
                 if (table.context[0].sTableId != "datatable-future") {
-                    table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!", arr_rides[i].Status, btnStr])
+                    table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!", arr_rides[i].Status, btnStr]).draw(false);
                 }
                 else {
-                    table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!", arr_rides[i].Status, btnStr]);
+                    table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!", arr_rides[i].Status, btnStr]).draw(false);
                 }
             }
             else {
@@ -273,11 +274,11 @@
 
                 else if (arr_rides[i].Drivers.length == 2)
                     var drivers = "ראשי: " + primary + ", " + "גיבוי: " + secondary;
-                if (table != "tFuture") {
-                    table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr])
+                if (table.context[0].sTableId != "datatable-future") {
+                    table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr]).draw(false);
                 }
                 else {
-                    table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr]);
+                    table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr]).draw(false);
                 }
             }
         }
@@ -285,10 +286,12 @@
         function confirmDelete(ridePat) {
             arr_details = { RidePatNum: ridePat.name, func: "show" };//attribute name=RidePatNum
             var data = tFuture.row($(ridePat).parents('tr')).data();
+            var hour =" בשעה ";
+            if (data[1] == "אחה''צ" ) hour= " ";
             swal({
                 title: "האם אתם בטוחים?",
                 type: "warning",
-                text: "מחיקת ההסעה של " + data[4] + " מ: " + data[2] + " ל: " + data[3] + ", בתאריך " + data[0] + " בשעה " + data[1],
+                text: "מחיקת ההסעה של " + data[4] + " מ: " + data[2] + " ל: " + data[3] + ", בתאריך " + data[0] + hour + data[1],
                 showCancelButton: true,
                 cancelButtonText: "בטל",
                 confirmButtonClass: 'btn-warning',
@@ -416,7 +419,7 @@
                         <!-- LOGO -->
                         <div class="pull-left">
                             <div class="text-center">
-                                <a href="index.html" class="logo"><span>בדרך להחלמה</span>&nbsp&nbsp&nbsp</a>
+                                <a href="manageRidePats.html" class="logo"><span>בדרך להחלמה</span>&nbsp&nbsp&nbsp</a>
                             </div>
                         </div>
                     </div>
