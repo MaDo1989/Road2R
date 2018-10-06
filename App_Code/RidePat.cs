@@ -540,9 +540,13 @@ public class RidePat
                     primary.DriverType = "Primary";
 
                     primary.Id = int.Parse(dr["MainDriver"].ToString());
-                    string query3 = "select DisplayName from Volunteer where Id=" + primary.Id;
+                    string query3 = "select DisplayName,CellPhone from Volunteer where Id=" + primary.Id;
                     DbService db3 = new DbService();
-                    primary.DisplayName = db3.GetObjectScalarByQuery(query3).ToString();
+                    //primary.DisplayName = db3.GetObjectScalarByQuery(query3).ToString();
+                    DataSet driverSet = db3.GetDataSetByQuery(query3);
+                    DataRow driverRow = driverSet.Tables[0].Rows[0];
+                    primary.DisplayName = driverRow["DisplayName"].ToString();
+                    primary.CellPhone = driverRow["CellPhone"].ToString();
                     rp.Drivers.Add(primary);
                 }
 
@@ -554,9 +558,13 @@ public class RidePat
                     Volunteer secondary = new Volunteer();
                     secondary.DriverType = "secondary";
                     secondary.Id = int.Parse(dr["secondaryDriver"].ToString());
-                    string query4 = "select DisplayName from Volunteer where Id=" + secondary.Id;
+                    string query4 = "select DisplayName,Cellphone from Volunteer where Id=" + secondary.Id;
                     DbService db4 = new DbService();
-                    secondary.DisplayName = db4.GetObjectScalarByQuery(query4).ToString();
+                    // secondary.DisplayName = db4.GetObjectScalarByQuery(query4).ToString();
+                    DataSet driverSet = db4.GetDataSetByQuery(query4);
+                    DataRow driverRow = driverSet.Tables[0].Rows[0];
+                    secondary.DisplayName = driverRow["DisplayName"].ToString();
+                    secondary.CellPhone = driverRow["CellPhone"].ToString();
                     rp.Drivers.Add(secondary);
                 }
                 //  }

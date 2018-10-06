@@ -242,8 +242,8 @@
                                 t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, arr_rides[i].Status, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
                             else {
                                 for (j in arr_rides[i].Drivers) {
-                                    if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName;
-                                    else secondary = arr_rides[i].Drivers[j].DisplayName;
+                                    if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName + " " + arr_rides[i].Drivers[j].CellPhone;
+                                    else secondary = arr_rides[i].Drivers[j].DisplayName + " " + arr_rides[i].Drivers[j].CellPhone;
                                 }
                                 if (arr_rides[i].Drivers.length == 1)
                                     var drivers = "ראשי: " + primary;
@@ -469,7 +469,7 @@
 
                                     <li class="active">כל ההסעות</li>
                                 </ol>
-                                <h4 class="page-title">כל הסעות&nbsp&nbsp<i class="md md-recent-actors"></i></h4>
+                                <h4 class="page-title">כל ההסעות&nbsp&nbsp<i class="md md-recent-actors"></i></h4>
                             </div>
                         </div>
                     </div>

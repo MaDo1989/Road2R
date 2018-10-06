@@ -1801,8 +1801,6 @@ pre {
 
 thead {
     background-color: darkblue;
-}
+    color:white;
+    }
 
-th {
-    color: white;
-}
