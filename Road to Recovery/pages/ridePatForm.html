@@ -690,90 +690,6 @@
             }
             $select.val("00");
         }
-        //function generateHour1(ridePat) {
-        //    var $select = $("#hour");
-        //    $.ajax({
-        //        dataType: "json",
-        //        url: "WebService.asmx/getHoursView",
-        //        contentType: "application/json; charset=utf-8",
-        //        type: "POST",
-        //        async: false,
-        //        data: JSON.stringify({}),
-        //        success: function (data) {
-        //            var arr_hours = JSON.parse(data.d);
-        //            if (ridePat.LeavingHour != "") {
-        //                $('<option>', { value: ridePat.LeavingHour, text: ridePat.LeavingHour }).appendTo($select);
-        //            }
-        //            $('<option>', { value: "", text: "בחר " }).appendTo($select);
-
-        //            for (i in arr_hours) {
-        //                $('<option>', { value: arr_hours[i].Hour, text: arr_hours[i].Hour }).appendTo($select);
-        //            }
-        //        },
-        //        error: function (err) { alert("Error in generateHour1"); }
-        //    });
-        //}
-
-        //function generateAdd1(ridePat) {
-        //    var $select = $("#Equipment");
-        //    if (ridePat.Addition != "") {
-        //        $('<option>', { value: ridePat.Addition, text: ridePat.Addition }).appendTo($select);
-        //    }
-        //    $('<option>', { value: "", text: "בחר " }).appendTo($select);
-
-        //    $('<option>', { value: "כיסא גלגלים", text: "כיסא גלגלים " }).appendTo($select);
-        //    $('<option>', { value: "בוסטר", text: "בוסטר " }).appendTo($select);
-        //    $('<option>', { value: "כיסא תינוק", text: "כיסא תינוק " }).appendTo($select);
-        //    $('<option>', { value: "כיסא גלגלים+בוסטר", text: "כיסא גלגלים+בוסטר " }).appendTo($select);
-        //}
-
-        //function generateAdd() {
-        //    var $select = $("#Equipment");
-        //    $('<option>', { value: "", text: "בחר " }).appendTo($select);
-
-        //    $('<option>', { value: "כיסא גלגלים", text: "כיסא גלגלים " }).appendTo($select);
-        //    $('<option>', { value: "בוסטר", text: "בוסטר " }).appendTo($select);
-        //    $('<option>', { value: "כיסא תינוק", text: "כיסא תינוק " }).appendTo($select);
-        //    $('<option>', { value: "כיסא גלגלים+בוסטר", text: "כיסא גלגלים+בוסטר " }).appendTo($select);
-        //}
-
-        //function generateRideType(ridePat) {
-        //    var $select = $("#rideType");
-        //    if (ridePat.RideType != "") {
-        //        $('<option>', { value: ridePat.RideType, text: ridePat.RideType }).appendTo($select);
-        //    }
-        //    $('<option>', { value: "", text: "בחר " }).appendTo($select);
-        //    $('<option>', { value: "ממחסום אל בית החולים", text: "ממחסום אל בית החולים " }).appendTo($select);
-        //    $('<option>', { value: "מבית החולים למחסום", text: "מבית החולים למחסום " }).appendTo($select);
-        //    $('<option>', { value: "אחר", text: "אחר " }).appendTo($select);
-        //}
-
-        //function generateRideType1() {
-        //    var $select = $("#rideType");
-        //    $('<option>', { value: "", text: "בחר " }).appendTo($select);
-        //    $('<option>', { value: "ממחסום אל בית החולים", text: "ממחסום אל בית החולים " }).appendTo($select);
-        //    $('<option>', { value: "מבית החולים למחסום", text: "מבית החולים למחסום " }).appendTo($select);
-        //    $('<option>', { value: "אחר", text: "אחר " }).appendTo($select);
-        //}
-
-        //function generateQuantity(ridePat) {
-        //    var $select = $("#quantity");
-        //    if (ridePat.RideType != "") {
-        //        $('<option>', { value: ridePat.Quantity, text: ridePat.Quantity }).appendTo($select);
-        //    }
-        //    $('<option>', { value: "1", text: "1" }).appendTo($select);
-        //    $('<option>', { value: "2", text: "2" }).appendTo($select);
-        //    $('<option>', { value: "3", text: "3" }).appendTo($select);
-        //    $('<option>', { value: "4", text: "4" }).appendTo($select);
-        //}
-
-        //function generateQuantity1() {
-        //    var $select = $("#quantity");
-        //    $('<option>', { value: "1", text: "1" }).appendTo($select);
-        //    $('<option>', { value: "2", text: "2" }).appendTo($select);
-        //    $('<option>', { value: "3", text: "3" }).appendTo($select);
-        //    $('<option>', { value: "4", text: "4" }).appendTo($select);
-        //}
 
         function validateInputs() {
 
@@ -879,8 +795,14 @@
         }
 
         function checkFutureDate(date) {
-
+            if ($("#afterNoon").is(':checked')) { //22:14 is the default time that means afternoon אחה''צ
+                Hour = 22;
+                Minute = 14;
+            }
             checkDate = Date.parse(date); //parameter datetime to compare with today
+            if ($("#afterNoon").is(':checked')) { //22:14 is the default time that means afternoon אחה''צ
+                checkDate = Date.parse(new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59));
+            }
             var d2 = new Date(); //now
             currentDate = Date.parse(d2);
 
@@ -1155,7 +1077,7 @@
                         <!-- LOGO -->
                         <div class="pull-left">
                             <div class="text-center">
-                                <a href="index.html" class="logo"><span>בדרך להחלמה</span>&nbsp&nbsp&nbsp</a>
+                                <a href="manageRidePats.html" class="logo"><span>בדרך להחלמה</span>&nbsp&nbsp&nbsp</a>
                             </div>
                         </div>
                     </div>
@@ -1324,9 +1246,9 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">שעת הסעה&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6" id="selecthour">
-                                                        <select id="minute" name="minute" class="form-control" style="width:20%;display:inline"><option>דקות</option></select>
+                                                        <select id="minute" name="minute" class="form-control" style="width:33%;display:inline"><option>דקות</option></select>
                                                         <p style="display:inline;">:</p>
-                                                        <select id="hour" name="hour" class="form-control" style="width:20%; display:inline;"><option>שעות</option></select>
+                                                        <select id="hour" name="hour" class="form-control" style="width:33%; display:inline;"><option>שעות</option></select>
                                                         <input type="checkbox" id="afterNoon" onchange="checkAfternoon()" />
                                                         <label for="afterNoon">אחה"צ</label>
                                                     </div>
