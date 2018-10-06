@@ -837,8 +837,8 @@
             $("#Equipment").text(str);
         }
 
-        function getEquipmentForPatientErrorCB() {
-            alert("Error in getEquipmentForPatient");
+        function getEquipmentForPatientErrorCB(err) {
+            alert("Error in getEquipmentForPatient: "+ err.responseText);
         }
 
         function switchDir() {
@@ -886,26 +886,12 @@
                     }
                 }
                 else {
-                    // $("#ridePatNum").attr('disabled', 'disabled');
                     generateStatus();
                     generatePat();
                     getCoor();
                     generateLocation();
                     generateHour();
                     generateMinute();
-                    // $("#statusRidePat").attr('disabled', 'disabled');
-
-                    //generateCoor();
-                    //generateRideType1()
-                    //generateEsc()
-
-                    //generateAdd();
-                    //  generateArea1();
-                    //generateday1();
-                    //generateQuantity1()
-
-                    //initializeSelect2();
-                    //$("#activeridePat").prop('checked', 'checked');
                 }
             }
         }
@@ -927,23 +913,7 @@
                 success: function (data) {
                     var ridePat = JSON.parse(data.d);
                     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(ridePat));
-                    //generatePreferDestination(ridePat);
-                    //generatePreferDayAndHour(ridePat);
-                    //generateStatus(ridePat);
-                    // generateGender(ridePat);
-                    //generateAdd1(ridePat)
-                    // generatePat1(ridePat)
-                    //generateCoor1(ridePat)
-                    // generateEsc1(ridePat)
-                    //generateQuantity(ridePat)
-                    //generateHour1(ridePat)
-                    //generateStatus1(ridePat)
-                    //generateDestination1(ridePat)
-                    //generateRideType(ridePat)
-                    //  generateArea(ridePat)
-                    //generateday(ridePat)
-
-
+                    
                     var temp = ridePat.Date.substring(ridePat.Date.indexOf("(") + 1, ridePat.Date.indexOf(")"))
                     var date = new Date(parseInt(temp));
                     var hours = date.getHours(date);
@@ -997,26 +967,15 @@
                         $("#hour option[value='" + hours + "']").prop('selected', true);
                         $("#minute option[value='" + minutes + "']").prop('selected', true);
                     }
-
-
-                    //$("#selectaddition").val(ridePat.Pat.Addition);
-
-
+                    
                     $("#coordinator").val(ridePat.Coordinator.DisplayName);
 
                     $("#remark").val(ridePat.Remark);
 
                     $("#statusRidePat option[value='" + ridePat.Status + "']").prop('selected', true);
-                    //$("#selectEscorted1").val(ridePat.Escorted1.DisplayName);
-                    //$("#selectEscorted2").val(ridePat.Escorted2.DisplayName);
-                    //$("#selectEscorted3").val(ridePat.Escorted3.DisplayName);
-                    // $("#selectday1").val(ridePat.Escorted3);
-                    // $("#selectarea").val(ridePat.StartArea);
-                    // $("#selectstatusRidePat").val(ridePat.Status);
-
-
+                    
                 },
-                error: function (err) { alert("Error in uploadData"); }
+                error: function (err) { alert("Error in uploadData: "+ err.responseText); }
             });
         }
 
@@ -1024,15 +983,6 @@
             location.href = "viewRidePats.html"
         }
 
-
-        //function checkCity(value) {
-        //    if (value == "-1") {
-        //        // validate the fields here
-        //        return [false, "אנא בחר יישוב"];
-        //    } else {
-        //        return [true, ""];
-        //    }
-        //};
         function checkAfternoon() {
             if ($("#afterNoon").is(':checked')) {
                 $("#hour").val("");
@@ -1046,10 +996,7 @@
                 $("#minute").attr('disabled', false);
             }
         }
-
-
-
-
+        
     </script>
 </head>
 <body class="fixed-left">

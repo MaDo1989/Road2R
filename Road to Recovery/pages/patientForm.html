@@ -160,10 +160,9 @@
 
             for (i in arr_equipment) {
                 var equipment = arr_equipment[i];
-                //var equipment = arr_equipment[i].replace("'", "");
-                //var id = arr_equipment[i].Id;
-                str += "<input id='equipmentCB" + i + "' type=checkbox name='" + i + "'>&nbsp";
-                str += "<label for='equipmentCB" + i + "'>" + equipment + "</label>&nbsp&nbsp";
+               
+                str += "<div><input id='equipmentCB" + i + "' type=checkbox name='" + i + "'>&nbsp";
+                str += "<label for='equipmentCB" + i + "'>" + equipment + "</label>&nbsp&nbsp</div>";
             }
             //if (arr_equipment.length == 0) str = "<label>אין מלווים</label>";
             $("#selectEquipment").html(str);
@@ -829,7 +828,7 @@
                             <div class="col-sm-12">
                                 <div class="card-box">
                                     <div class="row">
-                                        <h4 class="m-t-0 header-title"><b>טופס חולה</b></h4>
+                                        <h4 class="m-t-0 header-title"><b>פרטי חולה</b></h4>
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <br />
