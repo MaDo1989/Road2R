@@ -36,3 +36,9 @@ function getCookie(cname) {
     }
     return "";
 }
+
+function deleteCookie()
+{
+    setCookie("username", "", 0);
+    location.href = "login.html";
+}
