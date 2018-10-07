@@ -102,7 +102,7 @@ public class User
         if (dt != null && dt.Rows.Count > 0)
         {
             DataRow dr = dt.Rows[0];
-            if (dr["Password"].ToString() == Password)
+            if (dr["Password"].ToString() == Password && (bool)dr["IsActive"])
             {
                 userInDB = true;
             }
