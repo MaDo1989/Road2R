@@ -614,7 +614,7 @@ public class RidePat
                     {
                         rp.Statuses.Add(status.ItemArray[0].ToString());
                     }
-                    //rp.Status = rp.Statuses[0];
+                    rp.Status = rp.Statuses[0];
 
                 }
                 rpl.Add(rp);
