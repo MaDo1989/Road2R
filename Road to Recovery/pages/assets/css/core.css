@@ -1799,8 +1799,10 @@ pre {
     right: auto;
 }
 
-thead {
-    background-color: darkblue;
-    color:white;
-    }
+thead tr th {
+    color: white;
+}
 
+thead {
+    background-color: #2a3142;
+}
