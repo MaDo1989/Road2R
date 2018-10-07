@@ -180,214 +180,8 @@
         }
 
 
-
-        //function generateStatus(volunteer) {
-        //    var $select = $("#statusVolunteer");
-        //    if (volunteer.Status != "") {
-        //        $('<option>', { value: volunteer.Status, text: volunteer.Status }).appendTo($select);
-        //    }
-        //    $('<option>', { value: "", text: "בחר " }).appendTo($select);
-
-        //    $('<option>', { value: "פעיל", text: "פעיל " }).appendTo($select);
-        //    $('<option>', { value: "לא פעיל", text: "לא פעיל " }).appendTo($select);
-        //}
-
-        //function generateStatus1() {
-        //    var $select = $("#statusVolunteer");
-        //    $('<option>', { value: "", text: "בחר " }).appendTo($select);
-        //    $('<option>', { value: "פעיל", text: "פעיל " }).appendTo($select);
-        //    $('<option>', { value: "לא פעיל", text: "לא פעיל " }).appendTo($select);
-        //}
-
-        //function generateGender(volunteer) {
-        //    var $select = $("#gender");
-        //    if (volunteer.Gender != "") {
-        //        $('<option>', { value: volunteer.Gender, text: patient.Gender }).appendTo($select);
-        //    }
-        //    $('<option>', { value: "", text: "בחר " }).appendTo($select);
-        //    $('<option>', { value: "זכר", text: "זכר " }).appendTo($select);
-        //    $('<option>', { value: "נקבה", text: "נקבה " }).appendTo($select);
-        //}
-
-        //function generateGender1() {
-        //    var $select = $("#gender");
-        //    $('<option>', { value: "", text: "בחר " }).appendTo($select);
-        //    $('<option>', { value: "זכר", text: "זכר " }).appendTo($select);
-        //    $('<option>', { value: "נקבה", text: "נקבה " }).appendTo($select);
-        //}
-
-        //function generateDestination() {
-        //    var $select = $("#preferRoute1");
-        //    var $select1 = $("#PreferedDrivers2");
-        //    var $select2 = $("#preferedDrivers3");
-        //    $.ajax({
-        //        dataType: "json",
-        //        url: "WebService.asmx/getDestinationView",
-        //        contentType: "application/json; charset=utf-8",
-        //        type: "POST",
-        //        async: false,
-        //        data: JSON.stringify({ active: true }),
-        //        success: function (data) {
-        //            var arr_drivers = JSON.parse(data.d);
-
-        //            $('<option>', { value: "", text: "בחר " }).appendTo($select);
-        //            $('<option>', { value: "", text: "בחר " }).appendTo($select1);
-        //            $('<option>', { value: "", text: "בחר " }).appendTo($select2);
-
-        //            for (i in arr_drivers) {
-
-        //                $('<option>', { value: arr_drivers[i].Name, text: arr_drivers[i].Name }).appendTo($select);
-        //                $('<option>', { value: arr_drivers[i].Name, text: arr_drivers[i].Name }).appendTo($select1);
-        //                $('<option>', { value: arr_drivers[i].Name, text: arr_drivers[i].Name }).appendTo($select2);
-
-        //            }
-        //        },
-        //        error: function (err) { alert("Error"); }
-        //    });
-        //}
-
-
-        //function generatePreferDestination(volunteer) {
-
-        //    var $select = $("#preferRoute1");
-        //    var $select1 = $("#PreferedDrivers3");
-        //    var $select2 = $("#preferedDrivers2");
-        //    $.ajax({
-        //        dataType: "json",
-        //        url: "WebService.asmx/getDestinationView",
-        //        contentType: "application/json; charset=utf-8",
-        //        type: "POST",
-        //        async: false,
-        //        data: JSON.stringify({ active: true }),
-        //        success: function (data) {
-        //            var arr_drivers = JSON.parse(data.d);
-        //            if (volunteer.PreferRoute1 != "") {
-        //                $('<option>', { value: volunteer.PreferRoute1, text: volunteer.PreferRoute1 }).appendTo($select);
-        //            }
-        //            if (volunteer.PreferRoute2 != "") {
-        //                $('<option>', { value: volunteer.PreferRoute2, text: volunteer.PreferRoute2 }).appendTo($select1);
-        //            }
-        //            if (volunteer.PreferRoute3 != "") {
-        //                $('<option>', { value: volunteer.PreferRoute3, text: volunteer.PreferRoute3 }).appendTo($select2);
-        //            }
-        //            $('<option>', { value: "", text: "בחר " }).appendTo($select);
-        //            $('<option>', { value: "", text: "בחר " }).appendTo($select1);
-        //            $('<option>', { value: "", text: "בחר " }).appendTo($select2);
-
-        //            for (i in arr_drivers) {
-        //                $('<option>', { value: arr_drivers[i].Name, text: arr_drivers[i].Name }).appendTo($select);
-        //                $('<option>', { value: arr_drivers[i].Name, text: arr_drivers[i].Name }).appendTo($select1);
-        //                $('<option>', { value: arr_drivers[i].Name, text: arr_drivers[i].Name }).appendTo($select2);
-        //            }
-        //        },
-        //        error: function (err) { alert("Error"); }
-        //    });
-        //}
-
-        //function generatePreferDayAndHour(volunteer) {
-        //    var $selectDay1 = $("#day1");
-        //    var $selectDay2 = $("#day2");
-        //    var $selectDay3 = $("#day3");
-        //    var $selectHour1 = $("#hour1");
-        //    var $selectHour2 = $("#hour2");
-        //    var $selectHour3 = $("#hour3");
-        //    if (volunteer.Day1 != "")
-        //        $('<option>', { value: volunteer.Day1, text: volunteer.Day1 }).appendTo($selectDay1);
-        //    if (volunteer.Day2 != "")
-        //        $('<option>', { value: volunteer.Day2, text: volunteer.Day2 }).appendTo($selectDay2);
-        //    if (volunteer.Day3 != "")
-        //        $('<option>', { value: volunteer.Day3, text: volunteer.Day3 }).appendTo($selectDay3);
-        //    if (volunteer.Hour1 != "")
-        //        $('<option>', { value: volunteer.Hour1, text: volunteer.Hour1 }).appendTo($selectHour1);
-        //    if (volunteer.Hour2 != "")
-        //        $('<option>', { value: volunteer.Hour2, text: volunteer.Hour2 }).appendTo($selectHour2);
-        //    if (volunteer.Hour3 != "")
-        //        $('<option>', { value: volunteer.Hour3, text: volunteer.Hour3 }).appendTo($selectHour3);
-        //    $('<option>', { value: "", text: "בחר " }).appendTo($selectDay1);
-        //    $('<option>', { value: "", text: "בחר " }).appendTo($selectDay2);
-        //    $('<option>', { value: "", text: "בחר " }).appendTo($selectDay3);
-        //    $('<option>', { value: "", text: "בחר " }).appendTo($selectHour1);
-        //    $('<option>', { value: "", text: "בחר " }).appendTo($selectHour2);
-        //    $('<option>', { value: "", text: "בחר " }).appendTo($selectHour3);
-        //    $('<option>', { value: "בוקר", text: "בוקר " }).appendTo($selectHour1);
-        //    $('<option>', { value: "בוקר", text: "בוקר " }).appendTo($selectHour2);
-        //    $('<option>', { value: "בוקר", text: "בוקר " }).appendTo($selectHour3);
-        //    $('<option>', { value: "אחהצ", text: "אחהצ " }).appendTo($selectHour1);
-        //    $('<option>', { value: "אחהצ", text: "אחהצ " }).appendTo($selectHour2);
-        //    $('<option>', { value: "אחהצ", text: "אחהצ " }).appendTo($selectHour3);
-        //    $('<option>', { value: "ראשון", text: "ראשון " }).appendTo($selectDay1);
-        //    $('<option>', { value: "ראשון", text: "ראשון " }).appendTo($selectDay2);
-        //    $('<option>', { value: "ראשון", text: "ראשון " }).appendTo($selectDay3);
-        //    $('<option>', { value: "שני", text: "שני " }).appendTo($selectDay1);
-        //    $('<option>', { value: "שני", text: "שני " }).appendTo($selectDay2);
-        //    $('<option>', { value: "שני", text: "שני " }).appendTo($selectDay3);
-        //    $('<option>', { value: "שלישי", text: "שלישי " }).appendTo($selectDay1);
-        //    $('<option>', { value: "שלישי", text: "שלישי " }).appendTo($selectDay2);
-        //    $('<option>', { value: "שלישי", text: "שלישי " }).appendTo($selectDay3);
-        //    $('<option>', { value: "רביעי", text: "רביעי " }).appendTo($selectDay1);
-        //    $('<option>', { value: "רביעי", text: "רביעי " }).appendTo($selectDay2);
-        //    $('<option>', { value: "רביעי", text: "רביעי " }).appendTo($selectDay3);
-        //    $('<option>', { value: "חמישי", text: "חמישי " }).appendTo($selectDay1);
-        //    $('<option>', { value: "חמישי", text: "חמישי " }).appendTo($selectDay2);
-        //    $('<option>', { value: "חמישי", text: "חמישי " }).appendTo($selectDay3);
-        //    $('<option>', { value: "שישי", text: "שישי " }).appendTo($selectDay1);
-        //    $('<option>', { value: "שישי", text: "שישי " }).appendTo($selectDay2);
-        //    $('<option>', { value: "שישי", text: "שישי " }).appendTo($selectDay3);
-        //    $('<option>', { value: "שבת", text: "שבת " }).appendTo($selectDay1);
-        //    $('<option>', { value: "שבת", text: "שבת " }).appendTo($selectDay2);
-        //    $('<option>', { value: "שבת", text: "שבת " }).appendTo($selectDay3);
-        //}
-
-        //function generateDayAndHour() {
-        //    var $selectDay1 = $("#day1");
-        //    var $selectDay2 = $("#day2");
-        //    var $selectDay3 = $("#day3");
-        //    var $selectHour1 = $("#hour1");
-        //    var $selectHour2 = $("#hour2");
-        //    var $selectHour3 = $("#hour3");
-
-        //    $('<option>', { value: "", text: "בחר " }).appendTo($selectDay1);
-        //    $('<option>', { value: "", text: "בחר " }).appendTo($selectDay2);
-        //    $('<option>', { value: "", text: "בחר " }).appendTo($selectDay3);
-        //    $('<option>', { value: "", text: "בחר " }).appendTo($selectHour1);
-        //    $('<option>', { value: "", text: "בחר " }).appendTo($selectHour2);
-        //    $('<option>', { value: "", text: "בחר " }).appendTo($selectHour3);
-        //    $('<option>', { value: "בוקר", text: "בוקר " }).appendTo($selectHour1);
-        //    $('<option>', { value: "בוקר", text: "בוקר " }).appendTo($selectHour2);
-        //    $('<option>', { value: "בוקר", text: "בוקר " }).appendTo($selectHour3);
-        //    $('<option>', { value: "אחהצ", text: "אחהצ " }).appendTo($selectHour1);
-        //    $('<option>', { value: "אחהצ", text: "אחהצ " }).appendTo($selectHour2);
-        //    $('<option>', { value: "אחהצ", text: "אחהצ " }).appendTo($selectHour3);
-        //    $('<option>', { value: "ראשון", text: "ראשון " }).appendTo($selectDay1);
-        //    $('<option>', { value: "ראשון", text: "ראשון " }).appendTo($selectDay2);
-        //    $('<option>', { value: "ראשון", text: "ראשון " }).appendTo($selectDay3);
-        //    $('<option>', { value: "שני", text: "שני " }).appendTo($selectDay1);
-        //    $('<option>', { value: "שני", text: "שני " }).appendTo($selectDay2);
-        //    $('<option>', { value: "שני", text: "שני " }).appendTo($selectDay3);
-        //    $('<option>', { value: "שלישי", text: "שלישי " }).appendTo($selectDay1);
-        //    $('<option>', { value: "שלישי", text: "שלישי " }).appendTo($selectDay2);
-        //    $('<option>', { value: "שלישי", text: "שלישי " }).appendTo($selectDay3);
-        //    $('<option>', { value: "רביעי", text: "רביעי " }).appendTo($selectDay1);
-        //    $('<option>', { value: "רביעי", text: "רביעי " }).appendTo($selectDay2);
-        //    $('<option>', { value: "רביעי", text: "רביעי " }).appendTo($selectDay3);
-        //    $('<option>', { value: "חמישי", text: "חמישי " }).appendTo($selectDay1);
-        //    $('<option>', { value: "חמישי", text: "חמישי " }).appendTo($selectDay2);
-        //    $('<option>', { value: "חמישי", text: "חמישי " }).appendTo($selectDay3);
-        //    $('<option>', { value: "שישי", text: "שישי " }).appendTo($selectDay1);
-        //    $('<option>', { value: "שישי", text: "שישי " }).appendTo($selectDay2);
-        //    $('<option>', { value: "שישי", text: "שישי " }).appendTo($selectDay3);
-        //    $('<option>', { value: "שבת", text: "שבת " }).appendTo($selectDay1);
-        //    $('<option>', { value: "שבת", text: "שבת " }).appendTo($selectDay2);
-        //    $('<option>', { value: "שבת", text: "שבת " }).appendTo($selectDay3);
-        //}
-
-
-
         function loadPage() {
-            //generate select options
-            //generatePaymentType();
-
-
+            
             if (JSON.parse(GENERAL.VOLUNTEERS.getVolunteersList()).length != 0) {
                 arr_volunteer = JSON.parse(GENERAL.VOLUNTEERS.getVolunteersList());
                 if (arr_volunteer.func == "edit" || arr_volunteer.func == "show") {
@@ -561,13 +355,6 @@
                 <div id="sidebar-menu">
 
                     <ul>
-
-                        <!--<li>
-                            <a href="index.html" class="waves-effect waves-primary">
-                                <i class="md md-dashboard"></i><span> דף הבית </span>
-                            </a>
-                        </li>-->
-
                         <li>
                             <a href="viewVolunteer.html" class="waves-effect waves-primary">
                                 <i class="md md-today"></i><span> ניהול מתנדבים</span>
@@ -588,6 +375,11 @@
                         <li>
                             <a href="manageRidePats.html" class="waves-effect waves-primary">
                                 <i class="md md-today"></i><span> ניהול ההסעות שלי</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="waves-effect waves-primary" onclick="deleteCookie()">
+                                <i class="md md-remove-circle-outline"></i><span>התנתקות מהמערכת</span>
                             </a>
                         </li>
                     </ul>
