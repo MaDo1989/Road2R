@@ -140,44 +140,44 @@
             alert("Error in generateVolTypes: " + e.responseText);
         }
 
-        function loadAddresses(customerID) {
-            // show loading message
-            $("#jqGrid")[0].grid.beginReq();
+        //function loadAddresses(customerID) {
+        //    // show loading message
+        //    $("#jqGrid")[0].grid.beginReq();
 
-            $.ajax({
-                dataType: "json",
-                url: "WebService.asmx/getCustomerAddresses",
-                contentType: "application/json; charset=utf-8",
-                type: "POST",
-                data: JSON.stringify({ customerID: customerID }),
-                success: function (data) {
-                    var arr_addresses = JSON.parse(data.d);
+            //$.ajax({
+            //    dataType: "json",
+            //    url: "WebService.asmx/getCustomerAddresses",
+            //    contentType: "application/json; charset=utf-8",
+            //    type: "POST",
+            //    data: JSON.stringify({ customerID: customerID }),
+            //    success: function (data) {
+            //        var arr_addresses = JSON.parse(data.d);
 
-                    for (i in arr_addresses) {
-                        addressesArrayData.push({
-                            ID: arr_addresses[i].AddressID,
-                            AddressName: arr_addresses[i].AddressName,
-                            City: arr_addresses[i].CustomerCity.CityName,
-                            Street: arr_addresses[i].Street,
-                            Number: arr_addresses[i].Number,
-                            ContactPerson: arr_addresses[i].ContactPerson,
-                            ContactPhone: arr_addresses[i].ContactPhone,
-                            Comments: arr_addresses[i].Comments
-                        });
-                    }
+            //        for (i in arr_addresses) {
+            //            addressesArrayData.push({
+            //                ID: arr_addresses[i].AddressID,
+            //                AddressName: arr_addresses[i].AddressName,
+            //                City: arr_addresses[i].CustomerCity.CityName,
+            //                Street: arr_addresses[i].Street,
+            //                Number: arr_addresses[i].Number,
+            //                ContactPerson: arr_addresses[i].ContactPerson,
+            //                ContactPhone: arr_addresses[i].ContactPhone,
+            //                Comments: arr_addresses[i].Comments
+            //            });
+            //        }
 
-                    // set the new data
-                    $("#jqGrid").jqGrid('setGridParam', { data: addressesArrayData });
-                    // hide the show message
-                    $("#jqGrid")[0].grid.endReq();
-                    // refresh the grid
-                    $("#jqGrid").trigger('reloadGrid');
+        //            // set the new data
+        //            $("#jqGrid").jqGrid('setGridParam', { data: addressesArrayData });
+        //            // hide the show message
+        //            $("#jqGrid")[0].grid.endReq();
+        //            // refresh the grid
+        //            $("#jqGrid").trigger('reloadGrid');
 
-                    numberOfRecords = $("#jqGrid").getGridParam("records");
-                },
-                error: function (err) { alert("Error in getCustomerAddresses: " + err.responseText); }
-            });
-        }
+        //            numberOfRecords = $("#jqGrid").getGridParam("records");
+        //        },
+        //        error: function (err) { alert("Error in getCustomerAddresses: " + err.responseText); }
+        //    });
+        //}
 
 
         function loadPage() {
@@ -262,14 +262,16 @@
                     $("#firstA").val(volunteer.FirstNameA);
                     $("#lastA").val(volunteer.LastNameA);
                     var temp = volunteer.JoinDate.substring(volunteer.JoinDate.indexOf("(") + 1, volunteer.JoinDate.indexOf(")"))
-                    var jdate = new Date(parseInt(temp));
+                    var jdate = new Date(parseInt(temp));//.toISOString();
                     var jday = jdate.getDate();
                     var jmonth = jdate.getMonth() + 1;
                     var jyear = jdate.getFullYear();
                     if (jday < 10) jday = "0" + jday;
                     if (jmonth < 10) jmonth = "0" + jmonth;
-                    jdate = jday + "/" + jmonth + "/" + jyear
-                    $("#joinDate").val(jdate);
+                    //jdate = jday + "/" + jmonth + "/" + jyear
+                    jdate = jyear + "-" + jmonth + "-" + jday;
+                    document.getElementById("joinDate").value = jdate;
+                    //$("#joinDate").value = jdate;
                     $("#remarks").val(volunteer.Remakrs);
                     $("#phone1").val(volunteer.CellPhone);
                     $("#phone2").val(volunteer.CellPhone2);
@@ -568,8 +570,11 @@
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">תאריך הצטרפות </label>
-                                                    <div class="col-sm-6">
+                                                    <!--<div class="col-sm-6">
                                                         <input id="joinDate" name="joinDate" type="text" placeholder="dd/mm/yyyy" class="form-control">
+                                                    </div>-->
+                                                    <div class="col-sm-6">
+                                                        <input type="date" id="joinDate" placeholder="dd/mm/yyyy" class="form-control">
                                                     </div>
                                                 </div>
                                             </div>
@@ -685,13 +690,14 @@
                     var homePhone = $("#HomePhone").val();
                     var nameA = $("#firstA").val();
                     var lastNameA = $("#lastA").val();
-                    var joinDate = $("#joinDate").val();
-                    if (joinDate != "") {
-                        var joinDay = parseInt(joinDate.substring(0, 2));
-                        var joinMonth = parseInt(joinDate.substring(3, 5)) - 1;
-                        var joinYear = parseInt(joinDate.substring(6));
-                        var jdate = new Date(joinYear, joinMonth, joinDay);
-                    } else var jdate = new Date();
+                    var joinDate = new Date($("#joinDate").val());
+
+                    //if (joinDate != "") {
+                    //    var joinDay = parseInt(joinDate.substring(0, 2));
+                    //    var joinMonth = parseInt(joinDate.substring(3, 5)) - 1;
+                    //    var joinYear = parseInt(joinDate.substring(6));
+                    //    var jdate = new Date(joinYear, joinMonth, joinDay);
+                    //} else var jdate = new Date();
 
                     if ($("#ArabSpeaking").is(':checked')) var knowsArabic = true;
                     else knowsArabic = false;
@@ -705,7 +711,7 @@
 
                     volunteer = {
                         firstNameH: firstNameH, firstNameA: nameA, lastNameH: lastNameH, lastNameA: lastNameA, cellPhone: cellPhone, cellphone2: cellphone2, homePhone: homePhone,
-                        city: city, address: address, email: email, joinDate: jdate, gender: gender, KnowsArabic: knowsArabic,
+                        city: city, address: address, email: email, joinDate: joinDate, gender: gender, KnowsArabic: knowsArabic,
                         typeVol: typeVol, IsActive: active, Remarks: remark, DisplayName: displayName //birthdate: bdate,
                     }
                     $.ajax({
@@ -793,12 +799,12 @@
                 alert("יש לבחור מין מתוך הרשימה");
             }
 
-            var jDate = $("#joinDate").val();
-            if (jDate != "") {
-                var reg = new RegExp("[0-9]{2}\/[0-9]{2}\/[0-9]{4}");
-                var jdateMatch = reg.test(jDate);
-                if (!jdateMatch) alert("תאריך ההצטרפות שהוזן אינו חוקי");
-            } else (jdateMatch = true);
+            //var jDate = $("#joinDate").val();
+            //if (jDate != "") {
+            //    var reg = new RegExp("[0-9]{2}\/[0-9]{2}\/[0-9]{4}");
+            //    var jdateMatch = reg.test(jDate);
+            //    if (!jdateMatch) alert("תאריך ההצטרפות שהוזן אינו חוקי");
+            //} else (jdateMatch = true);
 
 
             var checkPhone1 = $("#phone1").val();
@@ -821,7 +827,7 @@
             } else phoneMatch3 = true;
 
 
-            if (!CityExists || !volType || !gender || !jdateMatch || !phoneMatch || !phoneMatch2 || !phoneMatch3) {
+            if (!CityExists || !volType || !gender || !phoneMatch || !phoneMatch2 || !phoneMatch3) { //|| !jdateMatch
                 return false;
             } else return true;
         }
