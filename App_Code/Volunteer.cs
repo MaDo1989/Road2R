@@ -952,14 +952,27 @@ public class Volunteer
         }
         else if (func == "new")
         {
-            query = "insert into Volunteer (Address, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, HomePhone, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks)";
-            query += " values (@address,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@phone,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks);SELECT SCOPE_IDENTITY();";
-            db = new DbService();
-            Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
 
-            query = "insert into VolunType_Volunteer (VolunTypeType,VolunteerId) values (@volType," + Id + ")";
-            db = new DbService();
-            db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+            try
+            {
+                query = "insert into Volunteer (Address, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, HomePhone, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks)";
+                query += " values (@address,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@phone,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks);SELECT SCOPE_IDENTITY();";
+                db = new DbService();
+                Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
+
+                query = "insert into VolunType_Volunteer (VolunTypeType,VolunteerId) values (@volType," + Id + ")";
+                db = new DbService();
+                db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+            }
+            catch (SqlException)
+            {
+                throw new Exception("משתמש עם מספר טלפון זה כבר קיים במערכת");
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
         }
 
     }
