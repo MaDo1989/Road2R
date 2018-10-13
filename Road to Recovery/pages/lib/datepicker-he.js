@@ -1,10 +1,10 @@
 ﻿
 function datePicker() {
-    jQuery('#dateRide').datepicker({
-        toggleActive: true,
-        clearBtn: true,
-        autoclose: true
-    });
+    //jQuery('#dateRide').datepicker({
+    //    toggleActive: true,
+    //    clearBtn: true,
+    //    autoclose: true
+    //});
  
     //jQuery('#joinDate').datepicker({
     //    toggleActive: true,
@@ -15,23 +15,23 @@ function datePicker() {
 
    // $.datepicker.setDefaults($.datepicker.regional[""]);
     
-    jQuery('#birthDate').datepicker({
-        toggleActive: true,
-        clearBtn: true,
-        autoclose: true
-    });
+    //jQuery('#birthDate').datepicker({
+    //    toggleActive: true,
+    //    clearBtn: true,
+    //    autoclose: true
+    //});
 
 
   //  $.datepicker.setDefaults($.datepicker.regional[""]);
 
-    $.datepicker.setDefaults($.datepicker.regional[""]);
-    $("dateRide").datepicker($.datepicker.regional["he"]);
+    //$.datepicker.setDefaults($.datepicker.regional[""]);
+    //$("dateRide").datepicker($.datepicker.regional["he"]);
 
-    $.datepicker.setDefaults($.datepicker.regional[""]);
-    $("birthDate").datepicker($.datepicker.regional["he"]);
+    //$.datepicker.setDefaults($.datepicker.regional[""]);
+    //$("birthDate").datepicker($.datepicker.regional["he"]);
 
-    $.datepicker.setDefaults($.datepicker.regional[""]);
-    $("joinDate").datepicker($.datepicker.regional["he"]);
+    //$.datepicker.setDefaults($.datepicker.regional[""]);
+    //$("joinDate").datepicker($.datepicker.regional["he"]);
 
 
     /* Hebrew initialisation for the UI Datepicker extension. */
