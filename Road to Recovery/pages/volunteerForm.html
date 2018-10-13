@@ -690,8 +690,9 @@
                     var homePhone = $("#HomePhone").val();
                     var nameA = $("#firstA").val();
                     var lastNameA = $("#lastA").val();
-                    var joinDate = new Date($("#joinDate").val());
-
+                    if ($("#joinDate").val() != "")
+                        var joinDate = new Date($("#joinDate").val());
+                    else joinDate = new Date();
                     //if (joinDate != "") {
                     //    var joinDay = parseInt(joinDate.substring(0, 2));
                     //    var joinMonth = parseInt(joinDate.substring(3, 5)) - 1;
