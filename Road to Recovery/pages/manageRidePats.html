@@ -164,8 +164,10 @@
 
 
                        // date2 = date.toLocaleDateString();
-                        date2 = date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getUTCFullYear();
-
+                        var day3 = date.getDate();
+                        if (day3 < 10) day3 = "0" + day3; 
+                        date2 = day3 + "/" + (date.getMonth()+1) + "/" + date.getUTCFullYear();
+                        
 
                         hours = date.getHours();
                         time = hours + ":" + minutes;
