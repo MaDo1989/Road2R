@@ -6,11 +6,13 @@ function datePicker() {
         autoclose: true
     });
  
-    jQuery('#joinDate').datepicker({
-        toggleActive: true,
-        clearBtn: true,
-        autoclose: true
-    });
+    //jQuery('#joinDate').datepicker({
+    //    toggleActive: true,
+    //    clearBtn: true,
+    //    autoclose: true
+    //});
+
+
    // $.datepicker.setDefaults($.datepicker.regional[""]);
     
     jQuery('#birthDate').datepicker({

@@ -842,51 +842,43 @@ public class Volunteer
     public Volunteer getVolunteer()
     {
         #region DB functions
-        string query = "select * from VolunteerTypeView where displayName ='" + displayName + "'";
+        SqlCommand cmd = new SqlCommand();
+        cmd.CommandType = CommandType.Text;
+        SqlParameter[] cmdParams = new SqlParameter[1];
+        cmdParams[0] = cmd.Parameters.AddWithValue("name", displayName);
+        string query = "select * from VolunteerTypeView where displayName=@name";
         Volunteer v = new Volunteer();
         DbService db = new DbService();
-        DataSet ds = db.GetDataSetByQuery(query);
+        DataSet ds = db.GetDataSetByQuery(query, cmd.CommandType, cmdParams);
+        DataRow dr = ds.Tables[0].Rows[0];
 
-        foreach (DataRow dr in ds.Tables[0].Rows)
+        v.Id = int.Parse(dr["Id"].ToString());
+        v.DisplayName = dr["DisplayName"].ToString();
+        v.FirstNameA = dr["FirstNameA"].ToString();
+        v.FirstNameH = dr["FirstNameH"].ToString();
+        v.LastNameH = dr["LastNameH"].ToString();
+        v.LastNameA = dr["LastNameA"].ToString();
+        v.CellPhone = dr["CellPhone"].ToString();
+        v.CellPhone2 = dr["CellPhone2"].ToString();
+        v.HomePhone = dr["HomePhone"].ToString();
+        v.City = dr["CityCityName"].ToString();
+        v.Address = dr["Address"].ToString();
+        v.Email = dr["Email"].ToString();
+        // v.BirthDate = Convert.ToDateTime(dr["BirthDate"].ToString());
+        v.JoinDate = Convert.ToDateTime(dr["JoinDate"].ToString());
+        v.IsActive = Convert.ToBoolean(dr["IsActive"].ToString());
+        v.Gender = dr["Gender"].ToString();
+        v.KnowsArabic = Convert.ToBoolean(dr["KnowsArabic"].ToString());
+        try
         {
-            v.Id = int.Parse(dr["Id"].ToString());
-            v.DisplayName = dr["DisplayName"].ToString();
-            v.FirstNameA = dr["FirstNameA"].ToString();
-            v.FirstNameH = dr["FirstNameH"].ToString();
-            v.LastNameH = dr["LastNameH"].ToString();
-            v.LastNameA = dr["LastNameA"].ToString();
-            v.CellPhone = dr["CellPhone"].ToString();
-            v.CellPhone2 = dr["CellPhone2"].ToString();
-            v.HomePhone = dr["HomePhone"].ToString();
-            v.City = dr["CityCityName"].ToString();
-            v.Address = dr["Address"].ToString();
-            v.Email = dr["Email"].ToString();
-            // v.BirthDate = Convert.ToDateTime(dr["BirthDate"].ToString());
-            v.JoinDate = Convert.ToDateTime(dr["JoinDate"].ToString());
-            v.IsActive = Convert.ToBoolean(dr["IsActive"].ToString());
-            v.Gender = dr["Gender"].ToString();
-            v.KnowsArabic = Convert.ToBoolean(dr["KnowsArabic"].ToString());
-            try
-            {
-                v.AvailableSeats = int.Parse(dr["AvailableSeats"].ToString());
-            }
-            catch (Exception)
-            {
-
-            }
-            //v.PreferRoute1 = dr["preferRoute1"].ToString();
-            //v.PreferRoute2 = dr["preferRoute2"].ToString();
-            //v.PreferRoute3 = dr["preferRoute3"].ToString();
-            //v.Day1 = dr["preferDay1"].ToString();
-            //v.Day2 = dr["preferDay2"].ToString();
-            //v.Day3 = dr["preferDay3"].ToString();
-            //v.Hour1 = dr["preferHour1"].ToString();
-            //v.Hour2 = dr["preferHour2"].ToString();
-            //v.Hour3 = dr["preferHour3"].ToString();
-            v.TypeVol = dr["VolunTypeType"].ToString();
-
+            v.AvailableSeats = int.Parse(dr["AvailableSeats"].ToString());
+        }
+        catch (Exception)
+        {
 
         }
+        v.TypeVol = dr["VolunTypeType"].ToString();
+
         Volunteer temp = new Volunteer();
         temp = getVolunteerPrefs(v.Id);
 
