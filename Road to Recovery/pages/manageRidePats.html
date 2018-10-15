@@ -262,19 +262,21 @@
                     table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!", arr_rides[i].Status, btnStr]).draw(false);
                 }
             }
-            else {
-                for (j in arr_rides[i].Drivers) {
+            else { //ride has at least one drive assigned to it
+                for (j in arr_rides[i].Drivers)
+                {
                     if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName+" " + arr_rides[i].Drivers[j].CellPhone;
                     else secondary = arr_rides[i].Drivers[j].DisplayName + " " + arr_rides[i].Drivers[j].CellPhone;
                 }
-                if (arr_rides[i].Drivers.length == 1) {
-                    if (primary != undefined)
+
+                if (arr_rides[i].Drivers.length == 1)
+                {
+                    if (primary != undefined) //Only a primary driver is assigned
                         var drivers = "ראשי: " + primary;
-                    else
+                    else //only a secondary driver is assigned
                         drivers = "גיבוי בלבד: " + secondary;
                 }
-
-                else if (arr_rides[i].Drivers.length == 2)
+                else if (arr_rides[i].Drivers.length == 2) //Two drivers are assigned
                     var drivers = "ראשי: " + primary + ", " + "גיבוי: " + secondary;
                 if (table.context[0].sTableId != "datatable-future") {
                     table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr]).draw(false);
