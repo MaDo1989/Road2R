@@ -59,11 +59,11 @@
             //  document.getElementById("Numbers").checked = localStorage.numbers === 'true';
 
             //$("#activeRidePats").prop('checked', localStorage.active);
-           // $("#TodaysRidePats").prop('checked', localStorage.today);
-           // $("#UnassignedRidePats").prop('checked', localStorage.unassigned);
-           // $("#MyRidePats").prop('checked', localStorage.myRidePats);
+            // $("#TodaysRidePats").prop('checked', localStorage.today);
+            // $("#UnassignedRidePats").prop('checked', localStorage.unassigned);
+            // $("#MyRidePats").prop('checked', localStorage.myRidePats);
 
-//            $.fn.dataTable.moment('DD/MM/YY HH:mm');
+            //            $.fn.dataTable.moment('DD/MM/YY HH:mm');
             $.fn.dataTable.moment('DD/MM/YY');
             //$('#example').DataTable();
             // $.fn.dataTable.moment('DD/MM/YYYY HH:MM');//'' DD/MM/YYYY HH:MM
@@ -129,9 +129,9 @@
         function refreshTable() {
             checkCookie();
             var active = JSON.parse(localStorage.active);//$("#activeRidePats").prop('checked');
-            $("#activeRidePats").prop('checked',active);
+            $("#activeRidePats").prop('checked', active);
             var today = JSON.parse(localStorage.today);//$("#TodaysRidePats").prop('checked');
-            $("#TodaysRidePats").prop('checked',today);
+            $("#TodaysRidePats").prop('checked', today);
             var unassigned = JSON.parse(localStorage.unassigned);//$("#UnassignedRidePats").prop('checked');
             $("#UnassignedRidePats").prop('checked', unassigned)
             var myRidePats = JSON.parse(localStorage.myRidePats);//$("#MyRidePats").prop('checked');
@@ -217,106 +217,99 @@
                         var deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' name='" + arr_rides[i].RidePatNum + "' title='מחיקה'><i class='fa fa-remove' ></i></button>";
                         btnStr += " " + showBtn;
 
-                        if (arr_rides[i].Status == 'ממתינה לשיבוץ' && arr_rides[i].Coordinator.DisplayName == currentCoor) 
-                           // btnStr += showBtn + " " + editBtn + " " + deleteBtn;
-                            btnStr += " " + editBtn;
+                        if (arr_rides[i].Status == 'ממתינה לשיבוץ' && arr_rides[i].Coordinator.DisplayName == currentCoor) btnStr += " " + editBtn;
 
-                            btnStr += " " + deleteBtn;
-                            //if (arr_rides[i].Status == "בוטלה") {
-                            //    var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזר'><i class='fa fa-undo' ></i></button>";
-                            //    btnStr += " " + reactiveBtn;
-                            //}
-                            if (arr_rides[i].Status == "הסתיימה") {
-                                var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-default btn-sm m-b-5' id='reactive' title='הסתיימה'><i class='fa fa-check' ></i></button>";
-                                btnStr += " " + reactiveBtn;
+                        btnStr += " " + deleteBtn;
+
+                        //if (arr_rides[i].Status == "הסתיימה") {
+                        //    var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-default btn-sm m-b-5' id='reactive' title='הסתיימה'><i class='fa fa-check' ></i></button>";
+                        //    btnStr += " " + reactiveBtn;
+                        //}
+
+                        if (arr_rides[i].Status == "ממתינה לשיבוץ")
+                            t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, arr_rides[i].Status, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
+                        else
+                        {
+                            for (j in arr_rides[i].Drivers) {
+                                if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName + " " + arr_rides[i].Drivers[j].CellPhone;
+                                else secondary = arr_rides[i].Drivers[j].DisplayName + " " + arr_rides[i].Drivers[j].CellPhone;
                             }
 
-                            // else if (arr_rides[i].Status == "משובצת") {
-                            //       var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-info btn-sm m-b-5' id='reactive' title='משובצת'><i class='fa fa-check' ></i></button>";
-                            // btnStr += " " + reactiveBtn;
-                            // }
-                            else {
-
-                            }
-
-                            if (arr_rides[i].Status == "ממתינה לשיבוץ")
-                                t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, arr_rides[i].Status, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
-                            else {
-                                for (j in arr_rides[i].Drivers) {
-                                    if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName + " " + arr_rides[i].Drivers[j].CellPhone;
-                                    else secondary = arr_rides[i].Drivers[j].DisplayName + " " + arr_rides[i].Drivers[j].CellPhone;
-                                }
-                                if (arr_rides[i].Drivers.length == 1)
+                            if (arr_rides[i].Drivers.length == 1) {
+                                if (primary != undefined) //Only a primary driver is assigned
                                     var drivers = "ראשי: " + primary;
-                                if (arr_rides[i].Drivers.length == 2)
-                                    var drivers = "ראשי: " + primary + ", " + "גיבוי: " + secondary;
-                                t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, drivers, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
+                                else //only a secondary driver is assigned
+                                    drivers = "גיבוי בלבד: " + secondary;
                             }
+                            else if (arr_rides[i].Drivers.length == 2) //Two drivers are assigned
+                                var drivers = "ראשי: " + primary + ", " + "גיבוי: " + secondary;
+                            t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, drivers, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
                         }
-                        //$.fn.dataTable.moment('DD/MM/YYYY HH:MM');
-                        //$('#datatable-buttons').DataTable();
-                        t.columns([3]).order('asc').draw();
-                        // t.createdRow();
+                    }
+                    //$.fn.dataTable.moment('DD/MM/YYYY HH:MM');
+                    //$('#datatable-buttons').DataTable();
+                    t.columns([3]).order('asc').draw();
+                    // t.createdRow();
 
 
-                        $('#datatable-buttons tbody').on('click', '#edit', function () {
-                            //var data = t.row($(this).parents('tr')).data();
-                            arr_details = { RidePatNum: this.name, func: "edit" }; //attribute name=RidePatNum
-                            GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
-                            location.href = "ridePatForm.html";
+                    $('#datatable-buttons tbody').on('click', '#edit', function () {
+                        //var data = t.row($(this).parents('tr')).data();
+                        arr_details = { RidePatNum: this.name, func: "edit" }; //attribute name=RidePatNum
+                        GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
+                        location.href = "ridePatForm.html";
+                    });
+
+                    $('#datatable-buttons tbody').on('click', '#show', function () {
+                        // var data = t.row($(this).parents('tr')).data();
+                        arr_details = { RidePatNum: this.name, func: "show" };//attribute name=RidePatNum
+                        GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
+                        location.href = "ridePatForm.html";
+                    });
+
+                    $('#datatable-buttons tbody').on('click', '#remove', function () {
+                        arr_details = { RidePatNum: this.name, func: "show" };//attribute name=RidePatNum
+                        var data = t.row($(this).parents('tr')).data();
+                        swal({
+                            title: "האם אתם בטוחים?",
+                            type: "warning",
+                            text: "מחיקת ההסעה של " + data[0] + " מ" + data[1] + " ל" + data[2] + ", בתאריך " + data[3],
+                            showCancelButton: true,
+                            cancelButtonText: "בטל",
+                            confirmButtonClass: 'btn-warning',
+                            confirmButtonText: "מחק",
+                            closeOnConfirm: false
+                        }, function () {
+                            var RidePat = new Object();
+                            RidePat.RidePatNum = arr_details.RidePatNum;
+                            deleteRidePat(RidePat, 'delete');
+
                         });
+                    });
 
-                        $('#datatable-buttons tbody').on('click', '#show', function () {
-                            // var data = t.row($(this).parents('tr')).data();
-                            arr_details = { RidePatNum: this.name, func: "show" };//attribute name=RidePatNum
-                            GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
-                            location.href = "ridePatForm.html";
-                        });
+                    //$('#datatable-buttons tbody').on('click', '#reactive', function () {
+                    //    var data = t.row($(this).parents('tr')).data();
+                    //    swal({
+                    //        title: "אתה בטוח שברצונך לשחזר את ההסעה:",
+                    //        type: "warning",
+                    //        text: data[1],
+                    //        showCancelButton: true,
+                    //        cancelButtonText: "בטל",
+                    //        confirmButtonClass: 'btn-warning',
+                    //        confirmButtonText: "שחזר",
+                    //        closeOnConfirm: false
+                    //    }, function () {
+                    //        deactivateRidePat(data[0], 'ממתינה לשיבוץ');
+                    //        swal({
+                    //            title: "ההסעה הפכה לממתינה לשיבוץ",
+                    //            timer: 1000,
+                    //            type: "success",
+                    //            showConfirmButton: false
+                    //        });
+                    //        setTimeout(function () { refreshTable() }, 1001);
+                    //    });
 
-                        $('#datatable-buttons tbody').on('click', '#remove', function () {
-                            arr_details = { RidePatNum: this.name, func: "show" };//attribute name=RidePatNum
-                            var data = t.row($(this).parents('tr')).data();
-                            swal({
-                                title: "האם אתם בטוחים?",
-                                type: "warning",
-                                text: "מחיקת ההסעה של " + data[0] + " מ" + data[1] + " ל" + data[2] + ", בתאריך " + data[3],
-                                showCancelButton: true,
-                                cancelButtonText: "בטל",
-                                confirmButtonClass: 'btn-warning',
-                                confirmButtonText: "מחק",
-                                closeOnConfirm: false
-                            }, function () {
-                                var RidePat = new Object();
-                                RidePat.RidePatNum = arr_details.RidePatNum;
-                                deleteRidePat(RidePat, 'delete');
-
-                            });
-                        });
-
-                        //$('#datatable-buttons tbody').on('click', '#reactive', function () {
-                        //    var data = t.row($(this).parents('tr')).data();
-                        //    swal({
-                        //        title: "אתה בטוח שברצונך לשחזר את ההסעה:",
-                        //        type: "warning",
-                        //        text: data[1],
-                        //        showCancelButton: true,
-                        //        cancelButtonText: "בטל",
-                        //        confirmButtonClass: 'btn-warning',
-                        //        confirmButtonText: "שחזר",
-                        //        closeOnConfirm: false
-                        //    }, function () {
-                        //        deactivateRidePat(data[0], 'ממתינה לשיבוץ');
-                        //        swal({
-                        //            title: "ההסעה הפכה לממתינה לשיבוץ",
-                        //            timer: 1000,
-                        //            type: "success",
-                        //            showConfirmButton: false
-                        //        });
-                        //        setTimeout(function () { refreshTable() }, 1001);
-                        //    });
-
-                        //});
-                    },
+                    //});
+                },
                 error: function (err) { alert("Error in GetRidePatView"); }
             });
         }
