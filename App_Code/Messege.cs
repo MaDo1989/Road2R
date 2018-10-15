@@ -15,7 +15,7 @@ public class Message
         //
         // TODO: Add constructor logic here
         //
-        
+
     }
 
     public int insertMsg(int parentID, string type, string title, string msgContent, int ridePatID, DateTime dateTime, int userID, string userNotes, bool isPush, bool isMail, bool isWhatsapp)
@@ -37,7 +37,7 @@ public class Message
         cmdParams[9] = cmd.Parameters.AddWithValue("@isMail", isMail);
         cmdParams[10] = cmd.Parameters.AddWithValue("@isWhatsapp", isWhatsapp);
         string query = "insert into [Messages] OUTPUT inserted.MsgID values (@ParentID,@Type,@Title,@MsgContent,@RidePatID,@DateTime,@UserID,@UserNotes,@isPush,@isMail,@isWhatsapp)";
-        
+
         try
         {
             return int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
@@ -57,7 +57,7 @@ public class Message
         //get volunteers
         Volunteer v = new Volunteer();
         List<Volunteer> volunteersList = v.getVolunteersList(true);
-        
+
         //create push
         var x = new JObject();
         x.Add("message", message);
@@ -88,9 +88,40 @@ public class Message
         x.Add("status", "Canceled");
         x.Add("msgID", msgID);
         x.Add("content-available", 1);
-       
+
         //send push
         myPushNot push = new myPushNot();
         push.RunPushNotificationOne(user, x);
+    }
+
+    public int backupToPrimary(int ridePatID)
+    {
+        string time = "";
+        //get ride details and generate msg
+        RidePat rp = new RidePat();
+        rp = rp.GetRidePat(ridePatID);
+        Volunteer v = new Volunteer();
+        if (rp.Drivers[0].DriverType == "Secondary") v = rp.Drivers[0];
+        else throw new Exception("The assigned driver is the primary driver for this ride");
+
+        if (rp.Date.ToShortTimeString() == "22:14") time = "אחה\"צ"; else time = rp.Date.ToShortTimeString();
+        string msg = "האם ברצונך להחליף את הנהג הראשי בנסיעה מ" + rp.Origin.Name + " ל" + rp.Destination.Name + " בתאריך " + rp.Date.ToShortDateString() + ", בשעה " + time + "?";
+
+        //insert msg to db
+        int msgID = insertMsg(0, "BackupToPrimary","החלפת נהג ראשי", msg, ridePatID, DateTime.Now, v.Id, "", true, false, false);
+
+        //create push
+        var x = new JObject();
+        x.Add("message", msg);
+        x.Add("title", "החלפת נהג ראשי");
+        x.Add("rideID", ridePatID);
+        //x.Add("status", "Canceled");
+        x.Add("msgID", msgID);
+        x.Add("content-available", 1);
+
+        //send push
+        myPushNot push = new myPushNot();
+        push.RunPushNotificationOne(v, x);
+        return 1;
     }
 }

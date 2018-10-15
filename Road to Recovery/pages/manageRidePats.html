@@ -176,14 +176,16 @@
                         btnStr = "";
                         showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' name='" + arr_rides[i].RidePatNum + "' title='צפייה'><i class='fa fa-wpforms'></i></button>";
                         editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' name='" + arr_rides[i].RidePatNum + "' title='עריכה'><i class='ti-pencil'></i></button>";
-                        deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' name='" + arr_rides[i].RidePatNum + "' title='מחיקה'><i class='fa fa-remove' ></i></button>";
+                        deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' name='" + arr_rides[i].RidePatNum + "' title='מחיקה'><i class='fa fa-remove'></i></button>";
+                        backupBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='backup' name='" + arr_rides[i].RidePatNum + "' title='גיבוי לראשי'><i class='fa fa-send'></i></button>";
+
 
                         btnStr += showBtn;
-
-                        if (arr_rides[i].Status == 'ממתינה לשיבוץ')
-                            btnStr += " " + editBtn; //allow editing a ridepat if no drivers are assigned to it
+                        if (arr_rides[i].Status == 'ממתינה לשיבוץ') btnStr += " " + editBtn; //allow editing a ridepat if no drivers are assigned to it
 
                         btnStr += " " + deleteBtn;
+
+                        if (arr_rides[i].Status == 'שובץ גיבוי') btnStr += " " + backupBtn; //Enable option to text the secondary driver asking to assign him to primary
 
                         //tables rows building
                         if (date.toLocaleDateString() == new Date().toLocaleDateString()) //today's rides
@@ -223,6 +225,10 @@
                         confirmDelete(this);
                     });
 
+                    $('#datatable-morning tbody').on('click', '#backup', function () {
+                        backupToPrimaryButton(this);
+                    });
+
                     $('#datatable-afternoon tbody').on('click', '#edit', function () {
                         editButton(this);
                     });
@@ -235,6 +241,10 @@
                         confirmDelete(this);
                     });
 
+                    $('#datatable-afternoon tbody').on('click', '#backup', function () {
+                        backupToPrimaryButton(this);
+                    });
+
                     $('#datatable-future tbody').on('click', '#edit', function () {
                         editButton(this);
                     });
@@ -245,6 +255,10 @@
 
                     $('#datatable-future tbody').on('click', '#remove', function () {
                         confirmDelete(this);
+                    });
+
+                    $('#datatable-future tbody').on('click', '#backup', function () {
+                        backupToPrimaryButton(this);
                     });
 
                 },
@@ -288,7 +302,7 @@
         }
 
         function confirmDelete(ridePat) {
-            arr_details = { RidePatNum: ridePat.name, func: "show" };//attribute name=RidePatNum
+            arr_details = { RidePatNum: ridePat.name, func: "show" };// ridePat.name=RidePatNum
             var data = tFuture.row($(ridePat).parents('tr')).data();
             var hour =" בשעה ";
             if (data[1] == "אחה''צ" ) hour= " ";
@@ -310,15 +324,45 @@
         }
 
         function showButton(ridePat) {
-            arr_details = { RidePatNum: ridePat.name, func: "show" };//attribute name=RidePatNum
+            arr_details = { RidePatNum: ridePat.name, func: "show" };//ridePat.name=RidePatNum
             GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
             location.href = "ridePatForm.html";
         }
 
         function editButton(ridePat) {
-            arr_details = { RidePatNum: ridePat.name, func: "edit" }; //attribute name=RidePatNum
+            arr_details = { RidePatNum: ridePat.name, func: "edit" }; //ridePat.name=RidePatNum
             GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
             location.href = "ridePatForm.html";
+        }
+
+        function backupToPrimaryButton(ridePat)
+        {
+            //arr_details = { RidePatNum: ridePat.name, func: "show" };//ridePat.name=RidePatNum
+            var RidePat = new Object();
+            RidePat.RidePatNum = ridePat.name;
+
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/backupToPrimaryNotification",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                data: JSON.stringify({ ridePatId: RidePat.RidePatNum}),
+                success: function (data) {
+                    if (data.d==1) {
+                        swal({
+                            title: "ההודעה נשלחה",
+                            timer: 1000,
+                            type: "success",
+                            showConfirmButton: false
+                        });
+                    }
+                    
+                    
+                },
+                error: function (err) {
+                    alert("Error in backupToPrimaryNotification:" + err.responseText);
+                }
+            });
         }
 
 
