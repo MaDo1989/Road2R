@@ -581,7 +581,7 @@ public class Volunteer
     public Volunteer getVolunteerByMobile(string mobile, string regId)
     {
         DbService db = new DbService();
-        string query = "select * from VolunteerTypeView where CellPhone = '" + mobile + "'";
+        string query = "select * from VolunteerTypeView where CellPhone = '" + mobile + "' and IsActive='true'";
         DataSet ds = db.GetDataSetByQuery(query);
         Volunteer v = new Volunteer();
         foreach (DataRow dr in ds.Tables[0].Rows)
@@ -966,7 +966,7 @@ public class Volunteer
             }
             catch (SqlException)
             {
-                throw new Exception("משתמש עם מספר טלפון זה כבר קיים במערכת");
+                throw new Exception("phone already exists");
             }
             catch (Exception e)
             {
