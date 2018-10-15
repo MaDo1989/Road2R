@@ -736,7 +736,7 @@
                         error: function (err) {
                             alert("Error in setVolunteer: " + err.responseText);
 
-                            if (err.responseText.indexOf("קיים במערכת") != -1) {
+                            if (err.responseText.indexOf("phone already exists") != -1) {
                                 swal(
                                     {
                                         title: "משתמש עם מספר טלפון זה כבר קיים במערכת",
