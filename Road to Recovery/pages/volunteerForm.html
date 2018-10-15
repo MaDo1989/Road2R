@@ -71,7 +71,6 @@
     <script src="../plugins/moment/moment.js"></script>
     <script src="../plugins/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
     <script src="../plugins/bootstrap-daterangepicker/daterangepicker.js"></script>-->
-
     <!--<script src="lib/datepicker-he.js"></script>-->
 
     <script>
@@ -144,27 +143,27 @@
         //    // show loading message
         //    $("#jqGrid")[0].grid.beginReq();
 
-            //$.ajax({
-            //    dataType: "json",
-            //    url: "WebService.asmx/getCustomerAddresses",
-            //    contentType: "application/json; charset=utf-8",
-            //    type: "POST",
-            //    data: JSON.stringify({ customerID: customerID }),
-            //    success: function (data) {
-            //        var arr_addresses = JSON.parse(data.d);
+        //$.ajax({
+        //    dataType: "json",
+        //    url: "WebService.asmx/getCustomerAddresses",
+        //    contentType: "application/json; charset=utf-8",
+        //    type: "POST",
+        //    data: JSON.stringify({ customerID: customerID }),
+        //    success: function (data) {
+        //        var arr_addresses = JSON.parse(data.d);
 
-            //        for (i in arr_addresses) {
-            //            addressesArrayData.push({
-            //                ID: arr_addresses[i].AddressID,
-            //                AddressName: arr_addresses[i].AddressName,
-            //                City: arr_addresses[i].CustomerCity.CityName,
-            //                Street: arr_addresses[i].Street,
-            //                Number: arr_addresses[i].Number,
-            //                ContactPerson: arr_addresses[i].ContactPerson,
-            //                ContactPhone: arr_addresses[i].ContactPhone,
-            //                Comments: arr_addresses[i].Comments
-            //            });
-            //        }
+        //        for (i in arr_addresses) {
+        //            addressesArrayData.push({
+        //                ID: arr_addresses[i].AddressID,
+        //                AddressName: arr_addresses[i].AddressName,
+        //                City: arr_addresses[i].CustomerCity.CityName,
+        //                Street: arr_addresses[i].Street,
+        //                Number: arr_addresses[i].Number,
+        //                ContactPerson: arr_addresses[i].ContactPerson,
+        //                ContactPhone: arr_addresses[i].ContactPhone,
+        //                Comments: arr_addresses[i].Comments
+        //            });
+        //        }
 
         //            // set the new data
         //            $("#jqGrid").jqGrid('setGridParam', { data: addressesArrayData });
@@ -181,7 +180,7 @@
 
 
         function loadPage() {
-            
+
             if (JSON.parse(GENERAL.VOLUNTEERS.getVolunteersList()).length != 0) {
                 arr_volunteer = JSON.parse(GENERAL.VOLUNTEERS.getVolunteersList());
                 if (arr_volunteer.func == "edit" || arr_volunteer.func == "show") {
@@ -420,17 +419,17 @@
                                         <h4 class="m-t-0 header-title"><b>פרטי מתנדב</b></h4>
                                         <!--<p class="text-muted font-13 m-b-30">
                                             יצירת, צפייה ועריכת מתנדב. לחץ על כפתור חזור בכדי לצפות בכל הלקוחות.-->
-                                            <br />
+                                        <br />
 
-                                            <div class="col-md-6 checkbox checkbox-primary text-left">
-                                                <input id="activeVolunteer" type="checkbox">
-                                                <label for="activeVolunteer">
-                                                    מתנדב פעיל
-                                                </label>
-                                            </div>
-                                            <div class="text-right m-b-30 m-r-15">
-                                                <button type="button" onclick="returnVolunteers()" class="btn btn-default waves-effect w-md m-b-5"><i class="ti-back-right m-r-5"></i>חזור</button>
-                                            </div>
+                                        <div class="col-md-6 checkbox checkbox-primary text-left">
+                                            <input id="activeVolunteer" type="checkbox">
+                                            <label for="activeVolunteer">
+                                                מתנדב פעיל
+                                            </label>
+                                        </div>
+                                        <div class="text-right m-b-30 m-r-15">
+                                            <button type="button" onclick="returnVolunteers()" class="btn btn-default waves-effect w-md m-b-5"><i class="ti-back-right m-r-5"></i>חזור</button>
+                                        </div>
                                         <p class="required">* שדה חובה</p>
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
@@ -634,7 +633,7 @@
     <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
     <script>
         $(document).ready(function () {
-           // datePicker();
+            // datePicker();
             generateCities();
             generateVolTypes();
             // DO NOT REMOVE : GLOBAL FUNCTIONS!
@@ -736,6 +735,17 @@
                         },
                         error: function (err) {
                             alert("Error in setVolunteer: " + err.responseText);
+
+                            if (err.responseText.indexOf("קיים במערכת") != -1) {
+                                swal(
+                                    {
+                                        title: "משתמש עם מספר טלפון זה כבר קיים במערכת",
+                                        type: "info",
+                                        timer: 3000,
+                                        showConfirmButton: false
+                                    });
+                            }
+
                         }
                     });
                     //END OF Insert Product Code
@@ -861,7 +871,7 @@
             addressesArrayData = [];
             addRowCount = 0;
             numberOfRecords = 0;
-           // datePicker();
+            // datePicker();
 
             $("#jqGrid").jqGrid({
                 ajaxSelectOptions: {
