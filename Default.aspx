@@ -26,6 +26,14 @@
         </div>
 
         <div>
+            <asp:TextBox ID="TextBox3" placeholder="Ride ID" runat="server"></asp:TextBox>
+            <br />
+            
+
+            <asp:Button ID="Button1" runat="server" Text="Notify BackupToPrimary" OnClick="backupToPrimary_Click" />
+        </div>
+
+        <div>
             <asp:TextBox ID="TextBox1" placeholder="Title" runat="server"></asp:TextBox>
             <br />
             <asp:TextBox ID="TextBox2" placeholder="Messege" runat="server"></asp:TextBox>

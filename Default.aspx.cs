@@ -32,11 +32,19 @@ public partial class _Default : System.Web.UI.Page
         }
     }
 
+    protected void backupToPrimary_Click(object sender, EventArgs e)
+    {
+        int ridePatID = int.Parse(TextBox3.Text);
+        Message m = new Message();
+        m.backupToPrimary(ridePatID);
+    }
+
+
     protected void globalBTN_Click(object sender, EventArgs e)
     {
         string title = TextBox1.Text;
         string message = TextBox2.Text;
-        
+
         Message m = new Message();
         m.globalMessage(message, title);
     }

@@ -412,20 +412,23 @@ public class RidePat
         rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
         rp.OnlyEscort = Convert.ToBoolean(dr["OnlyEscort"].ToString());
         rp.pat.DisplayName = dr["DisplayName"].ToString();
+        rp.Drivers = new List<Volunteer>();
         if (dr["MainDriver"].ToString() != "")
         {
-            rp.Drivers = new List<Volunteer>();
             Volunteer v1 = new Volunteer();
             v1.Id = int.Parse(dr["MainDriver"].ToString());
             v1.RegId = v1.GetVolunteerRegById(v1.Id);
+            v1.DriverType = "Primary";
             rp.Drivers.Add(v1);
-            if (dr["secondaryDriver"].ToString() != "")
-            {
-                Volunteer v2 = new Volunteer();
-                v2.Id = int.Parse(dr["secondaryDriver"].ToString());
-                v2.RegId = v2.GetVolunteerRegById(v2.Id);
-                rp.Drivers.Add(v2);
-            }
+            
+        }
+        if (dr["secondaryDriver"].ToString() != "")
+        {
+            Volunteer v2 = new Volunteer();
+            v2.Id = int.Parse(dr["secondaryDriver"].ToString());
+            v2.RegId = v2.GetVolunteerRegById(v2.Id);
+            v2.DriverType = "Secondary";
+            rp.Drivers.Add(v2);
         }
         //rp.pat.EscortedList = new List<Escorted>();
         rp.Escorts = new List<Escorted>();
