@@ -373,7 +373,7 @@
             tableAfternoon = document.getElementById("datatable-afternoon");
             tableFuture = document.getElementById("datatable-future");
 
-            tdarr = tableMorning.getElementsByTagName("td");
+            tdarr = tableMorning.getElementsByTagName("td"); //Morning functions
 
             for (var j = 0; j < tdarr.length; j++) {
                 if (tdarr[j].innerHTML.indexOf("אין!") !== -1) {
@@ -385,8 +385,14 @@
                     tdarr[j].style.backgroundColor = "red";
                 }
             }
+            for (var j = 0; j < tdarr.length; j++) {
+                if (tdarr[j].innerHTML.indexOf("הגענו ליעד") !== -1) {
+                    tdarr[j].style.backgroundColor = "green";
+                    tdarr[j].style.color = "white";
+                }
+            }
 
-            tdarr = tableAfternoon.getElementsByTagName("td");
+            tdarr = tableAfternoon.getElementsByTagName("td"); //Afternoon functions
 
             for (var j = 0; j < tdarr.length; j++) {
                 if (tdarr[j].innerHTML.indexOf("אין!") !== -1) {
@@ -396,6 +402,22 @@
             for (var j = 0; j < tdarr.length; j++) {
                 if (tdarr[j].innerHTML.indexOf("גיבוי בלבד") !== -1) {
                     tdarr[j].style.backgroundColor = "orange";
+                }
+            }
+
+            for (var j = 0; j < tdarr.length; j++) {
+                if (tdarr[j].innerHTML.indexOf("הגענו ליעד") !== -1) {
+                    tdarr[j].style.backgroundColor = "green";
+                    tdarr[j].style.color = "white";
+                }
+            }
+
+            tdarr = tableFuture.getElementsByTagName("td"); //Future functions
+
+            for (var j = 0; j < tdarr.length; j++) {
+                if (tdarr[j].innerHTML.indexOf("הגענו ליעד") !== -1) {
+                    tdarr[j].style.backgroundColor = "green";
+                    tdarr[j].style.color = "white";
                 }
             }
         }
