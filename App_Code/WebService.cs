@@ -43,6 +43,45 @@ public class WebService : System.Web.Services.WebService
     //    var a = 0;
     //}
 
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string isPrimaryStillCanceled(int driverID, int rideID)
+    {
+        Ride r = new Ride();
+        bool res = r.isPrimaryStillCanceled(rideID, driverID);
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        return j.Serialize(res);
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string backupToPrimary(int rideID, int driverID)
+    {
+        Ride r = new Ride();
+        int res = r.backupToPrimary(rideID, driverID);
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        return j.Serialize(res);
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string getLocations()
+    {
+        try
+        {
+            List<Location> ll = new List<Location>();
+            Location l = new Location();
+            ll.AddRange(l.getHospitalListForView(true));
+            ll.AddRange(l.getBarrierListForView(true));
+
+            JavaScriptSerializer j = new JavaScriptSerializer();
+            return j.Serialize(ll);
+        }
+        catch (Exception e)
+        {
+            throw new Exception("Error in getLocations: " + e.Message);
+        }
+    }
 
     [WebMethod]
     public int setVolunteerPrefs(int Id, List<string> PrefLocation, List<string> PrefArea, List<string> PrefTime, int AvailableSeats)

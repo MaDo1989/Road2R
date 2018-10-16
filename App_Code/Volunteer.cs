@@ -635,17 +635,21 @@ public class Volunteer
             }
         }
 
-        db = new DbService();
-        var updateRegid = "update Volunteer set pnRegId=@REGID where Id=@ID";
+        //dont update reg id if user is rakaz on a mission
+        if (regId != "i_am_spy")
+        {
+            db = new DbService();
+            var updateRegid = "update Volunteer set pnRegId=@REGID where Id=@ID";
 
-        SqlCommand cmd = new SqlCommand();
-        cmd.CommandType = CommandType.Text;
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandType = CommandType.Text;
 
-        SqlParameter[] cmdParams = new SqlParameter[2];
-        cmdParams[0] = cmd.Parameters.AddWithValue("@REGID", regId);
-        cmdParams[1] = cmd.Parameters.AddWithValue("@ID", v.Id);
+            SqlParameter[] cmdParams = new SqlParameter[2];
+            cmdParams[0] = cmd.Parameters.AddWithValue("@REGID", regId);
+            cmdParams[1] = cmd.Parameters.AddWithValue("@ID", v.Id);
 
-        int result = db.ExecuteQuery(updateRegid, cmd.CommandType, cmdParams);
+            int result = db.ExecuteQuery(updateRegid, cmd.CommandType, cmdParams);
+        }
 
 
 
