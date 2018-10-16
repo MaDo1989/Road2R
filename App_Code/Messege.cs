@@ -115,7 +115,7 @@ public class Message
         x.Add("message", msg);
         x.Add("title", "החלפת נהג ראשי");
         x.Add("rideID", ridePatID);
-        //x.Add("status", "Canceled");
+        x.Add("status", "PrimaryCanceled");
         x.Add("msgID", msgID);
         x.Add("content-available", 1);
 
