@@ -452,7 +452,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">اسم شخصي&nbsp;<span class="required">*</span></label>
+                                                    <label class="col-sm-2 control-label">اسم شخصي</label>
                                                     <div class="col-sm-6">
                                                         <input id="firstA" name="firstA" type="text" class="form-control">
                                                     </div>
@@ -460,7 +460,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">اسم عائلة&nbsp;<span class="required">*</span></label>
+                                                    <label class="col-sm-2 control-label">اسم عائلة</label>
                                                     <div class="col-sm-6">
                                                         <input id="lastA" name="lastA" type="text" class="form-control">
                                                     </div>
@@ -551,7 +551,7 @@
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">משמרות מועדפות</label>
-                                                    <div class="col-sm-6">
+                                                    <div class="col-sm-6 control-label">
                                                         <label id="PrefShift" name="PrefShift"></label>
                                                     </div>
                                                 </div>
@@ -559,7 +559,7 @@
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">מקומות מועדפים</label>
-                                                    <div class="col-sm-6" id="selectPreferRoute1">
+                                                    <div class="col-sm-6 control-label" id="selectPreferRoute1">
                                                         <label id="PrefLocation" name="PrefLocation"></label>
                                                     </div>
                                                 </div>
@@ -660,12 +660,13 @@
                     phone1: {
                         required: true
                     },
-                    firstA: {
-                        required: true
-                    },
-                    lastA: {
-                        required: true
-                    }, city: {
+                    //firstA: {
+                    //    required: true
+                    //},
+                    //lastA: {
+                    //    required: true
+                    //},
+                    city: {
                         required: true
                     }
 
@@ -765,12 +766,14 @@
                     },
                     phone1: {
                         required: "יש להכניס טלפון ראשי"
-                    }, firstA: {
-                        required: "أدخل الاسم الأول"
                     },
-                    lastA: {
-                        required: "أدخل اسم العائلة"
-                    }, city: {
+                    //firstA: {
+                    //    required: "أدخل الاسم الأول"
+                    //},
+                    //lastA: {
+                    //    required: "أدخل اسم العائلة"
+                    //},
+                    city: {
                         required: "יש להכניס יישוב"
                     }
 
