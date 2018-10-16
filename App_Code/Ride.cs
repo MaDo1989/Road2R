@@ -126,6 +126,28 @@ public class Ride
         return rides;
     }
 
+    internal bool isPrimaryStillCanceled(int rideID, int driverID)
+    {
+        string query = "select * from Ride where RideNum = " + rideID + " AND SecondaryDriver = " + driverID + " AND MainDriver is null";
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+
+        if (ds.Tables[0].Rows[0].IsNull(0)) return false;
+        else return true;
+    }
+
+    internal int backupToPrimary(int rideID, int driverID)
+    {
+        SqlCommand cmd = new SqlCommand();
+        cmd.CommandType = CommandType.Text;
+        SqlParameter[] cmdParams = new SqlParameter[2];
+        cmdParams[0] = cmd.Parameters.AddWithValue("@rideID", rideID);
+        cmdParams[1] = cmd.Parameters.AddWithValue("@driverID", driverID);
+        string query = "update Ride set SecondaryDriver = null, MainDriver = @driverID where RideNum = @rideID";
+        DbService db = new DbService();
+        return db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+    }
+
     public int setStatus(int rideId, string status)
     {
         SqlCommand cmd = new SqlCommand();
