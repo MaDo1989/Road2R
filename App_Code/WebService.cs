@@ -243,6 +243,7 @@ public class WebService : System.Web.Services.WebService
         RidePat rp = new RidePat();
         List<RidePat> r = rp.GetRidePatView(volunteerId);
         JavaScriptSerializer j = new JavaScriptSerializer();
+        j.MaxJsonLength=Int32.MaxValue;
         return j.Serialize(r);
     }
 

@@ -105,17 +105,75 @@
     <script src="assets/js/jquery.app.js"></script>
     <script src="lib/datepicker-he.js"></script>
     <script>
-           
+
         $(document).ready(function () {
-            datePicker();
+            var doc = document.getElementById("placeholder");
+
+            counter = 0;
+            myfunction();
+            setInterval("showCounter()", 1000);
+            function showCounter()
+            {
+            doc.innerHTML = counter;
+            }
+            function myfunction() {
+                    
+                if (counter == 1000) return;
+                    //var RidePatNum = $("#ridePatNum").val();
+                    var Pat = new Object();
+                    Pat.DisplayName = "יסמין עלי";
+                    Pat.Id = 4;
+                    var Origin = new Object();
+                    Origin.Name = "אייל";
+                    var Destination = new Object();
+                    Destination.Name = "איכילוב";
+                    var Remark = "";
+                    var dateRide = new Date();
+                    var hours = 10;
+                    var minutes = 0;
+                    //dateRide + " " + hours + ":" + minutes;
+                    var Day = 19;
+                    var Month = 7;
+                    var Year = 2018;
+                    var Hour = parseInt(hours);
+                    var Minute = parseInt(minutes);
+
+                    var date = new Date(Year, Month, Day, Hour, Minute);
+                    var func = "new";
+                    var Coordinator = new Object();
+                    Coordinator.DisplayName = "מתן דורון";
+                    var OnlyEscort = false;
+                    var Escorts = [];
+
+                    RidePat = {
+                        Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Remark: Remark, Escorts: Escorts, Date: date, OnlyEscort: OnlyEscort
+                    }
+                    var request = { RidePat: RidePat, func: func }
+                    var dataString = JSON.stringify(request);
+                    $.ajax({
+                        dataType: "json",
+                        url: "WebService.asmx/setRidePat",
+                        contentType: "application/json; charset=utf-8",
+                        type: "POST",
+                        async: false,
+                        data: dataString,
+                        success: function (data) {
+                            counter++;
+                            myfunction();
+                        },
+
+                        error: function (err) {
+                            alert("Error in setRidePat: " + err.responseText);
+                        }
+                    });
+                }
+            
         });
-        
     </script>
-   
+
 </head>
 <body>
-    <input type="text" id="joinDate" name="joinDate"  placeholder="dd/mm/yyyy" class="form-control">
-    <input type="text" id="dateRide" name="dateRide"  placeholder="dd/mm/yyyy" class="form-control" >
+<div id="placeholder"></div>
 
 </body>
 </html>
