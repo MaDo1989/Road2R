@@ -469,79 +469,15 @@ public class RidePat
 
     //}
 
-    private DataTable getDriver()
+private DataTable getDriver(int id)
     {
-        DbService db = new DbService();
-        SqlCommand cmd = new SqlCommand();
-        //SqlParameter[] cmdparams= new SqlParameter[1];
-        cmd.CommandType = CommandType.Text;
-        //cmdparams[0] = cmd.Parameters.AddWithValue("id", id);
-        string query = "select Id,DisplayName,CellPhone from Volunteer";
-        DataSet ds = db.GetDataSetByQuery(query);
-        DataTable dt = ds.Tables[0];
-        return dt;
-    }
 
-    private DataTable getRideStatus()
-    {
-        DbService db = new DbService();
-        SqlCommand cmd = new SqlCommand();
-        //SqlParameter[] cmdparams= new SqlParameter[1];
-        cmd.CommandType = CommandType.Text;
-        //cmdparams[0] = cmd.Parameters.AddWithValue("id", id);
-        string query = "select Id,DisplayName,CellPhone from Volunteer";
-        DataSet ds = db.GetDataSetByQuery(query);
-        DataTable dt = ds.Tables[0];
-        return dt;
-    }
-
-    private DataTable getEquipment()
-    {
-        DbService db = new DbService();
-        SqlCommand cmd = new SqlCommand();
-        //SqlParameter[] cmdparams= new SqlParameter[1];
-        cmd.CommandType = CommandType.Text;
-        //cmdparams[0] = cmd.Parameters.AddWithValue("id", id);
-        string query = "select * from EquipmentForPatientView";
-        DataSet ds = db.GetDataSetByQuery(query);
-        DataTable dt = ds.Tables[0];
-        return dt;
-    }
-
-    private DataTable getRides()
-    {
-        DbService db = new DbService();
-        SqlCommand cmd = new SqlCommand();
-        //SqlParameter[] cmdparams= new SqlParameter[1];
-        cmd.CommandType = CommandType.Text;
-        //cmdparams[0] = cmd.Parameters.AddWithValue("id", id);
-        string query = "select * from status_Ride";
-        DataSet ds = db.GetDataSetByQuery(query);
-        DataTable dt = ds.Tables[0];
-        return dt;
-    }
-
-    private DataTable getEscorts()
-    {
-        DbService db = new DbService();
-        SqlCommand cmd = new SqlCommand();
-        //SqlParameter[] cmdparams= new SqlParameter[1];
-        cmd.CommandType = CommandType.Text;
-        //cmdparams[0] = cmd.Parameters.AddWithValue("id", id);
-        string query = "select * from RidePatEscortView";
-        DataSet ds = db.GetDataSetByQuery(query);
-        DataTable dt = ds.Tables[0];
-        return dt;
     }
 
 
     //This method is used for שבץ אותי
     public List<RidePat> GetRidePatView(int volunteerId) //VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
     {
-        DataTable driverTable = getDriver();
-        DataTable equipmentTable = getEquipment();
-        DataTable rideTable = getRides();
-        DataTable escortTable = getEscorts();
         List<Escorted> el = new List<Escorted>();
         string query = "";
 
@@ -550,21 +486,42 @@ public class RidePat
         else if (volunteerId == -2)
             query = "select * from RPView"; //get ALL ridePats
         else
-            query = "select * from RPView where (Status<>'הסתיימה' or Status<>'בוטלה') and PickupTime>= getdate()"; //Get ALL ACTIVE RidePats (used by mobile app)
+            query = "select * from RPView where (Status<>'הסתיימה' or Status<>'בוטלה')"; //Get ALL ACTIVE RidePats (used by mobile app)
 
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         // Ride ride = new Ride();
         // ride.RidePats = new List<RidePat>();
         List<RidePat> rpl = new List<RidePat>();
-        
+        // int numOfDrivers = 0;
+
+        string query2 = "select * from RidePatEscortView";
+        DbService db2 = new DbService();
+        try
+        {
+            DataSet ds2 = db2.GetDataSetByQuery(query2);
+
+            foreach (DataRow dr2 in ds2.Tables[0].Rows)
+            {
+                Escorted e = new Escorted();
+                e.Id = int.Parse(dr2["RidePatNum"].ToString());
+                e.DisplayName = dr2["DisplayName"].ToString();
+                el.Add(e);
+
+            }
+
+        }
+        catch (Exception)
+        {
+
+        }
         int counter = 0;
 
         try
         {
             foreach (DataRow dr in ds.Tables[0].Rows)
             {
-                counter++;
+                counter++;                
                 // if voluneer is assigned to this ridePat, don't return it (for mobile app)
                 if ((dr["MainDriver"].ToString() != "" && int.Parse(dr["MainDriver"].ToString()) == volunteerId) || (dr["secondaryDriver"].ToString() != "" && int.Parse(dr["secondaryDriver"].ToString()) == volunteerId))
                     continue;
@@ -580,12 +537,15 @@ public class RidePat
 
                     Volunteer primary = new Volunteer();
                     primary.DriverType = "Primary";
-                
+
                     primary.Id = int.Parse(dr["MainDriver"].ToString());
-                    string searchExpression = "Id = " + primary.Id;
-                    DataRow[] driverRow = driverTable.Select(searchExpression);
-                    primary.DisplayName = driverRow[0]["DisplayName"].ToString();
-                    primary.CellPhone = driverRow[0]["CellPhone"].ToString();
+                    string query3 = "select DisplayName,CellPhone from Volunteer where Id=" + primary.Id;
+                    DbService db3 = new DbService();
+                    //primary.DisplayName = db3.GetObjectScalarByQuery(query3).ToString();
+                    DataSet driverSet = db3.GetDataSetByQuery(query3);
+                    DataRow driverRow = driverSet.Tables[0].Rows[0];
+                    primary.DisplayName = driverRow["DisplayName"].ToString();
+                    primary.CellPhone = driverRow["CellPhone"].ToString();
                     rp.Drivers.Add(primary);
                 }
 
@@ -597,17 +557,20 @@ public class RidePat
                     Volunteer secondary = new Volunteer();
                     secondary.DriverType = "secondary";
                     secondary.Id = int.Parse(dr["secondaryDriver"].ToString());
-                    string searchExpression = "Id = " + secondary.Id;
-                    DataRow[] driverRow = driverTable.Select(searchExpression);
-                    secondary.DisplayName = driverRow[0]["DisplayName"].ToString();
-                    secondary.CellPhone = driverRow[0]["CellPhone"].ToString();
+                    string query4 = "select DisplayName,Cellphone from Volunteer where Id=" + secondary.Id;
+                    DbService db4 = new DbService();
+                    // secondary.DisplayName = db4.GetObjectScalarByQuery(query4).ToString();
+                    DataSet driverSet = db4.GetDataSetByQuery(query4);
+                    DataRow driverRow = driverSet.Tables[0].Rows[0];
+                    secondary.DisplayName = driverRow["DisplayName"].ToString();
+                    secondary.CellPhone = driverRow["CellPhone"].ToString();
                     rp.Drivers.Add(secondary);
                 }
-
+                
                 rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
                 try
                 {
-                    rp.RideNum =int.Parse(dr["RideNum"].ToString());
+                    rp.RideNum = int.Parse(dr["RideNum"].ToString());
                 }
                 catch (Exception)
                 {
@@ -618,23 +581,14 @@ public class RidePat
 
                 rp.pat.DisplayName = dr["DisplayName"].ToString();
                 rp.pat.CellPhone = dr["CellPhone"].ToString();
-                rp.pat.Id = int.Parse(dr["Id"].ToString());
-                rp.pat.Equipment = new List<string>();
-                string equipmentSearchExpression = "Id = " + rp.Pat.Id;
-                DataRow[] equipmentRow = equipmentTable.Select(equipmentSearchExpression);
-                foreach (DataRow row in equipmentRow)
-                {
-                    rp.pat.Equipment.Add(row.ToString());
-                }
+                rp.pat.Equipment = rp.Pat.getEquipmentForPatient(rp.pat.DisplayName);
                 rp.pat.EscortedList = new List<Escorted>();
-                string escortSearchExpression = "RidePatNum = " + rp.ridePatNum;
-                DataRow[] escortRow = escortTable.Select(escortSearchExpression);
-                foreach (DataRow row in escortRow)
+                foreach (Escorted e in el)
                 {
-                    Escorted e = new Escorted();
-                    e.Id = int.Parse(row[0].ToString());
-                    e.DisplayName = row[1].ToString();
-                    rp.pat.EscortedList.Add(e);
+                    if (e.Id == rp.RidePatNum)
+                    {
+                        rp.pat.EscortedList.Add(e);
+                    }
                 }
 
 
@@ -650,36 +604,25 @@ public class RidePat
                 rp.Status = dr["Status"].ToString();
                 if (rp.RideNum > 0) // if RidePat is assigned to a Ride - Take the Ride's status
                 {
-                    string searchExpression = "RideRideNum = " + rp.RideNum;
-                    DataRow[] rideRow = rideTable.Select(searchExpression);
-                    
+                    query = "select statusStatusName from status_Ride where RideRideNum=" + rp.RideNum + " order by Timestamp desc";
+                    db = new DbService();
                     rp.Statuses = new List<string>();
-                    foreach (DataRow status in rideRow)
+                    foreach (DataRow status in db.GetDataSetByQuery(query).Tables[0].Rows)
                     {
                         rp.Statuses.Add(status.ItemArray[0].ToString());
                     }
-                    try
-                    {
-                        rp.Status = rp.Statuses[0];
-                    }
-                    catch (Exception err)
-                    {
-
-                        throw err;
-                    }
-
+                    rp.Status = rp.Statuses[0];
 
                 }
-
                 rpl.Add(rp);
 
             }
 
             return rpl;
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            throw e;
+            throw;
         }
         #region old
         //        DbService db = new DbService();
