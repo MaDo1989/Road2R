@@ -278,8 +278,8 @@ public class RidePat
         else if (func == "edit") //Edit existing RidePat in DB
         {
             RidePatNum = ridePat.RidePatNum;
-            string query = "select Status from RidePat where RidePatNum="+RidePatNum;
-            Status =  db.GetObjectScalarByQuery(query).ToString();
+            string query = "select Status from RidePat where RidePatNum=" + RidePatNum;
+            Status = db.GetObjectScalarByQuery(query).ToString();
             if (Status != "ממתינה לשיבוץ") throw new Exception("נסיעה זו כבר הוקצתה לנהג ואין אפשרות לערוך אותה");
             cmdParams[6] = cmd.Parameters.AddWithValue("@ridePatNum", RidePatNum);
             query = "update RidePat set Patient=@pat,Origin=@origin,Destination=@destination,PickupTime=@date,Remark=@remark,OnlyEscort=@onlyEscort where RidePatNum=@ridePatNum";
@@ -420,7 +420,7 @@ public class RidePat
             v1.RegId = v1.GetVolunteerRegById(v1.Id);
             v1.DriverType = "Primary";
             rp.Drivers.Add(v1);
-            
+
         }
         if (dr["secondaryDriver"].ToString() != "")
         {
@@ -473,15 +473,18 @@ public class RidePat
 
 
     //This method is used for שבץ אותי
-    public List<RidePat> GetRidePatView(int volunteerId)//In case of coordinator will send -1 as ID to receive all RidePats.
+    public List<RidePat> GetRidePatView(int volunteerId) //VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
     {
         List<Escorted> el = new List<Escorted>();
         string query = "";
-        if (volunteerId != -1)
 
-            query = "select * from RPView where (Status<>'הסתיימה' or Status<>'בוטלה')"; //Get all active RidePats
+        if (volunteerId == -1)
+            query = "select * from RPView where PickupTime>= getdate()"; // Get ALL FUTURE RidePats, even if cancelled
+        else if (volunteerId == -2)
+            query = "select * from RPView"; //get ALL ridePats
         else
-            query = "select * from RPView where PickupTime>= getdate()"; // Get all future RidePats, even if cancelled
+            query = "select * from RPView where (Status<>'הסתיימה' or Status<>'בוטלה')"; //Get ALL ACTIVE RidePats (used by mobile app)
+
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         // Ride ride = new Ride();
