@@ -103,7 +103,7 @@ a:focus {
     border-top: 1px solid rgba(0, 0, 0, 0.05);
     bottom: 0;
     color: #58666e;
-    text-align: left !important;
+    text-align: center !important;
     padding: 20px 30px;
     position: absolute;
     right: 240px;
