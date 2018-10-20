@@ -55,32 +55,27 @@
     <script>
         checkCookie();
         $(document).ready(function () {
+            if (localStorage.active = "undefined")
+                localStorage.active = true;
 
-            //  document.getElementById("Numbers").checked = localStorage.numbers === 'true';
+            if (localStorage.today = "undefined")
+                localStorage.today = false;
 
-            //$("#activeRidePats").prop('checked', localStorage.active);
-            // $("#TodaysRidePats").prop('checked', localStorage.today);
-            // $("#UnassignedRidePats").prop('checked', localStorage.unassigned);
-            // $("#MyRidePats").prop('checked', localStorage.myRidePats);
+            if (localStorage.unassigned = "undefined")
+                localStorage.unassigned = false;
 
-            //            $.fn.dataTable.moment('DD/MM/YY HH:mm');
+            if (localStorage.myRidePats = "undefined")
+                localStorage.myRidePats = false;
+
+            if (localStorage.pastRidePats = "undefined")
+                localStorage.pastRidePats = false;
+           
             $.fn.dataTable.moment('DD/MM/YY');
-            //$('#example').DataTable();
-            // $.fn.dataTable.moment('DD/MM/YYYY HH:MM');//'' DD/MM/YYYY HH:MM
-
 
             //Create a DataTable from the Table
-            t = $('#datatable-buttons').DataTable({ "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] }
-                //{
-                //"createdRow": function (row, data, dataIndex) {
-                //    if (data[4] == "A") {
-                //        $(row).addClass('important');
-                //    }
-                //},
-                //    }
+            t = $('#datatable-buttons').DataTable({ "paging": true }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] }
             );
-
-
+            
             getCoors();
             refreshTable();
         });
@@ -91,6 +86,7 @@
             localStorage.today = $("#TodaysRidePats").prop('checked');
             localStorage.unassigned = $("#UnassignedRidePats").prop('checked');
             localStorage.myRidePats = $("#MyRidePats").prop('checked');
+            localStorage.pastRidePats = $("#PastRidePats").prop('checked');
             refreshTable();
         }
 
@@ -128,25 +124,27 @@
 
         function refreshTable() {
             checkCookie();
-            var active = JSON.parse(localStorage.active);//$("#activeRidePats").prop('checked');
+            var active = JSON.parse(localStorage.active);
             $("#activeRidePats").prop('checked', active);
-            var today = JSON.parse(localStorage.today);//$("#TodaysRidePats").prop('checked');
+            var today = JSON.parse(localStorage.today);
             $("#TodaysRidePats").prop('checked', today);
-            var unassigned = JSON.parse(localStorage.unassigned);//$("#UnassignedRidePats").prop('checked');
-            $("#UnassignedRidePats").prop('checked', unassigned)
-            var myRidePats = JSON.parse(localStorage.myRidePats);//$("#MyRidePats").prop('checked');
-            $("#MyRidePats").prop('checked', myRidePats)
+            var unassigned = JSON.parse(localStorage.unassigned);
+            $("#UnassignedRidePats").prop('checked', unassigned);
+            var myRidePats = JSON.parse(localStorage.myRidePats);
+            $("#MyRidePats").prop('checked', myRidePats);
+            var pastRidePats = JSON.parse(localStorage.pastRidePats);
+            $("#pastRidePats").prop('checked', pastRidePats)
 
             t.clear().draw();
 
-
+            var volunteerId = -2 // VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
 
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/GetRidePatView",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                data: JSON.stringify({ volunteerId: -1 }), //VolunteerId -1 means get all ridePats
+                data: JSON.stringify({ volunteerId: volunteerId }),
                 success: function (data) {
                     var arr_rides = JSON.parse(data.d);
                     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
@@ -210,6 +208,10 @@
                             if (arr_rides[i].Coordinator.DisplayName != currentCoor) continue;
                         }
 
+                        if (!pastRidePats)
+                        {
+                            if (new Date(parseInt(temp)) < new Date()) continue;
+                        }
 
                         var btnStr = "";
                         var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' name='" + arr_rides[i].RidePatNum + "' title='צפייה'><i class='fa fa-wpforms'></i></button>";
@@ -228,8 +230,7 @@
 
                         if (arr_rides[i].Status == "ממתינה לשיבוץ")
                             t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, arr_rides[i].Status, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
-                        else
-                        {
+                        else {
                             for (j in arr_rides[i].Drivers) {
                                 if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName + " " + arr_rides[i].Drivers[j].CellPhone;
                                 else secondary = arr_rides[i].Drivers[j].DisplayName + " " + arr_rides[i].Drivers[j].CellPhone;
@@ -505,6 +506,10 @@
                                         <input id="MyRidePats" type="checkbox" onchange="saveFilters()">
                                         <label for="MyRidePats">
                                             דרישות שלי בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
+                                        </label>
+                                        <input id="PastRidePats" type="checkbox" onchange="saveFilters()">
+                                        <label for="PastRidePats">
+                                            הצג נסיעות עבר  &nbsp;&nbsp;|&nbsp;&nbsp;
                                         </label>
                                     </div>
 
