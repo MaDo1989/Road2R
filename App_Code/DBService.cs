@@ -85,7 +85,7 @@ public class DbService
                 row_affected = cmd.ExecuteNonQuery();
                 tran.Commit();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 tran.Rollback();
             }
