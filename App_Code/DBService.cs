@@ -88,6 +88,7 @@ public class DbService
             catch (Exception ex)
             {
                 tran.Rollback();
+                throw ex;
             }
         }
 

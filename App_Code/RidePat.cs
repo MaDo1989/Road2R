@@ -349,10 +349,15 @@ public class RidePat
             query = "delete from RidePat where RidePatNum=" + RidePatNum;
             res += db.ExecuteQuery(query);
 
-
-
+            if (res > 0)
+            {
+                string message = " נסיעה מספר" + rp.ridePatNum + " בוטלה ";
+                LogEntry le = new LogEntry(DateTime.Now, "info", message, 1);
+                le.Write();
+            }
 
             return res;
+
 
         }
         return RidePatNum;
@@ -557,7 +562,7 @@ public class RidePat
         // Ride ride = new Ride();
         // ride.RidePats = new List<RidePat>();
         List<RidePat> rpl = new List<RidePat>();
-        
+
         int counter = 0;
 
         try
@@ -580,7 +585,7 @@ public class RidePat
 
                     Volunteer primary = new Volunteer();
                     primary.DriverType = "Primary";
-                
+
                     primary.Id = int.Parse(dr["MainDriver"].ToString());
                     string searchExpression = "Id = " + primary.Id;
                     DataRow[] driverRow = driverTable.Select(searchExpression);
@@ -607,7 +612,7 @@ public class RidePat
                 rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
                 try
                 {
-                    rp.RideNum =int.Parse(dr["RideNum"].ToString());
+                    rp.RideNum = int.Parse(dr["RideNum"].ToString());
                 }
                 catch (Exception)
                 {
@@ -652,7 +657,7 @@ public class RidePat
                 {
                     string searchExpression = "RideRideNum = " + rp.RideNum;
                     DataRow[] rideRow = rideTable.Select(searchExpression);
-                    
+
                     rp.Statuses = new List<string>();
                     foreach (DataRow status in rideRow)
                     {

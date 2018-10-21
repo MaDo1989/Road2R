@@ -44,11 +44,13 @@
     <!-- Select2 css+js -->
     <link href="assets/css/select2.css" rel="stylesheet" />
     <script src="assets/js/select2.min.js"></script>
-
+    <script src="lib/includeHTML.js"></script>
 
     <script>
         checkCookie();
         $(document).ready(function () {
+
+        includeHTML();
             //adds menu.html content into any "#menu" element
             //$('#menu').load('menu.html');
 
@@ -99,18 +101,18 @@
                         }
                         if  (arr_Locations[i].ManagerPhones ==null){
                             arr_Locations[i].ManagerPhones = "";
-                        }             
+                        }
                         if  (arr_Locations[i].ManagerName == null){
                             arr_Locations[i].ManagerName = "";
-                        }    
+                        }
                         if  (arr_Locations[i].ManagerLastName == null){
                             arr_Locations[i].ManagerLastName = "";
                         }
                         if (arr_Locations[i].ManagerName != "") {
-                            t.row.add([arr_Locations[i].Type, arr_Locations[i].Name, arr_Locations[i].Area,arr_Locations[i].ManagerName + " " + arr_Locations[i].ManagerLastName + ', ' + arr_Locations[i].ManagerPhones , arr_Locations[i].Remarks, btnStr]).draw(false);         
+                            t.row.add([arr_Locations[i].Type, arr_Locations[i].Name, arr_Locations[i].Area,arr_Locations[i].ManagerName + " " + arr_Locations[i].ManagerLastName + ', ' + arr_Locations[i].ManagerPhones , arr_Locations[i].Remarks, btnStr]).draw(false);
                         }
                         else
-                            t.row.add([arr_Locations[i].Type, arr_Locations[i].Name, arr_Locations[i].Area,"" , arr_Locations[i].Remarks, btnStr]).draw(false);         
+                            t.row.add([arr_Locations[i].Type, arr_Locations[i].Name, arr_Locations[i].Area,"" , arr_Locations[i].Remarks, btnStr]).draw(false);
 
                     }
 
@@ -130,7 +132,7 @@
                         location.href = "locationForm.html";
                     });
 
-                    
+
                     $('#datatable-buttons tbody').on('click', '#remove', function () {
                         var data = t.row($(this).parents('tr')).data();
                         swal({
@@ -255,48 +257,7 @@
         </div>
         <!-- Top Bar End -->
         <!-- ========== Right Sidebar Start ========== -->
-        <div class="left side-menu">
-
-            <div class="sidebar-inner slimscrollleft">
-
-                <div id="sidebar-menu">
-
-                    <ul>
-                        <li>
-                            <a href="viewVolunteer.html" class="waves-effect waves-primary">
-                                <i class="md md-person"></i><span> ניהול מתנדבים</span>
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="viewPatient.html" class="waves-effect waves-primary">
-                                <i class="md md-recent-actors"></i><span> ניהול חולים</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="viewRidePats.html" class="waves-effect waves-primary">
-                                <i class="md md-today"></i><span> כל ההסעות</span>
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="manageRidePats.html" class="waves-effect waves-primary">
-                                <i class="md md-today"></i><span> ניהול ההסעות שלי</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="waves-effect waves-primary" onclick="deleteCookie()">
-                                <i class="md md-remove-circle-outline"></i><span>התנתקות מהמערכת</span>
-                            </a>
-                        </li>
-                    </ul>
-                    <div class="clearfix"></div>
-                </div>
-
-                <div class="clearfix"></div>
-            </div>
-
-        </div>
+        <div w3-include-html="menu.html"></div>
         <!-- Right Sidebar End -->
         <!-- ============================================================== -->
         <!-- Start page Content here -->

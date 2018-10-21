@@ -460,7 +460,7 @@ public class Location
             }
             catch (SqlException e)
             {
-                throw;
+                throw e;
             }
             catch (Exception ex)
             {
