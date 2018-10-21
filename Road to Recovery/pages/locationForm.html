@@ -1,0 +1,758 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" dir=rtl>
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="KSMoving">
+    <meta name="author" content="Coderthemes">
+
+    <link rel="shortcut icon" href="assets/images/favicon_1.ico">
+
+    <title>אזורים</title>
+
+    <link href="../plugins/switchery/switchery.min.css" rel="stylesheet" />
+    <link href="assets/css/bootstrap-rtl.min.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/core.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/icons.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/components.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/pages.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/menu.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/responsive.css" rel="stylesheet" type="text/css">
+
+    <script src="assets/js/CookiesFunctions.js"></script>
+
+    <script src="assets/js/modernizr.min.js"></script>
+
+    <script src="assets/js/jquery.min.js"></script>
+
+    <!-- The jQuery library is a prerequisite for all jqSuite products -->
+    <script type="text/ecmascript" src="assets/js/jquery.min.js"></script>
+    <!-- This is the Javascript file of jqGrid -->
+    <script type="text/ecmascript" src="Guriddo_jqGrid_JS_5.2.0/js/jquery.jqGrid.min.js"></script>
+    <!-- We support more than 40 localizations -->
+    <script type="text/ecmascript" src="Guriddo_jqGrid_JS_5.2.0/js/i18n/grid.locale-he.js"></script>
+    <!-- A link to a Boostrap  and jqGrid Bootstrap CSS siles-->
+    <link href="Guriddo_jqGrid_JS_5.2.0/css/ui.jqgrid-bootstrap.css" rel="stylesheet" />
+
+    <!-- Sweet Alert css -->
+    <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
+
+    <!--GENERAL object and additional functions-->
+    <script src="lib/master.js"></script>
+
+    <!-- Select2 css+js -->
+    <link href="assets/css/select2.css" rel="stylesheet" />
+    <script src="assets/js/select2.min.js"></script>
+
+    <!--City Autocomplete-->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <style>
+        .ui-autocomplete {
+            max-height: 100px;
+            overflow-y: auto;
+            /* prevent horizontal scrollbar */
+            overflow-x: hidden;
+        }
+        /* IE 6 doesn't support max-height
+        * we use height instead, but this forces the menu to always be this tall
+        */
+        * html .ui-autocomplete {
+            height: 100px;
+        }
+    </style>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <!--City Autocomplete-->
+    <!--DatePicker css+js-->
+    <link href="../plugins/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" rel="stylesheet">
+    <link href="../plugins/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+    <script src="../plugins/moment/moment.js"></script>
+    <script src="../plugins/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <script src="../plugins/bootstrap-daterangepicker/daterangepicker.js"></script>
+
+    <script src="lib/datepicker-he.js"></script>
+
+    <script>
+        checkCookie();
+        arr_addressRows = [];
+        $.jgrid.defaults.responsive = true;
+        $.jgrid.defaults.styleUI = 'Bootstrap';
+
+        function loadPage() {
+
+            if (JSON.parse(GENERAL.LOCATIONS.getDestinationsList()).length != 0) {
+                arr_location = JSON.parse(GENERAL.LOCATIONS.getDestinationsList());
+                if (arr_location.func == "edit" || arr_location.func == "show") {
+                    uploadDataVol(arr_location.displayName);
+
+                    if (arr_location.func == "show") {
+
+                        //disabeling fields in case of "show" mode (readonly).
+                        $("#locationName").attr('disabled', 'disabled');
+                        $("#area").attr('disabled', 'disabled');
+                        $("#type").attr('disabled', 'disabled');
+                        $("#direction").attr('disabled', 'disabled');
+                        $("#remarks").attr('disabled', 'disabled');
+                        $("#phone1").attr('disabled', 'disabled');
+                        $("#activeLocation").attr('disabled', 'disabled');
+                        $("#ManagerLastName").attr('disabled', 'disabled');
+                        $("#ManagerName").attr('disabled', 'disabled');
+                        $("#saveCustomer").attr('disabled', 'disabled');
+
+                    }
+                }
+                else {
+                    $("#activeLocation").prop('checked', 'checked');
+                }
+            }
+        }
+
+        //function to fill form for edit
+        //need to change it to location form for edit.
+        function uploadDataVol(displayName) {
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getLocation",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                data: JSON.stringify({ displayName: displayName }),
+                success: function (data) {
+                    var location = JSON.parse(data.d);
+                    GENERAL.LOCATIONS.setLocationsList(location);
+
+                    $("#type").val(location.Type);
+                    $("#locationName").val(location.Name);
+                    $("#locationName").attr('disabled', 'disabled');
+                    $("#area").val(location.Area);
+                    //$("#direction").val(location.Direction);
+                    $("#remarks").val(location.Remarks);
+                    $("#phone1").val(location.ManagerPhones);
+                    if(location.IsActive){
+                        $("#activeLocation").prop('checked', 'checked');
+                    }
+                    $("#ManagerName").val(location.ManagerName);
+                    $("#ManagerLastName").val(location.ManagerLastName);
+                },
+                error: function (err) { alert("Error in getLocation: " + err.responseText); }
+            });
+        }
+
+        function returnLocations() {
+            location.href = "viewLocation.html"
+        }
+
+
+        function checkCity(value) {
+            if (value == "-1") {
+                // validate the fields here
+                return [false, "אנא בחר יישוב"];
+            } else {
+                return [true, ""];
+            }
+        };
+
+    </script>
+</head>
+<body class="fixed-left">
+
+    <!-- Begin page -->
+    <div id="wrapper">
+
+        <!-- Top Bar Start -->
+        <div class="topbar">
+            <!-- Navbar -->
+            <div class="navbar navbar-default" role="navigation">
+                <div class="container">
+                    <div class="">
+                        <!--Expend/Collaps Side Menue-->
+                        <div class="pull-left">
+                            <button class="button-menu-mobile open-left waves-effect">
+                                <i class="md md-menu"></i>
+                            </button>
+                            <span class="clearfix"></span>
+                        </div>
+
+                        <!-- LOGO -->
+                        <div class="pull-left">
+                            <div class="text-center">
+                                <a href="manageRidePats.html" class="logo"><span>בדרך להחלמה</span></a>
+                            </div>
+                        </div>
+
+
+
+                        <!--Search-->
+                        <!--<form role="search" class="navbar-right app-search pull-right hidden-xs">
+                            <input type="text" placeholder="חיפוש..." class="form-control app-search-input">
+                            <a href=""><i class="fa fa-search"></i></a>
+                        </form>-->
+                    </div>
+                    <!--/.nav-collapse -->
+                </div>
+            </div>
+        </div>
+        <!-- Top Bar End -->
+        <!-- ========== Right Sidebar Start ========== -->
+        <div class="left side-menu">
+
+            <div class="sidebar-inner slimscrollleft">
+
+                <div id="sidebar-menu">
+
+                    <ul>
+                        <li>
+                            <a href="viewVolunteer.html" class="waves-effect waves-primary">
+                                <i class="md md-today"></i><span> ניהול מתנדבים</span>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="viewPatient.html" class="waves-effect waves-primary">
+                                <i class="md md-recent-actors"></i><span> ניהול חולים</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="viewRidePats.html" class="waves-effect waves-primary">
+                                <i class="md md-today"></i><span>כל ההסעות</span>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="manageRidePats.html" class="waves-effect waves-primary">
+                                <i class="md md-today"></i><span> ניהול ההסעות שלי</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="waves-effect waves-primary" onclick="deleteCookie()">
+                                <i class="md md-remove-circle-outline"></i><span>התנתקות מהמערכת</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="clearfix"></div>
+                </div>
+
+                <div class="clearfix"></div>
+            </div>
+
+        </div>
+        <!-- Right Sidebar End -->
+        <!-- ============================================================== -->
+        <!-- Start page Content here -->
+        <!-- ============================================================== -->
+        <div class="content-page">
+            <!-- Start content -->
+            <div class="content">
+                <div class="container">
+                    <!-- Page-Title -->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="page-title-box">
+                                <ol class="breadcrumb pull-right">
+                                    <li><a href="viewLocation.html">ניהול אזורים</a></li>
+                                    <li class="active">אזור</li>
+                                </ol>
+                                <h4 class="page-title">אזור&nbsp&nbsp<i class="md md-recent-actors"></i></h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <form class="form-horizontal" role="form" id="customerForm">
+                            <div class="col-sm-12">
+                                <div class="card-box">
+                                    <div class="row">
+                                        <h4 class="m-t-0 header-title"><b>פרטי אזור</b></h4>
+                                        <!--<p class="text-muted font-13 m-b-30">
+                                        יצירה, צפייה ועריכת אזור. לחץ על כפתור חזור בכדי לצפות בכל האזורים.-->
+                                        <br />
+
+                                        <div class="col-md-6 checkbox checkbox-primary text-left">
+                                            <input id="activeLocation" type="checkbox">
+                                            <label for="activeLocation">
+                                                אזור פעיל
+                                            </label>
+                                        </div>
+                                        <div class="text-right m-b-30 m-r-15">
+                                            <button type="button" onclick="returnLocations()" class="btn btn-default waves-effect w-md m-b-5"><i class="ti-back-right m-r-5"></i>חזור</button>
+                                        </div>
+                                        <p class="required">* שדה חובה</p>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">שם &nbsp;<span class="required">*</span></label>
+                                                    <div class="col-sm-6">
+                                                        <input id="locationName" name="locationName" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">אזור&nbsp;<span class="required">*</span></label>
+                                                    <div class="col-sm-6" id="selectgender">
+                                                        <select id="area" name="area" class="form-control">
+                                                            <option>בחר</option>
+                                                            <option>צפון</option>
+                                                            <option>מרכז</option>
+                                                            <option>דרום</option>
+                                                            <option>מרכז-דרום</option>
+                                                            <option>מרכז-צפון</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!--<div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">اسم عائلة&nbsp;</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="lastA" name="lastA" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>-->
+                                        </div>
+
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">סוג&nbsp;<span class="required">*</span></label>
+                                                    <div class="col-sm-6" id="selectgender">
+                                                        <select id="type" name="type" class="form-control">
+                                                            <option>בחר</option>
+                                                            <option>מחסום</option>
+                                                            <option>בית חולים</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">שם מנהל יעד</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="ManagerName" name="email" type="text" class="form-control" style="text-align:left;">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">שם משפחה מנהל יעד</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="ManagerLastName" name="email" type="text" class="form-control" style="text-align:left;">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">טלפון מנהל יעד</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="phone1" name="phone1" type="text" class="form-control" placeholder="0xx-xxxxxxx או 0x-xxxxxxx">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--<div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">Email</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="email" name="email" type="text" class="form-control" style="text-align:left;">
+                                                    </div>
+                                                </div>
+                                            </div>-->
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <!--<div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">משמרות מועדפות</label>
+                                                    <div class="col-sm-6">
+                                                        <label id="PrefShift" name="PrefShift"></label>
+                                                    </div>
+                                                </div>
+                                            </div>-->
+                                            <!--<div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">מקומות מועדפים</label>
+                                                    <div class="col-sm-6" id="selectPreferRoute1">
+                                                        <label id="PrefLocation" name="PrefLocation"></label>
+                                                    </div>
+                                                </div>
+                                            </div>-->
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <!--<div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label">תאריך הצטרפות </label>-->
+                                            <!--<div class="col-sm-6">
+                                                <input id="joinDate" name="joinDate" type="text" placeholder="dd/mm/yyyy" class="form-control">
+                                            </div>-->
+                                            <!--<div class="col-sm-6">
+                                                        <input type="date" id="joinDate" placeholder="dd/mm/yyyy" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>-->
+                                            <!--div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">הוראות הגעה</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="direction" name="address" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>-->
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">הערות</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="remarks" name="remarks" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="addressesForm">
+                                        <hr />
+                                        <!--<table id="jqGrid" class="table table-striped table-bordered text-right"></table>-->
+                                        <!--<div id="jqGridPager"></div>-->
+                                        <div class="text-right m-t-30 row">
+                                            <button type="submit" id="saveCustomer" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-save m-r-5"></i>שמור</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- end container -->
+            </div>
+            <!-- end content -->
+            <!-- FOOTER -->
+            <footer class="footer text-right">
+                2018 © Road to Recovery Management System by Matan Doron
+            </footer>
+            <!-- End FOOTER -->
+        </div>
+        <!-- ============================================================== -->
+        <!-- End page content here -->
+        <!-- ============================================================== -->
+    </div>
+    <!-- END wrapper -->
+    <script>
+        var resizefunc = [];
+    </script>
+
+    <!--Validators-->
+    <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            //datePicker();
+            //generateCities();
+            //generateVolTypes();
+            // DO NOT REMOVE : GLOBAL FUNCTIONS!
+            var errorClass = 'invalid';
+            var errorElement = 'em';
+            var $serviceForm = $('#customerForm').validate({
+
+                highlight: function (element) {
+                    jQuery(element).closest('.form-group').addClass('has-error');
+                },
+                unhighlight: function (element) {
+                    jQuery(element).closest('.form-group').removeClass('has-error');
+                },
+
+                // Rules for form validation
+                //rules: {
+                //    {
+                //        required: true
+                //    },
+                //    volunteerLastName: {
+                //        required: fa
+                //    },
+                //    phone1: {
+                //        required: false
+                //    },
+                //    firstA: {
+                //        required: false//first name in arabic not required
+                //    },
+                //    lastA: {
+                //        required: false//second name in arabic not required
+                //    }, city: {
+                //        required: true
+                //    }
+
+                //},
+
+
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+
+                    var func = arr_customers.func;
+                    var displayName = arr_location.displayName;
+
+                    var valid = validateLocationInputs();
+                    if (!valid) return false;
+
+                    var locationName = $("#locationName").val();
+                    var area = $("#area").val();
+                    var type = $("#type").val();
+                    var direction = $("#direction").val();
+                    var remark = $("#remarks").val();
+                    var cellPhone = $("#phone1").val();
+                    var managerFirstName = $("#ManagerName").val();
+                    var managerLastName = $("#ManagerLastName").val();
+                    if ($("#activeLocation").is(':checked')) var active = true;
+                    else active = false;
+
+                    //var lastNameH = $("#volunteerLastName").val();
+                    //var email = $("#email").val();
+                    //var typeVol = $("#typeVolunteer").val();
+                    //var city = $("#city").val();
+                    //var cellphone2 = $("#phone2").val();
+                    //var homePhone = $("#HomePhone").val();
+                    //var nameA = $("#firstA").val();
+                    //var lastNameA = $("#lastA").val();
+                    //var joinDate = new Date($("#joinDate").val());
+
+                    newLocation = {
+                        Type: type, Name: locationName, Area: area, Direction: "", Responsible: null,
+                        Status: active, Remarks: remark, ManagerName: managerFirstName,
+                        ManagerLastName: managerLastName, ManagerPhones: cellPhone
+                    };
+                    $.ajax({
+                        dataType: "json",
+                        url: "WebService.asmx/setLocation",
+                        contentType: "application/json; charset=utf-8",
+                        type: "POST",
+                        async: false,
+                        data: JSON.stringify({ location: newLocation, func: func }),
+                        success: function (data) {
+                            //SaveAddresses(0, numberOfRecords, customerID);
+
+                            swal({
+                                title: "נשמר",
+                                type: "success",
+                                timer: 1000,
+                                showConfirmButton: false
+                            });
+                            setTimeout(function () { returnLocations() }, 1001);
+
+                        },
+                        error: function (err) {
+                            alert("Error in setLocation: " + err.responseText);
+                        }
+                    });
+                    //END OF Insert Product Code
+
+                    return false;
+                },
+
+                // Messages for form validation
+                messages: {
+
+                    locationName: {
+                        required: "יש להכניס שם אזור"
+                    },
+                    volunteerLastName: {
+                        required: "יש להכניס שם משפחה"
+                    },
+                    phone1: {
+                        required: "יש להכניס טלפון ראשי"
+                    },
+
+
+
+                },
+
+
+            });
+        });
+
+        function validateLocationInputs() {
+
+            var area = $("#area").val();
+            if (area == "בחר") {
+                area = false
+                alert("יש לבחור אזור מתוך הרשימה");
+            }
+            else { area = true; }
+            var type = $("#type").val();
+            if (type == "בחר") {
+                type = false
+                alert("יש לבחור מחסום מתוך הרשימה");
+            }
+            else { type = true; }
+
+            var phoneCheck = false;
+            if ($("#phone1").val() != "") {
+                var checkPhone1 = $("#phone1").val();
+                var phoneReg = new RegExp("0\\d{2}-\\d{7}$|0\\d{1}-\\d{7}$");
+                var phoneMatch = phoneReg.test(checkPhone1);
+                if (!phoneMatch) {
+                    alert("הטלפון הראשי שהוזן אינו חוקי");
+                }
+                else phoneCheck = true;
+            }
+
+            if (!area || !type || !phoneCheck) { //|| !jdateMatch
+                return false;
+            } else return true;
+        }
+    </script>
+
+    <!-- jQuery  -->
+    <script src="assets/js/bootstrap-rtl.min.js"></script>
+    <script src="assets/js/detect.js"></script>
+    <script src="assets/js/fastclick.js"></script>
+    <script src="assets/js/jquery.slimscroll.js"></script>
+    <script src="assets/js/jquery.blockUI.js"></script>
+    <script src="assets/js/waves.js"></script>
+    <script src="assets/js/wow.min.js"></script>
+    <script src="assets/js/jquery.nicescroll.js"></script>
+    <script src="assets/js/jquery.scrollTo.min.js"></script>
+    <script src="../plugins/switchery/switchery.min.js"></script>
+
+    <!-- Sweet Alert js -->
+    <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
+    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+
+    <script src="assets/js/jquery.core.js"></script>
+    <script src="assets/js/jquery.app.js"></script>
+
+    <script type="text/javascript">
+
+
+        $(document).ready(function () {
+
+            addressesArrayData = [];
+            addRowCount = 0;
+            numberOfRecords = 0;
+            datePicker();
+
+            $("#jqGrid").jqGrid({
+                ajaxSelectOptions: {
+                    type: "POST",
+                    contentType: 'application/json; charset=utf-8',
+                    datatype: "json",
+                    data: JSON.stringify({}),
+                },
+                editurl: 'clientArray',
+                viewrecords: true,
+                colModel: [
+                    {
+                        label: 'ID',
+                        name: 'ID',
+                        width: "5%",
+                    },
+                    {
+                        label: 'יעד התחלה',
+                        name: 'AddressName',
+                        width: "10%",
+                        editable: true,
+                        edittype: "select",
+                        editoptions: {
+                            dataUrl: "WebService.asmx/getDestinationView",
+                            buildSelect: function (data) {
+                                var retValue = $.parseJSON(data);
+                                var arr_cities = $.parseJSON(retValue.d);
+                                var select = "<select>";
+                                select += "<option value='-1' selected='' disabled=''>בחר</option>";
+
+                                if (arr_cities && arr_cities.length) {
+                                    for (i in arr_cities) {
+                                        select += "<option value='" + arr_cities[i].Name + "'>" + arr_cities[i].Name + "</option>";
+                                    }
+                                }
+                                select += "</select>";
+                                return select;
+                            }
+
+                        },
+                        editrules: { custom: true, custom_func: checkCity }
+                    },
+
+                    {
+                        label: 'יעד סיום',
+                        name: 'Street',
+                        width: "20%",
+                        editable: true,
+                        editrules: { required: true }
+                    },
+                    {
+                        label: 'יום',
+                        name: 'Number',
+                        width: "10%",
+                        editable: true,
+                        editrules: { required: true }
+                    },
+                    {
+                        label: 'שעה',
+                        name: 'ContactPerson',
+                        width: "10%",
+                        editable: true
+                    },
+                    {
+                        label: 'כיוון',
+                        name: 'ContactPhone',
+                        width: "10%",
+                        editable: true
+                    },
+                    //{
+                    //            //    label: 'הערות',
+                    //            //    name: 'Comments',
+                    //            //    width: "15%",
+                    //    editable: true
+                    //}
+                ],
+
+                sortname: 'City',
+                loadonce: true,
+                autowidth: true,
+                height: "100%",
+                rowNum: 150,
+                direction: "rtl",
+                pager: "#jqGridPager",
+
+            });
+
+            //need to be fixed
+
+            if (JSON.parse(GENERAL.LOCATIONS.getDestinationsList()).length != 0) {
+                arr_customers = JSON.parse(GENERAL.LOCATIONS.getDestinationsList());
+                //if (arr_customer.func != "show") {
+                //    $('#jqGrid').navGrid("#jqGridPager", { edit: false, add: false, del: true, refresh: false, view: false, position: "left", cloneToTop: true });
+                //    $('#jqGrid').inlineNav('#jqGridPager',
+                //        // the buttons to appear on the toolbar of the grid
+                //        {
+                //            edit: true,
+                //            add: true,
+                //            del: true,
+                //            cancel: false,
+                //            addParams: {
+                //                addRowParams: {
+                //                    oneditfunc: function () { addRowCount += 1; }
+                //                }
+
+                //            }
+                //        });
+
+            }
+
+
+            loadPage();
+        });
+    </script>
+</body>
+</html>
+
+

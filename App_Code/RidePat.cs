@@ -781,6 +781,9 @@ public class RidePat
             string query = "update Ride set secondaryDriver=null where RideNum=" + rideId;
             DbService db = new DbService();
             res = db.ExecuteQuery(query);
+            
+            LogEntry le = new LogEntry(DateTime.Now, "bad", driverId.ToString() + " is secondary driver and left the ride", 12);
+            le.Write();
         }
         else
         {
@@ -788,6 +791,10 @@ public class RidePat
             string query = "update Ride set MainDriver=null where RideNum=" + rideId;
             DbService db = new DbService();
             res = db.ExecuteQuery(query);
+
+        
+            LogEntry le = new LogEntry(DateTime.Now, "bad", driverId.ToString() + " is primary driver and left the ride", 12);
+            le.Write();
         }
 
         //string query2 = "select RidePatNum from RidePat where RideId=" + rideId;

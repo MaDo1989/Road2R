@@ -1,3 +1,4 @@
-﻿2018-10-13 11:45:47,415 ERROR [10] WebService.writeToLog - Successful login ;for user: matan
-2018-10-13 12:01:25,148 ERROR [6] WebService.writeToLog - Successful login ;for user: matan
-2018-10-13 12:02:36,958 ERROR [6] WebService.writeToLog - Successful login ;for user: matan
+﻿2018-10-21 11:09:19,364 ERROR [8] WebService.writeToLog - Successful login ;for user: sapir
+2018-10-21 11:21:02,770 ERROR [6] WebService.writeToLog - Successful login ;for user: sapir
+2018-10-21 14:03:09,382 ERROR [10] WebService.writeToLog - Successful login ;for user: sapir
+2018-10-21 14:45:47,793 ERROR [43] WebService.writeToLog - Successful login ;for user: sapir

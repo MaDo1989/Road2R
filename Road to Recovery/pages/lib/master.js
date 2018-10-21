@@ -30,7 +30,14 @@
             localStorage.volunteersList = volunteersList;
         }
     },
-
+    LOCATIONS: {
+        getDestinationsList: function () {
+            return localStorage.locationsList;
+        },
+        setLocationsList: function (locationsList) {
+            localStorage.locationsList = locationsList;
+        }
+    },
     ESCORTED: {
         getEscortedList: function () {
             return localStorage.escortedList;
