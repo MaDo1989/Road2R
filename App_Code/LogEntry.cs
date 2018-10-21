@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using log4net;
+using System.Web;
 
 public class LogEntry
 {
@@ -15,6 +16,7 @@ public class LogEntry
     public string Severity { get; set; }
     public string Message { get; set; }
     public int Code { get; set; }
+    public string Coordinator { get; set; }
 
     private static readonly ILog Log =
          LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -43,18 +45,22 @@ public class LogEntry
             DbService db = new DbService();
             SqlCommand cmd = new SqlCommand();
             cmd.CommandType = CommandType.Text;
-            SqlParameter[] cmdParams = new SqlParameter[4];
+            SqlParameter[] cmdParams = new SqlParameter[5];
+
+           string user = (string)HttpContext.Current.Session["userSession"];
 
             cmdParams[0] = cmd.Parameters.AddWithValue("@date", Date);
             cmdParams[1] = cmd.Parameters.AddWithValue("@severity", Severity);
             cmdParams[2] = cmd.Parameters.AddWithValue("@message", Message);
             cmdParams[3] = cmd.Parameters.AddWithValue("@code", Code);
-            string query = "insert into [LogTable] ([date],[severity],[message],[code]) values (@date,@severity,@message,@code);";
+            cmdParams[4] = cmd.Parameters.AddWithValue("@coordinator", user);
+
+            string query = "insert into [LogTable] ([date],[severity],[message],[code],[Coordinator]) values (@date,@severity,@message,@code,@coordinator);";
             db.ExecuteQuery(query, cmd.CommandType, cmdParams);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-
+            throw ex;
         }
     }
 
@@ -75,6 +81,7 @@ public class LogEntry
             le.Severity = (string)dr2["severity"].ToString();
             le.Message = (string)dr2["message"].ToString();
             le.Date = (DateTime)dr2["date"];
+            le.Coordinator = dr2["Coordinator"].ToString();
 
             el.Add(le);
         }

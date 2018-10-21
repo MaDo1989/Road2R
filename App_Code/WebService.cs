@@ -100,11 +100,19 @@ public class WebService : System.Web.Services.WebService
         return j.Serialize(v);
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public int setRidePat(RidePat RidePat, string func)
     {
         RidePat rp = new RidePat();
-        return rp.setRidePat(RidePat, func);
+        int res = rp.setRidePat(RidePat, func);
+        //if (res > 0 && func == "delete")
+        //{
+          //  string message = " נסיעה מספר" + RidePat.RidePatNum + " בוטלה ";
+            //LogEntry le = new LogEntry(DateTime.Now, "info", message, 1);
+            //le.Coordinator = (string)HttpContext.Current.Session["userSession"];
+           // le.Write();
+       // }
+        return res;
     }
 
     [WebMethod]
@@ -243,7 +251,7 @@ public class WebService : System.Web.Services.WebService
         RidePat rp = new RidePat();
         List<RidePat> r = rp.GetRidePatView(volunteerId);
         JavaScriptSerializer j = new JavaScriptSerializer();
-        j.MaxJsonLength=Int32.MaxValue;
+        j.MaxJsonLength = Int32.MaxValue;
         return j.Serialize(r);
     }
 
@@ -512,6 +520,8 @@ public class WebService : System.Web.Services.WebService
         HttpContext.Current.Session["userSession"] = uName;
 
         writeToLog("Successful login");
+
+
         return j.Serialize(userInDB);
     }
 
@@ -520,8 +530,7 @@ public class WebService : System.Web.Services.WebService
         string user = (string)HttpContext.Current.Session["userSession"];
         Log.Error(str + " ;for user: " + user);
     }
-<<<<<<< HEAD
-=======
+
 
     [WebMethod]
     public void writeLog(string str)
@@ -553,7 +562,7 @@ public class WebService : System.Web.Services.WebService
     //}
 
 
->>>>>>> sapir
+
 
     [WebMethod]
     public string loginDriver(string uName, string password)
@@ -576,9 +585,9 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     public int backupToPrimaryNotification(int ridePatId)
-    {       
-                Message m = new Message();
-               return m.backupToPrimary(ridePatId);               
+    {
+        Message m = new Message();
+        return m.backupToPrimary(ridePatId);
     }
 
 }

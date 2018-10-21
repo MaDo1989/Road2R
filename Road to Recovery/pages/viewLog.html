@@ -8,7 +8,7 @@
 
     <link rel="shortcut icon" href="assets/images/favicon_1.ico">
 
-    <title>הסעות חולים</title>
+    <title>יומן מערכת</title>
 
     <!-- DataTables -->
     <link href="../plugins/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
@@ -51,11 +51,13 @@
     <!--<script src="../plugins/moment/moment.js"></script>-->
     <script src="lib/sorting.js"></script>
 
-
+    <script src="lib/includeHTML.js"></script>
 
     <script>
         //checkCookie();
         $(document).ready(function () {
+
+            includeHTML();
 
             //  document.getElementById("Numbers").checked = localStorage.numbers === 'true';
 
@@ -146,8 +148,14 @@
                 success: function (data) {
                     var arr_log = JSON.parse(data.d);
                     //GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
-
+                    var thisUser = $('#thisUser').is(':checked');
+                    var user = GENERAL.USER.getUserName();
                     for (i in arr_log) {
+
+                        if (thisUser) {
+                            if (arr_log[i].Coordinator != user) continue;
+                        }
+
                         var myDate = new Date(parseInt(arr_log[i].Date.replace('/Date(', '')));
                         var datePrint =  myDate.toTimeString().match('([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]')[0] + ' ' +myDate.getDate() + "." + (myDate.getMonth() + 1) + "." + myDate.getFullYear();
                         t.row.add([arr_log[i].Code, datePrint,arr_log[i].Message, arr_log[i].Severity]).draw(false);
@@ -319,7 +327,7 @@
 
                         //});
                     },
-                error: function (err) { alert("Error in getLog"); }
+                error: function (err) { alert("Error in getLog: "+err.responseText); }
             });
         }
 
@@ -375,48 +383,7 @@
         </div>
         <!-- Top Bar End -->
         <!-- ========== Right Sidebar Start ========== -->
-        <div class="left side-menu">
-
-            <div class="sidebar-inner slimscrollleft">
-
-                <div id="sidebar-menu">
-
-                    <ul>
-                        <li>
-                            <a href="viewVolunteer.html" class="waves-effect waves-primary">
-                                <i class="md md-person"></i><span> ניהול מתנדבים</span>
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="viewPatient.html" class="waves-effect waves-primary">
-                                <i class="md md-recent-actors"></i><span> ניהול חולים</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="viewRidePats.html" class="waves-effect waves-primary">
-                                <i class="md md-today"></i><span> כל ההסעות</span>
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="manageRidePats.html" class="waves-effect waves-primary">
-                                <i class="md md-today"></i><span> ניהול ההסעות שלי</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="waves-effect waves-primary" onclick="deleteCookie()">
-                                <i class="md md-remove-circle-outline"></i><span>התנתקות מהמערכת</span>
-                            </a>
-                        </li>
-                    </ul>
-                    <div class="clearfix"></div>
-                </div>
-
-                <div class="clearfix"></div>
-            </div>
-
-        </div>
+        <div w3-include-html="menu.html"></div>
         <!-- Right Sidebar End -->
         <!-- ============================================================== -->
         <!-- Start page Content here -->
@@ -438,15 +405,19 @@
                             </div>
                         </div>
                     </div>
-
+                    
 
 
                     <div class="row">
                         <div class="col-sm-12">
+                            <input id="thisUser" type="checkbox" checked="checked" onchange="refreshTable(document.getElementById('hourSelect').value)">
+                            <label for="thisUser">
+                                הודעות שלי בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
+                            </label>
                             <div class="card-box table-responsive" id="log">
-
+                                
                                 <div class="col-sm-6">
-                                    <select class="form-control" aria-required="true" aria-invalid="false" onchange="refreshTable(this.value)">
+                                    <select id="hourSelect" class="form-control" aria-required="true" aria-invalid="false" onchange="refreshTable(this.value)">
                                         <option value="1">שעה</option>
                                         <option value="12">12 שעות</option>
                                         <option value="24">יום אחד</option>

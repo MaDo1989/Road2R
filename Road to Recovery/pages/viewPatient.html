@@ -31,10 +31,13 @@
     <!-- Select2 css+js -->
     <link href="assets/css/select2.css" rel="stylesheet" />
     <script src="assets/js/select2.min.js"></script>
-
+    <script src="lib/includeHTML.js"></script>
     <script>
         checkCookie();
         $(document).ready(function () {
+
+        includeHTML();
+
             //adds menu.html content into any "#menu" element
             //$('#menu').load('menu.html');
 
@@ -223,42 +226,7 @@
         </div>
         <!-- Top Bar End -->
         <!-- ========== Right Sidebar Start ========== -->
-        <div class="left side-menu">
-            <div class="sidebar-inner slimscrollleft">
-                <div id="sidebar-menu">
-                    <ul>
-                        <li>
-                            <a href="viewVolunteer.html" class="waves-effect waves-primary">
-                                <i class="md md-person"></i><span> ניהול מתנדבים</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="viewPatient.html" class="waves-effect waves-primary">
-                                <i class="md md-recent-actors"></i><span> ניהול חולים</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="viewRidePats.html" class="waves-effect waves-primary">
-                                <i class="md md-today"></i><span> כל ההסעות</span>
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="manageRidePats.html" class="waves-effect waves-primary">
-                                <i class="md md-today"></i><span> ניהול ההסעות שלי</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="waves-effect waves-primary" onclick="deleteCookie()">
-                                <i class="md md-remove-circle-outline"></i><span>התנתקות מהמערכת</span>
-                            </a>
-                        </li>
-                    </ul>
-                    <div class="clearfix"></div>
-                </div>
-                <div class="clearfix"></div>
-            </div>
-        </div>
+        <div w3-include-html="menu.html"></div>
         <!-- Right Sidebar End -->
         <!-- ============================================================== -->
         <!-- Start page Content here -->
