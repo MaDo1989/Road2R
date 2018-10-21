@@ -360,6 +360,29 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod]
+    public void deactivateLocation(string displayName, string active)
+    {
+        Location l = new Location();
+        l.Name = displayName;
+        l.deactivateLocation(active);
+    }
+    [WebMethod]
+    public void setLocation(Location location, string func)
+    {
+        Location l = location;
+        l.setLocation(l, func);
+    }
+    [WebMethod]
+    public string getLocation(string displayName)
+    {
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        Location l = new Location();
+        l.Name = displayName;
+        Location location = l.getLocation();
+        return j.Serialize(location);
+    }
+
+    [WebMethod]
     public string getVolunteers(bool active)
     {
         JavaScriptSerializer j = new JavaScriptSerializer();
@@ -460,6 +483,26 @@ public class WebService : System.Web.Services.WebService
         string user = (string)HttpContext.Current.Session["userSession"];
         Log.Error(str + " ;for user: "+user);
     }
+
+    [WebMethod]
+    public void writeLog(string str)
+    {
+        for (int i = 0; i < 50; i++)
+        {
+            LogEntry le = new LogEntry(DateTime.Now, str, "error in something" + i.ToString(), i);
+            le.Write();
+        }
+    }
+
+    [WebMethod]
+    public string getLog(int hours)
+    {
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        LogEntry le = new LogEntry();
+        List<LogEntry> list = le.GetLog(hours);
+        return j.Serialize(list);
+    }
+
     //[WebMethod]
     //public string getUserType(string user)
     //{

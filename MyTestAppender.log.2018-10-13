@@ -1,0 +1,9 @@
+﻿2018-10-13 11:45:47,415 ERROR [10] WebService.writeToLog - Successful login ;for user: matan
+2018-10-13 12:01:25,148 ERROR [6] WebService.writeToLog - Successful login ;for user: matan
+2018-10-13 12:02:36,958 ERROR [6] WebService.writeToLog - Successful login ;for user: matan
+2018-10-13 13:52:33,873 ERROR [6] WebService.writeToLog - Successful login ;for user: sapir
+2018-10-13 15:02:09,045 ERROR [5] LogEntry.Write - ERROR WITH MESSI!
+2018-10-13 17:42:40,043 ERROR [33] WebService.writeToLog - Successful login ;for user: sapir
+2018-10-13 17:58:40,717 ERROR [24] WebService.writeToLog - Successful login ;for user: sapir
+2018-10-13 18:05:10,649 ERROR [24] WebService.writeToLog - Successful login ;for user: sapir
+2018-10-13 19:00:20,716 ERROR [7] WebService.writeToLog - Successful login ;for user: sapir

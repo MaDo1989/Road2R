@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
 using System.Web.Script.Serialization;
@@ -213,12 +214,21 @@ public class Location
     public List<Location> getDestinationsListForView(bool active)
     {
         #region DB functions
+        
         string query = "select * from Location ";
-        query += "order by Name";
+        if (active)
+        {
+            query += "where IsActive = '" + active + "' order by Name";
+        }
+        else query += "order by Name";
 
         List<Location> list = new List<Location>();
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
+
+        SqlCommand cmd2 = new SqlCommand();
+        cmd2.CommandType = CommandType.Text;
+        SqlParameter[] cmdParams2 = new SqlParameter[1];
 
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
@@ -227,14 +237,24 @@ public class Location
             l.Name = dr["Name"].ToString();
             l.Type = dr["Type"].ToString();
             l.Area = dr["Area"].ToString();
-            //tmp.Direction = dr["direction"].ToString();
+            l.Direction = dr["adress"].ToString();
             l.Responsible = new Volunteer(dr["Responsible"].ToString());
             l.IsActive =Convert.ToBoolean( dr["IsActive"].ToString());
             l.Remarks = dr["Remarks"].ToString();
-            //l.ManagerName = dr["DestinationManager"].ToString();
-            //l.ManagerLastName = dr["managerLastName"].ToString();
-            //l.ManagerPhones = dr["managerPhones1"].ToString();
-            //l.ManagerPhones2 = dr["managerPhones2"].ToString();
+            if (dr["DestinationManager"].ToString() != "")
+            {
+                int managerId = int.Parse(dr["DestinationManager"].ToString());
+                cmdParams2[0] = cmd2.Parameters.AddWithValue("Id", managerId);
+                string query2 = "select * from DestinationManagers where Id=@Id";
+                DestinationManager m = new DestinationManager();
+                DbService db2 = new DbService();
+                DataSet ds2 = db2.GetDataSetByQuery(query2, cmd2.CommandType, cmdParams2);
+                DataRow dr2 = ds2.Tables[0].Rows[0];
+                l.ManagerName = dr2["FirstName"].ToString();
+                l.ManagerLastName = dr2["LastName"].ToString();
+                l.managerPhones = dr2["Phone"].ToString();
+            }
+
             list.Add(l);
         }
         #endregion
@@ -310,4 +330,146 @@ public class Location
         return list;
 
     }
+    public void deactivateLocation(string active)
+    {
+        DbService db = new DbService();
+        db.ExecuteQuery("UPDATE Location SET IsActive='" + active + "' WHERE Name='" + Name + "'");
+    }
+
+
+    public Location getLocation()
+    {
+        #region DB functions
+        SqlCommand cmd = new SqlCommand();
+        cmd.CommandType = CommandType.Text;
+        SqlParameter[] cmdParams = new SqlParameter[1];
+        cmdParams[0] = cmd.Parameters.AddWithValue("name", Name);
+        string query = "select * from Location where Name=@name";
+        Location l = new Location();
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query, cmd.CommandType, cmdParams);
+        DataRow dr = ds.Tables[0].Rows[0];
+
+        l.Type = dr["Type"].ToString();
+        l.Name = dr["Name"].ToString();
+        l.Area = dr["Area"].ToString();
+        l.Direction = dr["adress"].ToString();
+        //l.Responsible = (Volunteer)dr["Responsible"];
+        l.IsActive = bool.Parse(dr["IsActive"].ToString());
+        l.Remarks = dr["Remarks"].ToString();
+        if (dr["DestinationManager"].ToString() != "")
+        {
+            int managerId = int.Parse(dr["DestinationManager"].ToString());
+            SqlCommand cmd2 = new SqlCommand();
+            cmd2.CommandType = CommandType.Text;
+            SqlParameter[] cmdParams2 = new SqlParameter[1];
+            cmdParams2[0] = cmd2.Parameters.AddWithValue("Id", managerId);
+            string query2 = "select * from DestinationManagers where Id=@Id";
+
+            DestinationManager m = new DestinationManager();
+            DbService db2 = new DbService();
+            DataSet ds2 = db2.GetDataSetByQuery(query2, cmd2.CommandType, cmdParams2);
+            DataRow dr2 = ds2.Tables[0].Rows[0];
+            l.ManagerName = dr2["FirstName"].ToString();
+            l.ManagerLastName = dr2["LastName"].ToString();
+            l.managerPhones = dr2["Phone"].ToString();
+        }
+        #endregion
+
+        return l;
+    }
+
+
+
+    public void setLocation(Location v, string func)
+    {
+        #region DB functions
+        int res = 0;
+        DbService db = new DbService();
+        SqlCommand cmd = new SqlCommand();
+        cmd.CommandType = CommandType.Text;
+        SqlParameter[] cmdParams = new SqlParameter[9];
+
+        //getting the index for the destination manager
+        DestinationManager m = new DestinationManager(v.ManagerName,v.ManagerLastName,v.ManagerPhones,v.ManagerPhones2);
+        int managerId = m.setDestinationManager(m, func);
+
+        cmdParams[0] = cmd.Parameters.AddWithValue("@type", v.Type);
+        cmdParams[1] = cmd.Parameters.AddWithValue("@name", v.Name);
+        cmdParams[2] = cmd.Parameters.AddWithValue("@area", v.Area);
+        cmdParams[3] = cmd.Parameters.AddWithValue("@adress", v.Direction);
+        cmdParams[4] = cmd.Parameters.AddWithValue("@responsible", "x x");
+        cmdParams[5] = cmd.Parameters.AddWithValue("@isActive", v.Status);
+        cmdParams[6] = cmd.Parameters.AddWithValue("@remarks", v.Remarks);
+        cmdParams[7] = cmd.Parameters.AddWithValue("@DestinationManager", managerId);
+        cmdParams[8] = cmd.Parameters.AddWithValue("@cityCityName", "אביחיל");
+
+        string query = "";
+        if (func == "edit")
+        {
+            //SqlCommand cmd1 = new SqlCommand();
+            //cmd1.CommandType = CommandType.Text;
+            //SqlParameter[] cmdParams1 = new SqlParameter[1];
+            //cmdParams1[0] = cmd1.Parameters.AddWithValue("name", Name);
+            //string query1 = "select * from Location where Name=@name";
+            //Location l = new Location();
+            //DbService db1 = new DbService();
+            //DataSet ds1 = db1.GetDataSetByQuery(query1, cmd1.CommandType, cmdParams1);
+            //DataRow dr1 = ds1.Tables[0].Rows[0];
+
+            //if (dr1[0] != null && v.Name == (string)dr1[1])
+            //{
+            //    throw new Exception("שימוש באותו שם אזור");
+            //}
+
+            //int counter = 0;
+            //List<Location> ls = new List<Location>();
+            //ls = getDestinationsListForView(true);
+            //foreach (Location item in ls)
+            //{
+            //    if (item.Name == v.Name)
+            //    {
+            //        counter++;
+            //    }
+            //}
+            //if (counter>1)
+            //{
+            //    throw new Exception("שימוש באותו שם אזור");
+            //}
+
+            query = "update Location set Type=@type, Name=@name,";
+            query += "Area=@area, Adress=@adress, Responsible=@responsible, IsActive=@IsActive, Remarks=@remarks, ";
+            query += "DestinationManager=@DestinationManager, CityCityName=@cityCityName where Name=@name"; 
+
+            res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+
+            if (res == 0)
+            {
+                throw new Exception("שם האזור לא תקין");
+            }
+          
+        }
+        else if (func == "new")
+        {
+            query = "insert into Location (Type, Name, Area, Adress, Responsible, IsActive, Remarks, DestinationManager, CityCityName)";
+            query += " values (@type,@name,@area,@adress,@responsible,@IsActive,@remarks,@DestinationManager,@cityCityName);SELECT SCOPE_IDENTITY();";
+            db = new DbService();
+            try
+            {
+                db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+            }
+            catch (SqlException e)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion
+
+    }
+
 }
