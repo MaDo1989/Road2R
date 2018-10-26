@@ -138,14 +138,14 @@
             tAfternoon.clear().draw();
             tFuture.clear().draw();
 
-
+            var volunteerId = -2 // VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
 
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/GetRidePatView",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                data: JSON.stringify({ volunteerId: -1 }), //VolunteerId -1 means get all ridePats
+                data: JSON.stringify({ volunteerId: volunteerId }), 
                 success: function (data) {
                     arr_rides = JSON.parse(data.d);
                     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
