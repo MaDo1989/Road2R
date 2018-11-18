@@ -442,7 +442,7 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">טלפון ראשי&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
-                                                        <input id="phone1" name="phone1" type="text" class="form-control" placeholder="0xx-xxxxxxx או 0x-xxxxxxx">
+                                                        <input id="phone1" name="phone1" type="text" class="form-control" placeholder="0xxxxxxxxx או 0xxxxxxxx">
                                                     </div>
                                                 </div>
                                             </div>
@@ -450,7 +450,7 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">טלפון 2</label>
                                                     <div class="col-sm-6">
-                                                        <input id="phone2" name="phone2" type="text" class="form-control" placeholder="0xx-xxxxxxx או 0x-xxxxxxx">
+                                                        <input id="phone2" name="phone2" type="text" class="form-control" placeholder="0xxxxxxxxx או 0xxxxxxxx">
                                                     </div>
                                                 </div>
                                             </div>
@@ -460,7 +460,7 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">טלפון נוסף</label>
                                                     <div class="col-sm-6">
-                                                        <input id="HomePhone" name="HomePhone" type="text" class="form-control" placeholder="0xx-xxxxxxx או 0x-xxxxxxx">
+                                                        <input id="HomePhone" name="HomePhone" type="text" class="form-control" placeholder="0xxxxxxxxx או 0xxxxxxxx">
                                                     </div>
                                                 </div>
                                             </div>
@@ -784,20 +784,20 @@
 
 
             var checkPhone1 = $("#phone1").val();
-            var phoneReg = new RegExp("0\\d{2}-\\d{7}$|0\\d{1}-\\d{7}$");
+            var phoneReg = new RegExp("0\\d{8}$|0\\d{9}$");
             var phoneMatch = phoneReg.test(checkPhone1);
             if (!phoneMatch) alert("הטלפון הראשי שהוזן אינו חוקי");
 
             if ($("#phone2").val() != "") {
                 var checkPhone2 = $("#phone2").val();
-                var phoneReg2 = new RegExp("0\\d{2}-\\d{7}$|0\\d{1}-\\d{7}$");
+                var phoneReg2 = new RegExp("0\\d{8}$|0\\d{9}$");
                 var phoneMatch2 = phoneReg2.test(checkPhone2);
                 if (!phoneMatch2) alert("טלפון 2 שהוזן אינו חוקי");
             } else phoneMatch2 = true;
 
             if ($("#HomePhone").val() != "") {
                 var checkPhone3 = $("#HomePhone").val();
-                var phoneReg3 = new RegExp("0\\d{2}-\\d{7}$|0\\d{1}-\\d{7}$");
+                var phoneReg3 = new RegExp("0\\d{8}$|0\\d{9}$");
                 var phoneMatch3 = phoneReg3.test(checkPhone3);
                 if (!phoneMatch3) alert("הטלפון הנוסף שהוזן אינו חוקי");
             } else phoneMatch3 = true;
