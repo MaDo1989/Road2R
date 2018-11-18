@@ -84,7 +84,7 @@
             getCoors();
 
             refreshTable();
-            setInterval("refreshTable()", 20000);
+            setInterval("refreshTable()", 60000);
         });
 
         function saveFilters() {
@@ -138,7 +138,7 @@
             tAfternoon.clear().draw();
             tFuture.clear().draw();
 
-            var volunteerId = -2 // VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
+            var volunteerId = -1 // VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
 
             $.ajax({
                 dataType: "json",
