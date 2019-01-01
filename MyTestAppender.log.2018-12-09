@@ -1,0 +1,4 @@
+﻿2018-12-09 09:34:59,950 ERROR [9] WebService.writeToLog - Successful login ;for user: sapir
+2018-12-09 09:41:32,996 ERROR [9] WebService.writeToLog - Successful login ;for user: sapir
+2018-12-09 10:04:49,514 ERROR [6] WebService.writeToLog - Successful login ;for user: sapir
+2018-12-09 11:54:46,882 ERROR [15] WebService.writeToLog - Successful login ;for user: sapir

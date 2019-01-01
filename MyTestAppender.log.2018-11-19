@@ -1,0 +1,87 @@
+﻿2018-11-19 08:52:37,279 ERROR [56] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-19 08:53:46,361 ERROR [12] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-19 11:13:38,405 ERROR [29] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-19 11:26:15,121 ERROR [35] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): הזמן הקצוב של החיבור תם. פרק הזמן הקצוב חלף במהלך ניסיון לצרוך את הודעת האישור של לחיצת היד המתבצעת לפני הכניסה. ייתכן שהסיבה היא שלחיצת היד המתבצעת לפני הכניסה נכשלה או שלשרת לא היתה אפשרות להגיב בזמן.  משך הזמן של ניסיון החיבור לשרת זה הוא - אתחול [לפני ההתחברות] = 93; לחיצת יד = 15275;  ---> System.ComponentModel.Win32Exception (0x80004005): The wait operation timed out
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 493
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 554
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 509
+ClientConnectionId:77944a1e-fcd7-4ffa-9bea-fdba762ba283
+Error Number:-2,State:0,Class:11
+2018-11-19 11:28:50,825 ERROR [35] WebService.setVolunteer - Error in setVolunteer
+System.Exception: phone already exists
+   ב-  Volunteer.setVolunteer(Volunteer v, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 984
+   ב-  WebService.setVolunteer(Volunteer volunteer, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 790
+2018-11-19 11:33:26,988 ERROR [33] WebService.setVolunteer - Error in setVolunteer
+System.Exception: phone already exists
+   ב-  Volunteer.setVolunteer(Volunteer v, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 984
+   ב-  WebService.setVolunteer(Volunteer volunteer, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 790
+2018-11-19 11:43:25,187 ERROR [50] WebService.writeToLog - Successful login ;for user: שימי הזמר
+2018-11-19 11:43:36,180 ERROR [62] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-19 12:02:31,416 ERROR [55] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-19 12:03:18,849 ERROR [55] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-19 12:04:14,197 ERROR [24] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-19 12:05:48,734 ERROR [32] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-19 12:07:35,434 ERROR [55] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-19 16:17:26,519 ERROR [19] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-19 17:18:18,256 ERROR [54] WebService.writeToLog - Successful login ;for user: שימי הזמר
+2018-11-19 17:21:15,139 ERROR [55] WebService.setUserPassword - Error in setUserPassword
+System.Data.SqlClient.SqlException (0x80131904): Invalid column name 'UsarName'.
+   ב-  DbService.ExecuteQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 91
+   ב-  Volunteer.setUserPassword(String userName, String newPassword) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 1033
+   ב-  WebService.setUserPassword(String userName, String password) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 401
+ClientConnectionId:77cba46e-b871-409a-8b2d-8a4ba6e4c9ca
+Error Number:207,State:1,Class:16
+2018-11-19 17:22:30,836 ERROR [12] WebService.setUserPassword - Error in setUserPassword
+System.Data.SqlClient.SqlException (0x80131904): Invalid column name 'UsarName'.
+   ב-  DbService.ExecuteQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 91
+   ב-  Volunteer.setUserPassword(String userName, String newPassword) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 1033
+   ב-  WebService.setUserPassword(String userName, String password) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 401
+ClientConnectionId:afcafb22-92a1-4a1c-9962-d4239032d718
+Error Number:207,State:1,Class:16
+2018-11-19 17:24:51,094 ERROR [6] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-19 17:25:04,401 ERROR [5] WebService.writeToLog - Successful login ;for user: שימי הזמר
+2018-11-19 18:06:29,416 ERROR [12] WebService.getPatients - Error in getPatients
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: Named Pipes Provider, error: 40 - לא הייתה אפשרות לפתוח חיבור ל- SQL Server) ---> System.ComponentModel.Win32Exception (0x80004005): The user name or password is incorrect
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Patient.getPatientsList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 456
+   ב-  WebService.getPatients(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 201
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:1326,State:0,Class:20
+2018-11-19 18:07:53,475 ERROR [22] WebService.getPatients - Error in getPatients
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: Named Pipes Provider, error: 40 - לא הייתה אפשרות לפתוח חיבור ל- SQL Server) ---> System.ComponentModel.Win32Exception (0x80004005): The user name or password is incorrect
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Patient.getPatientsList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 456
+   ב-  WebService.getPatients(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 201
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:1326,State:0,Class:20
+2018-11-19 18:08:02,834 ERROR [13] WebService.getPatients - Error in getPatients
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: Named Pipes Provider, error: 40 - לא הייתה אפשרות לפתוח חיבור ל- SQL Server) ---> System.ComponentModel.Win32Exception (0x80004005): The user name or password is incorrect
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Patient.getPatientsList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 456
+   ב-  WebService.getPatients(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 201
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:1326,State:0,Class:20
+2018-11-19 18:08:02,837 ERROR [21] WebService.getPatients - Error in getPatients
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: Named Pipes Provider, error: 40 - לא הייתה אפשרות לפתוח חיבור ל- SQL Server) ---> System.ComponentModel.Win32Exception (0x80004005): The user name or password is incorrect
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Patient.getPatientsList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 456
+   ב-  WebService.getPatients(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 201
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:1326,State:0,Class:20
+2018-11-19 18:08:48,188 ERROR [13] WebService.getPatients - Error in getPatients
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: Named Pipes Provider, error: 40 - לא הייתה אפשרות לפתוח חיבור ל- SQL Server) ---> System.ComponentModel.Win32Exception (0x80004005): The network path was not found
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Patient.getPatientsList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 456
+   ב-  WebService.getPatients(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 201
+ClientConnectionId:9538624c-055e-4134-930a-ee0423e12d90
+Error Number:53,State:0,Class:20
+2018-11-19 18:09:15,191 ERROR [21] WebService.getPatients - Error in getPatients
+System.Data.SqlClient.SqlException (0x80131904): הזמן הקצוב של החיבור תם. פרק הזמן הקצוב חלף במהלך ניסיון לצרוך את הודעת האישור של לחיצת היד המתבצעת לפני הכניסה. ייתכן שהסיבה היא שלחיצת היד המתבצעת לפני הכניסה נכשלה או שלשרת לא היתה אפשרות להגיב בזמן.  משך הזמן של ניסיון החיבור לשרת זה הוא - אתחול [לפני ההתחברות] = 13529; לחיצת יד = 3186;  ---> System.ComponentModel.Win32Exception (0x80004005): The wait operation timed out
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Patient.getPatientsList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 456
+   ב-  WebService.getPatients(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 201
+ClientConnectionId:aaeda661-d097-44d8-a04c-03c8c047c98c
+Error Number:-2,State:0,Class:11
+2018-11-19 18:13:50,684 ERROR [26] WebService.writeToLog - Successful login ;for user: sapir

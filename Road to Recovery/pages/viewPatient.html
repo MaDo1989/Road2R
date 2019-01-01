@@ -36,8 +36,9 @@
         checkCookie();
         $(document).ready(function () {
 
-        includeHTML();
-
+            includeHTML();
+            var userName = GENERAL.USER.getUserName();
+            $("#userName").html(userName);
             //adds menu.html content into any "#menu" element
             //$('#menu').load('menu.html');
 
@@ -72,11 +73,12 @@
                         }
                         equip = equip.substring(0, equip.length - 2);
                         if (arr_patients[i].Equipment.length==0) equip = "אין";
-                        var btnStr = ""
-                        var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button>";
+                        var btnStr = "";
+                        //כפתור צפייה כרגע מוסתר
+                        //var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button>";
                         var editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button>";
 
-                        btnStr += showBtn + " " + editBtn;
+                        btnStr += /*showBtn + " " +*/ editBtn;
 
                         if (arr_patients[i].IsActive == false) {
                             var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo' ></i></button>";
@@ -86,9 +88,30 @@
                             var deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove' ></i></button>";
                             btnStr += " " + deleteBtn;
                         }
-
-
-                        t.row.add([arr_patients[i].DisplayName, arr_patients[i].CellPhone, arr_patients[i].Barrier.Name, arr_patients[i].Hospital.Name, equip, btnStr]).draw(false); // arr_patients[i].BirthDate.substring(0,10),
+                        
+                        //if this is an anonymous patient than cellphone number not relevent.
+                        var cellPhoneCheck = arr_patients[i].CellPhone;
+                        if(cellPhoneCheck.indexOf(":") != -1){
+                            cellPhoneCheck = "";
+                        }
+                        
+                        //var myDate = arr_patients[i].BirthDate.replace('/Date(', '');
+                        if (arr_patients[i].BirthDate != "") {
+                            var bDate = arr_patients[i].BirthDate.split(" ");
+                            var year = bDate[0].split("/");
+                            var d = new Date();
+                            var n = d.getFullYear();
+                            var newDate = n - year[2];
+                            if(newDate != 0){
+                            t.row.add([arr_patients[i].DisplayName, cellPhoneCheck, newDate, arr_patients[i].Barrier.Name, arr_patients[i].Hospital.Name, equip, btnStr]).draw(false); // arr_patients[i].BirthDate.substring(0,10),
+                            }
+                            else {
+                            t.row.add([arr_patients[i].DisplayName, cellPhoneCheck, "", arr_patients[i].Barrier.Name, arr_patients[i].Hospital.Name, equip, btnStr]).draw(false); // arr_patients[i].BirthDate.substring(0,10),
+                            }
+                        }
+                        else {
+                            t.row.add([arr_patients[i].DisplayName, cellPhoneCheck, "", arr_patients[i].Barrier.Name, arr_patients[i].Hospital.Name, equip, btnStr]).draw(false); // arr_patients[i].BirthDate.substring(0,10),
+                        }
 
                     }
 
@@ -98,7 +121,11 @@
                         var data = t.row($(this).parents('tr')).data();
                         arr_details = { displayName: data[0], func: "edit" };
                         GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
-                        location.href = "patientForm.html";
+                        if (data[0].indexOf("אנונימי")!=-1) {
+                            location.href = "anonymousPatientForm.html";
+                        }
+                        else location.href = "patientForm.html";
+
                     });
 
                     $('#datatable-buttons tbody').on('click', '#show', function () {
@@ -213,12 +240,14 @@
                                 <a href="manageRidePats.html" class="logo"><span>בדרך להחלמה</span>&nbsp&nbsp&nbsp</a>
                             </div>
                         </div>
-
+                        <div class="pull-right">
+                            <a href="passwordForm.html"> <span class="logo" id="userName"></span></a>
+                        </div>
                         <!--Search-->
                         <!--<form role="search" class="navbar-right app-search pull-right hidden-xs">
-                            <input type="text" placeholder="חיפוש..." class="form-control app-search-input">
-                            <a href=""><i class="fa fa-search"></i></a>
-                        </form>-->
+        <input type="text" placeholder="חיפוש..." class="form-control app-search-input">
+        <a href=""><i class="fa fa-search"></i></a>
+    </form>-->
                     </div>
                     <!--/.nav-collapse -->
                 </div>
@@ -242,7 +271,12 @@
                                 <ol class="breadcrumb pull-right">
                                     <li class="active">ניהול חולים</li>
                                 </ol>
-                                <h4 class="page-title">ניהול חולים&nbsp&nbsp<i class="md md-recent-actors"></i></h4>
+                                <h4 class="page-title">
+                                    ניהול חולים&nbsp&nbsp
+                                    <i>
+                                        <img src="../../Media/רשימת חולים.png" height="25" width="25" />
+                                    </i>
+                                </h4>
                             </div>
                         </div>
                     </div>
@@ -280,6 +314,7 @@
                                         <tr>
                                             <th>החולה</th>
                                             <th>טלפון</th>
+                                            <th>גיל</th>
                                             <th>מחסום</th>
                                             <th>בית חולים</th>
                                             <!--<th>תאריך לידה</th>-->

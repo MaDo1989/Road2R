@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -581,7 +582,8 @@ public class Volunteer
     public Volunteer getVolunteerByMobile(string mobile, string regId)
     {
         DbService db = new DbService();
-        string query = "select * from VolunteerTypeView where CellPhone = '" + mobile + "' and IsActive='true'";
+        mobile = mobile.Replace("-", "");
+        string query = "select * from VolunteerTypeView where CellPhone = '" + mobile +"'";
         DataSet ds = db.GetDataSetByQuery(query);
         Volunteer v = new Volunteer();
         foreach (DataRow dr in ds.Tables[0].Rows)
@@ -593,6 +595,7 @@ public class Volunteer
             v.LastNameH = dr["LastNameH"].ToString();
             v.LastNameA = dr["LastNameA"].ToString();
             v.CellPhone = dr["CellPhone"].ToString();
+            //v.CellPhone = v.CellPhone.Replace("-", "");
             v.CellPhone2 = dr["CellPhone2"].ToString();
             v.HomePhone = dr["HomePhone"].ToString();
             v.City = dr["CityCityName"].ToString();
@@ -605,6 +608,7 @@ public class Volunteer
             // v.BirthDate = Convert.ToDateTime(dr["BirthDate"].ToString());
             v.JoinDate = Convert.ToDateTime(dr["JoinDate"].ToString());
             v.Status = dr["IsActive"].ToString();
+            v.IsActive = Convert.ToBoolean(dr["IsActive"].ToString());
             v.Gender = dr["Gender"].ToString();
             v.KnowsArabic = Convert.ToBoolean(dr["KnowsArabic"].ToString());
             try
@@ -907,7 +911,7 @@ public class Volunteer
         DbService db = new DbService();
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
-        SqlParameter[] cmdParams = new SqlParameter[17];
+        SqlParameter[] cmdParams = new SqlParameter[18];
 
         cmdParams[0] = cmd.Parameters.AddWithValue("@address", v.Address);
         cmdParams[1] = cmd.Parameters.AddWithValue("@cell", v.CellPhone);
@@ -926,6 +930,7 @@ public class Volunteer
         cmdParams[14] = cmd.Parameters.AddWithValue("@volType", v.TypeVol);
         cmdParams[15] = cmd.Parameters.AddWithValue("@remarks", v.Remarks);
         cmdParams[16] = cmd.Parameters.AddWithValue("@displayName", v.DisplayName);
+        cmdParams[17] = cmd.Parameters.AddWithValue("@UserName", v.FirstNameH + " " +v.LastNameH);
         //cmdParams[1] = cmd.Parameters.AddWithValue("@bDay", v.BirthDate);
 
         string query = "";
@@ -959,8 +964,18 @@ public class Volunteer
 
             try
             {
-                query = "insert into Volunteer (Address, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, HomePhone, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks)";
-                query += " values (@address,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@phone,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks);SELECT SCOPE_IDENTITY();";
+                if (v.TypeVol == "רכז" || v.TypeVol =="מנהל")
+                {
+                    string password = ConfigurationManager.AppSettings["password"];
+                    query = "insert into Volunteer (Address, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, HomePhone, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks,UserName,Password)";
+                    query += " values (@address,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@phone,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks,@UserName,"+password+");SELECT SCOPE_IDENTITY();";
+
+                }
+                else
+                {
+                    query = "insert into Volunteer (Address, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, HomePhone, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks)";
+                    query += " values (@address,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@phone,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks);SELECT SCOPE_IDENTITY();";
+                }
                 db = new DbService();
                 Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
 
@@ -968,7 +983,7 @@ public class Volunteer
                 db = new DbService();
                 db.ExecuteQuery(query, cmd.CommandType, cmdParams);
             }
-            catch (SqlException)
+            catch (SqlException ex)
             {
                 throw new Exception("phone already exists");
             }
@@ -985,5 +1000,45 @@ public class Volunteer
     {
         DbService db = new DbService();
         db.ExecuteQuery("UPDATE Volunteer SET IsActive='" + active + "' WHERE displayName='" + DisplayName + "'");
+       
+    }
+
+    //check volunteer spaces in car with volunteer fullName(displayName)
+    public int spaceInCar(int driverId)
+    {
+        string query = "select * from Volunteer where Id = " + driverId;
+        DbService db = new DbService();
+        try
+        {
+            DataSet ds = db.GetDataSetByQuery(query);
+            return int.Parse(ds.Tables[0].Rows[0]["AvailableSeats"].ToString());
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
+
+    }
+    public void setUserPassword(string userName, string newPassword)
+    {
+        int res = 0;
+        DbService db = new DbService();
+        SqlCommand cmd = new SqlCommand();
+        cmd.CommandType = CommandType.Text;
+        SqlParameter[] cmdParams = new SqlParameter[1];
+
+        cmdParams[0] = cmd.Parameters.AddWithValue("@password", newPassword);
+
+        string query;
+        query = "update Volunteer set Password=@password where UserName='"+ userName + "'";
+
+        res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+
+        if (res == 0)
+        {
+            throw new Exception();
+        }
+        
     }
 }

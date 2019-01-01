@@ -54,10 +54,16 @@
 
     <script>
         checkCookie();
+        var isAnonymous = false;
+        var destinationName = "";
+        var originName = "";
+        var driverName = "";
+        var patientName = "";
         $(document).ready(function () {
 
             includeHTML();
-
+            var userName = GENERAL.USER.getUserName();
+            $("#userName").html(userName);
             if (localStorage.active = "undefined")
                 localStorage.active = true;
 
@@ -76,7 +82,17 @@
             $.fn.dataTable.moment('DD/MM/YY');
 
             //Create a DataTable from the Table
-            t = $('#datatable-buttons').DataTable({ "paging": true }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] }
+            t = $('#datatable-buttons').DataTable({ "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] }
+                //{
+                //    "columns": [
+                //        { "data": "החולה" },
+                //        { "data": "מוצא" },
+                //        { "data": "יעד" },
+                //        { "data": "תאריך ושעה" },
+                //        { "data": "נהגים בנסיעה" },
+                //        { "data": "רכז" },
+                //        { "data": "פעולות" } ]
+                //    }
             );
             
             getCoors();
@@ -141,7 +157,7 @@
             t.clear().draw();
 
             var volunteerId = -2 // VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
-
+            $('#wait').show();
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/GetRidePatView",
@@ -149,15 +165,23 @@
                 type: "POST",
                 data: JSON.stringify({ volunteerId: volunteerId }),
                 success: function (data) {
+                    $('#wait').hide();
                     var arr_rides = JSON.parse(data.d);
                     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
-
+                    
                     for (i in arr_rides) {
 
                         //Change date format
                         var temp = arr_rides[i].Date.substring(arr_rides[i].Date.indexOf("(") + 1);
                         temp = temp.substring(0, temp.indexOf(")"));
                         var date = new Date(parseInt(temp));
+
+                        if (arr_rides[i].Drivers.length != 0) {
+                            driverName = arr_rides[i].Drivers[0].DisplayName;
+                        }
+                        destinationName = arr_rides[i].Destination.Name;
+                        originName = arr_rides[i].Origin.Name;
+                        patientName = arr_rides[i].Pat.DisplayName;
 
                         if (date.getDate() < 10) {
                             day = "0" + date.getDate();
@@ -181,7 +205,7 @@
 
                         if (date.getHours() == 22 && date.getMinutes() == 14) { //22:14 is the default time to show afternoon אחה''צ
                             date2 = day + "/" + month + "/" + date.getUTCFullYear() % 2000;
-                            date2 += " אחה\"צ";
+                            date2 += " או אחה\"צ";
                         }
                         if (unassigned) {
                             // $("#activeRidePats").prop('checked', false);
@@ -220,12 +244,15 @@
                         var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' name='" + arr_rides[i].RidePatNum + "' title='צפייה'><i class='fa fa-wpforms'></i></button>";
                         var editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' name='" + arr_rides[i].RidePatNum + "' title='עריכה'><i class='ti-pencil'></i></button>";
                         var deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' name='" + arr_rides[i].RidePatNum + "' title='מחיקה'><i class='fa fa-remove' ></i></button>";
-                        btnStr += " " + showBtn;
+                        //btnStr += " " + showBtn;
 
-                        if (arr_rides[i].Status == 'ממתינה לשיבוץ' && arr_rides[i].Coordinator.DisplayName == currentCoor) btnStr += " " + editBtn;
-
-                        btnStr += " " + deleteBtn;
-
+                        if (arr_rides[i].Status == 'ממתינה לשיבוץ' && arr_rides[i].Coordinator.DisplayName == currentCoor || ((arr_rides[i].Pat.IsAnonymous == "True") && arr_rides[i].Coordinator.DisplayName == currentCoor)) btnStr += " " + editBtn;
+                        else btnStr += " " + showBtn;
+                        if(arr_rides[i].Coordinator.DisplayName == currentCoor){
+                            btnStr += " " + deleteBtn;
+                        }
+                        
+                       
                         //if (arr_rides[i].Status == "הסתיימה") {
                         //    var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-default btn-sm m-b-5' id='reactive' title='הסתיימה'><i class='fa fa-check' ></i></button>";
                         //    btnStr += " " + reactiveBtn;
@@ -238,16 +265,17 @@
                                 if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName + " " + arr_rides[i].Drivers[j].CellPhone;
                                 else secondary = arr_rides[i].Drivers[j].DisplayName + " " + arr_rides[i].Drivers[j].CellPhone;
                             }
-
+                            var drivers = "";
                             if (arr_rides[i].Drivers.length == 1) {
                                 if (primary != undefined) //Only a primary driver is assigned
-                                    var drivers = "ראשי: " + primary;
+                                    drivers = "ראשי: " + primary;
                                 else //only a secondary driver is assigned
                                     drivers = "גיבוי בלבד: " + secondary;
                             }
                             else if (arr_rides[i].Drivers.length == 2) //Two drivers are assigned
-                                var drivers = "ראשי: " + primary + ", " + "גיבוי: " + secondary;
-                            t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, drivers, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
+                                   drivers = "ראשי: " + primary + ",<br> " + "גיבוי: " + secondary;
+                            var buttons = btnStr;
+                            t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, drivers, arr_rides[i].Coordinator.DisplayName,buttons,arr_rides[i].Pat.IsAnonymous]).draw(false);
                         }
                     }
                     //$.fn.dataTable.moment('DD/MM/YYYY HH:MM');
@@ -255,6 +283,7 @@
                     t.columns([3]).order('asc').draw();
                     // t.createdRow();
 
+                                $(".dataTables_empty").html("אין הסעות");
 
                     $('#datatable-buttons tbody').on('click', '#edit', function () {
                         //var data = t.row($(this).parents('tr')).data();
@@ -273,6 +302,9 @@
                     $('#datatable-buttons tbody').on('click', '#remove', function () {
                         arr_details = { RidePatNum: this.name, func: "show" };//attribute name=RidePatNum
                         var data = t.row($(this).parents('tr')).data();
+                        if (data[7] == "True") {
+                            isAnonymous = true;
+                        }
                         swal({
                             title: "האם אתם בטוחים?",
                             type: "warning",
@@ -284,37 +316,29 @@
                             closeOnConfirm: false
                         }, function () {
                             var RidePat = new Object();
+                            //try to add the name of the driver in this ride. 
+
                             RidePat.RidePatNum = arr_details.RidePatNum;
+                            var Pat = new Object();
+                            Pat.DisplayName = patientName;
+                            RidePat.Pat = Pat;
+                            var Destination = new Object();
+                            Destination.Name = destinationName;
+                            RidePat.Destination = Destination;
+                            var Origin = new Object();
+                            Origin.Name = originName;
+                            RidePat.Origin = Origin;
                             deleteRidePat(RidePat, 'delete');
 
                         });
                     });
 
-                    //$('#datatable-buttons tbody').on('click', '#reactive', function () {
-                    //    var data = t.row($(this).parents('tr')).data();
-                    //    swal({
-                    //        title: "אתה בטוח שברצונך לשחזר את ההסעה:",
-                    //        type: "warning",
-                    //        text: data[1],
-                    //        showCancelButton: true,
-                    //        cancelButtonText: "בטל",
-                    //        confirmButtonClass: 'btn-warning',
-                    //        confirmButtonText: "שחזר",
-                    //        closeOnConfirm: false
-                    //    }, function () {
-                    //        deactivateRidePat(data[0], 'ממתינה לשיבוץ');
-                    //        swal({
-                    //            title: "ההסעה הפכה לממתינה לשיבוץ",
-                    //            timer: 1000,
-                    //            type: "success",
-                    //            showConfirmButton: false
-                    //        });
-                    //        setTimeout(function () { refreshTable() }, 1001);
-                    //    });
-
-                    //});
+           
                 },
-                error: function (err) { alert("Error in GetRidePatView: " + err.responseText); }
+                error: function (err) {
+                    $('#wait').hide();
+                    alert("Error in GetRidePatView: " + err.responseText);
+                }
             });
         }
 
@@ -336,7 +360,7 @@
                 url: "WebService.asmx/setRidePat",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                data: JSON.stringify({ RidePat: RidePat, func: func }),
+                data: JSON.stringify({ RidePat: RidePat, func: func, isAnonymous : isAnonymous}),
                 success: function (data) {
                     swal({
                         title: "ההסעה נמחקה",
@@ -399,6 +423,9 @@
                                 <a href="manageRidePats.html" class="logo"><span>בדרך להחלמה</span>&nbsp&nbsp&nbsp</a>
                             </div>
                         </div>
+                        <div class="pull-right">
+                            <a href="passwordForm.html"> <span class="logo" id="userName"></span></a>
+                        </div>
                     </div>
                     <!--/.nav-collapse -->
                 </div>
@@ -424,7 +451,11 @@
 
                                     <li class="active">כל ההסעות</li>
                                 </ol>
-                                <h4 class="page-title">כל ההסעות&nbsp&nbsp<i class="md md-recent-actors"></i></h4>
+                                <h4 class="page-title">כל ההסעות&nbsp&nbsp
+                                <i>
+                                    <img src="../../Media/היסטורית הסעות.png" height="25" width="25"/>
+                                </i>
+                                </h4>
                             </div>
                         </div>
                     </div>
@@ -436,21 +467,21 @@
                             <div class="card-box table-responsive">
 
                                 <!--<div class="row">
-                                    <div class="col-sm-8">
-                                        <h4 class="m-t-0 header-title"><b>טבלת הסעות חולים</b></h4>
-                                        <p class="text-muted font-13 m-b-30">
-                                            מבט כללי על ההסעות חולים שבוצעו, ניתן לצפות בפרטים נוספים בלחיצה על כפתור ההרחבה.
-                                        </p>
-                                    </div>
-                                    <div class="col-sm-5 text-right">
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button> צפייה
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button> עריכה
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button> מחיקה
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo'></i></button> שחזור
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-default btn-sm m-b-5' id='reactive' title='הסעה בוצעה'><i class='fa fa-check'></i></button> בוצעה
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-info btn-sm m-b-5' id='reactive' title='משובצת'><i class='fa fa-check'></i></button>משובצת
-                                    </div>
-                                </div>-->
+        <div class="col-sm-8">
+            <h4 class="m-t-0 header-title"><b>טבלת הסעות חולים</b></h4>
+            <p class="text-muted font-13 m-b-30">
+                מבט כללי על ההסעות חולים שבוצעו, ניתן לצפות בפרטים נוספים בלחיצה על כפתור ההרחבה.
+            </p>
+        </div>
+        <div class="col-sm-5 text-right">
+            <button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button> צפייה
+            <button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button> עריכה
+            <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button> מחיקה
+            <button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo'></i></button> שחזור
+            <button type='button' class='btn btn-icon waves-effect waves-light btn-default btn-sm m-b-5' id='reactive' title='הסעה בוצעה'><i class='fa fa-check'></i></button> בוצעה
+            <button type='button' class='btn btn-icon waves-effect waves-light btn-info btn-sm m-b-5' id='reactive' title='משובצת'><i class='fa fa-check'></i></button>משובצת
+        </div>
+    </div>-->
                                 <div class="row">
                                     <div class="col-sm-8 checkbox checkbox-primary text-left">
                                         <input id="activeRidePats" type="checkbox" onchange="saveFilters()">
@@ -490,11 +521,16 @@
                                             <th>נהגים בנסיעה</th>
                                             <th>רכז</th>
                                             <th>פעולות</th>
+                                            <!--<th style="visibility:hidden;">האם אנונימי</th>-->
                                         </tr>
 
                                     </thead>
                                     <tbody></tbody>
                                 </table>
+
+                                <div id="wait" style="display:none;width:69px;height:89px;position:absolute;top:50%;left:50%;padding:2px;">
+                                    <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
+                                </div>
                             </div>
                         </div>
                     </div>

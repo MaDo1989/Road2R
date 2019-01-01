@@ -1,0 +1,72 @@
+﻿2018-11-12 00:49:41,172 ERROR [5] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-12 09:13:28,304 ERROR [11] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-12 09:48:37,289 ERROR [30] WebService.getCoorList - Error in getCoorList
+System.Data.SqlClient.SqlException (0x80131904): הזמן הקצוב של החיבור תם. פרק הזמן הקצוב חלף במהלך ניסיון לצרוך את הודעת האישור של לחיצת היד המתבצעת לפני הכניסה. ייתכן שהסיבה היא שלחיצת היד המתבצעת לפני הכניסה נכשלה או שלשרת לא היתה אפשרות להגיב בזמן.  משך הזמן של ניסיון החיבור לשרת זה הוא - אתחול [לפני ההתחברות] = 4476; לחיצת יד = 10579;  ---> System.ComponentModel.Win32Exception (0x80004005): The wait operation timed out
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Volunteer.getCoorList() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 532
+   ב-  WebService.getCoorList() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 238
+ClientConnectionId:7bfbeefd-91e3-47b2-81b3-d1c84c24a019
+Error Number:-2,State:0,Class:11
+2018-11-12 10:00:14,078 ERROR [6] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-12 10:59:52,276 ERROR [31] WebService.setPatient - Error in setPatient
+System.Data.SqlClient.SqlException (0x80131904): Violation of UNIQUE KEY constraint 'UQ__Patient__A18E1CB11B9317B3'. Cannot insert duplicate key in object 'dbo.Patient'.
+The statement has been terminated.
+   ב-  DbService.GetObjectScalarByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 117
+   ב-  Patient.setPatient(String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 633
+   ב-  WebService.setPatient(Patient patient, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 335
+ClientConnectionId:e52562c7-f1cc-46cc-9e8b-c0d4be491566
+Error Number:2627,State:1,Class:14
+2018-11-12 11:10:52,314 ERROR [24] WebService.setPatient - Error in setPatient
+System.Data.SqlClient.SqlException (0x80131904): Violation of UNIQUE KEY constraint 'UQ__Patient__A18E1CB11B9317B3'. Cannot insert duplicate key in object 'dbo.Patient'.
+The statement has been terminated.
+   ב-  DbService.GetObjectScalarByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 117
+   ב-  Patient.setPatient(String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 633
+   ב-  WebService.setPatient(Patient patient, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 335
+ClientConnectionId:e52562c7-f1cc-46cc-9e8b-c0d4be491566
+Error Number:2627,State:1,Class:14
+2018-11-12 14:08:55,979 ERROR [43] WebService.getPatientsForAnonymous - Error in getPatientsForAnonymous
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Patient.getAnonymousPatientsList(Boolean active, String origin, String dest) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 524
+   ב-  WebService.getPatientsForAnonymous(Boolean active, String origin, String dest) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 218
+2018-11-12 14:10:06,711 ERROR [43] WebService.getPatientsForAnonymous - Error in getPatientsForAnonymous
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Patient.getAnonymousPatientsList(Boolean active, String origin, String dest) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 524
+   ב-  WebService.getPatientsForAnonymous(Boolean active, String origin, String dest) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 218
+2018-11-12 14:14:35,880 ERROR [6] WebService.getPatientsForAnonymous - Error in getPatientsForAnonymous
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Patient.getAnonymousPatientsList(Boolean active, String origin, String dest) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 524
+   ב-  WebService.getPatientsForAnonymous(Boolean active, String origin, String dest) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 218
+2018-11-12 14:14:52,952 ERROR [7] WebService.getPatientsForAnonymous - Error in getPatientsForAnonymous
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Patient.getAnonymousPatientsList(Boolean active, String origin, String dest) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 524
+   ב-  WebService.getPatientsForAnonymous(Boolean active, String origin, String dest) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 218
+2018-11-12 14:17:59,865 ERROR [13] WebService.getPatientsForAnonymous - Error in getPatientsForAnonymous
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Patient.getAnonymousPatientsList(Boolean active, String origin, String dest) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 524
+   ב-  WebService.getPatientsForAnonymous(Boolean active, String origin, String dest) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 218
+2018-11-12 14:18:59,888 ERROR [15] WebService.getPatientsForAnonymous - Error in getPatientsForAnonymous
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Patient.getAnonymousPatientsList(Boolean active, String origin, String dest) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 524
+   ב-  WebService.getPatientsForAnonymous(Boolean active, String origin, String dest) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 218
+2018-11-12 14:27:21,032 ERROR [35] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-12 14:39:18,412 ERROR [28] WebService.getPatientsForAnonymous - Error in getPatientsForAnonymous
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Patient.getAnonymousPatientsList(Boolean active, String origin, String dest) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 524
+   ב-  WebService.getPatientsForAnonymous(Boolean active, String origin, String dest) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 218
+2018-11-12 14:40:22,446 ERROR [49] WebService.getPatientsForAnonymous - Error in getPatientsForAnonymous
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Patient.getAnonymousPatientsList(Boolean active, String origin, String dest) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 524
+   ב-  WebService.getPatientsForAnonymous(Boolean active, String origin, String dest) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 218
+2018-11-12 16:19:58,276 ERROR [80] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-12 16:29:19,796 ERROR [79] WebService.setRidePat - Error in setRidePat
+System.Exception: נסיעה זו כבר הוקצתה לנהג ואין אפשרות לערוך אותה
+   ב-  RidePat.setRidePat(RidePat ridePat, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 284
+   ב-  WebService.setRidePat(RidePat RidePat, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 146
+2018-11-12 16:32:26,162 ERROR [70] WebService.setRidePat - Error in setRidePat
+System.Exception: נסיעה זו כבר הוקצתה לנהג ואין אפשרות לערוך אותה
+   ב-  RidePat.setRidePat(RidePat ridePat, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 284
+   ב-  WebService.setRidePat(RidePat RidePat, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 146
+2018-11-12 16:39:03,720 ERROR [74] WebService.setRidePat - Error in setRidePat
+System.Exception: נסיעה זו כבר הוקצתה לנהג ואין אפשרות לערוך אותה
+   ב-  RidePat.setRidePat(RidePat ridePat, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 284
+   ב-  WebService.setRidePat(RidePat RidePat, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 146

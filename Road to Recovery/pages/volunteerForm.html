@@ -180,7 +180,8 @@
 
 
         function loadPage() {
-
+            var userName = GENERAL.USER.getUserName();
+            $("#userName").html(userName);
             if (JSON.parse(GENERAL.VOLUNTEERS.getVolunteersList()).length != 0) {
                 arr_volunteer = JSON.parse(GENERAL.VOLUNTEERS.getVolunteersList());
                 if (arr_volunteer.func == "edit" || arr_volunteer.func == "show") {
@@ -277,7 +278,13 @@
                     $("#HomePhone").val(volunteer.HomePhone);
                     $("#email").val(volunteer.Email);
                     $("#typeVolunteer").val(volunteer.TypeVol);
-                    $("#gender").val(volunteer.Gender);
+                    if (volunteer.Gender == "זכר") {
+                        $("#gender").val("מתנדב");
+                    }
+                    else if (volunteer.Gender == "נקבה") {
+                        $("#gender").val("מתנדבת")
+                    }
+                    else $("#gender").val(volunteer.Gender);
                     $("#city").val(volunteer.City);
                     $("#address").val(volunteer.Address);
                     $("#selectgender").val(volunteer.Gender);
@@ -335,7 +342,9 @@
                             </div>
                         </div>
 
-
+                        <div class="pull-right">
+                            <span class="logo" id="userName"></span>
+                        </div>
 
                         <!--Search-->
                         <!--<form role="search" class="navbar-right app-search pull-right hidden-xs">
@@ -442,7 +451,7 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">טלפון ראשי&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
-                                                        <input id="phone1" name="phone1" type="text" class="form-control" placeholder="0xx-xxxxxxx או 0x-xxxxxxx">
+                                                        <input id="phone1" dir="ltr" name="phone1" type="text" class="form-control" placeholder="0xxxxxxxxx או 0xxxxxxxx">
                                                     </div>
                                                 </div>
                                             </div>
@@ -450,7 +459,7 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">טלפון 2</label>
                                                     <div class="col-sm-6">
-                                                        <input id="phone2" name="phone2" type="text" class="form-control" placeholder="0xx-xxxxxxx או 0x-xxxxxxx">
+                                                        <input id="phone2" dir="ltr" name="phone2" type="text" class="form-control" placeholder="0xxxxxxxxx או 0xxxxxxxx">
                                                     </div>
                                                 </div>
                                             </div>
@@ -460,7 +469,7 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">טלפון נוסף</label>
                                                     <div class="col-sm-6">
-                                                        <input id="HomePhone" name="HomePhone" type="text" class="form-control" placeholder="0xx-xxxxxxx או 0x-xxxxxxx">
+                                                        <input id="HomePhone" dir="ltr" name="HomePhone" type="text" class="form-control" placeholder="0xxxxxxxxx או 0xxxxxxxx">
                                                     </div>
                                                 </div>
                                             </div>
@@ -469,7 +478,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">יישוב&nbsp;<span class="required">*</span></label>
+                                                    <label class="col-sm-2 control-label">יישוב&nbsp;</label>
                                                     <div class="col-sm-6">
                                                         <input id="city" name="city" type="text" class="form-control">
                                                     </div>
@@ -487,12 +496,12 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">מין&nbsp;<span class="required">*</span></label>
+                                                    <label class="col-sm-2 control-label">מגדר&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6" id="selectgender">
                                                         <select id="gender" name="gender" class="form-control">
                                                             <option>בחר</option>
-                                                            <option>זכר</option>
-                                                            <option>נקבה</option>
+                                                            <option>מתנדב</option>
+                                                            <option>מתנדבת</option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -541,7 +550,7 @@
                                                     <label class="col-sm-2 control-label">סוג משתמש&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <select id="typeVolunteer" name="typeVolunteer" type="text" class="form-control">
-                                                            <option>בחר</option>
+                                                            <option>מתנדב</option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -627,9 +636,9 @@
                     //lastA: {
                     //    required: true
                     //},
-                    city: {
-                        required: true
-                    }
+                    //city: {
+                    //  required: true
+                    //}
 
                 },
 
@@ -643,12 +652,22 @@
                     var firstNameH = $("#volunteerFirstName").val();
                     var lastNameH = $("#volunteerLastName").val();
                     var cellPhone = $("#phone1").val();
+                    cellPhone = cellPhone.replace(/-/g, '');
+                    cellPhone = cellPhone.replace(/ /g, '');
                     var email = $("#email").val();
                     var typeVol = $("#typeVolunteer").val();
                     var city = $("#city").val();
                     var gender = $("#gender").val();
                     var cellphone2 = $("#phone2").val();
+                    if (cellphone2 != "") {
+                        cellphone2 = cellphone2.replace(/-/g, '');
+                        cellphone2 = cellphone2.replace(/ /g, '');      
+                    }
                     var homePhone = $("#HomePhone").val();
+                    if (homePhone != "") {
+                        homePhone = homePhone.replace(/-/g, '');
+                        homePhone = homePhone.replace(/ /g, '');      
+                    }
                     var nameA = $("#firstA").val();
                     var lastNameA = $("#lastA").val();
                     if ($("#joinDate").val() != "")
@@ -693,23 +712,23 @@
                                 showConfirmButton: false
                             });
                             setTimeout(function () { returnVolunteers() }, 1001);
-
                         },
                         error: function (err) {
 
-                            //alert("Error in setVolunteer: " + err.responseText);
+                            swal("שגיאה בהוספת מתנדב חדש, בדוק אם מספר הטלפון קיים כבר");
 
-                            if (err.responseText.indexOf("phone already exists") != -1) {
-                                swal(
-                                    {
-                                        title: "משתמש עם מספר טלפון זה כבר קיים במערכת",
-                                        type: "info",
-                                        timer: 3000,
-                                        showConfirmButton: false
-                                    });
-                            }
-
+                            //if (err.responseText.indexOf("phone already exists") != -1) {
+                            //    swal(
+                            //        {
+                            //            title: "משתמש עם מספר טלפון זה כבר קיים במערכת",
+                            //            type: "info",
+                            //            timer: 3000,
+                            //            showConfirmButton: false
+                            //        });
+                            //}
+         
                         }
+                        
                     });
                     //END OF Insert Product Code
 
@@ -734,9 +753,9 @@
                     //lastA: {
                     //    required: "أدخل اسم العائلة"
                     //},
-                    city: {
-                        required: "יש להכניס יישוב"
-                    }
+                    //city: {
+                    //    required: "יש להכניס יישוב"
+                    //}
 
 
                 },
@@ -747,32 +766,40 @@
 
         function validateVolunteerInputs() {
 
-            var CityExists = false;
+            //var CityExists = false;
             var volType = true;
             var gender = true;
             var city = $("#city").val();
-            for (i in cities) {
-                if (city == cities[i]) {
-                    CityExists = true;
-                    break;
-                }
-            }
+            //for (i in cities) {
+            //    if (city == cities[i]) {
+            //        CityExists = true;
+            //        break;
+            //    }
+            //}
 
 
-            if (!CityExists) {
-                alert("יש לבחור יישוב מתוך הרשימה");
-            }
+            //if (!CityExists) {
+            //    alert("יש לבחור יישוב מתוך הרשימה");
+            //}
 
             var volType = $("#typeVolunteer").val();
             if (volType == "בחר") {
                 volType = false
-                alert("יש לבחור סוג משתמש מתוך הרשימה");
+                swal(
+                    "שים לב!",
+                    "יש לבחור סוג משתמש מתוך הרשימה",
+                    "warning"
+                );
             }
 
             var gender = $("#gender").val();
             if (gender == "בחר") {
                 gender = false
-                alert("יש לבחור מין מתוך הרשימה");
+                swal(
+                    "שים לב!",
+                    "יש לבחור מגדר מתוך הרשימה",
+                    "warning"
+                );
             }
 
             //var jDate = $("#joinDate").val();
@@ -784,26 +811,52 @@
 
 
             var checkPhone1 = $("#phone1").val();
-            var phoneReg = new RegExp("0\\d{2}-\\d{7}$|0\\d{1}-\\d{7}$");
+            checkPhone1 = checkPhone1.replace(/ /g, '');
+            checkPhone1 = checkPhone1.replace(/-/g, '');
+            var phoneReg = new RegExp("0\\d{8}$|0\\d{9}$");
             var phoneMatch = phoneReg.test(checkPhone1);
-            if (!phoneMatch) alert("הטלפון הראשי שהוזן אינו חוקי");
+            if (!phoneMatch) {
+                swal(
+                    "שים לב!",
+                    "הטלפון הראשי שהוזן אינו חוקי",
+                    "warning"
+                );
+            }
 
             if ($("#phone2").val() != "") {
                 var checkPhone2 = $("#phone2").val();
-                var phoneReg2 = new RegExp("0\\d{2}-\\d{7}$|0\\d{1}-\\d{7}$");
+                checkPhone2 = checkPhone2.replace(/ /g, '');
+                checkPhone2 = checkPhone2.replace(/-/g, '');
+
+                var phoneReg2 = new RegExp("0\\d{8}$|0\\d{9}$");
                 var phoneMatch2 = phoneReg2.test(checkPhone2);
-                if (!phoneMatch2) alert("טלפון 2 שהוזן אינו חוקי");
+                if (!phoneMatch2) {
+                    swal(
+                        "שים לב!",
+                        "הטלפון 2 שהוזן אינו חוקי",
+                        "warning"
+                    );
+                }
             } else phoneMatch2 = true;
 
             if ($("#HomePhone").val() != "") {
                 var checkPhone3 = $("#HomePhone").val();
-                var phoneReg3 = new RegExp("0\\d{2}-\\d{7}$|0\\d{1}-\\d{7}$");
+                checkPhone3 = checkPhone3.replace(/ /g, '');
+                checkPhone3 = checkPhone3.replace(/-/g, '');
+
+                var phoneReg3 = new RegExp("0\\d{8}$|0\\d{9}$");
                 var phoneMatch3 = phoneReg3.test(checkPhone3);
-                if (!phoneMatch3) alert("הטלפון הנוסף שהוזן אינו חוקי");
+                if (!phoneMatch3) {
+                    swal(
+                        "שים לב!",
+                        "הטלפון הנוסף שהוזן אינו חוקי",
+                        "warning"
+                    );
+                }
             } else phoneMatch3 = true;
 
 
-            if (!CityExists || !volType || !gender || !phoneMatch || !phoneMatch2 || !phoneMatch3) { //|| !jdateMatch
+            if (/*!CityExists ||*/ !volType || !gender || !phoneMatch || !phoneMatch2 || !phoneMatch3) { //|| !jdateMatch
                 return false;
             } else return true;
         }

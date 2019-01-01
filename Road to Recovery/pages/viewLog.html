@@ -58,30 +58,15 @@
         $(document).ready(function () {
 
             includeHTML();
+            var userName = GENERAL.USER.getUserName();
+            $("#userName").html(userName);
 
-            //  document.getElementById("Numbers").checked = localStorage.numbers === 'true';
-
-            //$("#activeRidePats").prop('checked', localStorage.active);
-           // $("#TodaysRidePats").prop('checked', localStorage.today);
-           // $("#UnassignedRidePats").prop('checked', localStorage.unassigned);
-           // $("#MyRidePats").prop('checked', localStorage.myRidePats);
-
-//            $.fn.dataTable.moment('DD/MM/YY HH:mm');
             $.fn.dataTable.moment('DD/MM/YY');
-            //$('#example').DataTable();
-            // $.fn.dataTable.moment('DD/MM/YYYY HH:MM');//'' DD/MM/YYYY HH:MM
-
 
             //Create a DataTable from the Table
             //t = $('#datatable-buttons').DataTable({ "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] }
             t = $('#datatable-buttons').DataTable({ "paging": false }
-                //{
-                //"createdRow": function (row, data, dataIndex) {
-                //    if (data[4] == "A") {
-                //        $(row).addClass('important');
-                //    }
-                //},
-                //    }
+               
             );
 
 
@@ -135,8 +120,9 @@
 
             t.clear().draw();
 
-
+            
             var hoursObj = { hours: hours };
+            $('#wait').show();
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/getLog",
@@ -146,6 +132,7 @@
                 
                 //data: JSON.stringify({ volunteerId: -1 }), //VolunteerId -1 means get all ridePats
                 success: function (data) {
+                    $('#wait').hide();
                     var arr_log = JSON.parse(data.d);
                     //GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
                     var thisUser = $('#thisUser').is(':checked');
@@ -327,7 +314,10 @@
 
                         //});
                     },
-                error: function (err) { alert("Error in getLog: "+err.responseText); }
+                error: function (err) {
+                    $('#wait').hide();
+                    alert("Error in getLog: " + err.responseText);
+                }
             });
         }
 
@@ -376,6 +366,9 @@
                                 <a href="manageRidePats.html" class="logo"><span>בדרך להחלמה</span>&nbsp&nbsp&nbsp</a>
                             </div>
                         </div>
+                        <div class="pull-right">
+                            <a href="passwordForm.html"> <span class="logo" id="userName"></span></a>
+                        </div>
                     </div>
                     <!--/.nav-collapse -->
                 </div>
@@ -399,9 +392,13 @@
                             <div class="page-title-box">
                                 <ol class="breadcrumb pull-right">
 
-                                    <li class="active">דיווחי מערכת</li>
+                                    <li class="active">יומן מערכת</li>
                                 </ol>
-                                <h4 class="page-title">דיווחי מערכת&nbsp&nbsp<i class="md md-recent-actors"></i></h4>
+                                <h4 class="page-title">יומן מערכת&nbsp&nbsp
+                                <i>
+                                    <img src="../../Media/יומן מערכת.png" height="25" width="25"/>
+                                </i>
+                                </h4>
                             </div>
                         </div>
                     </div>
@@ -409,14 +406,29 @@
 
 
                     <div class="row">
+
                         <div class="col-sm-12">
+
+                            <!--check boxs for filtering-->
                             <input id="thisUser" type="checkbox" checked="checked" onchange="refreshTable(document.getElementById('hourSelect').value)">
                             <label for="thisUser">
                                 הודעות שלי בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
                             </label>
+                            <!--<input id="canceldRides" type="checkbox" onchange="refreshTable(document.getElementById('hourSelect').value)">
+                            <label for="canceldRides">
+                                הסעות שבוטלו  &nbsp;&nbsp;|&nbsp;&nbsp;
+                            </label>
+                            <input id="changedStatus" type="checkbox" onchange="refreshTable(document.getElementById('hourSelect').value)">
+                            <label for="changedStatus">
+                                שינוי סטטוס  &nbsp;&nbsp;|&nbsp;&nbsp;
+                            </label>-->
+
+
                             <div class="card-box table-responsive" id="log">
-                                
-                                <div class="col-sm-6">
+                                <div class="col-sm-1">
+                                    <p style="font-size: initial;">טווח זמן: </p>
+                                </div>
+                                <div class="col-sm-3">
                                     <select id="hourSelect" class="form-control" aria-required="true" aria-invalid="false" onchange="refreshTable(this.value)">
                                         <option value="1">שעה</option>
                                         <option value="12">12 שעות</option>
@@ -439,7 +451,9 @@
                                     </thead>
                                     <tbody></tbody>
                                 </table>
-
+                                <div id="wait" style="display:none;width:69px;height:89px;position:absolute;top:50%;left:50%;padding:2px;">
+                                    <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -454,7 +468,7 @@
             <!-- end content -->
             <!-- FOOTER -->
             <footer class="footer text-right">
-                2018 © Road to Recovery Management System by Matan Doron
+                2018 © כל הזכויות שמורות לעמותת בדרך להחלמה
             </footer>
             <!-- End FOOTER -->
 

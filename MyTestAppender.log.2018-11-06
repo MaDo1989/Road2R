@@ -1,0 +1,331 @@
+﻿2018-11-06 13:23:32,654 ERROR [10] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-06 14:33:19,487 ERROR [34] WebService.setRideStatus - Error in setRideStatus
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Auxiliary.GetDriverId(Int32 rideId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Auxiliary.cs:שורה 39
+   ב-  WebService.setRideStatus(Int32 rideId, String status) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 128
+ClientConnectionId:e71e03c8-a254-4537-9d93-82db1200b39f
+Error Number:18456,State:1,Class:14
+2018-11-06 14:55:24,443 ERROR [13] WebService.isPrimaryStillCanceled - Error in isPrimaryStillCanceled
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Ride.isPrimaryStillCanceled(Int32 rideID, Int32 driverID) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Ride.cs:שורה 133
+   ב-  WebService.isPrimaryStillCanceled(Int32 driverID, Int32 rideID) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 53
+ClientConnectionId:35ff899d-aba3-4fe6-9e1b-2ceb74f67896
+Error Number:18456,State:1,Class:14
+2018-11-06 14:58:48,361 ERROR [7] WebService.isPrimaryStillCanceled - Error in isPrimaryStillCanceled
+System.IndexOutOfRangeException: אין שורה במיקום 0.
+   ב-  System.Data.RBTree`1.GetNodeByIndex(Int32 userIndex)
+   ב-  System.Data.DataRowCollection.get_Item(Int32 index)
+   ב-  Ride.isPrimaryStillCanceled(Int32 rideID, Int32 driverID) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Ride.cs:שורה 135
+   ב-  WebService.isPrimaryStillCanceled(Int32 driverID, Int32 rideID) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 53
+2018-11-06 15:05:53,767 ERROR [10] WebService.backupToPrimary - Error in isPrimaryStillCanceled
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  System.Data.SqlClient.SqlInternalConnectionTds..ctor(DbConnectionPoolIdentity identity, SqlConnectionString connectionOptions, SqlCredential credential, Object providerInfo, String newPassword, SecureString newSecurePassword, Boolean redirectedUserInstance, SqlConnectionString userConnectionOptions, SessionData reconnectSessionData, DbConnectionPool pool, String accessToken, Boolean applyTransientFaultHandling, SqlAuthenticationProviderManager sqlAuthProviderManager)
+   ב-  System.Data.SqlClient.SqlConnectionFactory.CreateConnection(DbConnectionOptions options, DbConnectionPoolKey poolKey, Object poolGroupProviderInfo, DbConnectionPool pool, DbConnection owningConnection, DbConnectionOptions userOptions)
+   ב-  System.Data.ProviderBase.DbConnectionFactory.CreatePooledConnection(DbConnectionPool pool, DbConnection owningObject, DbConnectionOptions options, DbConnectionPoolKey poolKey, DbConnectionOptions userOptions)
+   ב-  System.Data.ProviderBase.DbConnectionPool.CreateObject(DbConnection owningObject, DbConnectionOptions userOptions, DbConnectionInternal oldConnection)
+   ב-  System.Data.ProviderBase.DbConnectionPool.UserCreateRequest(DbConnection owningObject, DbConnectionOptions userOptions, DbConnectionInternal oldConnection)
+   ב-  System.Data.ProviderBase.DbConnectionPool.TryGetConnection(DbConnection owningObject, UInt32 waitForMultipleObjectsTimeout, Boolean allowCreate, Boolean onlyOneCheckConnection, DbConnectionOptions userOptions, DbConnectionInternal& connection)
+   ב-  System.Data.ProviderBase.DbConnectionPool.TryGetConnection(DbConnection owningObject, TaskCompletionSource`1 retry, DbConnectionOptions userOptions, DbConnectionInternal& connection)
+   ב-  System.Data.ProviderBase.DbConnectionFactory.TryGetConnection(DbConnection owningConnection, TaskCompletionSource`1 retry, DbConnectionOptions userOptions, DbConnectionInternal oldConnection, DbConnectionInternal& connection)
+   ב-  System.Data.ProviderBase.DbConnectionInternal.TryOpenConnectionInternal(DbConnection outerConnection, DbConnectionFactory connectionFactory, TaskCompletionSource`1 retry, DbConnectionOptions userOptions)
+   ב-  System.Data.ProviderBase.DbConnectionClosed.TryOpenConnection(DbConnection outerConnection, DbConnectionFactory connectionFactory, TaskCompletionSource`1 retry, DbConnectionOptions userOptions)
+   ב-  System.Data.SqlClient.SqlConnection.TryOpenInner(TaskCompletionSource`1 retry)
+   ב-  System.Data.SqlClient.SqlConnection.TryOpen(TaskCompletionSource`1 retry)
+   ב-  System.Data.SqlClient.SqlConnection.Open()
+   ב-  DbService.ExecuteQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 72
+   ב-  Ride.backupToPrimary(Int32 rideID, Int32 driverID) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Ride.cs:שורה 148
+   ב-  WebService.backupToPrimary(Int32 rideID, Int32 driverID) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 72
+ClientConnectionId:f230833a-90fb-44d6-bd85-b408555999b8
+Error Number:18456,State:1,Class:14
+2018-11-06 15:08:00,222 ERROR [10] WebService.getLocations - Error in getLocations
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Location.getHospitalListForView(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Location.cs:שורה 274
+   ב-  WebService.getLocations() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 92
+ClientConnectionId:adbb118e-30c0-400a-9272-6b43d0aa827e
+Error Number:18456,State:1,Class:14
+2018-11-06 15:12:28,382 ERROR [6] WebService.getVolunteerPrefs - Error in getVolunteerPrefs
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Volunteer.getVolunteerPrefs(Int32 id) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 481
+   ב-  WebService.getVolunteerPrefs(Int32 Id) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 128
+ClientConnectionId:5d548fd6-2d39-4176-ba5a-2201b246942b
+Error Number:18456,State:1,Class:14
+2018-11-06 15:14:51,476 ERROR [10] WebService.setRidePat - Error in setRidePat
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetObjectScalarByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 117
+   ב-  RidePat.setRidePat(RidePat ridePat, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 250
+   ב-  WebService.setRidePat(RidePat RidePat, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 146
+ClientConnectionId:8b36ebcb-89c8-4e53-9a1d-08c1536c2bd8
+Error Number:18456,State:1,Class:14
+2018-11-06 15:17:14,810 ERROR [6] WebService.getPatients - Error in getPatients
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Patient.getPatientsList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 427
+   ב-  WebService.getPatients(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 201
+ClientConnectionId:a98b68a1-ef0f-4d71-8bc8-760625ad5b6d
+Error Number:18456,State:1,Class:14
+2018-11-06 15:18:24,556 ERROR [28] WebService.getEquipmentForPatient - Error in getEquipmentForPatient
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Patient.getEquipmentForPatient(String patient) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 69
+   ב-  WebService.getEquipmentForPatient(String patient) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 219
+ClientConnectionId:4722a461-7cfa-4140-9b0f-d21a25c1e91a
+Error Number:18456,State:1,Class:14
+2018-11-06 15:20:06,557 ERROR [28] WebService.getCoorList - Error in getCoorList
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Volunteer.getCoorList() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 532
+   ב-  WebService.getCoorList() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 238
+ClientConnectionId:fc838946-c653-403b-8b15-79d6c220aca1
+Error Number:18456,State:1,Class:14
+2018-11-06 15:20:59,902 ERROR [13] WebService.getCoor - Error in getCoor
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Volunteer.getCoor(String userName) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 564
+   ב-  WebService.getCoor(String userName) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 256
+ClientConnectionId:6d4734ab-1893-4bbc-a708-9b67b1b0cc79
+Error Number:18456,State:1,Class:14
+2018-11-06 15:22:41,609 ERROR [20] WebService.getPatientEscorted - Error in getPatientEscorted
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Patient.getescortedsList(String displayName, String caller) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 634
+   ב-  WebService.getPatientEscorted(String displayName, String caller) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 274
+ClientConnectionId:72980cc6-b9a2-4546-8e15-cfd99118f068
+Error Number:18456,State:1,Class:14
+2018-11-06 15:23:58,955 ERROR [28] WebService.setEscortedStatus - Error in getPatientEscorted
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  System.Data.SqlClient.SqlInternalConnectionTds..ctor(DbConnectionPoolIdentity identity, SqlConnectionString connectionOptions, SqlCredential credential, Object providerInfo, String newPassword, SecureString newSecurePassword, Boolean redirectedUserInstance, SqlConnectionString userConnectionOptions, SessionData reconnectSessionData, DbConnectionPool pool, String accessToken, Boolean applyTransientFaultHandling, SqlAuthenticationProviderManager sqlAuthProviderManager)
+   ב-  System.Data.SqlClient.SqlConnectionFactory.CreateConnection(DbConnectionOptions options, DbConnectionPoolKey poolKey, Object poolGroupProviderInfo, DbConnectionPool pool, DbConnection owningConnection, DbConnectionOptions userOptions)
+   ב-  System.Data.ProviderBase.DbConnectionFactory.CreatePooledConnection(DbConnectionPool pool, DbConnection owningObject, DbConnectionOptions options, DbConnectionPoolKey poolKey, DbConnectionOptions userOptions)
+   ב-  System.Data.ProviderBase.DbConnectionPool.CreateObject(DbConnection owningObject, DbConnectionOptions userOptions, DbConnectionInternal oldConnection)
+   ב-  System.Data.ProviderBase.DbConnectionPool.UserCreateRequest(DbConnection owningObject, DbConnectionOptions userOptions, DbConnectionInternal oldConnection)
+   ב-  System.Data.ProviderBase.DbConnectionPool.TryGetConnection(DbConnection owningObject, UInt32 waitForMultipleObjectsTimeout, Boolean allowCreate, Boolean onlyOneCheckConnection, DbConnectionOptions userOptions, DbConnectionInternal& connection)
+   ב-  System.Data.ProviderBase.DbConnectionPool.TryGetConnection(DbConnection owningObject, TaskCompletionSource`1 retry, DbConnectionOptions userOptions, DbConnectionInternal& connection)
+   ב-  System.Data.ProviderBase.DbConnectionFactory.TryGetConnection(DbConnection owningConnection, TaskCompletionSource`1 retry, DbConnectionOptions userOptions, DbConnectionInternal oldConnection, DbConnectionInternal& connection)
+   ב-  System.Data.ProviderBase.DbConnectionInternal.TryOpenConnectionInternal(DbConnection outerConnection, DbConnectionFactory connectionFactory, TaskCompletionSource`1 retry, DbConnectionOptions userOptions)
+   ב-  System.Data.ProviderBase.DbConnectionClosed.TryOpenConnection(DbConnection outerConnection, DbConnectionFactory connectionFactory, TaskCompletionSource`1 retry, DbConnectionOptions userOptions)
+   ב-  System.Data.SqlClient.SqlConnection.TryOpenInner(TaskCompletionSource`1 retry)
+   ב-  System.Data.SqlClient.SqlConnection.TryOpen(TaskCompletionSource`1 retry)
+   ב-  System.Data.SqlClient.SqlConnection.Open()
+   ב-  DbService.ExecuteQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 72
+   ב-  Escorted.setEscortedStatus(String active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Escorted.cs:שורה 286
+   ב-  WebService.setEscortedStatus(String displayName, String active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 292
+ClientConnectionId:94e7ce80-7e30-4ac7-9cb7-666136e4c339
+Error Number:18456,State:1,Class:14
+2018-11-06 15:25:38,281 ERROR [30] WebService.SetPatientStatus - Error in SetPatientStatus
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  System.Data.SqlClient.SqlInternalConnectionTds..ctor(DbConnectionPoolIdentity identity, SqlConnectionString connectionOptions, SqlCredential credential, Object providerInfo, String newPassword, SecureString newSecurePassword, Boolean redirectedUserInstance, SqlConnectionString userConnectionOptions, SessionData reconnectSessionData, DbConnectionPool pool, String accessToken, Boolean applyTransientFaultHandling, SqlAuthenticationProviderManager sqlAuthProviderManager)
+   ב-  System.Data.SqlClient.SqlConnectionFactory.CreateConnection(DbConnectionOptions options, DbConnectionPoolKey poolKey, Object poolGroupProviderInfo, DbConnectionPool pool, DbConnection owningConnection, DbConnectionOptions userOptions)
+   ב-  System.Data.ProviderBase.DbConnectionFactory.CreatePooledConnection(DbConnectionPool pool, DbConnection owningObject, DbConnectionOptions options, DbConnectionPoolKey poolKey, DbConnectionOptions userOptions)
+   ב-  System.Data.ProviderBase.DbConnectionPool.CreateObject(DbConnection owningObject, DbConnectionOptions userOptions, DbConnectionInternal oldConnection)
+   ב-  System.Data.ProviderBase.DbConnectionPool.UserCreateRequest(DbConnection owningObject, DbConnectionOptions userOptions, DbConnectionInternal oldConnection)
+   ב-  System.Data.ProviderBase.DbConnectionPool.TryGetConnection(DbConnection owningObject, UInt32 waitForMultipleObjectsTimeout, Boolean allowCreate, Boolean onlyOneCheckConnection, DbConnectionOptions userOptions, DbConnectionInternal& connection)
+   ב-  System.Data.ProviderBase.DbConnectionPool.TryGetConnection(DbConnection owningObject, TaskCompletionSource`1 retry, DbConnectionOptions userOptions, DbConnectionInternal& connection)
+   ב-  System.Data.ProviderBase.DbConnectionFactory.TryGetConnection(DbConnection owningConnection, TaskCompletionSource`1 retry, DbConnectionOptions userOptions, DbConnectionInternal oldConnection, DbConnectionInternal& connection)
+   ב-  System.Data.ProviderBase.DbConnectionInternal.TryOpenConnectionInternal(DbConnection outerConnection, DbConnectionFactory connectionFactory, TaskCompletionSource`1 retry, DbConnectionOptions userOptions)
+   ב-  System.Data.ProviderBase.DbConnectionClosed.TryOpenConnection(DbConnection outerConnection, DbConnectionFactory connectionFactory, TaskCompletionSource`1 retry, DbConnectionOptions userOptions)
+   ב-  System.Data.SqlClient.SqlConnection.TryOpenInner(TaskCompletionSource`1 retry)
+   ב-  System.Data.SqlClient.SqlConnection.TryOpen(TaskCompletionSource`1 retry)
+   ב-  System.Data.SqlClient.SqlConnection.Open()
+   ב-  DbService.ExecuteQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 72
+   ב-  Patient.SetPatientStatus(String active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 535
+   ב-  WebService.SetPatientStatus(String displayName, String active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 309
+ClientConnectionId:6e64437e-6e1e-410f-80b4-17ef7462acb6
+Error Number:18456,State:1,Class:14
+2018-11-06 15:28:31,710 ERROR [8] WebService.setPatient - Error in setPatient
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetObjectScalarByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 117
+   ב-  Patient.setPatient(String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 601
+   ב-  WebService.setPatient(Patient patient, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 335
+ClientConnectionId:3573d782-068a-411a-a2ac-7bccf4dcc4ad
+Error Number:18456,State:1,Class:14
+2018-11-06 15:29:42,976 ERROR [40] WebService.setEscorted - Error in setEscorted
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  Escorted.setEscorted(String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Escorted.cs:שורה 383
+   ב-  WebService.setEscorted(Escorted escorted, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 352
+ClientConnectionId:a5ada479-faa4-4259-b351-5f4a6b4a5bf7
+Error Number:18456,State:1,Class:14
+2018-11-06 15:30:33,345 ERROR [40] WebService.getEscorted - Error in getEscorted
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Escorted.getEscorted(String patientName) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Escorted.cs:שורה 316
+   ב-  WebService.getEscorted(String displayName, String patientName) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 370
+ClientConnectionId:20d9bada-1504-49cf-bc49-6e37979cd1ef
+Error Number:18456,State:1,Class:14
+2018-11-06 15:35:13,656 ERROR [11] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 480
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 541
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 440
+ClientConnectionId:657a70fe-4300-4606-99bf-3a644deebf8c
+Error Number:18456,State:1,Class:14
+2018-11-06 15:35:35,277 ERROR [35] WebService.getContactType - Error in getContactType
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Escorted.getContactType() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Escorted.cs:שורה 294
+   ב-  WebService.getContactType() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 407
+ClientConnectionId:bcc16249-1413-4605-b4c1-1de6cd794673
+Error Number:18456,State:1,Class:14
+2018-11-06 15:36:45,024 ERROR [35] WebService.GetRidePat - Error in GetRidePat
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  RidePat.GetRidePat(Int32 ridePatNum) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 407
+   ב-  WebService.GetRidePat(Int32 ridePatNum) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 460
+ClientConnectionId:39ab44b6-6cd1-4c43-a711-0495e4a0cf0f
+Error Number:18456,State:1,Class:14
+2018-11-06 15:38:56,910 ERROR [7] WebService.getMyRides - Error in getMyRides
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Ride.GetMyRides(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Ride.cs:שורה 345
+   ב-  WebService.getMyRides(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 482
+ClientConnectionId:f2748e8d-352f-471c-a403-bf1b2a60b67c
+Error Number:18456,State:1,Class:14
+2018-11-06 15:39:28,178 ERROR [22] WebService.CheckUser - Error in CheckUser
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Volunteer.getVolunteerByMobile(String mobile, String regId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 585
+   ב-  WebService.CheckUser(String mobile, String regId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 523
+ClientConnectionId:9c5eac0f-b455-441b-99bd-8e2ce89fd591
+Error Number:18456,State:1,Class:14
+2018-11-06 15:42:17,482 ERROR [35] WebService.SignDriver - Error in SignDriver
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  RidePat.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 914
+   ב-  WebService.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 543
+ClientConnectionId:c5ba0fa6-b291-41a1-8011-81c19c6b593d
+Error Number:18456,State:1,Class:14
+2018-11-06 15:43:27,275 ERROR [32] WebService.DeleteDriver - Error in DeleteDriver
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  RidePat.DeleteDriver(Int32 ridePatId, Int32 driverId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 871
+   ב-  WebService.DeleteDriver(Int32 ridePatId, Int32 driverId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 564
+ClientConnectionId:8205f000-1924-4fcf-9324-409f17ed06f8
+Error Number:18456,State:1,Class:14
+2018-11-06 15:44:56,532 ERROR [25] WebService.AssignRideToRidePat - Error in AssignRideToRidePat
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  RidePat.AssignRideToRidePat(Int32 ridePatId, Int32 userId, String driverType) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 751
+   ב-  WebService.AssignRideToRidePat(Int32 ridePatId, Int32 userId, String driverType) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 589
+ClientConnectionId:789812ae-229f-433c-984d-756648741cdb
+Error Number:18456,State:1,Class:14
+2018-11-06 15:49:09,667 ERROR [27] WebService.LeaveRidePat - Error in LeaveRidePat
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  RidePat.LeaveRidePat(Int32 ridePatId, Int32 rideId, Int32 driverId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 821
+   ב-  WebService.LeaveRidePat(Int32 ridePatId, Int32 rideId, Int32 driverId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 628
+ClientConnectionId:3ed2e891-6043-4c6d-9857-2d98f1c8069d
+Error Number:18456,State:1,Class:14
+2018-11-06 15:51:30,912 ERROR [6] WebService.getAllStatus - Error in getAllStatus
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Status.getAllStatus() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Irrelevant\Status.cs:שורה 26
+   ב-  WebService.getAllStatus() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 657
+ClientConnectionId:7e06bebc-ac1a-49f5-a9bd-b432c38bc6c4
+Error Number:18456,State:1,Class:14
+2018-11-06 16:01:07,586 ERROR [56] WebService.getCities - Error in getCities
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  City.getCitiesList() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Irrelevant\City.cs:שורה 92
+   ב-  WebService.getCities() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 970
+ClientConnectionId:02a6f299-6289-4a60-955d-8c7b2fd508ce
+Error Number:18456,State:1,Class:14
+2018-11-06 16:01:17,694 ERROR [53] WebService.getAllEquipment - Error in getAllEquipment
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Patient.getAllEquipment() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 524
+   ב-  WebService.getAllEquipment() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 676
+ClientConnectionId:4f76ccc7-a8bd-4abb-bbbd-476158abb7d6
+Error Number:18456,State:1,Class:14
+2018-11-06 16:01:38,988 ERROR [47] WebService.deactivateLocation - Error in deactivateLocation
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  System.Data.SqlClient.SqlInternalConnectionTds..ctor(DbConnectionPoolIdentity identity, SqlConnectionString connectionOptions, SqlCredential credential, Object providerInfo, String newPassword, SecureString newSecurePassword, Boolean redirectedUserInstance, SqlConnectionString userConnectionOptions, SessionData reconnectSessionData, DbConnectionPool pool, String accessToken, Boolean applyTransientFaultHandling, SqlAuthenticationProviderManager sqlAuthProviderManager)
+   ב-  System.Data.SqlClient.SqlConnectionFactory.CreateConnection(DbConnectionOptions options, DbConnectionPoolKey poolKey, Object poolGroupProviderInfo, DbConnectionPool pool, DbConnection owningConnection, DbConnectionOptions userOptions)
+   ב-  System.Data.ProviderBase.DbConnectionFactory.CreatePooledConnection(DbConnectionPool pool, DbConnection owningObject, DbConnectionOptions options, DbConnectionPoolKey poolKey, DbConnectionOptions userOptions)
+   ב-  System.Data.ProviderBase.DbConnectionPool.CreateObject(DbConnection owningObject, DbConnectionOptions userOptions, DbConnectionInternal oldConnection)
+   ב-  System.Data.ProviderBase.DbConnectionPool.UserCreateRequest(DbConnection owningObject, DbConnectionOptions userOptions, DbConnectionInternal oldConnection)
+   ב-  System.Data.ProviderBase.DbConnectionPool.TryGetConnection(DbConnection owningObject, UInt32 waitForMultipleObjectsTimeout, Boolean allowCreate, Boolean onlyOneCheckConnection, DbConnectionOptions userOptions, DbConnectionInternal& connection)
+   ב-  System.Data.ProviderBase.DbConnectionPool.TryGetConnection(DbConnection owningObject, TaskCompletionSource`1 retry, DbConnectionOptions userOptions, DbConnectionInternal& connection)
+   ב-  System.Data.ProviderBase.DbConnectionFactory.TryGetConnection(DbConnection owningConnection, TaskCompletionSource`1 retry, DbConnectionOptions userOptions, DbConnectionInternal oldConnection, DbConnectionInternal& connection)
+   ב-  System.Data.ProviderBase.DbConnectionInternal.TryOpenConnectionInternal(DbConnection outerConnection, DbConnectionFactory connectionFactory, TaskCompletionSource`1 retry, DbConnectionOptions userOptions)
+   ב-  System.Data.ProviderBase.DbConnectionClosed.TryOpenConnection(DbConnection outerConnection, DbConnectionFactory connectionFactory, TaskCompletionSource`1 retry, DbConnectionOptions userOptions)
+   ב-  System.Data.SqlClient.SqlConnection.TryOpenInner(TaskCompletionSource`1 retry)
+   ב-  System.Data.SqlClient.SqlConnection.TryOpen(TaskCompletionSource`1 retry)
+   ב-  System.Data.SqlClient.SqlConnection.Open()
+   ב-  DbService.ExecuteQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 72
+   ב-  Location.deactivateLocation(String active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Location.cs:שורה 336
+   ב-  WebService.deactivateLocation(String displayName, String active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 740
+ClientConnectionId:0254247e-ce33-47ae-acfc-a1ee226ac0ee
+Error Number:18456,State:1,Class:14
+2018-11-06 16:01:50,731 ERROR [56] WebService.CombineRideRidePat - Error in CombineRideRidePat
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  RidePat.CombineRideRidePat(Int32 rideId, Int32 ridePatId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 735
+   ב-  WebService.CombineRideRidePat(Int32 rideId, Int32 RidePatId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 608
+ClientConnectionId:0254247e-ce33-47ae-acfc-a1ee226ac0ee
+Error Number:18456,State:1,Class:14
+2018-11-06 16:05:53,395 ERROR [50] WebService.getBarrierView - Error in getBarrierView
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Location.getBarrierListForView(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Location.cs:שורה 307
+   ב-  WebService.getBarrierView(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 892
+ClientConnectionId:71d4c232-4c31-4a40-a811-4c84976b09d4
+Error Number:18456,State:1,Class:14
+2018-11-06 16:06:12,538 ERROR [50] WebService.deactivateVolunteer - Error in deactivateVolunteer
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  System.Data.SqlClient.SqlInternalConnectionTds..ctor(DbConnectionPoolIdentity identity, SqlConnectionString connectionOptions, SqlCredential credential, Object providerInfo, String newPassword, SecureString newSecurePassword, Boolean redirectedUserInstance, SqlConnectionString userConnectionOptions, SessionData reconnectSessionData, DbConnectionPool pool, String accessToken, Boolean applyTransientFaultHandling, SqlAuthenticationProviderManager sqlAuthProviderManager)
+   ב-  System.Data.SqlClient.SqlConnectionFactory.CreateConnection(DbConnectionOptions options, DbConnectionPoolKey poolKey, Object poolGroupProviderInfo, DbConnectionPool pool, DbConnection owningConnection, DbConnectionOptions userOptions)
+   ב-  System.Data.ProviderBase.DbConnectionFactory.CreatePooledConnection(DbConnectionPool pool, DbConnection owningObject, DbConnectionOptions options, DbConnectionPoolKey poolKey, DbConnectionOptions userOptions)
+   ב-  System.Data.ProviderBase.DbConnectionPool.CreateObject(DbConnection owningObject, DbConnectionOptions userOptions, DbConnectionInternal oldConnection)
+   ב-  System.Data.ProviderBase.DbConnectionPool.UserCreateRequest(DbConnection owningObject, DbConnectionOptions userOptions, DbConnectionInternal oldConnection)
+   ב-  System.Data.ProviderBase.DbConnectionPool.TryGetConnection(DbConnection owningObject, UInt32 waitForMultipleObjectsTimeout, Boolean allowCreate, Boolean onlyOneCheckConnection, DbConnectionOptions userOptions, DbConnectionInternal& connection)
+   ב-  System.Data.ProviderBase.DbConnectionPool.TryGetConnection(DbConnection owningObject, TaskCompletionSource`1 retry, DbConnectionOptions userOptions, DbConnectionInternal& connection)
+   ב-  System.Data.ProviderBase.DbConnectionFactory.TryGetConnection(DbConnection owningConnection, TaskCompletionSource`1 retry, DbConnectionOptions userOptions, DbConnectionInternal oldConnection, DbConnectionInternal& connection)
+   ב-  System.Data.ProviderBase.DbConnectionInternal.TryOpenConnectionInternal(DbConnection outerConnection, DbConnectionFactory connectionFactory, TaskCompletionSource`1 retry, DbConnectionOptions userOptions)
+   ב-  System.Data.ProviderBase.DbConnectionClosed.TryOpenConnection(DbConnection outerConnection, DbConnectionFactory connectionFactory, TaskCompletionSource`1 retry, DbConnectionOptions userOptions)
+   ב-  System.Data.SqlClient.SqlConnection.TryOpenInner(TaskCompletionSource`1 retry)
+   ב-  System.Data.SqlClient.SqlConnection.TryOpen(TaskCompletionSource`1 retry)
+   ב-  System.Data.SqlClient.SqlConnection.Open()
+   ב-  DbService.ExecuteQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 72
+   ב-  Volunteer.deactivateCustomer(String active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 987
+   ב-  WebService.deactivateVolunteer(String displayName, String active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 696
+ClientConnectionId:efeab4dc-2ec9-42ae-8bd8-d255c34d6880
+Error Number:18456,State:1,Class:14
+2018-11-06 16:06:22,429 ERROR [50] WebService.getHospitalView - Error in getHospitalView
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Location.getHospitalListForView(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Location.cs:שורה 274
+   ב-  WebService.getHospitalView(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 874
+ClientConnectionId:efeab4dc-2ec9-42ae-8bd8-d255c34d6880
+Error Number:18456,State:1,Class:14
+2018-11-06 16:06:35,987 ERROR [56] WebService.getLocation - Error in getLocation
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Location.getLocation() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Location.cs:שורה 350
+   ב-  WebService.getLocation(String displayName) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 781
+ClientConnectionId:290d3464-3672-4d54-928f-e719ee263d51
+Error Number:18456,State:1,Class:14
+2018-11-06 16:06:45,156 ERROR [50] WebService.getVolunteerTypes - Error in getVolunteerTypes
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Volunteer.getVolunteerTypes() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 552
+   ב-  WebService.getVolunteerTypes() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 837
+ClientConnectionId:290d3464-3672-4d54-928f-e719ee263d51
+Error Number:18456,State:1,Class:14
+2018-11-06 16:06:58,249 ERROR [59] WebService.getPatient - Error in getPatient
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Patient.getPatient() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 485
+   ב-  WebService.getPatient(String displayName) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 389
+ClientConnectionId:a50e4b73-43e3-45dc-b5c8-d0db40a80831
+Error Number:18456,State:1,Class:14
+2018-11-06 16:07:19,284 ERROR [58] WebService.getVolunteers - Error in getVolunteers
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Volunteer.getVolunteersList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 805
+   ב-  WebService.getVolunteers(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 799
+ClientConnectionId:a50e4b73-43e3-45dc-b5c8-d0db40a80831
+Error Number:18456,State:1,Class:14

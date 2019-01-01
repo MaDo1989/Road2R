@@ -1,0 +1,506 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" dir=rtl>
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="KSMoving">
+    <meta name="author" content="Coderthemes">
+
+    <link rel="shortcut icon" href="assets/images/favicon_1.ico">
+
+    <title>ניהול גרסאות אפליקציה</title>
+
+    <link href="../plugins/switchery/switchery.min.css" rel="stylesheet" />
+    <link href="assets/css/bootstrap-rtl.min.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/core.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/icons.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/components.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/pages.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/menu.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/responsive.css" rel="stylesheet" type="text/css">
+
+    <!-- DataTables -->
+    <link href="../plugins/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/buttons.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/fixedHeader.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/responsive.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/scroller.bootstrap.min.css" rel="stylesheet" type="text/css" />
+
+
+    <script src="assets/js/CookiesFunctions.js"></script>
+
+    <script src="assets/js/modernizr.min.js"></script>
+
+    <script src="assets/js/jquery.min.js"></script>
+
+    <!-- The jQuery library is a prerequisite for all jqSuite products -->
+    <script type="text/ecmascript" src="assets/js/jquery.min.js"></script>
+    <!-- This is the Javascript file of jqGrid -->
+    <script type="text/ecmascript" src="Guriddo_jqGrid_JS_5.2.0/js/jquery.jqGrid.min.js"></script>
+    <!-- We support more than 40 localizations -->
+    <script type="text/ecmascript" src="Guriddo_jqGrid_JS_5.2.0/js/i18n/grid.locale-he.js"></script>
+    <!-- A link to a Boostrap  and jqGrid Bootstrap CSS siles-->
+    <link href="Guriddo_jqGrid_JS_5.2.0/css/ui.jqgrid-bootstrap.css" rel="stylesheet" />
+
+    <!-- Sweet Alert css -->
+    <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
+
+    <!--GENERAL object and additional functions-->
+    <script src="lib/master.js"></script>
+
+    <!-- Select2 css+js -->
+    <link href="assets/css/select2.css" rel="stylesheet" />
+    <script src="assets/js/select2.min.js"></script>
+
+    <!--DatePicker css+js-->
+    <link href="../plugins/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" rel="stylesheet">
+    <link href="../plugins/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+    <script src="../plugins/moment/moment.js"></script>
+    <script src="../plugins/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <script src="../plugins/bootstrap-daterangepicker/daterangepicker.js"></script>
+
+    <script src="lib/datepicker-he.js"></script>
+
+    <!--City Autocomplete-->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <style>
+        .ui-autocomplete {
+            max-height: 100px;
+            overflow-y: auto;
+            /* prevent horizontal scrollbar */
+            overflow-x: hidden;
+        }
+        /* IE 6 doesn't support max-height
+        * we use height instead, but this forces the menu to always be this tall
+        */
+        * html .ui-autocomplete {
+            height: 100px;
+        }
+    </style>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <!--City Autocomplete-->
+    <script src="lib/includeHTML.js"></script>
+    <script>
+        checkCookie();
+        arr_addressRows = [];
+        $.jgrid.defaults.responsive = true;
+        $.jgrid.defaults.styleUI = 'Bootstrap';
+
+        $(document).ready(function () {
+
+            includeHTML();
+            var userName = GENERAL.USER.getUserName();
+            $("#userName").html(userName);
+            //change ID from #patientFirstName"
+            $("#username").val(userName);
+            $("#username").attr('disabled', 'disabled');
+            //set today date as defualt for realse date
+            document.getElementById('realseDate').valueAsDate = new Date();
+        });
+
+        //return to the last page we were in
+        function goBack() {
+            window.history.back();
+        }
+
+    </script>
+</head>
+<body class="fixed-left">
+
+    <!-- Begin page -->
+    <div id="wrapper">
+
+        <!-- Top Bar Start -->
+        <div class="topbar">
+
+
+
+            <!-- Navbar -->
+            <div class="navbar navbar-default" role="navigation">
+                <div class="container">
+                    <div class="">
+                        <!--Expend/Collaps Side Menue-->
+                        <div class="pull-left">
+                            <button class="button-menu-mobile open-left waves-effect">
+                                <i class="md md-menu"></i>
+                            </button>
+                            <span class="clearfix"></span>
+                        </div>
+
+                        <!-- LOGO -->
+                        <div class="pull-left">
+                            <div class="text-center">
+                                <a href="index.html" class="logo"><span>בדרך להחלמה</span></a>
+                            </div>
+                        </div>
+                        <div class="pull-right">
+                            <span class="logo" id="userName"></span>
+                        </div>
+                    </div>
+                    <!--/.nav-collapse -->
+                </div>
+            </div>
+        </div>
+        <!-- Top Bar End -->
+        <!-- ========== Right Sidebar Start ========== -->
+
+        <div w3-include-html="menu.html"></div>
+        <!-- Right Sidebar End -->
+        <!-- ============================================================== -->
+        <!-- Start page Content here -->
+        <!-- ============================================================== -->
+        <div class="content-page">
+            <!-- Start content -->
+            <div class="content">
+                <div class="container">
+                    <!-- Page-Title -->
+
+                    <div class="row">
+                        <form class="form-horizontal" role="form" id="customerForm">
+                            <div class="col-sm-12">
+                                <div class="card-box">
+                                    <div class="row">
+                                        <h4 class="m-t-0 header-title"><b>החלפת גרסת אפליקציה</b></h4>
+
+                                        <div class="text-right m-b-30 m-r-15">
+                                            <!--כפתור חזור, צריך לזכור את הדף הקודם שהיינו בו-->
+                                            <button type="button" onclick="goBack()" class="btn btn-default waves-effect w-md m-b-5"><i class="ti-back-right m-r-5"></i>חזור</button>
+                                        </div>
+                                        <p class="required">* שדה חובה</p>
+
+
+                                        <div class="row m-l-10 m-r-10">
+
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-4 control-label">שם משתמש</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="username" name="username" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <div class="col-sm-6">
+                                                        <input dir="ltr" type="url" name="googleStoreUrl" id="googleStoreUrl"
+                                                               placeholder="https://example.com"
+                                                               pattern="https://.*" size="40"
+                                                               class="form-control"
+                                                               required>
+                                                    </div>
+                                                    <label dir="ltr" class="col-sm-4 control-label">Google store:<span class="required">&nbsp;*</span></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-4 control-label">שם גרסה:<span class="required">&nbsp;*</span></label>
+                                                    <div class="col-sm-6">
+                                                        <input id="versionName" name="versionName" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <div class="col-sm-6">
+                                                        <input dir="ltr" type="url" name="appStoreUrl" id="appStoreUrl"
+                                                               placeholder="https://example.com"
+                                                               pattern="https://.*" size="40"
+                                                               class="form-control"
+                                                               required>
+                                                    </div>
+                                                    <label dir="ltr" class="col-sm-4 control-label">App Store:<span class="required">&nbsp;*</span></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-4 control-label">תאריך שחרור גרסה<span class="required">&nbsp;*</span></label>
+                                                    <div class="col-sm-6">
+                                                        <input dir="ltr" type="date" class="form-control" placeholder="dd/mm/yyyy" id="realseDate" name="realseDate" />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-6">
+                                                <div class="col-md-6 checkbox checkbox-primary text-left">
+                                                    <input id="mandatory" type="checkbox" checked="checked">
+                                                    <label for="mandatory">
+                                                        החל חובת הורדת אפליקציה
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+
+                                        </div>
+
+                                        <div class="row m-l-10 m-r-10">
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="text-right m-t-30 row">
+                                        <button type="submit" id="saveCustomer" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-save m-r-5"></i>שמור</button>
+                                    </div>
+                                </div>
+                                <hr />
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- end container -->
+            </div>
+            <!-- end content -->
+            <!-- FOOTER -->
+            <footer class="footer text-right">
+                2018 © כל הזכויות שמורות לעמותת בדרך להחלמה
+            </footer>
+            <!-- End FOOTER -->
+        </div>
+        <!-- ============================================================== -->
+        <!-- End page content here -->
+        <!-- ============================================================== -->
+    </div>
+    <!-- END wrapper -->
+    <script>
+        var resizefunc = [];
+    </script>
+
+
+    <!--Validators-->
+    <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // DO NOT REMOVE : GLOBAL FUNCTIONS!
+            var errorClass = 'invalid';
+            var errorElement = 'em';
+            var $serviceForm = $('#customerForm').validate({
+
+                highlight: function (element) {
+                    jQuery(element).closest('.form-group').addClass('has-error');
+                },
+                unhighlight: function (element) {
+                    jQuery(element).closest('.form-group').removeClass('has-error');
+                },
+
+                // Rules for form validation
+                rules: {
+                    appStoreUrl: {
+                        required: true
+                    },
+                    googleStoreUrl: {
+                        required: true
+                    },
+                    realseDate: {
+                        required: true
+                    },
+                    versionName: {
+                        required: true
+                    },
+                },
+
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    //debugger;
+
+                    var valid = validateUserInputs();
+                    if (!valid) return false;
+
+
+                    var userName = GENERAL.USER.getUserName();
+                    var version = $("#versionName").val();
+
+                    //DATE settings
+                    var date = $("#realseDate").val();
+                    var Day = parseInt(date.substring(8));
+                    var Month = parseInt(date.substring(5, 7)) - 1;
+                    var Year = parseInt(date.substring(0, 4));
+                    var date1 = new Date(Year, Month, Day);
+                    var mandatory = false;
+                    if ($("#mandatory").is(':checked')) {
+                        mandatory = true;
+                    }
+                    var google = $("#googleStoreUrl").val();
+                    var appstore = $("#appStoreUrl").val();
+
+                    //string userName, string google, string appstore, DateTime date, string version
+                    $.ajax({
+                        dataType: "json",
+                        url: "WebService.asmx/setNewVersion",
+                        contentType: "application/json; charset=utf-8",
+                        type: "POST",
+                        async: false,
+                        data: JSON.stringify({ userName: userName, google: google, appstore: appstore, date: date1, version: version, mandatory: mandatory }),
+                        success: function (data) {
+                            //SaveAddresses(0, numberOfRecords, customerID);
+
+                            swal({
+                                title: "נשמר",
+                                type: "success",
+                                timer: 1000,
+                                showConfirmButton: false
+                            });
+                            setTimeout(function () { goBack() }, 1001);
+
+                        },
+                        error: function (err) {
+                            alert("Error in setNewVersion: " + err.responseText);
+                        }
+                    });
+                    //END OF Insert Product Code
+
+
+                    return false;
+                },
+
+                // Messages for form validation
+                messages: {
+                    appStoreUrl: {
+                        required: "יש להכניס קישור לApp store"
+                    },
+                    googleStoreUrl: {
+                        required: "יש להכניס קישור לGoogle play"
+                    },
+                    realseDate: {
+                        required: "יש להוסיף תאריך שחרור גרסה"
+                    },
+                    versionName: {
+                        required: "יש להוסיך שם גרסה"
+                    },
+                },
+
+
+            });
+        });
+        //Input validation
+        function validateUserInputs() {
+
+            var checkGoogle = $("#googleStoreUrl").val();
+            var checkApple = $("#appStoreUrl").val();
+            //validate urls
+            var urlReg = new RegExp("^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$");
+            var googleMatch = urlReg.test(checkGoogle);
+            if (!googleMatch) {
+                swal(
+                    "שים לב!",
+                    "כתובת ל-Google play שגויה",
+                    "warning"
+                );
+            }
+            var appMatch = urlReg.test(checkApple);
+            if (!appMatch) {
+                swal(
+                    "שים לב!",
+                    "כתובת ל-AppStore שגויה",
+                    "warning"
+                );
+            }
+
+            //validate date
+            //var date = $("#realseDate").val();
+            //var Day = parseInt(date.substring(8));
+            //var Month = parseInt(date.substring(5, 7)) - 1;
+            //var Year = parseInt(date.substring(0, 4));
+            //var date1 = new Date(Year, Month, Day);
+
+            //futureDate = checkFutureDate(date1);
+            //if (!futureDate)
+            //{
+            //    swal( "שים לב!","יש לבחור תאריך עתידי","warning");
+            //}
+
+            if (!appMatch || !googleMatch) {
+                return false;
+            } else return true;
+        }
+        //function checkFutureDate(date1) {
+        //    var checkDate = Date.parse(date1); //parameter datetime to compare with today
+        //    var today = new Date();
+        //    var dd = today.getDate();
+        //    var mm = today.getMonth() + 1; //January is 0!
+        //    var yyyy = today.getFullYear();
+
+
+        //    var d1 = new Date(yyyy, mm, dd);
+        //    currentDate = Date.parse(d1);
+
+        //    if (checkDate < currentDate) return false //past datetime
+        //    else return true; //future datetime
+        //}
+    </script>
+
+    <!-- jQuery  -->
+    <script src="assets/js/bootstrap-rtl.min.js"></script>
+    <script src="assets/js/detect.js"></script>
+    <script src="assets/js/fastclick.js"></script>
+    <script src="assets/js/jquery.slimscroll.js"></script>
+    <script src="assets/js/jquery.blockUI.js"></script>
+    <script src="assets/js/waves.js"></script>
+    <script src="assets/js/wow.min.js"></script>
+    <script src="assets/js/jquery.nicescroll.js"></script>
+    <script src="assets/js/jquery.scrollTo.min.js"></script>
+    <script src="../plugins/switchery/switchery.min.js"></script>
+
+    <!-- Sweet Alert js -->
+    <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
+    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+
+    <script src="assets/js/jquery.core.js"></script>
+    <script src="assets/js/jquery.app.js"></script>
+
+
+    <!-- jQuery  -->
+    <script src="assets/js/bootstrap-rtl.min.js"></script>
+    <script src="assets/js/detect.js"></script>
+    <script src="assets/js/fastclick.js"></script>
+    <script src="assets/js/jquery.slimscroll.js"></script>
+    <script src="assets/js/jquery.blockUI.js"></script>
+    <script src="assets/js/waves.js"></script>
+    <script src="assets/js/wow.min.js"></script>
+    <script src="assets/js/jquery.nicescroll.js"></script>
+    <script src="assets/js/jquery.scrollTo.min.js"></script>
+    <script src="../plugins/switchery/switchery.min.js"></script>
+
+    <!-- Datatables-->
+    <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="../plugins/datatables/dataTables.bootstrap.js"></script>
+    <script src="../plugins/datatables/dataTables.buttons.min.js"></script>
+    <script src="../plugins/datatables/buttons.bootstrap.min.js"></script>
+    <script src="../plugins/datatables/jszip.min.js"></script>
+    <script src="../plugins/datatables/pdfmake.min.js"></script>
+    <script src="../plugins/datatables/vfs_fonts.js"></script>
+    <script src="../plugins/datatables/buttons.html5.min.js"></script>
+    <script src="../plugins/datatables/buttons.print.min.js"></script>
+    <script src="../plugins/datatables/dataTables.fixedHeader.min.js"></script>
+    <script src="../plugins/datatables/dataTables.keyTable.min.js"></script>
+    <script src="../plugins/datatables/dataTables.responsive.min.js"></script>
+    <script src="../plugins/datatables/responsive.bootstrap.min.js"></script>
+    <script src="../plugins/datatables/dataTables.scroller.min.js"></script>
+
+    <!-- Datatable init js -->
+    <script src="assets/pages/datatables.init.js"></script>
+
+    <!-- Sweet Alert js -->
+    <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
+    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+
+    <script src="assets/js/jquery.core.js"></script>
+    <script src="assets/js/jquery.app.js"></script>
+
+    <script type="text/javascript">
+
+        TableManageButtons.init();
+
+    </script>
+
+</body>
+</html>
