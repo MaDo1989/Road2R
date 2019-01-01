@@ -267,7 +267,8 @@ public class Location
     {
         #region DB functions
         string query = "select * from Location where Type='בית חולים'";
-        query += "order by name";
+        query += " and IsActive = 'True'";
+        query += " order by name";
 
         List<Location> list = new List<Location>();
         DbService db = new DbService();
@@ -300,7 +301,8 @@ public class Location
     {
         #region DB functions
         string query = "select * from Location where Type='מחסום'";
-        query += "order by name";
+        query += " and IsActive = 'True'";
+        query += " order by name";
 
         List<Location> list = new List<Location>();
         DbService db = new DbService();

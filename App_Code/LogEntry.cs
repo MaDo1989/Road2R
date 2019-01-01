@@ -17,6 +17,8 @@ public class LogEntry
     public string Message { get; set; }
     public int Code { get; set; }
     public string Coordinator { get; set; }
+    public int RidePatId { get; set; }
+    public int RideId { get; set; }
 
     private static readonly ILog Log =
          LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -31,12 +33,60 @@ public class LogEntry
         Severity = severity;
         Message = message;
         Code = code;
+        this.Write();
     }
+    public LogEntry(DateTime date, string severity, string message, int code,int ridePatId, bool isRideId)
+    {
+        Date = date;
+        Severity = severity;
+        Message = message;
+        Code = code;
+        
+        if (isRideId)
+        {
+            RideId = ridePatId;
+        }
+        else RidePatId = ridePatId;
 
-    //public void Write(string str)
+        this.setCoordinator();
+        //write to log table inside the ctor. only need to init an LogEntry object.
+        this.Write();
+    }
+    //public LogEntry(DateTime date, string severity, string message, int code,int ridePatId, bool isRideId,string Coordinator)
     //{
-    //    Log.Error(str);
+    //    Date = date;
+    //    Severity = severity;
+    //    Message = message;
+    //    Code = code;
+        
+    //    if (isRideId)
+    //    {
+    //        RideId = ridePatId;
+    //    }
+    //    else RidePatId = ridePatId;
+
+    //    this.Coordinator = Coordinator;
+    //    //write to log table inside the ctor. only need to init an LogEntry object.
+    //    this.Write();
     //}
+    
+    public void setCoordinator()
+    {
+        Coordinator = (string)HttpContext.Current.Session["userSession"];
+
+        if (Coordinator == null)
+        {
+            Auxiliary a = new Auxiliary();
+            string[] names = new string[2];
+            if (RideId == 0)
+            {
+                names = a.GetDriverAndCoordinatorByRidePat(RidePatId);
+            }
+            else names = a.GetDriverAndCoordinatorByRide(RideId);
+
+            Coordinator = names[0];
+        }
+    }
 
     public void Write()
     {
@@ -46,14 +96,21 @@ public class LogEntry
             SqlCommand cmd = new SqlCommand();
             cmd.CommandType = CommandType.Text;
             SqlParameter[] cmdParams = new SqlParameter[5];
+            if (Coordinator==null)
+            {
+                Coordinator = (string)HttpContext.Current.Session["userSession"];
+            }
 
-           string user = (string)HttpContext.Current.Session["userSession"];
+            if (Coordinator == null)
+            {
+                Coordinator = "כללי";
+            }
 
             cmdParams[0] = cmd.Parameters.AddWithValue("@date", Date);
             cmdParams[1] = cmd.Parameters.AddWithValue("@severity", Severity);
             cmdParams[2] = cmd.Parameters.AddWithValue("@message", Message);
             cmdParams[3] = cmd.Parameters.AddWithValue("@code", Code);
-            cmdParams[4] = cmd.Parameters.AddWithValue("@coordinator", user);
+            cmdParams[4] = cmd.Parameters.AddWithValue("@coordinator", Coordinator);
 
             string query = "insert into [LogTable] ([date],[severity],[message],[code],[Coordinator]) values (@date,@severity,@message,@code,@coordinator);";
             db.ExecuteQuery(query, cmd.CommandType, cmdParams);

@@ -1,0 +1,52 @@
+﻿2018-11-23 09:25:03,358 ERROR [10] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-23 12:22:05,088 ERROR [60] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-23 12:28:44,751 ERROR [69] WebService.GetRidePatView - Error in GetRidePatView
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 494
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 554
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 524
+2018-11-23 12:29:08,040 ERROR [50] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: Named Pipes Provider, error: 40 - לא הייתה אפשרות לפתוח חיבור ל- SQL Server) ---> System.ComponentModel.Win32Exception (0x80004005): The network path was not found
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 493
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 554
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 524
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:53,State:0,Class:20
+2018-11-23 14:38:52,672 ERROR [88] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-23 14:40:18,466 ERROR [89] WebService.SignDriver - Error in SignDriver
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  RidePat.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 945
+   ב-  WebService.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 627
+2018-11-23 14:41:15,694 ERROR [9] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-23 15:20:34,707 ERROR [47] WebService.GetRidePatView - Error in GetRidePatView
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 494
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 554
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 524
+2018-11-23 16:26:07,184 ERROR [17] WebService.GetRidePatView - Error in GetRidePatView
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 494
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 554
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 524
+2018-11-23 17:17:48,844 ERROR [25] WebService.GetRidePatView - Error in GetRidePatView
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 494
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 554
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 524
+2018-11-23 17:20:15,266 ERROR [29] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-23 17:47:05,516 ERROR [22] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-23 18:11:25,353 ERROR [44] WebService.setRidePat - Error in setRidePat
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  WebService.setRidePat(RidePat RidePat, String func, Boolean isAnonymous) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 151
+2018-11-23 18:14:32,661 ERROR [22] WebService.setRidePat - Error in setRidePat
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  WebService.setRidePat(RidePat RidePat, String func, Boolean isAnonymous) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 151
+2018-11-23 18:27:06,919 ERROR [86] WebService.setRidePat - Error in setRidePat
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  WebService.setRidePat(RidePat RidePat, String func, Boolean isAnonymous) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 151
+2018-11-23 20:40:53,627 ERROR [6] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-23 20:57:54,813 ERROR [6] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-23 22:25:55,845 ERROR [9] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-23 22:34:20,995 ERROR [6] WebService.writeToLog - Successful login ;for user: sapir
+2018-11-23 22:36:44,096 ERROR [6] WebService.writeToLog - Successful login ;for user: sapir

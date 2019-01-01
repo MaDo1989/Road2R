@@ -26,6 +26,7 @@ public class Escorted
     string contactType;//קרבה לחולה
     string gender;
     int id;
+    bool isAnonymous;
 
     public string City { get; set; }
 
@@ -200,6 +201,19 @@ public class Escorted
         set
         {
             gender = value;
+        }
+    }
+
+    public bool IsAnonymous
+    {
+        get
+        {
+            return isAnonymous;
+        }
+
+        set
+        {
+            isAnonymous = value;
         }
     }
 
@@ -435,6 +449,62 @@ public class Escorted
         }
     }
 
+    //the function works only if the anonymous escort's id is: 22,23,25,26,28.
+    public void setAnonymousEscorted(string func,int patientId,int numberOfEscort)
+    {
+        DbService db = new DbService();
+        string query = "";
+        SqlCommand cmd = new SqlCommand();
+        cmd.CommandType = CommandType.Text;
+        SqlParameter[] cmdParams = new SqlParameter[3];
+        
+        cmdParams[0] = cmd.Parameters.AddWithValue("@ContactType", 7);
+        cmdParams[1] = cmd.Parameters.AddWithValue("@PatientId", patientId);
+
+        if (func == "new")
+        {
+            for (int i = 1; i <= numberOfEscort; i++)
+            {
+                if (i==1)
+                {
+                    cmdParams[2] = cmd.Parameters.AddWithValue("@Id", 22);
+                }
+                else if (i == 2)
+                {
+                    cmdParams[2] = cmd.Parameters.AddWithValue("@Id", 23);
+                }
+                else if (i == 3)
+                {
+                    cmdParams[2] = cmd.Parameters.AddWithValue("@Id", 25);
+                }
+                else if (i == 4)
+                {
+                    cmdParams[2] = cmd.Parameters.AddWithValue("@Id", 26);
+                }
+                else if (i == 5)
+                {
+                    cmdParams[2] = cmd.Parameters.AddWithValue("@Id", 28);
+                }
+                query = "insert into PatientEscort (PatientId,EscortId,ContactTypeId) values (@PatientId,@Id,@ContactType);";
+                db = new DbService();
+                try
+                {
+                    int res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+                    if (res == 0) throw new Exception();
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+            }
+        }
+    }
+    
+    
+    
+    
+    
+    
     //public DataTable read()
     //{
     //    DBservices dbs = new DBservices();

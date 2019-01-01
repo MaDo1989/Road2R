@@ -50,10 +50,13 @@
         checkCookie();
         $(document).ready(function () {
 
-        includeHTML();
+            includeHTML();
+            var userName = GENERAL.USER.getUserName();
+            $("#userName").html(userName);
             //adds menu.html content into any "#menu" element
             //$('#menu').load('menu.html');
-
+            var userName = GENERAL.USER.getUserName();
+            $("#userName").html(userName);
             //Create a DataTable from the Table
             t = $('#datatable-buttons').DataTable({
                 columnDefs: [
@@ -86,10 +89,11 @@
 
                     for (i in arr_volunteers) {
                         var btnStr = ""
-                        var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button>";
+                        //כפתור צפייה כרגע מוסתר
+                        //var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button>";
                         var editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button>";
 
-                        btnStr += showBtn + " " + editBtn;
+                        btnStr += /*showBtn + " " +*/ editBtn;
 
                         if (arr_volunteers[i].IsActive == false) {
                             var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo' ></i></button>";
@@ -166,7 +170,7 @@
                         }, function () {
                             deactivateVolunteer(data[0], 'true');
                             swal({
-                                title: "הלקוח הפך לפעיל",
+                                title: "המתנדב הפך לפעיל",
                                 timer: 1000,
                                 type: "success",
                                 showConfirmButton: false
@@ -182,6 +186,8 @@
 
         function deactivateVolunteer(displayName, active) {
             checkCookie();
+            
+            
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/deactivateVolunteer",
@@ -242,14 +248,16 @@
                                 <a href="manageRidePats.html" class="logo"><span>בדרך להחלמה</span></a>
                             </div>
                         </div>
-
+                        <div class="pull-right">
+                            <a href="passwordForm.html"> <span class="logo" id="userName"></span></a>
+                        </div>
 
 
                         <!--Search-->
                         <!--<form role="search" class="navbar-right app-search pull-right hidden-xs">
-                            <input type="text" placeholder="חיפוש..." class="form-control app-search-input">
-                            <a href=""><i class="fa fa-search"></i></a>
-                        </form>-->
+        <input type="text" placeholder="חיפוש..." class="form-control app-search-input">
+        <a href=""><i class="fa fa-search"></i></a>
+    </form>-->
                     </div>
                     <!--/.nav-collapse -->
                 </div>
@@ -275,7 +283,11 @@
 
                                     <li class="active">ניהול מתנדבים</li>
                                 </ol>
-                                <h4 class="page-title">ניהול מתנדבים&nbsp&nbsp<i class="md md-recent-actors"></i></h4>
+                                <h4 class="page-title">ניהול מתנדבים&nbsp&nbsp
+                                <i>
+                                    <img src="../../Media/רשימת מתנדבים.png" height="25" width="25"/>
+                                </i>
+                                </h4>
                             </div>
                         </div>
                     </div>
@@ -317,7 +329,7 @@
                                         <tr>
                                             <th>המתנדב/ת</th>
                                             <th>סוג משתמש/ת</th>
-                                            <th>טלפון</th>
+                                            <th >טלפון</th>
                                             <th>טלפון נוסף</th>
                                             <th>יישוב</th>
                                             <th>Email</th>

@@ -70,6 +70,7 @@ public class Message
         push.RunPushNotificationAll(volunteersList, x);
     }
 
+
     public void cancelRide(int ridePatID, Volunteer user)
     {
         //get ride details and generate msg
@@ -86,6 +87,29 @@ public class Message
         x.Add("title", "נסיעה בוטלה");
         x.Add("rideID", ridePatID);
         x.Add("status", "Canceled");
+        x.Add("msgID", msgID);
+        x.Add("content-available", 1);
+
+        //send push
+        myPushNot push = new myPushNot();
+        push.RunPushNotificationOne(user, x);
+    }
+    public void changeAnonymousPatient(int ridePatID, Volunteer user)
+    {
+        //get ride details and generate msg
+        RidePat rp = new RidePat();
+        var abc = rp.GetRidePat(ridePatID);
+        var msg = "עודכן חולה אנונימי ל " + abc.Pat.DisplayName + "בנסיעה מ" + abc.Origin.Name + " ל" + abc.Destination.Name + " בתאריך " + abc.Date.ToShortDateString() + ", בשעה " + abc.Date.ToShortTimeString();
+        if (abc.Date.ToShortTimeString() == "22:14") msg = "עודכן חולה אנונימי ל " + abc.Pat.DisplayName + "הנסיעה מ" + abc.Origin.Name + " ל" + abc.Destination.Name + " בתאריך " + abc.Date.ToShortDateString() + "אחה\"צ";
+        //insert msg to db
+        int msgID = insertMsg(1, "Anonymous Patient changed", "חולה אנונימי השתנה", msg, ridePatID, DateTime.Now, user.Id, "", true, false, false);
+
+        //create push
+        var x = new JObject();
+        x.Add("message", msg);
+        x.Add("title", "חולה אנונימי השתנה");
+        x.Add("rideID", ridePatID);
+        x.Add("status", "Anonymous Patient changed");
         x.Add("msgID", msgID);
         x.Add("content-available", 1);
 

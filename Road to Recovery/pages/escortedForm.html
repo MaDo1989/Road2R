@@ -67,8 +67,10 @@
     <!--City Autocomplete-->
 
     <script>
+        
         checkCookie();
         arr_addressRows = [];
+        cities = [];
         $.jgrid.defaults.responsive = true;
         $.jgrid.defaults.styleUI = 'Bootstrap';
 
@@ -180,7 +182,7 @@
         function generateCitiesSuccessCB(data) {
             var arr_cities = JSON.parse(data.d);
 
-            cities = [];
+            
 
             for (i in arr_cities) {
                 cities.push(arr_cities[i].CityName);
@@ -240,7 +242,8 @@
         function loadPage() {
             //generate select options
             //generatePaymentType();
-
+            var userName = GENERAL.USER.getUserName();
+            $("#userName").html(userName);
 
             if (JSON.parse(GENERAL.ESCORTED.getEscortedList()).length != 0) {
                 arr_customer = JSON.parse(GENERAL.ESCORTED.getEscortedList());
@@ -279,6 +282,7 @@
         //function to fill form for edit
         function uploadData(displayName) {
             generateContactType();
+            generateCities();
 
             var patName = JSON.parse(GENERAL.PATIENTS.getPatientsList()).DisplayName;
 
@@ -308,7 +312,16 @@
                         $("#activeescorted").prop('checked', true);
                     else
                         $("#activeescorted").prop('checked', false);
-                    $("#gender").val(escorted.Gender);
+
+                    if (escorted.Gender == "זכר") {
+                        $("#gender").val("מְלַוֶּה");
+                    }
+                    else if (escorted.Gender == "נקבה") {
+                        $("#gender").val("מְלַוֶּה")
+                    }
+                    else $("#gender").val(escorted.Gender);
+
+                    //$("#gender").val(escorted.Gender);
                     $("#contactType").val(escorted.ContactType);
 
                 },
@@ -370,14 +383,16 @@
                                 <a href="index.html" class="logo"><span>בדרך להחלמה</span></a>
                             </div>
                         </div>
-
+                        <div class="pull-right">
+                            <span class="logo" id="userName"></span>
+                        </div>
 
 
                         <!--Search-->
                         <!--<form role="search" class="navbar-right app-search pull-right hidden-xs">
-                            <input type="text" placeholder="חיפוש..." class="form-control app-search-input">
-                            <a href=""><i class="fa fa-search"></i></a>
-                        </form>-->
+        <input type="text" placeholder="חיפוש..." class="form-control app-search-input">
+        <a href=""><i class="fa fa-search"></i></a>
+    </form>-->
                     </div>
                     <!--/.nav-collapse -->
                 </div>
@@ -461,7 +476,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">اسم شخصي&nbsp;<span class="required">*</span></label>
+                                                    <label class="col-sm-3 control-label">اسم شخصي&nbsp;</label>
                                                     <div class="col-sm-6">
                                                         <input id="firstA" name="firstA" type="text" class="form-control">
                                                     </div>
@@ -469,7 +484,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">اسم عائلة&nbsp;<span class="required">*</span></label>
+                                                    <label class="col-sm-3 control-label">اسم عائلة&nbsp;</label>
                                                     <div class="col-sm-6">
                                                         <input id="lastA" name="lastA" type="text" class="form-control">
                                                     </div>
@@ -481,7 +496,7 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-3 control-label">טלפון ראשי&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
-                                                        <input id="phone1" name="phone1" type="text" class="form-control" placeholder="0xx-xxxxxxx או 0x-xxxxxxx">
+                                                        <input dir="ltr" id="phone1" name="phone1" type="text" class="form-control" placeholder="0xxxxxxxxx או 0xxxxxxxx">
                                                     </div>
                                                 </div>
                                             </div>
@@ -489,7 +504,7 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-3 control-label">טלפון 2</label>
                                                     <div class="col-sm-6">
-                                                        <input id="phone2" name="phone2" type="text" class="form-control" placeholder="0xx-xxxxxxx או 0x-xxxxxxx">
+                                                        <input dir="ltr" id="phone2" name="phone2" type="text" class="form-control" placeholder="0xxxxxxxxx או 0xxxxxxxx">
                                                     </div>
                                                 </div>
                                             </div>
@@ -499,7 +514,7 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-3 control-label">טלפון נוסף</label>
                                                     <div class="col-sm-6">
-                                                        <input id="HomePhone" name="HomePhone" type="text" class="form-control" placeholder="0xx-xxxxxxx או 0x-xxxxxxx">
+                                                        <input dir="ltr" id="HomePhone" name="HomePhone" type="text" class="form-control" placeholder="0xxxxxxxxx או 0xxxxxxxx">
                                                     </div>
                                                 </div>
                                             </div>
@@ -507,7 +522,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">יישוב&nbsp;<span class="required">*</span></label>
+                                                    <label class="col-sm-3 control-label">יישוב&nbsp;</label>
                                                     <div class="col-sm-6">
                                                         <input id="city" name="city" type="text" class="form-control">
                                                     </div>
@@ -517,12 +532,12 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">מין&nbsp;<span class="required">*</span></label>
+                                                    <label class="col-sm-3 control-label">מגדר&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6" id="selectgender">
                                                         <select id="gender" name="gender" class="form-control">
                                                             <option>בחר</option>
-                                                            <option>זכר</option>
-                                                            <option>נקבה</option>
+                                                            <option>מְלַוֶּה</option>
+                                                            <option>מְלַוֶּה</option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -601,12 +616,12 @@
                     phone1: {
                         required: true
                     },
-                    firstA: {
+                    /*firstA: {
                         required: true
                     },
                     lastA: {
                         required: true
-                    },
+                    },*/
 
                 },
 
@@ -626,13 +641,25 @@
                     var firstNameH = $("#escortedFirstName").val();
                     var lastNameH = $("#escortedLastName").val();
                     var cellPhone = $("#phone1").val();
+                    if (cellPhone != "") {
+                        cellPhone = cellPhone.replace(/-/g, '');
+                        cellPhone = cellPhone.replace(/ /g, '');      
+                    }
                     var city = $("#city").val();
                     //  var status = $("#statusEscorted").val();
-
+                   
                     var gender = $("#gender").val();
 
                     var cellphone2 = $("#phone2").val();
+                    if (cellphone2 != "") {
+                        cellphone2 = cellphone2.replace(/-/g, '');
+                        cellphone2 = cellphone2.replace(/ /g, '');      
+                    }
                     var homePhone = $("#HomePhone").val();
+                    if (homePhone != "") {
+                        homePhone = homePhone.replace(/-/g, '');
+                        homePhone = homePhone.replace(/ /g, '');      
+                    }
                     var nameA = $("#firstA").val();
                     var lastNameA = $("#lastA").val();
 
@@ -685,12 +712,12 @@
                     phone1: {
                         required: "יש להכניס טלפון ראשי"
                     },
-                    firstA: {
+                    /*firstA: {
                         required: "أدخل الاسم الأول"
                     },
                     lastA: {
                         required: "أدخل اسم العائلة"
-                    }
+                    }*/
                 },
 
 
@@ -713,47 +740,76 @@
                 }
             }
             if (!CityExists) {
-                alert("יש לבחור יישוב מתוך הרשימה");
+                swal(
+                    "שגיאה",
+                    "יש לבחור יישוב מתוך הרשימה",
+                    "warning"
+                );
             }
 
-
-
-
-            //var gender = $("#gender").val();
-            //if (gender == "בחר") {
-            //    $("#gender").val(null);
-            //}
-
-
             var checkPhone1 = $("#phone1").val();
-            var phoneReg = new RegExp("0\\d{2}-\\d{7}$|0\\d{1}-\\d{7}$");
+            checkPhone1 = checkPhone1.replace(/ /g, '');
+            checkPhone1 = checkPhone1.replace(/-/g, '');
+
+            var phoneReg = new RegExp("0\\d{8}$|0\\d{9}$");
             var phoneMatch = phoneReg.test(checkPhone1);
-            if (!phoneMatch) alert("הטלפון הראשי שהוזן אינו חוקי");
+            if (!phoneMatch) {
+                swal(
+                    "שגיאה",
+                    "טלפון הראשי שהוזן אינו חוקי",
+                    "warning"
+                );
+            }
 
             if ($("#phone2").val() != "") {
                 var checkPhone2 = $("#phone2").val();
-                var phoneReg2 = new RegExp("0\\d{2}-\\d{7}$|0\\d{1}-\\d{7}$");
+                checkPhone2 = checkPhone2.replace(/ /g, '');
+                checkPhone2 = checkPhone2.replace(/-/g, '');
+
+                var phoneReg2 = new RegExp("0\\d{8}$|0\\d{9}$");
                 var phoneMatch2 = phoneReg2.test(checkPhone2);
-                if (!phoneMatch2) alert("טלפון 2 שהוזן אינו חוקי");
+                if (!phoneMatch2) {
+                    swal(
+                        "שגיאה",
+                        "טלפון 2 שהוזן אינו חוקי",
+                        "warning"
+                    );
+                }
             } else phoneMatch2 = true;
 
             if ($("#HomePhone").val() != "") {
                 var checkPhone3 = $("#HomePhone").val();
-                var phoneReg3 = new RegExp("0\\d{2}-\\d{7}$|0\\d{1}-\\d{7}$");
+                checkPhone3 = checkPhone3.replace(/ /g, '');
+                checkPhone3 = checkPhone3.replace(/-/g, '');
+                var phoneReg3 = new RegExp("0\\d{8}$|0\\d{9}$");
                 var phoneMatch3 = phoneReg3.test(checkPhone3);
-                if (!phoneMatch3) alert("הטלפון הנוסף שהוזן אינו חוקי");
+                if (!phoneMatch3) {
+                    swal(
+                        "שגיאה",
+                        "טלפון הנוסף שהוזן אינו חוקי",
+                        "warning"
+                    );
+                }
             } else phoneMatch3 = true;
 
             var gender = $("#gender").val();
             if (gender == "בחר") {
                 gender = false
-                alert("יש לבחור מין מתוך הרשימה");
+                swal(
+                    "שגיאה",
+                    "יש לבחור מין מתוך הרשימה",
+                    "warning"
+                );
             }
 
             var contactType = $("#contactType").val();
             if (contactType == "בחר") {
                 relationship = false
-                alert("יש לבחור סוג קרבה מתוך הרשימה");
+                swal(
+                    "שגיאה",
+                    "יש לבחור סוג קרבה מתוך הרשימה",
+                    "warning"
+                );
             }
 
 

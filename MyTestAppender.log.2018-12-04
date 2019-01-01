@@ -1,0 +1,25 @@
+﻿2018-12-04 12:18:00,223 ERROR [9] WebService.writeToLog - Successful login ;for user: sapir
+2018-12-04 12:18:53,103 ERROR [12] WebService.writeToLog - Successful login ;for user: matan
+2018-12-04 12:37:20,664 ERROR [8] WebService.writeToLog - Successful login ;for user: sapir
+2018-12-04 13:44:34,203 ERROR [22] WebService.writeToLog - Successful login ;for user: matan
+2018-12-04 14:23:33,484 ERROR [32] WebService.setRideStatus - Error in setRideStatus
+System.IndexOutOfRangeException: אין שורה במיקום 0.
+   ב-  System.Data.RBTree`1.GetNodeByIndex(Int32 userIndex)
+   ב-  System.Data.DataRowCollection.get_Item(Int32 index)
+   ב-  Auxiliary.GetDriverId(Int32 rideId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Auxiliary.cs:שורה 41
+   ב-  WebService.setRideStatus(Int32 rideId, String status) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 175
+2018-12-04 14:25:12,748 ERROR [32] WebService.setRideStatus - Error in setRideStatus
+System.IndexOutOfRangeException: אין שורה במיקום 0.
+   ב-  System.Data.RBTree`1.GetNodeByIndex(Int32 userIndex)
+   ב-  System.Data.DataRowCollection.get_Item(Int32 index)
+   ב-  Auxiliary.GetDriverId(Int32 rideId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Auxiliary.cs:שורה 41
+   ב-  WebService.setRideStatus(Int32 rideId, String status) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 175
+2018-12-04 14:44:46,751 ERROR [40] WebService.SetPatientStatus - Error in SetPatientStatus
+System.Data.SqlClient.SqlException (0x80131904): The parameterized query '(@date datetime,@severity nvarchar(10),@message nvarchar(30),@co' expects the parameter '@coordinator', which was not supplied.
+   ב-  LogEntry.Write() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\LogEntry.cs:שורה 120
+   ב-  LogEntry..ctor(DateTime date, String severity, String message, Int32 code) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\LogEntry.cs:שורה 36
+   ב-  WebService.SetPatientStatus(String displayName, String active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 359
+ClientConnectionId:616c4ca5-c6e7-48b0-b448-25e2bf9b439d
+Error Number:8178,State:1,Class:16
+2018-12-04 14:46:47,658 ERROR [35] WebService.writeToLog - Successful login ;for user: matan
+2018-12-04 15:13:25,211 ERROR [9] WebService.writeToLog - Successful login ;for user: sapir

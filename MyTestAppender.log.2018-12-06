@@ -1,0 +1,54 @@
+﻿2018-12-06 13:48:05,454 ERROR [10] WebService.writeToLog - Successful login ;for user: sapir
+2018-12-06 13:56:06,082 ERROR [13] WebService.setRidePat - Error in setRidePat
+System.Data.SqlClient.SqlException (0x80131904): The INSERT statement conflicted with the FOREIGN KEY constraint "FKPatientEsc960759". The conflict occurred in database "bgroup64_test2", table "dbo.PatientEscort".
+The statement has been terminated.
+   ב-  RidePat.setRidePat(RidePat ridePat, String func, Boolean isAnonymous) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 273
+   ב-  WebService.setRidePat(RidePat RidePat, String func, Boolean isAnonymous) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 146
+ClientConnectionId:cd69de1f-ccb8-4612-8658-241f325bf5c8
+Error Number:547,State:0,Class:16
+2018-12-06 14:05:43,126 ERROR [7] WebService.writeToLog - Successful login ;for user: sapir
+2018-12-06 15:50:44,891 ERROR [25] WebService.DeleteDriver - Error in DeleteDriver
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Auxiliary.GetDriverAndCoordinatorByRidePat(Int32 ridePatId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Auxiliary.cs:שורה 55
+   ב-  LogEntry.setCoordinator() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\LogEntry.cs:שורה 83
+   ב-  LogEntry..ctor(DateTime date, String severity, String message, Int32 code, Int32 ridePatId, Boolean isRideId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\LogEntry.cs:שורה 51
+   ב-  WebService.DeleteDriver(Int32 ridePatId, Int32 driverId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 659
+2018-12-06 15:55:04,442 ERROR [25] WebService.DeleteDriver - Error in DeleteDriver
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Auxiliary.GetDriverAndCoordinatorByRidePat(Int32 ridePatId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Auxiliary.cs:שורה 55
+   ב-  LogEntry.setCoordinator() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\LogEntry.cs:שורה 83
+   ב-  LogEntry..ctor(DateTime date, String severity, String message, Int32 code, Int32 ridePatId, Boolean isRideId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\LogEntry.cs:שורה 51
+   ב-  WebService.DeleteDriver(Int32 ridePatId, Int32 driverId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 659
+2018-12-06 16:03:40,131 ERROR [10] WebService.DeleteDriver - Error in DeleteDriver
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Auxiliary.GetDriverAndCoordinatorByRidePat(Int32 ridePatId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Auxiliary.cs:שורה 64
+   ב-  LogEntry.setCoordinator() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\LogEntry.cs:שורה 83
+   ב-  LogEntry..ctor(DateTime date, String severity, String message, Int32 code, Int32 ridePatId, Boolean isRideId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\LogEntry.cs:שורה 51
+   ב-  WebService.DeleteDriver(Int32 ridePatId, Int32 driverId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 659
+2018-12-06 16:05:03,085 ERROR [48] WebService.DeleteDriver - Error in DeleteDriver
+System.FormatException: מחרוזת קלט לא היתה בתבנית הנכונה.
+   ב-  System.Number.StringToNumber(String str, NumberStyles options, NumberBuffer& number, NumberFormatInfo info, Boolean parseDecimal)
+   ב-  System.Number.ParseInt32(String s, NumberStyles style, NumberFormatInfo info)
+   ב-  System.Int32.Parse(String s)
+   ב-  RidePat.DeleteDriver(Int32 ridePatId, Int32 driverId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 898
+   ב-  WebService.DeleteDriver(Int32 ridePatId, Int32 driverId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 654
+2018-12-06 16:09:04,707 ERROR [17] WebService.DeleteDriver - Error in DeleteDriver
+System.IndexOutOfRangeException: אין שורה במיקום 0.
+   ב-  System.Data.RBTree`1.GetNodeByIndex(Int32 userIndex)
+   ב-  System.Data.DataRowCollection.get_Item(Int32 index)
+   ב-  RidePat.DeleteDriver(Int32 ridePatId, Int32 driverId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 887
+   ב-  WebService.DeleteDriver(Int32 ridePatId, Int32 driverId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 654
+2018-12-06 16:43:39,604 ERROR [55] WebService.SignDriver - Error in SignDriver
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  RidePat.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 947
+   ב-  WebService.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 633
+2018-12-06 16:48:41,433 ERROR [55] WebService.SignDriver - Error in SignDriver
+System.Exception: הנסיעה הזו בוטלה, תודה על הרצון לעזור.
+   ב-  RidePat.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 932
+   ב-  WebService.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 633
+2018-12-06 16:50:28,949 ERROR [34] WebService.SignDriver - Error in SignDriver
+System.Exception: הנסיעה הזו בוטלה, תודה על הרצון לעזור.
+   ב-  RidePat.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 932
+   ב-  WebService.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 633
+2018-12-06 17:08:57,184 ERROR [6] WebService.writeToLog - Successful login ;for user: sapir
+2018-12-06 17:09:02,573 ERROR [6] WebService.writeToLog - Successful login ;for user: sapir

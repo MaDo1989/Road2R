@@ -81,7 +81,8 @@
         $.jgrid.defaults.styleUI = 'Bootstrap';
 
         function loadPage() {
-
+            var userName = GENERAL.USER.getUserName();
+            $("#userName").html(userName);
             if (JSON.parse(GENERAL.LOCATIONS.getDestinationsList()).length != 0) {
                 arr_location = JSON.parse(GENERAL.LOCATIONS.getDestinationsList());
                 if (arr_location.func == "edit" || arr_location.func == "show") {
@@ -180,14 +181,16 @@
                                 <a href="manageRidePats.html" class="logo"><span>בדרך להחלמה</span></a>
                             </div>
                         </div>
-
+                        <div class="pull-right">
+                            <span class="logo" id="userName"></span>
+                        </div>
 
 
                         <!--Search-->
                         <!--<form role="search" class="navbar-right app-search pull-right hidden-xs">
-                            <input type="text" placeholder="חיפוש..." class="form-control app-search-input">
-                            <a href=""><i class="fa fa-search"></i></a>
-                        </form>-->
+        <input type="text" placeholder="חיפוש..." class="form-control app-search-input">
+        <a href=""><i class="fa fa-search"></i></a>
+    </form>-->
                     </div>
                     <!--/.nav-collapse -->
                 </div>
@@ -317,7 +320,7 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">טלפון מנהל יעד</label>
                                                     <div class="col-sm-6">
-                                                        <input id="phone1" name="phone1" type="text" class="form-control" placeholder="0xx-xxxxxxx או 0x-xxxxxxx">
+                                                        <input dir="ltr" id="phone1" name="phone1" type="text" class="form-control" placeholder="0xxxxxxxxx או 0xxxxxxxx">
                                                     </div>
                                                 </div>
                                             </div>
@@ -470,6 +473,10 @@
                     var direction = $("#direction").val();
                     var remark = $("#remarks").val();
                     var cellPhone = $("#phone1").val();
+                    if (cellPhone != "") {
+                        cellPhone = cellPhone.replace(/-/g, '');
+                        cellPhone = cellPhone.replace(/ /g, '');      
+                    }
                     var managerFirstName = $("#ManagerName").val();
                     var managerLastName = $("#ManagerLastName").val();
                     if ($("#activeLocation").is(':checked')) var active = true;
@@ -556,25 +563,41 @@
 
             var area = $("#area").val();
             if (area == "בחר") {
-                area = false
-                alert("יש לבחור אזור מתוך הרשימה");
+                area = false;
+                swal(
+                    "שגיאה",
+                    "יש לבחור אזור מתוך הרשימה",
+                    "warning"
+                );
+
             }
             else { area = true; }
             var type = $("#type").val();
             if (type == "בחר") {
-                type = false
-                alert("יש לבחור מחסום מתוך הרשימה");
+                type = false;
+                swal(
+                    "שגיאה",
+                    "יש לבחור מחסום מתוך הרשימה",
+                    "warning"
+                );
             }
             else { type = true; }
 
             var phoneCheck = true;
             if ($("#phone1").val() != "") {
+
                 var checkPhone1 = $("#phone1").val();
-                var phoneReg = new RegExp("0\\d{2}-\\d{7}$|0\\d{1}-\\d{7}$");
+                checkPhone1 = checkPhone1.replace(/ /g, '');
+                checkPhone1 = checkPhone1.replace(/-/g, '');
+                var phoneReg = new RegExp("0\\d{8}$|0\\d{9}$");
                 var phoneMatch = phoneReg.test(checkPhone1);
                 if (!phoneMatch) {
                     phoneCheck = false;
-                    alert("הטלפון הראשי שהוזן אינו חוקי");
+                     swal(
+                    "שגיאה",
+                    "הטלפון הראשי שהוזן אינו חוקי",
+                    "warning"
+                    );
                 }
                  
             }

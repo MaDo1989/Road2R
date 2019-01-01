@@ -158,10 +158,11 @@ public class Ride
         cmdParams[2] = cmd.Parameters.AddWithValue("@time", DateTime.Now);
         string query = "insert into status_Ride (statusStatusName,RideRideNum,Timestamp) values (@status,@rideId,@time)";
         DbService db = new DbService();
+
         return db.ExecuteQuery(query, cmd.CommandType, cmdParams);
     }
 
-    //public List<Ride> GetRidesForNotify()
+    //public List<R> GetRidesForNotify()
     //{
     //    List<Ride> lr = new List<Ride>();
 
@@ -412,6 +413,8 @@ public class Ride
                         rp2.Area = dr["Area"].ToString();
                         rp2.Shift = dr["Shift"].ToString();
                         rp2.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
+                        //adding anonymous
+                        rp2.Pat.IsAnonymous =dr["IsAnonymous"].ToString();
                         ride.RidePats.Add(rp2);
                     }
                 }
@@ -468,6 +471,7 @@ public class Ride
                 rp.Destination = dest2;
                 rp.Area = dr["Area"].ToString();
                 rp.Shift = dr["Shift"].ToString();
+                rp.Pat.IsAnonymous = dr["IsAnonymous"].ToString();
                 rp.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
                 r2.RidePats.Add(rp);
                 rl.Add(r2);

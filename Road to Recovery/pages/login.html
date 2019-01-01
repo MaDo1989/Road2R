@@ -21,6 +21,15 @@
             background-color: #3bafda;
             max-width: 450px;
         }
+
+        body,html {
+            overflow-y: hidden;
+        }
+        #footer img{
+            margin:0px auto;
+            height: 100%;
+            width:100%;
+        }
     </style>
 
     <script src="assets/js/CookiesFunctions.js"></script>
@@ -110,16 +119,28 @@
                             כניסה
                         </button>
                     </div>
-                </div> 
-                
+                </div>
+
             </form>
-            
+
         </div>
-       
+
     </div>
     <div class="text-center">
-        תאריך עדכון אחרון: 21/10/2018 23:40
+        תאריך עדכון אחרון: 04/12/2018 16:00
     </div>
+        <div class="row" id="footer">
+            <div class="col-sm-4">
+
+            </div>
+            <div class="col-sm-4">
+                <img src="../../Media/Leonard Cohen.jpg" alt="Alternate Text" />
+            </div>
+            <div class="col-sm-4">
+
+            </div>
+        </div>
+
 
     <script>
         var resizefunc = [];
@@ -187,7 +208,7 @@
                                 });
 
                                 setTimeout(function () {
-                                    location.href = "viewRidePats.html";
+                                    location.href = "manageRidePats.html";
                                 }, 1001);
                                 GENERAL.USER.setUserName(userName);
                                // getUserType(userName);

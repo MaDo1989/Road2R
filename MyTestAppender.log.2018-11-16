@@ -1,0 +1,49 @@
+﻿2018-11-16 09:10:08,335 ERROR [58] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: Named Pipes Provider, error: 40 - לא הייתה אפשרות לפתוח חיבור ל- SQL Server) ---> System.ComponentModel.Win32Exception (0x80004005): The network path was not found
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 493
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 554
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 509
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:53,State:0,Class:20
+2018-11-16 09:17:08,865 ERROR [6] WebService.getCoorList - Error in getCoorList
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: Named Pipes Provider, error: 40 - לא הייתה אפשרות לפתוח חיבור ל- SQL Server) ---> System.ComponentModel.Win32Exception (0x80004005): The network path was not found
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Volunteer.getCoorList() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 532
+   ב-  WebService.getCoorList() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 256
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:53,State:0,Class:20
+2018-11-16 09:17:13,661 ERROR [9] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: Named Pipes Provider, error: 40 - לא הייתה אפשרות לפתוח חיבור ל- SQL Server) ---> System.ComponentModel.Win32Exception (0x80004005): The network path was not found
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 493
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 554
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 509
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:53,State:0,Class:20
+2018-11-16 09:17:36,882 ERROR [11] WebService.getPatients - Error in getPatients
+System.InvalidOperationException: הזמן הקצוב פג. משך הזמן הקצוב חלף לפני השגת חיבור מהמאגר. ייתכן שהדבר אירע מכיוון שכל החיבורים במאגר היו בשימוש והגעת לגודל המאגר המקסימלי.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Patient.getPatientsList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 456
+   ב-  WebService.getPatients(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 201
+2018-11-16 09:17:37,215 ERROR [9] WebService.getAllStatus - Error in getAllStatus
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: Named Pipes Provider, error: 40 - לא הייתה אפשרות לפתוח חיבור ל- SQL Server) ---> System.ComponentModel.Win32Exception (0x80004005): The network path was not found
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Status.getAllStatus() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Irrelevant\Status.cs:שורה 26
+   ב-  WebService.getAllStatus() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 726
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:53,State:0,Class:20
+2018-11-16 09:17:38,413 ERROR [6] WebService.getCoor - Error in getCoor
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: Named Pipes Provider, error: 40 - לא הייתה אפשרות לפתוח חיבור ל- SQL Server) ---> System.ComponentModel.Win32Exception (0x80004005): The network path was not found
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Volunteer.getCoor(String userName) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 564
+   ב-  WebService.getCoor(String userName) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 274
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:53,State:0,Class:20
+2018-11-16 09:17:38,415 ERROR [8] WebService.getDestinationView - Error in getDestinationView
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: Named Pipes Provider, error: 40 - לא הייתה אפשרות לפתוח חיבור ל- SQL Server) ---> System.ComponentModel.Win32Exception (0x80004005): The network path was not found
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Location.getDestinationsListForView(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Location.cs:שורה 227
+   ב-  WebService.getDestinationView(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 925
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:53,State:0,Class:20
