@@ -564,7 +564,7 @@ public class RidePat
         else if (volunteerId == -2)
             query = "select * from RPView"; //get ALL ridePats
         else
-            query = "select * from RPView where (Status<>'הסתיימה' or Status<>'בוטלה') and PickupTime>= getdate()"; //Get ALL ACTIVE RidePats (used by mobile app)
+            query = "select * from RPView where (Status<>N'הסתיימה' or Status<>N'בוטלה') and PickupTime>= getdate()"; //Get ALL ACTIVE RidePats (used by mobile app)
 
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
@@ -950,7 +950,7 @@ public class RidePat
         {
             Origin.Name = Origin.Name.Replace("'", "''");
             Destination.Name = Destination.Name.Replace("'", "''");
-            query = "set dateformat dmy; insert into Ride (Origin, Destination, Date, MainDriver) values ('" + Origin.Name + "','" + Destination.Name + "','" + Date + "', " + driverId + ") SELECT SCOPE_IDENTITY()";
+            query = "set dateformat dmy; insert into Ride (Origin, Destination, Date, MainDriver) values (N'" + Origin.Name + "',N'" + Destination.Name + "',N'" + Date + "', " + driverId + ") SELECT SCOPE_IDENTITY()";
             RideId = int.Parse(db2.GetObjectScalarByQuery(query).ToString()); //Insert and get the new RideId
 
 

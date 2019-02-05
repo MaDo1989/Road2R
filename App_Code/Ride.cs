@@ -35,7 +35,7 @@ public class Ride
 
     public List<Ride> GetRidesForNotifyfull()
     {
-        string query = "select * from RideViewForNotify where statusRide='שובץ נהג' or statusRide='מלאה'";
+        string query = "select * from RideViewForNotify where statusRide=N'שובץ נהג' or statusRide=N'מלאה'";
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         List<Ride> rides = new List<Ride>();

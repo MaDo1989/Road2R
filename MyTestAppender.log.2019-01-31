@@ -1,0 +1,242 @@
+﻿2019-01-31 16:28:57,877 ERROR [10] WebService.writeToLog - Successful login ;for user: sapir
+2019-01-31 16:33:02,753 ERROR [10] WebService.getVolunteers - Error in getVolunteers
+System.Data.SqlClient.SqlException (0x80131904): Cannot open server 'road2r' requested by the login. Client with IP address '31.154.81.16' is not allowed to access the server.  To enable access, use the Windows Azure Management Portal or run sp_set_firewall_rule on the master database to create a firewall rule for this IP address or address range.  It may take up to five minutes for this change to take effect.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Volunteer.getVolunteersList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 809
+   ב-  WebService.getVolunteers(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 943
+ClientConnectionId:22762ebc-f019-42d7-8088-67cbecde27bb
+Error Number:40615,State:1,Class:14
+2019-01-31 16:33:22,277 ERROR [6] WebService.getVolunteers - Error in getVolunteers
+System.Data.SqlClient.SqlException (0x80131904): Cannot open server 'road2r' requested by the login. Client with IP address '31.154.81.16' is not allowed to access the server.  To enable access, use the Windows Azure Management Portal or run sp_set_firewall_rule on the master database to create a firewall rule for this IP address or address range.  It may take up to five minutes for this change to take effect.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Volunteer.getVolunteersList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 809
+   ב-  WebService.getVolunteers(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 943
+ClientConnectionId:a7e370be-af29-4bbe-a00b-52c5191c4033
+Error Number:40615,State:1,Class:14
+2019-01-31 16:34:32,957 ERROR [10] WebService.getVolunteers - Error in getVolunteers
+System.Data.SqlClient.SqlException (0x80131904): Cannot open server 'road2r' requested by the login. Client with IP address '31.154.81.16' is not allowed to access the server.  To enable access, use the Windows Azure Management Portal or run sp_set_firewall_rule on the master database to create a firewall rule for this IP address or address range.  It may take up to five minutes for this change to take effect.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Volunteer.getVolunteersList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 809
+   ב-  WebService.getVolunteers(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 943
+ClientConnectionId:f82a8792-3d14-448b-b801-45932c3c1541
+Error Number:40615,State:1,Class:14
+2019-01-31 16:39:51,167 ERROR [13] WebService.getVolunteers - Error in getVolunteers
+System.Data.SqlClient.SqlException (0x80131904): Cannot open server 'road2r' requested by the login. Client with IP address '31.154.81.16' is not allowed to access the server.  To enable access, use the Windows Azure Management Portal or run sp_set_firewall_rule on the master database to create a firewall rule for this IP address or address range.  It may take up to five minutes for this change to take effect.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Volunteer.getVolunteersList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 809
+   ב-  WebService.getVolunteers(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 943
+ClientConnectionId:7cd3936d-8501-45e3-8bcc-583036e7c635
+Error Number:40615,State:1,Class:14
+2019-01-31 16:43:02,716 ERROR [15] WebService.getVolunteers - Error in getVolunteers
+System.Data.SqlClient.SqlException (0x80131904): Cannot open server 'road2r' requested by the login. Client with IP address '31.154.81.16' is not allowed to access the server.  To enable access, use the Windows Azure Management Portal or run sp_set_firewall_rule on the master database to create a firewall rule for this IP address or address range.  It may take up to five minutes for this change to take effect.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 55
+   ב-  Volunteer.getVolunteersList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 809
+   ב-  WebService.getVolunteers(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 943
+ClientConnectionId:4783c214-caa0-4909-a8f0-ed376a85bfaf
+Error Number:40615,State:1,Class:14
+2019-01-31 16:49:51,106 ERROR [6] WebService.getVolunteers - Error in getVolunteers
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user '{your_username}'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 64
+   ב-  Volunteer.getVolunteersList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 809
+   ב-  WebService.getVolunteers(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 943
+ClientConnectionId:7f6ddffb-d237-4ac9-b854-2e015965107f
+Error Number:18456,State:1,Class:14
+2019-01-31 16:49:52,036 ERROR [7] WebService.getPatients - Error in getPatients
+System.Data.SqlClient.SqlException (0x80131904): Login failed for user '{your_username}'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 64
+   ב-  Patient.getPatientsList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 456
+   ב-  WebService.getPatients(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 203
+ClientConnectionId:691b2f5b-f15c-493b-95bf-c2a6196d13e4
+Error Number:18456,State:1,Class:14
+2019-01-31 16:52:17,506 ERROR [6] WebService.writeToLog - Successful login ;for user: sapir
+2019-01-31 17:09:56,667 ERROR [6] WebService.GetRidePatView - Error in GetRidePatView
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 495
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 555
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 546
+2019-01-31 17:11:13,878 ERROR [18] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: TCP Provider, error: 0 - No such host is known.) ---> System.ComponentModel.Win32Exception (0x80004005): No such host is known
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 64
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 494
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 555
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 546
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:11001,State:0,Class:20
+2019-01-31 17:12:13,840 ERROR [18] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: TCP Provider, error: 0 - No such host is known.) ---> System.ComponentModel.Win32Exception (0x80004005): No such host is known
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 64
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 494
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 555
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 546
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:11001,State:0,Class:20
+2019-01-31 17:13:13,820 ERROR [14] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: TCP Provider, error: 0 - No such host is known.) ---> System.ComponentModel.Win32Exception (0x80004005): No such host is known
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 64
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 494
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 555
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 546
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:11001,State:0,Class:20
+2019-01-31 17:14:13,825 ERROR [15] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: TCP Provider, error: 0 - No such host is known.) ---> System.ComponentModel.Win32Exception (0x80004005): No such host is known
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 64
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 494
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 555
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 546
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:11001,State:0,Class:20
+2019-01-31 17:15:13,866 ERROR [15] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: TCP Provider, error: 0 - No such host is known.) ---> System.ComponentModel.Win32Exception (0x80004005): No such host is known
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 64
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 494
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 555
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 546
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:11001,State:0,Class:20
+2019-01-31 17:16:13,851 ERROR [15] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: TCP Provider, error: 0 - No such host is known.) ---> System.ComponentModel.Win32Exception (0x80004005): No such host is known
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 64
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 494
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 555
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 546
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:11001,State:0,Class:20
+2019-01-31 17:17:13,829 ERROR [17] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: TCP Provider, error: 0 - No such host is known.) ---> System.ComponentModel.Win32Exception (0x80004005): No such host is known
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 64
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 494
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 555
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 546
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:11001,State:0,Class:20
+2019-01-31 17:18:13,863 ERROR [8] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: TCP Provider, error: 0 - No such host is known.) ---> System.ComponentModel.Win32Exception (0x80004005): No such host is known
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 64
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 494
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 555
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 546
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:11001,State:0,Class:20
+2019-01-31 17:19:13,903 ERROR [18] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: TCP Provider, error: 0 - No such host is known.) ---> System.ComponentModel.Win32Exception (0x80004005): No such host is known
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 64
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 494
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 555
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 546
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:11001,State:0,Class:20
+2019-01-31 17:20:13,811 ERROR [16] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: TCP Provider, error: 0 - No such host is known.) ---> System.ComponentModel.Win32Exception (0x80004005): No such host is known
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 64
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 494
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 555
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 546
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:11001,State:0,Class:20
+2019-01-31 17:21:13,855 ERROR [18] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: TCP Provider, error: 0 - No such host is known.) ---> System.ComponentModel.Win32Exception (0x80004005): No such host is known
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 64
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 494
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 555
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 546
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:11001,State:0,Class:20
+2019-01-31 17:22:13,838 ERROR [16] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: TCP Provider, error: 0 - No such host is known.) ---> System.ComponentModel.Win32Exception (0x80004005): No such host is known
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 64
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 494
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 555
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 546
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:11001,State:0,Class:20
+2019-01-31 17:23:13,875 ERROR [17] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: TCP Provider, error: 0 - No such host is known.) ---> System.ComponentModel.Win32Exception (0x80004005): No such host is known
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 64
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 494
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 555
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 546
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:11001,State:0,Class:20
+2019-01-31 17:24:13,846 ERROR [7] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: TCP Provider, error: 0 - No such host is known.) ---> System.ComponentModel.Win32Exception (0x80004005): No such host is known
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 64
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 494
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 555
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 546
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:11001,State:0,Class:20
+2019-01-31 17:25:13,841 ERROR [18] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: TCP Provider, error: 0 - No such host is known.) ---> System.ComponentModel.Win32Exception (0x80004005): No such host is known
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 64
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 494
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 555
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 546
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:11001,State:0,Class:20
+2019-01-31 17:26:13,891 ERROR [7] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: TCP Provider, error: 0 - No such host is known.) ---> System.ComponentModel.Win32Exception (0x80004005): No such host is known
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 64
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 494
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 555
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 546
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:11001,State:0,Class:20
+2019-01-31 17:27:13,828 ERROR [16] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: TCP Provider, error: 0 - No such host is known.) ---> System.ComponentModel.Win32Exception (0x80004005): No such host is known
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 64
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 494
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 555
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 546
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:11001,State:0,Class:20
+2019-01-31 18:54:39,246 ERROR [18] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): Cannot open server 'road2r' requested by the login. Client with IP address '185.175.33.100' is not allowed to access the server.  To enable access, use the Windows Azure Management Portal or run sp_set_firewall_rule on the master database to create a firewall rule for this IP address or address range.  It may take up to five minutes for this change to take effect.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 64
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 494
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 555
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 546
+ClientConnectionId:00c5d298-79dd-44d9-9463-8cb9c12e1c6d
+Error Number:40615,State:1,Class:14
+2019-01-31 19:00:28,705 ERROR [14] WebService.writeToLog - Successful login ;for user: sapir
+2019-01-31 19:47:45,908 ERROR [57] WebService.writeToLog - Successful login ;for user: sapir
+2019-01-31 19:48:56,429 ERROR [59] WebService.writeToLog - Successful login ;for user: benny
+2019-01-31 19:48:58,025 ERROR [64] WebService.writeToLog - Successful login ;for user: benny
+2019-01-31 19:49:03,115 ERROR [59] WebService.writeToLog - Successful login ;for user: sapir
+2019-01-31 20:14:47,249 ERROR [83] WebService.getVolunteers - Error in getVolunteers
+System.FormatException: המחרוזת לא זוהתה כ- DateTime חוקי.
+   ב-  System.DateTimeParse.Parse(String s, DateTimeFormatInfo dtfi, DateTimeStyles styles)
+   ב-  System.Convert.ToDateTime(String value)
+   ב-  Volunteer.getVolunteersList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 836
+   ב-  WebService.getVolunteers(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 943
+2019-01-31 20:15:19,297 ERROR [78] WebService.writeToLog - Successful login ;for user: sapir
+2019-01-31 20:16:39,874 ERROR [82] WebService.getVolunteers - Error in getVolunteers
+System.FormatException: המחרוזת לא זוהתה כ- DateTime חוקי.
+   ב-  System.DateTimeParse.Parse(String s, DateTimeFormatInfo dtfi, DateTimeStyles styles)
+   ב-  System.Convert.ToDateTime(String value)
+   ב-  Volunteer.getVolunteersList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 836
+   ב-  WebService.getVolunteers(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 943
+2019-01-31 20:17:25,520 ERROR [82] WebService.getVolunteers - Error in getVolunteers
+System.FormatException: מחרוזת לא זוהתה כ- Boolean חוקי.
+   ב-  System.Boolean.Parse(String value)
+   ב-  System.Convert.ToBoolean(String value)
+   ב-  Volunteer.getVolunteersList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 838
+   ב-  WebService.getVolunteers(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 943
+2019-01-31 20:18:49,206 ERROR [79] WebService.getVolunteers - Error in getVolunteers
+System.FormatException: מחרוזת לא זוהתה כ- Boolean חוקי.
+   ב-  System.Boolean.Parse(String value)
+   ב-  System.Convert.ToBoolean(String value)
+   ב-  Volunteer.getVolunteersList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 838
+   ב-  WebService.getVolunteers(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 943
+2019-01-31 20:20:49,292 ERROR [84] WebService.setVolunteer - Error in setVolunteer
+System.Exception: phone already exists
+   ב-  Volunteer.setVolunteer(Volunteer v, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 988
+   ב-  WebService.setVolunteer(Volunteer volunteer, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 860
+2019-01-31 21:05:59,576 ERROR [62] WebService.setVolunteer - Error in setVolunteer
+System.Exception: phone already exists
+   ב-  Volunteer.setVolunteer(Volunteer v, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 988
+   ב-  WebService.setVolunteer(Volunteer volunteer, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 860
+2019-01-31 21:13:43,061 ERROR [60] WebService.setVolunteer - Error in setVolunteer
+System.Exception: phone already exists
+   ב-  Volunteer.setVolunteer(Volunteer v, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 988
+   ב-  WebService.setVolunteer(Volunteer volunteer, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 860

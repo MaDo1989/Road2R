@@ -51,7 +51,7 @@ public class Auxiliary
 
         if (dr1[1].ToString() == "")
         {
-            string query2 = "select UserName from Volunteer where DisplayName = '" + dr1[0] + "'";
+            string query2 = "select UserName from Volunteer where DisplayName = N'" + dr1[0] + "'";
             DataSet ds2 = db.GetDataSetByQuery(query2);
             DataRow dr2 = ds2.Tables[0].Rows[0];
         }
@@ -64,7 +64,7 @@ public class Auxiliary
 
 
 
-        string query3 = "select UserName from Volunteer where DisplayName = '" + dr1[0]+ "'";
+        string query3 = "select UserName from Volunteer where DisplayName = N'" + dr1[0]+ "'";
         DataSet ds3 = db.GetDataSetByQuery(query3);
         DataRow dr3 = ds3.Tables[0].Rows[0];
 
@@ -84,7 +84,7 @@ public class Auxiliary
         DataSet ds2 = db.GetDataSetByQuery(query2);
         DataRow dr2 = ds2.Tables[0].Rows[0];
 
-        string query3 = "select UserName from Volunteer where DisplayName = '" + dr1[0] + "'";
+        string query3 = "select UserName from Volunteer where DisplayName = N'" + dr1[0] + "'";
         DataSet ds3 = db.GetDataSetByQuery(query3);
         DataRow dr3 = ds3.Tables[0].Rows[0];
 

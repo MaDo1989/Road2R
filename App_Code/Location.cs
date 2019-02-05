@@ -266,7 +266,7 @@ public class Location
     public List<Location> getHospitalListForView(bool active)
     {
         #region DB functions
-        string query = "select * from Location where Type='בית חולים'";
+        string query = "select * from Location where Type=N'בית חולים'";
         query += " and IsActive = 'True'";
         query += " order by name";
 
@@ -300,9 +300,10 @@ public class Location
     public List<Location> getBarrierListForView(bool active)
     {
         #region DB functions
-        string query = "select * from Location where Type='מחסום'";
-        query += " and IsActive = 'True'";
-        query += " order by name";
+        // where Type='מחסום'
+        string query = "select * from Location where Type=N'מחסום'";
+        //query += " and IsActive = 'True'";
+        //query += " order by name";
 
         List<Location> list = new List<Location>();
         DbService db = new DbService();
@@ -335,7 +336,7 @@ public class Location
     public void deactivateLocation(string active)
     {
         DbService db = new DbService();
-        db.ExecuteQuery("UPDATE Location SET IsActive='" + active + "' WHERE Name='" + Name + "'");
+        db.ExecuteQuery("UPDATE Location SET IsActive='" + active + "' WHERE Name=N'" + Name + "'");
     }
 
 

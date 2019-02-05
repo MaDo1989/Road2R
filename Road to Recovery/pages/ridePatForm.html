@@ -495,6 +495,7 @@
         }
 
         function getCoorSuccessCB(data) {
+            
             var $select = $("#coordinator");
             var coor = JSON.parse(data.d);
             //$('<option>', { value: "", text: "בחר" }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
@@ -506,6 +507,9 @@
             //}
 
             $select.val(coor.DisplayName);
+            if (isAnonymous === true) {
+                $select.is("checked:", "checked");
+            }
         }
 
         function getCoorErrorCB(e) {
@@ -616,12 +620,22 @@
 
             var str = "";
 
+            var displayName = $("#pat").val();
+            var j = patients.indexOf($("#pat").val());
+            localStorage.PatID = arr_pat[j].Id;
+            
             for (i in arr_escort) {
                 var escort1 = arr_escort[i].DisplayName;
                 var escort = arr_escort[i].DisplayName.replace("'", "");
                 var id = arr_escort[i].Id;
-                str += "<input id='escortCB" + id + "' type=checkbox name='" + escort + "'>&nbsp";
-                str += "<label for='escortCB" + id + "'>" + escort1 + "</label>&nbsp&nbsp";
+                if(arr_pat[j].IsAnonymous == "True"){
+                    str += "<input checked id='escortCB" + id + "' type=checkbox name='" + escort + "'>&nbsp";
+                    str += "<label for='escortCB" + id + "'>" + escort1 + "</label>&nbsp&nbsp</br>";
+                }
+                else{
+                    str += "<input id='escortCB" + id + "' type=checkbox name='" + escort + "'>&nbsp";
+                    str += "<label for='escortCB" + id + "'>" + escort1 + "</label>&nbsp&nbsp</br>";
+                }
             }
             if (arr_escort.length == 0) str = "<label>אין מלווים</label>";
             $("#selectEscort").html(str);

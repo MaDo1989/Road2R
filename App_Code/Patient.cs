@@ -66,7 +66,7 @@ public class Patient
         patient = patient.Replace("'", "''");
         Patient p = new Patient(patient);
         p.Equipment = new List<string>();
-        string query = "select EquipmentName from EquipmentForPatientView where PatientName='" + patient + "'";
+        string query = "select EquipmentName from EquipmentForPatientView where PatientName=N'" + patient + "'";
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         foreach (DataRow dr in ds.Tables[0].Rows)
@@ -511,7 +511,7 @@ public class Patient
     public List<Patient> getAnonymousPatientsList(bool active,string origin,string dest)
     {
         #region DB functions
-        string query = "select * from Patient where Barrier = '" + origin + "' and Hospital = '" +dest +"' OR Barrier = '"+dest+"' and Hospital = '"+origin+"'";
+        string query = "select * from Patient where Barrier = N'" + origin + "' and Hospital = N'" +dest +"' OR Barrier = N'"+dest+"' and Hospital = N'"+origin+"'";
         if (active)
         {
             query += " and IsActive = 'true'";
@@ -579,7 +579,7 @@ public class Patient
     {
         #region DB functions
         displayName = displayName.Replace("'", "''");
-        string query = "select * from Patient where displayName ='" + displayName + "'";
+        string query = "select * from Patient where displayName =N'" + displayName + "'";
         Patient p = new Patient();
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
@@ -633,7 +633,7 @@ public class Patient
     public void SetPatientStatus(string active)
     {
         DbService db = new DbService();
-        db.ExecuteQuery("UPDATE Patient SET IsActive='" + active + "' WHERE DisplayName='" + DisplayName + "'");
+        db.ExecuteQuery("UPDATE Patient SET IsActive='" + active + "' WHERE DisplayName=N'" + DisplayName + "'");
 
     }
 
@@ -725,9 +725,9 @@ public class Patient
     {
         #region DB functions
         displayName = displayName.Replace("'", "''");
-        string query = "select * from PatientEscortView where PatientName='" + displayName + "'";
+        string query = "select * from PatientEscortView where PatientName= N'" + displayName + "'";
         if (caller == "ridePatForm") query += " and IsActive = 'True'";
-        query += " order by EscortName";
+        //query += " order by EscortName";
 
         List<Escorted> list = new List<Escorted>();
         DbService db = new DbService();

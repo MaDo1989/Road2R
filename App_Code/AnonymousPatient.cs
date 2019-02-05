@@ -467,7 +467,7 @@ public class AnonymousPatient
         anonymousPatient = anonymousPatient.Replace("'", "''");
         AnonymousPatient p = new AnonymousPatient(anonymousPatient);
         p.Equipment = new List<string>();
-        string query = "select EquipmentName from EquipmentForPatientView where PatientName='" + anonymousPatient + "'";
+        string query = "select EquipmentName from EquipmentForPatientView where PatientName=N'" + anonymousPatient + "'";
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         foreach (DataRow dr in ds.Tables[0].Rows)
@@ -481,7 +481,7 @@ public class AnonymousPatient
     {
         #region DB functions
         displayName = displayName.Replace("'", "''");
-        string query = "select * from Patient where displayName ='" + displayName + "'";
+        string query = "select * from Patient where displayName =N'" + displayName + "'";
         AnonymousPatient p = new AnonymousPatient();
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);

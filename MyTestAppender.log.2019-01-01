@@ -1,0 +1,28 @@
+﻿2018-12-29 19:39:12,311 ERROR [10] WebService.writeToLog - Successful login ;for user: sapir
+2018-12-29 19:40:11,248 ERROR [12] WebService.deactivateLocation - Error in deactivateLocation
+System.Data.SqlClient.SqlException (0x80131904): Incorrect syntax near 'ארלי'.
+Unclosed quotation mark after the character string ''.
+   ב-  DbService.ExecuteQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 91
+   ב-  Location.deactivateLocation(String active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Location.cs:שורה 338
+   ב-  WebService.deactivateLocation(String displayName, String active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 884
+ClientConnectionId:778729aa-5d87-4815-a751-85bdda9e2846
+Error Number:102,State:1,Class:15
+2018-12-29 20:03:08,827 ERROR [24] WebService.writeToLog - Successful login ;for user: sapir
+2018-12-29 20:04:01,577 ERROR [37] WebService.SignDriver - Error in SignDriver
+System.Exception: הנסיעה הזו בוטלה, תודה על הרצון לעזור.
+   ב-  RidePat.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 932
+   ב-  WebService.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 670
+2018-12-29 20:04:17,724 ERROR [35] WebService.SignDriver - Error in SignDriver
+System.FormatException: מחרוזת קלט לא היתה בתבנית הנכונה.
+   ב-  System.Number.StringToNumber(String str, NumberStyles options, NumberBuffer& number, NumberFormatInfo info, Boolean parseDecimal)
+   ב-  System.Number.ParseInt32(String s, NumberStyles style, NumberFormatInfo info)
+   ב-  System.Int32.Parse(String s)
+   ב-  RidePat.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 972
+   ב-  WebService.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 670
+2018-12-29 20:04:39,537 ERROR [7] WebService.SignDriver - Error in SignDriver
+System.FormatException: מחרוזת קלט לא היתה בתבנית הנכונה.
+   ב-  System.Number.StringToNumber(String str, NumberStyles options, NumberBuffer& number, NumberFormatInfo info, Boolean parseDecimal)
+   ב-  System.Number.ParseInt32(String s, NumberStyles style, NumberFormatInfo info)
+   ב-  System.Int32.Parse(String s)
+   ב-  RidePat.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 972
+   ב-  WebService.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 670
