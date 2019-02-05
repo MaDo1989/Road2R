@@ -1,28 +1,75 @@
-﻿2018-12-29 19:39:12,311 ERROR [10] WebService.writeToLog - Successful login ;for user: sapir
-2018-12-29 19:40:11,248 ERROR [12] WebService.deactivateLocation - Error in deactivateLocation
-System.Data.SqlClient.SqlException (0x80131904): Incorrect syntax near 'ארלי'.
-Unclosed quotation mark after the character string ''.
-   ב-  DbService.ExecuteQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 91
-   ב-  Location.deactivateLocation(String active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Location.cs:שורה 338
-   ב-  WebService.deactivateLocation(String displayName, String active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 884
-ClientConnectionId:778729aa-5d87-4815-a751-85bdda9e2846
-Error Number:102,State:1,Class:15
-2018-12-29 20:03:08,827 ERROR [24] WebService.writeToLog - Successful login ;for user: sapir
-2018-12-29 20:04:01,577 ERROR [37] WebService.SignDriver - Error in SignDriver
-System.Exception: הנסיעה הזו בוטלה, תודה על הרצון לעזור.
-   ב-  RidePat.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 932
-   ב-  WebService.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 670
-2018-12-29 20:04:17,724 ERROR [35] WebService.SignDriver - Error in SignDriver
-System.FormatException: מחרוזת קלט לא היתה בתבנית הנכונה.
-   ב-  System.Number.StringToNumber(String str, NumberStyles options, NumberBuffer& number, NumberFormatInfo info, Boolean parseDecimal)
-   ב-  System.Number.ParseInt32(String s, NumberStyles style, NumberFormatInfo info)
-   ב-  System.Int32.Parse(String s)
-   ב-  RidePat.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 972
-   ב-  WebService.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 670
-2018-12-29 20:04:39,537 ERROR [7] WebService.SignDriver - Error in SignDriver
-System.FormatException: מחרוזת קלט לא היתה בתבנית הנכונה.
-   ב-  System.Number.StringToNumber(String str, NumberStyles options, NumberBuffer& number, NumberFormatInfo info, Boolean parseDecimal)
-   ב-  System.Number.ParseInt32(String s, NumberStyles style, NumberFormatInfo info)
-   ב-  System.Int32.Parse(String s)
-   ב-  RidePat.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 972
-   ב-  WebService.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 670
+﻿2019-02-04 08:48:31,042 ERROR [11] WebService.setVolunteer - Error in setVolunteer
+System.Exception: phone already exists
+   ב-  Volunteer.setVolunteer(Volunteer v, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 988
+   ב-  WebService.setVolunteer(Volunteer volunteer, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 860
+2019-02-04 08:48:39,879 ERROR [11] WebService.setVolunteer - Error in setVolunteer
+System.Exception: phone already exists
+   ב-  Volunteer.setVolunteer(Volunteer v, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 988
+   ב-  WebService.setVolunteer(Volunteer volunteer, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 860
+2019-02-04 08:49:12,878 ERROR [6] WebService.writeToLog - Successful login ;for user: sapir
+2019-02-04 08:51:10,758 ERROR [6] WebService.setVolunteer - Error in setVolunteer
+System.Exception: phone already exists
+   ב-  Volunteer.setVolunteer(Volunteer v, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 988
+   ב-  WebService.setVolunteer(Volunteer volunteer, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 860
+2019-02-04 08:53:53,170 ERROR [9] WebService.setVolunteer - Error in setVolunteer
+System.Exception: phone already exists
+   ב-  Volunteer.setVolunteer(Volunteer v, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 988
+   ב-  WebService.setVolunteer(Volunteer volunteer, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 860
+2019-02-04 11:33:13,198 ERROR [7] WebService.writeToLog - Successful login ;for user: 0524842888
+2019-02-04 11:34:50,644 ERROR [7] WebService.getVolunteers - Error in getVolunteers
+System.FormatException: המחרוזת לא זוהתה כ- DateTime חוקי.
+   ב-  System.DateTimeParse.Parse(String s, DateTimeFormatInfo dtfi, DateTimeStyles styles)
+   ב-  System.Convert.ToDateTime(String value)
+   ב-  Volunteer.getVolunteersList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 836
+   ב-  WebService.getVolunteers(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 943
+2019-02-04 11:34:59,132 ERROR [7] WebService.getVolunteers - Error in getVolunteers
+System.FormatException: המחרוזת לא זוהתה כ- DateTime חוקי.
+   ב-  System.DateTimeParse.Parse(String s, DateTimeFormatInfo dtfi, DateTimeStyles styles)
+   ב-  System.Convert.ToDateTime(String value)
+   ב-  Volunteer.getVolunteersList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 836
+   ב-  WebService.getVolunteers(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 943
+2019-02-04 11:35:53,705 ERROR [7] WebService.getVolunteers - Error in getVolunteers
+System.FormatException: המחרוזת לא זוהתה כ- DateTime חוקי.
+   ב-  System.DateTimeParse.Parse(String s, DateTimeFormatInfo dtfi, DateTimeStyles styles)
+   ב-  System.Convert.ToDateTime(String value)
+   ב-  Volunteer.getVolunteersList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 836
+   ב-  WebService.getVolunteers(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 943
+2019-02-04 11:37:33,303 ERROR [9] WebService.writeToLog - Successful login ;for user: 0524842888
+2019-02-04 11:37:40,994 ERROR [9] WebService.getVolunteers - Error in getVolunteers
+System.FormatException: מחרוזת לא זוהתה כ- Boolean חוקי.
+   ב-  System.Boolean.Parse(String value)
+   ב-  System.Convert.ToBoolean(String value)
+   ב-  Volunteer.getVolunteersList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 843
+   ב-  WebService.getVolunteers(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 943
+2019-02-04 11:38:57,824 ERROR [9] WebService.getVolunteers - Error in getVolunteers
+System.FormatException: מחרוזת לא זוהתה כ- Boolean חוקי.
+   ב-  System.Boolean.Parse(String value)
+   ב-  System.Convert.ToBoolean(String value)
+   ב-  Volunteer.getVolunteersList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 843
+   ב-  WebService.getVolunteers(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 943
+2019-02-04 11:40:52,769 ERROR [9] WebService.getVolunteers - Error in getVolunteers
+System.FormatException: מחרוזת לא זוהתה כ- Boolean חוקי.
+   ב-  System.Boolean.Parse(String value)
+   ב-  System.Convert.ToBoolean(String value)
+   ב-  Volunteer.getVolunteersList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 843
+   ב-  WebService.getVolunteers(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 943
+2019-02-04 11:43:21,660 ERROR [25] WebService.getVolunteers - Error in getVolunteers
+System.FormatException: מחרוזת לא זוהתה כ- Boolean חוקי.
+   ב-  System.Boolean.Parse(String value)
+   ב-  System.Convert.ToBoolean(String value)
+   ב-  Volunteer.getVolunteersList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 848
+   ב-  WebService.getVolunteers(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 943
+2019-02-04 11:43:54,081 ERROR [10] WebService.getVolunteers - Error in getVolunteers
+System.FormatException: מחרוזת לא זוהתה כ- Boolean חוקי.
+   ב-  System.Boolean.Parse(String value)
+   ב-  System.Convert.ToBoolean(String value)
+   ב-  Volunteer.getVolunteersList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 848
+   ב-  WebService.getVolunteers(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 943
+2019-02-04 11:48:22,483 ERROR [25] WebService.getVolunteer - Error in getVolunteer
+System.FormatException: המחרוזת לא זוהתה כ- DateTime חוקי.
+   ב-  System.DateTimeParse.Parse(String s, DateTimeFormatInfo dtfi, DateTimeStyles styles)
+   ב-  System.Convert.ToDateTime(String value)
+   ב-  Volunteer.getVolunteer() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 890
+   ב-  WebService.getVolunteer(String displayName) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 962
+2019-02-04 11:49:37,556 ERROR [28] WebService.writeToLog - Successful login ;for user: sapir
+2019-02-04 11:49:46,951 ERROR [11] WebService.writeToLog - Successful login ;for user: 0524842888

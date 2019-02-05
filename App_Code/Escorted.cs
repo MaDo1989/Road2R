@@ -465,26 +465,7 @@ public class Escorted
         {
             for (int i = 1; i <= numberOfEscort; i++)
             {
-                if (i==1)
-                {
-                    cmdParams[2] = cmd.Parameters.AddWithValue("@Id", 22);
-                }
-                else if (i == 2)
-                {
-                    cmdParams[2] = cmd.Parameters.AddWithValue("@Id", 23);
-                }
-                else if (i == 3)
-                {
-                    cmdParams[2] = cmd.Parameters.AddWithValue("@Id", 25);
-                }
-                else if (i == 4)
-                {
-                    cmdParams[2] = cmd.Parameters.AddWithValue("@Id", 26);
-                }
-                else if (i == 5)
-                {
-                    cmdParams[2] = cmd.Parameters.AddWithValue("@Id", 28);
-                }
+                cmdParams[2] = cmd.Parameters.AddWithValue("@Id", i);
                 query = "insert into PatientEscort (PatientId,EscortId,ContactTypeId) values (@PatientId,@Id,@ContactType);";
                 db = new DbService();
                 try

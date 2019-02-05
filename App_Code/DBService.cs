@@ -13,13 +13,22 @@ public class DbService
 {
     SqlTransaction tran;
     SqlCommand cmd;
-    SqlConnection con= new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+    SqlConnection con;
 
     SqlDataAdapter adp;
 
     public DbService()
     {
-     
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+
+        }
+        catch (Exception ex)
+        {
+
+            throw ex;
+        }
     }
 
     public DataSet GetDataSetByQuery(string sqlQuery, CommandType cmdType = CommandType.Text, params SqlParameter[] parametersArray)

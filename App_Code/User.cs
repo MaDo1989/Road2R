@@ -92,7 +92,7 @@ public class User
     public bool CheckLoginDetails()
     {
         #region DB functions
-        string query = "select * from Volunteer where UserName ='" + userName + "'";
+        string query = "select * from Volunteer where UserName =N'" + userName + "'";
 
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);

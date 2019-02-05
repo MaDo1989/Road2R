@@ -1068,7 +1068,7 @@ public class WebService : System.Web.Services.WebService
             User u = new User(uName, password);
             userInDB = u.CheckLoginDetails();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
 
             throw;
