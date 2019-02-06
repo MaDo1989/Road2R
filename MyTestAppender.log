@@ -20,3 +20,4 @@ System.Data.SqlClient.SqlException (0x80131904): The parameterized query '(@type
    ב-  WebService.setLocation(Location location, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 908
 ClientConnectionId:a578ba18-a394-4320-867d-ce500259fee7
 Error Number:8178,State:1,Class:16
+2019-02-06 18:50:40,001 ERROR [6] WebService.writeToLog - Successful login ;for user: 0524842888
