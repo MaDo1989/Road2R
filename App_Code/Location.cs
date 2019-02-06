@@ -391,8 +391,8 @@ public class Location
         DbService db = new DbService();
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
-        SqlParameter[] cmdParams = new SqlParameter[9];
-
+        SqlParameter[] cmdParams = new SqlParameter[8];
+        
         //getting the index for the destination manager
         DestinationManager m = new DestinationManager(v.ManagerName,v.ManagerLastName,v.ManagerPhones,v.ManagerPhones2);
         int managerId = m.setDestinationManager(m, func);
@@ -401,11 +401,11 @@ public class Location
         cmdParams[1] = cmd.Parameters.AddWithValue("@name", v.Name);
         cmdParams[2] = cmd.Parameters.AddWithValue("@area", v.Area);
         cmdParams[3] = cmd.Parameters.AddWithValue("@adress", v.Direction);
-        cmdParams[4] = cmd.Parameters.AddWithValue("@responsible", "x x");
-        cmdParams[5] = cmd.Parameters.AddWithValue("@isActive", v.Status);
-        cmdParams[6] = cmd.Parameters.AddWithValue("@remarks", v.Remarks);
-        cmdParams[7] = cmd.Parameters.AddWithValue("@DestinationManager", managerId);
-        cmdParams[8] = cmd.Parameters.AddWithValue("@cityCityName", "אביחיל");
+        //cmdParams[4] = cmd.Parameters.AddWithValue("@responsible", null);
+        cmdParams[4] = cmd.Parameters.AddWithValue("@isActive", v.Status);
+        cmdParams[5] = cmd.Parameters.AddWithValue("@remarks", v.Remarks);
+        cmdParams[6] = cmd.Parameters.AddWithValue("@DestinationManager", managerId);
+        cmdParams[7] = cmd.Parameters.AddWithValue("@cityCityName", "אביחיל");
 
         string query = "";
         if (func == "edit")
@@ -441,7 +441,7 @@ public class Location
             //}
 
             query = "update Location set Type=@type, Name=@name,";
-            query += "Area=@area, Adress=@adress, Responsible=@responsible, IsActive=@IsActive, Remarks=@remarks, ";
+            query += "Area=@area, Adress=@adress, IsActive=@IsActive, Remarks=@remarks, ";
             query += "DestinationManager=@DestinationManager, CityCityName=@cityCityName where Name=@name"; 
 
             res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
@@ -454,8 +454,8 @@ public class Location
         }
         else if (func == "new")
         {
-            query = "insert into Location (Type, Name, Area, Adress, Responsible, IsActive, Remarks, DestinationManager, CityCityName)";
-            query += " values (@type,@name,@area,@adress,@responsible,@IsActive,@remarks,@DestinationManager,@cityCityName);SELECT SCOPE_IDENTITY();";
+            query = "insert into Location (Type, Name, Area, Adress, IsActive, Remarks, DestinationManager, CityCityName)";
+            query += " values (@type,@name,@area,@adress,@IsActive,@remarks,@DestinationManager,@cityCityName);SELECT SCOPE_IDENTITY();";
             db = new DbService();
             try
             {

@@ -606,11 +606,24 @@ public class Volunteer
             //    v.BirthDate = Convert.ToDateTime(dr["BirthDate"].ToString());
             //}
             // v.BirthDate = Convert.ToDateTime(dr["BirthDate"].ToString());
-            v.JoinDate = Convert.ToDateTime(dr["JoinDate"].ToString());
-            v.Status = dr["IsActive"].ToString();
-            v.IsActive = Convert.ToBoolean(dr["IsActive"].ToString());
-            v.Gender = dr["Gender"].ToString();
-            v.KnowsArabic = Convert.ToBoolean(dr["KnowsArabic"].ToString());
+            string date = dr["JoinDate"].ToString();
+            if (date == "")
+            {
+
+            }
+            else v.JoinDate = Convert.ToDateTime(dr["JoinDate"].ToString());
+            bool ac = false;
+            if (dr["IsActive"].ToString().ToLower() == "true")
+            {
+                ac = true;
+            }
+            v.IsActive = ac;
+            bool arabic = false;
+            if (dr["KnowsArabic"].ToString().ToLower() == "true")
+            {
+                arabic = true;
+            }
+            v.KnowsArabic = arabic;
             try
             {
                 v.AvailableSeats = int.Parse(dr["AvailableSeats"].ToString());
