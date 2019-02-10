@@ -467,7 +467,7 @@
                                             </div>
                                         </div>
                                         <div class="row m-l-10 m-r-10">
-                                            <div class="col-sm-6">
+                                            <div class="col-sm-6" hidden>
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">טלפון נוסף</label>
                                                     <div class="col-sm-6">
@@ -666,11 +666,11 @@
                         cellphone2 = cellphone2.replace(/-/g, '');
                         cellphone2 = cellphone2.replace(/ /g, '');      
                     }
-                    var homePhone = $("#HomePhone").val();
-                    if (homePhone != "") {
-                        homePhone = homePhone.replace(/-/g, '');
-                        homePhone = homePhone.replace(/ /g, '');      
-                    }
+                    //var homePhone = $("#HomePhone").val();
+                    //if (homePhone != "") {
+                    //    homePhone = homePhone.replace(/-/g, '');
+                    //    homePhone = homePhone.replace(/ /g, '');      
+                    //}
                     var nameA = $("#firstA").val();
                     var lastNameA = $("#lastA").val();
                     if ($("#joinDate").val() != "")
@@ -694,7 +694,7 @@
 
 
                     volunteer = {
-                        firstNameH: firstNameH, firstNameA: nameA, lastNameH: lastNameH, lastNameA: lastNameA, cellPhone: cellPhone, cellphone2: cellphone2, homePhone: homePhone,
+                        firstNameH: firstNameH, firstNameA: nameA, lastNameH: lastNameH, lastNameA: lastNameA, cellPhone: cellPhone, cellphone2: cellphone2, /*homePhone: homePhone,*/
                         city: city, address: address, email: email, joinDate: joinDate, gender: gender, KnowsArabic: knowsArabic,
                         typeVol: typeVol, IsActive: active, Remarks: remark, DisplayName: displayName //birthdate: bdate,
                     }

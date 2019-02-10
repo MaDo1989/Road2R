@@ -351,6 +351,8 @@
                         // generateGender1();
                         //  initializeSelect2();
                         //document.getElementById("escorted").style.visibility = "hidden";
+                        $("#patientFirstName").attr('disabled', 'disabled');
+                        $("#patientLastName").attr('disabled', 'disabled');
                         $("#activepatient").prop('checked', 'checked');
                         $("#anonymouspatient").attr('disabled', 'disabled');
                         document.getElementById("anonymouspatient").disabled = true;
@@ -824,7 +826,8 @@
                                                     <div class="form-group">
                                                         <label class="col-sm-2 control-label">טלפון נוסף</label>
                                                         <div class="col-sm-6">
-                                                            <input dir="ltr" id="HomePhone" name="HomePhone" type="text" class="form-control" placeholder="0xxxxxxxxx או 0xxxxxxxx">
+                                                            <input id="HomePhone" dir="ltr" name="HomePhone" type="text" class="form-control" placeholder="0xxxxxxxxx או 0xxxxxxxx">
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1072,7 +1075,7 @@
 
                     patient = {
                         firstNameH: name, firstNameA: nameA, lastNameH: lastName, lastNameA: lastNameA, cellPhone: phone, cellPhone1: phone1,
-                        homePhone: homePhone, city: city, gender: gender, barrier: barrier, hospital: hospital,
+                        city: city, gender: gender, barrier: barrier, hospital: hospital, homephone: homePhone,
                         department: department, Equipment: EquipmentArr, history: history, remarks: remarks, IsActive: IsActive, Id: Id , birthDate: Bdate
                     }
                     
@@ -1225,7 +1228,7 @@
             } else phoneMatch3 = true;
 
 
-            if (/*!CityExists ||*/ !barrier || !hospital || !gender  || !phoneMatch || !phoneMatch2 || !phoneMatch3) {
+            if (/*!CityExists ||*/ !barrier || !hospital || !gender  || !phoneMatch || !phoneMatch2 || !phoneMatch3 ) {
                 return false;
             } else return true;
         }
