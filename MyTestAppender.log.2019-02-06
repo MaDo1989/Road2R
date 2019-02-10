@@ -1,0 +1,23 @@
+﻿2019-02-06 11:33:11,112 ERROR [11] WebService.writeToLog - Successful login ;for user: 0524842888
+2019-02-06 11:33:41,539 ERROR [13] WebService.setLocation - Error in setLocation
+System.Data.SqlClient.SqlException (0x80131904): The INSERT statement conflicted with the FOREIGN KEY constraint "FKLocation375672". The conflict occurred in database "r2rdb_test", table "dbo.Volunteer", column 'DisplayName'.
+The statement has been terminated.
+   ב-  Location.setLocation(Location v, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Location.cs:שורה 466
+   ב-  WebService.setLocation(Location location, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 908
+ClientConnectionId:55aa9429-bc71-44b8-b1f3-caa42daf1aa4
+Error Number:547,State:0,Class:16
+2019-02-06 11:34:44,042 ERROR [7] WebService.writeToLog - Successful login ;for user: 0524842888
+2019-02-06 11:37:05,562 ERROR [7] WebService.setLocation - Error in setLocation
+System.Data.SqlClient.SqlException (0x80131904): The INSERT statement conflicted with the FOREIGN KEY constraint "FKLocation375672". The conflict occurred in database "r2rdb_test", table "dbo.Volunteer", column 'DisplayName'.
+The statement has been terminated.
+   ב-  Location.setLocation(Location v, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Location.cs:שורה 466
+   ב-  WebService.setLocation(Location location, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 908
+ClientConnectionId:55e3f6b8-c55f-43ad-a49c-948ebf41ea07
+Error Number:547,State:0,Class:16
+2019-02-06 11:40:02,237 ERROR [7] WebService.setLocation - Error in setLocation
+System.Data.SqlClient.SqlException (0x80131904): The parameterized query '(@type nvarchar(5),@name nvarchar(12),@area nvarchar(4),@adress ' expects the parameter '@responsible', which was not supplied.
+   ב-  Location.setLocation(Location v, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Location.cs:שורה 466
+   ב-  WebService.setLocation(Location location, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 908
+ClientConnectionId:a578ba18-a394-4320-867d-ce500259fee7
+Error Number:8178,State:1,Class:16
+2019-02-06 18:50:40,001 ERROR [6] WebService.writeToLog - Successful login ;for user: 0524842888
