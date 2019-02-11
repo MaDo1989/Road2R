@@ -1,1 +1,30 @@
-﻿2019-02-10 08:33:42,442 ERROR [6] WebService.writeToLog - Successful login ;for user: 0524842888
+﻿2019-02-11 20:04:38,296 ERROR [11] WebService.writeToLog - Successful login ;for user: 0524842888
+2019-02-11 20:05:38,186 ERROR [11] WebService.getAnonymousPatient - Error in getAnonymousPatient
+System.FormatException: מחרוזת קלט לא היתה בתבנית הנכונה.
+   ב-  System.Number.StringToNumber(String str, NumberStyles options, NumberBuffer& number, NumberFormatInfo info, Boolean parseDecimal)
+   ב-  System.Number.ParseInt32(String s, NumberStyles style, NumberFormatInfo info)
+   ב-  System.Int32.Parse(String s)
+   ב-  AnonymousPatient.getAnonymousPatient() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\AnonymousPatient.cs:שורה 513
+   ב-  WebService.getAnonymousPatient(String displayName) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 495
+2019-02-11 20:07:07,843 ERROR [12] WebService.getAnonymousPatient - Error in getAnonymousPatient
+System.FormatException: מחרוזת קלט לא היתה בתבנית הנכונה.
+   ב-  System.Number.StringToNumber(String str, NumberStyles options, NumberBuffer& number, NumberFormatInfo info, Boolean parseDecimal)
+   ב-  System.Number.ParseInt32(String s, NumberStyles style, NumberFormatInfo info)
+   ב-  System.Int32.Parse(String s)
+   ב-  AnonymousPatient.getAnonymousPatient() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\AnonymousPatient.cs:שורה 513
+   ב-  WebService.getAnonymousPatient(String displayName) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 495
+2019-02-11 20:10:13,864 ERROR [12] WebService.getAnonymousPatient - Error in getAnonymousPatient
+System.FormatException: מחרוזת קלט לא היתה בתבנית הנכונה.
+   ב-  System.Number.StringToNumber(String str, NumberStyles options, NumberBuffer& number, NumberFormatInfo info, Boolean parseDecimal)
+   ב-  System.Number.ParseInt32(String s, NumberStyles style, NumberFormatInfo info)
+   ב-  System.Int32.Parse(String s)
+   ב-  AnonymousPatient.getAnonymousPatient() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\AnonymousPatient.cs:שורה 513
+   ב-  WebService.getAnonymousPatient(String displayName) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 495
+2019-02-11 20:11:00,872 ERROR [12] WebService.writeToLog - Successful login ;for user: 0524842888
+2019-02-11 20:13:40,789 ERROR [12] WebService.getAnonymousPatient - Error in getAnonymousPatient
+System.FormatException: מחרוזת קלט לא היתה בתבנית הנכונה.
+   ב-  System.Number.StringToNumber(String str, NumberStyles options, NumberBuffer& number, NumberFormatInfo info, Boolean parseDecimal)
+   ב-  System.Number.ParseInt32(String s, NumberStyles style, NumberFormatInfo info)
+   ב-  System.Int32.Parse(String s)
+   ב-  AnonymousPatient.getAnonymousPatient() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\AnonymousPatient.cs:שורה 513
+   ב-  WebService.getAnonymousPatient(String displayName) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 495
