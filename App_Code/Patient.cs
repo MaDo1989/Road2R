@@ -597,9 +597,7 @@ public class Patient
             p.HomePhone = dr["HomePhone"].ToString();
             p.City = dr["CityCityName"].ToString();
             p.LivingArea = dr["LivingArea"].ToString();
-            //p.Status = dr["statusPatient"].ToString();
             p.IsActive = Convert.ToBoolean(dr["IsACtive"].ToString());
-            //p.Addition = dr["addition"].ToString();
             p.BirthDate = dr["BirthDate"].ToString();
             p.History = dr["History"].ToString();
             p.Department = dr["Department"].ToString();
@@ -608,8 +606,6 @@ public class Patient
             p.Gender = dr["Gender"].ToString();
             p.Remarks = dr["Remarks"].ToString();
             p.Equipment = p.getEquipmentForPatient(p.displayName);
-            //p.IsAnonymous = Convert.ToBoolean(dr["IsAnonymous"].ToString());
-            //p.NumberOfEscort = int.Parse(dr["NumberOfEscort"].ToString());
         }
         #endregion
 

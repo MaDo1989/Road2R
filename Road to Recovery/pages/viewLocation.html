@@ -71,6 +71,7 @@
 
 
         function refreshTable() {
+            $('#wait').show();
             checkCookie();
             var active = $("#activeCustomers").prop('checked');
 
@@ -83,6 +84,7 @@
                 type: "POST",
                 data: JSON.stringify({active: active}),
                 success: function (data) {
+                    $('#wait').hide();
                     var arr_Locations = JSON.parse(data.d);
                     GENERAL.LOCATIONS.setLocationsList(JSON.stringify(arr_Locations));
 
@@ -182,7 +184,10 @@
 
                     });
                 },
-                error: function (err) { alert("Error in deactivateLocation: "+ err.responseText); }
+                error: function (err) {
+                    alert("Error in deactivateLocation: " + err.responseText);
+                    $('#wait').hide();
+                }
             });
         }
 
@@ -321,6 +326,9 @@
                                     </thead>
                                     <tbody></tbody>
                                 </table>
+                                <div id="wait" style="display:none;width:69px;height:89px;position:absolute;top:50%;left:50%;padding:2px;">
+                                    <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
+                                </div>
                             </div>
                         </div>
                     </div>

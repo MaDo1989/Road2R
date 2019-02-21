@@ -105,9 +105,12 @@
                             var deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove' ></i></button>";
                             btnStr += " " + deleteBtn;
                         }
-
-
-                        t.row.add([arr_volunteers[i].DisplayName, arr_volunteers[i].TypeVol, arr_volunteers[i].CellPhone, arr_volunteers[i].HomePhone,arr_volunteers[i].City, arr_volunteers[i].Email, btnStr]).draw(false);
+                        var cellphone2 = "";
+                        if(arr_volunteers[i].CellPhone2!=""){
+                            cellphone2 = arr_volunteers[i].CellPhone2;
+                        }
+                        else cellphone2 = arr_volunteers[i].HomePhone;
+                        t.row.add([arr_volunteers[i].DisplayName, arr_volunteers[i].TypeVol, arr_volunteers[i].CellPhone, cellphone2,arr_volunteers[i].City, arr_volunteers[i].Email, btnStr]).draw(false);
 
                     }
 

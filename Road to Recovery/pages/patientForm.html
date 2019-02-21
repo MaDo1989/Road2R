@@ -363,6 +363,7 @@
 
         //function to fill form for edit
         function uploadData(displayName) {
+            $('#wait').show();
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/getPatient",
@@ -370,6 +371,7 @@
                 type: "POST",
                 data: JSON.stringify({ displayName: displayName }),
                 success: function (data) {
+                    $('#wait').hide();
                     var patient = JSON.parse(data.d);
                     GENERAL.PATIENTS.setPatientsList(JSON.stringify(patient));
                     generateEquipment();
@@ -422,7 +424,10 @@
                     refreshTable(patient.DisplayName)
 
                 },
-                error: function (err) { alert("Error in getPatient: " + err.responseText); }
+                error: function (err) { 
+                alert("Error in getPatient: " + err.responseText); 
+                 $('#wait').hide();
+                }
             });
         }
 
@@ -932,6 +937,9 @@
                                                 </thead>
                                                 <tbody></tbody>
                                             </table>
+                                            <div id="wait" style="display:none;width:69px;height:89px;position:absolute;top:50%;left:50%;padding:2px;">
+                                                <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1141,17 +1149,27 @@
             var barrier = true;
             var hospital = true;
             var gender = true;
-            //var city = $("#city").val();
-            //for (i in cities) {
-            //    if (city == cities[i]) {
-            //        CityExists = true;
-            //        break;
-            //    }
-            //}
+            var city = $("#city").val();
 
-            //if (!CityExists) {
-            //    alert("יש לבחור יישוב מתוך הרשימה");
-            //}
+            if(city == ""){
+               CityExists = true;
+            }
+            if(!CityExists){
+                for (i in cities) {
+                    if (city == cities[i]) {
+                        CityExists = true;
+                        break;
+                   }
+                }
+            }
+
+            if (!CityExists) {
+                swal(
+                    "שגיאה",
+                    "ישוב זה אינו מוגדר במערכת. אנא השתמש בישוב שמוגדר או פנה למנהל המערכת.",
+                    "warning"
+                );           
+            }
 
             var barrier = $("#barrier").val();
             if (barrier == "") {
@@ -1228,7 +1246,7 @@
             } else phoneMatch3 = true;
 
 
-            if (/*!CityExists ||*/ !barrier || !hospital || !gender  || !phoneMatch || !phoneMatch2 || !phoneMatch3 ) {
+            if (!CityExists || !barrier || !hospital || !gender  || !phoneMatch || !phoneMatch2 || !phoneMatch3 ) {
                 return false;
             } else return true;
         }

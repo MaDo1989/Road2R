@@ -230,6 +230,7 @@
                         generateHospital();
                         generateEquipment();
                         generateCities();
+                        $("#patientFirstName").attr('disabled', 'disabled');
                         $("#activepatient").prop('checked', 'checked');
                     }
                 }
@@ -238,6 +239,7 @@
 
         //function to fill form for edit
         function uploadData(displayName) {
+            $('#wait').show();
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/getAnonymousPatient",
@@ -245,6 +247,7 @@
                 type: "POST",
                 data: JSON.stringify({ displayName: displayName }),
                 success: function (data) {
+                    $('#wait').hide();
                     var patient = JSON.parse(data.d);
                     GENERAL.PATIENTS.setPatientsList(JSON.stringify(patient));
                     generateEquipment();
@@ -273,7 +276,10 @@
                     //refreshTable(patient.DisplayName)
 
                 },
-                error: function (err) { alert("Error in getPatient: " + err.responseText); }
+                error: function (err) {
+                    alert("Error in getPatient: " + err.responseText);
+                    $('#wait').hide();
+                }
             });
         }
 
@@ -404,7 +410,7 @@
                                                 </div>
 
                                             </div>
-                                           
+
                                         </div>
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
@@ -439,7 +445,7 @@
                                             </div>
                                         </div>
                                         <div class="row m-l-10 m-r-10">
-                                          
+
                                         </div>
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
@@ -459,7 +465,7 @@
                                                         <select id="hospital" name="hospital" class="form-control"></select>
                                                     </div>
                                                 </div>
-                                            </div>  
+                                            </div>
                                         </div>
                                         <div class="row m-l-10 m-r-10">
 
@@ -473,6 +479,9 @@
                                 </div>
                                 <hr />
 
+                            </div>
+                            <div id="wait" style="display:none;width:69px;height:89px;position:absolute;top:50%;left:50%;padding:2px;">
+                                <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
                             </div>
                         </form>
                     </div>

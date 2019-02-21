@@ -219,6 +219,10 @@
                         $("#ArabSpeaking").attr('disabled', 'disabled');
                         // initializeSelect2();
                     }
+                    else{
+                         $("#volunteerFirstName").attr('disabled', 'disabled');
+                        $("#volunteerLastName").attr('disabled', 'disabled');
+                    }
                 }
                 else {
                     // generateDestination();
@@ -769,21 +773,30 @@
 
         function validateVolunteerInputs() {
 
-            //var CityExists = false;
+            var CityExists = false;
             var volType = true;
             var gender = true;
             var city = $("#city").val();
-            //for (i in cities) {
-            //    if (city == cities[i]) {
-            //        CityExists = true;
-            //        break;
-            //    }
-            //}
 
+            if (city == "") {
+                CityExists = true;
+            }
+            if (!CityExists) {
+                for (i in cities) {
+                    if (city == cities[i]) {
+                        CityExists = true;
+                        break;
+                    }
+                }
+            }
 
-            //if (!CityExists) {
-            //    alert("יש לבחור יישוב מתוך הרשימה");
-            //}
+            if (!CityExists) {
+                swal(
+                    "שגיאה",
+                    "ישוב זה אינו מוגדר במערכת. אנא השתמש בישוב שמוגדר או פנה למנהל המערכת.",
+                    "warning"
+                );
+            }
 
             var volType = $("#typeVolunteer").val();
             if (volType == "בחר") {
@@ -857,7 +870,7 @@
             } else phoneMatch3 = true;
 
 
-            if (/*!CityExists ||*/ !volType || !gender || !phoneMatch || !phoneMatch2 || !phoneMatch3) { //|| !jdateMatch
+            if (!CityExists || !volType || !gender || !phoneMatch || !phoneMatch2 || !phoneMatch3) { //|| !jdateMatch
                 return false;
             } else return true;
         }
