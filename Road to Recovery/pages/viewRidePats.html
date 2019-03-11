@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
 <html lang="en" dir="rtl">
 <head>
     <meta charset="utf-8">
@@ -62,7 +63,7 @@
         $(document).ready(function () {
 
             includeHTML();
-            var userName = GENERAL.USER.getUserName();
+            var userName = GENERAL.USER.getUserDisplayName();
             $("#userName").html(userName);
             if (localStorage.active = "undefined")
                 localStorage.active = true;
@@ -312,7 +313,7 @@
                             showCancelButton: true,
                             cancelButtonText: "בטל",
                             confirmButtonClass: 'btn-warning',
-                            confirmButtonText: "מחק",
+                            confirmButtonText: "מחיקה",
                             closeOnConfirm: false
                         }, function () {
                             var RidePat = new Object();

@@ -833,6 +833,7 @@ public class Volunteer
             v.CellPhone = dr["CellPhone"].ToString();
             v.CellPhone2 = dr["CellPhone2"].ToString();
             v.HomePhone = dr["HomePhone"].ToString();
+            v.Remarks = dr["Remarks"].ToString();
             v.City = dr["CityCityName"].ToString();
             v.Address = dr["Address"].ToString();
             v.TypeVol = dr["VolunTypeType"].ToString();
@@ -884,10 +885,11 @@ public class Volunteer
         string query = "select * from VolunteerTypeView where displayName=@name";
         Volunteer v = new Volunteer();
         DbService db = new DbService();
-        DataSet ds = db.GetDataSetByQuery(query, cmd.CommandType, cmdParams);
+        DataSet ds = db.GetDataSetByQuery(query,true, cmd.CommandType, cmdParams);
         DataRow dr = ds.Tables[0].Rows[0];
 
         v.Id = int.Parse(dr["Id"].ToString());
+        v.Remarks = dr["Remarks"].ToString();
         v.DisplayName = dr["DisplayName"].ToString();
         v.FirstNameA = dr["FirstNameA"].ToString();
         v.FirstNameH = dr["FirstNameH"].ToString();
@@ -919,6 +921,139 @@ public class Volunteer
         v.KnowsArabic = arabic;
         // v.BirthDate = Convert.ToDateTime(dr["BirthDate"].ToString());
           v.Gender = dr["Gender"].ToString();
+        try
+        {
+            v.AvailableSeats = int.Parse(dr["AvailableSeats"].ToString());
+        }
+        catch (Exception)
+        {
+
+        }
+        v.TypeVol = dr["VolunTypeType"].ToString();
+
+        Volunteer temp = new Volunteer();
+        temp = getVolunteerPrefs(v.Id);
+
+        v.PrefArea = temp.PrefArea;
+        v.PrefTime = temp.PrefTime;
+        v.PrefLocation = temp.PrefLocation;
+        #endregion
+
+        return v;
+    }
+    public Volunteer getVolunteerByDisplayName(string name)
+    {
+        #region DB functions
+        SqlCommand cmd = new SqlCommand();
+        cmd.CommandType = CommandType.Text;
+        SqlParameter[] cmdParams = new SqlParameter[1];
+        cmdParams[0] = cmd.Parameters.AddWithValue("name", name);
+        string query = "select * from VolunteerTypeView where displayName=@name";
+        Volunteer v = new Volunteer();
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query, true, cmd.CommandType, cmdParams);
+        DataRow dr = ds.Tables[0].Rows[0];
+
+        v.Id = int.Parse(dr["Id"].ToString());
+        v.Remarks = dr["Remarks"].ToString();
+        v.DisplayName = dr["DisplayName"].ToString();
+        v.FirstNameA = dr["FirstNameA"].ToString();
+        v.FirstNameH = dr["FirstNameH"].ToString();
+        v.LastNameH = dr["LastNameH"].ToString();
+        v.LastNameA = dr["LastNameA"].ToString();
+        v.CellPhone = dr["CellPhone"].ToString();
+        v.CellPhone2 = dr["CellPhone2"].ToString();
+        v.HomePhone = dr["HomePhone"].ToString();
+        v.City = dr["CityCityName"].ToString();
+        v.RegId = dr["pnRegId"].ToString();
+        v.Address = dr["Address"].ToString();
+        v.Email = dr["Email"].ToString();
+        string date = dr["JoinDate"].ToString();
+        if (date == "")
+        {
+
+        }
+        else v.JoinDate = Convert.ToDateTime(dr["JoinDate"].ToString());
+        bool ac = false;
+        if (dr["IsActive"].ToString().ToLower() == "true")
+        {
+            ac = true;
+        }
+        v.IsActive = ac;
+        bool arabic = false;
+        if (dr["KnowsArabic"].ToString().ToLower() == "true")
+        {
+            arabic = true;
+        }
+        v.KnowsArabic = arabic;
+        // v.BirthDate = Convert.ToDateTime(dr["BirthDate"].ToString());
+        v.Gender = dr["Gender"].ToString();
+        try
+        {
+            v.AvailableSeats = int.Parse(dr["AvailableSeats"].ToString());
+        }
+        catch (Exception)
+        {
+
+        }
+        v.TypeVol = dr["VolunTypeType"].ToString();
+
+        Volunteer temp = new Volunteer();
+        temp = getVolunteerPrefs(v.Id);
+
+        v.PrefArea = temp.PrefArea;
+        v.PrefTime = temp.PrefTime;
+        v.PrefLocation = temp.PrefLocation;
+        #endregion
+
+        return v;
+    }
+    public Volunteer getVolunteerByID(int id)
+    {
+        #region DB functions
+        SqlCommand cmd = new SqlCommand();
+        cmd.CommandType = CommandType.Text;
+        SqlParameter[] cmdParams = new SqlParameter[1];
+        cmdParams[0] = cmd.Parameters.AddWithValue("id", id);
+        string query = "select * from VolunteerTypeView where ID=@id";
+        Volunteer v = new Volunteer();
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query, true, cmd.CommandType, cmdParams);
+        DataRow dr = ds.Tables[0].Rows[0];
+
+        v.Id = int.Parse(dr["Id"].ToString());
+        v.Remarks = dr["Remarks"].ToString();
+        v.DisplayName = dr["DisplayName"].ToString();
+        v.FirstNameA = dr["FirstNameA"].ToString();
+        v.FirstNameH = dr["FirstNameH"].ToString();
+        v.LastNameH = dr["LastNameH"].ToString();
+        v.LastNameA = dr["LastNameA"].ToString();
+        v.CellPhone = dr["CellPhone"].ToString();
+        v.CellPhone2 = dr["CellPhone2"].ToString();
+        v.HomePhone = dr["HomePhone"].ToString();
+        v.City = dr["CityCityName"].ToString();
+        v.Address = dr["Address"].ToString();
+        v.Email = dr["Email"].ToString();
+        string date = dr["JoinDate"].ToString();
+        if (date == "")
+        {
+
+        }
+        else v.JoinDate = Convert.ToDateTime(dr["JoinDate"].ToString());
+        bool ac = false;
+        if (dr["IsActive"].ToString().ToLower() == "true")
+        {
+            ac = true;
+        }
+        v.IsActive = ac;
+        bool arabic = false;
+        if (dr["KnowsArabic"].ToString().ToLower() == "true")
+        {
+            arabic = true;
+        }
+        v.KnowsArabic = arabic;
+        // v.BirthDate = Convert.ToDateTime(dr["BirthDate"].ToString());
+        v.Gender = dr["Gender"].ToString();
         try
         {
             v.AvailableSeats = int.Parse(dr["AvailableSeats"].ToString());

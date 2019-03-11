@@ -51,7 +51,7 @@
         $(document).ready(function () {
 
             includeHTML();
-            var userName = GENERAL.USER.getUserName();
+            var userName = GENERAL.USER.getUserDisplayName();
             $("#userName").html(userName);
             //adds menu.html content into any "#menu" element
             //$('#menu').load('menu.html');
@@ -146,7 +146,7 @@
                             showCancelButton: true,
                             cancelButtonText: "בטל",
                             confirmButtonClass: 'btn-warning',
-                            confirmButtonText: "מחק",
+                            confirmButtonText: "מחיקה",
                             closeOnConfirm: false
                         }, function () {
                             deactivateLocation(data[1], 'false');

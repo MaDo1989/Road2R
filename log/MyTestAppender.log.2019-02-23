@@ -1,0 +1,36 @@
+﻿2019-02-23 10:09:36,197 ERROR [10] WebService.writeToLog - Successful login ;for user: 0524842888
+2019-02-23 11:20:13,043 ERROR [6] WebService.writeToLog - Successful login ;for user: 0524842888
+2019-02-23 11:30:18,947 ERROR [16] WebService.writeToLog - Successful login ;for user: 0524842888
+2019-02-23 15:20:55,694 ERROR [44] WebService.writeToLog - Successful login ;for user: 0524842888
+2019-02-23 15:46:55,163 ERROR [9] WebService.writeToLog - Successful login ;for user: 0524842888
+2019-02-23 15:47:15,495 ERROR [33] WebService.writeToLog - Successful login ;for user: 0524842888
+2019-02-23 15:47:37,537 ERROR [9] WebService.writeToLog - Successful login ;for user: 0524842888
+2019-02-23 15:49:11,659 ERROR [21] WebService.setUserPassword - Error in setUserPassword
+System.Exception: המערכת התריעה על חריג מסוג 'System.Exception'.
+   ב-  Volunteer.setUserPassword(String userName, String newPassword) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 1082
+   ב-  WebService.setUserPassword(String userName, String password) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 407
+2019-02-23 15:53:46,798 ERROR [30] WebService.writeToLog - Successful login ;for user: 0524842888
+2019-02-23 15:56:36,341 ERROR [23] WebService.setRidePat - Error in setRidePat
+System.Data.SqlClient.SqlException (0x80131904): The INSERT statement conflicted with the FOREIGN KEY constraint "FKRidePat293793". The conflict occurred in database "r2rdb_test", table "dbo.Volunteer", column 'DisplayName'.
+The statement has been terminated.
+   ב-  DbService.GetObjectScalarByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 126
+   ב-  RidePat.setRidePat(RidePat ridePat, String func, Boolean isAnonymous) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 251
+   ב-  WebService.setRidePat(RidePat RidePat, String func, Boolean isAnonymous) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 146
+ClientConnectionId:aa7001b8-db8b-468f-9aa6-077bb40f8535
+Error Number:547,State:0,Class:16
+2019-02-23 15:56:52,563 ERROR [23] WebService.setRidePat - Error in setRidePat
+System.Data.SqlClient.SqlException (0x80131904): The INSERT statement conflicted with the FOREIGN KEY constraint "FKRidePat293793". The conflict occurred in database "r2rdb_test", table "dbo.Volunteer", column 'DisplayName'.
+The statement has been terminated.
+   ב-  DbService.GetObjectScalarByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 126
+   ב-  RidePat.setRidePat(RidePat ridePat, String func, Boolean isAnonymous) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 251
+   ב-  WebService.setRidePat(RidePat RidePat, String func, Boolean isAnonymous) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 146
+ClientConnectionId:7374dc5c-2d1a-43ab-b585-6ded621477ae
+Error Number:547,State:0,Class:16
+2019-02-23 16:05:26,505 ERROR [33] WebService.writeToLog - Successful login ;for user: 0524842888
+2019-02-23 16:08:12,107 ERROR [34] WebService.setRidePat - Error in setRidePat
+System.IndexOutOfRangeException: אין שורה במיקום 0.
+   ב-  System.Data.RBTree`1.GetNodeByIndex(Int32 userIndex)
+   ב-  System.Data.DataRowCollection.get_Item(Int32 index)
+   ב-  RidePat.GetRidePat(Int32 ridePatNum) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 423
+   ב-  RidePat.setRidePat(RidePat ridePat, String func, Boolean isAnonymous) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 345
+   ב-  WebService.setRidePat(RidePat RidePat, String func, Boolean isAnonymous) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 146

@@ -7,6 +7,7 @@ using System.Web.Services;
 using System.Globalization;
 using System.Web.Script.Services;
 using log4net;
+using System.Web.UI;
 
 /// <summary>
 /// Summary description for WebService
@@ -444,7 +445,6 @@ public class WebService : System.Web.Services.WebService
             Log.Error("Error in setNewVersion", ex);
             throw new Exception("שגיאה בעדכון גרסה חדשה");
         }
-
     }
 
     [WebMethod]
@@ -682,7 +682,7 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
-
+ 
 
     [WebMethod(EnableSession = true,Description = "delete's driver from a ride, for example - two ridepats on the same ride")]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -698,14 +698,24 @@ public class WebService : System.Web.Services.WebService
                 Auxiliary a = new Auxiliary();
                 string message = " הנהג/ת " + a.getDriverName(driverId) + " נמחק/ה מנסיעה מספר " + ridePatId.ToString();
                 LogEntry le = new LogEntry(DateTime.Now, "מחיקת נהג/ת", message, 2, ridePatId, false);
+                if (res == 911)
+                {
+                    //send push notification to coordinator phone
+                    Message m = new Message();
+                    //get driver details 
+                    Volunteer V = new Volunteer();
+                    V.getVolunteerByID(driverId);
+                    m.driverCanceledRide(ridePatId,V.getVolunteerByID(driverId));
+                }
             }
+
             JavaScriptSerializer j = new JavaScriptSerializer();
             return j.Serialize(res);
         }
         catch (Exception ex)
         {
             Log.Error("Error in DeleteDriver", ex);
-            throw new Exception("שגיאה בעת שנהג ביטל נסיעה");
+            throw new Exception(ex.Message);
         }
 
     }
@@ -1057,7 +1067,6 @@ public class WebService : System.Web.Services.WebService
 
     #region login functions
     [WebMethod(EnableSession = true)]
-
     public string loginUser(string uName, string password)
     {
         JavaScriptSerializer j = new JavaScriptSerializer();
@@ -1086,8 +1095,24 @@ public class WebService : System.Web.Services.WebService
         string user = (string)HttpContext.Current.Session["userSession"];
         Log.Error(str + " ;for user: " + user);
     }
+    [WebMethod]
+    public string GetUserNameByCellphone(string uName)
+    {
+        string userInDB;
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        try
+        {
 
+            User u = new User();
+            userInDB = u.getUserNameByCellphone(uName);
+        }
+        catch (Exception ex)
+        {
 
+            throw;
+        }
+        return j.Serialize(userInDB);
+    }
     [WebMethod]
     public void writeLog(string str)
     {
@@ -1174,3 +1199,4 @@ public class WebService : System.Web.Services.WebService
         }
     }
 }
+

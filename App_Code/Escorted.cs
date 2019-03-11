@@ -327,7 +327,7 @@ public class Escorted
         cmd.CommandType = CommandType.Text;
         cmdParams = new SqlParameter[1];
         cmdParams[0] = cmd.Parameters.AddWithValue("@displayName", displayName);
-        DataSet ds = db.GetDataSetByQuery(query, cmd.CommandType, cmdParams);
+        DataSet ds = db.GetDataSetByQuery(query, true,cmd.CommandType, cmdParams);
 
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
@@ -355,7 +355,7 @@ public class Escorted
         cmdParams[0] = cmd.Parameters.AddWithValue("@patient", patientName);
         cmdParams[1] = cmd.Parameters.AddWithValue("@escort", e.DisplayName);
         query = "select Relationship from RelationshipView where Patient=@patient and Escort=@escort";
-        DataRow dr2 = db.GetDataSetByQuery(query, cmd.CommandType, cmdParams).Tables[0].Rows[0];
+        DataRow dr2 = db.GetDataSetByQuery(query, true,cmd.CommandType, cmdParams).Tables[0].Rows[0];
         e.ContactType = dr2["Relationship"].ToString();
         #endregion
 

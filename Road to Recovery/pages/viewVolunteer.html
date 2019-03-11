@@ -11,7 +11,8 @@
     <title>פרטי מתנדב/ת</title>
     
     <style type="text/css">
-        .dt-body-left{text-align:left;}
+        /*.dt-body-left{text-align:left;}*/
+        .dt-body-right{text-align:right;}
     </style>
     <!-- DataTables -->
     <link href="../plugins/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
@@ -45,26 +46,52 @@
     <link href="assets/css/select2.css" rel="stylesheet" />
     <script src="assets/js/select2.min.js"></script>
     <script src="lib/includeHTML.js"></script>
+    <script></script>
 
     <script>
         checkCookie();
         $(document).ready(function () {
 
             includeHTML();
-            var userName = GENERAL.USER.getUserName();
+            var userName = GENERAL.USER.getUserDisplayName();
             $("#userName").html(userName);
+
             //adds menu.html content into any "#menu" element
             //$('#menu').load('menu.html');
-            var userName = GENERAL.USER.getUserName();
-            $("#userName").html(userName);
+            //var userName = GENERAL.USER.getUserName();
+            //$("#userName").html(userName);
+
             //Create a DataTable from the Table
             t = $('#datatable-buttons').DataTable({
+                //bProcessing: true,
+                //bServerSide:true,
+                //ajax: function (data, callback, settings) {
+                //    $.ajax({
+                //        url: '/your/url',
+                //        type: 'POST',
+                //        data: data,
+                //        success: function (data) {
+                //            callback(data);
+                //            // Do whatever you want.
+                //        }
+                //    });
+                //},
                 columnDefs: [
                     {
                         targets: 5,
                         className: 'dt-body-left'
                     }
-                ]
+
+                ],
+                "autoWidth": true,
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'excel',
+                        title:'מתנדבים'
+                    }
+                ],
+                
             });
 
             refreshTable();
@@ -77,6 +104,7 @@
             var active = $("#activeCustomers").prop('checked');
 
             t.clear().draw();
+            //messi = Date.now();
 
             $.ajax({
                 dataType: "json",
@@ -85,6 +113,9 @@
                 type: "POST",
                 data: JSON.stringify({active: active}),
                 success: function (data) {
+                    //messi2 = Date.now();
+                    //var timeDiff = messi2 - messi;
+                    //alert(timeDiff);
                     $('#wait').hide();
                     var arr_volunteers = JSON.parse(data.d);
                     GENERAL.VOLUNTEERS.setVolunteersList(JSON.stringify(arr_volunteers));
@@ -110,19 +141,11 @@
                             cellphone2 = arr_volunteers[i].CellPhone2;
                         }
                         else cellphone2 = arr_volunteers[i].HomePhone;
-                        t.row.add([arr_volunteers[i].DisplayName, arr_volunteers[i].TypeVol, arr_volunteers[i].CellPhone, cellphone2,arr_volunteers[i].City, arr_volunteers[i].Email, btnStr]).draw(false);
+                        t.row.add([arr_volunteers[i].DisplayName, arr_volunteers[i].TypeVol, arr_volunteers[i].CellPhone, cellphone2,arr_volunteers[i].City, arr_volunteers[i].Remarks, btnStr]).draw(false);
 
                     }
 
-                    //$('#datatable-buttons').DataTable({
-                    //    columnDefs: [
-                    //        {
-                    //            targets: 4,
-                    //            className: 'dt-body-left'
-                    //        }
-                    //    ]
-                    //});
-                    t.columns([1]).order('asc').draw();
+                    t.columns([1]).draw();
 
                     $('#datatable-buttons tbody').on('click', '#edit', function () {
                         var data = t.row($(this).parents('tr')).data();
@@ -147,7 +170,7 @@
                             showCancelButton: true,
                             cancelButtonText: "בטל",
                             confirmButtonClass: 'btn-warning',
-                            confirmButtonText: "מחק",
+                            confirmButtonText: "מחיקה",
                             closeOnConfirm: false
                         }, function () {
                             deactivateVolunteer(data[0], 'false');
@@ -331,13 +354,13 @@
                                 </div>
                                 <table id="datatable-buttons" class="table table-striped table-bordered">
                                     <thead>
-                                        <tr>
+                                        <tr dir="rtl">
                                             <th>המתנדב/ת</th>
                                             <th>סוג משתמש/ת</th>
                                             <th>טלפון</th>
                                             <th>טלפון נוסף</th>
                                             <th>יישוב</th>
-                                            <th>Email</th>
+                                            <th style="text-align:right">הערות</th>
                                             <th>פעולות</th>
                                         </tr>
                                     </thead>

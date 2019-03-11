@@ -94,6 +94,73 @@ public class Message
         myPushNot push = new myPushNot();
         push.RunPushNotificationOne(user, x);
     }
+    public void rideIsTomorrow(int ridePatID, Volunteer user)
+    {
+        //get ride details and generate msg
+        RidePat rp = new RidePat();
+        var abc = rp.GetRidePat(ridePatID);
+        var msg = "מחר מתקיימת הסעה מ" + abc.Origin.Name + " ל" + abc.Destination.Name +  ", בשעה " + abc.Date.ToShortTimeString();
+
+        if (abc.Date.ToShortTimeString() == "22:14") msg = "מחר מתקיימת הסעה מ" + abc.Origin.Name + " ל" + abc.Destination.Name + " אחה\"צ";
+        //insert msg to db
+        int msgID = insertMsg(0, "Reminder", "תזכורת", msg, ridePatID, DateTime.Now, user.Id, "", true, false, false);
+
+        //create push
+        var x = new JObject();
+        x.Add("message", msg);
+        x.Add("title", "נסיעה קרובה");
+        x.Add("rideID", ridePatID);
+        x.Add("status", "Reminder");
+        x.Add("msgID", msgID);
+        x.Add("content-available", 1);
+
+        //send push
+        myPushNot push = new myPushNot();
+        push.RunPushNotificationOne(user, x);
+    }
+    public void driverCanceledRide(int ridePatID, Volunteer user)
+    {
+        //get ride details and generate message
+        RidePat rp = new RidePat();
+        var abc = rp.GetRidePat(ridePatID);
+        Volunteer coor = new Volunteer();
+         coor = abc.Coordinator.getVolunteerByDisplayName(abc.Coordinator.DisplayName);
+        
+        var message = "";
+        if (user.Gender == "מתנדב")
+        {
+            message = "הנהג " + user.FirstNameH + " " + user.LastNameH + " ביטל את הנסיעה מ" + abc.Origin.Name + " ל" + abc.Destination.Name + " שמתקיימת מחר";
+            if (abc.Date.ToShortTimeString() == "22:14")
+            {
+                message += " אחה\"צ";
+            }
+            else message += " בשעה " + abc.Date.ToShortTimeString();
+        }
+        else
+        {
+            message = "הנהגת " + user.FirstNameH + " " + user.LastNameH + " ביטלה את הנסיעה מ" + abc.Origin.Name + " ל" + abc.Destination.Name + " שמתקיימת מחר";
+            if (abc.Date.ToShortTimeString() == "22:14")
+            {
+                message += " אחה\"צ";
+            }
+            else message += " בשעה " + abc.Date.ToShortTimeString();
+        }
+        //insert msg to db
+        int msgID = insertMsg(0, "Canceled by driver", "נסיעה בוטלה על ידי נהג\\ת", message, ridePatID, DateTime.Now, user.Id, "", true, false, false);
+
+        //create push
+        var x = new JObject();
+        x.Add("message", message);
+        x.Add("title", "נסיעה בוטלה על ידי נהג\\ת");
+        x.Add("rideID", ridePatID);
+        x.Add("status", "Canceled");
+        x.Add("msgID", msgID);
+        x.Add("content-available", 1);
+
+        //send push
+        myPushNot push = new myPushNot();
+        push.RunPushNotificationOne(coor, x);
+    }
     public void changeAnonymousPatient(int ridePatID, Volunteer user)
     {
         //get ride details and generate msg

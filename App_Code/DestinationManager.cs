@@ -177,7 +177,7 @@ public class DestinationManager
 
         DestinationManager m = new DestinationManager();
         DbService db = new DbService();
-        DataSet ds = db.GetDataSetByQuery(query, cmd.CommandType, cmdParams);
+        DataSet ds = db.GetDataSetByQuery(query,true ,cmd.CommandType, cmdParams);
         DataRow dr = ds.Tables[0].Rows[0];
 
         m.Id = int.Parse(dr["Id"].ToString());

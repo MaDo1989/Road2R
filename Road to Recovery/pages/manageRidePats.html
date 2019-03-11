@@ -65,7 +65,7 @@
             //});
 
             includeHTML();
-            var userName = GENERAL.USER.getUserName();
+            var userName = GENERAL.USER.getUserDisplayName();
             $("#userName").html(userName);
             splitHour = 12; //The hourthat seperates morning and afternoon ridepats
 
@@ -347,7 +347,7 @@
                 showCancelButton: true,
                 cancelButtonText: "בטל",
                 confirmButtonClass: 'btn-warning',
-                confirmButtonText: "מחק",
+                confirmButtonText: "מחיקה",
                 closeOnConfirm: false
             }, function () {
                 var RidePat = new Object();

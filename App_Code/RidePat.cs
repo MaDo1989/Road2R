@@ -478,6 +478,7 @@ public class RidePat
 
     }
 
+
     //public List<RidePat> GetAllRidePats()
     //{
 
@@ -743,6 +744,61 @@ public class RidePat
         #endregion
     }
 
+    public List<Volunteer> GetRidePatViewForTomorrow(ref List<int> ridesId) 
+    {
+        #region Database
+        DataTable driverTable = getDriver();
+
+        string query = "select RidePatNum,MainDriver from rpview where pickuptime>GETDATE() and datediff(hour,getdate(),pickuptime)<=24";
+
+        List<Volunteer> volunteerListForNotification = new List<Volunteer>();
+        List<RidePat> rp = new List<RidePat>();
+
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+
+        try
+        {
+            foreach (DataRow dr in ds.Tables[0].Rows)
+            {
+                // if voluneer is assigned to this ridePat, don't return it (for mobile app)
+                if ((dr["MainDriver"].ToString() != "") /*|| (dr["secondaryDriver"].ToString() != "")*/)
+                {
+                    if ((dr["MainDriver"].ToString() != ""))
+                    {
+                        Volunteer primary = new Volunteer();
+                       // RidePat ridep = new RidePat();
+                        primary.DriverType = "Primary";
+
+                        primary.Id = int.Parse(dr["MainDriver"].ToString());
+                        string searchExpression = "Id = " + primary.Id;
+                        DataRow[] driverRow = driverTable.Select(searchExpression);
+                        primary.DisplayName = driverRow[0]["DisplayName"].ToString();
+                       // primary.Gender = driverRow[0]["Gender"].ToString();
+                        primary.CellPhone = driverRow[0]["CellPhone"].ToString();
+                        primary.RegId = driverRow[0]["pnRegId"].ToString();
+                        
+                       // ridep.
+
+                        volunteerListForNotification.Add(primary);
+                        ridesId.Add(int.Parse(dr["RidePatNum"].ToString()));
+
+                    }
+                }
+
+            }
+
+            return volunteerListForNotification;
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+        #endregion
+    }
+
+
+
     public int CombineRideRidePat(int rideId, int ridePatId)
     {
         string query = "select Status from RidePat where RidePatNum=" + ridePatId;
@@ -881,13 +937,21 @@ public class RidePat
         bool primary = false;
         int rideNum = -1;
         int BackupDriver = -1;
+        DateTime pickupTime = new DateTime();
+        DateTime timeRightAboutNow = new DateTime();
+        timeRightAboutNow = DateTime.Now;
         DbService db = new DbService();
+        int hours = 0;
+
         string query = "select * from RPView where RidePatNum=" + ridePatId;
         DataSet ds = db.GetDataSetByQuery(query);
         DataRow row = ds.Tables[0].Rows[0];
-
+        bool is24Hours = false;
         try
         {
+            pickupTime = DateTime.Parse(row["PickupTime"].ToString());
+            TimeSpan difference = pickupTime- DateTime.Now;
+            hours = difference.Hours;
             BackupDriver = int.Parse(row["secondaryDriver"].ToString());
         }
         catch (Exception)
@@ -917,7 +981,12 @@ public class RidePat
             DbService db5 = new DbService();
             res = db5.ExecuteQuery(query);
         }
-
+        if (hours <= 24)
+        {
+            is24Hours = true;
+            //call the police!! it's less than 24 to the ride
+            res = 911;
+        }
 
         return res;
     }

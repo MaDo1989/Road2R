@@ -1,0 +1,38 @@
+﻿2019-03-05 11:34:11,995 ERROR [9] WebService.writeToLog - Successful login ;for user: 0524842888
+2019-03-05 21:21:07,400 ERROR [6] WebService.writeToLog - Successful login ;for user: 0524842888
+2019-03-05 21:22:27,797 ERROR [10] WebService.getPatients - Error in getPatients
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Patient.getPatientsList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 528
+   ב-  WebService.getPatients(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 204
+2019-03-05 21:22:35,447 ERROR [9] WebService.getPatients - Error in getPatients
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Patient.getPatientsList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 528
+   ב-  WebService.getPatients(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 204
+2019-03-05 21:22:42,811 ERROR [7] WebService.getPatients - Error in getPatients
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Patient.getPatientsList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 528
+   ב-  WebService.getPatients(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 204
+2019-03-05 21:23:52,493 ERROR [6] WebService.writeToLog - Successful login ;for user: 0524842888
+2019-03-05 21:24:06,423 ERROR [6] WebService.getPatients - Error in getPatients
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Patient.getPatientsList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 528
+   ב-  WebService.getPatients(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 204
+2019-03-05 21:25:39,015 ERROR [9] WebService.getPatients - Error in getPatients
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Patient.getPatientsList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 528
+   ב-  WebService.getPatients(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 204
+2019-03-05 21:25:44,561 ERROR [8] WebService.getPatients - Error in getPatients
+System.Data.SqlClient.SqlException (0x80131904): חיבור עם השרת נוצר בהצלחה, אך לאחר מכן אירעה שגיאה במשך תהליך הכניסה. (provider: SSL Provider, error: 0 - An existing connection was forcibly closed by the remote host.) ---> System.ComponentModel.Win32Exception (0x80004005): An existing connection was forcibly closed by the remote host
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, Boolean needToClose, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 76
+   ב-  Patient.getPatientsList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 527
+   ב-  WebService.getPatients(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 204
+ClientConnectionId:2e8f4c51-7ac7-4fe4-baab-e82efd1ed8ef
+Error Number:10054,State:0,Class:20
+2019-03-05 21:26:40,619 ERROR [9] WebService.getPatients - Error in getPatients
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Patient.getPatientsList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 528
+   ב-  WebService.getPatients(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 204
+2019-03-05 21:27:40,109 ERROR [9] WebService.getPatients - Error in getPatients
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Patient.getPatientsList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 528
+   ב-  WebService.getPatients(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 204

@@ -71,6 +71,9 @@
         * html .ui-autocomplete {
             height: 100px;
         }
+        input[type=text]:focus {
+            background-color: #FFE684;
+        }
     </style>
     <!--<script src="https://code.jquery.com/jquery-1.12.4.js"></script>-->
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -105,6 +108,7 @@
     <!--<script src="lib/datepicker-he.js"></script>-->
     <script src="lib/includeHTML.js"></script>
     <script>
+        //1.בהסעה חדשה רק שדה שם חולה הוא write, אחרי שמזינים אותו הכל נפתח. 
         checkCookie();
         arr_addressRows = [];
         $.jgrid.defaults.responsive = true;
@@ -117,10 +121,12 @@
         var anonymousName = "";
         var isAnonymous = false;
         var driverId;
+        //0 means no driver is asigned to the ride
+        var rideStatusForFields = 0;
         $(document).ready(function () {
             includeHTML();
 
-            var userName = GENERAL.USER.getUserName();
+            var userName = GENERAL.USER.getUserDisplayName();
             $("#userName").html(userName);
             //datePicker();
             loadPage();
@@ -267,23 +273,6 @@
                             checkSpaceInCar = spaceInCar + checkEscorts.length - Escorts.length;
                             if (checkSpaceInCar > Escorts.length) {
                                 var numberOfAddedEscorts = Escorts.length - checkEscorts.length;
-                                //return swal({
-                                //    title: "אזהרה",
-                                //    text: "נוספו מלווים להסעה, מספר המלווים שנוספו הוא: " + numberOfAddedEscorts + ", למרות זאת, יש עדיין מקום ברכב המתנדב. האם תרצה להמשיך בעריכה? ",
-                                //    type: "warning",
-                                //    showCancelButton: true,
-                                //    confirmButtonColor: '#DD6B55',
-                                //    confirmButtonText: 'המשך',
-                                //    cancelButtonText: "בטל"
-                                //}, function (isConfirm) {
-                                //    if (!isConfirm) {
-                                //        location.href = "manageRidePats.html";
-                                //        return false;
-                                //    }
-                                //    else {
-                                //        return true;
-                                //    }
-                                //});
 
                                 var answer = confirm("נוספו מלווים להסעה, מספר המלווים שנוספו הוא: " + numberOfAddedEscorts + ", למרות זאת, יש עדיין מקום ברכב המתנדב. האם תרצה להמשיך בעריכה? ");
                                 if (!answer) {
@@ -294,27 +283,6 @@
                             else {
                                 var numberOfAddedEscorts = Escorts.length - checkEscorts.length;
                                 var numberOfSeatsAv = spaceInCar + checkEscorts.length;
-
-                                //event.preventDefault();
-                                //return swal({
-                                //    title: "אזהרה",
-                                //    text: " נוספו " + numberOfAddedEscorts + " מלווים. מספר המקומות הפנויים ברכב הוא: " + numberOfSeatsAv + " האם תרצה להמשיך בעריכה?",
-                                //    type: "warning",
-                                //    showCancelButton: true,
-                                //    confirmButtonColor: '#DD6B55',
-                                //    confirmButtonText: 'המשך',
-                                //    cancelButtonText: "בטל"
-                                //}, function (isConfirm) {
-                                //    if (!isConfirm) {
-                                //        location.href = "manageRidePats.html";
-                                //        return false;
-                                //    }
-                                //    else {
-                                //        return true;
-                                //    }
-                                //}
-                                //);
-
 
                                 var answer = confirm(" נוספו " + numberOfAddedEscorts + " מלווים. מספר המקומות הפנויים ברכב הוא: " + numberOfSeatsAv + " האם תרצה להמשיך בעריכה?");
                                 if (!answer) {
@@ -795,7 +763,7 @@
             date = new Date(Year, Month, Day, $("#hour").val(), $("#minute").val());
             futureDate = checkFutureDate(date);
             if (!futureDate) {
-                swal("שגיאה","יש לבחור תאריך עתידי","warning");
+                swal("שגיאה","זמן ההסעה עבר, נא לתקן","warning");
             }
 
             var timeMatch = true;
@@ -838,12 +806,34 @@
                 var i = patients.indexOf($("#pat").val());
                 $("#patArabic").val(arr_arabNames[i]);
                 localStorage.PatID = arr_pat[i].Id;
-
+               
+                if(rideStatusForFields == 0){
+                    $("#afterNoon").removeAttr('disabled');
+                    $("#Origin").removeAttr('disabled');
+                    $("#remark").removeAttr('disabled');
+                    $("#Destination").removeAttr('disabled');
+                    $("#dateRide").removeAttr('disabled');
+                    $("#hour").removeAttr('disabled');
+                    $("#minute").removeAttr('disabled');
+                    $("#dirBTN").removeAttr('disabled');
+                    $("#patArabic").removeAttr('disabled');
+                }
             }
             else if ($("#patArabic").val() != "") {
                 var i = arr_arabNames.indexOf($("#patArabic").val());
                 $("#pat").val(patients[i]);
                 localStorage.PatID = arr_pat[i].Id;
+                if(rideStatusForFields == 0){
+                    $("#afterNoon").removeAttr('disabled');
+                    $("#Origin").removeAttr('disabled');
+                    $("#remark").removeAttr('disabled');
+                    $("#Destination").removeAttr('disabled');
+                    $("#dateRide").removeAttr('disabled');
+                    $("#hour").removeAttr('disabled');
+                    $("#minute").removeAttr('disabled');
+                    $("#dirBTN").removeAttr('disabled');
+                    $("#patArabic").removeAttr('disabled');
+                }
             }
 
             try {
@@ -853,6 +843,9 @@
                 if (arr_pat[i].IsAnonymous == "True") {
                     getEquipmentForAnonymousPatient();
                     anonymousName = "True";
+                    $("#Origin").attr('disabled', 'disabled');
+                    $("#Destination").attr('disabled', 'disabled');
+                    $("#dirBTN").attr('disabled', 'disabled');
                 }
                 else getEquipmentForPatient();
                 generateEsc();
@@ -999,6 +992,17 @@
                     }
                 }
                 else {
+                    //check on בדיקה.
+                    $("#afterNoon").attr('disabled', 'disabled');
+                    $("#Origin").attr('disabled', 'disabled');
+                    $("#remark").attr('disabled', 'disabled');
+                    $("#Destination").attr('disabled', 'disabled');
+                    $("#dateRide").attr('disabled', 'disabled');
+                    $("#hour").attr('disabled', 'disabled');
+                    $("#minute").attr('disabled', 'disabled');
+                    $("#dirBTN").attr('disabled', 'disabled');
+                    $("#patArabic").attr('disabled', 'disabled');
+                    //$("#saveCustomer").attr('disabled', 'disabled');
                     generateStatus();
                     generatePat();
                     getCoor();
@@ -1055,9 +1059,13 @@
                         $("#hour option[value='" + hours + "']").prop('selected', true);
                         $("#minute option[value='" + minutes + "']").prop('selected', true);
                     }
-
+                    if(ridePat.Status != 'ממתינה לשיבוץ'){
+                        rideStatusForFields = 1;
+                    }
+                    
                     //editing anonymous ridepat only if a driver assigned to the ride.
                     if ((ridePat.Pat.IsAnonymous == "True") && (ridePat.Status != 'ממתינה לשיבוץ')) {
+                        
                         $("#afterNoon").attr('disabled', 'disabled');
                         $("#Origin").attr('disabled', 'disabled');
                         $("#Destination").attr('disabled', 'disabled');
@@ -1203,7 +1211,7 @@
                                         <h4 class="m-t-0 header-title"><b>הסעת חולה</b></h4>
 
                                         <div class="text-right m-b-30 m-r-15">
-                                            <button type="button" onclick="returnRidePat()" class="btn btn-default waves-effect w-md m-b-5"><i class="ti-back-right m-r-5"></i>חזור</button>
+                                            <button type="button" onclick="returnRidePat()" class="btn btn-default waves-effect w-md m-b-5"><i class="ti-back-right m-r-5"></i>חזרה</button>
                                         </div>
                                         <p class="required">* שדה חובה</p>
                                         <div class="row m-l-10 m-r-10">
@@ -1341,7 +1349,7 @@
                             <div>
                                 <hr />
                                 <div class="text-right m-t-30 row">
-                                    <button type="submit" id="saveCustomer" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-save m-r-5"></i>שמור</button>
+                                    <button type="submit" id="saveCustomer" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-save m-r-5"></i>שמירה</button>
                                 </div>
                             </div>
                         </form>

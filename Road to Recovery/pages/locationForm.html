@@ -56,11 +56,11 @@
             /* prevent horizontal scrollbar */
             overflow-x: hidden;
         }
-        /* IE 6 doesn't support max-height
-        * we use height instead, but this forces the menu to always be this tall
-        */
         * html .ui-autocomplete {
             height: 100px;
+        }
+        input[type=text]:focus {
+            background-color: #FFE684;
         }
     </style>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -81,7 +81,7 @@
         $.jgrid.defaults.styleUI = 'Bootstrap';
 
         function loadPage() {
-            var userName = GENERAL.USER.getUserName();
+            var userName = GENERAL.USER.getUserDisplayName();
             $("#userName").html(userName);
             if (JSON.parse(GENERAL.LOCATIONS.getDestinationsList()).length != 0) {
                 arr_location = JSON.parse(GENERAL.LOCATIONS.getDestinationsList());
@@ -239,7 +239,7 @@
                                             </label>
                                         </div>
                                         <div class="text-right m-b-30 m-r-15">
-                                            <button type="button" onclick="returnLocations()" class="btn btn-default waves-effect w-md m-b-5"><i class="ti-back-right m-r-5"></i>חזור</button>
+                                            <button type="button" onclick="returnLocations()" class="btn btn-default waves-effect w-md m-b-5"><i class="ti-back-right m-r-5"></i>חזרה</button>
                                         </div>
                                         <p class="required">* שדה חובה</p>
                                         <div class="row m-l-10 m-r-10">
@@ -391,7 +391,7 @@
                                         <!--<table id="jqGrid" class="table table-striped table-bordered text-right"></table>-->
                                         <!--<div id="jqGridPager"></div>-->
                                         <div class="text-right m-t-30 row">
-                                            <button type="submit" id="saveLocation" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-save m-r-5"></i>שמור</button>
+                                            <button type="submit" id="saveLocation" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-save m-r-5"></i>שמירה</button>
                                         </div>
                                     </div>
                                 </div>

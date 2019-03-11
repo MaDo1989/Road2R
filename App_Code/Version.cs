@@ -51,13 +51,15 @@ public class Version
         {
             //getting the id of this version.
             Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
+            //Uri googleUrl = new Uri(google);
+            ////googleUrl.
+            //Uri appleUrl = new Uri(appstore);
             //Message m = new Message();
-            //string msg = "עודכנה גרסת האפלקציה,קישור למשתמשי אנדרואיד: " +google + "\nקישור למשתמשי אפל: "+appstore;
-            //m.globalMessage(msg,"ניסיון עדכון גרסה");
+            //string msg = "עודכנה גרסת האפלקציה,קישור למשתמשי אנדרואיד: " + googleUrl.AbsoluteUri + "\nקישור למשתמשי אפל: "+ appleUrl.AbsoluteUri;
+            //m.globalMessage(msg,"עדכון גרסה");
         }
         catch (SqlException ex)
         {
-
             throw;
         }
 

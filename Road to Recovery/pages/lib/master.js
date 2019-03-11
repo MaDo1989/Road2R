@@ -7,6 +7,12 @@
         setUserName: function (userName) {
             localStorage.user = userName;
         },
+        getUserDisplayName: function () {
+            return localStorage.userCell;
+        },
+        setUserDisplayName: function (userCell) {
+            localStorage.userCell = userCell;
+        },
         getPassword: function () {
             return localStorage.password;
         },

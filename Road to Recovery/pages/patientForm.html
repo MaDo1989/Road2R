@@ -79,11 +79,20 @@
         * html .ui-autocomplete {
             height: 100px;
         }
+        input[type=text]:focus {
+            background-color: #FFE684;
+        }
     </style>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <!--City Autocomplete-->
     <script src="lib/includeHTML.js"></script>
     <script>
+
+
+        //do this!
+        var isNew = true;
+
+
         checkCookie();
         arr_addressRows = [];
         $.jgrid.defaults.responsive = true;
@@ -94,7 +103,7 @@
             includeHTML();
             //adds menu.html content into any "#menu" element
             //$('#menu').load('menu.html');
-            var userName = GENERAL.USER.getUserName();
+            var userName = GENERAL.USER.getUserDisplayName();
             $("#userName").html(userName);
             //Create a DataTable from the Table
             t = $('#datatable-buttons').DataTable(
@@ -347,12 +356,12 @@
                         generateHospital();
                         generateEquipment();
                         generateCities();
-                        //  generateStatus1();
-                        // generateGender1();
-                        //  initializeSelect2();
+                        //generateStatus1();
+                        //generateGender1();
+                        //initializeSelect2();
                         //document.getElementById("escorted").style.visibility = "hidden";
-                        $("#patientFirstName").attr('disabled', 'disabled');
-                        $("#patientLastName").attr('disabled', 'disabled');
+                        //$("#patientFirstName").attr('disabled', 'disabled');
+                        //$("#patientLastName").attr('disabled', 'disabled');
                         $("#activepatient").prop('checked', 'checked');
                         $("#anonymouspatient").attr('disabled', 'disabled');
                         document.getElementById("anonymouspatient").disabled = true;
@@ -363,6 +372,7 @@
 
         //function to fill form for edit
         function uploadData(displayName) {
+            isNew=false;
             $('#wait').show();
             $.ajax({
                 dataType: "json",
@@ -549,7 +559,7 @@
                             showCancelButton: true,
                             cancelButtonText: "בטל",
                             confirmButtonClass: 'btn-warning',
-                            confirmButtonText: "מחק",
+                            confirmButtonText: "מחיקה",
                             closeOnConfirm: false
                         }, function () {
                             setEscortedStatus(data[0], false);
@@ -749,7 +759,7 @@
                                             </div>
                                         </div>
                                         <div class="text-right m-b-30 m-r-15">
-                                            <button type="button" onclick="returnpatients()" class="btn btn-default waves-effect w-md m-b-5"><i class="ti-back-right m-r-5"></i>חזור</button>
+                                            <button type="button" onclick="returnpatients()" class="btn btn-default waves-effect w-md m-b-5"><i class="ti-back-right m-r-5"></i>חזרה</button>
                                         </div>
                                         <p class="required">* שדה חובה</p>
 
@@ -910,7 +920,7 @@
                                 </div>
                                 <div>
                                     <div class="text-right m-t-30 row">
-                                        <button type="submit" id="saveCustomer" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-save m-r-5"></i>שמור</button>
+                                        <button type="submit" id="saveCustomer" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-save m-r-5"></i>שמירה</button>
                                     </div>
                                 </div>
                                 <hr />
@@ -1053,6 +1063,9 @@
                     var nameA = $("#firstA").val();
                     var lastNameA = $("#lastA").val();
                     var func = arr_customer.func;
+                    if(!isNew){
+                       func = 'edit'; 
+                    }
                     var IsActive = false;
                     if ($("#activepatient").is(':checked')) {
                         IsActive = true;

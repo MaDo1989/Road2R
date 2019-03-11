@@ -58,16 +58,20 @@
         $(document).ready(function () {
 
             includeHTML();
-            var userName = GENERAL.USER.getUserName();
+            var userName = GENERAL.USER.getUserDisplayName();
             $("#userName").html(userName);
 
             $.fn.dataTable.moment('DD/MM/YY');
 
             //Create a DataTable from the Table
             //t = $('#datatable-buttons').DataTable({ "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] }
-            t = $('#datatable-buttons').DataTable({ "paging": false }
-               
-            );
+            t = $('#datatable-buttons').DataTable({ 
+                "paging": false,
+                dom: 'Bfrtip',
+                buttons: [
+                    'excel'
+                ]
+            });
 
 
             //getLog();

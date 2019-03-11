@@ -21,6 +21,7 @@ public class DbService
     {
         try
         {
+
             con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
 
         }
@@ -30,12 +31,23 @@ public class DbService
             throw ex;
         }
     }
+    public void CloseConnection()
+    {
+        if (con.State == ConnectionState.Open)
+        {
+            con.Close();
+        }
+    }
 
-    public DataSet GetDataSetByQuery(string sqlQuery, CommandType cmdType = CommandType.Text, params SqlParameter[] parametersArray)
+    public DataSet GetDataSetByQuery(string sqlQuery,bool needToClose = true,CommandType cmdType = CommandType.Text, params SqlParameter[] parametersArray)
     {
         try
         {
-            con.Open();
+            if (con.State == ConnectionState.Closed)
+            {
+                con.Open();
+            }
+
             cmd = new SqlCommand(sqlQuery, con);
             cmd.CommandType = cmdType;
             DataSet ds = new DataSet();
@@ -51,7 +63,7 @@ public class DbService
             {
                 adp.Fill(ds);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 //do something with the error
                 ds = null;
@@ -66,7 +78,11 @@ public class DbService
 
         finally
         {
-            con.Close();
+            if (needToClose)
+            {
+                con.Close();
+            }
+            
         }
 
 

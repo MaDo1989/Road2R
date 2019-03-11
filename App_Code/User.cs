@@ -112,7 +112,19 @@ public class User
 
         return userInDB;
     }
+    public string getUserNameByCellphone(string cellphone)
+    {
+        #region DB functions
+        string query = "select displayName from Volunteer where Cellphone ='" + cellphone + "'";
 
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        DataRow dr = ds.Tables[0].Rows[0];
+        string userName = dr["DisplayName"].ToString();
+
+        return userName;
+        #endregion
+    }
     public string getUserType(string userName)
     {
         SqlCommand cmd = new SqlCommand();
@@ -121,7 +133,7 @@ public class User
         cmdParams[0] = cmd.Parameters.AddWithValue("@user", userName);
         string query = "select VolunTypeType from VolunteerTypeView where UserName =@user";
         DbService db = new DbService();
-        DataSet ds = db.GetDataSetByQuery(query, cmd.CommandType, cmdParams);
+        DataSet ds = db.GetDataSetByQuery(query,true, cmd.CommandType, cmdParams);
         DataRow dr = ds.Tables[0].Rows[0];
         string type = dr["VolunTypeType"].ToString();
         return type;

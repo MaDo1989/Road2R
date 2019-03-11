@@ -248,7 +248,7 @@ public class Location
                 string query2 = "select * from DestinationManagers where Id=@Id";
                 DestinationManager m = new DestinationManager();
                 DbService db2 = new DbService();
-                DataSet ds2 = db2.GetDataSetByQuery(query2, cmd2.CommandType, cmdParams2);
+                DataSet ds2 = db2.GetDataSetByQuery(query2, true,cmd2.CommandType, cmdParams2);
                 DataRow dr2 = ds2.Tables[0].Rows[0];
                 l.ManagerName = dr2["FirstName"].ToString();
                 l.ManagerLastName = dr2["LastName"].ToString();
@@ -350,7 +350,7 @@ public class Location
         string query = "select * from Location where Name=@name";
         Location l = new Location();
         DbService db = new DbService();
-        DataSet ds = db.GetDataSetByQuery(query, cmd.CommandType, cmdParams);
+        DataSet ds = db.GetDataSetByQuery(query,true, cmd.CommandType, cmdParams);
         DataRow dr = ds.Tables[0].Rows[0];
 
         l.Type = dr["Type"].ToString();
@@ -371,7 +371,7 @@ public class Location
 
             DestinationManager m = new DestinationManager();
             DbService db2 = new DbService();
-            DataSet ds2 = db2.GetDataSetByQuery(query2, cmd2.CommandType, cmdParams2);
+            DataSet ds2 = db2.GetDataSetByQuery(query2, true,cmd2.CommandType, cmdParams2);
             DataRow dr2 = ds2.Tables[0].Rows[0];
             l.ManagerName = dr2["FirstName"].ToString();
             l.ManagerLastName = dr2["LastName"].ToString();
