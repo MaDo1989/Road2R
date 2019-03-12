@@ -769,6 +769,8 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
+            //need to send push from here!
+
             RidePat rp = new RidePat();
             int res = rp.LeaveRidePat(ridePatId, rideId, driverId);
 
@@ -779,7 +781,15 @@ public class WebService : System.Web.Services.WebService
                 string message = " הנהג/ת " + a.getDriverName(driverId) + " נמחק/ה מנסיעה מספר " + ridePatId.ToString();
                 LogEntry le = new LogEntry(DateTime.Now, "מחיקת נהג/ת", message, 2, ridePatId, false);
             }
-
+            if (res == 911)
+            {
+                //send push notification to coordinator phone
+                Message m = new Message();
+                //get driver details 
+                Volunteer V = new Volunteer();
+                V.getVolunteerByID(driverId);
+                m.driverCanceledRide(ridePatId, V.getVolunteerByID(driverId));
+            }
             JavaScriptSerializer j = new JavaScriptSerializer();
             return j.Serialize(res);
         }

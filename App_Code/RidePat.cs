@@ -887,10 +887,20 @@ public class RidePat
     {
         int res = -1;
         string driver = "";
-        string query4 = "select MainDriver,secondaryDriver from Ride where RideNum=" + rideId;
+        string query = "select * from RPView where RidePatNum=" + ridePatId;
         DbService db4 = new DbService();
-        DataSet ds2 = db4.GetDataSetByQuery(query4);
+        DataSet ds2 = db4.GetDataSetByQuery(query);
         DataRow dr = ds2.Tables[0].Rows[0];
+
+        DateTime pickupTime = new DateTime();
+        DateTime timeRightAboutNow = new DateTime();
+        timeRightAboutNow = DateTime.Now;
+        int hours = 0;
+
+        pickupTime = DateTime.Parse(dr["PickupTime"].ToString());
+        TimeSpan difference = pickupTime - DateTime.Now;
+        hours = difference.Hours;
+
         if (dr["MainDriver"].ToString() == driverId.ToString())
         {
             driver = "MainDriver";
@@ -903,30 +913,23 @@ public class RidePat
 
         if (driver == "secondaryDriver")
         {
-            string query = "update Ride set secondaryDriver=null where RideNum=" + rideId;
+            string query1 = "update Ride set secondaryDriver=null where RideNum=" + rideId;
             DbService db = new DbService();
-            res = db.ExecuteQuery(query);
+            res = db.ExecuteQuery(query1);
         }
         else
         {
             // string query = "update RidePat set RideId=null where RidePatNum=" + ridePatId; //+"; update Ride set "+driver+" =null where RideNum="+rideId;
-            string query = "update Ride set MainDriver=null where RideNum=" + rideId;
+            string query2 = "update Ride set MainDriver=null where RideNum=" + rideId;
             DbService db = new DbService();
-            res = db.ExecuteQuery(query);
+            res = db.ExecuteQuery(query2);
         }
-        //using driver id to get driver's name from volunteer table
-       
-
-
-        //string query2 = "select RidePatNum from RidePat where RideId=" + rideId;
-        //DbService db2 = new DbService();
-        //DataSet ds = db2.GetDataSetByQuery(query2);
-        //if (ds.Tables[0].Rows.Count == 0)
-        //{
-        //    string query3 = "update Ride set " + driver + " =null where RideNum=" + rideId;
-        //    DbService db3 = new DbService();
-        //    res += db3.ExecuteQuery(query3);
-        //}
+        if (hours <= 24)
+        {
+            //call the police!! it's less than 24 to the ride
+            res = 911;
+        }
+     
         return res;
 
     }

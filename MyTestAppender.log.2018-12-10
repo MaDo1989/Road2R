@@ -1,9 +1,0 @@
-﻿2018-12-10 10:35:59,918 ERROR [10] WebService.writeToLog - Successful login ;for user: sapir
-2018-12-10 12:20:27,249 ERROR [7] WebService.writeToLog - Successful login ;for user: sapir
-2018-12-10 12:34:25,601 ERROR [33] WebService.setNewVersion - Error in setNewVersion
-System.Data.SqlClient.SqlException (0x80131904): Incorrect syntax near the keyword 'values'.
-   ב-  DbService.GetObjectScalarByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 117
-   ב-  Version.setNewVersion(String userName, String google, String appstore, DateTime date, String version) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Version.cs:שורה 55
-   ב-  WebService.setNewVersion(String userName, String google, String appstore, DateTime date, String version) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 439
-ClientConnectionId:f56847a1-2e62-4b30-ae4e-59ae71cef274
-Error Number:156,State:1,Class:15

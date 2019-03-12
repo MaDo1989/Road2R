@@ -1,8 +1,0 @@
-﻿2019-02-02 19:54:24,890 ERROR [6] WebService.writeToLog - Successful login ;for user: sapir
-2019-02-02 19:58:00,669 ERROR [7] WebService.writeToLog - Successful login ;for user: sapir
-2019-02-02 22:25:16,450 ERROR [6] WebService.writeToLog - Successful login ;for user: sapir
-2019-02-02 22:26:03,114 ERROR [8] WebService.getPatientEscorted - Error in getPatientEscorted
-System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
-   ב-  Patient.getescortedsList(String displayName, String caller) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 736
-   ב-  WebService.getPatientEscorted(String displayName, String caller) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 294
-2019-02-02 22:26:41,060 ERROR [8] WebService.writeToLog - Successful login ;for user: sapir

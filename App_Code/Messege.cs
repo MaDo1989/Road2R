@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using log4net;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -8,8 +9,11 @@ using System.Xml.Linq;
 // <summary>
 /// Summary description for Messege
 /// </summary>
+
 public class Message
 {
+    private static readonly ILog Log =
+            LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
     public Message()
     {
         //
@@ -73,6 +77,7 @@ public class Message
 
     public void cancelRide(int ridePatID, Volunteer user)
     {
+        
         //get ride details and generate msg
         RidePat rp = new RidePat();
         var abc = rp.GetRidePat(ridePatID);
@@ -120,12 +125,15 @@ public class Message
     }
     public void driverCanceledRide(int ridePatID, Volunteer user)
     {
+        
+        
         //get ride details and generate message
         RidePat rp = new RidePat();
         var abc = rp.GetRidePat(ridePatID);
         Volunteer coor = new Volunteer();
-         coor = abc.Coordinator.getVolunteerByDisplayName(abc.Coordinator.DisplayName);
-        
+        coor = abc.Coordinator.getVolunteerByDisplayName(abc.Coordinator.DisplayName);
+
+
         var message = "";
         if (user.Gender == "מתנדב")
         {
