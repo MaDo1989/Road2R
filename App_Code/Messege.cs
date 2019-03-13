@@ -137,21 +137,12 @@ public class Message
         var message = "";
         if (user.Gender == "מתנדב")
         {
-            message = "הנהג " + user.FirstNameH + " " + user.LastNameH + " ביטל את הנסיעה מ" + abc.Origin.Name + " ל" + abc.Destination.Name + " שמתקיימת מחר";
-            if (abc.Date.ToShortTimeString() == "22:14")
-            {
-                message += " אחה\"צ";
-            }
-            else message += " בשעה " + abc.Date.ToShortTimeString();
+            message = "הנהג " + user.FirstNameH + " " + user.LastNameH + " ביטל את הנסיעה מ" + abc.Origin.Name + " ל" + abc.Destination.Name + " עם החולה " + abc.Pat.DisplayName+ " שמתקיימת בזמן הקרוב";
+
         }
         else
         {
-            message = "הנהגת " + user.FirstNameH + " " + user.LastNameH + " ביטלה את הנסיעה מ" + abc.Origin.Name + " ל" + abc.Destination.Name + " שמתקיימת מחר";
-            if (abc.Date.ToShortTimeString() == "22:14")
-            {
-                message += " אחה\"צ";
-            }
-            else message += " בשעה " + abc.Date.ToShortTimeString();
+            message = "הנהגת " + user.FirstNameH + " " + user.LastNameH + " ביטלה את הנסיעה מ" + abc.Origin.Name + " ל" + abc.Destination.Name + " עם החולה " + abc.Pat.DisplayName+ " שמתקיימת בזמן הקרוב";
         }
         //insert msg to db
         int msgID = insertMsg(0, "Canceled by driver", "נסיעה בוטלה על ידי נהג\\ת", message, ridePatID, DateTime.Now, user.Id, "", true, false, false);

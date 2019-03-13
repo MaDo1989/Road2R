@@ -30,3 +30,17 @@ System.ArgumentException: עמודה 'PickupTime' אינה שייכת לטבלה
   "msgID": 87,
   "content-available": 1
 }
+2019-03-12 21:51:16,315 ERROR [6] WebService.writeToLog - Successful login ;for user: 0524842888
+2019-03-12 21:51:31,370 ERROR [8] WebService.getPatients - Error in getPatients
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Patient.getPatientsList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 528
+   ב-  WebService.getPatients(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 204
+2019-03-12 21:52:08,321 ERROR [6] WebService.getPatients - Error in getPatients
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Patient.getPatientsList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 528
+   ב-  WebService.getPatients(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 204
+2019-03-12 21:52:47,157 ERROR [6] WebService.getPatients - Error in getPatients
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Patient.getPatientsList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 528
+   ב-  WebService.getPatients(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 204
+2019-03-12 21:54:07,672 ERROR [14] WebService.writeToLog - Successful login ;for user: 0524842888
