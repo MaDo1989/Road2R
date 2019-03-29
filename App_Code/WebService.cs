@@ -119,7 +119,22 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
-
+    [WebMethod]
+    public string getescortedsListMobile(string displayName, string patientCell)
+    {
+        try
+        {
+            JavaScriptSerializer j = new JavaScriptSerializer();
+            Patient p = new Patient();
+            List<Escorted> escortedsList = p.getescortedsListMobile(displayName, patientCell);
+            return j.Serialize(escortedsList);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in getPatientEscorted", ex);
+            throw new Exception("שגיאה בשליפת נתוני מלווים");
+        }
+    }
     [WebMethod]
     public string getVolunteerPrefs(int Id)
     {

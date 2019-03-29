@@ -51,7 +51,7 @@
     <!--<script src="../plugins/moment/moment.js"></script>-->
     <script src="lib/sorting.js"></script>
     <script src="lib/includeHTML.js"></script>
-
+    <script src="https://cdn.datatables.net/plug-ins/1.10.19/sorting/date-de.js"></script>
 
     <script>
         checkCookie();
@@ -79,23 +79,137 @@
 
             if (localStorage.pastRidePats = "undefined")
                 localStorage.pastRidePats = false;
-           
-            $.fn.dataTable.moment('DD/MM/YY');
 
+
+            jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+                "de_datetime-asc": function (a, b) {
+                    var x, y;
+                    if (jQuery.trim(a) !== '') {
+                        var deDatea = jQuery.trim(a).split(' ');
+                        var deTimea = "";
+                        if (jQuery.trim(a).includes("אחה\"צ")) {
+                            deTimea = "22:14";
+                            deTimea = deTimea.split(':');
+                        }
+                        else deTimea = deDatea[1].split(':');
+                        var deDatea2 = deDatea[0].split('/');
+                        if (typeof deTimea[2] != 'undefined') {
+                            x = (deDatea2[2] + deDatea2[1] + deDatea2[0] + deTimea[0] + deTimea[1] + deTimea[2]) * 1;
+                        } else {
+                            x = (deDatea2[2] + deDatea2[1] + deDatea2[0] + deTimea[0] + deTimea[1]) * 1;
+                        }
+                    } else {
+                        x = -Infinity; // = l'an 1000 ...
+                    }
+
+                    if (jQuery.trim(b) !== '') {
+                        var deDateb = jQuery.trim(b).split(' ');
+                        var deTimeb = "";
+                        if (jQuery.trim(b).includes("אחה\"צ")) {
+                            deTimeb = "22:14";
+                            deTimeb = deTimeb.split(':');
+                        }
+                        else deTimeb = deDateb[1].split(':');
+                        deDateb = deDateb[0].split('/');
+                        if (typeof deTimeb[2] != 'undefined') {
+                            y = (deDateb[2] + deDateb[1] + deDateb[0] + deTimeb[0] + deTimeb[1] + deTimeb[2]) * 1;
+                        } else {
+                            y = (deDateb[2] + deDateb[1] + deDateb[0] + deTimeb[0] + deTimeb[1]) * 1;
+                        }
+                    } else {
+                        y = -Infinity;
+                    }
+                    var z = ((x < y) ? -1 : ((x > y) ? 1 : 0));
+                    return z;
+                },
+
+                "de_datetime-desc": function (a, b) {
+                    var x, y;
+                    if (jQuery.trim(a) !== '') {
+                        var deDatea = jQuery.trim(a).split(' ');
+                        var deTimea = "";
+                        if (jQuery.trim(a).includes("אחה\"צ")) {
+                            deTimea = "22:14";
+                            deTimea = deTimea.split(':');
+                        }
+                        else deTimea = deDatea[1].split(':');
+                        var deDatea2 = deDatea[0].split('/');
+                        if (typeof deTimea[2] != 'undefined') {
+                            x = (deDatea2[2] + deDatea2[1] + deDatea2[0] + deTimea[0] + deTimea[1] + deTimea[2]) * 1;
+                        } else {
+                            x = (deDatea2[2] + deDatea2[1] + deDatea2[0] + deTimea[0] + deTimea[1]) * 1;
+                        }
+                    } else {
+                        x = Infinity;
+                    }
+
+                    if (jQuery.trim(b) !== '') {
+                        var deDateb = jQuery.trim(b).split(' ');
+                        var deTimeb = "";
+                        if (jQuery.trim(b).includes("אחה\"צ")) {
+                            deTimeb = "22:14";
+                            deTimeb = deTimeb.split(':');
+                        }
+                        else deTimeb = deDateb[1].split(':');
+                        deDateb = deDateb[0].split('/');
+                        if (typeof deTimeb[2] != 'undefined') {
+                            y = (deDateb[2] + deDateb[1] + deDateb[0] + deTimeb[0] + deTimeb[1] + deTimeb[2]) * 1;
+                        } else {
+                            y = (deDateb[2] + deDateb[1] + deDateb[0] + deTimeb[0] + deTimeb[1]) * 1;
+                        }
+                    } else {
+                        y = -Infinity;
+                    }
+                    var z = ((x < y) ? 1 : ((x > y) ? -1 : 0));
+                    return z;
+                },
+
+                "de_date-asc": function (a, b) {
+                    var x, y;
+                    if (jQuery.trim(a) !== '') {
+                        var deDatea = jQuery.trim(a).split('.');
+                        x = (deDatea[2] + deDatea[1] + deDatea[0]) * 1;
+                    } else {
+                        x = Infinity; // = l'an 1000 ...
+                    }
+
+                    if (jQuery.trim(b) !== '') {
+                        var deDateb = jQuery.trim(b).split('.');
+                        y = (deDateb[2] + deDateb[1] + deDateb[0]) * 1;
+                    } else {
+                        y = -Infinity;
+                    }
+                    var z = ((x < y) ? -1 : ((x > y) ? 1 : 0));
+                    return z;
+                },
+
+                "de_date-desc": function (a, b) {
+                    var x, y;
+                    if (jQuery.trim(a) !== '') {
+                        var deDatea = jQuery.trim(a).split('/');
+                        x = (deDatea[2] + deDatea[1] + deDatea[0]) * 1;
+                    } else {
+                        x = -Infinity;
+                    }
+
+                    if (jQuery.trim(b) !== '') {
+                        var deDateb = jQuery.trim(b).split('/');
+                        y = (deDateb[2] + deDateb[1] + deDateb[0]) * 1;
+                    } else {
+                        y = Infinity;
+                    }
+                    var z = ((x < y) ? 1 : ((x > y) ? -1 : 0));
+                    return z;
+                }
+            });
             //Create a DataTable from the Table
-            t = $('#datatable-buttons').DataTable({ "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] }
-                //{
-                //    "columns": [
-                //        { "data": "החולה" },
-                //        { "data": "מוצא" },
-                //        { "data": "יעד" },
-                //        { "data": "תאריך ושעה" },
-                //        { "data": "נהגים בנסיעה" },
-                //        { "data": "רכז" },
-                //        { "data": "פעולות" } ]
-                //    }
-            );
-            
+            t = $('#datatable-buttons').DataTable(
+                {
+                    columnDefs: [
+                        { type: 'de_datetime', targets: 3 },
+                    ]
+                } ,
+                { "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
             getCoors();
             refreshTable();
         });
@@ -206,7 +320,7 @@
 
                         if (date.getHours() == 22 && date.getMinutes() == 14) { //22:14 is the default time to show afternoon אחה''צ
                             date2 = day + "/" + month + "/" + date.getUTCFullYear() % 2000;
-                            date2 += " או אחה\"צ";
+                            date2 += " אחה\"צ";
                         }
                         if (unassigned) {
                             // $("#activeRidePats").prop('checked', false);

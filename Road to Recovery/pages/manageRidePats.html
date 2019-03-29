@@ -9,7 +9,7 @@
     <link rel="shortcut icon" href="assets/images/favicon_1.ico">
 
     <title>ניהול ההסעות שלי</title>
-    
+
     <!-- DataTables -->
     <link href="../plugins/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
     <link href="../plugins/datatables/buttons.bootstrap.min.css" rel="stylesheet" type="text/css" />
@@ -41,6 +41,7 @@
     <script src="dataTables.js"></script>
     <script src="moment.js"></script>
     <script src="datetime-moment.js"></script>
+    <script src="../../Scripts/moment.js"></script>
 
 
     <!-- Select2 css+js -->
@@ -59,6 +60,8 @@
         var driverName = "";
         var patientName = "";
         var isAnonymous = false;
+
+       
         $(document).ready(function () {
             //$("#userStyle").mouseover(function () {
             //    $(this).css("background-color", "blue")
@@ -74,22 +77,69 @@
             var today = new Date();
             var time;
 
-            time = parseInt(today.getHours()); 
+            time = parseInt(today.getHours());
 
             if ((12 <= time)) {
                 $('#collapse2').addClass("in");
             }
             else $('#collapse1').addClass("in");
 
-            $.fn.dataTable.moment('DD/MM/YYYY');
             //$('#example').DataTable();
             // $.fn.dataTable.moment('DD/MM/YYYY HH:MM');//'' DD/MM/YYYY HH:MM
+            //$.fn.dataTable.moment('DD/MM/YYYY');
 
+            //$.fn.dataTable.moment('DD.MM.YYYY');
+            jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+                "customdatesort-pre": function (a) {
+                    var r, x;
+                    if (a === null || a === "") {
+                        r = false;
+                    } else {
+                        x = a.split("/");
+                        r = +new Date(+x[2], +x[1] - 1, +x[0]);
+                    }
+                    console.log("[PRECALC] " + a + " becomes " + r);
+                    return r;
+                },
+                "customdatesort-asc": function (a, b) {
+                    if (a === false && b === false) {
+                        return 0;
+                    } else if (a === false) {
+                        return 1;
+                    } else if (b === false) {
+                        return -1;
+                    } else {
+                        return a - b;
+                    }
+                },
+                "customdatesort-desc": function (a, b) {
+                    if (a === false && b === false) {
+                        return 0;
+                    } else if (a === false) {
+                        return 1;
+                    } else if (b === false) {
+                        return -1;
+                    } else {
+                        return b - a;
+                    }
+                }
+            });
 
-           //Create a DataTable from the Table
-            tMorning = $('#datatable-morning').DataTable({ "paging": false}, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
+            //Create a DataTable from the Table
+            tMorning = $('#datatable-morning').DataTable({ "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
             tAfternoon = $('#datatable-afternoon').DataTable({ "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
-            tFuture = $('#datatable-future').DataTable({ "paging": false}, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
+            tFuture = $('#datatable-future').DataTable({
+                "aoColumns": [{
+                    "sType": "customdatesort"
+                },
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                ]},{ "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
 
 
             getCoors();
@@ -156,7 +206,7 @@
                 url: "WebService.asmx/GetRidePatView",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                data: JSON.stringify({ volunteerId: volunteerId }), 
+                data: JSON.stringify({ volunteerId: volunteerId }),
                 success: function (data) {
                     arr_rides = JSON.parse(data.d);
                     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
@@ -181,11 +231,11 @@
                         } else minutes = date.getMinutes();
 
 
-                       // date2 = date.toLocaleDateString();
+                        // date2 = date.toLocaleDateString();
                         var day3 = date.getDate();
-                        if (day3 < 10) day3 = "0" + day3; 
-                        date2 = day3 + "/" + (date.getMonth()+1) + "/" + date.getUTCFullYear();
-                        
+                        if (day3 < 10) day3 = "0" + day3;
+                        date2 = day3 + "/" + (date.getMonth() + 1) + "/" + date.getUTCFullYear();
+
 
                         hours = date.getHours();
                         time = hours + ":" + minutes;
@@ -196,7 +246,7 @@
                         editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' name='" + arr_rides[i].RidePatNum + "' title='עריכה'><i class='ti-pencil'></i></button>";
                         deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' name='" + arr_rides[i].RidePatNum + "' title='מחיקה'><i class='fa fa-remove'></i></button>";
                         backupBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='backup' name='" + arr_rides[i].RidePatNum + "' title='שליחת הודעה לגיבוי'><i class='fa fa-send'></i></button>";
-                        
+
 
                         //btnStr += showBtn;
                         if ((arr_rides[i].Status == 'ממתינה לשיבוץ') || (arr_rides[i].Pat.IsAnonymous == "True")) btnStr += " " + editBtn; //allow editing a ridepat if no drivers are assigned to it and if its not anonymous
@@ -291,21 +341,19 @@
 
             if (arr_rides[i].Status == "ממתינה לשיבוץ") {
                 if (table.context[0].sTableId != "datatable-future") {
-                    table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!", arr_rides[i].Status, btnStr,arr_rides[i].Pat.IsAnonymous]).draw(false);
+                    table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!", arr_rides[i].Status, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                 }
                 else {
                     table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!", arr_rides[i].Status, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                 }
             }
             else { //ride has at least one drive assigned to it
-                for (j in arr_rides[i].Drivers)
-                {
-                    if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName+" " + arr_rides[i].Drivers[j].CellPhone;
+                for (j in arr_rides[i].Drivers) {
+                    if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName + " " + arr_rides[i].Drivers[j].CellPhone;
                     else secondary = arr_rides[i].Drivers[j].DisplayName + " " + arr_rides[i].Drivers[j].CellPhone;
                 }
 
-                if (arr_rides[i].Drivers.length == 1)
-                {
+                if (arr_rides[i].Drivers.length == 1) {
                     if (primary != undefined) //Only a primary driver is assigned
                         var drivers = "ראשי: " + primary;
                     else //only a secondary driver is assigned
@@ -319,12 +367,12 @@
                 }
                 else {
                     table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
-
                 }
             }
+
         }
         //need to change the table from future to any table
-        function confirmDelete(ridePat,table) {
+        function confirmDelete(ridePat, table) {
             arr_details = { RidePatNum: ridePat.name, func: "show" };// ridePat.name=RidePatNum
             var data = table.row($(ridePat).parents('tr')).data();
             var msg = "";
@@ -378,8 +426,7 @@
             location.href = "ridePatForm.html";
         }
 
-        function backupToPrimaryButton(ridePat)
-        {
+        function backupToPrimaryButton(ridePat) {
             //arr_details = { RidePatNum: ridePat.name, func: "show" };//ridePat.name=RidePatNum
             var RidePat = new Object();
             RidePat.RidePatNum = ridePat.name;
@@ -389,9 +436,9 @@
                 url: "WebService.asmx/backupToPrimaryNotification",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                data: JSON.stringify({ ridePatId: RidePat.RidePatNum}),
+                data: JSON.stringify({ ridePatId: RidePat.RidePatNum }),
                 success: function (data) {
-                    if (data.d==1) {
+                    if (data.d == 1) {
                         swal({
                             title: "ההודעה נשלחה",
                             timer: 1000,
@@ -399,8 +446,8 @@
                             showConfirmButton: false
                         });
                     }
-                    
-                    
+
+
                 },
                 error: function (err) {
                     alert("Error in backupToPrimaryNotification:" + err.responseText);
@@ -417,7 +464,7 @@
             tableFuture = document.getElementById("datatable-future");
 
             tdarr = tableMorning.getElementsByTagName("td"); //Morning functions
-            tAnonymouse =tableMorning.getElementsByTagName("tr");//for anonymouse patient
+            tAnonymouse = tableMorning.getElementsByTagName("tr");//for anonymouse patient
 
             //MORNING!!!
             //NOT hardCoded for painting a row with a driver and anonymous patient.
@@ -450,9 +497,9 @@
                 }
             }
 
-            //when there is a reported problem 
+            //when there is a reported problem
             for (var j = 0; j < tdarr.length; j++) {
-                if (tdarr[j].innerHTML.indexOf("No data available in table") == -1 && tdarr[5].innerHTML.indexOf("שובץ נהג") == -1 && tdarr[5].innerHTML.indexOf("הגענו ליעד") == -1 && tdarr[5].innerHTML.indexOf("גיבוי בלבד") == -1 && tdarr[5].innerHTML.indexOf("שובץ נהג וגיבוי") == -1 && tdarr[5].innerHTML.indexOf("יצאתי לדרך") == -1 && tdarr[5].innerHTML.indexOf("הגעתי לנקודת האיסוף") == -1 && tdarr[5].innerHTML.indexOf("אספתי את החולה") == -1 && tdarr[5].innerHTML.indexOf("ממתינה לשיבוץ")==-1) {
+                if (tdarr[j].innerHTML.indexOf("No data available in table") == -1 && tdarr[5].innerHTML.indexOf("שובץ נהג") == -1 && tdarr[5].innerHTML.indexOf("הגענו ליעד") == -1 && tdarr[5].innerHTML.indexOf("גיבוי בלבד") == -1 && tdarr[5].innerHTML.indexOf("שובץ נהג וגיבוי") == -1 && tdarr[5].innerHTML.indexOf("יצאתי לדרך") == -1 && tdarr[5].innerHTML.indexOf("הגעתי לנקודת האיסוף") == -1 && tdarr[5].innerHTML.indexOf("אספתי את החולה") == -1 && tdarr[5].innerHTML.indexOf("ממתינה לשיבוץ") == -1) {
                     tdarr[5].style.backgroundColor = "#F1C232";
                     tdarr[5].style.color = "black";
                 }
@@ -468,7 +515,7 @@
             //                    tAnonymouse[j].style.backgroundColor = "#FFEF8F";
             //                }
             //            }
-            //        }                   
+            //        }
             //    }
             //}
 
@@ -478,18 +525,18 @@
             tAnonymouse = tableAfternoon.getElementsByTagName("tr");//for anonymouse patient
             //var data = tAfternoon.row().data();
 
-      //NOT hardCoded for painting a row with a driver and anonymous patient.
-            tAfternoon.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+            //NOT hardCoded for painting a row with a driver and anonymous patient.
+            tAfternoon.rows().every(function (rowIdx, tableLoop, rowLoop) {
                 var data = this.data();
-                if(data != undefined ){
+                if (data != undefined) {
                     if (data[7] == "True" && (data[5] != "ממתינה לשיבוץ")) {
                         var row = tAfternoon
-                            .row(rowIdx) 
+                            .row(rowIdx)
                             .node();
                         $(row).css("background-color", "#FFEF8F");
+                    }
                 }
-            }
-            } );
+            });
 
             for (var j = 0; j < tdarr.length; j++) {
                 if (tdarr[j].innerHTML.indexOf("אין!") !== -1) {
@@ -514,9 +561,9 @@
                     tdarr[5].style.color = "black";
                 }
             }
-                
-        //Hardcoded for painting a row with a driver and anonymous patient.
-            
+
+            //Hardcoded for painting a row with a driver and anonymous patient.
+
             //for (var j = 0; j < tAnonymouse.length; j++) {
             //    for (var i = 0; i < tAnonymouse[j].cells.length; i++) {
             //        if (tAnonymouse[j].cells[i].innerHTML.indexOf("שובץ נהג") !== -1 || tAnonymouse[j].cells[i].innerHTML.indexOf("גיבוי בלבד") !== -1 || tAnonymouse[j].cells[i].innerHTML.indexOf("שובץ נהג וגיבוי") !== -1) {
@@ -649,7 +696,7 @@
         <!-- ========== Right Sidebar Start ========== -->
 
         <div w3-include-html="menu.html"></div>
-       
+
         <!-- Right Sidebar End -->
         <!-- ============================================================== -->
         <!-- Start page Content here -->
@@ -704,9 +751,9 @@
                                 </div>
 
                                 <div id="accordion" class="panel-group">
-                                    <div class="panel panel-primary" >
+                                    <div class="panel panel-primary">
                                         <div class="panel-heading" id="col1">
-                                            <h4 class="panel-title"> <a href="#collapse1" data-parent="#accordion"  data-toggle="collapse" class="dropdown active open">נסיעות לבוקר</a></h4>
+                                            <h4 class="panel-title"> <a href="#collapse1" data-parent="#accordion" data-toggle="collapse" class="dropdown active open">נסיעות לבוקר</a></h4>
                                         </div>
                                         <div class="panel-collapse collapse" id="collapse1">
                                             <div class="panel-body">
@@ -727,11 +774,11 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="panel panel-primary" >
+                                    <div class="panel panel-primary">
                                         <div class="panel-heading" id="col2">
                                             <h4 class="panel-title"> <a href="#collapse2" data-parent="#accordion" data-toggle="collapse">נסיעות לאחה"צ</a></h4>
                                         </div>
-                                        <div class="panel-collapse collapse"  id="collapse2">
+                                        <div class="panel-collapse collapse" id="collapse2">
                                             <div class="panel-body">
                                                 <table id="datatable-afternoon" class="table table-striped table-bordered">
                                                     <thead>
@@ -750,9 +797,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="panel panel-primary" >
+                                    <div class="panel panel-primary">
                                         <div class="panel-heading" id="col3">
-                                            <h4 class="panel-title"> <a href="#collapse3" data-parent="#accordion"  data-toggle="collapse">נסיעות עתידיות</a></h4>
+                                            <h4 class="panel-title"> <a href="#collapse3" data-parent="#accordion" data-toggle="collapse">נסיעות עתידיות</a></h4>
                                         </div>
                                         <div class="panel-collapse collapse" id="collapse3">
                                             <div class="panel-body">

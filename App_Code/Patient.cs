@@ -823,4 +823,42 @@ public class Patient
 
         return list;
     }
+    public List<Escorted> getescortedsListMobile(string displayName, string patientCell)
+    {
+        #region DB functions
+        displayName = displayName.Replace("'", "''");
+        string query = "select * from PatientEscortView where PatientName= N'" + displayName + "' and PatientCell='" + patientCell + "'";
+        query += " and IsActive = 'True'";
+        //query += " order by EscortName";
+
+        List<Escorted> list = new List<Escorted>();
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+            Escorted e = new Escorted();
+            e.Pat = new Patient(dr["PatientName"].ToString()); //new Patient(dr["patient"].ToString());
+            e.Id = int.Parse(dr["EscortId"].ToString());
+            e.DisplayName = dr["EscortName"].ToString();
+            e.FirstNameA = dr["FirstNameA"].ToString();
+            e.FirstNameH = dr["FirstNameH"].ToString();
+            e.LastNameH = dr["LastNameH"].ToString();
+            e.LastNameA = dr["LastNameA"].ToString();
+            e.CellPhone = dr["CellPhone"].ToString();
+            e.CellPhone2 = dr["CellPhone2"].ToString();
+            e.HomePhone = dr["HomePhone"].ToString();
+            e.IsActive = Convert.ToBoolean(dr["IsActive"].ToString());
+            // e.ContactType = dr["ContactType"].ToString();
+            e.Gender = dr["Gender"].ToString();
+            e.City = dr["City"].ToString();
+            e.ContactType = dr["Relationship"].ToString();
+
+            list.Add(e);
+        }
+        #endregion
+
+        return list;
+    }
+
 }
