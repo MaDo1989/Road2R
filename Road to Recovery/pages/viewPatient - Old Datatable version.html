@@ -5,25 +5,16 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="description" content="KSMoving">
     <meta name="author" content="Coderthemes">
-
     <link rel="shortcut icon" href="assets/images/favicon_1.ico">
-
-    <title>פרטי מתנדב/ת</title>
-    
-    <style type="text/css">
-        /*.dt-body-left{text-align:left;}*/
-        .dt-body-right{text-align:right;}
-    </style>
+    <title>חולים</title>
     <!-- DataTables -->
     <link href="../plugins/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
     <link href="../plugins/datatables/buttons.bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="../plugins/datatables/fixedHeader.bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="../plugins/datatables/responsive.bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="../plugins/datatables/scroller.bootstrap.min.css" rel="stylesheet" type="text/css" />
-
     <!-- Sweet Alert css -->
     <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
-
     <link href="../plugins/switchery/switchery.min.css" rel="stylesheet" />
     <link href="assets/css/bootstrap-rtl.min.css" rel="stylesheet" type="text/css">
     <link href="assets/css/core.css" rel="stylesheet" type="text/css">
@@ -32,66 +23,32 @@
     <link href="assets/css/pages.css" rel="stylesheet" type="text/css">
     <link href="assets/css/menu.css" rel="stylesheet" type="text/css">
     <link href="assets/css/responsive.css" rel="stylesheet" type="text/css">
-
     <script src="assets/js/CookiesFunctions.js"></script>
-
     <script src="assets/js/modernizr.min.js"></script>
-
     <!--GENERAL object and additional functions-->
     <script src="lib/master.js"></script>
-
     <script src="assets/js/jquery.min.js"></script>
-
     <!-- Select2 css+js -->
     <link href="assets/css/select2.css" rel="stylesheet" />
     <script src="assets/js/select2.min.js"></script>
     <script src="lib/includeHTML.js"></script>
-    <script></script>
-
     <script>
         checkCookie();
-        var allVolunteersFromDb = [];
         $(document).ready(function () {
-            if (window.location.hostname.toString() == 'localhost' || window.location.pathname.indexOf('test') != -1) {
-                $("#na").css("background-color", "#ffde89");
-            }
-            if (window.location.href.indexOf('http://40.117.122.242/Road%20to%20Recovery/') != -1) {
-                window.location.href = "notAvailable.html";
-            }
+
             includeHTML();
             var userName = GENERAL.USER.getUserDisplayName();
             $("#userName").html(userName);
-
             //adds menu.html content into any "#menu" element
             //$('#menu').load('menu.html');
-            //var userName = GENERAL.USER.getUserName();
-            //$("#userName").html(userName);
 
             //Create a DataTable from the Table
             t = $('#datatable-buttons').DataTable({
-                //bProcessing: true,
-                //bServerSide:true,
-                //ajax: function (data, callback, settings) {
-                //    $.ajax({
-                //        url: '/your/url',
-                //        type: 'POST',
-                //        data: data,
-                //        success: function (data) {
-                //            callback(data);
-                //            // Do whatever you want.
-                //        }
-                //    });
-                //},
-                "bDeferRender": true,
-                columnDefs: [
-                    {
-                        targets: 5,
-                        className: 'dt-body-left'
-                    }
-                ],
                 "autoWidth": true,
-                
-                
+                dom: 'Bfrtip',
+                buttons: [
+                    'excel'
+                ]
             });
 
             refreshTable();
@@ -99,31 +56,41 @@
 
 
         function refreshTable() {
-            allVolunteersFromDb = [];
             $('#wait').show();
             checkCookie();
-            var active = $("#activeCustomers").prop('checked');
+            var active = $("#activePatient").prop('checked');
+
+            t.clear().draw();
+            //messi = Date.now();
             $.ajax({
                 dataType: "json",
-                url: "WebService.asmx/getVolunteers",
+                url: "WebService.asmx/getPatients",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                data: JSON.stringify({active: active}),
+                data: JSON.stringify({ active: active }),
                 success: function (data) {
-                    
+                    //messi2 = Date.now();
+                    //var timeDiff = messi2 - messi;
+                    //alert(timeDiff);
                     $('#wait').hide();
-                    var arr_volunteers = JSON.parse(data.d);
-                    GENERAL.VOLUNTEERS.setVolunteersList(JSON.stringify(arr_volunteers));
+                    var arr_patients = JSON.parse(data.d);
+                    //GENERAL.VOLUNTEERS.setvolunteersList(arr_volunteers);
 
-                    for (i in arr_volunteers) {
-                        var btnStr = ""
+                    for (i in arr_patients) {
+                        var equip = "";
+                        for (j in arr_patients[i].Equipment) {
+                            equip += arr_patients[i].Equipment[j] + ", ";
+                        }
+                        equip = equip.substring(0, equip.length - 2);
+                        if (arr_patients[i].Equipment.length == 0) equip = "אין";
+                        var btnStr = "";
                         //כפתור צפייה כרגע מוסתר
                         //var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button>";
                         var editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button>";
 
                         btnStr += /*showBtn + " " +*/ editBtn;
 
-                        if (arr_volunteers[i].IsActive == false) {
+                        if (arr_patients[i].IsActive == false) {
                             var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo' ></i></button>";
                             btnStr += " " + reactiveBtn;
                         }
@@ -131,147 +98,129 @@
                             var deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove' ></i></button>";
                             btnStr += " " + deleteBtn;
                         }
-                        var cellphone2 = "";
-                        if(arr_volunteers[i].CellPhone2!=""){
-                            cellphone2 = arr_volunteers[i].CellPhone2;
+
+                        //if this is an anonymous patient than cellphone number not relevent.
+                        var cellPhoneCheck = arr_patients[i].CellPhone;
+                        if (cellPhoneCheck.indexOf(":") != -1) {
+                            cellPhoneCheck = "";
                         }
-                        else cellphone2 = arr_volunteers[i].HomePhone;
-                        var Volunteer = {
-                            DisplayName: arr_volunteers[i].DisplayName,
-                            TypeVol: arr_volunteers[i].TypeVol,
-                            CellPhone: arr_volunteers[i].CellPhone,
-                            CellPhone2: cellphone2,
-                            City: arr_volunteers[i].City,
-                            Remarks: arr_volunteers[i].Remarks,
-                            Buttons: btnStr
+
+                        //var myDate = arr_patients[i].BirthDate.replace('/Date(', '');
+                        if (arr_patients[i].BirthDate != "") {
+                            var bDate = arr_patients[i].BirthDate.split(" ");
+                            var year = bDate[0].split("/");
+                            var d = new Date();
+                            var n = d.getFullYear();
+                            var newDate = n - year[2];
+                            if (newDate != 0) {
+                                t.row.add([arr_patients[i].DisplayName, cellPhoneCheck, newDate, arr_patients[i].Barrier.Name, arr_patients[i].Hospital.Name, equip, arr_patients[i].Remarks, btnStr]).draw(false); // arr_patients[i].BirthDate.substring(0,10),
+                            }
+                            else {
+                                t.row.add([arr_patients[i].DisplayName, cellPhoneCheck, "", arr_patients[i].Barrier.Name, arr_patients[i].Hospital.Name, equip, arr_patients[i].Remarks, btnStr]).draw(false); // arr_patients[i].BirthDate.substring(0,10),
+                            }
                         }
-                        allVolunteersFromDb.push(Volunteer);
+                        else {
+                            t.row.add([arr_patients[i].DisplayName, cellPhoneCheck, "", arr_patients[i].Barrier.Name, arr_patients[i].Hospital.Name, equip, arr_patients[i].Remarks, btnStr]).draw(false); // arr_patients[i].BirthDate.substring(0,10),
+                        }
+
                     }
 
-                    tbl = $('#datatable-buttons').DataTable({
-                        data: allVolunteersFromDb,
-                        "autoWidth": false,
-                        "destroy": true,
-                        dom: 'Bfrtip',
-                        buttons: [
-                            {
-                                extend: 'excel',
-                                title: 'מתנדבים'
-                            }
-                        ],
-                        columnDefs: [
-                            {
-                                targets: 5,
-                                className: 'dt-body-left'
-                            }
-                        ],
-                        columns: [
-                            { data: "DisplayName" },
-                            { data: "TypeVol" },
-                            { data: "CellPhone" },
-                            { data: "CellPhone2" },
-                            { data: "City" },
-                            { data: "Remarks" },
-                            { data: "Buttons" },
-                        ],
+                    t.columns([0]).order('asc').draw();
+
+                    $('#datatable-buttons tbody').on('click', '#edit', function () {
+                        var data = t.row($(this).parents('tr')).data();
+                        arr_details = { displayName: data[0], func: "edit" };
+                        GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
+                        if (data[0].indexOf("אנונימי") != -1) {
+                            location.href = "anonymousPatientForm.html";
+                        }
+                        else location.href = "patientForm.html";
+
                     });
 
-                    buttonsEvents();
+                    $('#datatable-buttons tbody').on('click', '#show', function () {
+                        var data = t.row($(this).parents('tr')).data();
+                        arr_details = { displayName: data[0], func: "show" };
+                        GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
+                        location.href = "patientForm.html";
+                    });
+
+                    $('#datatable-buttons tbody').on('click', '#remove', function () {
+                        var data = t.row($(this).parents('tr')).data();
+                        swal({
+                            title: "האם אתם בטוחים?",
+                            type: "warning",
+                            text: "מחיקת החולה " + data[0],
+                            showCancelButton: true,
+                            cancelButtonText: "בטל",
+                            confirmButtonClass: 'btn-warning',
+                            confirmButtonText: "מחיקה",
+                            closeOnConfirm: false
+                        }, function () {
+                            SetPatientStatus(data[0], 'false');
+                            swal({
+                                title: "החולה הפך ללא פעיל",
+                                timer: 1000,
+                                type: "success",
+                                showConfirmButton: false
+                            });
+                            setTimeout(function () { refreshTable() }, 1001);
+                        });
+                    });
+
+                    $('#datatable-buttons tbody').on('click', '#reactive', function () {
+                        var data = t.row($(this).parents('tr')).data();
+                        swal({
+                            title: "האם אתם בטוחים?",
+                            type: "warning",
+                            text: "שחזור החולה " + data[0],
+                            showCancelButton: true,
+                            cancelButtonText: "בטל",
+                            confirmButtonClass: 'btn-warning',
+                            confirmButtonText: "שחזר",
+                            closeOnConfirm: false
+                        }, function () {
+                            SetPatientStatus(data[0], 'true');
+                            swal({
+                                title: "החולה הפך לפעיל",
+                                timer: 1000,
+                                type: "success",
+                                showConfirmButton: false
+                            });
+                            setTimeout(function () { refreshTable() }, 1001);
+                        });
+
+                    });
                 },
                 error: function (err) {
-                    alert("Error in getVolunteers: " + err.responseText);
                     $('#wait').hide();
+                    alert("Error in getPatients: " + err.responseText);
                 }
             });
         }
-        function buttonsEvents(){
-            $('#datatable-buttons tbody').on('click', '#edit', function () {
-                var data = tbl.row($(this).parents('tr')).data();
-                arr_details = { displayName: data.DisplayName, func: "edit" };
-                GENERAL.VOLUNTEERS.setVolunteersList(JSON.stringify(arr_details));
-                location.href = "volunteerForm.html";
-            });
 
-            $('#datatable-buttons tbody').on('click', '#show', function () {
-                var data = tbl.row($(this).parents('tr')).data();
-                arr_details = { displayName: data.DisplayName, func: "show" };
-                GENERAL.VOLUNTEERS.setVolunteersList(JSON.stringify(arr_details));
-                location.href = "volunteerForm.html";
-            });
-
-            $('#datatable-buttons tbody').on('click', '#remove', function () {
-                var data = tbl.row($(this).parents('tr')).data();
-                swal({
-                    title: "האם אתם בטוחים?",
-                    type: "warning",
-                    text: "הפיכת המתנדב " + data.DisplayName + " ללא פעיל",
-                    showCancelButton: true,
-                    cancelButtonText: "בטל",
-                    confirmButtonClass: 'btn-warning',
-                    confirmButtonText: "מחיקה",
-                    closeOnConfirm: false
-                }, function () {
-                    deactivateVolunteer(data.DisplayName, 'false');
-                    swal({
-                        title: "המתנדב הפך ללא פעיל",
-                        timer: 1000,
-                        type: "success",
-                        showConfirmButton: false
-                    });
-                    setTimeout(function () { refreshTable() }, 1001);
-                });
-            });
-
-            $('#datatable-buttons tbody').on('click', '#reactive', function () {
-                var data = tbl.row($(this).parents('tr')).data();
-                swal({
-                    title: "האם אתם בטוחים?",
-                    type: "warning",
-                    text: "שחזור המתנדב " + data.DisplayName,
-                    showCancelButton: true,
-                    cancelButtonText: "בטל",
-                    confirmButtonClass: 'btn-warning',
-                    confirmButtonText: "שחזר",
-                    closeOnConfirm: false
-                }, function () {
-                    deactivateVolunteer(data.DisplayName, 'true');
-                    swal({
-                        title: "המתנדב הפך לפעיל",
-                        timer: 1000,
-                        type: "success",
-                        showConfirmButton: false
-                    });
-                    setTimeout(function () { refreshTable() }, 1001);
-                });
-
-            });
-        }
-
-        function deactivateVolunteer(displayName, active) {
+        function SetPatientStatus(displayName, active) {
             checkCookie();
-            
-            
             $.ajax({
                 dataType: "json",
-                url: "WebService.asmx/deactivateVolunteer",
+                url: "WebService.asmx/SetPatientStatus",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
                 data: JSON.stringify({ displayName: displayName, active: active }),
                 success: function (data) { },
-                error: function (err) { alert("Error in deactivateVolunteer: "+err.responseText); }
+                error: function (err) { alert("Error in SetPatientStatus: " + err.responseText); }
             });
 
         }
 
-        function newVolunteerForm() {
+        function newPatientForm() {
             displayName = " ";
             arr_details = { displayName: displayName, func: "new" };
-            GENERAL.VOLUNTEERS.setVolunteersList(JSON.stringify(arr_details));
-            location.href = "volunteerForm.html";
+            GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
+            location.href = "patientForm.html";
         }
 
     </script>
-
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -279,22 +228,16 @@
     <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
 
-
 </head>
 
-
 <body class="fixed-left">
-
     <!-- Begin page -->
     <div id="wrapper">
-
         <!-- Top Bar Start -->
         <div class="topbar">
 
-
-
             <!-- Navbar -->
-            <div id="na" class="navbar navbar-default" role="navigation">
+            <div class="navbar navbar-default" role="navigation">
                 <div class="container">
                     <div class="">
                         <!--Expend/Collaps Side Menue-->
@@ -304,23 +247,20 @@
                             </button>
                             <span class="clearfix"></span>
                         </div>
-
                         <!-- LOGO -->
                         <div class="pull-left">
                             <div class="text-center">
-                                <a href="manageRidePats.html" class="logo"><span>בדרך להחלמה</span></a>
+                                <a href="manageRidePats.html" class="logo"><span>בדרך להחלמה</span>&nbsp&nbsp&nbsp</a>
                             </div>
                         </div>
                         <div class="pull-right">
                             <a href="passwordForm.html"> <span class="logo" id="userName"></span></a>
                         </div>
-
-
                         <!--Search-->
                         <!--<form role="search" class="navbar-right app-search pull-right hidden-xs">
-        <input type="text" placeholder="חיפוש..." class="form-control app-search-input">
-        <a href=""><i class="fa fa-search"></i></a>
-    </form>-->
+                            <input type="text" placeholder="חיפוש..." class="form-control app-search-input">
+                            <a href=""><i class="fa fa-search"></i></a>
+                        </form>-->
                     </div>
                     <!--/.nav-collapse -->
                 </div>
@@ -337,65 +277,61 @@
             <!-- Start content -->
             <div class="content">
                 <div class="container">
-
                     <!-- Page-Title -->
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="page-title-box">
                                 <ol class="breadcrumb pull-right">
-
-                                    <li class="active">ניהול מתנדבים</li>
+                                    <li class="active">ניהול חולים</li>
                                 </ol>
-                                <h4 class="page-title">ניהול מתנדבים&nbsp&nbsp
-                                <i>
-                                    <img src="../../Media/רשימת מתנדבים.png" height="25" width="25"/>
-                                </i>
+                                <h4 class="page-title">
+                                    ניהול חולים&nbsp&nbsp
+                                    <i>
+                                        <img src="../../Media/רשימת חולים.png" height="25" width="25" />
+                                    </i>
                                 </h4>
                             </div>
                         </div>
                     </div>
 
-
-
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="card-box table-responsive">
-
                                 <!--<div class="row">
-        <div class="col-sm-8">
-            <h4 class="m-t-0 header-title"><b>טבלת מתנדבים</b></h4>
-            <p class="text-muted font-13 m-b-30">
-                מבט כללי על המתנדבים שבוצעו, ניתן לצפות בפרטים נוספים בלחיצה על כפתור ההרחבה.
-            </p>
-        </div>
-        <div class="col-sm-4 text-right">
-            <button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button> צפייה
-            <button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button> עריכה
-            <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button> מחיקה
-            <button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo'></i></button> שחזור
-        </div>
-    </div>-->
+                                    <div class="col-sm-8">
+                                        <h4 class="m-t-0 header-title"><b>טבלת חולים</b></h4>
+                                        <p class="text-muted font-13 m-b-30">
+                                            מבט כללי על החולים שבוצעו, ניתן לצפות בפרטים נוספים בלחיצה על כפתור ההרחבה.
+                                        </p>
+                                    </div>
+                                    <div class="col-sm-4 text-right">
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button> צפייה
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button> ערכיה
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button> מחיקה
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo'></i></button> שחזור
+                                    </div>
+                                </div>-->
                                 <div class="row">
                                     <div class="col-sm-3 checkbox checkbox-primary text-left">
-                                        <input id="activeCustomers" type="checkbox" onchange="refreshTable()" checked>
-                                        <label for="activeCustomers">
-                                            מתנדבים פעילים בלבד
+                                        <input id="activePatient" type="checkbox" onchange="refreshTable()" checked>
+                                        <label for="activePatient">
+                                            חולים פעילים בלבד
                                         </label>
                                     </div>
-
                                     <div class="col-sm-9 text-right ">
-                                        <button type="button" id="createCustomer" onclick="newVolunteerForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>חדש</button>
+                                        <button type="button" id="createCustomer" onclick="newPatientForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>חדש</button>
                                     </div>
                                 </div>
                                 <table id="datatable-buttons" class="table table-striped table-bordered">
                                     <thead>
-                                        <tr dir="rtl">
-                                            <th>המתנדב/ת</th>
-                                            <th>סוג משתמש/ת</th>
+                                        <tr>
+                                            <th>החולה</th>
                                             <th>טלפון</th>
-                                            <th>טלפון נוסף</th>
-                                            <th>יישוב</th>
-                                            <th style="text-align:right">הערות</th>
+                                            <th>גיל</th>
+                                            <th>מחסום</th>
+                                            <th>בית חולים</th>
+                                            <th>ציוד נלווה</th>
+                                            <th>הערות</th>
                                             <th>פעולות</th>
                                         </tr>
                                     </thead>
@@ -409,11 +345,8 @@
                     </div>
 
 
-
-
                 </div>
                 <!-- end container -->
-
             </div>
             <!-- end content -->
             <!-- FOOTER -->
@@ -421,21 +354,16 @@
                 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה
             </footer>
             <!-- End FOOTER -->
-
         </div>
         <!-- ============================================================== -->
         <!-- End page content here -->
         <!-- ============================================================== -->
-
     </div>
     <!-- END wrapper -->
-
-
 
     <script>
         var resizefunc = [];
     </script>
-
     <!-- jQuery  -->
     <script src="assets/js/bootstrap-rtl.min.js"></script>
     <script src="assets/js/detect.js"></script>
@@ -447,7 +375,6 @@
     <script src="assets/js/jquery.nicescroll.js"></script>
     <script src="assets/js/jquery.scrollTo.min.js"></script>
     <script src="../plugins/switchery/switchery.min.js"></script>
-
     <!-- Datatables-->
     <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="../plugins/datatables/dataTables.bootstrap.js"></script>
@@ -463,22 +390,17 @@
     <script src="../plugins/datatables/dataTables.responsive.min.js"></script>
     <script src="../plugins/datatables/responsive.bootstrap.min.js"></script>
     <script src="../plugins/datatables/dataTables.scroller.min.js"></script>
-
     <!-- Datatable init js -->
     <script src="assets/pages/datatables.init.js"></script>
-
     <!-- Sweet Alert js -->
     <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
     <script src="assets/pages/jquery.sweet-alert.init.js"></script>
-
     <script src="assets/js/jquery.core.js"></script>
     <script src="assets/js/jquery.app.js"></script>
-
     <script type="text/javascript">
 
         TableManageButtons.init();
 
     </script>
-
 </body>
 </html>

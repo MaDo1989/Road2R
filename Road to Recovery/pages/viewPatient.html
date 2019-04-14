@@ -34,34 +34,39 @@
     <script src="lib/includeHTML.js"></script>
     <script>
         checkCookie();
+        var allPatientsFromDB=[];
         $(document).ready(function () {
 
             includeHTML();
+            if(window.location.hostname.toString()=='localhost' || window.location.pathname.indexOf('test')!=-1){
+                $("#na").css("background-color", "#ffde89");
+            }
+           if (window.location.href.indexOf('http://40.117.122.242/Road%20to%20Recovery/') != -1) {
+                window.location.href = "notAvailable.html";
+            }
             var userName = GENERAL.USER.getUserDisplayName();
             $("#userName").html(userName);
             //adds menu.html content into any "#menu" element
             //$('#menu').load('menu.html');
 
             //Create a DataTable from the Table
-            t = $('#datatable-buttons').DataTable({
-                "autoWidth": true,
-                dom: 'Bfrtip',
-                buttons: [
-                    'excel'
-                ]
-            });
+            //t = $('#datatable-buttons').DataTable({
+            //    "autoWidth": true,
+            //    dom: 'Bfrtip',
+            //    buttons: [
+            //        'excel'
+            //    ]
+            //});
 
             refreshTable();
         });
 
 
         function refreshTable() {
+            allPatientsFromDB = [];
             $('#wait').show();
             checkCookie();
             var active = $("#activePatient").prop('checked');
-
-            t.clear().draw();
-            //messi = Date.now();
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/getPatients",
@@ -75,7 +80,7 @@
                     $('#wait').hide();
                     var arr_patients = JSON.parse(data.d);
                     //GENERAL.VOLUNTEERS.setvolunteersList(arr_volunteers);
-
+                
                     for (i in arr_patients) {
                         var equip = "";
                         for (j in arr_patients[i].Equipment) {
@@ -104,7 +109,7 @@
                         if (cellPhoneCheck.indexOf(":") != -1) {
                             cellPhoneCheck = "";
                         }
-
+                        var Patient = {};
                         //var myDate = arr_patients[i].BirthDate.replace('/Date(', '');
                         if (arr_patients[i].BirthDate != "") {
                             var bDate = arr_patients[i].BirthDate.split(" ");
@@ -113,25 +118,87 @@
                             var n = d.getFullYear();
                             var newDate = n - year[2];
                             if (newDate != 0) {
-                                t.row.add([arr_patients[i].DisplayName, cellPhoneCheck, newDate, arr_patients[i].Barrier.Name, arr_patients[i].Hospital.Name, equip, arr_patients[i].Remarks, btnStr]).draw(false); // arr_patients[i].BirthDate.substring(0,10),
+                                //t.row.add([arr_patients[i].DisplayName, cellPhoneCheck, newDate, arr_patients[i].Barrier.Name, arr_patients[i].Hospital.Name, equip, arr_patients[i].Remarks, btnStr]).draw(false); // arr_patients[i].BirthDate.substring(0,10),
+                                Patient = {
+                                    DisplayName:arr_patients[i].DisplayName,
+                                    CellPhone:cellPhoneCheck,
+                                    Date:newDate,
+                                    Barrier:arr_patients[i].Barrier.Name,
+                                    Hospital:arr_patients[i].Hospital.Name,
+                                    Equipment:equip,
+                                    Remarks:arr_patients[i].Remarks,
+                                    Buttons:btnStr
+                                };
                             }
                             else {
-                                t.row.add([arr_patients[i].DisplayName, cellPhoneCheck, "", arr_patients[i].Barrier.Name, arr_patients[i].Hospital.Name, equip, arr_patients[i].Remarks, btnStr]).draw(false); // arr_patients[i].BirthDate.substring(0,10),
+                                Patient = {
+                                    DisplayName:arr_patients[i].DisplayName,
+                                    CellPhone:cellPhoneCheck,
+                                    Date:"",
+                                    Barrier:arr_patients[i].Barrier.Name,
+                                    Hospital:arr_patients[i].Hospital.Name,
+                                    Equipment:equip,
+                                    Remarks:arr_patients[i].Remarks,
+                                    Buttons:btnStr
+                                };
+                               // t.row.add([arr_patients[i].DisplayName, cellPhoneCheck, "", arr_patients[i].Barrier.Name, arr_patients[i].Hospital.Name, equip, arr_patients[i].Remarks, btnStr]).draw(false); // arr_patients[i].BirthDate.substring(0,10),
                             }
+
                         }
                         else {
-                            t.row.add([arr_patients[i].DisplayName, cellPhoneCheck, "", arr_patients[i].Barrier.Name, arr_patients[i].Hospital.Name, equip, arr_patients[i].Remarks, btnStr]).draw(false); // arr_patients[i].BirthDate.substring(0,10),
+                                Patient = {
+                                    DisplayName:arr_patients[i].DisplayName,
+                                    CellPhone:cellPhoneCheck,
+                                    Date:"",
+                                    Barrier:arr_patients[i].Barrier.Name,
+                                    Hospital:arr_patients[i].Hospital.Name,
+                                    Equipment:equip,
+                                    Remarks:arr_patients[i].Remarks,
+                                    Buttons:btnStr
+                                };
+                            //t.row.add([arr_patients[i].DisplayName, cellPhoneCheck, "", arr_patients[i].Barrier.Name, arr_patients[i].Hospital.Name, equip, arr_patients[i].Remarks, btnStr]).draw(false); // arr_patients[i].BirthDate.substring(0,10),
                         }
+
+                        allPatientsFromDB.push(Patient);
 
                     }
 
-                    t.columns([0]).order('asc').draw();
+                    tbl = $('#datatable-buttons').DataTable({
+                        data: allPatientsFromDB,
+                        "autoWidth": false,
+                        "destroy": true,
+                        dom: 'Bfrtip',
+                        buttons: [
+                            'excel'
+                        ],
+                        columns: [
+                            { data: "DisplayName" },
+                            { data: "CellPhone" },
+                            { data: "Date" },
+                            { data: "Barrier" },
+                            { data: "Hospital" },
+                            { data: "Equipment" },
+                            { data: "Remarks" },
+                            { data: "Buttons" },
+                        ],
+                    });
+                    //fire up the buttons
+                    buttonsEvents();
 
+                },
+                error: function (err) {
+                    $('#wait').hide();
+                    alert("Error in getPatients: " + err.responseText);
+                }
+            });
+        }
+
+        function buttonsEvents(){
                     $('#datatable-buttons tbody').on('click', '#edit', function () {
-                        var data = t.row($(this).parents('tr')).data();
-                        arr_details = { displayName: data[0], func: "edit" };
+                        var data = tbl.row($(this).parents('tr')).data();
+                        arr_details = { displayName: data.DisplayName, func: "edit" };
                         GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
-                        if (data[0].indexOf("אנונימי") != -1) {
+                        if (data.DisplayName.indexOf("אנונימי") != -1) {
                             location.href = "anonymousPatientForm.html";
                         }
                         else location.href = "patientForm.html";
@@ -139,25 +206,25 @@
                     });
 
                     $('#datatable-buttons tbody').on('click', '#show', function () {
-                        var data = t.row($(this).parents('tr')).data();
-                        arr_details = { displayName: data[0], func: "show" };
+                        var data = tbl.row($(this).parents('tr')).data();
+                        arr_details = { displayName: data.DisplayName, func: "show" };
                         GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
                         location.href = "patientForm.html";
                     });
 
                     $('#datatable-buttons tbody').on('click', '#remove', function () {
-                        var data = t.row($(this).parents('tr')).data();
+                        var data = tbl.row($(this).parents('tr')).data();
                         swal({
                             title: "האם אתם בטוחים?",
                             type: "warning",
-                            text: "מחיקת החולה " + data[0],
+                            text: "מחיקת החולה " + data.DisplayName,
                             showCancelButton: true,
                             cancelButtonText: "בטל",
                             confirmButtonClass: 'btn-warning',
                             confirmButtonText: "מחיקה",
                             closeOnConfirm: false
                         }, function () {
-                            SetPatientStatus(data[0], 'false');
+                            SetPatientStatus(data.DisplayName, 'false');
                             swal({
                                 title: "החולה הפך ללא פעיל",
                                 timer: 1000,
@@ -169,18 +236,18 @@
                     });
 
                     $('#datatable-buttons tbody').on('click', '#reactive', function () {
-                        var data = t.row($(this).parents('tr')).data();
+                        var data = tbl.row($(this).parents('tr')).data();
                         swal({
                             title: "האם אתם בטוחים?",
                             type: "warning",
-                            text: "שחזור החולה " + data[0],
+                            text: "שחזור החולה " + data.DisplayName,
                             showCancelButton: true,
                             cancelButtonText: "בטל",
                             confirmButtonClass: 'btn-warning',
                             confirmButtonText: "שחזר",
                             closeOnConfirm: false
                         }, function () {
-                            SetPatientStatus(data[0], 'true');
+                            SetPatientStatus(data.DisplayName, 'true');
                             swal({
                                 title: "החולה הפך לפעיל",
                                 timer: 1000,
@@ -191,12 +258,7 @@
                         });
 
                     });
-                },
-                error: function (err) {
-                    $('#wait').hide();
-                    alert("Error in getPatients: " + err.responseText);
-                }
-            });
+
         }
 
         function SetPatientStatus(displayName, active) {
@@ -237,7 +299,7 @@
         <div class="topbar">
 
             <!-- Navbar -->
-            <div class="navbar navbar-default" role="navigation">
+            <div id="na" class="navbar navbar-default" role="navigation">
                 <div class="container">
                     <div class="">
                         <!--Expend/Collaps Side Menue-->

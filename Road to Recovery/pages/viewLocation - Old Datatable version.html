@@ -5,16 +5,24 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="description" content="KSMoving">
     <meta name="author" content="Coderthemes">
+
     <link rel="shortcut icon" href="assets/images/favicon_1.ico">
-    <title>חולים</title>
+
+    <title>פרטי אזורים</title>
+    
+    <style type="text/css">
+        .dt-body-left{text-align:left;}
+    </style>
     <!-- DataTables -->
     <link href="../plugins/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
     <link href="../plugins/datatables/buttons.bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="../plugins/datatables/fixedHeader.bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="../plugins/datatables/responsive.bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="../plugins/datatables/scroller.bootstrap.min.css" rel="stylesheet" type="text/css" />
+
     <!-- Sweet Alert css -->
     <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
+
     <link href="../plugins/switchery/switchery.min.css" rel="stylesheet" />
     <link href="assets/css/bootstrap-rtl.min.css" rel="stylesheet" type="text/css">
     <link href="assets/css/core.css" rel="stylesheet" type="text/css">
@@ -23,15 +31,21 @@
     <link href="assets/css/pages.css" rel="stylesheet" type="text/css">
     <link href="assets/css/menu.css" rel="stylesheet" type="text/css">
     <link href="assets/css/responsive.css" rel="stylesheet" type="text/css">
+
     <script src="assets/js/CookiesFunctions.js"></script>
+
     <script src="assets/js/modernizr.min.js"></script>
+
     <!--GENERAL object and additional functions-->
     <script src="lib/master.js"></script>
+
     <script src="assets/js/jquery.min.js"></script>
+
     <!-- Select2 css+js -->
     <link href="assets/css/select2.css" rel="stylesheet" />
     <script src="assets/js/select2.min.js"></script>
     <script src="lib/includeHTML.js"></script>
+
     <script>
         checkCookie();
         $(document).ready(function () {
@@ -44,10 +58,11 @@
 
             //Create a DataTable from the Table
             t = $('#datatable-buttons').DataTable({
-                "autoWidth": true,
-                dom: 'Bfrtip',
-                buttons: [
-                    'excel'
+                columnDefs: [
+                    {
+                        targets: 5,
+                        className: 'dt-body-left'
+                    }
                 ]
             });
 
@@ -58,40 +73,29 @@
         function refreshTable() {
             $('#wait').show();
             checkCookie();
-            var active = $("#activePatient").prop('checked');
+            var active = $("#activeCustomers").prop('checked');
 
             t.clear().draw();
-            //messi = Date.now();
+
             $.ajax({
                 dataType: "json",
-                url: "WebService.asmx/getPatients",
+                url: "WebService.asmx/getDestinationView",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                data: JSON.stringify({ active: active }),
+                data: JSON.stringify({active: active}),
                 success: function (data) {
-                    //messi2 = Date.now();
-                    //var timeDiff = messi2 - messi;
-                    //alert(timeDiff);
                     $('#wait').hide();
-                    var arr_patients = JSON.parse(data.d);
-                    //GENERAL.VOLUNTEERS.setvolunteersList(arr_volunteers);
+                    var arr_Locations = JSON.parse(data.d);
+                    GENERAL.LOCATIONS.setLocationsList(JSON.stringify(arr_Locations));
 
-                    for (i in arr_patients) {
-                        var equip = "";
-                        for (j in arr_patients[i].Equipment)
-                        {
-                            equip += arr_patients[i].Equipment[j] + ", ";
-                        }
-                        equip = equip.substring(0, equip.length - 2);
-                        if (arr_patients[i].Equipment.length==0) equip = "אין";
-                        var btnStr = "";
-                        //כפתור צפייה כרגע מוסתר
+                    for (i in arr_Locations) {
+                        var btnStr = ""
                         //var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button>";
                         var editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button>";
 
                         btnStr += /*showBtn + " " +*/ editBtn;
 
-                        if (arr_patients[i].IsActive == false) {
+                        if (arr_Locations[i].IsActive == false) {
                             var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo' ></i></button>";
                             btnStr += " " + reactiveBtn;
                         }
@@ -99,68 +103,55 @@
                             var deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove' ></i></button>";
                             btnStr += " " + deleteBtn;
                         }
-                        
-                        //if this is an anonymous patient than cellphone number not relevent.
-                        var cellPhoneCheck = arr_patients[i].CellPhone;
-                        if(cellPhoneCheck.indexOf(":") != -1){
-                            cellPhoneCheck = "";
+                        if  (arr_Locations[i].ManagerPhones ==null){
+                            arr_Locations[i].ManagerPhones = "";
                         }
-                        
-                        //var myDate = arr_patients[i].BirthDate.replace('/Date(', '');
-                        if (arr_patients[i].BirthDate != "") {
-                            var bDate = arr_patients[i].BirthDate.split(" ");
-                            var year = bDate[0].split("/");
-                            var d = new Date();
-                            var n = d.getFullYear();
-                            var newDate = n - year[2];
-                            if(newDate != 0){
-                                t.row.add([arr_patients[i].DisplayName, cellPhoneCheck, newDate, arr_patients[i].Barrier.Name, arr_patients[i].Hospital.Name, equip,arr_patients[i].Remarks, btnStr]).draw(false); // arr_patients[i].BirthDate.substring(0,10),
-                            }
-                            else {
-                                t.row.add([arr_patients[i].DisplayName, cellPhoneCheck, "", arr_patients[i].Barrier.Name, arr_patients[i].Hospital.Name, equip,arr_patients[i].Remarks, btnStr]).draw(false); // arr_patients[i].BirthDate.substring(0,10),
-                            }
+                        if  (arr_Locations[i].ManagerName == null){
+                            arr_Locations[i].ManagerName = "";
                         }
-                        else {
-                            t.row.add([arr_patients[i].DisplayName, cellPhoneCheck, "", arr_patients[i].Barrier.Name, arr_patients[i].Hospital.Name, equip,arr_patients[i].Remarks, btnStr]).draw(false); // arr_patients[i].BirthDate.substring(0,10),
+                        if  (arr_Locations[i].ManagerLastName == null){
+                            arr_Locations[i].ManagerLastName = "";
                         }
+                        if (arr_Locations[i].ManagerName != "") {
+                            t.row.add([arr_Locations[i].Type, arr_Locations[i].Name, arr_Locations[i].Area,arr_Locations[i].ManagerName + " " + arr_Locations[i].ManagerLastName + ', ' + arr_Locations[i].ManagerPhones , arr_Locations[i].Remarks, btnStr]).draw(false);
+                        }
+                        else
+                            t.row.add([arr_Locations[i].Type, arr_Locations[i].Name, arr_Locations[i].Area,"" , arr_Locations[i].Remarks, btnStr]).draw(false);
 
                     }
 
-                    t.columns([0]).order('asc').draw();
+                    t.columns([1]).order('asc').draw();
 
                     $('#datatable-buttons tbody').on('click', '#edit', function () {
                         var data = t.row($(this).parents('tr')).data();
-                        arr_details = { displayName: data[0], func: "edit" };
-                        GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
-                        if (data[0].indexOf("אנונימי")!=-1) {
-                            location.href = "anonymousPatientForm.html";
-                        }
-                        else location.href = "patientForm.html";
-
+                        arr_details = { displayName: data[1], func: "edit" };
+                        GENERAL.LOCATIONS.setLocationsList(JSON.stringify(arr_details));
+                        location.href = "locationForm.html";
                     });
 
                     $('#datatable-buttons tbody').on('click', '#show', function () {
                         var data = t.row($(this).parents('tr')).data();
-                        arr_details = { displayName: data[0], func: "show" };
-                        GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
-                        location.href = "patientForm.html";
+                        arr_details = { displayName: data[1], func: "show" };
+                        GENERAL.LOCATIONS.setLocationsList(JSON.stringify(arr_details));
+                        location.href = "locationForm.html";
                     });
+
 
                     $('#datatable-buttons tbody').on('click', '#remove', function () {
                         var data = t.row($(this).parents('tr')).data();
                         swal({
                             title: "האם אתם בטוחים?",
                             type: "warning",
-                            text: "מחיקת החולה "+data[0],
+                            text: "הפיכת האזור " + data[1]+" ללא פעיל",
                             showCancelButton: true,
                             cancelButtonText: "בטל",
                             confirmButtonClass: 'btn-warning',
                             confirmButtonText: "מחיקה",
                             closeOnConfirm: false
                         }, function () {
-                            SetPatientStatus(data[0], 'false');
+                            deactivateLocation(data[1], 'false');
                             swal({
-                                title: "החולה הפך ללא פעיל",
+                                title: "האזור הפך ללא פעיל",
                                 timer: 1000,
                                 type: "success",
                                 showConfirmButton: false
@@ -174,16 +165,16 @@
                         swal({
                             title: "האם אתם בטוחים?",
                             type: "warning",
-                            text: "שחזור החולה "+data[0],
+                            text: "שחזור האזור "+data[1],
                             showCancelButton: true,
                             cancelButtonText: "בטל",
                             confirmButtonClass: 'btn-warning',
                             confirmButtonText: "שחזר",
                             closeOnConfirm: false
                         }, function () {
-                            SetPatientStatus(data[0], 'true');
+                            deactivateLocation(data[1], 'true');
                             swal({
-                                title: "החולה הפך לפעיל",
+                                title: "האזור הפך לפעיל",
                                 timer: 1000,
                                 type: "success",
                                 showConfirmButton: false
@@ -194,34 +185,34 @@
                     });
                 },
                 error: function (err) {
+                    alert("Error in deactivateLocation: " + err.responseText);
                     $('#wait').hide();
-                    alert("Error in getPatients: " + err.responseText);
                 }
             });
         }
 
-        function SetPatientStatus(displayName, active) {
+        //changed by sapir.
+        function deactivateLocation(displayName, active) {
             checkCookie();
             $.ajax({
                 dataType: "json",
-                url: "WebService.asmx/SetPatientStatus",
+                url: "WebService.asmx/deactivateLocation",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
                 data: JSON.stringify({ displayName: displayName, active: active }),
                 success: function (data) { },
-                error: function (err) { alert("Error in SetPatientStatus: "+err.responseText); }
+                error: function (err) { alert("Error in deactivateLocation: "+err.responseText); }
             });
 
         }
-
-        function newPatientForm() {
+        function newLocationForm() {
             displayName = " ";
             arr_details = { displayName: displayName, func: "new" };
-            GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
-            location.href = "patientForm.html";
+            GENERAL.LOCATIONS.setLocationsList(JSON.stringify(arr_details));
+            location.href = "locationForm.html";
         }
-
     </script>
+
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -229,14 +220,17 @@
     <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
 
+
 </head>
 
+
 <body class="fixed-left">
+
     <!-- Begin page -->
     <div id="wrapper">
+
         <!-- Top Bar Start -->
         <div class="topbar">
-
             <!-- Navbar -->
             <div class="navbar navbar-default" role="navigation">
                 <div class="container">
@@ -248,15 +242,19 @@
                             </button>
                             <span class="clearfix"></span>
                         </div>
+
                         <!-- LOGO -->
                         <div class="pull-left">
                             <div class="text-center">
-                                <a href="manageRidePats.html" class="logo"><span>בדרך להחלמה</span>&nbsp&nbsp&nbsp</a>
+                                <a href="manageRidePats.html" class="logo"><span>בדרך להחלמה</span></a>
                             </div>
                         </div>
                         <div class="pull-right">
                             <a href="passwordForm.html"> <span class="logo" id="userName"></span></a>
                         </div>
+
+
+
                         <!--Search-->
                         <!--<form role="search" class="navbar-right app-search pull-right hidden-xs">
         <input type="text" placeholder="חיפוש..." class="form-control app-search-input">
@@ -278,60 +276,50 @@
             <!-- Start content -->
             <div class="content">
                 <div class="container">
+
                     <!-- Page-Title -->
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="page-title-box">
                                 <ol class="breadcrumb pull-right">
-                                    <li class="active">ניהול חולים</li>
+
+                                    <li class="active">ניהול נקודות איסוף והורדה</li>
                                 </ol>
                                 <h4 class="page-title">
-                                    ניהול חולים&nbsp&nbsp
+                                    ניהול נקודות איסוף והורדה&nbsp&nbsp
                                     <i>
-                                        <img src="../../Media/רשימת חולים.png" height="25" width="25" />
+                                        <img src="../../Media/נקודות איסוף.png" height="25" width="25" />
                                     </i>
                                 </h4>
                             </div>
                         </div>
                     </div>
 
+
+
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="card-box table-responsive">
-                                <!--<div class="row">
-        <div class="col-sm-8">
-            <h4 class="m-t-0 header-title"><b>טבלת חולים</b></h4>
-            <p class="text-muted font-13 m-b-30">
-                מבט כללי על החולים שבוצעו, ניתן לצפות בפרטים נוספים בלחיצה על כפתור ההרחבה.
-            </p>
-        </div>
-        <div class="col-sm-4 text-right">
-            <button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button> צפייה
-            <button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button> ערכיה
-            <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button> מחיקה
-            <button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo'></i></button> שחזור
-        </div>
-    </div>-->
+
                                 <div class="row">
                                     <div class="col-sm-3 checkbox checkbox-primary text-left">
-                                        <input id="activePatient" type="checkbox" onchange="refreshTable()" checked>
-                                        <label for="activePatient">
-                                            חולים פעילים בלבד
+                                        <input id="activeCustomers" type="checkbox" onchange="refreshTable()" checked>
+                                        <label for="activeCustomers">
+                                            נקודות פעילות בלבד
                                         </label>
                                     </div>
+
                                     <div class="col-sm-9 text-right ">
-                                        <button type="button" id="createCustomer" onclick="newPatientForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>חדש</button>
+                                        <button type="button" id="createCustomer" onclick="newLocationForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>חדש</button>
                                     </div>
                                 </div>
                                 <table id="datatable-buttons" class="table table-striped table-bordered">
                                     <thead>
                                         <tr>
-                                            <th>החולה</th>
-                                            <th>טלפון</th>
-                                            <th>גיל</th>
-                                            <th>מחסום</th>
-                                            <th>בית חולים</th>
-                                            <th>ציוד נלווה</th>
+                                            <th>סוג</th>
+                                            <th>שם</th>
+                                            <th>אזור</th>
+                                            <th>איש קשר</th>
                                             <th>הערות</th>
                                             <th>פעולות</th>
                                         </tr>
@@ -346,8 +334,11 @@
                     </div>
 
 
+
+
                 </div>
                 <!-- end container -->
+
             </div>
             <!-- end content -->
             <!-- FOOTER -->
@@ -355,16 +346,21 @@
                 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה
             </footer>
             <!-- End FOOTER -->
+
         </div>
         <!-- ============================================================== -->
         <!-- End page content here -->
         <!-- ============================================================== -->
+
     </div>
     <!-- END wrapper -->
+
+
 
     <script>
         var resizefunc = [];
     </script>
+
     <!-- jQuery  -->
     <script src="assets/js/bootstrap-rtl.min.js"></script>
     <script src="assets/js/detect.js"></script>
@@ -376,6 +372,7 @@
     <script src="assets/js/jquery.nicescroll.js"></script>
     <script src="assets/js/jquery.scrollTo.min.js"></script>
     <script src="../plugins/switchery/switchery.min.js"></script>
+
     <!-- Datatables-->
     <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="../plugins/datatables/dataTables.bootstrap.js"></script>
@@ -391,17 +388,22 @@
     <script src="../plugins/datatables/dataTables.responsive.min.js"></script>
     <script src="../plugins/datatables/responsive.bootstrap.min.js"></script>
     <script src="../plugins/datatables/dataTables.scroller.min.js"></script>
+
     <!-- Datatable init js -->
     <script src="assets/pages/datatables.init.js"></script>
+
     <!-- Sweet Alert js -->
     <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
     <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+
     <script src="assets/js/jquery.core.js"></script>
     <script src="assets/js/jquery.app.js"></script>
+
     <script type="text/javascript">
 
         TableManageButtons.init();
 
     </script>
+
 </body>
 </html>

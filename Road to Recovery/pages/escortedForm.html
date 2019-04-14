@@ -369,7 +369,7 @@
 
 
             <!-- Navbar -->
-            <div class="navbar navbar-default" role="navigation">
+            <div id="na" class="navbar navbar-default" role="navigation">
                 <div class="container">
                     <div class="">
                         <!--Expend/Collaps Side Menue-->
@@ -595,6 +595,12 @@
         $(document).ready(function () {
 
             includeHTML();
+            if (window.location.hostname.toString() == 'localhost' || window.location.pathname.indexOf('test') != -1) {
+                $("#na").css("background-color", "#ffde89");
+            }
+            if (window.location.href.indexOf('http://40.117.122.242/Road%20to%20Recovery/') != -1) {
+                window.location.href = "notAvailable.html";
+            }
             // DO NOT REMOVE : GLOBAL FUNCTIONS!
             var errorClass = 'invalid';
             var errorElement = 'em';

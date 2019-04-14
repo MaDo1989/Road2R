@@ -516,7 +516,7 @@ public class Patient
             query += " where IsActive = 'true'";
         }
 
-        query += " order by id";
+        query += " order by Id";
 
         List<Patient> list = new List<Patient>();
         List<string> el = new List<string>();

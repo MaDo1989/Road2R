@@ -50,14 +50,8 @@
 
     <script>
         checkCookie();
-        var allVolunteersFromDb = [];
         $(document).ready(function () {
-            if (window.location.hostname.toString() == 'localhost' || window.location.pathname.indexOf('test') != -1) {
-                $("#na").css("background-color", "#ffde89");
-            }
-            if (window.location.href.indexOf('http://40.117.122.242/Road%20to%20Recovery/') != -1) {
-                window.location.href = "notAvailable.html";
-            }
+
             includeHTML();
             var userName = GENERAL.USER.getUserDisplayName();
             $("#userName").html(userName);
@@ -88,9 +82,16 @@
                         targets: 5,
                         className: 'dt-body-left'
                     }
+
                 ],
                 "autoWidth": true,
-                
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'excel',
+                        title:'מתנדבים'
+                    }
+                ],
                 
             });
 
@@ -99,10 +100,13 @@
 
 
         function refreshTable() {
-            allVolunteersFromDb = [];
             $('#wait').show();
             checkCookie();
             var active = $("#activeCustomers").prop('checked');
+
+            t.clear().draw();
+            //messi = Date.now();
+
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/getVolunteers",
@@ -136,114 +140,74 @@
                             cellphone2 = arr_volunteers[i].CellPhone2;
                         }
                         else cellphone2 = arr_volunteers[i].HomePhone;
-                        var Volunteer = {
-                            DisplayName: arr_volunteers[i].DisplayName,
-                            TypeVol: arr_volunteers[i].TypeVol,
-                            CellPhone: arr_volunteers[i].CellPhone,
-                            CellPhone2: cellphone2,
-                            City: arr_volunteers[i].City,
-                            Remarks: arr_volunteers[i].Remarks,
-                            Buttons: btnStr
-                        }
-                        allVolunteersFromDb.push(Volunteer);
+                        t.row.add([arr_volunteers[i].DisplayName, arr_volunteers[i].TypeVol, arr_volunteers[i].CellPhone, cellphone2,arr_volunteers[i].City, arr_volunteers[i].Remarks, btnStr]).draw(false);
+
                     }
 
-                    tbl = $('#datatable-buttons').DataTable({
-                        data: allVolunteersFromDb,
-                        "autoWidth": false,
-                        "destroy": true,
-                        dom: 'Bfrtip',
-                        buttons: [
-                            {
-                                extend: 'excel',
-                                title: 'מתנדבים'
-                            }
-                        ],
-                        columnDefs: [
-                            {
-                                targets: 5,
-                                className: 'dt-body-left'
-                            }
-                        ],
-                        columns: [
-                            { data: "DisplayName" },
-                            { data: "TypeVol" },
-                            { data: "CellPhone" },
-                            { data: "CellPhone2" },
-                            { data: "City" },
-                            { data: "Remarks" },
-                            { data: "Buttons" },
-                        ],
+                    t.columns([1]).draw();
+
+                    $('#datatable-buttons tbody').on('click', '#edit', function () {
+                        var data = t.row($(this).parents('tr')).data();
+                        arr_details = { displayName: data[0], func: "edit" };
+                        GENERAL.VOLUNTEERS.setVolunteersList(JSON.stringify(arr_details));
+                        location.href = "volunteerForm.html";
                     });
 
-                    buttonsEvents();
+                    $('#datatable-buttons tbody').on('click', '#show', function () {
+                        var data = t.row($(this).parents('tr')).data();
+                        arr_details = { displayName: data[0], func: "show" };
+                        GENERAL.VOLUNTEERS.setVolunteersList(JSON.stringify(arr_details));
+                        location.href = "volunteerForm.html";
+                    });
+
+                    $('#datatable-buttons tbody').on('click', '#remove', function () {
+                        var data = t.row($(this).parents('tr')).data();
+                        swal({
+                            title: "האם אתם בטוחים?",
+                            type: "warning",
+                            text: "הפיכת המתנדב " + data[0]+" ללא פעיל",
+                            showCancelButton: true,
+                            cancelButtonText: "בטל",
+                            confirmButtonClass: 'btn-warning',
+                            confirmButtonText: "מחיקה",
+                            closeOnConfirm: false
+                        }, function () {
+                            deactivateVolunteer(data[0], 'false');
+                            swal({
+                                title: "המתנדב הפך ללא פעיל",
+                                timer: 1000,
+                                type: "success",
+                                showConfirmButton: false
+                            });
+                            setTimeout(function () { refreshTable() }, 1001);
+                        });
+                    });
+
+                    $('#datatable-buttons tbody').on('click', '#reactive', function () {
+                        var data = t.row($(this).parents('tr')).data();
+                        swal({
+                            title: "האם אתם בטוחים?",
+                            type: "warning",
+                            text: "שחזור המתנדב "+data[0],
+                            showCancelButton: true,
+                            cancelButtonText: "בטל",
+                            confirmButtonClass: 'btn-warning',
+                            confirmButtonText: "שחזר",
+                            closeOnConfirm: false
+                        }, function () {
+                            deactivateVolunteer(data[0], 'true');
+                            swal({
+                                title: "המתנדב הפך לפעיל",
+                                timer: 1000,
+                                type: "success",
+                                showConfirmButton: false
+                            });
+                            setTimeout(function () { refreshTable() }, 1001);
+                        });
+
+                    });
                 },
-                error: function (err) {
-                    alert("Error in getVolunteers: " + err.responseText);
-                    $('#wait').hide();
-                }
-            });
-        }
-        function buttonsEvents(){
-            $('#datatable-buttons tbody').on('click', '#edit', function () {
-                var data = tbl.row($(this).parents('tr')).data();
-                arr_details = { displayName: data.DisplayName, func: "edit" };
-                GENERAL.VOLUNTEERS.setVolunteersList(JSON.stringify(arr_details));
-                location.href = "volunteerForm.html";
-            });
-
-            $('#datatable-buttons tbody').on('click', '#show', function () {
-                var data = tbl.row($(this).parents('tr')).data();
-                arr_details = { displayName: data.DisplayName, func: "show" };
-                GENERAL.VOLUNTEERS.setVolunteersList(JSON.stringify(arr_details));
-                location.href = "volunteerForm.html";
-            });
-
-            $('#datatable-buttons tbody').on('click', '#remove', function () {
-                var data = tbl.row($(this).parents('tr')).data();
-                swal({
-                    title: "האם אתם בטוחים?",
-                    type: "warning",
-                    text: "הפיכת המתנדב " + data.DisplayName + " ללא פעיל",
-                    showCancelButton: true,
-                    cancelButtonText: "בטל",
-                    confirmButtonClass: 'btn-warning',
-                    confirmButtonText: "מחיקה",
-                    closeOnConfirm: false
-                }, function () {
-                    deactivateVolunteer(data.DisplayName, 'false');
-                    swal({
-                        title: "המתנדב הפך ללא פעיל",
-                        timer: 1000,
-                        type: "success",
-                        showConfirmButton: false
-                    });
-                    setTimeout(function () { refreshTable() }, 1001);
-                });
-            });
-
-            $('#datatable-buttons tbody').on('click', '#reactive', function () {
-                var data = tbl.row($(this).parents('tr')).data();
-                swal({
-                    title: "האם אתם בטוחים?",
-                    type: "warning",
-                    text: "שחזור המתנדב " + data.DisplayName,
-                    showCancelButton: true,
-                    cancelButtonText: "בטל",
-                    confirmButtonClass: 'btn-warning',
-                    confirmButtonText: "שחזר",
-                    closeOnConfirm: false
-                }, function () {
-                    deactivateVolunteer(data.DisplayName, 'true');
-                    swal({
-                        title: "המתנדב הפך לפעיל",
-                        timer: 1000,
-                        type: "success",
-                        showConfirmButton: false
-                    });
-                    setTimeout(function () { refreshTable() }, 1001);
-                });
-
+                error: function (err) { alert("Error in getVolunteers: "+ err.responseText);  $('#wait').hide();}
             });
         }
 
@@ -294,7 +258,7 @@
 
 
             <!-- Navbar -->
-            <div id="na" class="navbar navbar-default" role="navigation">
+            <div class="navbar navbar-default" role="navigation">
                 <div class="container">
                     <div class="">
                         <!--Expend/Collaps Side Menue-->

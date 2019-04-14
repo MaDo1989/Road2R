@@ -92,6 +92,12 @@
         $(document).ready(function () {
 
             includeHTML();
+            if(window.location.hostname.toString()=='localhost' || window.location.pathname.indexOf('test')!=-1){
+                $("#na").css("background-color", "#ffde89");
+            }
+            if (window.location.href.indexOf('http://40.117.122.242/Road%20to%20Recovery/') != -1) {
+                window.location.href = "notAvailable.html";
+            }
             var userName = GENERAL.USER.getUserDisplayName();
             $("#userName").html(userName);
             //change ID from #patientFirstName"
@@ -119,7 +125,7 @@
 
 
             <!-- Navbar -->
-            <div class="navbar navbar-default" role="navigation">
+            <div id="na" class="navbar navbar-default" role="navigation">
                 <div class="container">
                     <div class="">
                         <!--Expend/Collaps Side Menue-->
@@ -383,7 +389,20 @@
         });
         //Input validation
         function validateUserInputs() {
-
+            var version = $("#versionName").val();
+            version = version.replace(".","");
+            var versionCheck = true;
+            if (isNaN(version)) {
+                swal(
+                    "שים לב!",
+                    "שם הגרסה צריך להיות מספר!",
+                    "warning"
+                );
+                versionCheck = false;
+            }
+            if (versionCheck) {
+                //checkLatest version and compere
+            }
             var checkGoogle = $("#googleStoreUrl").val();
             var checkApple = $("#appStoreUrl").val();
             //validate urls
@@ -418,7 +437,7 @@
             //    swal( "שים לב!","יש לבחור תאריך עתידי","warning");
             //}
 
-            if (!appMatch || !googleMatch) {
+            if (!appMatch || !googleMatch || !versionCheck) {
                 return false;
             } else return true;
         }

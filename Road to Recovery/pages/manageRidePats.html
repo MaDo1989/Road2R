@@ -66,7 +66,12 @@
             //$("#userStyle").mouseover(function () {
             //    $(this).css("background-color", "blue")
             //});
-
+            if(window.location.hostname.toString()=='localhost' || window.location.pathname.indexOf('test')!=-1){
+                $("#na").css("background-color", "#ffde89");
+            }
+            if (window.location.href.indexOf('http://40.117.122.242/Road%20to%20Recovery/') != -1) {
+                window.location.href = "notAvailable.html";
+            }
             includeHTML();
             var userName = GENERAL.USER.getUserDisplayName();
             $("#userName").html(userName);
@@ -262,7 +267,7 @@
                         {
                             if (date.getHours() < splitHour) //morning rides
                             {
-                                buildTables(tMorning);
+                                buildTables(tMorning);א
                             }
                             else //afternoon rides
                             {
@@ -349,8 +354,10 @@
             }
             else { //ride has at least one drive assigned to it
                 for (j in arr_rides[i].Drivers) {
-                    if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName + " " + arr_rides[i].Drivers[j].CellPhone;
-                    else secondary = arr_rides[i].Drivers[j].DisplayName + " " + arr_rides[i].Drivers[j].CellPhone;
+                    var primaryCellPhone = arr_rides[i].Drivers[j].CellPhone.replace( /^([\w]{3})/, "$1-" );
+                    var secondaryCellPhone = arr_rides[i].Drivers[j].CellPhone.replace( /^([\w]{3})/, "$1-" );    
+                    if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName + "<br/>" + primaryCellPhone;
+                    else secondary = arr_rides[i].Drivers[j].DisplayName + "<br/>" + secondaryCellPhone;
                 }
 
                 if (arr_rides[i].Drivers.length == 1) {
@@ -667,7 +674,7 @@
 
 
             <!-- Navbar -->
-            <div class="navbar navbar-default" role="navigation">
+            <div id="na" class="navbar navbar-default" role="navigation">
                 <div class="container">
                     <div class="">
                         <!--Expend/Collaps Side Menue-->

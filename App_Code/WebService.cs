@@ -210,7 +210,7 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod]
-    public string getPatients(bool active)
+    public string getPatients(bool active=true)
     {
         try
         {
@@ -226,7 +226,24 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
-    
+    [WebMethod]
+    public string getPatients1()
+    {
+        try
+        {
+            JavaScriptSerializer j = new JavaScriptSerializer();
+            Patient c = new Patient();
+            List<Patient> patientsList = c.getPatientsList(true);
+            return j.Serialize(patientsList);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in getPatients", ex);
+            throw new Exception("שגיאה בשליפת נתוני חולים");
+        }
+
+    }
+
     [WebMethod(Description ="get patients with the same origin and destination")]
     public string getPatientsForAnonymous(bool active,string origin,string dest)
     {
@@ -451,9 +468,11 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
+            //add global messege to all volunteers to download new app
             Version v = new Version();
             //add mandatory
             v.setNewVersion(userName, google, appstore, date, version,mandatory);
+
         }
         catch (Exception ex)
         {
@@ -600,14 +619,35 @@ public class WebService : System.Web.Services.WebService
         try
         {
             Ride r = new Ride();
-            List<Ride> rl = r.GetMyRides(volunteerId);
+            List<Ride> rl = r.GetMyFutureRides(volunteerId);
             JavaScriptSerializer j = new JavaScriptSerializer();
             return j.Serialize(rl);
         }
         catch (Exception ex)
         {
             Log.Error("Error in getMyRides", ex);
-            throw new Exception("שגיאה בשליפת נתוני הסעות");
+            throw new Exception("שגיאה בשליפת נתוני הסעות מתוכננות");
+        }
+
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string getMyPastRides(int volunteerId)
+    {
+        //RidePat rp = new RidePat();
+        //List<RidePat> r = rp.GetRidePat();
+        try
+        {
+            Ride r = new Ride();
+            List<Ride> rl = r.GetMyPastRides(volunteerId);
+            JavaScriptSerializer j = new JavaScriptSerializer();
+            return j.Serialize(rl);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in getMyRides", ex);
+            throw new Exception(" שגיאה בשליפת נתוני הסעות עבר");
         }
 
     }

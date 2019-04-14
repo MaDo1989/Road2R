@@ -127,7 +127,7 @@
 
     </div>
     <div class="text-center">
-        תאריך עדכון אחרון: 09/03/2019 21:42
+        תאריך עדכון אחרון: 14/04/2019 17:00
     </div>
         <div class="row" id="footer">
             <div class="col-sm-4">
@@ -151,6 +151,9 @@
 
             // DO NOT REMOVE : GLOBAL FUNCTIONS!
             //debugger;
+            if (window.location.href.indexOf('http://40.117.122.242/Road%20to%20Recovery/') != -1) {
+                window.location.href = "notAvailable.html";
+            }
             var errorClass = 'invalid';
             var errorElement = 'em';
 

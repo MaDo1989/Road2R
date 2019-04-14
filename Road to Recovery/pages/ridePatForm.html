@@ -125,7 +125,12 @@
         var rideStatusForFields = 0;
         $(document).ready(function () {
             includeHTML();
-
+            if (window.location.hostname.toString() == 'localhost' || window.location.pathname.indexOf('test') != -1) {
+                $("#na").css("background-color", "#ffde89");
+            }
+            if (window.location.href.indexOf('http://40.117.122.242/Road%20to%20Recovery/') != -1) {
+                window.location.href = "notAvailable.html";
+            }
             var userName = GENERAL.USER.getUserDisplayName();
             $("#userName").html(userName);
             //datePicker();
@@ -398,7 +403,7 @@
                 error: function (err) { alert("Error in generatePat"); }
             });
         }
-        //generatePatAnonymous extracts all patients with the same barrier and hospital as asnonymous patient
+
         function generatePatAnonymous(origin, destination) {
             var $select = $("#pat");
             $.ajax({
@@ -426,8 +431,6 @@
                     $("#patArabic").autocomplete({
                         source: arr_arabNames
                     });
-
-
                 },
                 error: function (err) { alert("Error in getPatientsForAnonymous"); }
             });
@@ -1155,7 +1158,7 @@
 
 
             <!-- Navbar -->
-            <div class="navbar navbar-default" role="navigation">
+            <div id="na" class="navbar navbar-default" role="navigation">
                 <div class="container">
                     <div class="">
                         <!--Expend/Collaps Side Menue-->
