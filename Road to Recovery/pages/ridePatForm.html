@@ -71,9 +71,20 @@
         * html .ui-autocomplete {
             height: 100px;
         }
+
         input[type=text]:focus {
             background-color: #FFE684;
         }
+
+        .duplicateDisplay {
+            display: none;
+        }
+
+        .duplicateDisplayOnShow {
+            background-color: #F8F8B5
+        }
+       
+        
     </style>
     <!--<script src="https://code.jquery.com/jquery-1.12.4.js"></script>-->
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -98,6 +109,8 @@
     <script src="assets/js/jquery.scrollTo.min.js"></script>
     <script src="../plugins/switchery/switchery.min.js"></script>
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
 
     <!-- Sweet Alert js -->
     <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
@@ -108,11 +121,13 @@
     <!--<script src="lib/datepicker-he.js"></script>-->
     <script src="lib/includeHTML.js"></script>
     <script>
-        //1.בהסעה חדשה רק שדה שם חולה הוא write, אחרי שמזינים אותו הכל נפתח. 
+        //1.בהסעה חדשה רק שדה שם חולה הוא write, אחרי שמזינים אותו הכל נפתח.
         checkCookie();
         arr_addressRows = [];
         $.jgrid.defaults.responsive = true;
         $.jgrid.defaults.styleUI = 'Bootstrap';
+        var currentOrigin = '';
+        var currentDestination = '';
         var spaceInCar;
         var isWaiting = "";
         var checkEscorts = [];
@@ -189,10 +204,22 @@
                 },
                 submitHandler: function (form, event) {
                     event.preventDefault();
-                    debugger;
-
                     var valid = validateInputs();
                     if (!valid) return false;
+                    var numberOfRides = 1;
+                    var repeatRide = "";
+                    if (anonymousName == "True") {
+                        isAnonymous = true;
+                    }
+                    if ($("#duplicateRidePat").is(':checked')) {
+                        numberOfRides = parseInt($("#numberOfRides").val());
+                        repeatRide = $("#repeatRide").val();
+                    }
+                    if (numberOfRides > 1) {
+                        var validRides = PrintRides(repeatRide,numberOfRides);
+                        if (!validRides) return false;
+                    }
+                   
 
                     var RidePatNum = $("#ridePatNum").val();
                     var Pat = new Object();
@@ -244,9 +271,7 @@
                         }
                     }
 
-                    if (anonymousName == "True") {
-                        isAnonymous = true;
-                    }
+
 
                     //in case of different equipment than declared for anonymous ridepat.
                     var str = "";
@@ -309,7 +334,7 @@
                             Escorts: Escorts, OnlyEscort: OnlyEscort
                         }
                     }
-                    var request = { RidePat: RidePat, func: func, isAnonymous: isAnonymous }
+                    var request = { RidePat: RidePat, func: func, isAnonymous: isAnonymous, numberOfRides: numberOfRides, repeatRideEvery: repeatRide }
                     var dataString = JSON.stringify(request);
                     $.ajax({
                         dataType: "json",
@@ -320,18 +345,34 @@
                         data: dataString,
                         success: function (data) {
                             //SaveAddresses(0, numberOfRecords, customerID);
-
-                            swal({
-                                title: "נשמר",
-                                type: "success",
-                                timer: 1000,
-                                showConfirmButton: false
-                            });
-                            setTimeout(function () { returnRidePat() }, 1001);
+                            if (data.d <= 100000) {
+                                swal({
+                                    title: "נשמר",
+                                    type: "success",
+                                    timer: 1000,
+                                    showConfirmButton: false
+                                });
+                                setTimeout(function () { returnRidePat() }, 1001);
+                            }
+                            else {
+                                data.d = data.d.toString();
+                                var temp = data.d.replace(/(?!^)(\d{2})(?=(?:\d{2})*$)/g, '/$1');
+                                //var dateToShow = data.d.replace(;
+                                swal(
+                                    "שגיאה",
+                                    "קיימת כבר הסעה בתאריך " + temp + " עם אותו החולה ואותן נקודות האיסוף",
+                                    "warning"
+                                );
+                            }
 
                         },
                         error: function (err) {
-                            alert("Error in setRidePat: " + err.responseText);
+                            swal(
+                                "שגיאה",
+                                "משהו השתבש, צא ונסה שנית",
+                                "warning"
+                            );
+                            //alert("Error in setRidePat: " + err.responseText);
                         }
                     });
 
@@ -363,8 +404,54 @@
 
             });
         });
+        function formatDate(date) {
+            var d = new Date(date),
+                month = '' + (d.getMonth() + 1),
+                day = '' + d.getDate(),
+                year = d.getFullYear();
+
+            if (month.length < 2) month = '0' + month;
+            if (day.length < 2) day = '0' + day;
+
+            return [day, month, year].join('/');
+        }
+        function PrintRides(repeatRide,num) {
+            var datesToPrint = num + " הסעות חדשות יווצרו בתאריכים:\n";
+            var dateRide = $("#dateRide").val();
+            var hours = $("#hour").val();
+            var minutes = $("#minute").val();
+
+            var Day = parseInt(dateRide.substring(8));
+            var Month = parseInt(dateRide.substring(5, 7)) - 1;
+            var Year = parseInt(dateRide.substring(0, 4));
+            var Hour = parseInt(hours);
+            var Minute = parseInt(minutes);
+            if ($("#afterNoon").is(':checked')) { //22:14 is the default time that means afternoon אחה''צ
+                Hour = 22;
+                Minute = 14;
+            }
+            var date = new Date(Year, Month, Day, Hour, Minute);
+
+            if (repeatRide === "כל שבוע") {
+                for (let i = 0; i < num; i++) {
+                    datesToPrint += formatDate(date) + "\n";
+                    date = new Date(date.setDate(date.getDate() + 7));
+                }
+            }
+            else {
+                for (let i = 0; i < num; i++) {
+                    datesToPrint += formatDate(date) + "\n";
+                    date = new Date(date.setDate(date.getDate() + 1));
+                }
+            }
 
 
+            
+            if (confirm(datesToPrint)) {
+                return true;
+            }
+            return false;
+        }
         function generatePat() {
             var $select = $("#pat");
             $.ajax({
@@ -376,10 +463,7 @@
                 data: JSON.stringify({ active: true }),
                 success: function (data) {
                     arr_pat = JSON.parse(data.d);
-                    ////$('<option>', { value: "", text: "בחר" }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
-                    //for (i in arr_pat) {
-                    //    $('<option>', { value: arr_pat[i].DisplayName, text: arr_pat[i].DisplayName }).appendTo($select);
-                    //}
+
                     patients = [];
                     arr_arabNames = [];
 
@@ -466,16 +550,10 @@
         }
 
         function getCoorSuccessCB(data) {
-            
+
             var $select = $("#coordinator");
             var coor = JSON.parse(data.d);
-            //$('<option>', { value: "", text: "בחר" }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
-            //for (i in arr_coor)
 
-            //{
-            //    // $('<option>', { value: arr_coor[i].DisplayName, text: arr_coor[i].DisplayName }).appendTo($select);
-            //    //
-            //}
 
             $select.val(coor.DisplayName);
             if (isAnonymous === true) {
@@ -488,48 +566,6 @@
         }
 
 
-        //function generateCoor() {
-        //    var $select = $("#coordinator");
-        //    $.ajax({
-        //        dataType: "json",
-        //        url: "WebService.asmx/getCoorList",
-        //        contentType: "application/json; charset=utf-8",
-        //        type: "POST",
-        //        async: false,
-        //        data: JSON.stringify({}),
-        //        success: function (data) {
-        //            var arr_coor = JSON.parse(data.d);
-        //            $('<option>', { value: "", text: "בחר" }).attr({ 'selected': '', 'disabled': '' }).appendTo($select);
-        //            for (i in arr_coor) {
-        //                $('<option>', { value: arr_coor[i].DisplayName, text: arr_coor[i].DisplayName }).appendTo($select);
-        //            }
-        //        },
-        //        error: function (err) { alert("Error generateCoor"); }
-        //    });
-        //}
-
-        //function generateCoor1(ridePat) {
-        //    var $select = $("#coordinator");
-        //    $.ajax({
-        //        dataType: "json",
-        //        url: "WebService.asmx/getCoorList",
-        //        contentType: "application/json; charset=utf-8",
-        //        type: "POST",
-        //        async: false,
-        //        data: JSON.stringify({}),
-        //        success: function (data) {
-        //            var arr_coor = JSON.parse(data.d);
-        //            if (ridePat.Coordinator.DisplayName != "") {
-        //                $('<option>', { value: ridePat.Coordinator.DisplayName, text: ridePat.Coordinator.DisplayName }).appendTo($select);
-        //            }
-        //            $('<option>', { value: "", text: "בחר" }).appendTo($select);
-        //            for (i in arr_coor) {
-        //                $('<option>', { value: arr_coor[i].DisplayName, text: arr_coor[i].DisplayName }).appendTo($select);
-        //            }
-        //        },
-        //        error: function (err) { alert("Error in generateCoor1"); }
-        //    });
-        //}
 
         function generateEsc() {
 
@@ -537,42 +573,7 @@
             var displayName = $("#pat").val();
             var i = patients.indexOf($("#pat").val());
             localStorage.PatID = arr_pat[i].Id;
-            //if (arr_pat[i].IsAnonymous == "True") {
-            //    var str = "";
-            //    arr_escort = []
-            //    var escorts = Number(arr_pat[i].NumberOfEscort);
-            //    for (var i = 1; i <= escorts; i++) {
-            //        var name = "מלווה " + i;
-            //        str += "<input id='escortCB" + i + "' type=checkbox checked name='" + name + "'>&nbsp";
-            //        str += "<label for='escortCB" + i + "'>" + name + "</label>&nbsp&nbsp";
-            //        //יצירת מערך של מלווים פיקטביים, לקיחת האיידי מהדאתאבייס
-            //        //the if statments need to chage acording to the escort's ids.
-            //        var escortForArr = new Object();
-            //        escortForArr.DisplayName = name;
-            //        if (i==1) {
-            //            escortForArr.Id = 22;
-            //        }
-            //        else if (i==2) {
-            //            escortForArr.Id = 23;
-            //        }
-            //        else if (i==3) {
-            //            escortForArr.Id = 25;
-            //        }
-            //        else if (i==4) {
-            //            escortForArr.Id = 26;
-            //        }
-            //        else if (i==5) {
-            //            escortForArr.Id = 28;
-            //        }
-            //        arr_escort.push(escortForArr);
-            //    }
-            //    if (escorts == 0) {
-            //        str = "<label>אין מלווים</label>";
-            //    }
 
-            //    $("#selectEscort").html(str);
-            //}
-            //else {
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/getPatientEscorted",
@@ -594,16 +595,16 @@
             var displayName = $("#pat").val();
             var j = patients.indexOf($("#pat").val());
             localStorage.PatID = arr_pat[j].Id;
-            
+
             for (i in arr_escort) {
                 var escort1 = arr_escort[i].DisplayName;
                 var escort = arr_escort[i].DisplayName.replace("'", "");
                 var id = arr_escort[i].Id;
-                if(arr_pat[j].IsAnonymous == "True"){
+                if (arr_pat[j].IsAnonymous == "True") {
                     str += "<input checked id='escortCB" + id + "' type=checkbox name='" + escort + "'>&nbsp";
                     str += "<label for='escortCB" + id + "'>" + escort1 + "</label>&nbsp&nbsp</br>";
                 }
-                else{
+                else {
                     str += "<input id='escortCB" + id + "' type=checkbox name='" + escort + "'>&nbsp";
                     str += "<label for='escortCB" + id + "'>" + escort1 + "</label>&nbsp&nbsp</br>";
                 }
@@ -766,7 +767,7 @@
             date = new Date(Year, Month, Day, $("#hour").val(), $("#minute").val());
             futureDate = checkFutureDate(date);
             if (!futureDate) {
-                swal("שגיאה","זמן ההסעה עבר, נא לתקן","warning");
+                swal("שגיאה", "זמן ההסעה עבר, נא לתקן", "warning");
             }
 
             var timeMatch = true;
@@ -809,8 +810,8 @@
                 var i = patients.indexOf($("#pat").val());
                 $("#patArabic").val(arr_arabNames[i]);
                 localStorage.PatID = arr_pat[i].Id;
-               
-                if(rideStatusForFields == 0){
+
+                if (rideStatusForFields == 0) {
                     $("#afterNoon").removeAttr('disabled');
                     $("#Origin").removeAttr('disabled');
                     $("#remark").removeAttr('disabled');
@@ -826,7 +827,7 @@
                 var i = arr_arabNames.indexOf($("#patArabic").val());
                 $("#pat").val(patients[i]);
                 localStorage.PatID = arr_pat[i].Id;
-                if(rideStatusForFields == 0){
+                if (rideStatusForFields == 0) {
                     $("#afterNoon").removeAttr('disabled');
                     $("#Origin").removeAttr('disabled');
                     $("#remark").removeAttr('disabled');
@@ -840,15 +841,21 @@
             }
 
             try {
-                debugger;
-                $("#Origin option[value ='" + arr_pat[i].Barrier.Name.replace("'", "\\'") + "']").prop('selected', true);
-                $("#Destination option[value ='" + arr_pat[i].Hospital.Name.replace("'", "\\'") + "']").prop('selected', true);
+                if (currentOrigin != '' && currentDestination != '') {
+                    $("#Origin option[value ='" + currentOrigin.replace("'", "\\'") + "']").prop('selected', true);
+                    $("#Destination option[value ='" + currentDestination.replace("'", "\\'") + "']").prop('selected', true);
+
+                }
+                else {
+                    $("#Origin option[value ='" + arr_pat[i].Barrier.Name.replace("'", "\\'") + "']").prop('selected', true);
+                    $("#Destination option[value ='" + arr_pat[i].Hospital.Name.replace("'", "\\'") + "']").prop('selected', true);
+                }
                 if (arr_pat[i].IsAnonymous == "True") {
                     getEquipmentForAnonymousPatient();
                     anonymousName = "True";
                     $("#Origin").attr('disabled', 'disabled');
                     $("#Destination").attr('disabled', 'disabled');
-                    $("#dirBTN").attr('disabled', 'disabled');
+                    //$("#dirBTN").attr('disabled', 'disabled');
                 }
                 else getEquipmentForPatient();
                 generateEsc();
@@ -976,6 +983,7 @@
                 $("#Equipment").attr('disabled', 'disabled');
                 if (arr_customer.func == "edit" || arr_customer.func == "show") {
                     uploadData(arr_customer.RidePatNum);
+                    $("#hideOnEdit").addClass('duplicateDisplay');
 
                     if (arr_customer.func == "show") {
 
@@ -1015,6 +1023,17 @@
                 }
             }
         }
+
+
+        function showDuplicate() {
+            if ($("#duplicateRidePat").is(':checked')) {
+                $("#hideDuplicate").removeClass('duplicateDisplay');
+            }
+            else {
+                $("#hideDuplicate").addClass('duplicateDisplay');
+            }
+        }
+
 
         //function to fill form for edit
         function uploadData(ridePatNum) {
@@ -1062,13 +1081,13 @@
                         $("#hour option[value='" + hours + "']").prop('selected', true);
                         $("#minute option[value='" + minutes + "']").prop('selected', true);
                     }
-                    if(ridePat.Status != 'ממתינה לשיבוץ'){
+                    if (ridePat.Status != 'ממתינה לשיבוץ') {
                         rideStatusForFields = 1;
                     }
-                    
+
                     //editing anonymous ridepat only if a driver assigned to the ride.
                     if ((ridePat.Pat.IsAnonymous == "True") && (ridePat.Status != 'ממתינה לשיבוץ')) {
-                        
+
                         $("#afterNoon").attr('disabled', 'disabled');
                         $("#Origin").attr('disabled', 'disabled');
                         $("#Destination").attr('disabled', 'disabled');
@@ -1108,6 +1127,12 @@
                     ridePat.Destination.Name = ridePat.Destination.Name.replace("'", "\\'");
                     $("#selectDestination option[value='" + ridePat.Destination.Name + "']").prop('selected', true);
 
+                    if (ridePat.Pat.IsAnonymous == "True") {
+                        currentOrigin = ridePat.Origin.Name;
+                        currentDestination = ridePat.Destination.Name;
+                    }
+                   
+
                     //$("#dateRide").val(date);
 
 
@@ -1127,8 +1152,8 @@
         }
 
         function returnRidePat() {
-            window.history.back();
-            //location.href = "manageRidePats.html"
+            //window.history.back();
+            location.href = "manageRidePats.html"
         }
 
         function checkAfternoon() {
@@ -1313,6 +1338,19 @@
                                             </div>
                                         </div>
                                         <div class="row m-l-10 m-r-10">
+
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">מספר הסעה</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="ridePatNum" name="ridePatNum" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                            </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6" id="ph">
                                             </div>
                                             <div class="col-sm-6" id="coorDiv">
@@ -1333,9 +1371,8 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="row m-l-10 m-r-10">
-                                            <div class="col-sm-6">
-                                            </div>
+                                        <!--<div class="row m-l-10 m-r-10">
+
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">מספר הסעה</label>
@@ -1344,6 +1381,44 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="col-sm-6">
+                                            </div>
+                                        </div>-->
+                                        <!--duplicate ride section-->
+                                        <div class="row m-l-10 m-r-10" id="hideOnEdit">
+                                            <div class="col-sm-6">
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <div class="col-sm-6">
+                                                        <input type="checkbox" id="duplicateRidePat" onchange="showDuplicate()" />
+                                                        <label for="duplicateRidePat"> הסעה חוזרת?</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="row m-l-10 m-r-10 duplicateDisplay" id="hideDuplicate">
+                                            <div class="col-md-6"></div>
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">תזמון</label>
+                                                        <select id="repeatRide" name="repeatRide" class="form-control" style="width:80%;display:inline">
+                                                            <option>כל שבוע</option>
+                                                            <option>מספר ימים ברצף</option>
+                                                        </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-2" id="coorDiv">
+                                                <div class="form-group">
+                                                    <label class="col-sm-4 control-label">מספר פעמים</label>
+                                                    <div class="col-sm-6" id="selectCoordinator">
+                                                        <input type="number" id="numberOfRides" name="numberOfRides" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1"></div>
                                         </div>
                                     </div>
                                 </div>

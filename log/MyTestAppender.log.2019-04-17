@@ -1,0 +1,49 @@
+﻿2019-04-17 12:27:37,109 ERROR [10] WebService.writeToLog - Successful login ;for user: 0524842888
+2019-04-17 12:28:14,339 ERROR [10] WebService.getCoorList - Error in getCoorList
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Volunteer.getCoorList() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 535
+   ב-  WebService.getCoorList() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 303
+2019-04-17 12:28:38,989 ERROR [13] WebService.getCoorList - Error in getCoorList
+System.Data.SqlClient.SqlException (0x80131904): חיבור עם השרת נוצר בהצלחה, אך לאחר מכן אירעה שגיאה במשך לחיצת הידיים המתבצעת לפני הכניסה. (provider: SSL Provider, error: 0 - The wait operation timed out.) ---> System.ComponentModel.Win32Exception (0x80004005): The wait operation timed out
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, Boolean needToClose, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 76
+   ב-  Volunteer.getCoorList() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Volunteer.cs:שורה 533
+   ב-  WebService.getCoorList() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 303
+ClientConnectionId:97d3b944-22d8-45ac-9526-a4cbe24e682f
+Error Number:258,State:0,Class:20
+2019-04-17 12:29:17,219 ERROR [10] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): חיבור עם השרת נוצר בהצלחה, אך לאחר מכן אירעה שגיאה במשך לחיצת הידיים המתבצעת לפני הכניסה. (provider: SSL Provider, error: 0 - The wait operation timed out.) ---> System.ComponentModel.Win32Exception (0x80004005): The wait operation timed out
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, Boolean needToClose, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 76
+   ב-  RidePat.getDriver() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 528
+   ב-  RidePat.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 589
+   ב-  WebService.GetRidePatView(Int32 volunteerId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 592
+ClientConnectionId:7f1d6c18-0f9e-4cb4-97c7-0ccf393f6d15
+Error Number:258,State:0,Class:20
+2019-04-17 12:29:22,555 ERROR [12] WebService.getPatients - Error in getPatients
+System.InvalidOperationException: הזמן הקצוב פג. משך הזמן הקצוב חלף לפני השגת חיבור מהמאגר. ייתכן שהדבר אירע מכיוון שכל החיבורים במאגר היו בשימוש והגעת לגודל המאגר המקסימלי.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, Boolean needToClose, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 76
+   ב-  Patient.getPatientsList(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 527
+   ב-  WebService.getPatients(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 231
+2019-04-17 12:29:47,219 ERROR [11] WebService.getAllStatus - Error in getAllStatus
+System.Data.SqlClient.SqlException (0x80131904): חיבור עם השרת נוצר בהצלחה, אך לאחר מכן אירעה שגיאה במשך לחיצת הידיים המתבצעת לפני הכניסה. (provider: SSL Provider, error: 0 - The wait operation timed out.) ---> System.ComponentModel.Win32Exception (0x80004005): The wait operation timed out
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, Boolean needToClose, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 76
+   ב-  Status.getAllStatus() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Irrelevant\Status.cs:שורה 26
+   ב-  WebService.getAllStatus() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 879
+ClientConnectionId:eaf62722-fbfb-4036-9230-27973d92006e
+Error Number:258,State:0,Class:20
+2019-04-17 13:01:29,730 ERROR [26] WebService.setRidePat - Error in setRidePat
+System.IndexOutOfRangeException: אין שורה במיקום 0.
+   ב-  System.Data.RBTree`1.GetNodeByIndex(Int32 userIndex)
+   ב-  System.Data.DataRowCollection.get_Item(Int32 index)
+   ב-  RidePat.GetRidePat(Int32 ridePatNum) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 456
+   ב-  RidePat.setRidePat(RidePat ridePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 362
+   ב-  WebService.setRidePat(RidePat RidePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 162
+2019-04-17 13:57:27,956 ERROR [6] WebService.writeToLog - Successful login ;for user: 0524842888
+2019-04-17 14:00:47,770 ERROR [12] WebService.writeToLog - Successful login ;for user: 0524842888
+2019-04-17 14:52:04,273 ERROR [29] WebService.setRidePat - Error in setRidePat
+System.IndexOutOfRangeException: אין שורה במיקום 0.
+   ב-  System.Data.RBTree`1.GetNodeByIndex(Int32 userIndex)
+   ב-  System.Data.DataRowCollection.get_Item(Int32 index)
+   ב-  RidePat.GetRidePat(Int32 ridePatNum) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 466
+   ב-  RidePat.setRidePat(RidePat ridePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 372
+   ב-  WebService.setRidePat(RidePat RidePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 162
+2019-04-17 20:40:29,631 ERROR [7] WebService.writeToLog - Successful login ;for user: 0524842888

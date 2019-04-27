@@ -154,13 +154,17 @@ public class WebService : System.Web.Services.WebService
     }
     //לסדר
     [WebMethod(EnableSession = true)]
-    public int setRidePat(RidePat RidePat, string func, bool isAnonymous)
+    public int setRidePat(RidePat RidePat, string func, bool isAnonymous,int numberOfRides, string repeatRideEvery)
     {
         try
         {
             RidePat rp = new RidePat();
-            int res = rp.setRidePat(RidePat, func,isAnonymous);
+            int res = rp.setRidePat(RidePat, func,isAnonymous, numberOfRides, repeatRideEvery);
             //write to log on delete 
+            if (res==666)
+            {
+                return res;
+            }
             if (res > 0 && func == "delete")
             {
                 string message = "";
@@ -169,7 +173,15 @@ public class WebService : System.Web.Services.WebService
             }
             return res;
         }
-        catch(Exception ex)
+        catch (ArgumentException ex)
+        {
+            JavaScriptSerializer j = new JavaScriptSerializer();
+
+            Log.Error("Error in setRidePat - same ride isue in date: ", ex);
+            throw new Exception(j.Serialize(" ההסעה בתאריך " +ex.Message+" כבר קיימת.\nאנא בחר תאריך חדש."));
+        }
+
+        catch (Exception ex)
         {
             Log.Error("Error in setRidePat", ex);
             throw new Exception("שגיאה בפתיחה/עדכון/מחיקה של הסעה חדשה");

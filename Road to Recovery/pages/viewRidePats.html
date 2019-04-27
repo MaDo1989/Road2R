@@ -476,12 +476,14 @@
 
         function deleteRidePat(RidePat, func) {
             checkCookie();
+            var numberOfRides= 1;
+            var repeatRide= "";
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/setRidePat",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                data: JSON.stringify({ RidePat: RidePat, func: func, isAnonymous : isAnonymous}),
+                data: JSON.stringify({ RidePat: RidePat, func: func, isAnonymous: isAnonymous,numberOfRides:numberOfRides,repeatRideEvery: repeatRide}),
                 success: function (data) {
                     swal({
                         title: "ההסעה נמחקה",

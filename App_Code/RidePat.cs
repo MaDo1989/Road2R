@@ -210,7 +210,7 @@ public class RidePat
         //
     }
     //לשנות את  isAnonymous
-    public int setRidePat(RidePat ridePat, string func,bool isAnonymous)
+    public int setRidePat(RidePat ridePat, string func,bool isAnonymous, int numberOfRides, string repeatRideEvery)
     {
         
         DbService db = new DbService();
@@ -245,37 +245,66 @@ public class RidePat
 
         if (func == "new") //Insert new RidePat to DB
         {
-            cmdParams[6] = cmd.Parameters.AddWithValue("@coordinator", Coordinator.DisplayName);
-
-            string query = "insert into RidePat (Patient,Origin,Destination,PickupTime,Coordinator,Remark,OnlyEscort) values (@pat,@origin,@destination,@date,@coordinator,@remark,@onlyEscort);SELECT SCOPE_IDENTITY();";
-            RidePatNum = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
-
-            if (Escorts.Count > 0 && RidePatNum != 0)
+            DateTime newDate = new DateTime();
+            for (int i = 0; i < numberOfRides; i++)
             {
-                string query2 = "";
-                SqlCommand cmd2 = new SqlCommand();
-                cmd2.CommandType = CommandType.Text;
-                SqlParameter[] cmdParams2 = new SqlParameter[3];
-                cmdParams2[0] = cmd2.Parameters.AddWithValue("@pat", Pat.Id);
-                cmdParams2[1] = cmd2.Parameters.AddWithValue("@ridePatNum", RidePatNum);
-                foreach (Escorted e in Escorts)
+                if (CheckRidePat(ridePat, isAnonymous))
                 {
-                    cmdParams2[2] = cmd2.Parameters.AddWithValue("@Escort", e.Id);
-                    query2 = "insert into [PatientEscort_PatientInRide (RidePat)] ([PatientEscortPatientId],[PatientEscortEscortId],[PatientInRide (RidePat)RidePatNum]) values (@pat,@Escort,@ridePatNum);";
-                    DbService db2 = new DbService();
-                    try
-                    {
-                        // db2.ExecuteQuery(query2);
-                        db2.ExecuteQuery(query2, cmd2.CommandType, cmdParams2);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw ex;
+                   return int.Parse(ridePat.Date.ToString("ddMMyy"));
+                }
+                cmdParams[6] = cmd.Parameters.AddWithValue("@coordinator", Coordinator.DisplayName);
 
+                string query = "insert into RidePat (Patient,Origin,Destination,PickupTime,Coordinator,Remark,OnlyEscort) values (@pat,@origin,@destination,@date,@coordinator,@remark,@onlyEscort);SELECT SCOPE_IDENTITY();";
+                RidePatNum = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
+
+                if (Escorts.Count > 0 && RidePatNum != 0)
+                {
+                    string query2 = "";
+                    SqlCommand cmd2 = new SqlCommand();
+                    cmd2.CommandType = CommandType.Text;
+                    SqlParameter[] cmdParams2 = new SqlParameter[3];
+                    cmdParams2[0] = cmd2.Parameters.AddWithValue("@pat", Pat.Id);
+                    cmdParams2[1] = cmd2.Parameters.AddWithValue("@ridePatNum", RidePatNum);
+                    foreach (Escorted e in Escorts)
+                    {
+                        cmdParams2[2] = cmd2.Parameters.AddWithValue("@Escort", e.Id);
+                        query2 = "insert into [PatientEscort_PatientInRide (RidePat)] ([PatientEscortPatientId],[PatientEscortEscortId],[PatientInRide (RidePat)RidePatNum]) values (@pat,@Escort,@ridePatNum);";
+                        DbService db2 = new DbService();
+                        try
+                        {
+                            // db2.ExecuteQuery(query2);
+                            db2.ExecuteQuery(query2, cmd2.CommandType, cmdParams2);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+
+                        }
                     }
                 }
-               
+                if (repeatRideEvery =="כל שבוע")
+                {
+                    if (i == 0)
+                    {
+                        newDate = Date.AddDays(7);
+                    }
+                    else newDate = newDate.AddDays(7);
+
+                    ridePat.Date = newDate;
+                    cmdParams[3] = cmd.Parameters.AddWithValue("@date", newDate);
+                }
+                else if(repeatRideEvery == "מספר ימים ברצף")
+                {
+                    if (i == 0)
+                    {
+                        newDate = Date.AddDays(1);
+                    }
+                    else newDate = newDate.AddDays(1);
+                    ridePat.Date = newDate;
+                    cmdParams[3] = cmd.Parameters.AddWithValue("@date", newDate);
+                }
             }
+            
         }
         else if (func == "edit") //Edit existing RidePat in DB
         {
@@ -296,8 +325,6 @@ public class RidePat
 
             if (Escorts.Count > 0 && res > 0)
             {
-
-
                 string query2 = "";
                 SqlCommand cmd2 = new SqlCommand();
                 cmd2.CommandType = CommandType.Text;
@@ -411,7 +438,27 @@ public class RidePat
     //    Status = _status;
     //}
 
+    public bool CheckRidePat(RidePat ridePat, bool isAnonymous)
+    {
+        string[] date = ridePat.Date.ToString().Split(' ');
+        DateTime date1 = Convert.ToDateTime(date[0]);
+        if (!isAnonymous)
+        {
+            string origin = ridePat.Origin.Name.Replace("'", "''");
+            string dest = ridePat.Destination.Name.Replace("'", "''");
+            string patName = ridePat.Pat.DisplayName.Replace("'", "''");
 
+            string query = "select * from RPView where Origin=N'" + origin + "' and Destination=N'" + dest + "' and cast(PickupTime as date)='" + date1.ToString("yyyy-MM-dd") + "' and DisplayName=N'" + patName + "'";
+            DbService db = new DbService();
+            DataSet ds = db.GetDataSetByQuery(query);
+            if (ds.Tables[0].Rows.Count==0)
+            {
+                return false;
+            }
+            return true;
+        }
+        else return false;
+    }
 
     public RidePat GetRidePat(int ridePatNum)
     {
