@@ -83,7 +83,9 @@
         .duplicateDisplayOnShow {
             background-color: #F8F8B5
         }
-       
+        input[type=text], input[type=checkbox], input[type=date], #statusRidePat, #Origin, #Destination, #hour,#minute {
+            border-color: #000
+        }
         
     </style>
     <!--<script src="https://code.jquery.com/jquery-1.12.4.js"></script>-->
@@ -1414,7 +1416,7 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-4 control-label">מספר פעמים</label>
                                                     <div class="col-sm-6" id="selectCoordinator">
-                                                        <input type="number" id="numberOfRides" name="numberOfRides" class="form-control">
+                                                        <input type="number" max="8" min="0" id="numberOfRides" name="numberOfRides" class="form-control">
                                                     </div>
                                                 </div>
                                             </div>

@@ -82,6 +82,12 @@
         input[type=text]:focus {
             background-color: #FFE684;
         }
+        input[type=text] ,input[type=checkbox],input[type=date]{
+            border-color: #000
+        }
+        #gender, #barrier, #hospital {
+            border-color: #000
+        }
     </style>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <!--City Autocomplete-->
@@ -1211,7 +1217,7 @@
             }
 
             var gender = $("#gender").val();
-            if (gender == "בחר") {
+            if (gender == "בחר" || gender==null) {
                 gender = false
                 swal(
                     "שגיאה",
