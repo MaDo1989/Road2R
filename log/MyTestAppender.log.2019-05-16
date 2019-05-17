@@ -1,0 +1,44 @@
+﻿2019-05-16 14:07:25,101 ERROR [19] WebService.writeToLog - Successful login ;for user: 0524842888
+2019-05-16 14:30:07,908 ERROR [77] WebService.setRidePat - Error in setRidePat - same ride isue in date: 
+System.ArgumentException: עמודה 'RideId' אינה שייכת לטבלה Table.
+   ב-  System.Data.DataRow.GetDataColumn(String columnName)
+   ב-  System.Data.DataRow.get_Item(String columnName)
+   ב-  RidePat.GetRidePat(Int32 ridePatNum) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 493
+   ב-  RidePat.setRidePat(RidePat ridePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 372
+   ב-  WebService.setRidePat(RidePat RidePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 162
+2019-05-16 14:30:57,235 ERROR [76] WebService.setRidePat - Error in setRidePat - same ride isue in date: 
+System.ArgumentException: עמודה 'RideId' אינה שייכת לטבלה Table.
+   ב-  System.Data.DataRow.GetDataColumn(String columnName)
+   ב-  System.Data.DataRow.get_Item(String columnName)
+   ב-  RidePat.GetRidePat(Int32 ridePatNum) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 493
+   ב-  RidePat.setRidePat(RidePat ridePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 372
+   ב-  WebService.setRidePat(RidePat RidePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 162
+2019-05-16 14:37:05,929 ERROR [9] WebService.setRidePat - Error in setRidePat
+System.IndexOutOfRangeException: אין שורה במיקום 0.
+   ב-  System.Data.RBTree`1.GetNodeByIndex(Int32 userIndex)
+   ב-  System.Data.DataRowCollection.get_Item(Int32 index)
+   ב-  RidePat.GetRidePat(Int32 ridePatNum) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 495
+   ב-  RidePat.setRidePat(RidePat ridePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 372
+   ב-  WebService.setRidePat(RidePat RidePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 162
+2019-05-16 14:42:05,207 ERROR [13] WebService.getEquipmentForPatient - Error in getEquipmentForPatient
+System.Data.SqlClient.SqlException (0x80131904): למחשב לקוח לא היתה אפשרות ליצור חיבור עקב שגיאה בזמן תהליך אתחול החיבור לפני הכניסה. סיבות אפשרויות כוללות: מחשב הלקוח ניסה להתחבר לגירסה לא נתמכת של SQL Server; השרת היה עמוס מדי כדי לקבל חיבורים חדשים; או שהיתה מגבלת משאבים (לא היה די זיכרון או שמספר החיבורים המרבי המותר לא הספיק) בשרת. (provider: TCP Provider, error: 0 - An existing connection was forcibly closed by the remote host.) ---> System.ComponentModel.Win32Exception (0x80004005): An existing connection was forcibly closed by the remote host
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, Boolean needToClose, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 76
+   ב-  Patient.getEquipmentForPatient(String patient) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 71
+   ב-  WebService.getEquipmentForPatient(String patient) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 284
+ClientConnectionId:90bc78cb-2116-46a8-88c4-2a856888839b
+Error Number:10054,State:0,Class:20
+2019-05-16 15:43:37,458 ERROR [82] WebService.GetRidePat - Error in GetRidePat
+System.FormatException: מחרוזת קלט לא היתה בתבנית הנכונה.
+   ב-  System.Number.StringToNumber(String str, NumberStyles options, NumberBuffer& number, NumberFormatInfo info, Boolean parseDecimal)
+   ב-  System.Number.ParseInt32(String s, NumberStyles style, NumberFormatInfo info)
+   ב-  System.Int32.Parse(String s)
+   ב-  RidePat.GetRidePat(Int32 ridePatNum) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 500
+   ב-  WebService.GetRidePat(Int32 ridePatNum) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 612
+2019-05-16 21:50:47,852 ERROR [36] WebService.AssignRideToRidePat - Error in AssignRideToRidePat
+System.Exception: לנסיעה זו כבר שובץ נהג ראשי. באפשרותכם להירשם אליה כגיבוי
+   ב-  RidePat.AssignRideToRidePat(Int32 ridePatId, Int32 userId, String driverType) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 932
+   ב-  WebService.AssignRideToRidePat(Int32 ridePatId, Int32 userId, String driverType) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 797
+2019-05-16 21:52:28,661 ERROR [36] WebService.AssignRideToRidePat - Error in AssignRideToRidePat
+System.Exception: לנסיעה זו כבר שובץ נהג ראשי. באפשרותכם להירשם אליה כגיבוי
+   ב-  RidePat.AssignRideToRidePat(Int32 ridePatId, Int32 userId, String driverType) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 932
+   ב-  WebService.AssignRideToRidePat(Int32 ridePatId, Int32 userId, String driverType) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 797
