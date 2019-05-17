@@ -370,12 +370,26 @@ public class RidePat
             RidePatNum = ridePat.RidePatNum;
             Ride r = new Ride();
             RidePat rp = GetRidePat(ridePatNum);
+            bool anotherRide;
+            if (rp.RideNum==-1)
+            {
+                anotherRide = false;
+            }
+            else anotherRide = IsThereAnotherRidePat(rp.RideNum);
             if (rp.Drivers != null)
             {
                 foreach (Volunteer driver in rp.Drivers)
                 {
                     Message m = new Message();
-                    m.cancelRide(RidePatNum, driver);
+                    if (anotherRide)
+                    {
+                        m.cancelOneRide(RidePatNum, driver);
+                    }
+                    else
+                    {
+                        m.cancelRide(RidePatNum, driver);
+                    }
+
                 }
             }
 
@@ -397,6 +411,17 @@ public class RidePat
         }
         return RidePatNum;
 
+    }
+    public bool IsThereAnotherRidePat(int rideId)
+    {
+        string query = "select * from ridepat where rideid="+rideId;
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        if (ds.Tables[0].Rows.Count == 1)
+        {
+            return false;
+        }
+        return true;
     }
 
     //public RidePat(Patient _pat, Escorted _escorted1, Destination _startPlace, Destination _target,
@@ -470,6 +495,14 @@ public class RidePat
         DataRow dr = ds.Tables[0].Rows[0];
 
         rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
+        if (dr["RideNum"].ToString() != null)
+        {
+            if (dr["RideNum"].ToString() != "")
+            {
+                rp.RideNum = int.Parse(dr["RideNum"].ToString());
+            }
+        }
+        else rp.RideNum = -1;
         rp.OnlyEscort = Convert.ToBoolean(dr["OnlyEscort"].ToString());
         rp.pat.DisplayName = dr["DisplayName"].ToString();
         rp.pat.IsAnonymous = dr["IsAnonymous"].ToString();
@@ -925,7 +958,19 @@ public class RidePat
             if (res <= 0) return -1;
         }
 
+        Message m = new Message();
+        Volunteer v = new Volunteer();
+        TimeSpan hourDiff = Date - DateTime.Now;
 
+        if (hourDiff.Hours <= 12)
+        {
+            bool primary = false;
+            if (driverType== "primary")
+            {
+                primary = true;
+            }
+            m.driverSignUpToCloseRide(ridePatId, v.getVolunteerByID(userId), primary);
+        }
 
 
         return RideId;
@@ -985,6 +1030,11 @@ public class RidePat
 
     public int DeleteDriver(int ridePatId, int driverId)
     {
+        //NEED TO: update ridepat --> rideid=null
+        //if thers is a secondary OR maindriver --> 
+        //if primary canceled: create a new ride with SignMe
+        //if secondery canceled: create a new ride but take all statuses.
+
         int res = -1;
         bool primary = false;
         int rideNum = -1;
@@ -1024,12 +1074,20 @@ public class RidePat
         if (primary)
         {
             query = "update Ride set MainDriver=null where RideNum=" + rideNum;
+
+            //if there is a secondery driver on this ride also
+            if (BackupDriver!=-1)
+            {
+
+            }
+            //query = "update ridepat set RideId=null where ridepatnum =" + ridePatId;
             DbService db2 = new DbService();
             res = db2.ExecuteQuery(query);
         }
         else
         {
             query = "update Ride set secondaryDriver=null where RideNum=" + rideNum;
+            //query = "update ridepat set RideId=null where ridepatnum =" + ridePatId;
             DbService db5 = new DbService();
             res = db5.ExecuteQuery(query);
         }
@@ -1074,8 +1132,6 @@ public class RidePat
             query = "set dateformat dmy; insert into Ride (Origin, Destination, Date, MainDriver) values (N'" + Origin.Name + "',N'" + Destination.Name + "',N'" + Date + "', " + driverId + ") SELECT SCOPE_IDENTITY()";
             RideId = int.Parse(db2.GetObjectScalarByQuery(query).ToString()); //Insert and get the new RideId
 
-
-
             DbService db3 = new DbService();
             query = "update RidePat set RideId=" + RideId + " where ridePatNum=" + RidePatNum;
             res = db3.ExecuteQuery(query);
@@ -1084,6 +1140,7 @@ public class RidePat
                 query = "update RidePat set RideId=" + RideId + " where ridePatNum=" + ridePatId2;
                 DbService db4 = new DbService();
                 res += db4.ExecuteQuery(query);
+
             }
         }
         else
@@ -1094,8 +1151,20 @@ public class RidePat
             query = "update Ride set secondaryDriver=" + driverId + " where RideNum=" + RideId;
             DbService db6 = new DbService();
             res = db6.ExecuteQuery(query);
-        }
 
+        }
+        Message m = new Message();
+        Volunteer v = new Volunteer();
+        TimeSpan hourDiff = Date - DateTime.Now;
+
+        if (hourDiff.Hours<=12)
+        {
+            m.driverSignUpToCloseRide(ridePatId, v.getVolunteerByID(driverId), primary);
+            if (ridePatId2 != ridePatId && ridePatId2 != 0)
+            {
+                m.driverSignUpToCloseRide(ridePatId2, v.getVolunteerByID(driverId), primary);
+            }
+        }
         
 
         return res;

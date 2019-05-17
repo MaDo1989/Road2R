@@ -35,6 +35,7 @@
     <script src="assets/js/modernizr.min.js"></script>
 
     <!--GENERAL object and additional functions-->
+    <script src="lib/lz-string.js"></script>
     <script src="lib/master.js"></script>
 
     <script src="assets/js/jquery.min.js"></script>
@@ -60,6 +61,7 @@
         var originName = "";
         var driverName = "";
         var patientName = "";
+        var allRidesFromDB=[];
         $(document).ready(function () {
 
             includeHTML();
@@ -209,13 +211,13 @@
                 }
             });
             //Create a DataTable from the Table
-            t = $('#datatable-buttons').DataTable(
-                {
-                    columnDefs: [
-                        { type: 'de_datetime', targets: 3 },
-                    ]
-                } ,
-                { "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
+           // t = $('#datatable-buttons').DataTable(
+             //   {
+               //     columnDefs: [
+                 //       { type: 'de_datetime', targets: 3 },
+                   // ]
+                //} ,
+                //{ "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
             getCoors();
             refreshTable();
         });
@@ -264,6 +266,8 @@
 
         function refreshTable() {
             checkCookie();
+            allRidesFromDB = [];
+
             var active = JSON.parse(localStorage.active);
             $("#activeRidePats").prop('checked', active);
             var today = JSON.parse(localStorage.today);
@@ -275,7 +279,7 @@
             var pastRidePats = JSON.parse(localStorage.pastRidePats);
             $("#pastRidePats").prop('checked', pastRidePats)
 
-            t.clear().draw();
+           // t.clear().draw();
 
             var volunteerId = -2 // VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
             $('#wait').show();
@@ -378,9 +382,20 @@
                         //    var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-default btn-sm m-b-5' id='reactive' title='הסתיימה'><i class='fa fa-check' ></i></button>";
                         //    btnStr += " " + reactiveBtn;
                         //}
-
-                        if (arr_rides[i].Status == "ממתינה לשיבוץ")
-                            t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, arr_rides[i].Status, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
+                        var Ride = {};
+                        if (arr_rides[i].Status == "ממתינה לשיבוץ"){
+                            //t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, arr_rides[i].Status, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
+                            Ride = {
+                                PatDisplayName:arr_rides[i].Pat.DisplayName,
+                                OriginName:arr_rides[i].Origin.Name,
+                                DestinationName:arr_rides[i].Destination.Name,
+                                Date:date2,
+                                Drivers:arr_rides[i].Status,
+                                Coordinator:arr_rides[i].Coordinator.DisplayName,
+                                Buttons:btnStr,
+                                IsAnonymous:''
+                            }  
+                        }
                         else {
                             for (j in arr_rides[i].Drivers) {
                                 if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName + " " + arr_rides[i].Drivers[j].CellPhone;
@@ -396,15 +411,63 @@
                             else if (arr_rides[i].Drivers.length == 2) //Two drivers are assigned
                                    drivers = "ראשי: " + primary + ",<br> " + "גיבוי: " + secondary;
                             var buttons = btnStr;
-                            t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, drivers, arr_rides[i].Coordinator.DisplayName,buttons,arr_rides[i].Pat.IsAnonymous]).draw(false);
+                            //t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, drivers, arr_rides[i].Coordinator.DisplayName,buttons,arr_rides[i].Pat.IsAnonymous]).draw(false);
+                            
+                            Ride = {
+                                PatDisplayName:arr_rides[i].Pat.DisplayName,
+                                OriginName:arr_rides[i].Origin.Name,
+                                DestinationName:arr_rides[i].Destination.Name,
+                                Date:date2,
+                                Drivers:drivers,
+                                Coordinator:arr_rides[i].Coordinator.DisplayName,
+                                Buttons:buttons,
+                                IsAnonymous:arr_rides[i].Pat.IsAnonymous
+                            }
                         }
-                    }
-                    //$.fn.dataTable.moment('DD/MM/YYYY HH:MM');
-                    //$('#datatable-buttons').DataTable();
-                    t.columns([3]).order('asc').draw();
-                    // t.createdRow();
 
-                                $(".dataTables_empty").html("אין הסעות");
+                        allRidesFromDB.push(Ride);
+                    }
+                    tbl = $('#datatable-buttons').DataTable({
+                        data: allRidesFromDB,
+                        "autoWidth": false,
+                        "destroy": true,
+                        dom: 'Bfrtip',
+                        buttons: [
+                            'excel'
+                        ],
+                        
+                        columns: [
+                            { data: "PatDisplayName" },
+                            { data: "OriginName" },
+                            { data: "DestinationName" },
+                            { data: "Date" },
+                            { data: "Drivers" },
+                            { data: "Coordinator" },
+                            { data: "Buttons" },
+                            { data: "IsAnonymous" },
+                        ],
+                        
+                        columnDefs: [
+                            { type: 'de_datetime', targets: 3 },
+                            {"targets": [ 7],"visible": false}
+                        ]
+                        
+                    });
+
+                    //t.columns([3]).order('asc').draw();
+                    buttonsEvents();
+                },
+                error: function (err) {
+                    $('#wait').hide();
+                    alert("Error in GetRidePatView: " + err.responseText);
+                }
+            });
+        }
+
+
+
+        function buttonsEvents(){
+            $(".dataTables_empty").html("אין הסעות");
 
                     $('#datatable-buttons tbody').on('click', '#edit', function () {
                         //var data = t.row($(this).parents('tr')).data();
@@ -422,14 +485,14 @@
 
                     $('#datatable-buttons tbody').on('click', '#remove', function () {
                         arr_details = { RidePatNum: this.name, func: "show" };//attribute name=RidePatNum
-                        var data = t.row($(this).parents('tr')).data();
+                        var data = tbl.row($(this).parents('tr')).data();
                         if (data[7] == "True") {
                             isAnonymous = true;
                         }
                         swal({
                             title: "האם אתם בטוחים?",
                             type: "warning",
-                            text: "מחיקת ההסעה של " + data[0] + " מ" + data[1] + " ל" + data[2] + ", בתאריך " + data[3],
+                            text: "מחיקת ההסעה של " + data.PatDisplayName + " מ" + data.OriginName + " ל" + data.DestinationName + ", בתאריך " + data.Date,
                             showCancelButton: true,
                             cancelButtonText: "בטל",
                             confirmButtonClass: 'btn-warning',
@@ -453,16 +516,7 @@
 
                         });
                     });
-
-           
-                },
-                error: function (err) {
-                    $('#wait').hide();
-                    alert("Error in GetRidePatView: " + err.responseText);
-                }
-            });
         }
-
         function manipulateTable() {
             table1 = document.getElementById("datatable-buttons");//$('#datatable-buttons');
             tdarr = table1.getElementsByTagName("td");

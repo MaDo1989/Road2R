@@ -1,0 +1,61 @@
+﻿2019-05-15 09:04:07,418 ERROR [12] WebService.DeleteDriver - Error in DeleteDriver
+System.IndexOutOfRangeException: אין שורה במיקום 0.
+   ב-  System.Data.RBTree`1.GetNodeByIndex(Int32 userIndex)
+   ב-  System.Data.DataRowCollection.get_Item(Int32 index)
+   ב-  RidePat.DeleteDriver(Int32 ridePatId, Int32 driverId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1005
+   ב-  WebService.DeleteDriver(Int32 ridePatId, Int32 driverId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 762
+2019-05-15 09:04:41,845 ERROR [11] WebService.DeleteDriver - Error in DeleteDriver
+System.IndexOutOfRangeException: אין שורה במיקום 0.
+   ב-  System.Data.RBTree`1.GetNodeByIndex(Int32 userIndex)
+   ב-  System.Data.DataRowCollection.get_Item(Int32 index)
+   ב-  RidePat.DeleteDriver(Int32 ridePatId, Int32 driverId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1005
+   ב-  WebService.DeleteDriver(Int32 ridePatId, Int32 driverId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 762
+2019-05-15 09:05:48,214 ERROR [12] WebService.DeleteDriver - Error in DeleteDriver
+System.FormatException: מחרוזת קלט לא היתה בתבנית הנכונה.
+   ב-  System.Number.StringToNumber(String str, NumberStyles options, NumberBuffer& number, NumberFormatInfo info, Boolean parseDecimal)
+   ב-  System.Number.ParseInt32(String s, NumberStyles style, NumberFormatInfo info)
+   ב-  System.Int32.Parse(String s)
+   ב-  RidePat.DeleteDriver(Int32 ridePatId, Int32 driverId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1019
+   ב-  WebService.DeleteDriver(Int32 ridePatId, Int32 driverId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 762
+2019-05-15 09:06:21,750 ERROR [11] WebService.DeleteDriver - Error in DeleteDriver
+System.FormatException: מחרוזת קלט לא היתה בתבנית הנכונה.
+   ב-  System.Number.StringToNumber(String str, NumberStyles options, NumberBuffer& number, NumberFormatInfo info, Boolean parseDecimal)
+   ב-  System.Number.ParseInt32(String s, NumberStyles style, NumberFormatInfo info)
+   ב-  System.Int32.Parse(String s)
+   ב-  RidePat.DeleteDriver(Int32 ridePatId, Int32 driverId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1019
+   ב-  WebService.DeleteDriver(Int32 ridePatId, Int32 driverId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 762
+2019-05-15 09:08:02,033 ERROR [11] WebService.DeleteDriver - Error in DeleteDriver
+System.FormatException: מחרוזת קלט לא היתה בתבנית הנכונה.
+   ב-  System.Number.StringToNumber(String str, NumberStyles options, NumberBuffer& number, NumberFormatInfo info, Boolean parseDecimal)
+   ב-  System.Number.ParseInt32(String s, NumberStyles style, NumberFormatInfo info)
+   ב-  System.Int32.Parse(String s)
+   ב-  RidePat.DeleteDriver(Int32 ridePatId, Int32 driverId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1019
+   ב-  WebService.DeleteDriver(Int32 ridePatId, Int32 driverId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 762
+2019-05-15 09:12:00,434 ERROR [11] WebService.DeleteDriver - Error in DeleteDriver
+System.FormatException: מחרוזת קלט לא היתה בתבנית הנכונה.
+   ב-  System.Number.StringToNumber(String str, NumberStyles options, NumberBuffer& number, NumberFormatInfo info, Boolean parseDecimal)
+   ב-  System.Number.ParseInt32(String s, NumberStyles style, NumberFormatInfo info)
+   ב-  System.Int32.Parse(String s)
+   ב-  RidePat.DeleteDriver(Int32 ridePatId, Int32 driverId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1019
+   ב-  WebService.DeleteDriver(Int32 ridePatId, Int32 driverId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 762
+2019-05-15 09:24:52,376 ERROR [47] WebService.DeleteDriver - Error in DeleteDriver
+System.FormatException: מחרוזת קלט לא היתה בתבנית הנכונה.
+   ב-  System.Number.StringToNumber(String str, NumberStyles options, NumberBuffer& number, NumberFormatInfo info, Boolean parseDecimal)
+   ב-  System.Number.ParseInt32(String s, NumberStyles style, NumberFormatInfo info)
+   ב-  System.Int32.Parse(String s)
+   ב-  RidePat.DeleteDriver(Int32 ridePatId, Int32 driverId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1020
+   ב-  WebService.DeleteDriver(Int32 ridePatId, Int32 driverId) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 762
+2019-05-15 09:28:35,774 ERROR [48] WebService.SignDriver - Error in SignDriver
+System.FormatException: מחרוזת קלט לא היתה בתבנית הנכונה.
+   ב-  System.Number.StringToNumber(String str, NumberStyles options, NumberBuffer& number, NumberFormatInfo info, Boolean parseDecimal)
+   ב-  System.Number.ParseInt32(String s, NumberStyles style, NumberFormatInfo info)
+   ב-  System.Int32.Parse(String s)
+   ב-  RidePat.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1100
+   ב-  WebService.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 737
+2019-05-15 09:35:03,835 ERROR [46] WebService.SignDriver - Error in SignDriver
+System.FormatException: מחרוזת קלט לא היתה בתבנית הנכונה.
+   ב-  System.Number.StringToNumber(String str, NumberStyles options, NumberBuffer& number, NumberFormatInfo info, Boolean parseDecimal)
+   ב-  System.Number.ParseInt32(String s, NumberStyles style, NumberFormatInfo info)
+   ב-  System.Int32.Parse(String s)
+   ב-  RidePat.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1106
+   ב-  WebService.SignDriver(Int32 ridePatId, Int32 ridePatId2, Int32 driverId, Boolean primary) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 737

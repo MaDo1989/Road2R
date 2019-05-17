@@ -40,6 +40,7 @@
     <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
 
     <!--GENERAL object and additional functions-->
+    <script src="lib/lz-string.js"></script>
     <script src="lib/master.js"></script>
 
     <!-- Select2 css+js -->
@@ -83,10 +84,10 @@
         .duplicateDisplayOnShow {
             background-color: #F8F8B5
         }
-        input[type=text], input[type=checkbox], input[type=date], #statusRidePat, #Origin, #Destination, #hour,#minute {
+
+        input[type=text], input[type=checkbox], input[type=date], #statusRidePat, #Origin, #Destination, #hour, #minute {
             border-color: #000
         }
-        
     </style>
     <!--<script src="https://code.jquery.com/jquery-1.12.4.js"></script>-->
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -221,7 +222,7 @@
                         var validRides = PrintRides(repeatRide,numberOfRides);
                         if (!validRides) return false;
                     }
-                   
+
 
                     var RidePatNum = $("#ridePatNum").val();
                     var Pat = new Object();
@@ -448,7 +449,7 @@
             }
 
 
-            
+
             if (confirm(datesToPrint)) {
                 return true;
             }
@@ -962,6 +963,8 @@
         function switchDir() {
             var a = $("#Origin").val();
             var b = $("#Destination").val()
+            a = a.replace("'", "\\'");
+            b = b.replace("'", "\\'");
 
             $("#Origin option[value ='" + b + "']").prop('selected', true);
             $("#Destination option[value ='" + a + "']").prop('selected', true);
@@ -1133,7 +1136,7 @@
                         currentOrigin = ridePat.Origin.Name;
                         currentDestination = ridePat.Destination.Name;
                     }
-                   
+
 
                     //$("#dateRide").val(date);
 

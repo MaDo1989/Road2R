@@ -86,7 +86,7 @@ public class myPushNot
         sound = _sound;
     }
 
-    public void RunPushNotificationAll(List<Volunteer> userList, JObject data)
+    public void RunPushNotificationAll(List<Volunteer> userList, JObject data,JObject notification_)
     {
         List<string> registrationIDs = new List<string>();
 
@@ -123,11 +123,24 @@ public class myPushNot
         // Start the broker
         gcmBroker.Start();
 
-        gcmBroker.QueueNotification(new GcmNotification
+
+        if (notification_ == null)
         {
-            RegistrationIds = registrationIDs,
-            Data = data
-        });
+            gcmBroker.QueueNotification(new GcmNotification
+            {
+                RegistrationIds = registrationIDs,
+                Data = data
+            });
+        }
+        else
+        {
+            gcmBroker.QueueNotification(new GcmNotification
+            {
+                RegistrationIds = registrationIDs,
+                Notification = notification_,
+                Data = data
+            });
+        }
 
         // Stop the broker, wait for it to finish   
         // This isn't done after every message, but after you're
@@ -135,7 +148,7 @@ public class myPushNot
         gcmBroker.Stop();
     }
 
-    public void RunPushNotificationOne(Volunteer user, JObject data)
+    public void RunPushNotificationOne(Volunteer user, JObject data,JObject notification_)
     {
 
         // Configuration
@@ -159,15 +172,26 @@ public class myPushNot
         // Start the broker
         gcmBroker.Start();
 
-        // Queue a notification to send
-        gcmBroker.QueueNotification(new GcmNotification
-        {
 
-            RegistrationIds = new List<string> {
-            user.RegId
-        },
-            Data = data
-        });
+
+        if (notification_ == null)
+        {
+            gcmBroker.QueueNotification(new GcmNotification
+            {
+                RegistrationIds = new List<string> { user.RegId },
+                Data = data
+            });
+        }
+        else
+        {
+            gcmBroker.QueueNotification(new GcmNotification
+            {
+                RegistrationIds = new List<string> { user.RegId },
+                Notification = notification_,
+                Data = data
+            });
+        }
+
 
 
 

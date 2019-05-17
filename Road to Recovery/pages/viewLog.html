@@ -35,6 +35,7 @@
     <script src="assets/js/modernizr.min.js"></script>
 
     <!--GENERAL object and additional functions-->
+    <script src="lib/lz-string.js"></script>
     <script src="lib/master.js"></script>
 
     <script src="assets/js/jquery.min.js"></script>
@@ -66,12 +67,119 @@
             var userName = GENERAL.USER.getUserDisplayName();
             $("#userName").html(userName);
 
-            $.fn.dataTable.moment('DD/MM/YY');
+            //  $.fn.dataTable.moment('DD/MM/YY');
+            jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+                "de_datetime-asc": function (a, b) {
+                    var x, y;
+                    if (jQuery.trim(a) !== '') {
+                        var deDatea = jQuery.trim(a).split(' ');
+                        var deTimea = "";
+                        deTimea = deDatea[0].split(':');
+                        var deDatea2 = deDatea[1].split('.');
+                        if (typeof deTimea[2] != 'undefined') {
+                            x = (deDatea2[2] + deDatea2[1] + deDatea2[0] + deTimea[0] + deTimea[1] + deTimea[2]) * 1;
+                        } else {
+                            x = (deDatea2[2] + deDatea2[1] + deDatea2[0] + deTimea[0] + deTimea[1]) * 1;
+                        }
+                    } else {
+                        x = -Infinity; // = l'an 1000 ...
+                    }
 
+                    if (jQuery.trim(b) !== '') {
+                        var deDateb = jQuery.trim(b).split(' ');
+                        var deTimeb = "";
+                        deTimeb = deDateb[0].split(':');
+                        deDateb = deDateb[1].split('.');
+                        if (typeof deTimeb[2] != 'undefined') {
+                            y = (deDateb[2] + deDateb[1] + deDateb[0] + deTimeb[0] + deTimeb[1] + deTimeb[2]) * 1;
+                        } else {
+                            y = (deDateb[2] + deDateb[1] + deDateb[0] + deTimeb[0] + deTimeb[1]) * 1;
+                        }
+                    } else {
+                        y = -Infinity;
+                    }
+                    var z = ((x < y) ? -1 : ((x > y) ? 1 : 0));
+                    return z;
+                },
+
+                "de_datetime-desc": function (a, b) {
+                    var x, y;
+                    if (jQuery.trim(a) !== '') {
+                        var deDatea = jQuery.trim(a).split(' ');
+                        var deTimea = "";
+                        deTimea = deDatea[0].split(':');
+                        var deDatea2 = deDatea[1].split('.');
+                        if (typeof deTimea[2] != 'undefined') {
+                            x = (deDatea2[2] + deDatea2[1] + deDatea2[0] + deTimea[0] + deTimea[1] + deTimea[2]) * 1;
+                        } else {
+                            x = (deDatea2[2] + deDatea2[1] + deDatea2[0] + deTimea[0] + deTimea[1]) * 1;
+                        }
+                    } else {
+                        x = Infinity;
+                    }
+
+                    if (jQuery.trim(b) !== '') {
+                        var deDateb = jQuery.trim(b).split(' ');
+                        var deTimeb = "";
+                        deTimeb = deDateb[0].split(':');
+                        deDateb = deDateb[1].split('.');
+                        if (typeof deTimeb[2] != 'undefined') {
+                            y = (deDateb[2] + deDateb[1] + deDateb[0] + deTimeb[0] + deTimeb[1] + deTimeb[2]) * 1;
+                        } else {
+                            y = (deDateb[2] + deDateb[1] + deDateb[0] + deTimeb[0] + deTimeb[1]) * 1;
+                        }
+                    } else {
+                        y = -Infinity;
+                    }
+                    var z = ((x < y) ? 1 : ((x > y) ? -1 : 0));
+                    return z;
+                },
+
+                "de_date-asc": function (a, b) {
+                    var x, y;
+                    if (jQuery.trim(a) !== '') {
+                        var deDatea = jQuery.trim(a).split('.');
+                        x = (deDatea[2] + deDatea[1] + deDatea[0]) * 1;
+                    } else {
+                        x = Infinity; // = l'an 1000 ...
+                    }
+
+                    if (jQuery.trim(b) !== '') {
+                        var deDateb = jQuery.trim(b).split('.');
+                        y = (deDateb[2] + deDateb[1] + deDateb[0]) * 1;
+                    } else {
+                        y = -Infinity;
+                    }
+                    var z = ((x < y) ? -1 : ((x > y) ? 1 : 0));
+                    return z;
+                },
+
+                "de_date-desc": function (a, b) {
+                    var x, y;
+                    if (jQuery.trim(a) !== '') {
+                        var deDatea = jQuery.trim(a).split('.');
+                        x = (deDatea[2] + deDatea[1] + deDatea[0]) * 1;
+                    } else {
+                        x = -Infinity;
+                    }
+
+                    if (jQuery.trim(b) !== '') {
+                        var deDateb = jQuery.trim(b).split('.');
+                        y = (deDateb[2] + deDateb[1] + deDateb[0]) * 1;
+                    } else {
+                        y = Infinity;
+                    }
+                    var z = ((x < y) ? 1 : ((x > y) ? -1 : 0));
+                    return z;
+                }
+            });
             //Create a DataTable from the Table
             //t = $('#datatable-buttons').DataTable({ "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] }
-            t = $('#datatable-buttons').DataTable({ 
-                "paging": false,
+            t = $('#datatable-buttons').DataTable({
+                columnDefs: [
+                    { type: 'de_datetime', targets: 1 },
+                ],
+                "paging": true,
                 dom: 'Bfrtip',
                 buttons: [
                     'excel'
@@ -129,7 +237,7 @@
 
             t.clear().draw();
 
-            
+
             var hoursObj = { hours: hours };
             $('#wait').show();
             $.ajax({
@@ -138,7 +246,7 @@
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
                 data: JSON.stringify(hoursObj),
-                
+
                 //data: JSON.stringify({ volunteerId: -1 }), //VolunteerId -1 means get all ridePats
                 success: function (data) {
                     $('#wait').hide();
@@ -220,7 +328,7 @@
                         //var deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' name='" + arr_rides[i].RidePatNum + "' title='מחיקה'><i class='fa fa-remove' ></i></button>";
                         //btnStr += " " + showBtn;
 
-                        //if (arr_rides[i].Status == 'ממתינה לשיבוץ' && arr_rides[i].Coordinator.DisplayName == currentCoor) 
+                        //if (arr_rides[i].Status == 'ממתינה לשיבוץ' && arr_rides[i].Coordinator.DisplayName == currentCoor)
                         //   // btnStr += showBtn + " " + editBtn + " " + deleteBtn;
                         //    btnStr += " " + editBtn;
 

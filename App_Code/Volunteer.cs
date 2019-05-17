@@ -13,6 +13,7 @@ using System.Web.Script.Serialization;
 /// </summary>
 public class Volunteer
 {
+    string device;
     string displayName; //מזהה ייחודי
     string firstNameH;//שם פרטי בעברית
     string firstNameA;//שם פרטי בערבית
@@ -579,7 +580,7 @@ public class Volunteer
     }
 
 
-    public Volunteer getVolunteerByMobile(string mobile, string regId)
+    public Volunteer getVolunteerByMobile(string mobile, string regId,string device)
     {
         DbService db = new DbService();
         mobile = mobile.Replace("-", "");
@@ -588,6 +589,7 @@ public class Volunteer
         Volunteer v = new Volunteer();
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
+
             v.Id = int.Parse(dr["Id"].ToString());
             v.DisplayName = dr["DisplayName"].ToString();
             v.FirstNameA = dr["FirstNameA"].ToString();
@@ -652,9 +654,10 @@ public class Volunteer
             }
         }
 
-        //dont update reg id if user is rakaz on a mission
+        //dont update reg id and device type if user is rakaz on a mission
         if (regId != "i_am_spy")
         {
+            //update reg id
             db = new DbService();
             var updateRegid = "update Volunteer set pnRegId=@REGID where Id=@ID";
 
@@ -666,6 +669,18 @@ public class Volunteer
             cmdParams[1] = cmd.Parameters.AddWithValue("@ID", v.Id);
 
             int result = db.ExecuteQuery(updateRegid, cmd.CommandType, cmdParams);
+
+            //update device
+            db = new DbService();
+            var updateDevice = "update Volunteer set device=N'"+device+"' where Id=@ID";
+
+            SqlCommand cmd1 = new SqlCommand();
+            cmd1.CommandType = CommandType.Text;
+
+            SqlParameter[] cmdParams1 = new SqlParameter[1];
+            cmdParams1[0] = cmd1.Parameters.AddWithValue("@ID", v.Id);
+
+            int result1 = db.ExecuteQuery(updateDevice, cmd1.CommandType, cmdParams1);
         }
 
 
@@ -698,6 +713,19 @@ public class Volunteer
         set
         {
             status = value;
+        }
+    }
+
+    public string Device
+    {
+        get
+        {
+            return device;
+        }
+
+        set
+        {
+            device = value;
         }
     }
 
@@ -838,6 +866,7 @@ public class Volunteer
             v.Address = dr["Address"].ToString();
             v.TypeVol = dr["VolunTypeType"].ToString();
             v.Email = dr["Email"].ToString();
+            v.Device = dr["device"].ToString();
             //v.Day1 = dr["preferDay1"].ToString();
             //v.Hour1 = dr["preferHour1"].ToString();
             //v.Day2 = dr["preferDay2"].ToString();
@@ -968,6 +997,10 @@ public class Volunteer
         v.RegId = dr["pnRegId"].ToString();
         v.Address = dr["Address"].ToString();
         v.Email = dr["Email"].ToString();
+        if (dr["device"] != null)
+        {
+            v.Device = dr["device"].ToString();
+        }
         string date = dr["JoinDate"].ToString();
         if (date == "")
         {
@@ -1078,6 +1111,13 @@ public class Volunteer
     public string GetVolunteerRegById(int id)
     {
         string query = "select pnRegID from Volunteer where Id ='" + id + "'";
+        DbService db = new DbService();
+        return db.GetObjectScalarByQuery(query).ToString();
+    }
+
+    public string getDeviceByID(int id)
+    {
+        string query = "select device from Volunteer where Id ='" + id + "'";
         DbService db = new DbService();
         return db.GetObjectScalarByQuery(query).ToString();
     }

@@ -34,6 +34,7 @@
     <script src="assets/js/modernizr.min.js"></script>
 
     <!--GENERAL object and additional functions-->
+    <script src="lib/lz-string.js"></script>
     <script src="lib/master.js"></script>
 
     <script src="assets/js/jquery.min.js"></script>
@@ -61,7 +62,7 @@
         var patientName = "";
         var isAnonymous = false;
 
-       
+
         $(document).ready(function () {
             //$("#userStyle").mouseover(function () {
             //    $(this).css("background-color", "blue")
@@ -89,11 +90,7 @@
             }
             else $('#collapse1').addClass("in");
 
-            //$('#example').DataTable();
-            // $.fn.dataTable.moment('DD/MM/YYYY HH:MM');//'' DD/MM/YYYY HH:MM
-            //$.fn.dataTable.moment('DD/MM/YYYY');
 
-            //$.fn.dataTable.moment('DD.MM.YYYY');
             jQuery.extend(jQuery.fn.dataTableExt.oSort, {
                 "customdatesort-pre": function (a) {
                     var r, x;
@@ -355,7 +352,7 @@
             else { //ride has at least one drive assigned to it
                 for (j in arr_rides[i].Drivers) {
                     var primaryCellPhone = arr_rides[i].Drivers[j].CellPhone.replace( /^([\w]{3})/, "$1-" );
-                    var secondaryCellPhone = arr_rides[i].Drivers[j].CellPhone.replace( /^([\w]{3})/, "$1-" );    
+                    var secondaryCellPhone = arr_rides[i].Drivers[j].CellPhone.replace( /^([\w]{3})/, "$1-" );
                     if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName + "<br/>" + primaryCellPhone;
                     else secondary = arr_rides[i].Drivers[j].DisplayName + "<br/>" + secondaryCellPhone;
                 }

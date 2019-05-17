@@ -40,6 +40,7 @@
     <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
 
     <!--GENERAL object and additional functions-->
+    <script src="lib/lz-string.js"></script>
     <script src="lib/master.js"></script>
 
     <!-- Select2 css+js -->
@@ -62,6 +63,7 @@
         * html .ui-autocomplete {
             height: 100px;
         }
+
         input[type=text]:focus {
             background-color: #FFE684;
         }
@@ -70,7 +72,7 @@
     <!--City Autocomplete-->
 
     <script>
-        
+
         checkCookie();
         arr_addressRows = [];
         cities = [];
@@ -185,7 +187,7 @@
         function generateCitiesSuccessCB(data) {
             var arr_cities = JSON.parse(data.d);
 
-            
+
 
             for (i in arr_cities) {
                 cities.push(arr_cities[i].CityName);

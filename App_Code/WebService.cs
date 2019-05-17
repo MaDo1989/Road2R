@@ -709,12 +709,12 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string CheckUser(string mobile, string regId)
+    public string CheckUser(string mobile, string regId,string device)
     {
         try
         {
             Volunteer v = new Volunteer();
-            v = v.getVolunteerByMobile(mobile, regId);
+            v = v.getVolunteerByMobile(mobile, regId,device);
             JavaScriptSerializer j = new JavaScriptSerializer();
             return j.Serialize(v);
         }

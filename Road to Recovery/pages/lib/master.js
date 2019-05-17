@@ -1,4 +1,5 @@
-﻿var GENERAL = {
+﻿
+var GENERAL = {
 
     USER: {
         getUserName: function () {
@@ -7,6 +8,7 @@
         setUserName: function (userName) {
             localStorage.user = userName;
         },
+
         getUserDisplayName: function () {
             return localStorage.userCell;
         },
@@ -30,18 +32,18 @@
 
     VOLUNTEERS: {
         getVolunteersList: function () {
-            return localStorage.volunteersList;
+            return LZString.decompress(localStorage.volunteersList);
         },
         setVolunteersList: function (volunteersList) {
-            localStorage.volunteersList = volunteersList;
+            localStorage.volunteersList = LZString.compress(volunteersList);
         }
     },
     LOCATIONS: {
         getDestinationsList: function () {
-            return localStorage.locationsList;
+            return LZString.decompress(localStorage.locationsList);
         },
         setLocationsList: function (locationsList) {
-            localStorage.locationsList = locationsList;
+            localStorage.locationsList = LZString.compress(locationsList);
         }
     },
     ESCORTED: {
@@ -49,28 +51,28 @@
             return localStorage.escortedList;
         },
         setEscortedList: function (escortedList) {
-            localStorage.escortedList = escortedList;
+            localStorage.escortedList =escortedList;
         }
     },
 
     RIDEPAT: {
         getRidePatList: function () {
-            return localStorage.ridePatList;
+            return LZString.decompress(localStorage.ridePatList);
         },
         setRidePatList: function (ridePatList) {
-            localStorage.ridePatList = ridePatList;
+            localStorage.ridePatList = LZString.compress(ridePatList);
         }
     },
 
     PATIENTS: {
         getPatientsList: function () {
-            return localStorage.patientsList;
+            return LZString.decompress(localStorage.patientsList);
         },
         setPatientsList: function (patientsList) {
-            localStorage.patientsList = patientsList;
+            localStorage.patientsList = LZString.compress(patientsList);
         }
     }
-}
+};
 
 
 

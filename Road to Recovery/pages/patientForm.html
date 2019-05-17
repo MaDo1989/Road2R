@@ -48,6 +48,7 @@
     <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
 
     <!--GENERAL object and additional functions-->
+    <script src="lib/lz-string.js"></script>
     <script src="lib/master.js"></script>
 
     <!-- Select2 css+js -->
@@ -79,12 +80,15 @@
         * html .ui-autocomplete {
             height: 100px;
         }
+
         input[type=text]:focus {
             background-color: #FFE684;
         }
-        input[type=text] ,input[type=checkbox],input[type=date]{
+
+        input[type=text], input[type=checkbox], input[type=date] {
             border-color: #000
         }
+
         #gender, #barrier, #hospital {
             border-color: #000
         }
@@ -184,7 +188,7 @@
 
             for (i in arr_equipment) {
                 var equipment = arr_equipment[i];
-               
+
                 str += "<div><input id='equipmentCB" + i + "' type=checkbox name='" + i + "'>&nbsp";
                 str += "<label for='equipmentCB" + i + "'>" + equipment + "</label>&nbsp&nbsp</div>";
             }
@@ -325,7 +329,7 @@
                     document.getElementById("escorted").style.visibility = "visible";
                     document.getElementById("anonymouspatient").disabled = true;
                     uploadData(arr_patient.displayName);
-                    
+
                     //if (arr_patient.func == "edit") {
 
                     //}
@@ -446,8 +450,8 @@
                     refreshTable(patient.DisplayName)
 
                 },
-                error: function (err) { 
-                alert("Error in getPatient: " + err.responseText); 
+                error: function (err) {
+                alert("Error in getPatient: " + err.responseText);
                  $('#wait').hide();
                 }
             });
