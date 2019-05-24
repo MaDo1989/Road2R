@@ -879,7 +879,7 @@ public class RidePat
         #endregion
     }
 
-
+    //sdsdsd
 
     public int CombineRideRidePat(int rideId, int ridePatId)
     {
