@@ -1,1 +1,22 @@
-﻿2019-05-17 10:20:20,153 ERROR [10] WebService.writeToLog - Successful login ;for user: 0524842888
+﻿2019-05-24 17:36:42,237 ERROR [12] WebService.GetRidePatView - After the db: 798
+2019-05-24 17:36:42,281 ERROR [12] WebService.GetRidePatView - After Serialization: 45
+2019-05-24 17:39:30,771 ERROR [10] WebService.GetRidePatView - After the db: 771
+2019-05-24 17:39:40,249 ERROR [10] WebService.GetRidePatView - After Serialization: 539
+2019-05-24 17:40:00,126 ERROR [10] WebService.GetRidePatView - After the db: 15
+2019-05-24 17:40:07,078 ERROR [10] WebService.GetRidePatView - After Serialization: 563
+2019-05-24 17:44:46,103 ERROR [14] WebService.GetRidePatView - After the db: 151
+2019-05-24 17:44:46,134 ERROR [14] WebService.GetRidePatView - After Serialization: 14
+2019-05-24 17:45:50,477 ERROR [16] WebService.GetRidePatView - After the db: 279
+2019-05-24 17:45:50,496 ERROR [16] WebService.GetRidePatView - After Serialization: 17
+2019-05-24 17:46:22,476 ERROR [17] WebService.GetRidePatView - After the db: 79
+2019-05-24 17:46:22,490 ERROR [17] WebService.GetRidePatView - After Serialization: 13
+2019-05-24 17:46:26,388 ERROR [16] WebService.GetRidePatView - After the db: 747
+2019-05-24 17:46:26,394 ERROR [16] WebService.GetRidePatView - After Serialization: 6
+2019-05-24 17:46:28,205 ERROR [13] WebService.GetRidePatView - After the db: 695
+2019-05-24 17:46:28,214 ERROR [13] WebService.GetRidePatView - After Serialization: 9
+2019-05-24 17:49:25,606 ERROR [16] WebService.GetRidePatView - After the db: 610
+2019-05-24 17:49:26,025 ERROR [16] WebService.GetRidePatView - After Serialization: 402
+2019-05-24 17:50:12,858 ERROR [5] WebService.GetRidePatView - After the db: 430
+2019-05-24 17:50:13,294 ERROR [5] WebService.GetRidePatView - After Serialization: 435
+2019-05-24 18:11:02,190 ERROR [20] WebService.GetRidePatView - After the db: 929
+2019-05-24 18:11:02,854 ERROR [20] WebService.GetRidePatView - After Serialization: 660

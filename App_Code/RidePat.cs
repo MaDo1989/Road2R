@@ -768,6 +768,10 @@ public class RidePat
 
 
                 }
+                if (counter==4)
+                {
+                    break;
+                }
 
                 rpl.Add(rp);
 

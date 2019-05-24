@@ -586,13 +586,31 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
+            DateTime dateTime1 = DateTime.Now;
+
+
             //string test = (string)HttpContext.Current.Session["userSession"];
 
             RidePat rp = new RidePat();
+
+
             List<RidePat> r = rp.GetRidePatView(volunteerId);
+            DateTime dateTime2 = DateTime.Now;
+
+            TimeSpan t = dateTime2 - dateTime1;
+
+            Log.Error("After the db: "+ t.Milliseconds);
+
+            DateTime dateTime3 = DateTime.Now;
+
             JavaScriptSerializer j = new JavaScriptSerializer();
             j.MaxJsonLength = Int32.MaxValue;
-            return j.Serialize(r);
+            string s = j.Serialize(r);
+            DateTime dateTime4 = DateTime.Now;
+            t = dateTime4 - dateTime3;
+            Log.Error("After Serialization: " + t.Milliseconds);
+
+            return  s;
         }
         catch (Exception ex)
         {
