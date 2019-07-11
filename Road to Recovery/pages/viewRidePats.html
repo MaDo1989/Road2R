@@ -287,8 +287,11 @@
                 dataType: "json",
                 url: "WebService.asmx/GetRidePatView",
                 contentType: "application/json; charset=utf-8",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-Encoding", "gzip");
+                },
                 type: "POST",
-                data: JSON.stringify({ volunteerId: volunteerId }),
+                data: JSON.stringify({ volunteerId: volunteerId,maxDays:-1 }),
                 success: function (data) {
                     $('#wait').hide();
                     var arr_rides = JSON.parse(data.d);
@@ -629,7 +632,7 @@
                                     <li class="active">כל ההסעות</li>
                                 </ol>
                                 <h4 class="page-title">כל ההסעות&nbsp&nbsp
-                                <i>
+                                <i data-toggle="tooltip" title="All Rides جميع السفريات">
                                     <img src="../../Media/היסטורית הסעות.png" height="25" width="25"/>
                                 </i>
                                 </h4>
@@ -662,23 +665,23 @@
                                 <div class="row">
                                     <div class="col-sm-8 checkbox checkbox-primary text-left">
                                         <input id="activeRidePats" type="checkbox" onchange="saveFilters()">
-                                        <label for="activeRidePats">
+                                        <label data-toggle="tooltip" data-placement="bottom" title="Active rides only  طلبات فعالة فقط" for="activeRidePats">
                                             דרישות פעילות בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
                                         </label>
                                         <input id="TodaysRidePats" type="checkbox" onchange="saveFilters()">
-                                        <label for="TodaysRidePats">
+                                        <label data-toggle="tooltip" data-placement="top" title="Today's rides only  طلبات اليوم فقط" for="TodaysRidePats">
                                             דרישות של היום בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
                                         </label>
                                         <input id="UnassignedRidePats" type="checkbox" onchange="saveFilters()">
-                                        <label for="UnassignedRidePats">
+                                        <label data-toggle="tooltip" data-placement="bottom" title="Waiting for a driver only  طلبات تنتظر لتنسيق فقط"  for="UnassignedRidePats">
                                             דרישות ממתינות לשיבוץ בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
                                         </label>
                                         <input id="MyRidePats" type="checkbox" onchange="saveFilters()">
-                                        <label for="MyRidePats">
+                                        <label data-toggle="tooltip" data-placement="bottom" title="My rides only  الطلبات الخاصة بي" for="MyRidePats">
                                             דרישות שלי בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
                                         </label>
                                         <input id="PastRidePats" type="checkbox" onchange="saveFilters()">
-                                        <label for="PastRidePats">
+                                        <label data-toggle="tooltip" data-placement="bottom"  title="Show past rides عرض السفريات السابقة" for="PastRidePats">
                                             הצג נסיעות עבר  &nbsp;&nbsp;|&nbsp;&nbsp;
                                         </label>
                                     </div>
@@ -691,13 +694,13 @@
                                     <thead>
                                         <tr>
                                             <!--<th>מספר הסעה</th>-->
-                                            <th>החולה</th>
-                                            <th>מוצא</th>
-                                            <th>יעד</th>
-                                            <th>תאריך ושעה</th>
-                                            <th>נהגים בנסיעה</th>
-                                            <th>רכז</th>
-                                            <th>פעולות</th>
+                                            <th data-toggle="tooltip"  title="المريض Patient">החולה</th>
+                                            <th data-toggle="tooltip" title="نقطة الانطلاق Origin">מוצא</th>
+                                            <th data-toggle="tooltip" title="نقطة الوصول Destination">יעד</th>
+                                            <th data-toggle="tooltip" title="التاريخ والساعة Date & Time">תאריך ושעה</th>
+                                            <th data-toggle="tooltip" title="السائقين بالفرة Drivers">נהגים בנסיעה</th>
+                                            <th data-toggle="tooltip" title="مركز Coordinator">רכז</th>
+                                            <th data-toggle="tooltip" title="التاريخ Actions">פעולות</th>
                                             <!--<th style="visibility:hidden;">האם אנונימי</th>-->
                                         </tr>
 

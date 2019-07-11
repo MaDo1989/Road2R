@@ -1,0 +1,18 @@
+﻿2019-05-17 10:20:20,153 ERROR [10] WebService.writeToLog - Successful login ;for user: 0524842888
+2019-05-24 22:48:21,916 ERROR [87] WebService.writeToLog - Successful login ;for user: 0524842888
+2019-05-24 22:53:39,318 ERROR [68] WebService.setRidePat - Error in setRidePat
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  RidePat.IsThereAnotherRidePat(RidePat rp) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 421
+   ב-  RidePat.setRidePat(RidePat ridePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 378
+   ב-  WebService.setRidePat(RidePat RidePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 162
+2019-05-24 22:55:37,814 ERROR [68] WebService.setRidePat - Error in setRidePat
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  RidePat.IsThereAnotherRidePat(RidePat rp) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 421
+   ב-  RidePat.setRidePat(RidePat ridePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 378
+   ב-  WebService.setRidePat(RidePat RidePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 162
+2019-05-24 23:02:26,690 ERROR [68] WebService.setRidePat - Error in setRidePat
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  RidePat.IsThereAnotherRidePat(RidePat rp) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 424
+   ב-  RidePat.setRidePat(RidePat ridePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 378
+   ב-  WebService.setRidePat(RidePat RidePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 162
+2019-05-24 23:58:26,410 ERROR [19] WebService.writeToLog - Successful login ;for user: 0524842888

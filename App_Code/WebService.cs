@@ -226,6 +226,8 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
+            HttpResponse response = GzipMe();
+
             JavaScriptSerializer j = new JavaScriptSerializer();
             Patient c = new Patient();
             List<Patient> patientsList = c.getPatientsList(active);
@@ -582,14 +584,23 @@ public class WebService : System.Web.Services.WebService
     //This method is used for שבץ אותי
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetRidePatView(int volunteerId)
+
+    public string GetRidePatView(int volunteerId, int maxDays)
     {
         try
         {
-            //string test = (string)HttpContext.Current.Session["userSession"];
+            HttpResponse response = GzipMe();
+            //string AcceptEncoding = HttpContext.Current.Request.Headers["Accept-Encoding"];
+            //if (AcceptEncoding.Contains("gzip"))
+            //{
+            //    HttpResponse Response = HttpContext.Current.Response;
+            //    Response.Filter = new System.IO.Compression.GZipStream(Response.Filter, System.IO.Compression.CompressionMode.Compress);
+            //    Response.Headers.Remove("Content-Encoding");
+            //    Response.AppendHeader("Content-Encoding", "gzip");
+            //}
 
             RidePat rp = new RidePat();
-            List<RidePat> r = rp.GetRidePatView(volunteerId);
+            List<RidePat> r = rp.GetRidePatView(volunteerId,maxDays);
             JavaScriptSerializer j = new JavaScriptSerializer();
             j.MaxJsonLength = Int32.MaxValue;
             return j.Serialize(r);
@@ -630,6 +641,7 @@ public class WebService : System.Web.Services.WebService
         //List<RidePat> r = rp.GetRidePat();
         try
         {
+            GzipMe();
             Ride r = new Ride();
             List<Ride> rl = r.GetMyFutureRides(volunteerId);
             JavaScriptSerializer j = new JavaScriptSerializer();
@@ -651,6 +663,7 @@ public class WebService : System.Web.Services.WebService
         //List<RidePat> r = rp.GetRidePat();
         try
         {
+            GzipMe();
             Ride r = new Ride();
             List<Ride> rl = r.GetMyPastRides(volunteerId);
             JavaScriptSerializer j = new JavaScriptSerializer();
@@ -1025,6 +1038,8 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
+            HttpResponse response = GzipMe();
+
             JavaScriptSerializer j = new JavaScriptSerializer();
             Volunteer c = new Volunteer();
             List<Volunteer> volunteersList = c.getVolunteersList(active);
@@ -1274,6 +1289,20 @@ public class WebService : System.Web.Services.WebService
             Log.Error("Error in getServers", ex);
             throw new Exception("שגיאה בשליפת שרתים");
         }
+    }
+
+    private HttpResponse GzipMe()
+    {
+        string AcceptEncoding = HttpContext.Current.Request.Headers["Accept-Encoding"];
+        HttpResponse Response = HttpContext.Current.Response;
+        if (AcceptEncoding.Contains("gzip"))
+        {
+            //HttpResponse Response = HttpContext.Current.Response;
+            Response.Filter = new System.IO.Compression.GZipStream(Response.Filter, System.IO.Compression.CompressionMode.Compress);
+            Response.Headers.Remove("Content-Encoding");
+            Response.AppendHeader("Content-Encoding", "gzip");
+        }
+        return Response;
     }
 }
 

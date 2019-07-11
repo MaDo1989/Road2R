@@ -118,7 +118,7 @@
                 </div>
                 <div class="form-group text-center m-t-20">
                     <div class="col-xs-12">
-                        <button class="btn btn-primary btn-custom w-md waves-effect waves-light" type="submit" id="loginBTN">
+                        <button data-toggle="tooltip" title="دخول OK" class="btn btn-primary btn-custom w-md waves-effect waves-light" type="submit" id="loginBTN">
                             כניסה
                         </button>
                     </div>
@@ -159,6 +159,7 @@
             }
             var errorClass = 'invalid';
             var errorElement = 'em';
+            $('[data-toggle="tooltip"]').tooltip();   
 
             var $loginForm = $('#loginForm').validate({
                 //errorClass: errorClass,
@@ -207,7 +208,7 @@
 
                             if (userInDB) {
                                 swal({
-                                    title: "ברוכים הבאים",
+                                    title: "ברוכים הבאים\nمرحبا بك\nWelcome!",
                                     type: "success",
                                     timer: 1000,
                                     showConfirmButton: false

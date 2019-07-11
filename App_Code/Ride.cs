@@ -632,10 +632,11 @@ public class Ride
         }
     }
 
+
     //Get My Past rides
     public List<Ride> GetMyPastRides(int volunteerId)
     {
-        string query = "select * from RPView where (MainDriver=" + volunteerId + " or secondaryDriver=" + volunteerId + ") and CONVERT(date,pickuptime)<CONVERT(DATE,getdate())";
+        string query = "select RPView.* from RPView inner join status_Ride on RPView.ridenum = status_Ride.rideridenum  where (MainDriver=" + volunteerId + " or secondaryDriver=" + volunteerId + ") and (CONVERT(date,pickuptime)<CONVERT(DATE,getdate()) or status_Ride.statusStatusName=N'הגענו ליעד')";
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         DataSet EscortDS = new DataSet(); ;
@@ -648,73 +649,71 @@ public class Ride
         bool RideExists;
         try
         {
-
-
             foreach (DataRow dr in ds.Tables[0].Rows)
             {
-                RideExists = false;
-                foreach (Ride ride in rl)
-                {
-                    if (ride.Id == int.Parse(dr["RideNum"].ToString()))
-                    {
-                        RideExists = true;
+                //RideExists = false;
+                //foreach (Ride ride in rl)
+                //{
+                //    if (ride.Id == int.Parse(dr["RideNum"].ToString()))
+                //    {
+                //        RideExists = true;
 
-                        RidePatexists = false;
-                        foreach (RidePat ridePat in ride.RidePats)
-                        {
-                            if (ridePat.RidePatNum == int.Parse(dr["RidePatNum"].ToString())) RidePatexists = true;
-                            if (RidePatexists && dr["Escort"].ToString() != "")
-                            {
-                                if (EscortDS.Tables[0].Rows.Count > 0)
-                                {
-                                    foreach (DataRow row in EscortDS.Tables[0].Rows)
-                                    {
-                                        Escorted e = new Escorted();
-                                        e.DisplayName = row["DisplayName"].ToString();
-                                        rp2.Pat.EscortedList.Add(e);
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                        if (RidePatexists) continue;
-                        rp2 = new RidePat();
-                        //ride.RidePats = new List<RidePat>();
-                        rp2.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
-                        rp2.Pat = new Patient();
-                        rp2.Pat.DisplayName = dr["DisplayName"].ToString();
-                        rp2.Pat.CellPhone = dr["CellPhone"].ToString();
-                        rp2.Pat.Equipment = rp2.Pat.getEquipmentForPatient(rp2.Pat.DisplayName);
-                        db = new DbService();
-                        query = "select DisplayName from RidePatEscortView where RidePatNum=" + rp2.RidePatNum;
-                        EscortDS = db.GetDataSetByQuery(query);
-                        rp2.Pat.EscortedList = new List<Escorted>();
-                        if (EscortDS.Tables[0].Rows.Count > 0)
-                        {
-                            foreach (DataRow row in EscortDS.Tables[0].Rows)
-                            {
-                                Escorted e = new Escorted();
-                                e.DisplayName = row["DisplayName"].ToString();
-                                rp2.Pat.EscortedList.Add(e);
-                            }
-                        }
+                //        RidePatexists = false;
+                //        foreach (RidePat ridePat in ride.RidePats)
+                //        {
+                //            if (ridePat.RidePatNum == int.Parse(dr["RidePatNum"].ToString())) RidePatexists = true;
+                //            //if (RidePatexists && dr["Escort"].ToString() != "")
+                //            //{
+                //            //    if (EscortDS.Tables[0].Rows.Count > 0)
+                //            //    {
+                //            //        foreach (DataRow row in EscortDS.Tables[0].Rows)
+                //            //        {
+                //            //            Escorted e = new Escorted();
+                //            //            e.DisplayName = row["DisplayName"].ToString();
+                //            //            rp2.Pat.EscortedList.Add(e);
+                //            //        }
+                //            //    }
+                //            //    break;
+                //            //}
+                //        }
+                //        if (RidePatexists) continue;
+                //        rp2 = new RidePat();
+                //        //ride.RidePats = new List<RidePat>();
+                //        rp2.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
+                //        rp2.Pat = new Patient();
+                //        rp2.Pat.DisplayName = dr["DisplayName"].ToString();
+                //        rp2.Pat.CellPhone = dr["CellPhone"].ToString();
+                //        rp2.Pat.Equipment = rp2.Pat.getEquipmentForPatient(rp2.Pat.DisplayName);
+                //        db = new DbService();
+                //        query = "select DisplayName from RidePatEscortView where RidePatNum=" + rp2.RidePatNum;
+                //        EscortDS = db.GetDataSetByQuery(query);
+                //        if (EscortDS.Tables[0].Rows.Count > 0)
+                //        {
+                //            rp2.Pat.EscortedList = new List<Escorted>();
+                //            foreach (DataRow row in EscortDS.Tables[0].Rows)
+                //            {
+                //                Escorted e = new Escorted();
+                //                e.DisplayName = row["DisplayName"].ToString();
+                //                rp2.Pat.EscortedList.Add(e);
+                //            }
+                //        }
 
-                        Location origin = new Location();
-                        origin.Name = dr["Origin"].ToString();
-                        rp2.Origin = origin;
-                        Location dest = new Location();
-                        dest.Name = dr["Destination"].ToString();
-                        rp2.Destination = dest;
-                        rp2.Area = dr["Area"].ToString();
-                        rp2.Shift = dr["Shift"].ToString();
-                        rp2.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
-                        //adding anonymous
-                        rp2.Pat.IsAnonymous = dr["IsAnonymous"].ToString();
-                        ride.RidePats.Add(rp2);
-                    }
-                }
+                //        Location origin = new Location();
+                //        origin.Name = dr["Origin"].ToString();
+                //        rp2.Origin = origin;
+                //        Location dest = new Location();
+                //        dest.Name = dr["Destination"].ToString();
+                //        rp2.Destination = dest;
+                //        rp2.Area = dr["Area"].ToString();
+                //        rp2.Shift = dr["Shift"].ToString();
+                //        rp2.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
+                //        //adding anonymous
+                //        rp2.Pat.IsAnonymous = dr["IsAnonymous"].ToString();
+                //        ride.RidePats.Add(rp2);
+                //    }
+                //}
 
-                if (RideExists) continue;
+                //if (RideExists) continue;
                 Ride r2 = new Ride();
 
                 if (dr["Maindriver"].ToString() == volunteerId.ToString())
@@ -748,9 +747,10 @@ public class Ride
                 db = new DbService();
                 query = "select DisplayName from RidePatEscortView where RidePatNum=" + rp.RidePatNum;
                 EscortDS = db.GetDataSetByQuery(query);
-                rp.Pat.EscortedList = new List<Escorted>();
                 if (EscortDS.Tables[0].Rows.Count > 0)
                 {
+                    rp.Pat.EscortedList = new List<Escorted>();
+
                     foreach (DataRow row in EscortDS.Tables[0].Rows)
                     {
                         Escorted e = new Escorted();
@@ -781,5 +781,155 @@ public class Ride
             throw e;
         }
     }
+
+    ////Get My Past rides
+    //public List<Ride> GetMyPastRides(int volunteerId)
+    //{
+    //    string query = "select * from RPView where (MainDriver=" + volunteerId + " or secondaryDriver=" + volunteerId + ") and CONVERT(date,pickuptime)<CONVERT(DATE,getdate())";
+    //    DbService db = new DbService();
+    //    DataSet ds = db.GetDataSetByQuery(query);
+    //    DataSet EscortDS = new DataSet(); ;
+    //    Ride r = new Ride();
+    //    List<Ride> rl = new List<Ride>();
+    //    r.RidePats = new List<RidePat>();
+    //    RidePat rp2 = new RidePat();
+    //    //List<RidePat> rpl = r.RidePats;
+    //    bool RidePatexists;
+    //    bool RideExists;
+    //    try
+    //    {
+
+
+    //        foreach (DataRow dr in ds.Tables[0].Rows)
+    //        {
+    //            RideExists = false;
+    //            foreach (Ride ride in rl)
+    //            {
+    //                if (ride.Id == int.Parse(dr["RideNum"].ToString()))
+    //                {
+    //                    RideExists = true;
+
+    //                    RidePatexists = false;
+    //                    foreach (RidePat ridePat in ride.RidePats)
+    //                    {
+    //                        if (ridePat.RidePatNum == int.Parse(dr["RidePatNum"].ToString())) RidePatexists = true;
+    //                        if (RidePatexists && dr["Escort"].ToString() != "")
+    //                        {
+    //                            if (EscortDS.Tables[0].Rows.Count > 0)
+    //                            {
+    //                                foreach (DataRow row in EscortDS.Tables[0].Rows)
+    //                                {
+    //                                    Escorted e = new Escorted();
+    //                                    e.DisplayName = row["DisplayName"].ToString();
+    //                                    rp2.Pat.EscortedList.Add(e);
+    //                                }
+    //                            }
+    //                            break;
+    //                        }
+    //                    }
+    //                    if (RidePatexists) continue;
+    //                    rp2 = new RidePat();
+    //                    //ride.RidePats = new List<RidePat>();
+    //                    rp2.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
+    //                    rp2.Pat = new Patient();
+    //                    rp2.Pat.DisplayName = dr["DisplayName"].ToString();
+    //                    rp2.Pat.CellPhone = dr["CellPhone"].ToString();
+    //                    rp2.Pat.Equipment = rp2.Pat.getEquipmentForPatient(rp2.Pat.DisplayName);
+    //                    db = new DbService();
+    //                    query = "select DisplayName from RidePatEscortView where RidePatNum=" + rp2.RidePatNum;
+    //                    EscortDS = db.GetDataSetByQuery(query);
+    //                    rp2.Pat.EscortedList = new List<Escorted>();
+    //                    if (EscortDS.Tables[0].Rows.Count > 0)
+    //                    {
+    //                        foreach (DataRow row in EscortDS.Tables[0].Rows)
+    //                        {
+    //                            Escorted e = new Escorted();
+    //                            e.DisplayName = row["DisplayName"].ToString();
+    //                            rp2.Pat.EscortedList.Add(e);
+    //                        }
+    //                    }
+
+    //                    Location origin = new Location();
+    //                    origin.Name = dr["Origin"].ToString();
+    //                    rp2.Origin = origin;
+    //                    Location dest = new Location();
+    //                    dest.Name = dr["Destination"].ToString();
+    //                    rp2.Destination = dest;
+    //                    rp2.Area = dr["Area"].ToString();
+    //                    rp2.Shift = dr["Shift"].ToString();
+    //                    rp2.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
+    //                    //adding anonymous
+    //                    rp2.Pat.IsAnonymous = dr["IsAnonymous"].ToString();
+    //                    ride.RidePats.Add(rp2);
+    //                }
+    //            }
+
+    //            if (RideExists) continue;
+    //            Ride r2 = new Ride();
+
+    //            if (dr["Maindriver"].ToString() == volunteerId.ToString())
+    //            {
+    //                r2.DriverType = "Primary";
+    //            }
+    //            else
+    //            {
+    //                r2.DriverType = "Secondary";
+    //            }
+
+    //            r2.Id = int.Parse(dr["RideNum"].ToString());
+    //            query = "select statusStatusName from status_Ride where RideRideNum=" + r2.Id + " order by Timestamp desc";
+    //            db = new DbService();
+    //            r2.Statuses = new List<string>();
+    //            foreach (DataRow status in db.GetDataSetByQuery(query).Tables[0].Rows)
+    //            {
+    //                r2.Statuses.Add(status.ItemArray[0].ToString());
+    //            }
+    //            r2.Status = r2.Statuses[0];
+    //            db = new DbService();
+    //            r2.Status = db.GetObjectScalarByQuery(query).ToString();
+    //            RidePat rp = new RidePat();
+    //            r2.RidePats = new List<RidePat>();
+    //            rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
+    //            rp.Pat = new Patient();
+    //            rp.Pat.DisplayName = dr["DisplayName"].ToString();
+    //            rp.Pat.CellPhone = dr["CellPhone"].ToString();
+    //            rp.Pat.Equipment = rp.Pat.getEquipmentForPatient(rp.Pat.DisplayName);
+    //            rp.Pat.EscortedList = new List<Escorted>();
+    //            db = new DbService();
+    //            query = "select DisplayName from RidePatEscortView where RidePatNum=" + rp.RidePatNum;
+    //            EscortDS = db.GetDataSetByQuery(query);
+    //            rp.Pat.EscortedList = new List<Escorted>();
+    //            if (EscortDS.Tables[0].Rows.Count > 0)
+    //            {
+    //                foreach (DataRow row in EscortDS.Tables[0].Rows)
+    //                {
+    //                    Escorted e = new Escorted();
+    //                    e.DisplayName = row["DisplayName"].ToString();
+    //                    rp.Pat.EscortedList.Add(e);
+    //                }
+    //            }
+
+    //            Location origin2 = new Location();
+    //            origin2.Name = dr["Origin"].ToString();
+    //            rp.Origin = origin2;
+    //            Location dest2 = new Location();
+    //            dest2.Name = dr["Destination"].ToString();
+    //            rp.Destination = dest2;
+    //            rp.Area = dr["Area"].ToString();
+    //            rp.Shift = dr["Shift"].ToString();
+    //            rp.Pat.IsAnonymous = dr["IsAnonymous"].ToString();
+    //            rp.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
+    //            r2.RidePats.Add(rp);
+    //            rl.Add(r2);
+    //        }
+
+    //        return rl;
+    //    }
+    //    catch (Exception e)
+    //    {
+
+    //        throw e;
+    //    }
+    //}
 
 }

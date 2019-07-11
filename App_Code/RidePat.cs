@@ -375,7 +375,7 @@ public class RidePat
             {
                 anotherRide = false;
             }
-            else anotherRide = IsThereAnotherRidePat(rp.RideNum);
+            else anotherRide = IsThereAnotherRidePat(rp);
             if (rp.Drivers != null)
             {
                 foreach (Volunteer driver in rp.Drivers)
@@ -412,9 +412,24 @@ public class RidePat
         return RidePatNum;
 
     }
-    public bool IsThereAnotherRidePat(int rideId)
+    public bool IsThereAnotherRidePat(RidePat rp)
     {
-        string query = "select * from ridepat where rideid="+rideId;
+        //TimeZoneInfo sourceTimeZone = TimeZoneInfo.FindSystemTimeZoneById("UTC");
+        var date = rp.Date.ToString("yyyy-MM-dd");
+        var time = rp.Date.ToShortTimeString();
+        Volunteer v = new Volunteer();
+        int c = rp.Drivers.Count;
+        if (c!=0)
+        {
+            v = rp.Drivers[0];
+            if (v == null)
+            {
+                v = rp.Drivers[1];
+            }
+        }
+        
+
+        string query = "select * from rpview where Origin=N'" + rp.Origin.Name+"' and Destination=N'"+rp.Destination.Name+"' and pickuptime='"+ date + " " +time + "' and (MainDriver="+v.Id+" or SecondaryDriver="+v.Id+")";
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         if (ds.Tables[0].Rows.Count == 1)
@@ -631,7 +646,7 @@ public class RidePat
 
 
     //This method is used for שבץ אותי
-    public List<RidePat> GetRidePatView(int volunteerId) //VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
+    public List<RidePat> GetRidePatView(int volunteerId,int maxDays) //VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
     {
         DataTable driverTable = getDriver();
         DataTable equipmentTable = getEquipment();
@@ -641,13 +656,21 @@ public class RidePat
         string query = "";
 
         if (volunteerId == -1)
+        {
             query = "select * from RPView where PickupTime>= getdate()"; // Get ALL FUTURE RidePats, even if cancelled
+        }
         else if (volunteerId == -2)
+        {
             query = "select * from RPView"; //get ALL ridePats
+        }
         else
         {
             //query = "select * from RPView where (Status<>N'הסתיימה' or Status<>N'בוטלה') and PickupTime>= getdate()"; //Get ALL ACTIVE RidePats (used by mobile app)
-            query = "select * from RPView where (Status=N'שובץ נהג' or Status=N'ממתינה לשיבוץ' or Status=N'שובץ גיבוי') and PickupTime>= getdate()"; //Get ALL ACTIVE RidePats (used by mobile app)
+            if (maxDays!=-1)
+            {
+                query = "select * from RPView where (Status=N'שובץ נהג' or Status=N'ממתינה לשיבוץ' or Status=N'שובץ גיבוי') and DATEDIFF(day,getdate(),pickuptime)<=" + maxDays+" and pickuptime>=getdate()"; //Get ALL ACTIVE RidePats (used by mobile app) where max days=30
+            }
+            else query = "select * from RPView where (Status=N'שובץ נהג' or Status=N'ממתינה לשיבוץ' or Status=N'שובץ גיבוי') and PickupTime>= getdate()"; //Get ALL ACTIVE RidePats (used by mobile app)
         }
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
@@ -1021,7 +1044,7 @@ public class RidePat
         }
         if (hours <= 24)
         {
-            //call the police!! it's less than 24 to the ride
+            //it's less than 24 to the ride
             res = 911;
         }
      
