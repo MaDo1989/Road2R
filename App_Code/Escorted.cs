@@ -13,6 +13,7 @@ using System.Web.Script.Serialization;
 public class Escorted
 {
     Patient pat;//חולה
+    string englishName;//שם באנגלית
     string displayName; //מזהה ייחודי
     string firstNameH;//שם פרטי עברית
     string firstNameA;//שם פרטי ערבית
@@ -217,6 +218,19 @@ public class Escorted
         }
     }
 
+    public string EnglishName
+    {
+        get
+        {
+            return englishName;
+        }
+
+        set
+        {
+            englishName = value;
+        }
+    }
+
     public Escorted(Patient _pat, string _displayName, string _firstNameH, string _firstNameA, string _lastNameH, string _lastNameA,
      string _addrees, string _cellPhone, string _cellPhone2, string _homePhone, string _status, string _contactType, string _gender)
     {
@@ -346,6 +360,7 @@ public class Escorted
             e.IsActive = Convert.ToBoolean(dr["IsActive"].ToString());
             // p.ContactType = dr["contactType"].ToString();
             e.Gender = dr["Gender"].ToString();
+            e.EnglishName = dr["EnglishName"].ToString();
         }
 
         db = new DbService();
@@ -368,7 +383,7 @@ public class Escorted
         string query = "";
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
-        SqlParameter[] cmdParams = new SqlParameter[14];
+        SqlParameter[] cmdParams = new SqlParameter[15];
         cmdParams[0] = cmd.Parameters.AddWithValue("@FirstNameH", FirstNameH);
         cmdParams[1] = cmd.Parameters.AddWithValue("@FirstNameA", FirstNameA);
         cmdParams[2] = cmd.Parameters.AddWithValue("@LastNameH", LastNameH);
@@ -383,6 +398,7 @@ public class Escorted
         cmdParams[11] = cmd.Parameters.AddWithValue("@Id", Id);
         cmdParams[12] = cmd.Parameters.AddWithValue("@PatientId", Pat.Id);
         cmdParams[13] = cmd.Parameters.AddWithValue("@Relationship", 0);
+        cmdParams[14] = cmd.Parameters.AddWithValue("@EnglishName",EnglishName);
 
         db = new DbService();
         query = "select Id from ContactType where Name=@ContactType";
@@ -402,7 +418,7 @@ public class Escorted
         {
             query = "update Escorted set FirstNameH=@FirstNameH,LastNameH=@LastNameH,FirstNameA=@FirstNameA,";
             query += "LastNameA=@LastNameA,CellPhone=@CellPhone,CellPhone2=@CellPhone2,HomePhone=@HomePhone,";
-            query += "City=@City,IsActive=@IsActive,Gender=@Gender where Id=@Id";
+            query += "City=@City,IsActive=@IsActive,Gender=@Gender,EnglishName=@EnglishName where Id=@Id";
             db = new DbService();
             int res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
 
@@ -430,8 +446,8 @@ public class Escorted
         else if (func == "new")
         {
             query = "INSERT INTO Escorted (FirstNameH,LastNameH, CellPhone,CellPhone2,HomePhone,";
-            query += "City,IsActive,Gender,FirstNameA,LastNameA)";
-            query += " values (@FirstNameH,@LastNameH,@CellPhone,@CellPhone2,@HomePhone,@City,@IsActive,@Gender,@FirstNameA,@LastNameA); select SCOPE_IDENTITY()";
+            query += "City,IsActive,Gender,FirstNameA,LastNameA,EnglishName)";
+            query += " values (@FirstNameH,@LastNameH,@CellPhone,@CellPhone2,@HomePhone,@City,@IsActive,@Gender,@FirstNameA,@LastNameA,@EnglishName); select SCOPE_IDENTITY()";
             db = new DbService();
             Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
             cmdParams[11] = cmd.Parameters.AddWithValue("@Id", Id);

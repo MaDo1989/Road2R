@@ -219,6 +219,7 @@
                         $("#PatientName").attr('disabled', 'disabled');
                         $("#patientFirstName").attr('disabled', 'disabled');
                         $("#patientLastName").attr('disabled', 'disabled');
+                        $("#patientEnglishName").attr('disabled', 'disabled');
                         //$("#phone1").attr('disabled', 'disabled');
                         //$("#city").attr('disabled', 'disabled');
                         $("#barrier").attr('disabled', 'disabled');
@@ -272,6 +273,7 @@
                     $("#firstA").val(patient.FirstNameA);
                     $("#barrier").val(patient.Barrier.Name);
                     $("#hospital").val(patient.Hospital.Name);
+                    $("#patientEnglishName").val(patient.EnglishName);
 
                     if (typeof arr_equipment !== "undefined") {
                         for (i in arr_equipment) {
@@ -403,12 +405,22 @@
                                         <p class="required">* שדה חובה</p>
 
                                         <div class="row m-l-10 m-r-10">
-
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">שם&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="patientFirstName" name="patientFirstName" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">שם באנגלית&nbsp;<span class="required">*</span></label>
+                                                    <div class="col-sm-6">
+                                                        <input id="patientEnglishName" name="patientEnglishName" type="text" class="form-control">
                                                     </div>
                                                 </div>
                                             </div>
@@ -567,6 +579,8 @@
                     if (!valid) return false;
 
                     var name = $("#patientFirstName").val();
+                    var englishName = $("#patientEnglishName").val();
+
                     //var lastName = $("#patientLastName").val();
                     //var phone = $("#phone1").val();
                     //var city = $("#city").val();
@@ -628,7 +642,7 @@
 
                     anonymousPatient = {
                         firstNameH: name, firstNameA: nameA,barrier: barrier,NumberOfEscort:escort ,hospital: hospital,
-                        Equipment: EquipmentArr, IsActive: IsActive, Id: Id 
+                        Equipment: EquipmentArr, IsActive: IsActive, Id: Id ,EnglishName:englishName
                     }
                     $.ajax({
                         dataType: "json",
@@ -682,18 +696,31 @@
             var hospital = true;
             var escort = true;
             var checkName = true;
-
+            var englishName = $("#patientEnglishName").val();
+            
+            if(englishName==""){
+                swal(
+                    "שגיאה",
+                    "אנא הכנס שם חולה באנגלית",
+                    "warning"
+                );  
+                englishNameCon = false;
+            }
 
             var checkAnonymousName = $("#patientFirstName").val() + " ";
             //check if patient name exsits.
             generatePat();
+            var counter = 0;
             for (var i = 0; i < patients.length; i++) {
                 if (checkAnonymousName == patients[i]) {
-                    checkName = false;
-                    $("#patientFirstName").val("");
-                    alert("שם חולה אנונימי קיים, יש לבחור שם שונה");
-                    break;
+                    counter++;
+                    
                 }
+            }
+            if(counter>1){
+                checkName = false;
+                $("#patientFirstName").val("");
+                alert("שם חולה אנונימי קיים, יש לבחור שם שונה");
             }
 
             var barrier = $("#barrier").val();

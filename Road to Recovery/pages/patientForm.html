@@ -344,6 +344,7 @@
                         //document.getElementById("datatable-buttons").disabled = true;
 
                         $("#activepatient").attr('disabled', 'disabled');
+                        $("#patientEnglishName").attr('disabled', 'disabled');
                         $("#anonymouspatient").attr('disabled', 'disabled');
                         $("#PatientName").attr('disabled', 'disabled');
                         $("#patientFirstName").attr('disabled', 'disabled');
@@ -408,6 +409,7 @@
                     //generateStatus(patient);
                     //generateGender(patient);
                     $("#PatientName").val(patient.DisplayName);
+                    $("#patientEnglishName").val(patient.EnglishName);
                     $("#patientFirstName").val(patient.FirstNameH);
                     $("#patientLastName").val(patient.LastNameH);
                     $("#firstA").val(patient.FirstNameA);
@@ -528,7 +530,7 @@
                 success: function (data) {
                     var arr_escorts = JSON.parse(data.d);
                     //GENERAL.VOLUNTEERS.setvolunteersList(arr_volunteers);
-
+        console.log(arr_escorts)
                     for (i in arr_escorts) {
                         var btnStr = ""
                         var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button>";
@@ -546,7 +548,7 @@
                         }
 
 
-                        t.row.add([arr_escorts[i].DisplayName, arr_escorts[i].CellPhone, arr_escorts[i].City, arr_escorts[i].ContactType, arr_escorts[i].Gender, btnStr]).draw(false);
+                        t.row.add([arr_escorts[i].DisplayName,arr_escorts[i].EnglishName, arr_escorts[i].CellPhone, arr_escorts[i].City, arr_escorts[i].ContactType, arr_escorts[i].Gender, btnStr]).draw(false);
 
                     }
 
@@ -753,13 +755,13 @@
                             <div class="col-sm-12">
                                 <div class="card-box">
                                     <div class="row">
-                                        <h4 class="m-t-0 header-title"><b>פרטי חולה</b></h4>
+                                        <h4 data-toggle="tooltip" title="تفاصيل المريض  Patient Details" class="m-t-0 header-title"><b>פרטי חולה</b></h4>
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <br />
                                                 <div class="col-md-6 checkbox checkbox-primary text-left">
                                                     <input id="activepatient" type="checkbox" checked="checked">
-                                                    <label for="activepatient">
+                                                    <label data-toggle="tooltip" title="مريض فعال  Active Patient" for="activepatient">
                                                         חולה פעיל
                                                     </label>
                                                 </div>
@@ -768,22 +770,22 @@
                                                 <br />
                                                 <div class="col-md-6 checkbox checkbox-primary text-left">
                                                     <input id="anonymouspatient" type="checkbox" onclick="returnanonymouspatient()">
-                                                    <label for="anonymouspatient">
+                                                    <label data-toggle="tooltip" title="مريض مجهول   Anonymous Patient" for="anonymouspatient">
                                                         חולה אנונימי
                                                     </label>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="text-right m-b-30 m-r-15">
-                                            <button type="button" onclick="returnpatients()" class="btn btn-default waves-effect w-md m-b-5"><i class="ti-back-right m-r-5"></i>חזרה</button>
+                                            <button data-toggle="tooltip" title="عودة Back" type="button" onclick="returnpatients()" class="btn btn-default waves-effect w-md m-b-5"><i class="ti-back-right m-r-5"></i>חזרה</button>
                                         </div>
-                                        <p class="required">* שדה חובה</p>
+                                        <p data-toggle="tooltip" title="حقل اجباري Must field" class="required">* שדה חובה</p>
 
                                         <div class="row m-l-10 m-r-10">
 
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">שם פרטי&nbsp;<span class="required">*</span></label>
+                                                    <label data-toggle="tooltip" title="اسم شخصي First Name" class="col-sm-2 control-label">שם פרטי&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="patientFirstName" name="patientFirstName" type="text" class="form-control">
                                                     </div>
@@ -791,9 +793,19 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">שם משפחה&nbsp;<span class="required">*</span></label>
+                                                    <label data-toggle="tooltip" title="اسم العائلة  Last Name" class="col-sm-2 control-label">שם משפחה&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="patientLastName" name="patientLastName" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">שם באנגלית&nbsp;<span class="required">*</span></label>
+                                                    <div class="col-sm-6">
+                                                        <input id="patientEnglishName" name="patientEnglishName" type="text" class="form-control">
                                                     </div>
                                                 </div>
                                             </div>
@@ -819,7 +831,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">יישוב&nbsp;</label>
+                                                    <label data-toggle="tooltip" title="بلد  City / Village" class="col-sm-2 control-label">יישוב&nbsp;</label>
                                                     <div class="col-sm-6">
                                                         <input id="city" name="city" type="text" class="form-control">
                                                     </div>
@@ -827,7 +839,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">תאריך לידה </label>
+                                                    <label data-toggle="tooltip" title="تاريخ الولادة  Birth Date"  class="col-sm-2 control-label">תאריך לידה </label>
                                                     <div class="col-sm-6">
                                                         <input type="date" id="birthDate" placeholder="dd/mm/yyyy" class="form-control">
                                                     </div>
@@ -837,7 +849,7 @@
                                             <div class="row m-l-10 m-r-10">
                                                 <div class="col-sm-6">
                                                     <div class="form-group">
-                                                        <label class="col-sm-2 control-label">טלפון ראשי&nbsp;<span class="required">*</span></label>
+                                                        <label data-toggle="tooltip" title="هاتف رئيسي  Main Phone" class="col-sm-2 control-label">טלפון ראשי&nbsp;<span class="required">*</span></label>
                                                         <div class="col-sm-6">
                                                             <input dir="ltr" id="phone1" name="phone1" type="text" class="form-control" placeholder="0xxxxxxxxx או 0xxxxxxxx">
                                                         </div>
@@ -845,7 +857,7 @@
                                                 </div>
                                                 <div class="col-sm-6">
                                                     <div class="form-group">
-                                                        <label class="col-sm-2 control-label">טלפון 2</label>
+                                                        <label data-toggle="tooltip" title="هاتف اضافي  Telephone 2" class="col-sm-2 control-label">טלפון 2</label>
                                                         <div class="col-sm-6">
                                                             <input dir="ltr" id="phone2" name="phone2" type="text" class="form-control" placeholder="0xxxxxxxxx או 0xxxxxxxx">
                                                         </div>
@@ -855,7 +867,7 @@
                                             <div class="row m-l-10 m-r-10">
                                                 <div class="col-sm-6">
                                                     <div class="form-group">
-                                                        <label class="col-sm-2 control-label">טלפון נוסף</label>
+                                                        <label data-toggle="tooltip" title="هاتف إضافي  Additional Phone" class="col-sm-2 control-label">טלפון נוסף</label>
                                                         <div class="col-sm-6">
                                                             <input id="HomePhone" dir="ltr" name="HomePhone" type="text" class="form-control" placeholder="0xxxxxxxxx או 0xxxxxxxx">
 
@@ -866,7 +878,7 @@
                                             <div class="row m-l-10 m-r-10">
                                                 <div class="col-sm-6">
                                                     <div class="form-group">
-                                                        <label class="col-sm-2 control-label">ציוד נלווה</label>
+                                                        <label data-toggle="tooltip" title="معدات مرافقة  Equipment" class="col-sm-2 control-label">ציוד נלווה</label>
                                                         <div class="col-sm-6" id="selectEquipment">
                                                         </div>
                                                     </div>
@@ -875,12 +887,12 @@
                                             <div class="row m-l-10 m-r-10">
                                                 <div class="col-sm-6">
                                                     <div class="form-group">
-                                                        <label class="col-sm-2 control-label">מגדר&nbsp;<span class="required">*</span></label>
+                                                        <label data-toggle="tooltip" title="جنس  Gender" class="col-sm-2 control-label">מגדר&nbsp;<span class="required">*</span></label>
                                                         <div class="col-sm-6" id="selectgender">
                                                             <select id="gender" name="gender" class="form-control">
                                                                 <option>בחר</option>
-                                                                <option>חולֶה</option>
-                                                                <option>חולָה</option>
+                                                                <option data-toggle="tooltip" title="ذكر  Male">חולֶה</option>
+                                                                <option data-toggle="tooltip" title="انثى  Female">חולָה</option>
                                                             </select>
                                                         </div>
                                                     </div>
@@ -889,7 +901,7 @@
                                             <div class="row m-l-10 m-r-10">
                                                 <div class="col-sm-6">
                                                     <div class="form-group">
-                                                        <label class="col-sm-2 control-label">מחסום&nbsp;<span class="required">*</span></label>
+                                                        <label data-toggle="tooltip" title="معبر  Border Crossing" class="col-sm-2 control-label">מחסום&nbsp;<span class="required">*</span></label>
                                                         <div class="col-sm-6" id="selectBarrier">
                                                             <select id="barrier" name="barrier" class="form-control"></select>
                                                         </div>
@@ -899,7 +911,7 @@
                                             <div class="row m-l-10 m-r-10">
                                                 <div class="col-sm-6">
                                                     <div class="form-group">
-                                                        <label class="col-sm-2 control-label">בית חולים&nbsp;<span class="required">*</span></label>
+                                                        <label data-toggle="tooltip" title="مستشفى  Hospital" class="col-sm-2 control-label">בית חולים&nbsp;<span class="required">*</span></label>
                                                         <div class="col-sm-6" id="selectHospital">
                                                             <select id="hospital" name="hospital" class="form-control"></select>
                                                         </div>
@@ -907,7 +919,7 @@
                                                 </div>
                                                 <div class="col-sm-6">
                                                     <div class="form-group">
-                                                        <label class="col-sm-2 control-label">מחלקה</label>
+                                                        <label data-toggle="tooltip" title="قسم  Ward" class="col-sm-2 control-label">מחלקה</label>
                                                         <div class="col-sm-6">
                                                             <input id="department" name="department" type="text" class="form-control">
                                                         </div>
@@ -917,7 +929,7 @@
                                             <div class="row m-l-10 m-r-10">
                                                 <div class="col-sm-6">
                                                     <div class="form-group">
-                                                        <label class="col-sm-2 control-label">הערות</label>
+                                                        <label data-toggle="tooltip" title="ملاحظات  Notes" class="col-sm-2 control-label">הערות</label>
                                                         <div class="col-sm-6">
                                                             <input id="remarks" name="remarks" type="text" class="form-control" />
                                                         </div>
@@ -925,7 +937,7 @@
                                                 </div>
                                                 <div class="col-sm-6">
                                                     <div class="form-group">
-                                                        <label class="col-sm-2 control-label">היסטוריה</label>
+                                                        <label data-toggle="tooltip" title="تاريخ   History" class="col-sm-2 control-label">היסטוריה</label>
                                                         <div class="col-sm-6">
                                                             <input id="history" name="history" type="text" class="form-control">
                                                         </div>
@@ -936,7 +948,7 @@
                                 </div>
                                 <div>
                                     <div class="text-right m-t-30 row">
-                                        <button type="submit" id="saveCustomer" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-save m-r-5"></i>שמירה</button>
+                                        <button data-toggle="tooltip" title="حفظ   Save" type="submit" id="saveCustomer" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i  class="ti-save m-r-5"></i>שמירה</button>
                                     </div>
                                 </div>
                                 <hr />
@@ -954,6 +966,8 @@
                                                 <thead>
                                                     <tr>
                                                         <th>שם</th>
+                                                        <th>שם באנגלית</th>
+                                                        <!--<th>שם באנגלית</th>-->
                                                         <th>טלפון</th>
                                                         <th>יישוב</th>
                                                         <th>סוג קרבה</th>
@@ -999,6 +1013,7 @@
             // DO NOT REMOVE : GLOBAL FUNCTIONS!
             var errorClass = 'invalid';
             var errorElement = 'em';
+            $('[data-toggle="tooltip"]').tooltip();   
             var $serviceForm = $('#customerForm').validate({
 
                 highlight: function (element) {
@@ -1039,6 +1054,7 @@
 
                     var name = $("#patientFirstName").val();
                     var lastName = $("#patientLastName").val();
+                    var englishName = $("#patientEnglishName").val();
                     var phone = $("#phone1").val();
                     if (phone != "") {
                         phone = phone.replace(/-/g, '');
@@ -1113,7 +1129,7 @@
                     patient = {
                         firstNameH: name, firstNameA: nameA, lastNameH: lastName, lastNameA: lastNameA, cellPhone: phone, cellPhone1: phone1,
                         city: city, gender: gender, barrier: barrier, hospital: hospital, homephone: homePhone,
-                        department: department, Equipment: EquipmentArr, history: history, remarks: remarks, IsActive: IsActive, Id: Id , birthDate: Bdate
+                        department: department, Equipment: EquipmentArr, history: history, remarks: remarks, IsActive: IsActive, Id: Id , birthDate: Bdate,EnglishName:englishName
                     }
                     
                     $.ajax({
@@ -1178,8 +1194,18 @@
             var barrier = true;
             var hospital = true;
             var gender = true;
+            var englishNameCon = true;
             var city = $("#city").val();
-
+            var englishName = $("#patientEnglishName").val();
+            
+            if(englishName==""){
+                swal(
+                    "שגיאה",
+                    "אנא הכנס שם חולה באנגלית",
+                    "warning"
+                );  
+                englishNameCon = false;
+            }
             if(city == ""){
                CityExists = true;
             }
@@ -1275,7 +1301,7 @@
             } else phoneMatch3 = true;
 
 
-            if (!CityExists || !barrier || !hospital || !gender  || !phoneMatch || !phoneMatch2 || !phoneMatch3 ) {
+            if (!englishNameCon || !CityExists || !barrier || !hospital || !gender  || !phoneMatch || !phoneMatch2 || !phoneMatch3 ) {
                 return false;
             } else return true;
         }
