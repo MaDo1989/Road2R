@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -350,7 +351,7 @@ public class RidePat
                 }
 
             }
-            if (isAnonymous)
+            if (isAnonymous && Pat.DisplayName.IndexOf("אנונימי")==-1)
             {
                 RidePatNum = ridePat.RidePatNum;
                 Ride r = new Ride();
@@ -502,6 +503,8 @@ public class RidePat
 
     public RidePat GetRidePat(int ridePatNum)
     {
+        Location tmp = new Location();
+        Hashtable locations = tmp.getLocationsEnglishName();
         string query = "select * from RPView where RidePatNum=" + ridePatNum;
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
@@ -543,9 +546,11 @@ public class RidePat
         rp.Escorts = new List<Escorted>();
         Location origin = new Location();
         origin.Name = dr["Origin"].ToString();
+        origin.EnglishName = locations[origin.Name].ToString();
         rp.Origin = origin;
         Location dest = new Location();
         dest.Name = dr["Destination"].ToString();
+        dest.EnglishName = locations[dest.Name].ToString();
         rp.Destination = dest;
         rp.Area = dr["Area"].ToString();
         rp.Shift = dr["Shift"].ToString();
@@ -648,6 +653,8 @@ public class RidePat
     //This method is used for שבץ אותי
     public List<RidePat> GetRidePatView(int volunteerId,int maxDays) //VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
     {
+        Location tmp = new Location();
+        Hashtable locations = tmp.getLocationsEnglishName();
         DataTable driverTable = getDriver();
         DataTable equipmentTable = getEquipment();
         DataTable rideTable = getRides();
@@ -737,6 +744,7 @@ public class RidePat
 
                 rp.pat = new Patient();
                 rp.pat.DisplayName = dr["DisplayName"].ToString();
+                rp.pat.EnglishName = dr["EnglishName"].ToString();
                 rp.pat.CellPhone = dr["CellPhone"].ToString();
                 rp.pat.IsAnonymous = dr["IsAnonymous"].ToString();
             
@@ -761,9 +769,11 @@ public class RidePat
 
                 Location origin = new Location();
                 origin.Name = dr["Origin"].ToString();
+                origin.EnglishName = locations[origin.Name].ToString();
                 rp.Origin = origin;
                 Location dest = new Location();
                 dest.Name = dr["Destination"].ToString();
+                dest.EnglishName = locations[dest.Name].ToString();
                 rp.Destination = dest;
                 rp.Area = dr["Area"].ToString();
                 rp.Shift = dr["Shift"].ToString();

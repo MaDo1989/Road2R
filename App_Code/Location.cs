@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -17,6 +18,7 @@ public class Location
         // TODO: Add constructor logic here
         //
     }
+    string englishName;//שם באנגלית
     string type;//סוג יעד
     string name;//שם
     string area;//אזור
@@ -174,6 +176,19 @@ public class Location
         }
     }
 
+    public string EnglishName
+    {
+        get
+        {
+            return englishName;
+        }
+
+        set
+        {
+            englishName = value;
+        }
+    }
+
     public Location(string _type, string _name, string _area, string _direction, Volunteer _responsible, string _status,
         string _remarks, string _managerName, string _managerLastName, string _managerPhones, string _managerPhones2)
     {
@@ -194,6 +209,11 @@ public class Location
     public Location(string _name)
     {
         Name = _name;
+    }
+    public Location(string _name,string _englishName)
+    {
+        Name = _name;
+        EnglishName = _englishName;
     }
 
     //public DataTable read()
@@ -241,6 +261,7 @@ public class Location
             l.Responsible = new Volunteer(dr["Responsible"].ToString());
             l.IsActive =Convert.ToBoolean( dr["IsActive"].ToString());
             l.Remarks = dr["Remarks"].ToString();
+            l.EnglishName = dr["EnglishName"].ToString();
             if (dr["DestinationManager"].ToString() != "")
             {
                 int managerId = int.Parse(dr["DestinationManager"].ToString());
@@ -279,6 +300,7 @@ public class Location
 
             Location tmp = new Location();
             tmp.Name = dr["Name"].ToString();
+            tmp.EnglishName = dr["EnglishName"].ToString();
             tmp.Type = dr["Type"].ToString();
             tmp.Area = dr["Area"].ToString();
             //tmp.Direction = dr["direction"].ToString();
@@ -314,6 +336,7 @@ public class Location
 
             Location tmp = new Location();
             tmp.Name = dr["Name"].ToString();
+            tmp.EnglishName = dr["EnglishName"].ToString();
             tmp.Type = dr["Type"].ToString();
             tmp.Area = dr["Area"].ToString();
             //tmp.Direction = dr["direction"].ToString();
@@ -360,6 +383,7 @@ public class Location
         //l.Responsible = (Volunteer)dr["Responsible"];
         l.IsActive = bool.Parse(dr["IsActive"].ToString());
         l.Remarks = dr["Remarks"].ToString();
+        l.EnglishName = dr["EnglishName"].ToString();
         if (dr["DestinationManager"].ToString() != "")
         {
             int managerId = int.Parse(dr["DestinationManager"].ToString());
@@ -376,13 +400,32 @@ public class Location
             l.ManagerName = dr2["FirstName"].ToString();
             l.ManagerLastName = dr2["LastName"].ToString();
             l.managerPhones = dr2["Phone"].ToString();
+           
         }
         #endregion
 
         return l;
     }
 
+    public Hashtable getLocationsEnglishName()
+    {
+       
+        string query = "select Name,EnglishName from Location ";
+        Hashtable list = new Hashtable();
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
 
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+
+            Location tmp = new Location();
+            tmp.Name = dr["Name"].ToString();
+            tmp.EnglishName = dr["EnglishName"].ToString();
+
+            list[tmp.Name] = tmp.EnglishName;
+        }
+        return list;
+    }
 
     public void setLocation(Location v, string func)
     {
@@ -391,7 +434,7 @@ public class Location
         DbService db = new DbService();
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
-        SqlParameter[] cmdParams = new SqlParameter[8];
+        SqlParameter[] cmdParams = new SqlParameter[9];
         
         //getting the index for the destination manager
         DestinationManager m = new DestinationManager(v.ManagerName,v.ManagerLastName,v.ManagerPhones,v.ManagerPhones2);
@@ -406,6 +449,7 @@ public class Location
         cmdParams[5] = cmd.Parameters.AddWithValue("@remarks", v.Remarks);
         cmdParams[6] = cmd.Parameters.AddWithValue("@DestinationManager", managerId);
         cmdParams[7] = cmd.Parameters.AddWithValue("@cityCityName", "אביחיל");
+        cmdParams[8] = cmd.Parameters.AddWithValue("@EnglishName", EnglishName);
 
         string query = "";
         if (func == "edit")
@@ -442,7 +486,7 @@ public class Location
 
             query = "update Location set Type=@type, Name=@name,";
             query += "Area=@area, Adress=@adress, IsActive=@IsActive, Remarks=@remarks, ";
-            query += "DestinationManager=@DestinationManager, CityCityName=@cityCityName where Name=@name"; 
+            query += "DestinationManager=@DestinationManager, CityCityName=@cityCityName,EnglishName=@EnglishName where Name=@name"; 
 
             res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
 
@@ -454,8 +498,8 @@ public class Location
         }
         else if (func == "new")
         {
-            query = "insert into Location (Type, Name, Area, Adress, IsActive, Remarks, DestinationManager, CityCityName)";
-            query += " values (@type,@name,@area,@adress,@IsActive,@remarks,@DestinationManager,@cityCityName);SELECT SCOPE_IDENTITY();";
+            query = "insert into Location (Type, Name, Area, Adress, IsActive, Remarks, DestinationManager, CityCityName,EnglishName)";
+            query += " values (@type,@name,@area,@adress,@IsActive,@remarks,@DestinationManager,@cityCityName,@EnglishName);SELECT SCOPE_IDENTITY();";
             db = new DbService();
             try
             {

@@ -558,7 +558,7 @@ public class WebService : System.Web.Services.WebService
         {
             JavaScriptSerializer j = new JavaScriptSerializer();
             Escorted e = new Escorted();
-            List<string> cl = e.getContactType();
+            List<Escorted> cl = e.getContactType();
             return j.Serialize(cl);
         }
         catch (Exception ex)
@@ -1155,6 +1155,17 @@ public class WebService : System.Web.Services.WebService
         JavaScriptSerializer j = new JavaScriptSerializer();
         return j.Serialize("ok");
     }
+    [WebMethod]
+    public string pushAssistant(int ridepat,string cellphone, string msg)
+    {
+        
+        Message m = new Message();
+        m.pushFromAssistant(ridepat, cellphone, msg);
+        //Email e = new Email();
+        //e.sendMessage("Assistant change", "עוזר", cellphone, msg);
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        return j.Serialize("ok");
+    }
     #endregion
 
     #region login functions
@@ -1204,6 +1215,60 @@ public class WebService : System.Web.Services.WebService
             throw;
         }
         return j.Serialize(userInDB);
+    }
+    [WebMethod]
+    public string GetUserEnglishNameByCellphone(string uName)
+    {
+        string userInDB;
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        try
+        {
+
+            User u = new User();
+            userInDB = u.getUserEnglishNameByCellphone(uName);
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
+        return j.Serialize(userInDB);
+    }
+    [WebMethod]
+    public string GetIsAssistantByCellphone(string uName)
+    {
+        bool userInDB;
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        try
+        {
+
+            User u = new User();
+            userInDB = u.GetIsAssistantByCellphone(uName);
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
+        return j.Serialize(userInDB);
+    }
+    [WebMethod]
+    public string GetCoordinatorsList()
+    {
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        List<Volunteer> coors;
+        try
+        {
+            Volunteer v = new Volunteer();
+            coors =  v.getCoordinatorsList();
+
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
+        return j.Serialize(coors);
     }
     [WebMethod]
     public void writeLog(string str)

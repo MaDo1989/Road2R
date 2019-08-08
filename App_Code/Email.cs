@@ -20,7 +20,8 @@ public class Email
 
     Dictionary<string, string> subjects = new Dictionary<string, string>{
       {"problem","בעיה מדווחת מהאפליקציה"},
-      {"registration","בקשה לרישום"}
+      {"registration","בקשה לרישום"},
+      {"Assistant change","שינוי ע\"י עוזר" }
     };
 
 	public Email()

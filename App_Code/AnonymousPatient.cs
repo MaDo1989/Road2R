@@ -446,7 +446,7 @@ public class AnonymousPatient
         {
             query = "insert into Patient (FirstNameH,FirstNameA,LastNameH,LastNameA,CellPhone,CellPhone2,";
             query += "HomePhone,CityCityName,IsActive,BirthDate,History,Department,Barrier,Hospital,Gender,Remarks,IsAnonymous,NumberOfEscort,EnglishName)";
-            query += " values (@firstNameH,@firstNameA,@lastNameH,@lastNameA";
+            query += " values (@firstNameH,@firstNameA,@lastNameH,@lastNameA,";
             query += "@cellPhone,@cellPhone2,@homePhone,@city,@IsActive,@birthDate,";
             query += "@history,@department,@barrier,@hospital,@gender,@remarks,@isAnonymous,@numberOfEscort,@englishName); select SCOPE_IDENTITY()";
             db = new DbService();

@@ -61,27 +61,43 @@
         var driverName = "";
         var patientName = "";
         var isAnonymous = false;
-
+        var isAssistant = false;
 
         $(document).ready(function () {
-            //$("#userStyle").mouseover(function () {
-            //    $(this).css("background-color", "blue")
-            //});
-            $('[data-toggle="tooltip"]').tooltip();   
-
+            
+           // var isAssistant
+            $('[data-toggle="tooltip"]').tooltip({
+            container: 'body'
+            })
             if(window.location.hostname.toString()=='localhost' || window.location.pathname.indexOf('test')!=-1){
                 $("#na").css("background-color", "#ffde89");
             }
             if (window.location.href.indexOf('http://40.117.122.242/Road%20to%20Recovery/') != -1) {
                 window.location.href = "notAvailable.html";
             }
+            isAssistant = JSON.parse(GENERAL.USER.getIsAssistant());
+            console.log(isAssistant);
+            var assistantName = "";
+            if(isAssistant){
+                $("#menuType").attr("w3-include-html","HelperMenu.html");
+                var coorAssistant = GENERAL.USER.getCoorAssistant();
+                console.log(coorAssistant);
+                assistantName = GENERAL.USER.getAsistantDisplayName();
+            }
+            else $("#menuType").attr("w3-include-html","menu.html");
             includeHTML();
-            var userName = GENERAL.USER.getUserDisplayName();
-            $("#userName").html(userName);
+            if(isAssistant){
+                var userName = GENERAL.USER.getAsistantAndCoorDisplayName();
+                $("#userName").html(userName);
+            }
+            else{
+                var userName = GENERAL.USER.getUserDisplayName();
+                $("#userName").html(userName);
+            }
             splitHour = 12; //The hourthat seperates morning and afternoon ridepats
 
             //  document.getElementById("Numbers").checked = localStorage.numbers === 'true';
-
+            
             var today = new Date();
             var time;
 
@@ -173,7 +189,20 @@
                 error: getCoorsErrorCB
             });
         }
-
+        function sendMessegeFromAssistant(ridepat, cellphone,msg) {
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/pushAssistant",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                async: false,
+                data: JSON.stringify({ridepat:ridepat,cellphone:cellphone,msg:msg}),
+                error: pushAssistantErrorCB
+            });
+        }
+        function pushAssistantErrorCB(error) {
+            console.log(error);
+        }
         function getCoorsSuccessCB(data) {
             var arr_coor = JSON.parse(data.d);
             var user = GENERAL.USER.getUserName();
@@ -258,8 +287,10 @@
                         //btnStr += showBtn;
                         if ((arr_rides[i].Status == 'ממתינה לשיבוץ') || (arr_rides[i].Pat.IsAnonymous == "True")) btnStr += " " + editBtn; //allow editing a ridepat if no drivers are assigned to it and if its not anonymous
                         else btnStr += " " + showBtn;
-                        btnStr += " " + deleteBtn;
-
+                        if ((arr_rides[i].Status === 'שובץ נהג' || arr_rides[i].Status === 'שובץ נהג וגיבוי' || arr_rides[i].Status === 'שובץ גיבוי') && isAssistant) {
+                            btnStr += "";
+                        }
+                        else btnStr += " " + deleteBtn;
                         //localStorage.setItem('IsAnonymous', JSON.stringify(arr_rides[i].Pat.IsAnonymous));
 
                         if (arr_rides[i].Status == 'שובץ גיבוי') btnStr += " " + backupBtn; //Enable option to text the secondary driver asking to assign him to primary
@@ -298,6 +329,8 @@
                     $('#datatable-morning tbody').on('click', '#show', function () {
                         showButton(this);
                     });
+
+                   
 
                     $('#datatable-morning tbody').on('click', '#remove', function () {
                         confirmDelete(this, tMorning);
@@ -346,12 +379,22 @@
 
         function buildTables(table) {
 
-            if (arr_rides[i].Status == "ממתינה לשיבוץ") {
-                if (table.context[0].sTableId != "datatable-future") {
-                    table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!", arr_rides[i].Status, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+            if (arr_rides[i].Status.indexOf("ממתינה לשיבוץ") !==-1 ) {
+                if (isAssistant) {
+                    if (table.context[0].sTableId != "datatable-future") {
+                        table.row.add([time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, "אין!<br/>None!", arr_rides[i].Status + "<br/>Waiting for a driver", btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                    }
+                    else {
+                        table.row.add([date2, time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, "אין!<br/>None!", arr_rides[i].Status + "<br/>Waiting for a driver", btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                    }
                 }
                 else {
-                    table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!", arr_rides[i].Status, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                    if (table.context[0].sTableId != "datatable-future") {
+                        table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.EnglishName, "אין!<br/>None!", arr_rides[i].Status + "<br/>Waiting for a driver", btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                    }
+                    else {
+                        table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.EnglishName, "אין!<br/>None!", arr_rides[i].Status + "<br/>Waiting for a driver", btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                    }
                 }
             }
             else { //ride has at least one drive assigned to it
@@ -370,41 +413,57 @@
                 }
                 else if (arr_rides[i].Drivers.length == 2) //Two drivers are assigned
                     var drivers = "ראשי: " + primary + ",<br> " + "גיבוי: " + secondary;
-
-                if (table.context[0].sTableId != "datatable-future") {
-                    table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                if (isAssistant) {
+                    if (table.context[0].sTableId != "datatable-future") {
+                        table.row.add([time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                    }
+                    else {
+                        table.row.add([date2, time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                    }
                 }
                 else {
-                    table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                    if (table.context[0].sTableId != "datatable-future") {
+                        table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                    }
+                    else {
+                        table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                    }
                 }
             }
-
         }
+        
         //need to change the table from future to any table
         function confirmDelete(ridePat, table) {
             arr_details = { RidePatNum: ridePat.name, func: "show" };// ridePat.name=RidePatNum
             var data = table.row($(ridePat).parents('tr')).data();
             var msg = "";
+            //in case the assistant delet's the ride.
+            var pushMsg = "";
+            var userName = GENERAL.USER.getUserDisplayName();
             if (data.length == 7) {
                 var hour = " בשעה ";
                 if (data[0] == "אחה''צ") hour = " ";
-                msg = "מחיקת ההסעה של " + data[3] + " מ: " + data[2] + " ל: " + data[1] + ", היום בשעה " + data[0];
+                msg = "מחיקת ההסעה של " + data[3] + " מ: " + data[2] + " ל: " + data[1] + ", היום בשעה " + data[0] +"\n";
+                msg += "حذف سفرية " + data[3] + " من: " + data[2] + " الى: " + data[1] + ", في " + data[0];
+                pushMsg = "נמחקה ההסעה של " + data[3] + " מ: " + data[2] + " ל: " + data[1] + ", היום בשעה " + data[0] + " ע\"י העוזר/ת " + userName;
             }
             else {
                 var hour = " בשעה ";
                 if (data[1] == "אחה''צ") hour = " ";
                 msg = "מחיקת ההסעה של " + data[4] + " מ: " + data[2] + " ל: " + data[3] + ", בתאריך " + data[0] + hour + data[1];
+                msg += "حذف سفرية " + data[3] + " من: " + data[2] + " الى: " + data[1] + ", في " + data[0] + hour + data[1];
+                pushMsg = "נמחקה ההסעה של " + data[4] + " מ: " + data[2] + " ל: " + data[3] + ", בתאריך " + data[0] + hour + data[1] + " ע\"י העוזר/ת " + userName;
             }
             //var hour = " בשעה ";
             //if (data[1] == "אחה''צ") hour = " ";
             swal({
-                title: "האם אתם בטוחים?",
+                title: "هل انت متأكد?\nהאם אתם בטוחים?",
                 type: "warning",
                 text: msg,
                 showCancelButton: true,
-                cancelButtonText: "בטל",
+                cancelButtonText: "الغاء\nבטל",
                 confirmButtonClass: 'btn-warning',
-                confirmButtonText: "מחיקה",
+                confirmButtonText: "حذف\nמחיקה",
                 closeOnConfirm: false
             }, function () {
                 var RidePat = new Object();
@@ -419,7 +478,12 @@
                 Origin.Name = originName;
                 RidePat.Origin = Origin;
                 deleteRidePat(RidePat, 'delete');
-
+                if (isAssistant) {
+                    //send messege to coordinator from assistant.
+                    //int ridepat,string cellphone, string msg
+                    var user = GENERAL.USER.getUserName();
+                    sendMessegeFromAssistant(arr_details.RidePatNum, user, pushMsg);
+                }
             });
         }
 
@@ -449,7 +513,7 @@
                 success: function (data) {
                     if (data.d == 1) {
                         swal({
-                            title: "ההודעה נשלחה",
+                            title: "لقد تم ارسال الرسالة\nההודעה נשלחה",
                             timer: 1000,
                             type: "success",
                             showConfirmButton: false
@@ -594,7 +658,7 @@
             tFuture.rows().every(function (rowIdx, tableLoop, rowLoop) {
                 var data = this.data();
                 if (data != undefined) {
-                    if (data[8] == "True" && (data[6] != "ממתינה לשיבוץ")) {
+                    if (data[8] == "True" && (data[6].indexOf("ממתינה לשיבוץ") !==-1 )) {
                         var row = tFuture
                             .row(rowIdx)
                             .node();
@@ -636,7 +700,7 @@
                 data: JSON.stringify({ RidePat: RidePat, func: func, isAnonymous: isAnonymous,numberOfRides:numberOfRides,repeatRideEvery: repeatRide}),
                 success: function (data) {
                     swal({
-                        title: "ההסעה נמחקה",
+                        title: "لقد تم حذف السفرية\nההסעה נמחקה",
                         timer: 1000,
                         type: "success",
                         showConfirmButton: false
@@ -654,7 +718,7 @@
             GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
             location.href = "ridePatForm.html";
         }
-
+        
     </script>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -705,9 +769,9 @@
         </div>
         <!-- Top Bar End -->
         <!-- ========== Right Sidebar Start ========== -->
+        <div id="menuType" ></div>
 
-        <div w3-include-html="menu.html"></div>
-
+        <!--<div w3-include-html="HelperMenu.html"></div>-->
         <!-- Right Sidebar End -->
         <!-- ============================================================== -->
         <!-- Start page Content here -->
@@ -725,10 +789,10 @@
 
                                     <li class="active">
                                         ניהול ההסעות שלי
-                                        
+
                                     </li>
                                 </ol>
-                                <h4  class="page-title">
+                                <h4 class="page-title">
                                     ניהול ההסעות שלי&nbsp&nbsp&nbsp<i data-toggle="tooltip" title="My Rides تنسيق السفريات الخاصة بي">
                                         <img src="../../Media/הסעות להיום.png" height="25" width="25" />
                                     </i>
@@ -741,23 +805,23 @@
                             <div class="card-box table-responsive">
                                 <div class="row">
                                     <!--<div class="col-sm-8 checkbox checkbox-primary text-left">
-                                        <input id="activeRidePats" type="checkbox" onchange="saveFilters()">
-                                        <label for="activeRidePats">
-                                            דרישות פעילות בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
-                                        </label>
-                                        <input id="TodaysRidePats" type="checkbox" onchange="saveFilters()">
-                                        <label for="TodaysRidePats">
-                                            דרישות של היום בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
-                                        </label>
-                                        <input id="UnassignedRidePats" type="checkbox" onchange="saveFilters()">
-                                        <label for="UnassignedRidePats">
-                                            דרישות ממתינות לשיבוץ בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
-                                        </label>
-                                        <input id="MyRidePats" type="checkbox" onchange="saveFilters()">
-                                        <label for="MyRidePats">
-                                            דרישות שלי בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
-                                        </label>
-                                    </div>-->
+                                    <input id="activeRidePats" type="checkbox" onchange="saveFilters()">
+                                    <label for="activeRidePats">
+                                        דרישות פעילות בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
+                                    </label>
+                                    <input id="TodaysRidePats" type="checkbox" onchange="saveFilters()">
+                                    <label for="TodaysRidePats">
+                                        דרישות של היום בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
+                                    </label>
+                                    <input id="UnassignedRidePats" type="checkbox" onchange="saveFilters()">
+                                    <label for="UnassignedRidePats">
+                                        דרישות ממתינות לשיבוץ בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
+                                    </label>
+                                    <input id="MyRidePats" type="checkbox" onchange="saveFilters()">
+                                    <label for="MyRidePats">
+                                        דרישות שלי בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
+                                    </label>
+                                </div>-->
 
                                     <div class="col-sm-12 text-right ">
                                         <button data-placement="right" data-toggle="tooltip" title="New Ride جديد " type="button" id="createCustomer" onclick="newRidePatForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>חדש</button>
@@ -774,13 +838,13 @@
                                                 <table id="datatable-morning" class="table table-striped table-bordered">
                                                     <thead>
                                                         <tr>
-                                                            <th data-toggle="tooltip" data-placement="top" title="Time  الساعة">שעה</th>
-                                                            <th data-toggle="tooltip" data-placement="top" title="Origin  نقطة الانطلاق">מוצא</th>
-                                                            <th data-toggle="tooltip" data-placement="top" title="Destination  نقطة الوصول">יעד</th>
-                                                            <th data-toggle="tooltip" data-placement="top" title="Patient  المريض">החולה</th>
-                                                            <th data-toggle="tooltip" data-placement="top" title="Driver  السائق">המסיע</th>
-                                                            <th data-toggle="tooltip" data-placement="top" title="Status  حالة السفرية">סטטוס ההסעה</th>
-                                                            <th data-toggle="tooltip" data-placement="top" title="Actions  اعمال">פעולות</th>
+                                                            <th   title="Time  الساعة">שעה</th>
+                                                            <th  title="Origin  نقطة الانطلاق">מוצא</th>
+                                                            <th  title="Destination  نقطة الوصول">יעד</th>
+                                                            <th  title="Patient  المريض">החולה</th>
+                                                            <th  title="Driver  السائق">המסיע</th>
+                                                            <th  title="Status  حالة السفرية">סטטוס ההסעה</th>
+                                                            <th  title="Actions  اعمال">פעולות</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody></tbody>
@@ -797,13 +861,13 @@
                                                 <table id="datatable-afternoon" class="table table-striped table-bordered">
                                                     <thead>
                                                         <tr>
-                                                            <th data-toggle="tooltip" data-placement="top" title="Time  الساعة">שעה</th>
-                                                            <th data-toggle="tooltip" data-placement="top" title="Origin  نقطة الانطلاق">מוצא</th>
-                                                            <th data-toggle="tooltip" data-placement="top" title="Destination  نقطة الوصول">יעד</th>
-                                                            <th data-toggle="tooltip" data-placement="top" title="Patient  المريض">החולה</th>
-                                                            <th data-toggle="tooltip" data-placement="top" title="Driver  السائق">המסיע</th>
-                                                            <th data-toggle="tooltip" data-placement="top" title="Status  حالة السفرية">סטטוס ההסעה</th>
-                                                            <th data-toggle="tooltip" data-placement="top" title="Actions  اعمال">פעולות</th>
+                                                            <th  title="Time  الساعة">שעה</th>
+                                                            <th title="Origin  نقطة الانطلاق">מוצא</th>
+                                                            <th title="Destination  نقطة الوصول">יעד</th>
+                                                            <th title="Patient  المريض">החולה</th>
+                                                            <th title="Driver  السائق">המסיע</th>
+                                                            <th title="Status  حالة السفرية">סטטוס ההסעה</th>
+                                                            <th title="Actions  اعمال">פעולות</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody></tbody>
@@ -813,21 +877,21 @@
                                     </div>
                                     <div class="panel panel-primary">
                                         <div class="panel-heading" id="col3">
-                                            <h4 data-toggle="tooltip" data-placement="bottom" title="Future Rides  سفريات مستقبلية" class="panel-title"> <a  href="#collapse3" data-parent="#accordion" data-toggle="collapse">נסיעות עתידיות</a></h4>
+                                            <h4 data-toggle="tooltip" data-placement="bottom" title="Future Rides  سفريات مستقبلية" class="panel-title"> <a href="#collapse3" data-parent="#accordion" data-toggle="collapse">נסיעות עתידיות</a></h4>
                                         </div>
                                         <div class="panel-collapse collapse" id="collapse3">
                                             <div class="panel-body">
-                                                <table id="datatable-future" class="table table-striped table-bordered">
+                                                <table id="datatable-future" class="table table-striped table-bordered hover">
                                                     <thead>
                                                         <tr>
-                                                            <th data-toggle="tooltip" data-placement="top" title="Fate  الساعة">תאריך</th>
-                                                            <th data-toggle="tooltip" data-placement="top" title="Time  الساعة">שעה</th>
-                                                            <th data-toggle="tooltip" data-placement="top" title="Origin  نقطة الانطلاق">מוצא</th>
-                                                            <th data-toggle="tooltip" data-placement="top" title="Destination  نقطة الوصول">יעד</th>
-                                                            <th data-toggle="tooltip" data-placement="top" title="Patient  المريض">החולה</th>
-                                                            <th data-toggle="tooltip" data-placement="top" title="Driver  السائق">המסיע</th>
-                                                            <th data-toggle="tooltip" data-placement="top" title="Status  حالة السفرية">סטטוס ההסעה</th>
-                                                            <th data-toggle="tooltip" data-placement="top" title="Actions  اعمال">פעולות</th>
+                                                            <th title="Date  الساعة">תאריך</th>
+                                                            <th title="Time  الساعة">שעה</th>
+                                                            <th title="Origin  نقطة الانطلاق">מוצא</th>
+                                                            <th title="Destination  نقطة الوصول">יעד</th>
+                                                            <th title="Patient  المريض">החולה</th>
+                                                            <th title="Driver  السائق">המסיע</th>
+                                                            <th title="Status  حالة السفرية">סטטוס ההסעה</th>
+                                                            <th title="Actions  اعمال">פעולות</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody></tbody>
@@ -845,7 +909,7 @@
             </div>
             <!-- end content -->
             <!-- FOOTER -->
-            <footer data-toggle="tooltip" data-placement="top" title="© 2018 - 2019. All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء"  class="footer text-right">
+            <footer data-toggle="tooltip" data-placement="top" title="© 2018 - 2019. All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء" class="footer text-right">
                 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה
             </footer>
             <!-- End FOOTER -->
