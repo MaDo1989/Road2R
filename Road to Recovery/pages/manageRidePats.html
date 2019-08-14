@@ -382,18 +382,18 @@
             if (arr_rides[i].Status.indexOf("ממתינה לשיבוץ") !==-1 ) {
                 if (isAssistant) {
                     if (table.context[0].sTableId != "datatable-future") {
-                        table.row.add([time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, "אין!<br/>None!", arr_rides[i].Status + "<br/>Waiting for a driver", btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add([time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, "אין!<br/>None!",  "Waiting for a driver", btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                     }
                     else {
-                        table.row.add([date2, time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, "אין!<br/>None!", arr_rides[i].Status + "<br/>Waiting for a driver", btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add([date2, time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, "אין!<br/>None!", "Waiting for a driver", btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                     }
                 }
                 else {
                     if (table.context[0].sTableId != "datatable-future") {
-                        table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.EnglishName, "אין!<br/>None!", arr_rides[i].Status + "<br/>Waiting for a driver", btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!<br/>None!", arr_rides[i].Status, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                     }
                     else {
-                        table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.EnglishName, "אין!<br/>None!", arr_rides[i].Status + "<br/>Waiting for a driver", btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!<br/>None!", arr_rides[i].Status, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                     }
                 }
             }
@@ -414,11 +414,30 @@
                 else if (arr_rides[i].Drivers.length == 2) //Two drivers are assigned
                     var drivers = "ראשי: " + primary + ",<br> " + "גיבוי: " + secondary;
                 if (isAssistant) {
+                    var s = '';
+                    if(arr_rides[i].Status=="שובץ נהג"){
+                        s='Driver registered';
+                    }
+                    if(arr_rides[i].Status=="יצאתי לדרך"){
+                        s='On my way';
+                    }
+                    if(arr_rides[i].Status=="הגעתי לנקודת האיסוף"){
+                        s='At the meeting pt.';
+                    }
+                    if(arr_rides[i].Status=="הגענו ליעד"){
+                        s='Reached destination';
+                    }
+                    if(arr_rides[i].Status=="אני אאחר"){
+                        s="I'll be late";
+                    }
+                    if(arr_rides[i].Status=="עיכוב במחסום"){
+                        s='Delay at the border';
+                    }
                     if (table.context[0].sTableId != "datatable-future") {
-                        table.row.add([time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add([time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, drivers, s, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                     }
                     else {
-                        table.row.add([date2, time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add([date2, time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, drivers, s, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                     }
                 }
                 else {
