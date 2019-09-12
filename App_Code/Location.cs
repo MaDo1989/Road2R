@@ -454,35 +454,7 @@ public class Location
         string query = "";
         if (func == "edit")
         {
-            //SqlCommand cmd1 = new SqlCommand();
-            //cmd1.CommandType = CommandType.Text;
-            //SqlParameter[] cmdParams1 = new SqlParameter[1];
-            //cmdParams1[0] = cmd1.Parameters.AddWithValue("name", Name);
-            //string query1 = "select * from Location where Name=@name";
-            //Location l = new Location();
-            //DbService db1 = new DbService();
-            //DataSet ds1 = db1.GetDataSetByQuery(query1, cmd1.CommandType, cmdParams1);
-            //DataRow dr1 = ds1.Tables[0].Rows[0];
-
-            //if (dr1[0] != null && v.Name == (string)dr1[1])
-            //{
-            //    throw new Exception("שימוש באותו שם אזור");
-            //}
-
-            //int counter = 0;
-            //List<Location> ls = new List<Location>();
-            //ls = getDestinationsListForView(true);
-            //foreach (Location item in ls)
-            //{
-            //    if (item.Name == v.Name)
-            //    {
-            //        counter++;
-            //    }
-            //}
-            //if (counter>1)
-            //{
-            //    throw new Exception("שימוש באותו שם אזור");
-            //}
+            
 
             query = "update Location set Type=@type, Name=@name,";
             query += "Area=@area, Adress=@adress, IsActive=@IsActive, Remarks=@remarks, ";

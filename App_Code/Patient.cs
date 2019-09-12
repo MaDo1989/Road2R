@@ -668,7 +668,7 @@ public class Patient
             cmd.Parameters.AddWithValue("@displayName", p.DisplayName);
             cmd.CommandType = CommandType.Text;
             query = "select EquipmentName from EquipmentForPatientView where PatientName=@displayName";
-            DataSet ds2 = db.GetDataSetByQuery(query, false, cmd.CommandType, cmd.Parameters[0]);
+            DataSet ds2 = db.GetDataSetByQuery(query,true, cmd.CommandType, cmd.Parameters[0]);
             foreach (DataRow row in ds2.Tables[0].Rows)
             {
                 string e = row["EquipmentName"].ToString();
