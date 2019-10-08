@@ -73,19 +73,19 @@
             }
             var userName = GENERAL.USER.getUserDisplayName();
             $("#userName").html(userName);
-            if (localStorage.active = "undefined")
+            if (localStorage.active == "undefined")
                 localStorage.active = true;
 
-            if (localStorage.today = "undefined")
+            if (localStorage.today == "undefined")
                 localStorage.today = false;
 
-            if (localStorage.unassigned = "undefined")
+            if (localStorage.unassigned == "undefined")
                 localStorage.unassigned = false;
 
-            if (localStorage.myRidePats = "undefined")
-                localStorage.myRidePats = false;
+            if (localStorage.myRidePats == "undefined")
+                localStorage.myRidePats = true;
 
-            if (localStorage.pastRidePats = "undefined")
+            if (localStorage.pastRidePats == "undefined")
                 localStorage.pastRidePats = false;
 
 

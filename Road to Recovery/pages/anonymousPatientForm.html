@@ -578,8 +578,8 @@
                     var valid = validatePatientInputs();
                     if (!valid) return false;
 
-                    var name = $("#patientFirstName").val();
-                    var englishName = $("#patientEnglishName").val();
+                    var name = $("#patientFirstName").val().trim().replace(/\s\s+/g, ' ');;
+                    var englishName = $("#patientEnglishName").val().trim().replace(/\s\s+/g, ' ');;
 
                     //var lastName = $("#patientLastName").val();
                     //var phone = $("#phone1").val();
@@ -607,7 +607,7 @@
                     var hospital = new Object();
                     hospital.Name = $("#hospital").val();
                     //var remarks = $("#remarks").val();
-                    var nameA = $("#firstA").val();
+                    var nameA = $("#firstA").val().trim().replace(/\s\s+/g, ' ');;
                     var numOfEscort = $("#escort").val();
                     //var lastNameA = $("#lastA").val();
                     var func = arr_customer.func;

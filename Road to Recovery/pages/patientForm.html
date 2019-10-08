@@ -105,11 +105,26 @@
 
         checkCookie();
         arr_addressRows = [];
+        numOfPatinetEscorts = 0;
+        var sender = "";
         $.jgrid.defaults.responsive = true;
         $.jgrid.defaults.styleUI = 'Bootstrap';
 
         $(document).ready(function () {
+<<<<<<< Updated upstream
 
+=======
+            var assistantName = "";
+            sender = document.referrer;
+            $("#backToRide").hide();
+            if (isAssistant) {
+                $("#menuType").attr("w3-include-html", "HelperMenu.html");
+                var coorAssistant = GENERAL.USER.getCoorAssistant();
+                assistantName = GENERAL.USER.getAsistantDisplayName();
+                $("#anonymous").hide();
+            }
+            else $("#menuType").attr("w3-include-html", "menu.html");
+>>>>>>> Stashed changes
             includeHTML();
             if(window.location.hostname.toString()=='localhost' || window.location.pathname.indexOf('test')!=-1){
                 $("#na").css("background-color", "#ffde89");
@@ -315,6 +330,7 @@
 
         function loadPage() {
             localStorage.setItem('func', JSON.stringify(arr_customer.func));
+            
             if (JSON.parse(GENERAL.PATIENTS.getPatientsList()).length != 0) {
                 arr_patient = JSON.parse(GENERAL.PATIENTS.getPatientsList());
                 if (arr_customer.func == "new") {
@@ -328,8 +344,8 @@
                 if (arr_patient.func == "edit" || arr_patient.func == "show") {
                     document.getElementById("escorted").style.visibility = "visible";
                     document.getElementById("anonymouspatient").disabled = true;
-                    uploadData(arr_patient.displayName);
-
+                    uploadData(arr_patient.displayName.trim());
+                    
                     //if (arr_patient.func == "edit") {
 
                     //}
@@ -389,7 +405,8 @@
 
         //function to fill form for edit
         function uploadData(displayName) {
-            isNew=false;
+            isNew = false;
+            $("#backToRide").show();
             $('#wait').show();
             $.ajax({
                 dataType: "json",
@@ -400,6 +417,7 @@
                 success: function (data) {
                     $('#wait').hide();
                     var patient = JSON.parse(data.d);
+<<<<<<< Updated upstream
                     GENERAL.PATIENTS.setPatientsList(JSON.stringify(patient));
                     generateEquipment();
                     generateHospital();
@@ -440,16 +458,81 @@
                             for (j in patient.Equipment) {
                                 if (arr_equipment[i] == patient.Equipment[j]) {
                                     $("#equipmentCB" + i).prop('checked', true);
+=======
+                    if (patient.DisplayName === null) {
+                        uploadData($("#patientFirstName").val())
+                    }
+                    else {
+                        GENERAL.PATIENTS.setPatientsList(JSON.stringify(patient));
+                        generateEquipment();
+                        generateHospital();
+                        generateBarrier();
+                        // generateHospitalPat(patient);
+                        // generateBarrierPat(patient);
+                        //generateStatus(patient);
+                        //generateGender(patient);
+                        $("#PatientName").val(patient.DisplayName);
+                        $("#patientEnglishName").val(patient.EnglishName);
+                        $("#patientFirstName").val(patient.FirstNameH);
+                        $("#patientLastName").val(patient.LastNameH);
+                        $("#firstA").val(patient.FirstNameA);
+                        $("#lastA").val(patient.LastNameA);
+                        $("#phone1").val(patient.CellPhone);
+                        $("#phone2").val(patient.CellPhone1);
+                        if (patient.PatientIdentity === 0) {
+                            $("#PatientIdentity").val("");
+                        }
+                        else $("#PatientIdentity").val(patient.PatientIdentity);
+                        $("#HomePhone").val(patient.HomePhone);
+                        $("#city").val(patient.City);
+                        // $("#livingArea").val(patient.LivingArea);
+                        // $("#statusPatient").val(patient.Status);
+                        // $("#selectAddition").val(patient.Addition);
+                        $("#history").val(patient.History);
+                        $("#department").val(patient.Department);
+                        $("#barrier").val(patient.Barrier.Name);
+                        $("#hospital").val(patient.Hospital.Name);
+                        $("#remarks").val(patient.Remarks);
+                        if (patient.Gender == "") {
+                            $("#gender").val("Unknown");
+                        }
+                        else $("#gender").val(patient.Gender);
+                        
+                        var date = new Date(patient.BirthDate.substring(0, 10));
+                        var month = date.getMonth() + 1;
+                        if (month < 10) {
+                            month = "0" + month;
+                        }
+                        var year = date.getFullYear();
+                        var day = date.getDate();
+                        if (day < 10) {
+                            day = "0" + day;
+                        }
+                        date = year + "-" + month + "-" + day;
+                        document.getElementById("birthDate").value = date;
+                        //$("#birthDate").val(patient.BirthDate.substring(0, 10));
+                        $('#escortsToShow').show();
+                        $('html, body').animate({
+                            scrollTop: $("#escortsToShow").offset().top
+                        }, 2100);
+                        document.getElementById("newEscort").disabled = false;
+
+                        if (typeof arr_equipment !== "undefined") {
+
+                            for (i in arr_equipment) {
+                                for (j in patient.Equipment) {
+                                    if (arr_equipment[i] == patient.Equipment[j]) {
+                                        $("#equipmentCB" + i).prop('checked', true);
+                                    }
+>>>>>>> Stashed changes
                                 }
                             }
                         }
+                        if (patient.IsActive == true) {
+                            $("#activepatient").prop('checked', true)
+                        }
+                        refreshTable(patient.DisplayName)
                     }
-                    if (patient.IsActive == true) {
-                        $("#activepatient").prop('checked', true)
-                    }
-
-
-                    refreshTable(patient.DisplayName)
 
                 },
                 error: function (err) {
@@ -530,7 +613,8 @@
                 success: function (data) {
                     var arr_escorts = JSON.parse(data.d);
                     //GENERAL.VOLUNTEERS.setvolunteersList(arr_volunteers);
-        console.log(arr_escorts)
+                    console.log(arr_escorts)
+                    numOfPatinetEscorts = arr_escorts.length;
                     for (i in arr_escorts) {
                         var btnStr = ""
                         var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button>";
@@ -680,7 +764,147 @@
             GENERAL.ESCORTED.setEscortedList(JSON.stringify(arr_details));
             location.href = "escortedForm.html";
         }
+        function newAnonymousEscortedForm() {
+            var displayName = JSON.parse(GENERAL.PATIENTS.getPatientsList()).DisplayName;
+            arr_details = { displayName: displayName, func: "new" };
+            GENERAL.ESCORTED.setEscortedList(JSON.stringify(arr_details));
+            var escortPhone = $("#EscortPhone").val();
+            var checkPhone1 = $("#EscortPhone").val();
+            checkPhone1 = checkPhone1.replace(/ /g, '');
+            checkPhone1 = checkPhone1.replace(/-/g, '');
+            var phoneReg = new RegExp("0\\d{8}$|0\\d{9}$");
+            var phoneMatch = phoneReg.test(checkPhone1);
+            if (escortPhone === "") {
+                numOfPatinetEscorts = numOfPatinetEscorts + 1;
+                escortPhone = numOfPatinetEscorts;
+                var Eid = JSON.parse(GENERAL.ESCORTED.getEscortedList()).Id
+                var Pid = JSON.parse(GENERAL.PATIENTS.getPatientsList()).Id
 
+                patient = { displayName: displayName, id: Pid }
+                escorted = {
+                    pat: patient, id: Eid, firstNameH: "אנונימי", firstNameA: "", lastNameH: "אנונימי", lastNameA: "", city: "", cellPhone: escortPhone, cellphone2: "", homePhone: "",
+                    contactType: "אנונימי", gender: "Unknown", IsActive: true, EnglishName: "Unnamed"
+                }
+                
+                $.ajax({
+                    dataType: "json",
+                    url: "WebService.asmx/setEscorted",
+                    contentType: "application/json; charset=utf-8",
+                    type: "POST",
+                    async: false,
+                    data: JSON.stringify({ escorted: escorted, func: "new" }),
+                    success: function (data) {
+                        //SaveAddresses(0, numberOfRecords, customerID);
+
+                        swal({
+                            title: "נשמר",
+                            type: "success",
+                            timer: 1000,
+                            showConfirmButton: false
+                        });
+                        setTimeout(function () { returnPatient() }, 1001);
+
+                    },
+                    error: function (err) {
+                        alert("Error in setEscorted: " + err.responseText);
+                    }
+                });
+                return false;
+            }
+            else if (!phoneMatch) {
+                swal(
+                    "שגיאה",
+                    "הטלפון של המלווה שהוזן אינו חוקי\nالهاتف الرئيسي المسجل غير ملائم",
+                    "warning"
+                );
+            }
+            else {
+                var Eid = JSON.parse(GENERAL.ESCORTED.getEscortedList()).Id
+                var Pid = JSON.parse(GENERAL.PATIENTS.getPatientsList()).Id
+
+                patient = { displayName: displayName, id: Pid }
+                escorted = {
+                    pat: patient, id: Eid, firstNameH: "אנונימי", firstNameA: "", lastNameH: "אנונימי", lastNameA: "", city: "", cellPhone: escortPhone, cellphone2: "", homePhone: "",
+                    contactType: "אנונימי", gender: "Unknown", IsActive: true, EnglishName: "Unnamed"
+                }
+                $.ajax({
+                    dataType: "json",
+                    url: "WebService.asmx/setEscorted",
+                    contentType: "application/json; charset=utf-8",
+                    type: "POST",
+                    async: false,
+                    data: JSON.stringify({ escorted: escorted, func: "new" }),
+                    success: function (data) {
+                        //SaveAddresses(0, numberOfRecords, customerID);
+
+                        swal({
+                            title: "נשמר",
+                            type: "success",
+                            timer: 1000,
+                            showConfirmButton: false
+                        });
+                        setTimeout(function () { returnPatient() }, 1001);
+
+                    },
+                    error: function (err) {
+                        alert("Error in setEscorted: " + err.responseText);
+                    }
+                });
+                return false;
+            }
+        }
+        //function newAnonymousEscorts() {
+        //    var escort = $("#escort").val();
+        //    var func = arr_customer.func;
+
+        //    alert(func);
+
+        //    if (escort == "-1" || escort == "0") {
+        //        swal(
+        //            "שגיאה",
+        //            "בחר/י מספר מלווים\nchoose number of escorts",
+        //            "warning"
+        //        );
+        //    }
+        //    else {
+        //        var Pid = JSON.parse(GENERAL.PATIENTS.getPatientsList()).Id
+        //        $.ajax({
+        //            dataType: "json",
+        //            url: "WebService.asmx/setAnonymousEscorted",
+        //            contentType: "application/json; charset=utf-8",
+        //            type: "POST",
+        //            async: false,
+        //            data: JSON.stringify({ func: "new", patientId: Pid, numberOfEscort: escort }),
+        //            success: function (data) {
+        //                swal({
+        //                    title: "נשמר",
+        //                    type: "success",
+        //                    timer: 1000,
+        //                    showConfirmButton: false
+        //                });
+        //                setTimeout(function () { returnPatient() }, 1001);
+
+        //            },
+        //            error: function (err) {
+        //                alert("Error in setEscorted: " + err.responseText);
+        //            }
+        //        });
+        //        return false;
+        //    }
+        //}
+        
+        function returnPatient() {
+            // var displayNamePat = $("#patientDisplayName").val();
+            arr_pat = JSON.parse(GENERAL.PATIENTS.getPatientsList());
+            arr_details = { displayName: arr_pat.DisplayName, func: "edit" };
+            GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
+            location.href = "patientForm.html"
+        }
+        function createRide() {
+            arr_pat = JSON.parse(GENERAL.PATIENTS.getPatientsList());
+            localStorage.setItem("PatientNameForRide", JSON.stringify(arr_pat.DisplayName));
+            location.href = "ridePatForm.html";
+        }
     </script>
 </head>
 <body class="fixed-left">
@@ -777,7 +1001,13 @@
                                             </div>
                                         </div>
                                         <div class="text-right m-b-30 m-r-15">
+<<<<<<< Updated upstream
                                             <button data-toggle="tooltip" title="عودة Back" type="button" onclick="returnpatients()" class="btn btn-default waves-effect w-md m-b-5"><i class="ti-back-right m-r-5"></i>חזרה</button>
+=======
+                                            <button type="button" onclick="returnpatients()" class="btn btn-default waves-effect w-md m-b-5"><i data-toggle="tooltip" title="عودة Back" class="ti-back-right m-r-5"></i>&nbsp Back &nbsp</button>
+                                            <div id="backToRide"><button type="button" onclick="createRide()" class="btn btn-info waves-effect w-md m-b-5"><i data-toggle="tooltip" title="عودة Back to ride"></i>&nbsp Create Ride &nbsp</button></div>
+
+>>>>>>> Stashed changes
                                         </div>
                                         <p data-toggle="tooltip" title="حقل اجباري Must field" class="required">* שדה חובה</p>
 
@@ -785,7 +1015,7 @@
 
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label data-toggle="tooltip" title="اسم شخصي First Name" class="col-sm-2 control-label">שם פרטי&nbsp;<span class="required">*</span></label>
+                                                    <label data-toggle="tooltip" title="اسم شخصي First Name" class="col-sm-2 control-label">שם פרטי&nbsp;</label>
                                                     <div class="col-sm-6">
                                                         <input id="patientFirstName" name="patientFirstName" type="text" class="form-control">
                                                     </div>
@@ -793,7 +1023,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label data-toggle="tooltip" title="اسم العائلة  Last Name" class="col-sm-2 control-label">שם משפחה&nbsp;<span class="required">*</span></label>
+                                                    <label data-toggle="tooltip" title="اسم العائلة  Last Name" class="col-sm-2 control-label">שם משפחה&nbsp;</label>
                                                     <div class="col-sm-6">
                                                         <input id="patientLastName" name="patientLastName" type="text" class="form-control">
                                                     </div>
@@ -806,6 +1036,14 @@
                                                     <label class="col-sm-2 control-label">שם באנגלית&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="patientEnglishName" name="patientEnglishName" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label data-toggle="tooltip" title="Patient ID" class="col-sm-2 control-label">תעודת זהות&nbsp;</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="PatientIdentity" name="PatientIdentity" min="100000000" max="999999999" type="number" class="form-control">
                                                     </div>
                                                 </div>
                                             </div>
@@ -898,6 +1136,7 @@
                                                     </div>
                                                 </div>
                                             </div>
+<<<<<<< Updated upstream
                                             <div class="row m-l-10 m-r-10">
                                                 <div class="col-sm-6">
                                                     <div class="form-group">
@@ -905,6 +1144,19 @@
                                                         <div class="col-sm-6" id="selectBarrier">
                                                             <select id="barrier" name="barrier" class="form-control"></select>
                                                         </div>
+=======
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label data-toggle="tooltip" title="جنس  Gender" class="col-sm-2 control-label">מגדר&nbsp;</label>
+                                                    <div class="col-sm-6" id="selectgender">
+                                                        <select id="gender" name="gender" class="form-control">
+                                                            <option value="Unknown">Unknown</option>
+                                                            <option value="חולֶה">Male</option>
+                                                            <option value="חולָה">Female</option>
+                                                        </select>
+>>>>>>> Stashed changes
                                                     </div>
                                                 </div>
                                             </div>
@@ -957,11 +1209,51 @@
                                     <div class="col-sm-12">
                                         <div class="card-box table-responsive" id="escortsToShow">
                                             <div class="row">
+<<<<<<< Updated upstream
                                                 <h4 class="m-t-0 header-title"><b>מלווים</b></h4>
                                                 <div class="col-sm-9 text-right ">
                                                     <button type="button" id="newEscort" onclick="newEscortedForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>חדש</button>
+=======
+                                                <h4 data-toggle="tooltip" title="مرافقون   escorts" class="m-t-0 header-title"><b>מלווים</b></h4>
+
+                                                <div class="row m-l-12 m-r-12">
+                                                    <div class="col-sm-6 text-left ">
+                                                        <label data-toggle="tooltip" style="text-align:left" title="هاتف إضافي  Escort Phone" class="col-sm-4 control-label">טלפון המלווה</label>
+                                                        <div class="col-sm-8">
+                                                            <input id="EscortPhone" dir="ltr" name="EscortPhone" type="text" class="form-control" placeholder="0xxxxxxxxx או 0xxxxxxxx">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3 text-left ">
+                                                        <button type="button" id="newEscort" data-toggle="tooltip" title="New Anonymous Escort  " onclick="newAnonymousEscortedForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>הוספת מלווה אנונימי</button>
+                                                    </div>
+                                                    <div class="col-sm-3 text-right ">
+                                                        <button type="button" id="newEscort" data-toggle="tooltip" title="Add New Escort جديد " onclick="newEscortedForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>הוספת מלווה</button>
+                                                    </div>
+>>>>>>> Stashed changes
                                                 </div>
+                                                <!--<br />
+                                                <div class="row m-l-12 m-r-12">
+                                                    <div class="col-sm-6">
+                                                        <label style="text-align:left" class="col-sm-4 control-label">מספר מלווים&nbsp;</label>
+                                                        <div class="col-sm-8" id="selectEscort">
+                                                            <select id="escort" name="escort" class="form-control">
+                                                                <option value="-1">בחר</option>
+                                                                <option value="0">ללא מלווים</option>
+                                                                <option value="1">מלווה אחד</option>
+                                                                <option value="2">שני מלווים</option>
+                                                                <option value="3">שלושה מלווים</option>
+                                                                <option value="4">ארבעה מלווים</option>
+                                                                <option value="5">חמישה מלווים</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3 text-left ">
+                                                        <button type="button" id="newEscort" data-toggle="tooltip" title="Add Anonymous Escorts  " onclick="newAnonymousEscorts()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>הוספת מלווים אנונימיים ללא מספר טלפון</button>
+                                                    </div>
+                                                </div>-->
+
                                             </div>
+<<<<<<< Updated upstream
                                             <table id="datatable-buttons" class="table table-striped table-bordered">
                                                 <thead>
                                                     <tr>
@@ -979,8 +1271,28 @@
                                             </table>
                                             <div id="wait" style="display:none;width:69px;height:89px;position:absolute;top:50%;left:50%;padding:2px;">
                                                 <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
+=======
+                                                <br />
+                                                <table data-container="body" id="datatable-buttons" class="table table-striped table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th title="اسم ">שם</th>
+                                                            <th title="اسم">שם באנגלית</th>
+                                                            <!--<th>שם באנגלית</th>-->
+                                                            <th title="هاتف   Phone">טלפון</th>
+                                                            <th title="بلد   City / Village">יישוב</th>
+                                                            <th title="نوع القرابة">סוג קרבה</th>
+                                                            <th title="جنس   Gender">מגדר</th>
+                                                            <th title="اعمال   Actions">פעולות</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                </table>
+                                                <div id="wait" style="display:none;width:69px;height:89px;position:absolute;top:50%;left:50%;padding:2px;">
+                                                    <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
+                                                </div>
+>>>>>>> Stashed changes
                                             </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1052,10 +1364,21 @@
                     var valid = validatePatientInputs();
                     if (!valid) return false;
 
+<<<<<<< Updated upstream
                     var name = $("#patientFirstName").val();
                     var lastName = $("#patientLastName").val();
                     var englishName = $("#patientEnglishName").val();
                     var phone = $("#phone1").val();
+=======
+                    var name = $("#patientFirstName").val().trim().replace(/\s\s+/g, ' ');
+                    var lastName = $("#patientLastName").val().trim().replace(/\s\s+/g, ' ');
+                    var englishName = $("#patientEnglishName").val().trim().replace(/\s\s+/g, ' ');
+                    if (isAssistant) {
+                        name = englishName;
+                        lastName = " ";
+                    }
+                    var phone = $("#phone1").val().trim().replace(/\s\s+/g, ' ');
+>>>>>>> Stashed changes
                     if (phone != "") {
                         phone = phone.replace(/-/g, '');
                         phone = phone.replace(/ /g, '');
@@ -1081,6 +1404,11 @@
                         phone1 = phone1.replace(/-/g, '');
                         phone1 = phone1.replace(/ /g, '');
                     }
+                    var patientId = $("#PatientIdentity").val();
+
+                    if(patientId===""){
+                        patientId = 0;
+                    }
                     var homePhone = $("#HomePhone").val();
                     if (homePhone != "") {
                         homePhone = homePhone.replace(/-/g, '');
@@ -1094,7 +1422,11 @@
                     var remarks = $("#remarks").val();
                     var nameA = $("#firstA").val();
                     var lastNameA = $("#lastA").val();
+
                     var func = arr_customer.func;
+                    if (sender.indexOf("ridePatForm.html") !== -1) {
+                        func = "edit";
+                    }
                     if(!isNew){
                        func = 'edit'; 
                     }
@@ -1129,7 +1461,7 @@
                     patient = {
                         firstNameH: name, firstNameA: nameA, lastNameH: lastName, lastNameA: lastNameA, cellPhone: phone, cellPhone1: phone1,
                         city: city, gender: gender, barrier: barrier, hospital: hospital, homephone: homePhone,
-                        department: department, Equipment: EquipmentArr, history: history, remarks: remarks, IsActive: IsActive, Id: Id , birthDate: Bdate,EnglishName:englishName
+                        department: department, Equipment: EquipmentArr, history: history, remarks: remarks, IsActive: IsActive, Id: Id , birthDate: Bdate,EnglishName:englishName,PatientIdentity:patientId
                     }
                     
                     $.ajax({
@@ -1197,8 +1529,34 @@
             var englishNameCon = true;
             var city = $("#city").val();
             var englishName = $("#patientEnglishName").val();
+<<<<<<< Updated upstream
             
             if(englishName==""){
+=======
+            var firstName = $("#patientFirstName").val();
+            var lastName = $("#patientLastName").val();
+            
+            var name = true;
+            //if (!isAssistant) {
+            //    if (firstName === "") {
+            //        swal(
+            //            "שגיאה\nخطأ",
+            //            "Enter patient first name",
+            //            "warning"
+            //        );
+            //        name = false;
+            //    }
+            //    if (lastName === "") {
+            //        swal(
+            //            "שגיאה\nخطأ",
+            //            "Enter patient last name",
+            //            "warning"
+            //        );
+            //        name = false;
+            //    }
+            //}
+            if (englishName == "") {
+>>>>>>> Stashed changes
                 swal(
                     "שגיאה",
                     "אנא הכנס שם חולה באנגלית",
@@ -1206,8 +1564,21 @@
                 );  
                 englishNameCon = false;
             }
+<<<<<<< Updated upstream
             if(city == ""){
                CityExists = true;
+=======
+            else {
+               //if (isAssistant) {
+                    if (firstName === "" && lastName === "") {
+                        $("#patientFirstName").val(englishName);
+                        $("#patientLastName").val("");
+                    }
+              //}
+            }
+            if (city == "") {
+                CityExists = true;
+>>>>>>> Stashed changes
             }
             if(!CityExists){
                 for (i in cities) {
@@ -1246,6 +1617,7 @@
                 );
             }
 
+<<<<<<< Updated upstream
             var gender = $("#gender").val();
             if (gender == "בחר" || gender==null) {
                 gender = false
@@ -1255,6 +1627,17 @@
                     "warning"
                 );
             }
+=======
+            //var gender = $("#gender").val();
+            //if (gender == "בחר" || gender == null) {
+            //    gender = false
+            //    swal(
+            //        "שגיאה",
+            //        "יש לבחור מגדר מתוך הרשימה\nيجب اختيار الجنس من القائمة",
+            //        "warning"
+            //    );
+            //}
+>>>>>>> Stashed changes
 
 
             var checkPhone1 = $("#phone1").val();

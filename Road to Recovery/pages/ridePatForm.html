@@ -139,9 +139,41 @@
         var anonymousName = "";
         var isAnonymous = false;
         var driverId;
+<<<<<<< Updated upstream
         //0 means no driver is asigned to the ride
         var rideStatusForFields = 0;
         $(document).ready(function () {
+=======
+        var dateForPush = "";
+        var hourForPush = "";
+        var pushMsg = "";
+        var arr_for_assistant = [];
+        var patientsAssistent=[];
+        var arr_arabNamesAssistent=[];
+        var arr_englishNamesAssistent = [];
+        var patientsAssistentDisplay = [];
+        var patientsIdentityAssistent = [];
+        //0 means no driver is asigned to the ride
+        var rideStatusForFields = 0;
+        $(document).ready(function () {
+            
+            var pat = $("#pat").val();
+            if (pat === "") {
+                $("#patientInfo").hide();
+            }
+            isAssistant = JSON.parse(GENERAL.USER.getIsAssistant());
+            console.log(isAssistant);
+            var assistantName = "";
+            if (isAssistant) {
+                $("#menuType").attr("w3-include-html", "HelperMenu.html");
+                $("#duplicate").hide();
+                $("#selectstatusRidePat").hide();
+                $("#statuslabelRidePat").hide();
+                var coorAssistant = GENERAL.USER.getCoorAssistant();
+                assistantName = GENERAL.USER.getAsistantDisplayName();
+            }
+            else $("#menuType").attr("w3-include-html", "menu.html");
+>>>>>>> Stashed changes
             includeHTML();
             if (window.location.hostname.toString() == 'localhost' || window.location.pathname.indexOf('test') != -1) {
                 $("#na").css("background-color", "#ffde89");
@@ -158,8 +190,9 @@
             });
 
             $("#pat").keyup(function () {
+                $("#patEnglishName").val("");
                 $("#patArabic").val("");
-
+                $("#PatientIdentity").val("");
             });
 
             $("#patArabic").blur(function () {
@@ -168,9 +201,38 @@
 
             $("#patArabic").keyup(function () {
                 $("#pat").val("");
+                $("#patEnglishName").val("");
+                $("#PatientIdentity").val("");
             });
 
+<<<<<<< Updated upstream
 
+=======
+            $("#patEnglishName").blur(function () {
+                fillData();
+            });
+
+            $("#patEnglishName").keyup(function () {
+                $("#pat").val("");
+                $("#patArabic").val("");
+                $("#PatientIdentity").val("");
+            });
+            $("#PatientIdentity").blur(function () {
+                fillData();
+            });
+
+            $("#PatientIdentity").keyup(function () {
+                $("#pat").val("");
+                $("#patEnglishName").val("");
+                $("#patArabic").val("");
+            });
+          
+            if (JSON.parse(localStorage.getItem("PatientNameForRide")) !== null) {
+                $("#pat").val(JSON.parse(localStorage.getItem("PatientNameForRide")));
+                fillData();
+                localStorage.setItem("PatientNameForRide", null);
+            }
+>>>>>>> Stashed changes
 
             // DO NOT REMOVE : GLOBAL FUNCTIONS!
             var errorClass = 'invalid';
@@ -227,6 +289,7 @@
                     var RidePatNum = $("#ridePatNum").val();
                     var Pat = new Object();
                     Pat.DisplayName = $("#pat").val();
+                    Pat.DisplayName = Pat.DisplayName.replace(/\s\s+/g, ' ');
                     Pat.Id = localStorage.PatID;
                     var Origin = new Object();
                     Origin.Name = $("#Origin").val();
@@ -339,6 +402,7 @@
                     }
                     var request = { RidePat: RidePat, func: func, isAnonymous: isAnonymous, numberOfRides: numberOfRides, repeatRideEvery: repeatRide }
                     var dataString = JSON.stringify(request);
+                    localStorage.setItem("PatientNameForRide", null);
                     $.ajax({
                         dataType: "json",
                         url: "WebService.asmx/setRidePat",
@@ -348,7 +412,12 @@
                         data: dataString,
                         success: function (data) {
                             //SaveAddresses(0, numberOfRecords, customerID);
+<<<<<<< Updated upstream
                             if (data.d <= 100000) {
+=======
+                            
+                            if (data.d <= 10000) {
+>>>>>>> Stashed changes
                                 swal({
                                     title: "נשמר",
                                     type: "success",
@@ -468,10 +537,32 @@
                     arr_pat = JSON.parse(data.d);
 
                     patients = [];
+                    patientsIdentity = [];
                     arr_arabNames = [];
+<<<<<<< Updated upstream
 
                     for (i in arr_pat) {
                         patients.push(arr_pat[i].DisplayName);
+=======
+                    arr_englishNames = [];
+                    patientsAssistent = [];
+                    patientsAssistentDisplay = [];
+                    arr_arabNamesAssistent = [];
+                    arr_englishNamesAssistent = [];
+                    patientsIdentityAssistent = [];
+                    for (i in arr_pat) {
+                        //assistant cannot create anonymouse ride.
+                        if (isAssistant && arr_pat[i].IsAnonymous !== "") {
+                            patientsIdentityAssistent.push(arr_pat[i].PatientIdentity)
+                            patientsAssistent.push(arr_pat[i]);
+                            patientsAssistentDisplay.push(arr_pat[i].DisplayName.trim())
+                            arr_arabNamesAssistent.push(arr_pat[i].DisplayNameA);
+                            arr_englishNamesAssistent.push(arr_pat[i].EnglishName);
+                            continue;
+                        }
+                        patients.push(arr_pat[i].DisplayName.trim());
+                        patientsIdentity.push(arr_pat[i].PatientIdentity)
+>>>>>>> Stashed changes
                         arr_arabNames.push(arr_pat[i].DisplayNameA);
 
 
@@ -484,8 +575,10 @@
                     $("#patArabic").autocomplete({
                         source: arr_arabNames
                     });
-
-
+                    $("#PatientIdentity").autocomplete({
+                        source: patientsIdentity
+                    });
+                    
                 },
                 error: function (err) { alert("Error in generatePat"); }
             });
@@ -505,10 +598,20 @@
 
                     patients = [];
                     arr_arabNames = [];
+<<<<<<< Updated upstream
 
+=======
+                    arr_englishNames = [];
+                    patientsIdentity = [];
+>>>>>>> Stashed changes
                     for (i in arr_pat) {
-                        patients.push(arr_pat[i].DisplayName);
+                        patients.push(arr_pat[i].DisplayName.trim());
                         arr_arabNames.push(arr_pat[i].DisplayNameA);
+<<<<<<< Updated upstream
+=======
+                        arr_englishNames.push(arr_pat[i].EnglishName);
+                        patientsIdentity.push(arr_pat[i].PatientIdentity);
+>>>>>>> Stashed changes
                     }
 
                     $("#pat").autocomplete({
@@ -518,6 +621,15 @@
                     $("#patArabic").autocomplete({
                         source: arr_arabNames
                     });
+<<<<<<< Updated upstream
+=======
+                    $("#patEnglishName").autocomplete({
+                        source: arr_englishNames
+                    });
+                    $("#PatientIdentity").autocomplete({
+                        source: patientsIdentity
+                    });
+>>>>>>> Stashed changes
                 },
                 error: function (err) { alert("Error in getPatientsForAnonymous"); }
             });
@@ -568,13 +680,12 @@
             alert("Error in getCoor: " + e.responseText);
         }
 
-
-
         function generateEsc() {
 
             //first checking if the patient is anonymous.
             var displayName = $("#pat").val();
-            var i = patients.indexOf($("#pat").val());
+            displayName = displayName.replace(/\s\s+/g, ' ');
+            var i = patients.indexOf($("#pat").val().trim().replace(/\s\s+/g, ' '));
             localStorage.PatID = arr_pat[i].Id;
 
             $.ajax({
@@ -595,8 +706,9 @@
 
             var str = "";
 
-            var displayName = $("#pat").val();
-            var j = patients.indexOf($("#pat").val());
+            var displayName = $("#pat").val().trim().replace(/\s\s+/g, ' ');
+
+            var j = patients.indexOf($("#pat").val().trim().replace(/\s\s+/g, ' '));
             localStorage.PatID = arr_pat[j].Id;
 
             for (i in arr_escort) {
@@ -708,6 +820,11 @@
             var Origin = true;
             var Dest = true;
             var pat = document.forms["customerForm"]["pat"].value;
+<<<<<<< Updated upstream
+=======
+            var pat2 = $("#pat").val().trim().replace(/\s\s+/g, ' ');
+            
+>>>>>>> Stashed changes
             for (i in patients) {
                 if (pat == patients[i]) {
                     patientExists = true;
@@ -715,7 +832,7 @@
                 }
             }
 
-            var patA = document.forms["customerForm"]["patArabic"].value;
+            var patA = $("#patArabic").val().trim().replace(/\s\s+/g, ' ');
             for (i in arr_arabNames) {
                 if (patA == arr_arabNames[i]) {
                     patientAExists = true;
@@ -808,11 +925,33 @@
         }
 
         function fillData() {
-
+            //.trim().replace(/\s\s+/g, ' ')
             if ($("#pat").val() != "") {
+<<<<<<< Updated upstream
                 var i = patients.indexOf($("#pat").val());
                 $("#patArabic").val(arr_arabNames[i]);
                 localStorage.PatID = arr_pat[i].Id;
+=======
+                var i = patients.indexOf($("#pat").val().trim().replace(/\s\s+/g, ' '));
+                if (i === -1) {
+                    var i = patientsAssistentDisplay.indexOf($("#pat").val().trim().replace(/\s\s+/g, ' '));
+                    localStorage.PatID = patientsAssistent[i].Id;
+                    $("#patArabic").val(arr_arabNamesAssistent[i]);
+                    if (patientsIdentityAssistent[i] != '0') {
+                        $("#PatientIdentity").val(patientsIdentityAssistent[i]);
+                    }
+                    else $("#PatientIdentity").val("");
+                    $("#patEnglishName").val(arr_englishNamesAssistent[i]);
+                    $("#patientInfo").show();
+                }
+                else {
+                    localStorage.PatID = arr_pat[i].Id;
+                    $("#patArabic").val(arr_arabNames[i]);
+                    $("#patEnglishName").val(arr_englishNames[i]);
+                    $("#PatientIdentity").val(patientsIdentity[i]);
+                    $("#patientInfo").show();
+                }
+>>>>>>> Stashed changes
 
                 if (rideStatusForFields == 0) {
                     $("#afterNoon").removeAttr('disabled');
@@ -826,10 +965,90 @@
                     $("#patArabic").removeAttr('disabled');
                 }
             }
+<<<<<<< Updated upstream
             else if ($("#patArabic").val() != "") {
                 var i = arr_arabNames.indexOf($("#patArabic").val());
                 $("#pat").val(patients[i]);
                 localStorage.PatID = arr_pat[i].Id;
+=======
+            else if ($("#patEnglishName").val() != "") {
+                var i = arr_englishNames.indexOf($("#patEnglishName").val().trim().replace(/\s\s+/g, ' '));
+                if (i === -1) {
+                    var i = arr_englishNamesAssistent.indexOf($("#patEnglishName").val().trim().replace(/\s\s+/g, ' '));
+                    localStorage.PatID = patientsAssistent[i].Id;
+                    $("#patArabic").val(arr_arabNamesAssistent[i]);
+                    $("#PatientIdentity").val(patientsIdentityAssistent[i]);
+                    $("#pat").val(patientsAssistent[i].DisplayName);
+                    $("#patientInfo").show();
+                }
+                else {
+                    $("#pat").val(patients[i]);
+                    $("#patArabic").val(arr_arabNames[i]);
+                    localStorage.PatID = arr_pat[i].Id;
+                    $("#PatientIdentity").val(patientsIdentity[i]);
+                    $("#patientInfo").show();
+                }
+                if (rideStatusForFields == 0) {
+                    $("#afterNoon").removeAttr('disabled');
+                    $("#Origin").removeAttr('disabled');
+                    $("#remark").removeAttr('disabled');
+                    $("#Destination").removeAttr('disabled');
+                    $("#dateRide").removeAttr('disabled');
+                    $("#hour").removeAttr('disabled');
+                    $("#minute").removeAttr('disabled');
+                    $("#dirBTN").removeAttr('disabled');
+                    $("#patArabic").removeAttr('disabled');
+                }
+            }
+            else if ($("#patArabic").val() != "") {
+                var i = arr_arabNames.indexOf($("#patArabic").val().trim().replace(/\s\s+/g, ' '));
+                if (i === -1) {
+                    var i = arr_arabNamesAssistent.indexOf($("#patEnglishName").val().trim().replace(/\s\s+/g, ' '));
+                    localStorage.PatID = patientsAssistent[i].Id;
+                    $("#patEnglishName").val(arr_englishNamesAssistent[i]);
+                    $("#PatientIdentity").val(patientsIdentityAssistent[i]);
+                    $("#pat").val(patientsAssistent[i].DisplayName);
+                    $("#patientInfo").show();
+                }
+                else {
+                    $("#pat").val(patients[i]);
+                    $("#patEnglishName").val(arr_englishNames[i]);
+                    localStorage.PatID = arr_pat[i].Id;
+                    $("#PatientIdentity").val(patientsIdentity[i]);
+                    $("#patientInfo").show();
+
+                }
+                if (rideStatusForFields == 0) {
+                    $("#afterNoon").removeAttr('disabled');
+                    $("#Origin").removeAttr('disabled');
+                    $("#remark").removeAttr('disabled');
+                    $("#Destination").removeAttr('disabled');
+                    $("#dateRide").removeAttr('disabled');
+                    $("#hour").removeAttr('disabled');
+                    $("#minute").removeAttr('disabled');
+                    $("#dirBTN").removeAttr('disabled');
+                    $("#patArabic").removeAttr('disabled');
+                }
+            }
+            else if ($("#PatientIdentity").val() != '' && $("#PatientIdentity").val() != '0'){
+                var i = patientsIdentity.indexOf(parseInt($("#PatientIdentity").val().trim().replace(/\s\s+/g, ' ')));
+                if (i === -1) {
+                    var i = patientsIdentityAssistent.indexOf($("#PatientIdentity").val().trim().replace(/\s\s+/g, ' '));
+                    localStorage.PatID = patientsAssistent[i].Id;
+                    $("#patEnglishName").val(arr_englishNamesAssistent[i]);
+                    $("#patArabic").val(arr_arabNamesAssistent[i]);
+                    $("#pat").val(patientsAssistent[i].DisplayName);
+                    $("#patientInfo").show();
+                }
+                else {
+                    $("#pat").val(patients[i]);
+                    $("#patEnglishName").val(arr_englishNames[i]);
+                    localStorage.PatID = arr_pat[i].Id;
+                    $("#patArabic").val(arr_arabNamesAssistent[i]);
+                    //$("#PatientIdentity").val(patientsIdentity[i]);
+                    $("#patientInfo").show();
+                }
+>>>>>>> Stashed changes
                 if (rideStatusForFields == 0) {
                     $("#afterNoon").removeAttr('disabled');
                     $("#Origin").removeAttr('disabled');
@@ -890,8 +1109,13 @@
         }
 
         function getEquipmentForPatient() {
+<<<<<<< Updated upstream
 
             var dataString = document.forms["customerForm"]["pat"].value;
+=======
+            //.trim().replace(/\s\s+/g, ' ')
+            var dataString = $("#pat").val().trim().replace(/\s\s+/g, ' ');
+>>>>>>> Stashed changes
 
             $.ajax({
                 dataType: "json",
@@ -925,7 +1149,8 @@
 
         //getEquipment for anonymous patient
         function getEquipmentForAnonymousPatient() {
-            var dataString = document.forms["customerForm"]["pat"].value;
+            //var dataString = document.forms["customerForm"]["pat"].value;
+            var dataString = $("#pat").val().trim().replace(/\s\s+/g, ' ');
 
             $.ajax({
                 dataType: "json",
@@ -1100,7 +1325,7 @@
                         $("#minute").attr('disabled', 'disabled');
                         $("#dateRide").attr('disabled', 'disabled');
                     }
-                    if (ridePat.Pat.IsAnonymous == "True" && (ridePat.Status != 'ממתינה לשיבוץ')) {
+                    if (ridePat.Pat.IsAnonymous == "True") {
 
                         var origin = ridePat.Origin.Name;
                         var destination = ridePat.Destination.Name;
@@ -1158,6 +1383,7 @@
 
         function returnRidePat() {
             //window.history.back();
+            localStorage.setItem("PatientNameForRide",null);
             location.href = "manageRidePats.html"
         }
 
@@ -1174,7 +1400,15 @@
                 $("#minute").attr('disabled', false);
             }
         }
-
+        function getPatientInformation() {
+            var pat = $("#pat").val();
+            arr_details = { displayName: pat, func: "edit" };
+            GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
+            if (pat.indexOf("אנונימי") != -1) {
+                location.href = "anonymousPatientForm.html";
+            }
+            else location.href = "patientForm.html";
+        }
     </script>
 </head>
 <body class="fixed-left">
@@ -1244,7 +1478,12 @@
                                         <h4 class="m-t-0 header-title"><b>הסעת חולה</b></h4>
 
                                         <div class="text-right m-b-30 m-r-15">
+<<<<<<< Updated upstream
                                             <button type="button" onclick="returnRidePat()" class="btn btn-default waves-effect w-md m-b-5"><i class="ti-back-right m-r-5"></i>חזרה</button>
+=======
+                                            <button type="button" onclick="returnRidePat()" class="btn btn-default waves-effect w-md m-b-5"><i data-toggle="tooltip" data-placement="bottom" title="عودة  Back" class="ti-back-right m-r-5"></i>&nbsp Back</button>
+                                            <div id="patientInfo"> <button type="button" onclick="getPatientInformation()" dir="ltr" class="btn btn-info waves-effect w-md m-b-5"><i data-toggle="tooltip" data-placement="bottom"  title="Patient info" class="ti-info m-r-5"></i>&nbsp Patient information</button></div>
+>>>>>>> Stashed changes
                                         </div>
                                         <p class="required">* שדה חובה</p>
                                         <div class="row m-l-10 m-r-10">
@@ -1272,6 +1511,27 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
+<<<<<<< Updated upstream
+=======
+                                                    <label data-toggle="tooltip" title="Patient's English Name   اسم المريض" class="col-sm-2 control-label">שם החולה באנגלית&nbsp;<span class="required">*</span></label>
+                                                    <div class="col-sm-6 ui-widget" id="selectEnglishPat">
+                                                        <input type="text" id="patEnglishName" name="pat" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label data-toggle="tooltip" title="Patient ID" class="col-sm-2 control-label">תעודת זהות&nbsp;</label>
+                                                    <div class="col-sm-6 ui-widget" id="selectPatId">
+                                                        <input type="text" id="PatientIdentity" name="PatientIdentity" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+>>>>>>> Stashed changes
                                                     <label class="col-sm-2 control-label">اسم المريض</label>
                                                     <div class="col-sm-6 ui-widget" id="selectPat">
                                                         <input type="text" id="patArabic" name="patArabic" class="form-control"></input>
@@ -1346,7 +1606,11 @@
 
                                             <div class="col-sm-6">
                                                 <div class="form-group">
+<<<<<<< Updated upstream
                                                     <label class="col-sm-2 control-label">מספר הסעה</label>
+=======
+                                                    <label data-toggle="tooltip" title="Ride #number  رقم السفرية" class="col-sm-2 control-label">מספר הסעה</label>
+>>>>>>> Stashed changes
                                                     <div class="col-sm-6">
                                                         <input id="ridePatNum" name="ridePatNum" type="text" class="form-control">
                                                     </div>
@@ -1378,6 +1642,7 @@
                                         </div>
                                         <!--<div class="row m-l-10 m-r-10">
 
+<<<<<<< Updated upstream
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">מספר הסעה</label>
@@ -1389,6 +1654,19 @@
                                             <div class="col-sm-6">
                                             </div>
                                         </div>-->
+=======
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-2 control-label">מספר הסעה</label>
+                <div class="col-sm-6">
+                    <input id="ridePatNum" name="ridePatNum" type="text" class="form-control">
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+        </div>
+    </div>-->
+>>>>>>> Stashed changes
                                         <!--duplicate ride section-->
                                         <div class="row m-l-10 m-r-10" id="hideOnEdit">
                                             <div class="col-sm-6">
@@ -1419,7 +1697,7 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-4 control-label">מספר פעמים</label>
                                                     <div class="col-sm-6" id="selectCoordinator">
-                                                        <input type="number" max="16" min="0" id="numberOfRides" name="numberOfRides" class="form-control">
+                                                        <input type="number" max="30" min="0" id="numberOfRides" name="numberOfRides" class="form-control">
                                                     </div>
                                                 </div>
                                             </div>

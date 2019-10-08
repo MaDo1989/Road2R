@@ -37,6 +37,7 @@ public class Patient
     string numberOfEscort;
     string isAnonymous;
     int id;
+    int patientIdentity;
     List<string> equipment;
 
     public bool IsActive { get; set; }
@@ -377,6 +378,19 @@ public class Patient
         }
     }
 
+    public int PatientIdentity
+    {
+        get
+        {
+            return patientIdentity;
+        }
+
+        set
+        {
+            patientIdentity = value;
+        }
+    }
+
     public Patient()
     {
         //
@@ -547,9 +561,72 @@ public class Patient
                 //the first patient is null so we don't add him/her
                 if (tempID != 0)
                 {
+<<<<<<< Updated upstream
                     //adding the last patient to the list.
                     list.Add(p);
                     p = new Patient();
+=======
+                    //the first patient is null so we don't add him/her
+                    if (tempID != 0)
+                    {
+                        //adding the last patient to the list.
+                        list.Add(p);
+                        p = new Patient();
+                    }
+                    p.Id = int.Parse(dr["Id"].ToString());
+                    p.IsAnonymous = dr["IsAnonymous"].ToString();
+                    p.NumberOfEscort = dr["NumberOfEscort"].ToString();
+                    p.DisplayName = dr["DisplayName"].ToString();
+                    p.DisplayNameA = dr["DisplayNameA"].ToString();
+                    p.FirstNameA = dr["FirstNameA"].ToString();
+                    p.FirstNameH = dr["FirstNameH"].ToString();
+                    p.LastNameH = dr["LastNameH"].ToString();
+                    p.LastNameA = dr["LastNameA"].ToString();
+                    p.CellPhone = dr["CellPhone"].ToString();
+                    p.CellPhone1 = dr["CellPhone2"].ToString();
+                    p.HomePhone = dr["HomePhone"].ToString();
+                    p.City = dr["CityCityName"].ToString();
+                    p.LivingArea = dr["LivingArea"].ToString();
+                    p.IsActive = Convert.ToBoolean(dr["IsACtive"].ToString());
+                    p.BirthDate = dr["BirthDate"].ToString();
+                    p.History = dr["History"].ToString();
+                    p.Department = dr["Department"].ToString();
+                    if (dr["PatientIdentity"].ToString()=="")
+                    {
+                        p.PatientIdentity = 0;
+                    }
+                    else p.PatientIdentity = int.Parse(dr["PatientIdentity"].ToString());
+                    string barrier = dr["Barrier"].ToString();
+                    p.Barrier = new Location(barrier);
+                    if (locations[barrier] != null)
+                    {
+                        p.Barrier.EnglishName = locations[barrier].ToString();
+                    }
+                    else p.Barrier.EnglishName = "";
+                    string hospital = dr["Hospital"].ToString();
+                    p.Hospital = new Location();
+                    p.Hospital.Name = hospital;
+                    if (locations[hospital] != null)
+                    {
+                        p.Hospital.EnglishName = locations[hospital].ToString();
+                    }
+                    else p.Hospital.EnglishName = "";
+                    p.Gender = dr["Gender"].ToString();
+                    p.Remarks = dr["Remarks"].ToString();
+                    p.EnglishName = dr["EnglishName"].ToString();
+                    el = new List<string>();
+                    //get equipment for patient from the same view
+                    string e = dr["EquipmentName"].ToString();
+                    el.Add(e);
+                    p.Equipment = el;
+
+                    tempID = int.Parse(dr["Id"].ToString());
+                }
+                catch (Exception ex)
+                {
+
+                    throw;
+>>>>>>> Stashed changes
                 }
                 p.Id = int.Parse(dr["Id"].ToString());
                 p.IsAnonymous = dr["IsAnonymous"].ToString();
@@ -633,8 +710,11 @@ public class Patient
             p.Gender = dr["Gender"].ToString();
             p.Remarks = dr["Remarks"].ToString();
             p.EnglishName = dr["EnglishName"].ToString();
-
-
+            if (dr["PatientIdentity"].ToString()=="")
+            {
+                p.PatientIdentity = 0;
+            }
+            else p.PatientIdentity = int.Parse(dr["PatientIdentity"].ToString());
 
             //set equipment
             List<string> el = new List<string>();
@@ -689,6 +769,11 @@ public class Patient
             p.Gender = dr["Gender"].ToString();
             p.Remarks = dr["Remarks"].ToString();
             p.EnglishName = dr["EnglishName"].ToString();
+            if (dr["PatientIdentity"].ToString() == "")
+            {
+                p.PatientIdentity = 0;
+            }
+            else p.PatientIdentity = int.Parse(dr["PatientIdentity"].ToString());
 
             p.Equipment = p.getEquipmentForPatient(p.displayName);
         }
@@ -720,12 +805,18 @@ public class Patient
 
     public void setPatient(string func)
     {
+        //patient id
         int res = 0;
         DbService db;
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
+<<<<<<< Updated upstream
         SqlParameter[] cmdParams = new SqlParameter[18];
         
+=======
+        SqlParameter[] cmdParams = new SqlParameter[19];
+
+>>>>>>> Stashed changes
         cmdParams[0] = cmd.Parameters.AddWithValue("@firstNameH", FirstNameH);
         cmdParams[1] = cmd.Parameters.AddWithValue("@lastNameH", LastNameH);
         cmdParams[2] = cmd.Parameters.AddWithValue("@firstNameA", FirstNameA);
@@ -742,15 +833,19 @@ public class Patient
         cmdParams[13] = cmd.Parameters.AddWithValue("@hospital", Hospital.Name);
         cmdParams[14] = cmd.Parameters.AddWithValue("@gender", Gender);
         cmdParams[15] = cmd.Parameters.AddWithValue("@remarks", Remarks);
-        cmdParams[16] = cmd.Parameters.AddWithValue("@displayName", FirstNameH + " " + LastNameH);
+        string displayName = FirstNameH + " " + LastNameH;
+        cmdParams[16] = cmd.Parameters.AddWithValue("@displayName", displayName.Trim());
         cmdParams[17] = cmd.Parameters.AddWithValue("@englishName", EnglishName);
+        cmdParams[18] = cmd.Parameters.AddWithValue("@patientIdentity", PatientIdentity);
+
         string query = "";
         if (func == "edit")
         {
             //DisplayName=@displayName,
+            cmdParams[16].ToString().Trim();
             query = "UPDATE Patient SET FirstNameH=@firstNameH,FirstNameA=@firstNameA,LastNameH=@lastNameH,";
             query += "CellPhone=@cellPhone,CellPhone2=@cellPhone2,CityCityName=@city,IsActive=@IsActive,BirthDate=@birthDate,";
-            query += "HomePhone=@homePhone,History=@history,Department=@department,Barrier=@barrier,Hospital=@hospital,Gender=@gender,Remarks=@remarks,EnglishName=@englishName Where Id=" + Id;
+            query += "HomePhone=@homePhone,History=@history,Department=@department,Barrier=@barrier,Hospital=@hospital,Gender=@gender,Remarks=@remarks,EnglishName=@englishName,PatientIdentity=@patientIdentity Where Id=" + Id;
             db = new DbService();
             res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
             if (res > 0)
@@ -778,10 +873,14 @@ public class Patient
         else if (func == "new")
         {
             query = "insert into Patient (FirstNameH,FirstNameA,LastNameH,LastNameA,CellPhone,CellPhone2, HomePhone,";
+<<<<<<< Updated upstream
             query += "CityCityName,IsActive,BirthDate,History,Department,Barrier,Hospital,Gender,Remarks,EnglishName)"; 
+=======
+            query += "CityCityName,IsActive,BirthDate,History,Department,Barrier,Hospital,Gender,Remarks,EnglishName,PatientIdentity)";
+>>>>>>> Stashed changes
             query += " values (@firstNameH,@firstNameA,@lastNameH,@lastNameA,";
             query += "@cellPhone,@cellPhone2,@homephone,@city,@IsActive,@birthDate,";
-            query += "@history,@department,@barrier,@hospital,@gender,@remarks,@englishName); select SCOPE_IDENTITY()";
+            query += "@history,@department,@barrier,@hospital,@gender,@remarks,@englishName,@patientIdentity); select SCOPE_IDENTITY()";
             db = new DbService();
             Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
 

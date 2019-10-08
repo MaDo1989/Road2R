@@ -121,6 +121,7 @@
                             var n = d.getFullYear();
                             var newDate = n - year[2];
                             if (newDate != 0) {
+<<<<<<< Updated upstream
                                 //t.row.add([arr_patients[i].DisplayName, cellPhoneCheck, newDate, arr_patients[i].Barrier.Name, arr_patients[i].Hospital.Name, equip, arr_patients[i].Remarks, btnStr]).draw(false); // arr_patients[i].BirthDate.substring(0,10),
                                 Patient = {
                                     DisplayName: arr_patients[i].DisplayName,
@@ -132,12 +133,85 @@
                                     Equipment:equip,
                                     Remarks:arr_patients[i].Remarks,
                                     Buttons:btnStr
+=======
+                                if (isAssistant) {
+                                    Patient = {
+                                        DisplayName: arr_patients[i].DisplayName,
+                                        EnglishName: arr_patients[i].EnglishName,
+                                        CellPhone: cellPhoneCheck,
+                                        Date: newDate,
+                                        Barrier: arr_patients[i].Barrier.EnglishName,
+                                        Hospital: arr_patients[i].Hospital.EnglishName,
+                                        //Equipment: equip,
+                                        Remarks: arr_patients[i].PatientIdentity===0?"":arr_patients[i].PatientIdentity,
+                                        Buttons: btnStr
+                                    };
+                                }
+                                else {
+                                    Patient = {
+                                        DisplayName: arr_patients[i].DisplayName,
+                                        EnglishName: arr_patients[i].EnglishName,
+                                        CellPhone: cellPhoneCheck,
+                                        Date: newDate,
+                                        Barrier: arr_patients[i].Barrier.Name,
+                                        Hospital: arr_patients[i].Hospital.Name,
+                                        //Equipment: equip,
+                                        Remarks: arr_patients[i].PatientIdentity===0?"":arr_patients[i].PatientIdentity,
+                                        Buttons: btnStr
+                                    };
+                                }
+                            }
+                            else {
+                                if (isAssistant) {
+                                    Patient = {
+                                        DisplayName: arr_patients[i].DisplayName,
+                                        EnglishName: arr_patients[i].EnglishName,
+                                        CellPhone: cellPhoneCheck,
+                                        Date: "",
+                                        Barrier: arr_patients[i].Barrier.EnglishName,
+                                        Hospital: arr_patients[i].Hospital.EnglishName,
+                                        //Equipment: equip,
+                                        Remarks: arr_patients[i].PatientIdentity===0?"":arr_patients[i].PatientIdentity,
+                                        Buttons: btnStr
+                                    };
+                                }
+                                else {
+                                    Patient = {
+                                        DisplayName: arr_patients[i].DisplayName,
+                                        EnglishName: arr_patients[i].EnglishName,
+                                        CellPhone: cellPhoneCheck,
+                                        Date: "",
+                                        Barrier: arr_patients[i].Barrier.Name,
+                                        Hospital: arr_patients[i].Hospital.Name,
+                                        //Equipment: equip,
+                                        Remarks: arr_patients[i].PatientIdentity===0?"":arr_patients[i].PatientIdentity,
+                                        Buttons: btnStr
+                                    };
+                                }
+                                
+                            }
+
+                        }
+                        else {
+                            if (isAssistant) {
+                                Patient = {
+                                    DisplayName: arr_patients[i].DisplayName,
+                                    EnglishName: arr_patients[i].EnglishName,
+                                    CellPhone: cellPhoneCheck,
+                                    Date: "",
+                                    Barrier: arr_patients[i].Barrier.EnglishName,
+                                    Hospital: arr_patients[i].Hospital.EnglishName,
+                                    //Equipment: equip,
+                                    Remarks: arr_patients[i].PatientIdentity===0?"":arr_patients[i].PatientIdentity,
+                                    Buttons: btnStr
+>>>>>>> Stashed changes
                                 };
                             }
                             else {
                                 Patient = {
                                     DisplayName: arr_patients[i].DisplayName,
                                     EnglishName: arr_patients[i].EnglishName,
+<<<<<<< Updated upstream
                                     CellPhone:cellPhoneCheck,
                                     Date:"",
                                     Barrier:arr_patients[i].Barrier.Name,
@@ -145,6 +219,15 @@
                                     Equipment:equip,
                                     Remarks:arr_patients[i].Remarks,
                                     Buttons:btnStr
+=======
+                                    CellPhone: cellPhoneCheck,
+                                    Date: "",
+                                    Barrier: arr_patients[i].Barrier.Name,
+                                    Hospital: arr_patients[i].Hospital.Name,
+                                    //Equipment: equip,
+                                    Remarks: arr_patients[i].PatientIdentity===0?"":arr_patients[i].PatientIdentity,
+                                    Buttons: btnStr
+>>>>>>> Stashed changes
                                 };
                                // t.row.add([arr_patients[i].DisplayName, cellPhoneCheck, "", arr_patients[i].Barrier.Name, arr_patients[i].Hospital.Name, equip, arr_patients[i].Remarks, btnStr]).draw(false); // arr_patients[i].BirthDate.substring(0,10),
                             }
@@ -394,6 +477,7 @@
                                 <table id="datatable-buttons" class="table table-striped table-bordered">
                                     <thead>
                                         <tr>
+<<<<<<< Updated upstream
                                             <th>החולה</th>
                                             <th>שם באנגלית</th>
                                             <th data-toggle="tooltip" title="هاتف   Phone">טלפון</th>
@@ -403,6 +487,17 @@
                                             <th data-toggle="tooltip" title="معدات مرافقة   Equipment">ציוד נלווה</th>
                                             <th data-toggle="tooltip" title="ملاحظات   Notes">הערות</th>
                                             <th data-toggle="tooltip" title="اعمال   Actions">פעולות</th>
+=======
+                                            <th title="اسم   Name">החולה</th>
+                                            <th title="اسم  English Name">שם באנגלית</th>
+                                            <th title="هاتف   Phone">טלפון</th>
+                                            <th title="جيل   Age">גיל</th>
+                                            <th title="معبر   Border Crossing">מחסום</th>
+                                            <th title="مستشفى   Hospital">בית חולים</th>
+                                            <!--<th data-toggle="tooltip" title="معدات مرافقة   Equipment">ציוד נלווה</th>-->
+                                            <th title="patient id">תעודת זהות</th>
+                                            <th title="اعمال   Actions">פעולות</th>
+>>>>>>> Stashed changes
                                         </tr>
                                     </thead>
                                     <tbody></tbody>

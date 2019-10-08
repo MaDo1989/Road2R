@@ -139,7 +139,14 @@
                     // $('<option>', { value: "", text: "בחר " }).appendTo($select);
 
                     for (i in ContactType) {
+<<<<<<< Updated upstream
                         $('<option>', { value: ContactType[i], text: ContactType[i] }).appendTo($select);
+=======
+                        //<option value="אנונימי">Anonymous</option>
+                        if (ContactType[i].DisplayName!=="אנונימי") {
+                            $('<option>', { value: ContactType[i].DisplayName, text: ContactType[i].EnglishName }).appendTo($select);
+                        }
+>>>>>>> Stashed changes
                     }
                 },
                 error: function (err) { alert("Error in getContactType: " + err.responseText); }
@@ -549,22 +556,35 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
+<<<<<<< Updated upstream
                                                     <label class="col-sm-3 control-label">מגדר&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6" id="selectgender">
                                                         <select id="gender" name="gender" class="form-control">
                                                             <option>בחר</option>
                                                             <option>מְלַוֶּה</option>
                                                             <option>מְלַוֶּה</option>
+=======
+                                                    <label data-toggle="tooltip" title="جنس   Gender" class="col-sm-3 control-label">מגדר&nbsp;</label>
+                                                    <div class="col-sm-6" id="selectgender">
+                                                        <select id="gender" name="gender" class="form-control">
+                                                            <option value="Unknown">Unknown</option>
+                                                            <option value="מְלַוֶּה">Male</option>
+                                                            <option value="מְלַוֶּה">Female</option>
+>>>>>>> Stashed changes
                                                         </select>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
+<<<<<<< Updated upstream
                                                     <label class="col-sm-3 control-label">סוג קרבה&nbsp;<span class="required">*</span></label>
+=======
+                                                    <label data-toggle="tooltip" title="نوع القرابة   Relation Type" class="col-sm-3 control-label">סוג קרבה&nbsp;</label>
+>>>>>>> Stashed changes
                                                     <div class="col-sm-6" id="selectcontactType">
                                                         <select id="contactType" name="contactType" class="form-control">
-                                                            <option>בחר</option>
+                                                            <option value="אנונימי">Anonymous</option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -821,25 +841,25 @@
                 }
             } else phoneMatch3 = true;
 
-            var gender = $("#gender").val();
-            if (gender == "בחר") {
-                gender = false
-                swal(
-                    "שגיאה",
-                    "יש לבחור מין מתוך הרשימה",
-                    "warning"
-                );
-            }
+            //var gender = $("#gender").val();
+            //if (gender == "בחר") {
+            //    gender = false
+            //    swal(
+            //        "שגיאה",
+            //        "יש לבחור מין מתוך הרשימה",
+            //        "warning"
+            //    );
+            //}
 
-            var contactType = $("#contactType").val();
-            if (contactType == "בחר") {
-                relationship = false
-                swal(
-                    "שגיאה",
-                    "יש לבחור סוג קרבה מתוך הרשימה",
-                    "warning"
-                );
-            }
+            //var contactType = $("#contactType").val();
+            //if (contactType == "בחר") {
+            //    relationship = false
+            //    swal(
+            //        "שגיאה",
+            //        "יש לבחור סוג קרבה מתוך הרשימה",
+            //        "warning"
+            //    );
+            //}
 
 
             if (!isEnglishName || !CityExists || !phoneMatch || !phoneMatch2 || !phoneMatch3 || !gender || !relationship) {

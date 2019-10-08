@@ -467,7 +467,6 @@ public class AnonymousPatient
             Escorted escort = new Escorted();
             try
             {
-                //function to change when escort's ids will change!
                 escort.setAnonymousEscorted(func, Id, NumberOfEscort);
             }
             catch (Exception ex)

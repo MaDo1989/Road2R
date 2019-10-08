@@ -161,10 +161,10 @@ public class WebService : System.Web.Services.WebService
             RidePat rp = new RidePat();
             int res = rp.setRidePat(RidePat, func,isAnonymous, numberOfRides, repeatRideEvery);
             //write to log on delete 
-            if (res==666)
-            {
-                return res;
-            }
+            //if (res>=10019)
+            //{
+            //    return res;
+            //}
             if (res > 0 && func == "delete")
             {
                 string message = "";
@@ -442,6 +442,21 @@ public class WebService : System.Web.Services.WebService
         {
             Log.Error("Error in setAnonymousPatient", ex);
             throw new Exception("שגיאה בפתיחת חולה חדש");
+        }
+
+    }
+    [WebMethod]
+    public void setAnonymousEscorted(string func,int patientId,int numberOfEscort)
+    {
+        try
+        {
+            Escorted escorted = new Escorted();
+            escorted.setAnonymousEscorted(func, patientId, numberOfEscort);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in setAnonymousEscorted", ex);
+            throw new Exception("שגיאה בפתיחת מלווים אנונימיים חדשים");
         }
 
     }
