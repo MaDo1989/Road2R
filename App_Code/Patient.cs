@@ -561,72 +561,9 @@ public class Patient
                 //the first patient is null so we don't add him/her
                 if (tempID != 0)
                 {
-<<<<<<< Updated upstream
                     //adding the last patient to the list.
                     list.Add(p);
                     p = new Patient();
-=======
-                    //the first patient is null so we don't add him/her
-                    if (tempID != 0)
-                    {
-                        //adding the last patient to the list.
-                        list.Add(p);
-                        p = new Patient();
-                    }
-                    p.Id = int.Parse(dr["Id"].ToString());
-                    p.IsAnonymous = dr["IsAnonymous"].ToString();
-                    p.NumberOfEscort = dr["NumberOfEscort"].ToString();
-                    p.DisplayName = dr["DisplayName"].ToString();
-                    p.DisplayNameA = dr["DisplayNameA"].ToString();
-                    p.FirstNameA = dr["FirstNameA"].ToString();
-                    p.FirstNameH = dr["FirstNameH"].ToString();
-                    p.LastNameH = dr["LastNameH"].ToString();
-                    p.LastNameA = dr["LastNameA"].ToString();
-                    p.CellPhone = dr["CellPhone"].ToString();
-                    p.CellPhone1 = dr["CellPhone2"].ToString();
-                    p.HomePhone = dr["HomePhone"].ToString();
-                    p.City = dr["CityCityName"].ToString();
-                    p.LivingArea = dr["LivingArea"].ToString();
-                    p.IsActive = Convert.ToBoolean(dr["IsACtive"].ToString());
-                    p.BirthDate = dr["BirthDate"].ToString();
-                    p.History = dr["History"].ToString();
-                    p.Department = dr["Department"].ToString();
-                    if (dr["PatientIdentity"].ToString()=="")
-                    {
-                        p.PatientIdentity = 0;
-                    }
-                    else p.PatientIdentity = int.Parse(dr["PatientIdentity"].ToString());
-                    string barrier = dr["Barrier"].ToString();
-                    p.Barrier = new Location(barrier);
-                    if (locations[barrier] != null)
-                    {
-                        p.Barrier.EnglishName = locations[barrier].ToString();
-                    }
-                    else p.Barrier.EnglishName = "";
-                    string hospital = dr["Hospital"].ToString();
-                    p.Hospital = new Location();
-                    p.Hospital.Name = hospital;
-                    if (locations[hospital] != null)
-                    {
-                        p.Hospital.EnglishName = locations[hospital].ToString();
-                    }
-                    else p.Hospital.EnglishName = "";
-                    p.Gender = dr["Gender"].ToString();
-                    p.Remarks = dr["Remarks"].ToString();
-                    p.EnglishName = dr["EnglishName"].ToString();
-                    el = new List<string>();
-                    //get equipment for patient from the same view
-                    string e = dr["EquipmentName"].ToString();
-                    el.Add(e);
-                    p.Equipment = el;
-
-                    tempID = int.Parse(dr["Id"].ToString());
-                }
-                catch (Exception ex)
-                {
-
-                    throw;
->>>>>>> Stashed changes
                 }
                 p.Id = int.Parse(dr["Id"].ToString());
                 p.IsAnonymous = dr["IsAnonymous"].ToString();
@@ -810,13 +747,8 @@ public class Patient
         DbService db;
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
-<<<<<<< Updated upstream
-        SqlParameter[] cmdParams = new SqlParameter[18];
-        
-=======
         SqlParameter[] cmdParams = new SqlParameter[19];
 
->>>>>>> Stashed changes
         cmdParams[0] = cmd.Parameters.AddWithValue("@firstNameH", FirstNameH);
         cmdParams[1] = cmd.Parameters.AddWithValue("@lastNameH", LastNameH);
         cmdParams[2] = cmd.Parameters.AddWithValue("@firstNameA", FirstNameA);
@@ -873,11 +805,7 @@ public class Patient
         else if (func == "new")
         {
             query = "insert into Patient (FirstNameH,FirstNameA,LastNameH,LastNameA,CellPhone,CellPhone2, HomePhone,";
-<<<<<<< Updated upstream
-            query += "CityCityName,IsActive,BirthDate,History,Department,Barrier,Hospital,Gender,Remarks,EnglishName)"; 
-=======
             query += "CityCityName,IsActive,BirthDate,History,Department,Barrier,Hospital,Gender,Remarks,EnglishName,PatientIdentity)";
->>>>>>> Stashed changes
             query += " values (@firstNameH,@firstNameA,@lastNameH,@lastNameA,";
             query += "@cellPhone,@cellPhone2,@homephone,@city,@IsActive,@birthDate,";
             query += "@history,@department,@barrier,@hospital,@gender,@remarks,@englishName,@patientIdentity); select SCOPE_IDENTITY()";
