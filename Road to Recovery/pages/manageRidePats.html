@@ -154,7 +154,7 @@
 
             //Create a DataTable from the Table
             var recordsNum = 50; 
-            if (JSON.parse(localStorage.getItem("futurePageLength")) !== undefined)
+            if (JSON.parse(localStorage.getItem("futurePageLength")) !== null)
             {
                 recordsNum = JSON.parse(localStorage.getItem("futurePageLength"));
             }

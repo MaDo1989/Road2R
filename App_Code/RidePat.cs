@@ -393,6 +393,15 @@ public class RidePat
 
                 }
             }
+            if (!isAnonymous)
+            {
+                Message m = new Message();
+                if (rp.Drivers.Count>=1)
+                {
+                    m.coordinatorCanceledRide(RidePatNum, rp.Drivers[0]);
+                }
+                else m.coordinatorCanceledRide(RidePatNum, null);
+            }
 
             //need to change this --> new status is cancelled
             //  m.cancelRide(ridePatNum, dr);

@@ -177,13 +177,9 @@ public class WebService : System.Web.Services.WebService
         {
             RidePat rp = new RidePat();
             int res = rp.setRidePat(RidePat, func, isAnonymous, numberOfRides, repeatRideEvery);
-            //write to log on delete 
-            //if (res>=10019)
-            //{
-            //    return res;
-            //}
+
             if (res > 0 && func == "delete")
-            {
+            { 
                 string message = "";
                 message = " נסיעה מספר " + RidePat.RidePatNum + " מ" + RidePat.Origin.Name + " ל" + RidePat.Destination.Name + " עם החולה " + RidePat.Pat.DisplayName + " בוטלה.";
                 LogEntry le = new LogEntry(DateTime.Now, "info", message, 1);
