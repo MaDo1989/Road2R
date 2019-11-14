@@ -697,7 +697,7 @@
             var escort = true;
             var checkName = true;
             var englishName = $("#patientEnglishName").val();
-            
+            var englishNameCon = true;
             if(englishName==""){
                 swal(
                     "שגיאה",
@@ -741,7 +741,7 @@
                 alert("יש לבחור מספר מלווים מתוך הרשימה");
             }
 
-            if (!checkName || !barrier || !hospital || !escort ) {
+            if (!englishNameCon || !checkName || !barrier || !hospital || !escort ) {
                 return false;
             } else return true;
         }

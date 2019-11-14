@@ -12,6 +12,7 @@ public class User
 {
     int userID;
     string userName;
+    string englishName;
     string password;
     string userType;
 
@@ -68,6 +69,19 @@ public class User
         }
     }
 
+    public string EnglishName
+    {
+        get
+        {
+            return englishName;
+        }
+
+        set
+        {
+            englishName = value;
+        }
+    }
+
     public User()
     {
         //
@@ -115,14 +129,42 @@ public class User
     public string getUserNameByCellphone(string cellphone)
     {
         #region DB functions
-        string query = "select displayName from Volunteer where Cellphone ='" + cellphone + "'";
+        string query = "select displayName,englishname from Volunteer where Cellphone ='" + cellphone + "'";
 
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         DataRow dr = ds.Tables[0].Rows[0];
         string userName = dr["DisplayName"].ToString();
-
+        string userEnglishName = dr["EnglishName"].ToString();
+        //User u = new User();
+        //u.EnglishName = userEnglishName;
+        //u.UserName = userName;
         return userName;
+        #endregion
+    }
+    public string getUserEnglishNameByCellphone(string cellphone)
+    {
+        #region DB functions
+        string query = "select displayName,englishname from Volunteer where Cellphone ='" + cellphone + "'";
+
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        DataRow dr = ds.Tables[0].Rows[0];
+        string userName = dr["DisplayName"].ToString();
+        string userEnglishName = dr["EnglishName"].ToString();
+        return userEnglishName;
+        #endregion
+    }
+    public bool GetIsAssistantByCellphone(string cellphone)
+    {
+        #region DB functions
+        string query = "select isAssistant from Volunteer where Cellphone ='" + cellphone + "'";
+
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        DataRow dr = ds.Tables[0].Rows[0];
+        bool isAssistant = Convert.ToBoolean(dr["isAssistant"].ToString());
+        return isAssistant;
         #endregion
     }
     public string getUserType(string userName)
