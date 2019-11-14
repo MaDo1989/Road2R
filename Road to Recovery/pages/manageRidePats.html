@@ -67,8 +67,10 @@
             
            // var isAssistant
            
-            
-
+            if (!JSON.parse(localStorage.getItem("isProductionDatabase"))) {
+                $("#databaseType").text("Test database ")
+            }
+            else $("#databaseType").text("Production database")
             $('[data-toggle="tooltip"]').tooltip({
             container: 'body'
             })
@@ -794,8 +796,9 @@
                                 <a href="manageRidePats.html" class="logo"><span>בדרך להחלמה</span>&nbsp&nbsp&nbsp</a>
                             </div>
                         </div>
+
                         <div class="pull-right">
-                            <a href="passwordForm.html"> <span class="logo" id="userName"></span><span class="logo" id="databaseType"></span></a>
+                            <a href="passwordForm.html"> <span class="logo" id="userName"></span>&nbsp;<span class="logo" id="databaseType"></span></a>
                         </div>
                     </div>
                     <!--/.nav-collapse -->
