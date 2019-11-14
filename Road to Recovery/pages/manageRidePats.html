@@ -64,7 +64,9 @@
         var isAssistant = false;
 
         $(document).ready(function () {
-            
+            $(document).on("change", 'select[name ="datatable-future_length"]', function () {
+                localStorage.futurePageLength = $('select[name ="datatable-future_length"]').val();
+            })
            // var isAssistant
            
             if (!JSON.parse(localStorage.getItem("isProductionDatabase"))) {
@@ -151,9 +153,16 @@
             });
 
             //Create a DataTable from the Table
+            var recordsNum = 50; 
+            if (JSON.parse(localStorage.getItem("futurePageLength")) !== undefined)
+            {
+                recordsNum = JSON.parse(localStorage.getItem("futurePageLength"));
+            }
+
             tMorning = $('#datatable-morning').DataTable({ "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
             tAfternoon = $('#datatable-afternoon').DataTable({ "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
             tFuture = $('#datatable-future').DataTable({
+                "iDisplayLength": recordsNum,
                 "aoColumns": [{
                     "sType": "customdatesort"
                 },
@@ -170,16 +179,7 @@
             getCoors();
             refreshTable();
 
-            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if (localStorage.futurePageLength != null) {
-                var futurePageLength = localStorage.futurePageLength;
-            }
-
-            if (futurePageLength != null && futurePageLength != "") {
-
-            }
-            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+           
             setInterval("refreshTable()", 60000);
         });
 
@@ -330,16 +330,6 @@
                             
                             buildTables(tFuture);
 
-                            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        $('select[name="datatable-future_length"]').change(function() {
-        console.log("Changing the page");
-             var futurePageLength = $('select[name ="datatable-future_length"]').val();
-            if (futurePageLength != null && futurePageLength != "") {
-            localStorage.futurePageLength = futurePageLength;
-            }
-              });
-
-                            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                         }
 
                     }
@@ -482,13 +472,13 @@
   
 
             }
-            if (table.context[0].sTableId == "datatable-future") {
-        if (localStorage.futurePageLength != null && localStorage.futurePageLength != "") {
-                       $('select[name="datatable-future_length"]').val(parseInt(localStorage.futurePageLength));
+            //if (table.context[0].sTableId == "datatable-future") {
+            //    if (localStorage.futurePageLength != null && localStorage.futurePageLength != "") {
+            //        $('select[name="datatable-future_length"]').val(parseInt(localStorage.futurePageLength));
 
-            }
-                      }
-              }
+            //    }
+            //}
+        }
         
         //need to change the table from future to any table
         function confirmDelete(ridePat, table) {
