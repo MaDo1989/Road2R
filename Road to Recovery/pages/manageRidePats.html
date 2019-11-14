@@ -78,6 +78,12 @@
             includeHTML();
             var userName = GENERAL.USER.getUserDisplayName();
             $("#userName").html(userName);
+
+            if (localStorage["isProductionDatabase"] == "true") {
+            $("#databaseType").html(" DataBase Production ");
+            } else {
+            $("#databaseType").html(" DataBase Test ");
+            }
             splitHour = 12; //The hourthat seperates morning and afternoon ridepats
 
             //  document.getElementById("Numbers").checked = localStorage.numbers === 'true';
@@ -147,8 +153,18 @@
 
 
             getCoors();
-
             refreshTable();
+
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            if (localStorage.futurePageLength != null) {
+                var futurePageLength = localStorage.futurePageLength;
+            }
+
+            if (futurePageLength != null && futurePageLength != "") {
+
+            }
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
             setInterval("refreshTable()", 60000);
         });
 
@@ -194,6 +210,9 @@
         function refreshTable() {
 
             checkCookie();
+
+
+
             var active = localStorage.active;//$("#activeRidePats").prop('checked');
             var today = localStorage.today;//$("#TodaysRidePats").prop('checked');
             var unassigned = localStorage.unassigned;//$("#UnassignedRidePats").prop('checked');
@@ -278,8 +297,21 @@
                         }
                         else //futrue rides
                         {
+                            
                             buildTables(tFuture);
+
+                            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $('select[name="datatable-future_length"]').change(function() {
+        console.log("Changing the page");
+             var futurePageLength = $('select[name ="datatable-future_length"]').val();
+            if (futurePageLength != null && futurePageLength != "") {
+            localStorage.futurePageLength = futurePageLength;
+            }
+              });
+
+                            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                         }
+
                     }
 
                     tMorning.columns([0]).order('asc').draw();
@@ -377,9 +409,17 @@
                 else {
                     table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                 }
-            }
+  
 
-        }
+            }
+            if (table.context[0].sTableId == "datatable-future") {
+        if (localStorage.futurePageLength != null && localStorage.futurePageLength != "") {
+                       $('select[name="datatable-future_length"]').val(parseInt(localStorage.futurePageLength));
+
+            }
+                      }
+              }
+        
         //need to change the table from future to any table
         function confirmDelete(ridePat, table) {
             arr_details = { RidePatNum: ridePat.name, func: "show" };// ridePat.name=RidePatNum
@@ -696,7 +736,7 @@
                             </div>
                         </div>
                         <div class="pull-right">
-                            <a href="passwordForm.html"> <span class="logo" id="userName"></span></a>
+                            <a href="passwordForm.html"> <span class="logo" id="userName"></span><span class="logo" id="databaseType"></span></a>
                         </div>
                     </div>
                     <!--/.nav-collapse -->

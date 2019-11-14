@@ -60,7 +60,7 @@ public class WebService : System.Web.Services.WebService
             Log.Error("Error in isPrimaryStillCanceled", ex);
             throw new Exception("שגיאה בבדיקה האם נהג ראשי מבוטל");
         }
-        
+
     }
 
     [WebMethod]
@@ -79,7 +79,7 @@ public class WebService : System.Web.Services.WebService
             Log.Error("Error in backupToPrimary", ex);
             throw new Exception("שגיאה בעדכון נהג ראשי");
         }
-        
+
     }
 
     [WebMethod]
@@ -145,7 +145,7 @@ public class WebService : System.Web.Services.WebService
             JavaScriptSerializer j = new JavaScriptSerializer();
             return j.Serialize(v);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Log.Error("Error in getVolunteerPrefs", ex);
             throw new Exception("שגיאה בשליפת נתוני העדפות המתנדב");
@@ -154,12 +154,12 @@ public class WebService : System.Web.Services.WebService
     }
     //לסדר
     [WebMethod(EnableSession = true)]
-    public int setRidePat(RidePat RidePat, string func, bool isAnonymous,int numberOfRides, string repeatRideEvery)
+    public int setRidePat(RidePat RidePat, string func, bool isAnonymous, int numberOfRides, string repeatRideEvery)
     {
         try
         {
             RidePat rp = new RidePat();
-            int res = rp.setRidePat(RidePat, func,isAnonymous, numberOfRides, repeatRideEvery);
+            int res = rp.setRidePat(RidePat, func, isAnonymous, numberOfRides, repeatRideEvery);
             //write to log on delete 
             //if (res>=10019)
             //{
@@ -168,7 +168,7 @@ public class WebService : System.Web.Services.WebService
             if (res > 0 && func == "delete")
             {
                 string message = "";
-                message = " נסיעה מספר " + RidePat.RidePatNum + " מ"+RidePat.Origin.Name+" ל"+RidePat.Destination.Name+" עם החולה "+RidePat.Pat.DisplayName+" בוטלה.";
+                message = " נסיעה מספר " + RidePat.RidePatNum + " מ" + RidePat.Origin.Name + " ל" + RidePat.Destination.Name + " עם החולה " + RidePat.Pat.DisplayName + " בוטלה.";
                 LogEntry le = new LogEntry(DateTime.Now, "info", message, 1);
             }
             return res;
@@ -178,7 +178,7 @@ public class WebService : System.Web.Services.WebService
             JavaScriptSerializer j = new JavaScriptSerializer();
 
             Log.Error("Error in setRidePat - same ride isue in date: ", ex);
-            throw new Exception(j.Serialize(" ההסעה בתאריך " +ex.Message+" כבר קיימת.\nאנא בחר תאריך חדש."));
+            throw new Exception(j.Serialize(" ההסעה בתאריך " + ex.Message + " כבר קיימת.\nאנא בחר תאריך חדש."));
         }
 
         catch (Exception ex)
@@ -200,7 +200,7 @@ public class WebService : System.Web.Services.WebService
         string message = "";
         try
         {
-           // string coor;
+            // string coor;
             int driverId = a.GetDriverId(rideId);
             if (driverId < 0)
             {
@@ -208,21 +208,21 @@ public class WebService : System.Web.Services.WebService
             }
             else
             {
-                message = "  נסיעה מספר " + rideId + " עם הנהג " + a.getDriverName(driverId) +  " שינתה סטטוס ל" + status;
+                message = "  נסיעה מספר " + rideId + " עם הנהג " + a.getDriverName(driverId) + " שינתה סטטוס ל" + status;
             }
             LogEntry le = new LogEntry(DateTime.Now, "שינוי סטטוס", message, 2, rideId, true);
             return r.setStatus(rideId, status);
         }
         catch (Exception ex)
         {
-            Log.Error("Error in setRideStatus",ex);
+            Log.Error("Error in setRideStatus", ex);
             throw new Exception(" שגיאה בשינוי הסטטוס");
         }
 
     }
 
     [WebMethod]
-    public string getPatients(bool active=true)
+    public string getPatients(bool active = true)
     {
         try
         {
@@ -258,14 +258,14 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    [WebMethod(Description ="get patients with the same origin and destination")]
-    public string getPatientsForAnonymous(bool active,string origin,string dest)
+    [WebMethod(Description = "get patients with the same origin and destination")]
+    public string getPatientsForAnonymous(bool active, string origin, string dest)
     {
         try
         {
             JavaScriptSerializer j = new JavaScriptSerializer();
             Patient c = new Patient();
-            List<Patient> patientsList = c.getAnonymousPatientsList(active,origin,dest);
+            List<Patient> patientsList = c.getAnonymousPatientsList(active, origin, dest);
             return j.Serialize(patientsList);
         }
         catch (Exception ex)
@@ -383,7 +383,7 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    [WebMethod(Description = "Set Patient Status",EnableSession =true)]
+    [WebMethod(Description = "Set Patient Status", EnableSession = true)]
     public void SetPatientStatus(string displayName, string active)
     {
         try
@@ -446,7 +446,7 @@ public class WebService : System.Web.Services.WebService
 
     }
     [WebMethod]
-    public void setAnonymousEscorted(string func,int patientId,int numberOfEscort)
+    public void setAnonymousEscorted(string func, int patientId, int numberOfEscort)
     {
         try
         {
@@ -466,7 +466,7 @@ public class WebService : System.Web.Services.WebService
         try
         {
             Volunteer v = new Volunteer();
-            v.setUserPassword(userName,password);
+            v.setUserPassword(userName, password);
         }
         catch (Exception ex)
         {
@@ -493,14 +493,14 @@ public class WebService : System.Web.Services.WebService
 
     }
     [WebMethod]
-    public void setNewVersion(string userName, string google, string appstore, DateTime date, string version,bool mandatory)
+    public void setNewVersion(string userName, string google, string appstore, DateTime date, string version, bool mandatory)
     {
         try
         {
             //add global messege to all volunteers to download new app
             Version v = new Version();
             //add mandatory
-            v.setNewVersion(userName, google, appstore, date, version,mandatory);
+            v.setNewVersion(userName, google, appstore, date, version, mandatory);
 
         }
         catch (Exception ex)
@@ -615,7 +615,7 @@ public class WebService : System.Web.Services.WebService
             //}
 
             RidePat rp = new RidePat();
-            List<RidePat> r = rp.GetRidePatView(volunteerId,maxDays);
+            List<RidePat> r = rp.GetRidePatView(volunteerId, maxDays);
             JavaScriptSerializer j = new JavaScriptSerializer();
             j.MaxJsonLength = Int32.MaxValue;
             return j.Serialize(r);
@@ -737,12 +737,12 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string CheckUser(string mobile, string regId,string device)
+    public string CheckUser(string mobile, string regId, string device)
     {
         try
         {
             Volunteer v = new Volunteer();
-            v = v.getVolunteerByMobile(mobile, regId,device);
+            v = v.getVolunteerByMobile(mobile, regId, device);
             JavaScriptSerializer j = new JavaScriptSerializer();
             return j.Serialize(v);
         }
@@ -777,9 +777,9 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
- 
 
-    [WebMethod(EnableSession = true,Description = "delete's driver from a ride, for example - two ridepats on the same ride")]
+
+    [WebMethod(EnableSession = true, Description = "delete's driver from a ride, for example - two ridepats on the same ride")]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string DeleteDriver(int ridePatId, int driverId)
     {
@@ -800,7 +800,7 @@ public class WebService : System.Web.Services.WebService
                     //get driver details 
                     Volunteer V = new Volunteer();
                     V.getVolunteerByID(driverId);
-                    m.driverCanceledRide(ridePatId,V.getVolunteerByID(driverId));
+                    m.driverCanceledRide(ridePatId, V.getVolunteerByID(driverId));
                 }
             }
 
@@ -858,7 +858,7 @@ public class WebService : System.Web.Services.WebService
 
 
 
-    [WebMethod(EnableSession =true,Description = "delete from only one ride pat")]
+    [WebMethod(EnableSession = true, Description = "delete from only one ride pat")]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string LeaveRidePat(int ridePatId, int rideId, int driverId)
     {
@@ -1226,7 +1226,7 @@ public class WebService : System.Web.Services.WebService
         for (int i = 0; i < 50; i++)
         {
             LogEntry le = new LogEntry(DateTime.Now, str, "error in something" + i.ToString(), i);
-           
+
 
         }
     }
@@ -1318,6 +1318,17 @@ public class WebService : System.Web.Services.WebService
             Response.AppendHeader("Content-Encoding", "gzip");
         }
         return Response;
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string isProductionDatabase()
+    {
+        Auxiliary aux = new Auxiliary();
+        bool ans = aux.isProductionDatabase();
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        
+        return j.Serialize(ans);
     }
 }
 

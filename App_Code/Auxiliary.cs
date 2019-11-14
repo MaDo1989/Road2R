@@ -96,4 +96,10 @@ public class Auxiliary
     {
         return ConfigurationManager.AppSettings["AvailableServers"].Split(',').ToList();
     }
+
+    public bool isProductionDatabase()
+    {
+        string dbName = ConfigurationManager.ConnectionStrings["db"].ConnectionString;
+        return dbName.Contains("prod");
+    }
 }

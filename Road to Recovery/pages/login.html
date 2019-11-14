@@ -219,6 +219,7 @@
                                 }, 1001);
                                 GetUserNameByCellphone(userName);
                                 GENERAL.USER.setUserName(userName);
+                                GetDatabaseType();
                                // getUserType(userName);
                             }
                             else {
@@ -273,6 +274,25 @@
             }
         });
 
+        function GetDatabaseType() {
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/isProductionDatabase",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                async: true,
+                data: "",
+                success: function (data) {
+                    var ans = JSON.parse(data.d);
+                    //GENERAL.isProductionDatabase = ans;
+                    localStorage["isProductionDatabase"] = ans;
+                    //alert("HERE");
+                },
+                error: function (err) {
+                    alert("Error in isProductionDatabase function: " + err.responseText);
+                }
+            });
+        }
 
     </script>
 

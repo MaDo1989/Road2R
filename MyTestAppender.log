@@ -1,9 +1,6 @@
-﻿2019-02-12 16:25:09,289 ERROR [9] WebService.writeToLog - Successful login ;for user: 0524842888
-2019-02-12 16:26:40,119 ERROR [12] WebService.setPatient - Error in setPatient
-System.Data.SqlClient.SqlException (0x80131904): The INSERT statement conflicted with the FOREIGN KEY constraint "FKPatient117009". The conflict occurred in database "r2rdb_test", table "dbo.City", column 'CityName'.
-The statement has been terminated.
-   ב-  DbService.GetObjectScalarByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 126
-   ב-  Patient.setPatient(String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Patient.cs:שורה 701
-   ב-  WebService.setPatient(Patient patient, String func) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 376
-ClientConnectionId:98155051-c330-4e0a-8012-55cd38095746
-Error Number:547,State:0,Class:16
+﻿2019-11-14 14:23:24,732 ERROR [4] WebService.writeToLog - Successful login ;for user: 0524895999
+2019-11-14 14:25:01,282 ERROR [18] WebService.writeToLog - Successful login ;for user: 0524895999
+2019-11-14 14:25:08,763 ERROR [4] WebService.writeToLog - Successful login ;for user: 0544890081
+2019-11-14 14:26:14,155 ERROR [15] WebService.writeToLog - Successful login ;for user: 0524895999
+2019-11-14 14:26:37,460 ERROR [15] WebService.writeToLog - Successful login ;for user: 0524895999
+2019-11-14 14:27:34,293 ERROR [18] WebService.writeToLog - Successful login ;for user: 0524895999

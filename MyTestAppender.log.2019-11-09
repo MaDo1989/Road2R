@@ -1,0 +1,16 @@
+﻿2019-11-09 08:45:34,466 ERROR [10] WebService.writeToLog - Successful login ;for user: 0524895999
+2019-11-09 08:56:03,118 ERROR [17] WebService.writeToLog - Successful login ;for user: 0524895999
+2019-11-09 09:31:26,086 ERROR [6] WebService.writeToLog - Successful login ;for user: 0524895999
+2019-11-09 10:54:45,838 ERROR [24] WebService.GetRidePatView - Error in GetRidePatView
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at RidePat.getEscorts() in c:\פרטי\repo\Road2R - Copy before cloning 09.11\App_Code\RidePat.cs:line 643
+   at RidePat.GetRidePatView(Int32 volunteerId, Int32 maxDays) in c:\פרטי\repo\Road2R - Copy before cloning 09.11\App_Code\RidePat.cs:line 654
+   at WebService.GetRidePatView(Int32 volunteerId, Int32 maxDays) in c:\פרטי\repo\Road2R - Copy before cloning 09.11\App_Code\WebService.cs:line 618
+2019-11-09 11:30:31,936 ERROR [9] WebService.getCoorList - Error in getCoorList
+System.Data.SqlClient.SqlException (0x80131904): A network-related or instance-specific error occurred while establishing a connection to SQL Server. The server was not found or was not accessible. Verify that the instance name is correct and that SQL Server is configured to allow remote connections. (provider: TCP Provider, error: 0 - No such host is known.) ---> System.ComponentModel.Win32Exception (0x80004005): No such host is known
+   at DbService.GetDataSetByQuery(String sqlQuery, Boolean needToClose, CommandType cmdType, SqlParameter[] parametersArray) in c:\פרטי\repo\Road2R - Copy before cloning 09.11\App_Code\DBService.cs:line 76
+   at Volunteer.getCoorList() in c:\פרטי\repo\Road2R - Copy before cloning 09.11\App_Code\Volunteer.cs:line 534
+   at WebService.getCoorList() in c:\פרטי\repo\Road2R - Copy before cloning 09.11\App_Code\WebService.cs:line 305
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:11001,State:0,Class:20
+2019-11-09 11:30:47,667 ERROR [10] WebService.writeToLog - Successful login ;for user: 0524895999

@@ -1,0 +1,66 @@
+﻿2019-11-08 14:27:28,052 ERROR [7] WebService.getCoorList - Error in getCoorList
+System.Data.SqlClient.SqlException (0x80131904): Cannot open server 'road2r' requested by the login. Client with IP address '80.178.251.210' is not allowed to access the server.  To enable access, use the Windows Azure Management Portal or run sp_set_firewall_rule on the master database to create a firewall rule for this IP address or address range.  It may take up to five minutes for this change to take effect.
+   at DbService.GetDataSetByQuery(String sqlQuery, Boolean needToClose, CommandType cmdType, SqlParameter[] parametersArray) in c:\פרטי\repo\Road2R\App_Code\DBService.cs:line 76
+   at Volunteer.getCoorList() in c:\פרטי\repo\Road2R\App_Code\Volunteer.cs:line 534
+   at WebService.getCoorList() in c:\פרטי\repo\Road2R\App_Code\WebService.cs:line 305
+ClientConnectionId:9c0f8a3a-76ca-4951-8697-2756361905e4
+Error Number:40615,State:1,Class:14
+2019-11-08 14:42:13,411 ERROR [44] WebService.writeToLog - Successful login ;for user: 0524895999
+2019-11-08 14:42:38,499 ERROR [50] WebService.writeToLog - Successful login ;for user: 0544890081
+2019-11-08 14:49:43,268 ERROR [59] WebService.writeToLog - Successful login ;for user: 0544890081
+2019-11-08 14:57:18,517 ERROR [53] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): A connection was successfully established with the server, but then an error occurred during the pre-login handshake. (provider: TCP Provider, error: 0 - An existing connection was forcibly closed by the remote host.) ---> System.ComponentModel.Win32Exception (0x80004005): An existing connection was forcibly closed by the remote host
+   at DbService.GetDataSetByQuery(String sqlQuery, Boolean needToClose, CommandType cmdType, SqlParameter[] parametersArray) in c:\פרטי\repo\Road2R\App_Code\DBService.cs:line 76
+   at RidePat.getDriver() in c:\פרטי\repo\Road2R\App_Code\RidePat.cs:line 590
+   at RidePat.GetRidePatView(Int32 volunteerId, Int32 maxDays) in c:\פרטי\repo\Road2R\App_Code\RidePat.cs:line 651
+   at WebService.GetRidePatView(Int32 volunteerId, Int32 maxDays) in c:\פרטי\repo\Road2R\App_Code\WebService.cs:line 618
+ClientConnectionId:3777ad9e-c505-4d36-ae31-d13f91a5f040
+Error Number:10054,State:0,Class:20
+2019-11-08 14:58:26,691 ERROR [60] WebService.GetRidePatView - Error in GetRidePatView
+System.ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+   at RidePat.GetRidePatView(Int32 volunteerId, Int32 maxDays) in c:\פרטי\repo\Road2R\App_Code\RidePat.cs:line 807
+   at WebService.GetRidePatView(Int32 volunteerId, Int32 maxDays) in c:\פרטי\repo\Road2R\App_Code\WebService.cs:line 618
+2019-11-08 15:07:09,932 ERROR [62] WebService.writeToLog - Successful login ;for user: 0544890081
+2019-11-08 15:13:18,472 ERROR [39] WebService.writeToLog - Successful login ;for user: 0544890081
+2019-11-08 15:13:35,897 ERROR [39] WebService.writeToLog - Successful login ;for user: 0524895999
+2019-11-08 15:15:55,064 ERROR [66] WebService.writeToLog - Successful login ;for user: 0524895999
+2019-11-08 15:21:48,376 ERROR [47] WebService.writeToLog - Successful login ;for user: 0524895999
+2019-11-08 15:22:38,658 ERROR [29] WebService.writeToLog - Successful login ;for user: 0524895999
+2019-11-08 15:34:38,962 ERROR [28] WebService.getCoorList - Error in getCoorList
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at Volunteer.getCoorList() in c:\פרטי\repo\Road2R\App_Code\Volunteer.cs:line 536
+   at WebService.getCoorList() in c:\פרטי\repo\Road2R\App_Code\WebService.cs:line 305
+2019-11-08 15:34:47,593 ERROR [45] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): Cannot open server 'road2r' requested by the login. Client with IP address '80.178.251.210' is not allowed to access the server.  To enable access, use the Windows Azure Management Portal or run sp_set_firewall_rule on the master database to create a firewall rule for this IP address or address range.  It may take up to five minutes for this change to take effect.
+   at DbService.GetDataSetByQuery(String sqlQuery, Boolean needToClose, CommandType cmdType, SqlParameter[] parametersArray) in c:\פרטי\repo\Road2R\App_Code\DBService.cs:line 76
+   at RidePat.getDriver() in c:\פרטי\repo\Road2R\App_Code\RidePat.cs:line 590
+   at RidePat.GetRidePatView(Int32 volunteerId, Int32 maxDays) in c:\פרטי\repo\Road2R\App_Code\RidePat.cs:line 651
+   at WebService.GetRidePatView(Int32 volunteerId, Int32 maxDays) in c:\פרטי\repo\Road2R\App_Code\WebService.cs:line 618
+ClientConnectionId:ecef9e8b-d385-422a-8dc7-bc7d311d5bee
+Error Number:40615,State:1,Class:14
+2019-11-08 15:35:39,951 ERROR [28] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): Cannot open server 'road2r' requested by the login. Client with IP address '80.178.251.210' is not allowed to access the server.  To enable access, use the Windows Azure Management Portal or run sp_set_firewall_rule on the master database to create a firewall rule for this IP address or address range.  It may take up to five minutes for this change to take effect.
+   at DbService.GetDataSetByQuery(String sqlQuery, Boolean needToClose, CommandType cmdType, SqlParameter[] parametersArray) in c:\פרטי\repo\Road2R\App_Code\DBService.cs:line 76
+   at RidePat.getDriver() in c:\פרטי\repo\Road2R\App_Code\RidePat.cs:line 590
+   at RidePat.GetRidePatView(Int32 volunteerId, Int32 maxDays) in c:\פרטי\repo\Road2R\App_Code\RidePat.cs:line 651
+   at WebService.GetRidePatView(Int32 volunteerId, Int32 maxDays) in c:\פרטי\repo\Road2R\App_Code\WebService.cs:line 618
+ClientConnectionId:5d642c3e-c1ad-4da8-9876-fcb54bded52a
+Error Number:40615,State:1,Class:14
+2019-11-08 15:36:30,339 ERROR [45] WebService.getCoorList - Error in getCoorList
+System.Data.SqlClient.SqlException (0x80131904): Cannot open server 'road2r' requested by the login. Client with IP address '80.178.251.210' is not allowed to access the server.  To enable access, use the Windows Azure Management Portal or run sp_set_firewall_rule on the master database to create a firewall rule for this IP address or address range.  It may take up to five minutes for this change to take effect.
+   at DbService.GetDataSetByQuery(String sqlQuery, Boolean needToClose, CommandType cmdType, SqlParameter[] parametersArray) in c:\פרטי\repo\Road2R\App_Code\DBService.cs:line 76
+   at Volunteer.getCoorList() in c:\פרטי\repo\Road2R\App_Code\Volunteer.cs:line 534
+   at WebService.getCoorList() in c:\פרטי\repo\Road2R\App_Code\WebService.cs:line 305
+ClientConnectionId:2aacab33-2104-47d8-b2f1-bac5f4b58007
+Error Number:40615,State:1,Class:14
+2019-11-08 15:36:40,390 ERROR [24] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): Cannot open server 'road2r' requested by the login. Client with IP address '80.178.251.210' is not allowed to access the server.  To enable access, use the Windows Azure Management Portal or run sp_set_firewall_rule on the master database to create a firewall rule for this IP address or address range.  It may take up to five minutes for this change to take effect.
+   at DbService.GetDataSetByQuery(String sqlQuery, Boolean needToClose, CommandType cmdType, SqlParameter[] parametersArray) in c:\פרטי\repo\Road2R\App_Code\DBService.cs:line 76
+   at RidePat.getDriver() in c:\פרטי\repo\Road2R\App_Code\RidePat.cs:line 590
+   at RidePat.GetRidePatView(Int32 volunteerId, Int32 maxDays) in c:\פרטי\repo\Road2R\App_Code\RidePat.cs:line 651
+   at WebService.GetRidePatView(Int32 volunteerId, Int32 maxDays) in c:\פרטי\repo\Road2R\App_Code\WebService.cs:line 618
+ClientConnectionId:0967658e-8cab-4df7-b7d9-5deac2b9edd5
+Error Number:40615,State:1,Class:14
+2019-11-08 15:37:18,091 ERROR [44] WebService.writeToLog - Successful login ;for user: 0524895999
+2019-11-08 18:55:47,661 ERROR [7] WebService.writeToLog - Successful login ;for user: 0524895999
