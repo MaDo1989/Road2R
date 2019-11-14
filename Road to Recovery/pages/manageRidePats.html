@@ -179,8 +179,9 @@
             getCoors();
             refreshTable();
 
-           
-            setInterval("refreshTable()", 60000);
+            if (!isAssistant) {
+                setInterval("refreshTable()", 60000);
+            }           
         });
 
         function saveFilters() {
