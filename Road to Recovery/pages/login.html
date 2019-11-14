@@ -150,6 +150,7 @@
     </script>
     <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
     <script>
+        var isAssistant;
         $(document).ready(function () {
 
             // DO NOT REMOVE : GLOBAL FUNCTIONS!
@@ -207,20 +208,36 @@
                             var userInDB = JSON.parse(data.d);
 
                             if (userInDB) {
-                                swal({
-                                    title: "ברוכים הבאים\nمرحبا بك\nWelcome!",
-                                    type: "success",
-                                    timer: 1000,
-                                    showConfirmButton: false
-                                });
+                                GetIsAssistantByCellphone(userName);
+                                if (isAssistant) {
+                                    swal({
+                                        title: "ברוכים הבאים\nمرحبا بك\nWelcome!",
+                                        type: "success",
+                                        timer: 1000,
+                                        showConfirmButton: false
+                                    });
+                                    GetUserNameByCellphone(userName);
+                                    GENERAL.USER.setIsAssistant(isAssistant);
+                                    setTimeout(function () {
+                                        location.href = "SelectCoordinator.html";
+                                    }, 1002);
+                                }
+                                else {
+                                    swal({
+                                        title: "ברוכים הבאים\nمرحبا بك\nWelcome!",
+                                        type: "success",
+                                        timer: 1000,
+                                        showConfirmButton: false
+                                    });
 
-                                setTimeout(function () {
-                                    location.href = "manageRidePats.html";
-                                }, 1001);
-                                GetUserNameByCellphone(userName);
-                                GENERAL.USER.setUserName(userName);
-                                GetDatabaseType();
-                               // getUserType(userName);
+                                    setTimeout(function () {
+                                        location.href = "manageRidePats.html";
+                                    }, 1001);
+                                    GetUserNameByCellphone(userName);
+                                    GENERAL.USER.setUserName(userName);
+                                    GENERAL.USER.setIsAssistant(isAssistant);
+                                    // getUserType(userName);
+                                }
                             }
                             else {
                                 swal({
@@ -251,26 +268,66 @@
                 },
 
             });
-
-            function GetUserNameByCellphone(userName)
-            {
+            function GetIsAssistantByCellphone(userName) {
                 $.ajax({
                     dataType: "json",
-                    url: "WebService.asmx/GetUserNameByCellphone",
+                    url: "WebService.asmx/GetIsAssistantByCellphone",
                     contentType: "application/json; charset=utf-8",
                     type: "POST",
                     async: false,
-                    data: JSON.stringify({ uName: userName}),
+                    data: JSON.stringify({ uName: userName }),
                     success: function (data) {
                         var userInDB = JSON.parse(data.d);
-                        if (userInDB != "") {
-                            GENERAL.USER.setUserDisplayName(userInDB);
-                        }
+                        isAssistant = userInDB;
                     },
                     error: function (err) {
-                        alert("Error in finding user by cellphone: " + err.responseText);
+                        alert("Error in finding is assistant by cellphone: " + err.responseText);
+                        isAssistant = false;
                     }
                 });
+            }
+            function GetUserNameByCellphone(userName)
+            {
+                if(isAssistant){
+                      $.ajax({
+                        dataType: "json",
+                        url: "WebService.asmx/GetUserEnglishNameByCellphone",
+                        contentType: "application/json; charset=utf-8",
+                        type: "POST",
+                        async: false,
+                        data: JSON.stringify({ uName: userName}),
+                        success: function (data) {
+                            var userInDB = JSON.parse(data.d);
+                            console.log(userInDB)
+                            if (userInDB != "") {
+                                GENERAL.USER.setAsistantDisplayName(userInDB);
+                            }
+                        },
+                        error: function (err) {
+                            alert("Error in finding user by cellphone: " + err.responseText);
+                        }
+                    });
+                }
+                else{
+                    $.ajax({
+                        dataType: "json",
+                        url: "WebService.asmx/GetUserNameByCellphone",
+                        contentType: "application/json; charset=utf-8",
+                        type: "POST",
+                        async: false,
+                        data: JSON.stringify({ uName: userName}),
+                        success: function (data) {
+                            var userInDB = JSON.parse(data.d);
+                            console.log(userInDB)
+                            if (userInDB != "") {
+                                GENERAL.USER.setUserDisplayName(userInDB);
+                            }
+                        },
+                        error: function (err) {
+                            alert("Error in finding user by cellphone: " + err.responseText);
+                        }
+                    });
+                }
             }
         });
 

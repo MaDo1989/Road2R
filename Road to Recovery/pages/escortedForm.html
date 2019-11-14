@@ -139,14 +139,10 @@
                     // $('<option>', { value: "", text: "בחר " }).appendTo($select);
 
                     for (i in ContactType) {
-<<<<<<< Updated upstream
-                        $('<option>', { value: ContactType[i], text: ContactType[i] }).appendTo($select);
-=======
                         //<option value="אנונימי">Anonymous</option>
                         if (ContactType[i].DisplayName!=="אנונימי") {
                             $('<option>', { value: ContactType[i].DisplayName, text: ContactType[i].EnglishName }).appendTo($select);
                         }
->>>>>>> Stashed changes
                     }
                 },
                 error: function (err) { alert("Error in getContactType: " + err.responseText); }
@@ -252,11 +248,6 @@
         //}
 
         function loadPage() {
-            //generate select options
-            //generatePaymentType();
-            var userName = GENERAL.USER.getUserDisplayName();
-            $("#userName").html(userName);
-
             if (JSON.parse(GENERAL.ESCORTED.getEscortedList()).length != 0) {
                 arr_customer = JSON.parse(GENERAL.ESCORTED.getEscortedList());
                 $("#patientDisplayName").attr('disabled', 'disabled');
@@ -285,7 +276,7 @@
                     generateCities();
                     generateContactType();
                     arr_pat = JSON.parse(GENERAL.PATIENTS.getPatientsList());
-                    uploadDataNew(arr_pat.DisplayName);
+                    uploadDataNew(arr_pat.EnglishName);
                     //initializeSelect2();
                     $("#activeescorted").prop('checked', 'checked');
                 }
@@ -329,9 +320,12 @@
 
                     if (escorted.Gender == "זכר") {
                         $("#gender").val("מְלַוֶּה");
+            
+                        $("#gender").text("Male");
                     }
                     else if (escorted.Gender == "נקבה") {
-                        $("#gender").val("מְלַוֶּה")
+                        $("#gender").val("מְלַוֶּה");
+                        $("#gender").text("Female");
                     }
                     else $("#gender").val(escorted.Gender);
 
@@ -351,8 +345,9 @@
         }
 
         function returnPatient() {
-            var displayNamePat = $("#patientDisplayName").val();
-            arr_details = { displayName: displayNamePat, func: "show" };
+           // var displayNamePat = $("#patientDisplayName").val();
+            arr_pat = JSON.parse(GENERAL.PATIENTS.getPatientsList());
+            arr_details = { displayName: arr_pat.DisplayName, func: "show" };
             GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
             location.href = "patientForm.html"
         }
@@ -404,9 +399,9 @@
 
                         <!--Search-->
                         <!--<form role="search" class="navbar-right app-search pull-right hidden-xs">
-        <input type="text" placeholder="חיפוש..." class="form-control app-search-input">
-        <a href=""><i class="fa fa-search"></i></a>
-    </form>-->
+                        <input type="text" placeholder="חיפוש..." class="form-control app-search-input">
+                        <a href=""><i class="fa fa-search"></i></a>
+                    </form>-->
                     </div>
                     <!--/.nav-collapse -->
                 </div>
@@ -414,7 +409,7 @@
         </div>
         <!-- Top Bar End -->
         <!-- ========== Right Sidebar Start ========== -->
-        <div w3-include-html="menu.html"></div>
+        <div id="menuType"></div>
         <!-- Right Sidebar End -->
         <!-- ============================================================== -->
         <!-- Start page Content here -->
@@ -441,7 +436,7 @@
                                 <div class="card-box">
                                     <div class="row">
                                         <h4 class="m-t-0 header-title"><b>טופס מלווה</b></h4>
-                                        <p class="text-muted font-13 m-b-30">
+                                        <p data-toggle="tooltip" title="Company Details تفاصيل المرافق" data-placement="bottom" class="text-muted font-13 m-b-30">
                                             יצירת, צפייה ועריכת מלווה. לחץ על כפתור חזור בכדי לצפות בכל החולים.
                                         </p>
                                         <div class="row m-l-10 m-r-10">
@@ -449,20 +444,20 @@
                                                 <br />
                                                 <div class="col-md-6 checkbox checkbox-primary text-left">
                                                     <input id="activeescorted" type="checkbox">
-                                                    <label for="activeescorted">
+                                                    <label data-toggle="tooltip" title="مرافق فعال   Active Company" for="activeescorted">
                                                         מלווה פעיל
                                                     </label>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="text-right m-b-30 m-r-15">
-                                            <button type="button" onclick="returnPatient()" class="btn btn-default waves-effect w-md m-b-5"><i class="ti-back-right m-r-5"></i>חזרה</button>
+                                            <button data-toggle="tooltip" title="Back" type="button" onclick="returnPatient()" class="btn btn-default waves-effect w-md m-b-5"><i class="ti-back-right m-r-5"></i>&nbsp; Back</button>
                                         </div>
-                                        <p class="required">* שדה חובה</p>
+                                        <p data-toggle="tooltip" title="حقل اجباري Must field" class="required">* שדה חובה</p>
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">חולה</label>
+                                                    <label data-toggle="tooltip" title="اسم  Patient full name" class="col-sm-3 control-label">חולה</label>
                                                     <div class="col-sm-6">
                                                         <input id="patientDisplayName" name="patientDisplayName" type="text" class="form-control">
                                                     </div>
@@ -472,7 +467,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">שם פרטי&nbsp;<span class="required">*</span></label>
+                                                    <label data-toggle="tooltip" title="اسم شخصي First Name" class="col-sm-3 control-label">שם פרטי&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="escortedFirstName" name="escortedFirstName" type="text" class="form-control">
                                                     </div>
@@ -480,7 +475,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">שם משפחה&nbsp;<span class="required">*</span></label>
+                                                    <label data-toggle="tooltip" title="اسم العائلة  Last Name" class="col-sm-3 control-label">שם משפחה&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="escortedLastName" name="escortedLastName" type="text" class="form-control">
                                                     </div>
@@ -490,7 +485,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">שם באנגלית&nbsp;<span class="required">*</span></label>
+                                                    <label data-toggle="tooltip" title="اسم  name in english" class="col-sm-3 control-label">שם באנגלית&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="patientEnglishName" name="patientEnglishName" type="text" class="form-control">
                                                     </div>
@@ -518,7 +513,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">טלפון ראשי&nbsp;<span class="required">*</span></label>
+                                                    <label data-toggle="tooltip" title="هاتف رئيسي  Main Phone" class="col-sm-3 control-label">טלפון ראשי&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input dir="ltr" id="phone1" name="phone1" type="text" class="form-control" placeholder="0xxxxxxxxx או 0xxxxxxxx">
                                                     </div>
@@ -526,7 +521,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">טלפון 2</label>
+                                                    <label data-toggle="tooltip" title="هاتف اضافي  Telephone 2" class="col-sm-3 control-label">טלפון 2</label>
                                                     <div class="col-sm-6">
                                                         <input dir="ltr" id="phone2" name="phone2" type="text" class="form-control" placeholder="0xxxxxxxxx או 0xxxxxxxx">
                                                     </div>
@@ -536,7 +531,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">טלפון נוסף</label>
+                                                    <label data-toggle="tooltip" title="هاتف إضافي  Additional Phone" class="col-sm-3 control-label">טלפון נוסף</label>
                                                     <div class="col-sm-6">
                                                         <input dir="ltr" id="HomePhone" name="HomePhone" type="text" class="form-control" placeholder="0xxxxxxxxx או 0xxxxxxxx">
                                                     </div>
@@ -546,7 +541,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-3 control-label">יישוב&nbsp;</label>
+                                                    <label data-toggle="tooltip" title="بلد   City / Village" class="col-sm-3 control-label">יישוב&nbsp;</label>
                                                     <div class="col-sm-6">
                                                         <input id="city" name="city" type="text" class="form-control">
                                                     </div>
@@ -556,32 +551,19 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-<<<<<<< Updated upstream
-                                                    <label class="col-sm-3 control-label">מגדר&nbsp;<span class="required">*</span></label>
-                                                    <div class="col-sm-6" id="selectgender">
-                                                        <select id="gender" name="gender" class="form-control">
-                                                            <option>בחר</option>
-                                                            <option>מְלַוֶּה</option>
-                                                            <option>מְלַוֶּה</option>
-=======
                                                     <label data-toggle="tooltip" title="جنس   Gender" class="col-sm-3 control-label">מגדר&nbsp;</label>
                                                     <div class="col-sm-6" id="selectgender">
                                                         <select id="gender" name="gender" class="form-control">
                                                             <option value="Unknown">Unknown</option>
                                                             <option value="מְלַוֶּה">Male</option>
                                                             <option value="מְלַוֶּה">Female</option>
->>>>>>> Stashed changes
                                                         </select>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-<<<<<<< Updated upstream
-                                                    <label class="col-sm-3 control-label">סוג קרבה&nbsp;<span class="required">*</span></label>
-=======
                                                     <label data-toggle="tooltip" title="نوع القرابة   Relation Type" class="col-sm-3 control-label">סוג קרבה&nbsp;</label>
->>>>>>> Stashed changes
                                                     <div class="col-sm-6" id="selectcontactType">
                                                         <select id="contactType" name="contactType" class="form-control">
                                                             <option value="אנונימי">Anonymous</option>
@@ -594,9 +576,9 @@
                                         <div id="addressesForm">
                                             <hr />
                                             <!--<table id="jqGrid" class="table table-striped table-bordered text-right"></table>
-        <div id="jqGridPager"></div>-->
+                                        <div id="jqGridPager"></div>-->
                                             <div class="text-right m-t-30 row">
-                                                <button type="submit" id="saveCustomer" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-save m-r-5"></i>שמירה</button>
+                                                <button data-toggle="tooltip" title="حفظ   Save" type="submit" id="saveCustomer" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-save m-r-5"></i>&nbsp; Save</button>
                                             </div>
                                         </div>
                                     </div>
@@ -626,9 +608,25 @@
     <!--Validators-->
     <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
     <script>
+        var isAssistant = JSON.parse(GENERAL.USER.getIsAssistant());
         $(document).ready(function () {
-
+            console.log(isAssistant);
+            var assistantName = "";
+            if(isAssistant){
+                $("#menuType").attr("w3-include-html","HelperMenu.html");
+                var coorAssistant = GENERAL.USER.getCoorAssistant();
+                assistantName = GENERAL.USER.getAsistantDisplayName();
+            }
+            else $("#menuType").attr("w3-include-html","menu.html");
             includeHTML();
+            if(isAssistant){
+                var userName = GENERAL.USER.getAsistantAndCoorDisplayName();
+                $("#userName").html(userName);
+            }
+            else{
+                var userName = GENERAL.USER.getUserDisplayName();
+                $("#userName").html(userName);
+            }
             if (window.location.hostname.toString() == 'localhost' || window.location.pathname.indexOf('test') != -1) {
                 $("#na").css("background-color", "#ffde89");
             }
@@ -650,12 +648,12 @@
                 // Rules for form validation
                 rules: {
 
-                    escortedFirstName: {
-                        required: true
-                    },
-                    escortedLastName: {
-                        required: true
-                    },
+                    //escortedFirstName: {
+                    //    required: true
+                    //},
+                    //escortedLastName: {
+                    //    required: true
+                    //},
                     phone1: {
                         required: true
                     },
@@ -747,12 +745,12 @@
 
                 // Messages for form validation
                 messages: {
-                    escortedFirstName: {
-                        required: "יש להכניס שם פרטי"
-                    },
-                    escortedLastName: {
-                        required: "יש להכניס שם משפחה"
-                    },
+                    //escortedFirstName: {
+                    //    required: "יש להכניס שם פרטי"
+                    //},
+                    //escortedLastName: {
+                    //    required: "יש להכניס שם משפחה"
+                    //},
                     phone1: {
                         required: "יש להכניס טלפון ראשי"
                     },
@@ -776,10 +774,43 @@
             var gender = true;
             var relationship = true;
             var isEnglishName = true;
-
+            var firstName = $("#escortedFirstName").val();
+            var lastName = $("#escortedLastName").val();
+            var name = true;
+            if (!isAssistant) {
+                if (firstName === "") {
+                    swal(
+                        "שגיאה\nخطأ",
+                        "Enter escort first name",
+                        "warning"
+                    );
+                    name = false;
+                }
+                if (lastName === "") {
+                    swal(
+                        "שגיאה\nخطأ",
+                        "Enter escort last name",
+                        "warning"
+                    );
+                    name = false;
+                }
+            }
             var englishName = $("#patientEnglishName").val();
-            if (englishName=="") {
+            if (englishName == "") {
+                swal(
+                    "שגיאה\nخطأ",
+                    "Enter escort english name",
+                    "warning"
+                );
                 isEnglishName = false;
+            }
+            else {
+                if (isAssistant) {
+                    if (firstName === "" && lastName === "") {
+                        $("#escortedFirstName").val(englishName);
+                        $("#escortedLastName").val(" ");
+                    }
+                }
             }
             var city = $("#city").val();
             for (i in cities) {
@@ -862,7 +893,7 @@
             //}
 
 
-            if (!isEnglishName || !CityExists || !phoneMatch || !phoneMatch2 || !phoneMatch3 || !gender || !relationship) {
+            if (!name || !isEnglishName || !CityExists || !phoneMatch || !phoneMatch2 || !phoneMatch3 || !gender || !relationship) {
                 return false;
             } else return true;
         }
@@ -938,33 +969,6 @@
                         },
                         editrules: { custom: true, custom_func: checkCity }
                     },
-                    //{
-                    //    label: 'עיר',
-                    //    name: 'City',
-                    //    width: "10%",
-                    //    editable: true,
-                    //    edittype: "select",
-                    //    editoptions: {
-                    //        dataUrl: "WebService.asmx/getCities",
-                    //        buildSelect: function (data) {
-                    //            var retValue = $.parseJSON(data);
-                    //            var arr_cities = $.parseJSON(retValue.d);
-                    //            var select = "<select>";
-                    //            select += "<option value='-1' selected='' disabled=''>בחר</option>";
-
-                    //            if (arr_cities && arr_cities.length) {
-                    //                for (i in arr_cities) {
-                    //                    select += "<option value='" + arr_cities[i].CityID + "'>" + arr_cities[i].CityName + "</option>";
-                    //                }
-                    //            }
-                    //            select += "</select>";
-                    //            return select;
-                    //        }
-
-                    //    },
-                    //    editrules: { custom: true, custom_func: checkCity }
-
-                    //},
                     {
                         label: 'יעד סיום',
                         name: 'Street',
@@ -991,12 +995,6 @@
                         width: "10%",
                         editable: true
                     },
-                    //{
-                    //    label: 'הערות',
-                    //    name: 'Comments',
-                    //    width: "15%",
-                    //    editable: true
-                    //}
                 ],
 
                 sortname: 'City',
@@ -1013,21 +1011,6 @@
                 arr_customer = JSON.parse(GENERAL.ESCORTED.getEscortedList());
                 if (arr_customer.func != "show") {
 
-                    //$('#jqGrid').navGrid("#jqGridPager", { edit: false, add: false, del: true, refresh: false, view: false, position: "left", cloneToTop: true });
-                    //$('#jqGrid').inlineNav('#jqGridPager',
-                    //    // the buttons to appear on the toolbar of the grid
-                    //    {
-                    //        edit: true,
-                    //        add: true,
-                    //        del: true,
-                    //        cancel: false,
-                    //        addParams: {
-                    //            addRowParams: {
-                    //                oneditfunc: function () { addRowCount += 1; }
-                    //            }
-
-                    //        }
-                    //    });
                 }
             }
             loadPage();

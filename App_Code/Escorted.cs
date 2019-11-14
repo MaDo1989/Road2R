@@ -314,16 +314,18 @@ public class Escorted
         db.ExecuteQuery(query, cmd.CommandType, cmdParams);
     }
 
-    public List<string> getContactType()
+    public List<Escorted> getContactType()
     {
-        List<string> cl = new List<string>();
-        string query = "select Name from ContactType";
+        List<Escorted> cl = new List<Escorted>();
+        string query = "select Name,EnglishName from ContactType";
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
-            ContactType = dr["Name"].ToString();
-            cl.Add(ContactType);
+            Escorted e = new Escorted();
+            e.DisplayName = dr["Name"].ToString();
+            e.EnglishName = dr["EnglishName"].ToString();
+            cl.Add(e);
         }
         return cl;
     }

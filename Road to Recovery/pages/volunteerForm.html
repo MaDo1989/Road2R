@@ -208,6 +208,7 @@
                         $("#preferRoute1").attr('disabled', 'disabled');
                         $("#address").attr('disabled', 'disabled');
                         $("#gender").attr('disabled', 'disabled');
+                        $("#volunteerEnglishName").attr('disabled', 'disabled');
                         // $("#birthDate").attr('disabled', 'disabled');
                         $("#addAddress").attr('disabled', 'disabled');
                         $("#saveCustomer").attr('disabled', 'disabled');
@@ -272,6 +273,7 @@
                     $("#volunteerName").val(volunteer.DisplayName);
                     $("#volunteerFirstName").val(volunteer.FirstNameH);
                     $("#volunteerLastName").val(volunteer.LastNameH);
+                    $("#volunteerEnglishName").val(volunteer.EnglishName);
                     $("#firstA").val(volunteer.FirstNameA);
                     $("#lastA").val(volunteer.LastNameA);
                     var temp = volunteer.JoinDate.substring(volunteer.JoinDate.indexOf("(") + 1, volunteer.JoinDate.indexOf(")"))
@@ -399,7 +401,7 @@
                                     <div class="row">
                                         <h4 class="m-t-0 header-title"><b>פרטי מתנדב</b></h4>
                                         <!--<p class="text-muted font-13 m-b-30">
-                                            יצירת, צפייה ועריכת מתנדב. לחץ על כפתור חזרה בכדי לצפות בכל הלקוחות.-->
+        יצירת, צפייה ועריכת מתנדב. לחץ על כפתור חזרה בכדי לצפות בכל הלקוחות.-->
                                         <br />
 
                                         <div class="col-md-6 checkbox checkbox-primary text-left">
@@ -426,6 +428,16 @@
                                                     <label class="col-sm-2 control-label">שם משפחה&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="volunteerLastName" name="volunteerLastName" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">שם באנגלית&nbsp;<span class="required">*</span></label>
+                                                    <div class="col-sm-6">
+                                                        <input id="volunteerEnglishName" name="patientEnglishName" type="text" class="form-control">
                                                     </div>
                                                 </div>
                                             </div>
@@ -554,8 +566,8 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">תאריך הצטרפות </label>
                                                     <!--<div class="col-sm-6">
-                                                        <input id="joinDate" name="joinDate" type="text" placeholder="dd/mm/yyyy" class="form-control">
-                                                    </div>-->
+                    <input id="joinDate" name="joinDate" type="text" placeholder="dd/mm/yyyy" class="form-control">
+                </div>-->
                                                     <div class="col-sm-6">
                                                         <input type="date" id="joinDate" placeholder="dd/mm/yyyy" class="form-control">
                                                     </div>
@@ -673,11 +685,16 @@
 
                     var firstNameH = $("#volunteerFirstName").val();
                     var lastNameH = $("#volunteerLastName").val();
+                    var englishName = $("#volunteerEnglishName").val();
                     var cellPhone = $("#phone1").val();
                     cellPhone = cellPhone.replace(/-/g, '');
                     cellPhone = cellPhone.replace(/ /g, '');
                     var email = $("#email").val();
                     var typeVol = $("#typeVolunteer").val();
+                    var isHelper = false;
+                    if (typeVol.indexOf('עוזר') !== -1) {
+                        isHelper = true;
+                    }
                     var city = $("#city").val();
                     var gender = $("#gender").val();
                     var cellphone2 = $("#phone2").val();
@@ -715,7 +732,7 @@
                     volunteer = {
                         firstNameH: firstNameH, firstNameA: nameA, lastNameH: lastNameH, lastNameA: lastNameA, cellPhone: cellPhone, cellphone2: cellphone2, /*homePhone: homePhone,*/
                         city: city, address: address, email: email, joinDate: joinDate, gender: gender, KnowsArabic: knowsArabic,
-                        typeVol: typeVol, IsActive: active, Remarks: remark, DisplayName: displayName //birthdate: bdate,
+                        typeVol: typeVol, IsActive: active, Remarks: remark, DisplayName: displayName, EnglishName: englishName, IsAssistant:isHelper //birthdate: bdate,
                     }
                     $.ajax({
                         dataType: "json",
@@ -792,9 +809,20 @@
             var volType = true;
             var gender = true;
             var city = $("#city").val();
+            englishNameExists = true;
+            var englishName = $("#volunteerEnglishName").val();
 
+            if(englishName==""){
+                englishNameExists = false;
+                swal(
+                    "שגיאה",
+                    "חסר שם מתנדב/ת באנגלית",
+                    "warning"
+                );
+            }
             if (city == "") {
                 CityExists = true;
+                
             }
             if (!CityExists) {
                 for (i in cities) {
@@ -885,7 +913,7 @@
             } else phoneMatch3 = true;
 
 
-            if (!CityExists || !volType || !gender || !phoneMatch || !phoneMatch2 || !phoneMatch3) { //|| !jdateMatch
+            if (!englishNameExists || !CityExists || !volType || !gender || !phoneMatch || !phoneMatch2 || !phoneMatch3) { //|| !jdateMatch
                 return false;
             } else return true;
         }

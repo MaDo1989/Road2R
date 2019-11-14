@@ -65,6 +65,7 @@
         $(document).ready(function () {
 
             includeHTML();
+            $('[data-toggle="tooltip"]').tooltip();
             if (window.location.hostname.toString() == 'localhost' || window.location.pathname.indexOf('test') != -1) {
                 $("#na").css("background-color", "#ffde89");
             }
@@ -190,7 +191,7 @@
                     var z = ((x < y) ? -1 : ((x > y) ? 1 : 0));
                     return z;
                 },
-
+        
                 "de_date-desc": function (a, b) {
                     var x, y;
                     if (jQuery.trim(a) !== '') {
@@ -687,20 +688,20 @@
                                     </div>
 
                                     <div class="col-sm-4 text-right ">
-                                        <button type="button" id="createCustomer" onclick="newRidePatForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>חדש</button>
+                                        <button data-toggle="tooltip" title="جديد  New Ride" type="button" id="createCustomer" onclick="newRidePatForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>חדש</button>
                                     </div>
                                 </div>
                                 <table id="datatable-buttons" class="table table-striped table-bordered">
                                     <thead>
                                         <tr>
                                             <!--<th>מספר הסעה</th>-->
-                                            <th data-toggle="tooltip"  title="المريض Patient">החולה</th>
-                                            <th data-toggle="tooltip" title="نقطة الانطلاق Origin">מוצא</th>
-                                            <th data-toggle="tooltip" title="نقطة الوصول Destination">יעד</th>
-                                            <th data-toggle="tooltip" title="التاريخ والساعة Date & Time">תאריך ושעה</th>
-                                            <th data-toggle="tooltip" title="السائقين بالفرة Drivers">נהגים בנסיעה</th>
-                                            <th data-toggle="tooltip" title="مركز Coordinator">רכז</th>
-                                            <th data-toggle="tooltip" title="التاريخ Actions">פעולות</th>
+                                            <th title="المريض Patient">החולה</th>
+                                            <th title="نقطة الانطلاق Origin">מוצא</th>
+                                            <th title="نقطة الوصول Destination">יעד</th>
+                                            <th title="التاريخ والساعة Date & Time">תאריך ושעה</th>
+                                            <th title="السائقين بالفرة Drivers">נהגים בנסיעה</th>
+                                            <th title="مركز Coordinator">רכז</th>
+                                            <th title="التاريخ Actions">פעולות</th>
                                             <!--<th style="visibility:hidden;">האם אנונימי</th>-->
                                         </tr>
 

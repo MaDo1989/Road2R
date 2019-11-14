@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -77,7 +78,7 @@ public class Patient
         }
         return p.Equipment;
     }
-    
+
 
     public string FirstNameH
     {
@@ -538,6 +539,9 @@ public class Patient
     public List<Patient> getPatientsList(bool active)
     {
         #region DB functions
+        Location tmp = new Location();
+        Hashtable locations = tmp.getLocationsEnglishName();
+
         string query = "select * from PatientsAndEquipmentView";
         if (active)
         {
@@ -558,44 +562,70 @@ public class Patient
             //new patient from view (patients in this view repeat themselves)
             if (tempID != int.Parse(dr["Id"].ToString()))
             {
-                //the first patient is null so we don't add him/her
-                if (tempID != 0)
+                try
                 {
-                    //adding the last patient to the list.
-                    list.Add(p);
-                    p = new Patient();
-                }
-                p.Id = int.Parse(dr["Id"].ToString());
-                p.IsAnonymous = dr["IsAnonymous"].ToString();
-                p.NumberOfEscort = dr["NumberOfEscort"].ToString();
-                p.DisplayName = dr["DisplayName"].ToString();
-                p.DisplayNameA = dr["DisplayNameA"].ToString();
-                p.FirstNameA = dr["FirstNameA"].ToString();
-                p.FirstNameH = dr["FirstNameH"].ToString();
-                p.LastNameH = dr["LastNameH"].ToString();
-                p.LastNameA = dr["LastNameA"].ToString();
-                p.CellPhone = dr["CellPhone"].ToString();
-                p.CellPhone1 = dr["CellPhone2"].ToString();
-                p.HomePhone = dr["HomePhone"].ToString();
-                p.City = dr["CityCityName"].ToString();
-                p.LivingArea = dr["LivingArea"].ToString();
-                p.IsActive = Convert.ToBoolean(dr["IsACtive"].ToString());
-                p.BirthDate = dr["BirthDate"].ToString();
-                p.History = dr["History"].ToString();
-                p.Department = dr["Department"].ToString();
-                p.Barrier = new Location(dr["Barrier"].ToString());
-                p.Hospital = new Location(dr["Hospital"].ToString());
-                p.Gender = dr["Gender"].ToString();
-                p.Remarks = dr["Remarks"].ToString();
-                p.EnglishName = dr["EnglishName"].ToString();
-                el = new List<string>();
-            }
-            //get equipment for patient from the same view
-            string e = dr["EquipmentName"].ToString();
-            el.Add(e);
-            p.Equipment = el;
+                    //the first patient is null so we don't add him/her
+                    if (tempID != 0)
+                    {
+                        //adding the last patient to the list.
+                        list.Add(p);
+                        p = new Patient();
+                    }
+                    p.Id = int.Parse(dr["Id"].ToString());
+                    p.IsAnonymous = dr["IsAnonymous"].ToString();
+                    p.NumberOfEscort = dr["NumberOfEscort"].ToString();
+                    p.DisplayName = dr["DisplayName"].ToString();
+                    p.DisplayNameA = dr["DisplayNameA"].ToString();
+                    p.FirstNameA = dr["FirstNameA"].ToString();
+                    p.FirstNameH = dr["FirstNameH"].ToString();
+                    p.LastNameH = dr["LastNameH"].ToString();
+                    p.LastNameA = dr["LastNameA"].ToString();
+                    p.CellPhone = dr["CellPhone"].ToString();
+                    p.CellPhone1 = dr["CellPhone2"].ToString();
+                    p.HomePhone = dr["HomePhone"].ToString();
+                    p.City = dr["CityCityName"].ToString();
+                    p.LivingArea = dr["LivingArea"].ToString();
+                    p.IsActive = Convert.ToBoolean(dr["IsACtive"].ToString());
+                    p.BirthDate = dr["BirthDate"].ToString();
+                    p.History = dr["History"].ToString();
+                    p.Department = dr["Department"].ToString();
+                    if (dr["PatientIdentity"].ToString()=="")
+                    {
+                        p.PatientIdentity = 0;
+                    }
+                    else p.PatientIdentity = int.Parse(dr["PatientIdentity"].ToString());
+                    string barrier = dr["Barrier"].ToString();
+                    p.Barrier = new Location(barrier);
+                    if (locations[barrier] != null)
+                    {
+                        p.Barrier.EnglishName = locations[barrier].ToString();
+                    }
+                    else p.Barrier.EnglishName = "";
+                    string hospital = dr["Hospital"].ToString();
+                    p.Hospital = new Location();
+                    p.Hospital.Name = hospital;
+                    if (locations[hospital] != null)
+                    {
+                        p.Hospital.EnglishName = locations[hospital].ToString();
+                    }
+                    else p.Hospital.EnglishName = "";
+                    p.Gender = dr["Gender"].ToString();
+                    p.Remarks = dr["Remarks"].ToString();
+                    p.EnglishName = dr["EnglishName"].ToString();
+                    el = new List<string>();
+                    //get equipment for patient from the same view
+                    string e = dr["EquipmentName"].ToString();
+                    el.Add(e);
+                    p.Equipment = el;
 
-            tempID = int.Parse(dr["Id"].ToString());
+                    tempID = int.Parse(dr["Id"].ToString());
+                }
+                catch (Exception ex)
+                {
+
+                    throw;
+                }
+            }
         }
         #endregion
         list.Add(p);
@@ -603,10 +633,10 @@ public class Patient
     }
 
     //this function is for generating patients after anonymous patient is set. only patients with same locations will be assingned.
-    public List<Patient> getAnonymousPatientsList(bool active,string origin,string dest)
+    public List<Patient> getAnonymousPatientsList(bool active, string origin, string dest)
     {
         #region DB functions
-        string query = "select * from Patient where Barrier = N'" + origin + "' and Hospital = N'" +dest +"' OR Barrier = N'"+dest+"' and Hospital = N'"+origin+"'";
+        string query = "select * from Patient where Barrier = N'" + origin + "' and Hospital = N'" + dest + "' OR Barrier = N'" + dest + "' and Hospital = N'" + origin + "'";
         if (active)
         {
             query += " and IsActive = 'true'";
@@ -656,11 +686,139 @@ public class Patient
             //set equipment
             List<string> el = new List<string>();
             db = new DbService();
-            SqlCommand cmd= new SqlCommand();
+            SqlCommand cmd = new SqlCommand();
             cmd.Parameters.AddWithValue("@displayName", p.DisplayName);
             cmd.CommandType = CommandType.Text;
             query = "select EquipmentName from EquipmentForPatientView where PatientName=@displayName";
-            DataSet ds2 = db.GetDataSetByQuery(query,false,cmd.CommandType,cmd.Parameters[0]);
+            DataSet ds2 = db.GetDataSetByQuery(query,true, cmd.CommandType, cmd.Parameters[0]);
+            foreach (DataRow row in ds2.Tables[0].Rows)
+            {
+                string e = row["EquipmentName"].ToString();
+                el.Add(e);
+            }
+            p.Equipment = el;
+
+            list.Add(p);
+        }
+        #endregion
+
+        return list;
+    }
+    public List<string> GetAreasForCenter()
+    {
+        string areaName = "מרכז";
+        List<string> locations = new List<string>();
+        string query = "select * from Location where Area=N'"+areaName+"'";
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+            locations.Add(dr["Name"].ToString());
+        }
+
+        return locations;
+    }
+    public List<Patient> getAnonymousPatientsListForCenterPoints(bool active, string origin, string dest)
+    {
+        #region DB functions
+
+        List<string> centerLocations = GetAreasForCenter();
+        string query = "";
+        string text = "";
+        for (int i = 0; i < centerLocations.Count; i++)
+        {
+            text = centerLocations[i].Replace("'", "''");
+            if (i == 0)
+            {
+                query = "select * from Patient where ((Barrier = N'" + text + "' OR ";
+            }
+            if (i == centerLocations.Count - 1)
+            {
+                query += "Barrier = N'" + text + "') and Hospital = N'" + dest + "') OR ((Hospital = N'" + text + "' OR ";
+            }
+            else query += "Barrier = N'" + text + "' OR ";
+        }
+        for (int i = 0; i < centerLocations.Count; i++)
+        {
+            text = centerLocations[i].Replace("'", "''");
+            if (i == centerLocations.Count - 1)
+            {
+                query += "Hospital = N'" + text + "') and Barrier = N'" + origin + "') OR ((Hospital = N'" + text + "' OR ";
+            }
+            else query += "Hospital = N'" + text + "' OR ";
+        }
+        for (int i = 0; i < centerLocations.Count; i++)
+        {
+            text = centerLocations[i].Replace("'", "''");
+            if (i == centerLocations.Count - 1)
+            {
+                query += "Hospital = N'" + text + "') and Barrier = N'" + dest + "') OR ((Barrier = N'" + text + "' OR ";
+            }
+            else query += "Hospital = N'" + text + "' OR ";
+        }
+        for (int i = 0; i < centerLocations.Count; i++)
+        {
+            text = centerLocations[i].Replace("'", "''");
+            if (i == centerLocations.Count - 1)
+            {
+                query += "Barrier = N'" + text + "') and Hospital = N'" + origin + "')";
+            }
+            else query += "Barrier = N'" + text + "' OR ";
+        }
+        query += " OR (Barrier = N'" + origin + "' and Hospital = N'" + dest + "') OR (Barrier = N'" + dest + "' and Hospital = N'" + origin + "')";
+        if (active)
+        {
+            query += " and IsActive = 'true'";
+        }
+        query += " order by FirstNameH";
+
+        List<Patient> list = new List<Patient>();
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+            Patient p = new Patient();
+            p.Id = int.Parse(dr["Id"].ToString());
+            p.IsAnonymous = dr["IsAnonymous"].ToString();
+            p.NumberOfEscort = dr["NumberOfEscort"].ToString();
+            p.DisplayName = dr["DisplayName"].ToString();
+            p.DisplayNameA = dr["DisplayNameA"].ToString();
+            p.FirstNameA = dr["FirstNameA"].ToString();
+            p.FirstNameH = dr["FirstNameH"].ToString();
+            p.LastNameH = dr["LastNameH"].ToString();
+            p.LastNameA = dr["LastNameA"].ToString();
+            p.CellPhone = dr["CellPhone"].ToString();
+            p.CellPhone1 = dr["CellPhone2"].ToString();
+            p.HomePhone = dr["HomePhone"].ToString();
+            p.City = dr["CityCityName"].ToString();
+            p.LivingArea = dr["LivingArea"].ToString();
+            //p.Status = dr["statusPatient"].ToString();
+            p.IsActive = Convert.ToBoolean(dr["IsACtive"].ToString());
+            //p.Addition = dr["addition"].ToString();
+
+            p.BirthDate = dr["BirthDate"].ToString();
+            p.History = dr["History"].ToString();
+            p.Department = dr["Department"].ToString();
+            p.Barrier = new Location(dr["Barrier"].ToString());
+            p.Hospital = new Location(dr["Hospital"].ToString());
+            p.Gender = dr["Gender"].ToString();
+            p.Remarks = dr["Remarks"].ToString();
+            p.EnglishName = dr["EnglishName"].ToString();
+            if (dr["PatientIdentity"].ToString() == "")
+            {
+                p.PatientIdentity = 0;
+            }
+            else p.PatientIdentity = int.Parse(dr["PatientIdentity"].ToString());
+
+            //set equipment
+            List<string> el = new List<string>();
+            db = new DbService();
+            SqlCommand cmd = new SqlCommand();
+            cmd.Parameters.AddWithValue("@displayName", p.DisplayName);
+            cmd.CommandType = CommandType.Text;
+            query = "select EquipmentName from EquipmentForPatientView where PatientName=@displayName";
+            DataSet ds2 = db.GetDataSetByQuery(query, true, cmd.CommandType, cmd.Parameters[0]);
             foreach (DataRow row in ds2.Tables[0].Rows)
             {
                 string e = row["EquipmentName"].ToString();
@@ -859,7 +1017,7 @@ public class Patient
             e.CellPhone2 = dr["CellPhone2"].ToString();
             e.HomePhone = dr["HomePhone"].ToString();
             e.IsActive = Convert.ToBoolean(dr["IsActive"].ToString());
-           // e.ContactType = dr["ContactType"].ToString();
+            // e.ContactType = dr["ContactType"].ToString();
             e.Gender = dr["Gender"].ToString();
             e.City = dr["City"].ToString();
             e.ContactType = dr["Relationship"].ToString();

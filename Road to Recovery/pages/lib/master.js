@@ -8,12 +8,29 @@ var GENERAL = {
         setUserName: function (userName) {
             localStorage.user = userName;
         },
-
+        getIsAssistant: function () {
+            return localStorage.isAssistant;
+        },
+        setIsAssistant: function (isAssistant) {
+            localStorage.isAssistant = isAssistant;
+        },
         getUserDisplayName: function () {
             return localStorage.userCell;
         },
         setUserDisplayName: function (userCell) {
             localStorage.userCell = userCell;
+        },
+        getAsistantDisplayName: function () {
+            return localStorage.assistantCell;
+        },
+        setAsistantDisplayName: function (assistantCell) {
+            localStorage.assistantCell = assistantCell;
+        },
+        getAsistantAndCoorDisplayName: function () {
+            return localStorage.coorAndAssistant;
+        },
+        setAsistantAndCoorDisplayName: function (names) {
+            localStorage.coorAndAssistant = names;
         },
         getPassword: function () {
             return localStorage.password;
@@ -26,8 +43,13 @@ var GENERAL = {
         },
         setUserType: function (userType) {
             localStorage.userType = userType;
+        },
+        getCoorAssistant: function () {
+            return localStorage.coorAssistant;
+        },
+        setCoorAssistant: function (coorAssistant) {
+            localStorage.coorAssistant = coorAssistant;
         }
-
     },
 
     VOLUNTEERS: {

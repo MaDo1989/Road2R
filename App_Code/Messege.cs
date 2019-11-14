@@ -486,4 +486,59 @@ public class Message
 
         return 1;
     }
+
+    public void pushFromAssistant(int ridePatID, string cellphone, string msg)
+    {
+        RidePat rp = new RidePat();
+        var abc = rp.GetRidePat(ridePatID);
+
+
+        TimeSpan ts = abc.Date - DateTime.Now;
+
+        // Difference in days.
+        double differenceInDays = ts.TotalDays; // This is in double
+        if (differenceInDays<=2)
+        {
+            Volunteer V = new Volunteer();
+            Volunteer user = V.getVolunteerByCellphone(cellphone);
+            string device = V.getDeviceByID(user.Id);
+
+            int msgID = insertMsg(0, "Change by assistant", "שינוי על ידי עוזר", msg, ridePatID, DateTime.Now, user.Id, "", true, false, false);
+
+            var data = new JObject();
+
+
+            if (device == "iOS")
+            {
+                data = new JObject();
+                //PUSH IOS
+                var notification = new JObject();
+                notification.Add("title", "שינוי ע\"י עוזר");
+                notification.Add("body", msg);
+                data.Add("rideID", ridePatID);
+                data.Add("status", "Assistant change");
+                data.Add("msgID", msgID);
+                data.Add("content-available", 1);
+                //send push
+                myPushNot pushIOS = new myPushNot();
+                pushIOS.RunPushNotificationOne(user, data, notification);
+            }
+            else
+            {
+                data = new JObject();
+                //PUSH ANDROID
+                data.Add("message", msg);
+                data.Add("title", "שינוי ע\"י עוזר");
+                data.Add("rideID", ridePatID);
+                data.Add("status", "Assistant change");
+                data.Add("msgID", msgID);
+                data.Add("content-available", 1);
+                //send push
+                myPushNot pushANDROID = new myPushNot();
+                pushANDROID.RunPushNotificationOne(user, data, null);
+
+            }
+        }
+
+    }
 }

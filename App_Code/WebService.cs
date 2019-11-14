@@ -102,7 +102,24 @@ public class WebService : System.Web.Services.WebService
             throw new Exception("שגיאה בשליפת נתוני נקודות איסוף והורדה");
         }
     }
-
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string getAreas()
+    {
+        try
+        {
+            List<string> areas = new List<string>();
+            Location l = new Location();
+            areas = l.getAreas();
+            JavaScriptSerializer j = new JavaScriptSerializer();
+            return j.Serialize(areas);
+        }
+        catch (Exception e)
+        {
+            Log.Error("Error in getAreas", e);
+            throw new Exception("שגיאה בשליפת אזורים");
+        }
+    }
     [WebMethod]
     public int setVolunteerPrefs(int Id, List<string> PrefLocation, List<string> PrefArea, List<string> PrefTime, int AvailableSeats)
     {
@@ -275,7 +292,23 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
+    [WebMethod]
+    public string getAnonymousPatientsListForCenterPoints(bool active, string origin, string dest)
+    {
+        try
+        {
+            JavaScriptSerializer j = new JavaScriptSerializer();
+            Patient c = new Patient();
+            List<Patient> patientsList = c.getAnonymousPatientsListForCenterPoints(active, origin, dest);
+            return j.Serialize(patientsList);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in getPatientsForAnonymous", ex);
+            throw new Exception("שגיאה בשליפת נתוני חולים");
+        }
 
+    }
     [WebMethod]
     public string getEquipmentForPatient(string patient)
     {
@@ -573,7 +606,7 @@ public class WebService : System.Web.Services.WebService
         {
             JavaScriptSerializer j = new JavaScriptSerializer();
             Escorted e = new Escorted();
-            List<string> cl = e.getContactType();
+            List<Escorted> cl = e.getContactType();
             return j.Serialize(cl);
         }
         catch (Exception ex)
@@ -1170,6 +1203,17 @@ public class WebService : System.Web.Services.WebService
         JavaScriptSerializer j = new JavaScriptSerializer();
         return j.Serialize("ok");
     }
+    [WebMethod]
+    public string pushAssistant(int ridepat,string cellphone, string msg)
+    {
+        
+        Message m = new Message();
+        m.pushFromAssistant(ridepat, cellphone, msg);
+        //Email e = new Email();
+        //e.sendMessage("Assistant change", "עוזר", cellphone, msg);
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        return j.Serialize("ok");
+    }
     #endregion
 
     #region login functions
@@ -1219,6 +1263,60 @@ public class WebService : System.Web.Services.WebService
             throw;
         }
         return j.Serialize(userInDB);
+    }
+    [WebMethod]
+    public string GetUserEnglishNameByCellphone(string uName)
+    {
+        string userInDB;
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        try
+        {
+
+            User u = new User();
+            userInDB = u.getUserEnglishNameByCellphone(uName);
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
+        return j.Serialize(userInDB);
+    }
+    [WebMethod]
+    public string GetIsAssistantByCellphone(string uName)
+    {
+        bool userInDB;
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        try
+        {
+
+            User u = new User();
+            userInDB = u.GetIsAssistantByCellphone(uName);
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
+        return j.Serialize(userInDB);
+    }
+    [WebMethod]
+    public string GetCoordinatorsList()
+    {
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        List<Volunteer> coors;
+        try
+        {
+            Volunteer v = new Volunteer();
+            coors =  v.getCoordinatorsList();
+
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
+        return j.Serialize(coors);
     }
     [WebMethod]
     public void writeLog(string str)
