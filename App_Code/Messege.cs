@@ -562,10 +562,13 @@ public class Message
         //abc.Date.ToShortDateString()
         var message  = "נסיעה בוטלה על ידי הרכז/ת " + abc.Coordinator.DisplayName + "." + " הנסיעה בתאריך " + abc.Date.ToShortDateString() + " בשעה " + time + " עם החולה " + abc.Pat.DisplayName;
         int userId = 0;
+        Volunteer V = new Volunteer();
+
         if (user != null)
         {
+            V= V.getVolunteerByID(user.Id);
             userId = user.Id;
-            message = "נסיעה בוטלה על ידי הרכז/ת " + abc.Coordinator.DisplayName +"." + " הנסיעה בתאריך " + abc.Date.ToShortDateString() + " בשעה " + time+" עם החולה "+abc.Pat.DisplayName+" על ידי הנהג/ת "+user.DisplayName;
+            message = "נסיעה בוטלה על ידי הרכז/ת " + abc.Coordinator.DisplayName +"." + " הנסיעה בתאריך " + abc.Date.ToShortDateString() + " בשעה " + time+" עם החולה "+abc.Pat.DisplayName+" על ידי הנהג/ת "+V.DisplayName;
         }
         
         //insert msg to db

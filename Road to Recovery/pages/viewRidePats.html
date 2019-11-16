@@ -74,19 +74,19 @@
             }
             var userName = GENERAL.USER.getUserDisplayName();
             $("#userName").html(userName);
-            if (localStorage.active == "undefined")
+            if (localStorage.active == "undefined" || localStorage.active === undefined)
                 localStorage.active = true;
 
-            if (localStorage.today == "undefined")
+            if (localStorage.today == "undefined" || localStorage.today===undefined)
                 localStorage.today = false;
 
-            if (localStorage.unassigned == "undefined")
+            if (localStorage.unassigned == "undefined" || localStorage.unassigned===undefined)
                 localStorage.unassigned = false;
 
-            if (localStorage.myRidePats == "undefined")
+            if (localStorage.myRidePats == "undefined" || localStorage.myRidePats===undefined)
                 localStorage.myRidePats = true;
 
-            if (localStorage.pastRidePats == "undefined")
+            if (localStorage.pastRidePats == "undefined" || localStorage.pastRidePats===undefined)
                 localStorage.pastRidePats = false;
 
 
@@ -439,7 +439,7 @@
                         buttons: [
                             'excel'
                         ],
-                        
+                       
                         columns: [
                             { data: "PatDisplayName" },
                             { data: "OriginName" },
@@ -450,12 +450,11 @@
                             { data: "Buttons" },
                             { data: "IsAnonymous" },
                         ],
-                        
                         columnDefs: [
-                            { type: 'de_datetime', targets: 3 },
+                            { type: 'de_datetime', "targets": 3 },
                             {"targets": [ 7],"visible": false}
-                        ]
-                        
+                        ],
+                        "order": [[3, "asc"]]
                     });
 
                     //t.columns([3]).order('asc').draw();
