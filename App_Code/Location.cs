@@ -240,7 +240,7 @@ public class Location
         {
             query += " where IsActive = '" + active + "' order by EnglishName";
         }
-        else query += "order by englishName";
+        else query += " order by englishName";
 
         List<Location> list = new List<Location>();
         DbService db = new DbService();
