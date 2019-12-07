@@ -437,10 +437,10 @@
                                     showConfirmButton: false
                                 });
                                 setTimeout(function () { returnRidePat() }, 1001);
-                            if (isAssistant && pushMsg!=="") {
-                                //send messege to coordinator from assistant on new ridepat creation.
-                                sendMessegeFromAssistant(data.d, pushMsg);
-                            }
+                                if (isAssistant && pushMsg!=="") {
+                                    //send messege to coordinator from assistant on new ridepat creation.
+                                    sendMessegeFromAssistant(data.d, pushMsg);
+                                }
                             }
                             else {
                                 data.d = data.d.toString();

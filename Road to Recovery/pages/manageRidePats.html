@@ -488,8 +488,14 @@
             var msg = "";
             //in case the assistant delet's the ride.
             var pushMsg = "";
+            var patientNameMessage = "";
+            var destinationNameMessage = "";
+            var originNameMessage = "";
             var userName = GENERAL.USER.getUserDisplayName();
             if (data.length == 7) {
+                patientNameMessage = data[3];
+                originNameMessage = data[2];
+                destinationNameMessage = data[1];
                 var hour = " בשעה ";
                 if (data[0] == "אחה''צ") hour = " ";
                 msg = "מחיקת ההסעה של " + data[3] + " מ: " + data[2] + " ל: " + data[1] + ", היום בשעה " + data[0] +"\n";
@@ -497,6 +503,9 @@
                 pushMsg = "נמחקה ההסעה של " + data[3] + " מ: " + data[2] + " ל: " + data[1] + ", היום בשעה " + data[0] + " ע\"י העוזר/ת " + userName;
             }
             else {
+                patientNameMessage = data[4];
+                originNameMessage = data[2];
+                destinationNameMessage = data[3];
                 var hour = " בשעה ";
                 if (data[1] == "אחה''צ") hour = " ";
                 msg = "מחיקת ההסעה של " + data[4] + " מ: " + data[2] + " ל: " + data[3] + ", בתאריך " + data[0] + hour + data[1];
@@ -518,13 +527,13 @@
                 var RidePat = new Object();
                 RidePat.RidePatNum = arr_details.RidePatNum;
                 var Pat = new Object();
-                Pat.DisplayName = patientName;
+                Pat.DisplayName = patientNameMessage;
                 RidePat.Pat = Pat;
                 var Destination = new Object();
-                Destination.Name = destinationName;
+                Destination.Name = destinationNameMessage;
                 RidePat.Destination = Destination;
                 var Origin = new Object();
-                Origin.Name = originName;
+                Origin.Name = originNameMessage;
                 RidePat.Origin = Origin;
                 deleteRidePat(RidePat, 'delete');
                 if (isAssistant) {

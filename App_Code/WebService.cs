@@ -21,12 +21,16 @@ public class WebService : System.Web.Services.WebService
     private static readonly ILog Log =
              LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+    JavaScriptSerializer j;
     public WebService()
     {
+        j = new JavaScriptSerializer();
+        j.MaxJsonLength = int.MaxValue;
         //Uncomment the following line if using designed components 
         //InitializeComponent(); 
     }
-
+    
+    
     //----------------------Road to Recovery-----------------------------------------------
     //[WebMethod]
     //[ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -52,7 +56,6 @@ public class WebService : System.Web.Services.WebService
         {
             Ride r = new Ride();
             bool res = r.isPrimaryStillCanceled(rideID, driverID);
-            JavaScriptSerializer j = new JavaScriptSerializer();
             return j.Serialize(res);
         }
         catch (Exception ex)
@@ -71,7 +74,6 @@ public class WebService : System.Web.Services.WebService
         {
             Ride r = new Ride();
             int res = r.backupToPrimary(rideID, driverID);
-            JavaScriptSerializer j = new JavaScriptSerializer();
             return j.Serialize(res);
         }
         catch (Exception ex)
@@ -93,7 +95,7 @@ public class WebService : System.Web.Services.WebService
             ll.AddRange(l.getHospitalListForView(true));
             ll.AddRange(l.getBarrierListForView(true));
 
-            JavaScriptSerializer j = new JavaScriptSerializer();
+            
             return j.Serialize(ll);
         }
         catch (Exception e)
@@ -111,7 +113,6 @@ public class WebService : System.Web.Services.WebService
             List<string> areas = new List<string>();
             Location l = new Location();
             areas = l.getAreas();
-            JavaScriptSerializer j = new JavaScriptSerializer();
             return j.Serialize(areas);
         }
         catch (Exception e)
@@ -141,7 +142,6 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            JavaScriptSerializer j = new JavaScriptSerializer();
             Patient p = new Patient();
             List<Escorted> escortedsList = p.getescortedsListMobile(displayName, patientCell);
             return j.Serialize(escortedsList);
@@ -159,7 +159,6 @@ public class WebService : System.Web.Services.WebService
         {
             Volunteer v = new Volunteer();
             v = v.getVolunteerPrefs(Id);
-            JavaScriptSerializer j = new JavaScriptSerializer();
             return j.Serialize(v);
         }
         catch (Exception ex)
@@ -188,7 +187,6 @@ public class WebService : System.Web.Services.WebService
         }
         catch (ArgumentException ex)
         {
-            JavaScriptSerializer j = new JavaScriptSerializer();
 
             Log.Error("Error in setRidePat - same ride isue in date: ", ex);
             throw new Exception(j.Serialize(" ההסעה בתאריך " + ex.Message + " כבר קיימת.\nאנא בחר תאריך חדש."));
@@ -241,9 +239,9 @@ public class WebService : System.Web.Services.WebService
         {
             HttpResponse response = GzipMe();
 
-            JavaScriptSerializer j = new JavaScriptSerializer();
             Patient c = new Patient();
             List<Patient> patientsList = c.getPatientsList(active);
+            //j.MaxJsonLength = int.MaxValue;
             return j.Serialize(patientsList);
         }
         catch (Exception ex)
@@ -258,7 +256,6 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            JavaScriptSerializer j = new JavaScriptSerializer();
             Patient c = new Patient();
             List<Patient> patientsList = c.getPatientsList(true);
             return j.Serialize(patientsList);
@@ -276,7 +273,6 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            JavaScriptSerializer j = new JavaScriptSerializer();
             Patient c = new Patient();
             List<Patient> patientsList = c.getAnonymousPatientsList(active, origin, dest);
             return j.Serialize(patientsList);
@@ -293,7 +289,6 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            JavaScriptSerializer j = new JavaScriptSerializer();
             Patient c = new Patient();
             List<Patient> patientsList = c.getAnonymousPatientsListForCenterPoints(active, origin, dest);
             return j.Serialize(patientsList);
@@ -310,7 +305,6 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            JavaScriptSerializer j = new JavaScriptSerializer();
             Patient p = new Patient();
             p.Equipment = p.getEquipmentForPatient(patient);
             return j.Serialize(p.Equipment);
@@ -329,7 +323,6 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            JavaScriptSerializer j = new JavaScriptSerializer();
             Volunteer v = new Volunteer();
             List<Volunteer> vl = v.getCoorList();
             return j.Serialize(vl);
@@ -347,7 +340,6 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            JavaScriptSerializer j = new JavaScriptSerializer();
             Volunteer v = new Volunteer();
             v = v.getCoor(userName);
             return j.Serialize(v);
@@ -365,7 +357,6 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            JavaScriptSerializer j = new JavaScriptSerializer();
             Patient p = new Patient();
             List<Escorted> escortedsList = p.getescortedsList(displayName, caller);
             return j.Serialize(escortedsList);
@@ -382,7 +373,6 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            JavaScriptSerializer j = new JavaScriptSerializer();
             AnonymousPatient ap = new AnonymousPatient();
             int seats = ap.checkSpaceInCar(ridePatNum, driverId);
             return seats;
@@ -544,7 +534,6 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            JavaScriptSerializer j = new JavaScriptSerializer();
             Escorted p = new Escorted();
             p.DisplayName = displayName;
             Escorted escorted = p.getEscorted(patientName);
@@ -563,7 +552,6 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            JavaScriptSerializer j = new JavaScriptSerializer();
             Patient p = new Patient();
             p.DisplayName = displayName;
             Patient patient = p.getPatient();
@@ -581,7 +569,6 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            JavaScriptSerializer j = new JavaScriptSerializer();
             AnonymousPatient p = new AnonymousPatient();
             p.DisplayName = displayName;
             AnonymousPatient patient = p.getAnonymousPatient();
@@ -600,7 +587,6 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            JavaScriptSerializer j = new JavaScriptSerializer();
             Escorted e = new Escorted();
             List<Escorted> cl = e.getContactType();
             return j.Serialize(cl);
@@ -645,7 +631,6 @@ public class WebService : System.Web.Services.WebService
 
             RidePat rp = new RidePat();
             List<RidePat> r = rp.GetRidePatView(volunteerId, maxDays);
-            JavaScriptSerializer j = new JavaScriptSerializer();
             j.MaxJsonLength = Int32.MaxValue;
             return j.Serialize(r);
         }
@@ -665,7 +650,6 @@ public class WebService : System.Web.Services.WebService
         {
             RidePat rp = new RidePat();
             rp = rp.GetRidePat(ridePatNum);
-            JavaScriptSerializer j = new JavaScriptSerializer();
             return j.Serialize(rp);
         }
         catch (Exception ex)
@@ -688,7 +672,6 @@ public class WebService : System.Web.Services.WebService
             GzipMe();
             Ride r = new Ride();
             List<Ride> rl = r.GetMyFutureRides(volunteerId);
-            JavaScriptSerializer j = new JavaScriptSerializer();
             return j.Serialize(rl);
         }
         catch (Exception ex)
@@ -710,7 +693,6 @@ public class WebService : System.Web.Services.WebService
             GzipMe();
             Ride r = new Ride();
             List<Ride> rl = r.GetMyPastRides(volunteerId);
-            JavaScriptSerializer j = new JavaScriptSerializer();
             return j.Serialize(rl);
         }
         catch (Exception ex)
@@ -731,7 +713,6 @@ public class WebService : System.Web.Services.WebService
         {
             Version v = new Version();
             List<Version> vl = v.getVersions();
-            JavaScriptSerializer j = new JavaScriptSerializer();
             return j.Serialize(vl);
         }
         catch (Exception ex)
@@ -772,7 +753,6 @@ public class WebService : System.Web.Services.WebService
         {
             Volunteer v = new Volunteer();
             v = v.getVolunteerByMobile(mobile, regId, device);
-            JavaScriptSerializer j = new JavaScriptSerializer();
             return j.Serialize(v);
         }
         catch (Exception ex)
@@ -792,7 +772,6 @@ public class WebService : System.Web.Services.WebService
         {
             RidePat rp = new RidePat();
             int res = rp.SignDriver(ridePatId, ridePatId2, driverId, primary);
-            JavaScriptSerializer j = new JavaScriptSerializer();
             return j.Serialize(res);
         }
         catch (Exception ex)
@@ -833,7 +812,6 @@ public class WebService : System.Web.Services.WebService
                 }
             }
 
-            JavaScriptSerializer j = new JavaScriptSerializer();
             return j.Serialize(res);
         }
         catch (Exception ex)
@@ -852,7 +830,6 @@ public class WebService : System.Web.Services.WebService
         {
             RidePat rp = new RidePat();
             int res = rp.AssignRideToRidePat(ridePatId, userId, driverType);
-            JavaScriptSerializer j = new JavaScriptSerializer();
             return j.Serialize(res);
         }
         catch (Exception ex)
@@ -875,7 +852,6 @@ public class WebService : System.Web.Services.WebService
         {
             RidePat rp = new RidePat();
             int res = rp.CombineRideRidePat(rideId, RidePatId);
-            JavaScriptSerializer j = new JavaScriptSerializer();
             return j.Serialize(res);
         }
         catch (Exception ex)
@@ -914,7 +890,6 @@ public class WebService : System.Web.Services.WebService
                 V.getVolunteerByID(driverId);
                 m.driverCanceledRide(ridePatId, V.getVolunteerByID(driverId));
             }
-            JavaScriptSerializer j = new JavaScriptSerializer();
             return j.Serialize(res);
         }
         catch (Exception ex)
@@ -934,7 +909,6 @@ public class WebService : System.Web.Services.WebService
             Status s = new Status();
             List<Status> sl = new List<Status>();
             sl = s.getAllStatus();
-            JavaScriptSerializer j = new JavaScriptSerializer();
             return j.Serialize(sl);
         }
         catch (Exception ex)
@@ -953,7 +927,6 @@ public class WebService : System.Web.Services.WebService
         {
             Patient p = new Patient();
             List<string> el = p.getAllEquipment();
-            JavaScriptSerializer j = new JavaScriptSerializer();
             return j.Serialize(el);
         }
         catch (Exception ex)
@@ -1063,7 +1036,6 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            JavaScriptSerializer j = new JavaScriptSerializer();
             Location l = new Location();
             l.Name = displayName;
             Location location = l.getLocation();
@@ -1084,7 +1056,6 @@ public class WebService : System.Web.Services.WebService
         {
             HttpResponse response = GzipMe();
 
-            JavaScriptSerializer j = new JavaScriptSerializer();
             Volunteer c = new Volunteer();
             List<Volunteer> volunteersList = c.getVolunteersList(active);
             return j.Serialize(volunteersList);
@@ -1102,7 +1073,6 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            JavaScriptSerializer j = new JavaScriptSerializer();
             Volunteer v = new Volunteer();
             v.DisplayName = displayName;
             Volunteer volunteer = v.getVolunteer();
@@ -1121,7 +1091,6 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            JavaScriptSerializer j = new JavaScriptSerializer();
             Volunteer v = new Volunteer();
 
             List<string> types = v.getVolunteerTypes();
@@ -1141,7 +1110,6 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            JavaScriptSerializer j = new JavaScriptSerializer();
             Location d = new Location();
             List<Location> destinationsList = d.getDestinationsListForView(active);
             return j.Serialize(destinationsList);
@@ -1159,7 +1127,6 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            JavaScriptSerializer j = new JavaScriptSerializer();
             Location d = new Location();
             List<Location> hospitalList = d.getHospitalListForView(active);
             return j.Serialize(hospitalList);
@@ -1177,7 +1144,6 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            JavaScriptSerializer j = new JavaScriptSerializer();
             Location d = new Location();
             List<Location> hospitalList = d.getBarrierListForView(active);
             return j.Serialize(hospitalList);
@@ -1196,7 +1162,6 @@ public class WebService : System.Web.Services.WebService
         Message m = new Message();
         m.insertMsg(msgId, "", status, "", 0, DateTime.Now, userId, "", true, false, false);
 
-        JavaScriptSerializer j = new JavaScriptSerializer();
         return j.Serialize("ok");
     }
     [WebMethod]
@@ -1207,7 +1172,6 @@ public class WebService : System.Web.Services.WebService
         m.pushFromAssistant(ridepat, cellphone, msg);
         //Email e = new Email();
         //e.sendMessage("Assistant change", "עוזר", cellphone, msg);
-        JavaScriptSerializer j = new JavaScriptSerializer();
         return j.Serialize("ok");
     }
     #endregion
@@ -1216,7 +1180,6 @@ public class WebService : System.Web.Services.WebService
     [WebMethod(EnableSession = true)]
     public string loginUser(string uName, string password)
     {
-        JavaScriptSerializer j = new JavaScriptSerializer();
         bool userInDB;
         try
         {
@@ -1246,7 +1209,6 @@ public class WebService : System.Web.Services.WebService
     public string GetUserNameByCellphone(string uName)
     {
         string userInDB;
-        JavaScriptSerializer j = new JavaScriptSerializer();
         try
         {
 
@@ -1264,7 +1226,6 @@ public class WebService : System.Web.Services.WebService
     public string GetUserEnglishNameByCellphone(string uName)
     {
         string userInDB;
-        JavaScriptSerializer j = new JavaScriptSerializer();
         try
         {
 
@@ -1282,7 +1243,6 @@ public class WebService : System.Web.Services.WebService
     public string GetIsAssistantByCellphone(string uName)
     {
         bool userInDB;
-        JavaScriptSerializer j = new JavaScriptSerializer();
         try
         {
 
@@ -1299,7 +1259,6 @@ public class WebService : System.Web.Services.WebService
     [WebMethod]
     public string GetCoordinatorsList()
     {
-        JavaScriptSerializer j = new JavaScriptSerializer();
         List<Volunteer> coors;
         try
         {
@@ -1328,7 +1287,6 @@ public class WebService : System.Web.Services.WebService
     [WebMethod]
     public string getLog(int hours)
     {
-        JavaScriptSerializer j = new JavaScriptSerializer();
         LogEntry le = new LogEntry();
         List<LogEntry> list = le.GetLog(hours);
         return j.Serialize(list);
@@ -1350,7 +1308,6 @@ public class WebService : System.Web.Services.WebService
     [WebMethod]
     public string loginDriver(string uName, string password)
     {
-        JavaScriptSerializer j = new JavaScriptSerializer();
         Drivers d = new Drivers(uName, password);
         d = d.CheckLoginDetails();
         return j.Serialize(d);
@@ -1362,7 +1319,6 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            JavaScriptSerializer j = new JavaScriptSerializer();
             City c = new City();
             List<City> citiesList = c.getCitiesList();
             return j.Serialize(citiesList);
@@ -1389,7 +1345,6 @@ public class WebService : System.Web.Services.WebService
         try
         {
             Auxiliary a = new Auxiliary();
-            JavaScriptSerializer j = new JavaScriptSerializer();
             //a.getR2RServers()
             return j.Serialize(a.getR2RServers());
         }
@@ -1419,9 +1374,7 @@ public class WebService : System.Web.Services.WebService
     public string isProductionDatabase()
     {
         Auxiliary aux = new Auxiliary();
-        bool ans = aux.isProductionDatabase();
-        JavaScriptSerializer j = new JavaScriptSerializer();
-        
+        bool ans = aux.isProductionDatabase();        
         return j.Serialize(ans);
     }
 }
