@@ -947,7 +947,33 @@
             date = new Date(Year, Month, Day, $("#hour").val(), $("#minute").val());
             futureDate = checkFutureDate(date);
             if (!futureDate) {
-                swal("خطأ\nשגיאה", "زمن السفرية قد مضى، الرجاء التصحيح\nזמן ההסעה עבר, נא לתקן", "warning");
+                var r = confirm(" זמן ההסעה עבר, האם להמשיך?");
+                if (r == true) {
+                    futureDate = true;
+                } 
+
+                //swal({
+                //    title: "זמן ההסעה עבר",
+                //    text: "האם תרצה להמשיך?",
+                //    type: "warning",
+                //    showCancelButton: true,
+                //    confirmButtonClass: "btn-warning",
+                //    confirmButtonText: "המשך",
+                //    cancelButtonText: "ביטול",
+                //    closeOnConfirm: true,
+                //    closeOnCancel: true,
+                    
+                //},
+                //function (isConfirm) {
+                //    if (isConfirm) {
+                //        futureDate = true;
+                //    }
+                //});
+
+                //swal("خطأ\nשגיאה",
+                //    "زمن السفرية قد مضى، الرجاء التصحيح\nזמן ההסעה עבר, נא לתקן",
+                //    "warning"
+                //);
             }
 
             var timeMatch = true;
