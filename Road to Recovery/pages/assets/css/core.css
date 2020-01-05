@@ -1781,6 +1781,10 @@ pre {
     text-align: right;
 }
 
+.text-left-strong {
+    text-align: left;
+}
+
 .pull-right > .dropdown-menu {
     left: 0;
     right: auto;
