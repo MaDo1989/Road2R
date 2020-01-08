@@ -395,6 +395,8 @@
                                 DestinationName:arr_rides[i].Destination.Name,
                                 Date:date2,
                                 Drivers:arr_rides[i].Status,
+        
+                                Origin_Dest:arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
                                 Coordinator:arr_rides[i].Coordinator.DisplayName,
                                 Buttons:btnStr,
                                 IsAnonymous:''
@@ -424,11 +426,14 @@
                                 Date:date2,
                                 Drivers:drivers,
                                 Coordinator:arr_rides[i].Coordinator.DisplayName,
+        
+                                Origin_Dest:arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
+        
                                 Buttons:buttons,
                                 IsAnonymous:arr_rides[i].Pat.IsAnonymous
                             }
                         }
-
+        
                         allRidesFromDB.push(Ride);
                     }
                     tbl = $('#datatable-buttons').DataTable({
@@ -446,15 +451,18 @@
                             { data: "DestinationName" },
                             { data: "Date" },
                             { data: "Drivers" },
+                            { data: "Origin_Dest" },
                             { data: "Coordinator" },
                             { data: "Buttons" },
                             { data: "IsAnonymous" },
                         ],
                         columnDefs: [
                             { type: 'de_datetime', "targets": 3 },
-                            {"targets": [ 7],"visible": false}
+                            {"targets": [ 8],"visible": false},
+                            { "targets": 5, className: 'text-left-strong' }
                         ],
                         "order": [[3, "asc"]]
+                       
                     });
 
                     //t.columns([3]).order('asc').draw();
@@ -699,6 +707,7 @@
                                             <th title="نقطة الوصول Destination">יעד</th>
                                             <th title="التاريخ والساعة Date & Time">תאריך ושעה</th>
                                             <th title="السائقين بالفرة Drivers">נהגים בנסיעה</th>
+                                            <th title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
                                             <th title="مركز Coordinator">רכז</th>
                                             <th title="التاريخ Actions">פעולות</th>
                                             <!--<th style="visibility:hidden;">האם אנונימי</th>-->

@@ -1,0 +1,12 @@
+﻿2020-01-04 13:45:37,179 ERROR [10] WebService.writeToLog - Successful login ;for user: 0524895999
+2020-01-04 15:30:16,081 ERROR [11] WebService.writeToLog - Successful login ;for user: 0524895999
+2020-01-04 16:48:40,292 ERROR [51] WebService.writeToLog - Successful login ;for user: 0524895999
+2020-01-04 17:05:48,951 ERROR [31] WebService.writeToLog - Successful login ;for user: 0524895999
+2020-01-04 17:50:07,027 ERROR [29] WebService.setRidePat - Error in setRidePat
+System.IndexOutOfRangeException: There is no row at position 0.
+   at System.Data.RBTree`1.GetNodeByIndex(Int32 userIndex)
+   at System.Data.DataRowCollection.get_Item(Int32 index)
+   at RidePat.GetRidePat(Int32 ridePatNum) in c:\פרטי\repo\Road2R\App_Code\RidePat.cs:line 522
+   at RidePat.setRidePat(RidePat ridePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) in c:\פרטי\repo\Road2R\App_Code\RidePat.cs:line 373
+   at WebService.setRidePat(RidePat RidePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) in c:\פרטי\repo\Road2R\App_Code\WebService.cs:line 178
+2020-01-04 18:04:47,955 ERROR [7] WebService.writeToLog - Successful login ;for user: 0524895999

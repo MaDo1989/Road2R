@@ -60,6 +60,7 @@
         var originName = "";
         var driverName = "";
         var patientName = "";
+        var Origin_Dest = "";
         var isAnonymous = false;
         var isAssistant = false;
 
@@ -159,13 +160,15 @@
                 recordsNum = JSON.parse(localStorage.getItem("futurePageLength"));
             }
 
-            tMorning = $('#datatable-morning').DataTable({ "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
-            tAfternoon = $('#datatable-afternoon').DataTable({ "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
+            tMorning = $('#datatable-morning').DataTable({"columnDefs": [{ targets: 6, className: 'text-left-strong' }]}, { "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
+            tAfternoon = $('#datatable-afternoon').DataTable({"columnDefs": [{ targets: 6, className: 'text-left-strong' }]}, { "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
             tFuture = $('#datatable-future').DataTable({
+                "columnDefs": [{ targets: 7, className: 'text-left-strong' }],
                 "iDisplayLength": recordsNum,
                 "aoColumns": [{
                     "sType": "customdatesort"
                 },
+                    null,
                     null,
                     null,
                     null,
@@ -279,7 +282,7 @@
                         destinationName = arr_rides[i].Destination.Name;
                         originName = arr_rides[i].Origin.Name;
                         patientName = arr_rides[i].Pat.DisplayName;
-
+                        Origin_Dest = arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName;
 
                         if (date.getMinutes() < 10) {
                             minutes = "0" + date.getMinutes();
@@ -404,18 +407,18 @@
             if (arr_rides[i].Status.indexOf("ממתינה לשיבוץ") !==-1 ) {
                 if (isAssistant) {
                     if (table.context[0].sTableId != "datatable-future") {
-                        table.row.add([time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, "אין!<br/>None!",  "Waiting for a driver", btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add([time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, "אין!<br/>None!",  "Waiting for a driver", arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                     }
                     else {
-                        table.row.add([date2, time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, "אין!<br/>None!", "Waiting for a driver", btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add([date2, time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, "אין!<br/>None!", "Waiting for a driver",arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                     }
                 }
                 else {
                     if (table.context[0].sTableId != "datatable-future") {
-                        table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!<br/>None!", arr_rides[i].Status, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!<br/>None!", arr_rides[i].Status,arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                     }
                     else {
-                        table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!<br/>None!", arr_rides[i].Status, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!<br/>None!", arr_rides[i].Status,arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                     }
                 }
             }
@@ -456,18 +459,18 @@
                         s='Delay at the border';
                     }
                     if (table.context[0].sTableId != "datatable-future") {
-                        table.row.add([time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, drivers, s, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add([time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, drivers, s,arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                     }
                     else {
-                        table.row.add([date2, time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, drivers, s, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add([date2, time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, drivers, s,arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                     }
                 }
                 else {
                     if (table.context[0].sTableId != "datatable-future") {
-                        table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status,arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                     }
                     else {
-                        table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status,arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                     }
                 }
   
@@ -871,13 +874,14 @@
                                                 <table id="datatable-morning" class="table table-striped table-bordered">
                                                     <thead>
                                                         <tr>
-                                                            <th   title="Time  الساعة">שעה</th>
-                                                            <th  title="Origin  نقطة الانطلاق">מוצא</th>
-                                                            <th  title="Destination  نقطة الوصول">יעד</th>
-                                                            <th  title="Patient  المريض">החולה</th>
-                                                            <th  title="Driver  السائق">המסיע</th>
-                                                            <th  title="Status  حالة السفرية">סטטוס ההסעה</th>
-                                                            <th  title="Actions  اعمال">פעולות</th>
+                                                            <th title="Time  الساعة">שעה</th>
+                                                            <th title="Origin  نقطة الانطلاق">מוצא</th>
+                                                            <th title="Destination  نقطة الوصول">יעד</th>
+                                                            <th title="Patient  المريض">החולה</th>
+                                                            <th title="Driver  السائق">המסיע</th>
+                                                            <th title="Status  حالة السفرية">סטטוס ההסעה</th>
+                                                            <th title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
+                                                            <th title="Actions  اعمال">פעולות</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody></tbody>
@@ -894,12 +898,13 @@
                                                 <table id="datatable-afternoon" class="table table-striped table-bordered">
                                                     <thead>
                                                         <tr>
-                                                            <th  title="Time  الساعة">שעה</th>
+                                                            <th title="Time  الساعة">שעה</th>
                                                             <th title="Origin  نقطة الانطلاق">מוצא</th>
                                                             <th title="Destination  نقطة الوصول">יעד</th>
                                                             <th title="Patient  المريض">החולה</th>
                                                             <th title="Driver  السائق">המסיע</th>
                                                             <th title="Status  حالة السفرية">סטטוס ההסעה</th>
+                                                            <th title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
                                                             <th title="Actions  اعمال">פעולות</th>
                                                         </tr>
                                                     </thead>
@@ -924,6 +929,7 @@
                                                             <th title="Patient  المريض">החולה</th>
                                                             <th title="Driver  السائق">המסיע</th>
                                                             <th title="Status  حالة السفرية">סטטוס ההסעה</th>
+                                                            <th title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
                                                             <th title="Actions  اعمال">פעולות</th>
                                                         </tr>
                                                     </thead>
