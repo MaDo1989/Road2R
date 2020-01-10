@@ -1,0 +1,17 @@
+﻿2020-01-09 18:42:33,383 ERROR [10] WebService.writeToLog - Successful login ;for user: 0524895999
+2020-01-09 18:46:44,634 ERROR [11] WebService.setAnonymousPatient - Error in setAnonymousPatient
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at AnonymousPatient.setAnonymousPatient(String func) in c:\פרטי\repo\Road2R\App_Code\AnonymousPatient.cs:line 419
+   at WebService.setAnonymousPatient(AnonymousPatient anonymousPatient, String func) in c:\פרטי\repo\Road2R\App_Code\WebService.cs:line 458
+2020-01-09 18:47:00,534 ERROR [7] WebService.setAnonymousPatient - Error in setAnonymousPatient
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at AnonymousPatient.setAnonymousPatient(String func) in c:\פרטי\repo\Road2R\App_Code\AnonymousPatient.cs:line 419
+   at WebService.setAnonymousPatient(AnonymousPatient anonymousPatient, String func) in c:\פרטי\repo\Road2R\App_Code\WebService.cs:line 458
+2020-01-09 18:48:05,292 ERROR [11] WebService.setAnonymousPatient - Error in setAnonymousPatient
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at AnonymousPatient.setAnonymousPatient(String func) in c:\פרטי\repo\Road2R\App_Code\AnonymousPatient.cs:line 419
+   at WebService.setAnonymousPatient(AnonymousPatient anonymousPatient, String func) in c:\פרטי\repo\Road2R\App_Code\WebService.cs:line 458
+2020-01-09 18:48:49,109 ERROR [15] WebService.setAnonymousPatient - Error in setAnonymousPatient
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at AnonymousPatient.setAnonymousPatient(String func) in c:\פרטי\repo\Road2R\App_Code\AnonymousPatient.cs:line 419
+   at WebService.setAnonymousPatient(AnonymousPatient anonymousPatient, String func) in c:\פרטי\repo\Road2R\App_Code\WebService.cs:line 458

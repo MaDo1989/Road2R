@@ -163,6 +163,7 @@
             tMorning = $('#datatable-morning').DataTable({"columnDefs": [{ targets: 6, className: 'text-left-strong' }]}, { "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
             tAfternoon = $('#datatable-afternoon').DataTable({"columnDefs": [{ targets: 6, className: 'text-left-strong' }]}, { "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
             tFuture = $('#datatable-future').DataTable({
+        
                 "columnDefs": [{ targets: 7, className: 'text-left-strong' }],
                 "iDisplayLength": recordsNum,
                 "aoColumns": [{
@@ -766,8 +767,7 @@
     <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
     <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
-
-
+    
 </head>
 
 
@@ -874,14 +874,14 @@
                                                 <table id="datatable-morning" class="table table-striped table-bordered">
                                                     <thead>
                                                         <tr>
-                                                            <th title="Time  الساعة">שעה</th>
-                                                            <th title="Origin  نقطة الانطلاق">מוצא</th>
-                                                            <th title="Destination  نقطة الوصول">יעד</th>
-                                                            <th title="Patient  المريض">החולה</th>
-                                                            <th title="Driver  السائق">המסיע</th>
-                                                            <th title="Status  حالة السفرية">סטטוס ההסעה</th>
-                                                            <th title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
-                                                            <th title="Actions  اعمال">פעולות</th>
+                                                            <th class="middle" title="Time  الساعة">שעה</th>
+                                                            <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
+                                                            <th class="middle" title="Destination  نقطة الوصول">יעד</th>
+                                                            <th class="middle" title="Patient  المريض">החולה</th>
+                                                            <th class="middle" title="Driver  السائق">המסיע</th>
+                                                            <th class="middle" title="Status  حالة السفرية">סטטוס ההסעה</th>
+                                                            <th class="customWidth middle" title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
+                                                            <th class="middle" title="Actions  اعمال">פעולות</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody></tbody>
@@ -898,14 +898,14 @@
                                                 <table id="datatable-afternoon" class="table table-striped table-bordered">
                                                     <thead>
                                                         <tr>
-                                                            <th title="Time  الساعة">שעה</th>
-                                                            <th title="Origin  نقطة الانطلاق">מוצא</th>
-                                                            <th title="Destination  نقطة الوصول">יעד</th>
-                                                            <th title="Patient  المريض">החולה</th>
-                                                            <th title="Driver  السائق">המסיע</th>
-                                                            <th title="Status  حالة السفرية">סטטוס ההסעה</th>
-                                                            <th title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
-                                                            <th title="Actions  اعمال">פעולות</th>
+                                                            <th class="middle" title="Time  الساعة">שעה</th>
+                                                            <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
+                                                            <th class="middle" title="Destination  نقطة الوصول">יעד</th>
+                                                            <th class="middle" title="Patient  المريض">החולה</th>
+                                                            <th class="middle" title="Driver  السائق">המסיע</th>
+                                                            <th class="middle" title="Status  حالة السفرية">סטטוס ההסעה</th>
+                                                            <th class="customWidth middle" title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
+                                                            <th class="middle" title="Actions  اعمال">פעולות</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody></tbody>
@@ -922,15 +922,15 @@
                                                 <table id="datatable-future" class="table table-striped table-bordered hover">
                                                     <thead>
                                                         <tr>
-                                                            <th title="Date  الساعة">תאריך</th>
-                                                            <th title="Time  الساعة">שעה</th>
-                                                            <th title="Origin  نقطة الانطلاق">מוצא</th>
-                                                            <th title="Destination  نقطة الوصول">יעד</th>
-                                                            <th title="Patient  المريض">החולה</th>
-                                                            <th title="Driver  السائق">המסיע</th>
-                                                            <th title="Status  حالة السفرية">סטטוס ההסעה</th>
-                                                            <th title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
-                                                            <th title="Actions  اعمال">פעולות</th>
+                                                            <th class="middle" title="Date  الساعة">תאריך</th>
+                                                            <th class="middle" title="Time  الساعة">שעה</th>
+                                                            <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
+                                                            <th class="middle" title="Destination  نقطة الوصول">יעד</th>
+                                                            <th class="middle" title="Patient  المريض">החולה</th>
+                                                            <th class="middle" title="Driver  السائق">המסיע</th>
+                                                            <th class="middle" title="Status  حالة السفرية">סטטוס ההסעה</th>
+                                                            <th class="customWidth middle" title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
+                                                            <th class="middle" title="Actions  اعمال">פעולות</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody></tbody>

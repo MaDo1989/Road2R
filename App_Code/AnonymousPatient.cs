@@ -413,11 +413,10 @@ public class AnonymousPatient
         cmdParams[15] = cmd.Parameters.AddWithValue("@remarks", Remarks);
         cmdParams[16] = cmd.Parameters.AddWithValue("@isAnonymous", IsAnonymous);
         cmdParams[17] = cmd.Parameters.AddWithValue("@numberOfEscort", NumberOfEscort);
-        cmdParams[18] = cmd.Parameters.AddWithValue("@englishName", EnglishName);
-        ///////////////////////////////////////////////////////////////////////////////////////////////////////
+        cmdParams[18] = cmd.Parameters.AddWithValue("@englishName", EnglishName);        
         string displayName = FirstNameH + " " + LastNameH;
         cmdParams[19] = cmd.Parameters.AddWithValue("@displayName", displayName.Trim());
-        ///////////////////////////////////////////////////////////////////////////////////////////////////////
+        
         string query = "";
         if (func == "edit")
         {
