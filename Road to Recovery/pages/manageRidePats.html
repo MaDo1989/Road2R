@@ -606,7 +606,7 @@
             tMorning.rows().every(function (rowIdx, tableLoop, rowLoop) {
                 var data = this.data();
                 if (data != undefined) {
-                    if (data[7] == "True" && (data[5] != "ממתינה לשיבוץ")) {
+                    if (data[8] == "True" && (data[5] != "ממתינה לשיבוץ")) {
                         var row = tMorning
                             .row(rowIdx)
                             .node();
@@ -650,7 +650,7 @@
             tAfternoon.rows().every(function (rowIdx, tableLoop, rowLoop) {
                 var data = this.data();
                 if (data != undefined) {
-                    if (data[7] == "True" && (data[5] != "ממתינה לשיבוץ")) {
+                    if (data[8] == "True" && (data[5] != "ממתינה לשיבוץ")) {
                         var row = tAfternoon
                             .row(rowIdx)
                             .node();
@@ -692,7 +692,7 @@
             tFuture.rows().every(function (rowIdx, tableLoop, rowLoop) {
                 var data = this.data();
                 if (data != undefined) {
-                    if (data[8] == "True" && (data[5].indexOf("אין") !==-1 )) {
+                    if (data[9] == "True" && (data[5].indexOf("אין") !==-1 )) {
                         var row = tFuture
                             .row(rowIdx)
                             .node();
