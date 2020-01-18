@@ -39,6 +39,7 @@ public class Patient
     string isAnonymous;
     int id;
     int patientIdentity;
+    string lastModified;
     List<string> equipment;
 
     public bool IsActive { get; set; }
@@ -392,6 +393,19 @@ public class Patient
         }
     }
 
+    public string LastModified
+    {
+        get
+        {
+            return lastModified;
+        }
+
+        set
+        {
+            lastModified = value;
+        }
+    }
+
     public Patient()
     {
         //
@@ -615,6 +629,8 @@ public class Patient
                     el = new List<string>();
                     //get equipment for patient from the same view
                     string e = dr["EquipmentName"].ToString();
+                    
+                    p.LastModified = dr["lastModified"].ToString();
                     el.Add(e);
                     p.Equipment = el;
 
@@ -894,7 +910,7 @@ public class Patient
     public void SetPatientStatus(string active)
     {
         DbService db = new DbService();
-        db.ExecuteQuery("UPDATE Patient SET IsActive='" + active + "' WHERE DisplayName=N'" + DisplayName + "'");
+        db.ExecuteQuery("UPDATE Patient SET IsActive='" + active + "', lastModified=DATEADD(hour, 2, SYSDATETIME()) WHERE DisplayName=N'" + DisplayName + "'");
 
     }
 
@@ -935,7 +951,7 @@ public class Patient
             cmdParams[16].ToString().Trim();
             query = "UPDATE Patient SET FirstNameH=@firstNameH,FirstNameA=@firstNameA,LastNameH=@lastNameH,";
             query += "CellPhone=@cellPhone,CellPhone2=@cellPhone2,CityCityName=@city,IsActive=@IsActive,BirthDate=@birthDate,";
-            query += "HomePhone=@homePhone,History=@history,Department=@department,Barrier=@barrier,Hospital=@hospital,Gender=@gender,Remarks=@remarks,DisplayName=@displayName,EnglishName=@englishName,PatientIdentity=@patientIdentity Where Id=" + Id;
+            query += "HomePhone=@homePhone,History=@history,Department=@department,Barrier=@barrier,Hospital=@hospital,Gender=@gender,Remarks=@remarks,DisplayName=@displayName,EnglishName=@englishName,PatientIdentity=@patientIdentity,lastModified=DATEADD(hour, 2, SYSDATETIME()) Where Id=" + Id;
             db = new DbService();
             res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
             if (res > 0)
@@ -963,10 +979,10 @@ public class Patient
         else if (func == "new")
         {
             query = "insert into Patient (FirstNameH,FirstNameA,LastNameH,LastNameA,CellPhone,CellPhone2, HomePhone,";
-            query += "CityCityName,IsActive,BirthDate,History,Department,Barrier,Hospital,Gender,Remarks,EnglishName,PatientIdentity)";
+            query += "CityCityName,IsActive,BirthDate,History,Department,Barrier,Hospital,Gender,Remarks,EnglishName,PatientIdentity,lastModified)";
             query += " values (@firstNameH,@firstNameA,@lastNameH,@lastNameA,";
             query += "@cellPhone,@cellPhone2,@homephone,@city,@IsActive,@birthDate,";
-            query += "@history,@department,@barrier,@hospital,@gender,@remarks,@englishName,@patientIdentity); select SCOPE_IDENTITY()";
+            query += "@history,@department,@barrier,@hospital,@gender,@remarks,@englishName,@patientIdentity,DATEADD(hour, 2, SYSDATETIME())); select SCOPE_IDENTITY()";
             db = new DbService();
             Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
 

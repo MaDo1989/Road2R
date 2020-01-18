@@ -174,7 +174,8 @@
                                         Barrier: arr_patients[i].Barrier.EnglishName,
                                         Hospital: arr_patients[i].Hospital.EnglishName,
                                         //Equipment: equip,
-                                        Remarks: arr_patients[i].PatientIdentity===0?"":arr_patients[i].PatientIdentity,
+                                        Remarks: arr_patients[i].PatientIdentity === 0 ? "" : arr_patients[i].PatientIdentity,
+                                        LastModified: arr_patients[i].LastModified,
                                         Buttons: btnStr
                                     };
                                 }
@@ -187,7 +188,8 @@
                                         Barrier: arr_patients[i].Barrier.Name,
                                         Hospital: arr_patients[i].Hospital.Name,
                                         //Equipment: equip,
-                                        Remarks: arr_patients[i].PatientIdentity===0?"":arr_patients[i].PatientIdentity,
+                                        Remarks: arr_patients[i].PatientIdentity === 0 ? "" : arr_patients[i].PatientIdentity,
+                                        LastModified: arr_patients[i].LastModified,
                                         Buttons: btnStr
                                     };
                                 }
@@ -202,7 +204,8 @@
                                         Barrier: arr_patients[i].Barrier.EnglishName,
                                         Hospital: arr_patients[i].Hospital.EnglishName,
                                         //Equipment: equip,
-                                        Remarks: arr_patients[i].PatientIdentity===0?"":arr_patients[i].PatientIdentity,
+                                        Remarks: arr_patients[i].PatientIdentity === 0 ? "" : arr_patients[i].PatientIdentity,
+                                        LastModified: arr_patients[i].LastModified,
                                         Buttons: btnStr
                                     };
                                 }
@@ -215,7 +218,8 @@
                                         Barrier: arr_patients[i].Barrier.Name,
                                         Hospital: arr_patients[i].Hospital.Name,
                                         //Equipment: equip,
-                                        Remarks: arr_patients[i].PatientIdentity===0?"":arr_patients[i].PatientIdentity,
+                                        Remarks: arr_patients[i].PatientIdentity === 0 ? "" : arr_patients[i].PatientIdentity,
+                                        LastModified: arr_patients[i].LastModified,
                                         Buttons: btnStr
                                     };
                                 }
@@ -233,7 +237,8 @@
                                     Barrier: arr_patients[i].Barrier.EnglishName,
                                     Hospital: arr_patients[i].Hospital.EnglishName,
                                     //Equipment: equip,
-                                    Remarks: arr_patients[i].PatientIdentity===0?"":arr_patients[i].PatientIdentity,
+                                    Remarks: arr_patients[i].PatientIdentity === 0 ? "" : arr_patients[i].PatientIdentity,
+                                    LastModified: arr_patients[i].LastModified,
                                     Buttons: btnStr
                                 };
                             }
@@ -246,7 +251,8 @@
                                     Barrier: arr_patients[i].Barrier.Name,
                                     Hospital: arr_patients[i].Hospital.Name,
                                     //Equipment: equip,
-                                    Remarks: arr_patients[i].PatientIdentity===0?"":arr_patients[i].PatientIdentity,
+                                    Remarks: arr_patients[i].PatientIdentity === 0 ? "" : arr_patients[i].PatientIdentity,
+                                    LastModified: arr_patients[i].LastModified,
                                     Buttons: btnStr
                                 };
                             }
@@ -277,6 +283,7 @@
                             { data: "Hospital" },
                             //{ data: "Equipment" },
                             { data: "Remarks" },
+                            { data: "LastModified" },
                             { data: "Buttons" },
                         ],
                     });
@@ -479,6 +486,7 @@
                                             <th title="مستشفى   Hospital">בית חולים</th>
                                             <!--<th data-toggle="tooltip" title="معدات مرافقة   Equipment">ציוד נלווה</th>-->
                                             <th title="patient id">תעודת זהות</th>
+                                            <th title="Last Modified">עודכן לאחרונה</th>
                                             <th title="اعمال   Actions">פעולות</th>
                                         </tr>
                                     </thead>
