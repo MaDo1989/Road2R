@@ -1194,7 +1194,15 @@ public class WebService : System.Web.Services.WebService
         }
         HttpContext.Current.Session["userSession"] = uName;
 
-        writeToLog("Successful login");
+        
+        if (userInDB)
+        {
+            writeToLog("Successful login");
+        }
+        else
+        {
+            writeToLog("Login failed. password: " + password);
+        }
 
 
         return j.Serialize(userInDB);

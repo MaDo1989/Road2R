@@ -173,9 +173,9 @@
                             City: arr_volunteers[i].City,
                             Remarks: arr_volunteers[i].Remarks,
                             Buttons: btnStr,
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                            LastModified: arr_volunteers[i].LastModified,
                             EnglishName: arr_volunteers[i].EnglishName
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
                         }
                         allVolunteersFromDb.push(Volunteer);
                     }
@@ -211,6 +211,7 @@
 
                             { data: "City" },
                             { data: "Remarks" },
+                            { data: "LastModified" },
                             { data: "Buttons" },
                         ],
                     });
@@ -437,6 +438,7 @@
                                             <th>שם באנגלית</th>
                                             <th>יישוב</th>
                                             <th style="text-align:right">הערות</th>
+                                            <th>עודכן לאחרונה</th>
                                             <th>פעולות</th>
                                         </tr>
                                     </thead>

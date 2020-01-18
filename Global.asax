@@ -2,15 +2,16 @@
 
 <script runat="server">
 
-    
+
     void Application_Start(object sender, EventArgs e)
     {
         // Code that runs on application startup
         log4net.Config.XmlConfigurator.Configure();
-        
+        //log4net.Config.XmlConfigurator.Configure(new System.IO.FileInfo("log4net.xml"));  // configFile being the path to the file.
+
 
     }
-   
+
     void Application_End(object sender, EventArgs e)
     {
         //  Code that runs on application shutdown

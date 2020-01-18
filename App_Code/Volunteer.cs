@@ -43,6 +43,7 @@ public class Volunteer
     string status;//סטטוס
     int id;
     string regId;
+    string lastModified;
 
     public List<RideStatus> Statusim { get; set; }
 
@@ -851,6 +852,19 @@ public class Volunteer
         }
     }
 
+    public string LastModified
+    {
+        get
+        {
+            return lastModified;
+        }
+
+        set
+        {
+            lastModified = value;
+        }
+    }
+
     //public string KnowsArabic
     //{
     //    get
@@ -1019,9 +1033,9 @@ public class Volunteer
             v.KnowsArabic = arabic;
             v.Gender = dr["Gender"].ToString();
             v.RegId = dr["pnRegId"].ToString();
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            
             v.EnglishName = dr["englishName"].ToString();
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            v.LastModified = dr["lastModified"].ToString();
 
             list.Add(v);
         }
@@ -1293,7 +1307,7 @@ public class Volunteer
                 query = "update Volunteer set Address=@address, CellPhone=@cell,";
                 query += "CellPhone2=@cell2, CityCityName=@city, Email=@email, FirstNameA=@firstNameA, FirstNameH=@firstNameH, ";
                 query += "Gender=@gender, IsActive=@IsActive, JoinDate=@jDate, KnowsArabic=@knowsArabic, LastNameA=@lastNameA, ";
-                query += "LastNameH=@lastNameH,UserName=@UserName,Password='" + password + "', Remarks=@remarks,EnglishName=@englishName,isAssistant=@isAssistant where DisplayName=@displayName"; //, BirthDate=@bDay
+                query += "LastNameH=@lastNameH,UserName=@UserName,Password='" + password + "', Remarks=@remarks,EnglishName=@englishName,isAssistant=@isAssistant,lastModified=DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@displayName"; //, BirthDate=@bDay
 
             }
             else
@@ -1301,7 +1315,7 @@ public class Volunteer
                 query = "update Volunteer set Address=@address, CellPhone=@cell,";
                 query += "CellPhone2=@cell2, CityCityName=@city, Email=@email, FirstNameA=@firstNameA, FirstNameH=@firstNameH, ";
                 query += "Gender=@gender, IsActive=@IsActive, JoinDate=@jDate, KnowsArabic=@knowsArabic, LastNameA=@lastNameA, ";
-                query += "LastNameH=@lastNameH, Remarks=@remarks,EnglishName=@englishName,isAssistant=@isAssistant where DisplayName=@displayName"; //, BirthDate=@bDay
+                query += "LastNameH=@lastNameH, Remarks=@remarks,EnglishName=@englishName,isAssistant=@isAssistant,lastModified=DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@displayName"; //, BirthDate=@bDay
             }
             res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
 
@@ -1329,14 +1343,14 @@ public class Volunteer
                 if (v.TypeVol == "רכז" || v.TypeVol =="מנהל" || v.IsAssistant)
                 {
                     string password = ConfigurationManager.AppSettings["password"];
-                    query = "insert into Volunteer (Address, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks,EnglishName,isAssistant,UserName,Password)";
-                    query += " values (@address,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks,@englishName,@isAssistant,@UserName,'" + password+"');SELECT SCOPE_IDENTITY();";
+                    query = "insert into Volunteer (Address, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks,EnglishName,isAssistant,UserName,Password,lastModified)";
+                    query += " values (@address,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks,@englishName,@isAssistant,@UserName,'" + password+ "',DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
 
                 }
                 else
                 {
-                    query = "insert into Volunteer (Address, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks,EnglishName,isAssistant)";
-                    query += " values (@address,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks,@englishName,@isAssistant);SELECT SCOPE_IDENTITY();";
+                    query = "insert into Volunteer (Address, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks,EnglishName,isAssistant,lastModified)";
+                    query += " values (@address,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks,@englishName,@isAssistant,DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
                 }
                 db = new DbService();
                 Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
@@ -1361,7 +1375,7 @@ public class Volunteer
     public void deactivateCustomer(string active)
     {
         DbService db = new DbService();
-        db.ExecuteQuery("UPDATE Volunteer SET IsActive='" + active + "' WHERE displayName=N'" + DisplayName + "'");
+        db.ExecuteQuery("UPDATE Volunteer SET IsActive='" + active + "', lastModified=DATEADD(hour, 2, SYSDATETIME()) WHERE displayName=N'" + DisplayName + "'");
        
     }
 
