@@ -1329,7 +1329,7 @@ public class Volunteer
 
             db = new DbService();
             query = "update VolunType_Volunteer set VolunTypeType=@volType where VolunteerId=" + Id;
-            res += db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+            res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
             if (res == 0)
             {
                 throw new Exception();

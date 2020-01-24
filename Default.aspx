@@ -41,8 +41,6 @@
 
             <asp:Button ID="globalBTN" runat="server" Text="Global messege" OnClick="globalBTN_Click" />
         </div>
-
-
     </form>
 </body>
 </html>
