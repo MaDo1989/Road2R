@@ -1,0 +1,45 @@
+﻿2020-01-31 15:03:18,303 ERROR [11] WebService.writeToLog - Successful login ;for user: 0524842888
+2020-01-31 15:03:54,154 ERROR [7] WebService.writeToLog - Successful login ;for user: 0524842888
+2020-01-31 15:05:18,745 ERROR [6] WebService.setRidePat - Error in setRidePat
+System.Data.SqlClient.SqlException (0x80131904): Must declare the scalar variable "@Area".
+   ב-  DbService.GetObjectScalarByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 151
+   ב-  RidePat.setRidePat(RidePat ridePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 336
+   ב-  WebService.setRidePat(RidePat RidePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 178
+ClientConnectionId:1610fa09-0df7-4287-b31a-2829ceb6595d
+Error Number:137,State:2,Class:15
+2020-01-31 15:07:39,396 ERROR [20] WebService.writeToLog - Successful login ;for user: 0524842888
+2020-01-31 15:15:25,288 ERROR [20] WebService.setRidePat - Error in setRidePat
+System.Data.SqlClient.SqlException (0x80131904): Must declare the scalar variable "@Area".
+   ב-  DbService.GetObjectScalarByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 151
+   ב-  RidePat.setRidePat(RidePat ridePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 336
+   ב-  WebService.setRidePat(RidePat RidePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 178
+ClientConnectionId:20ff7749-725b-4303-99f3-76dd19caf115
+Error Number:137,State:2,Class:15
+2020-01-31 15:15:43,695 ERROR [20] WebService.writeToLog - Successful login ;for user: 0524842888
+2020-01-31 15:20:08,241 ERROR [14] WebService.writeToLog - Successful login ;for user: 0524842888
+2020-01-31 15:22:00,815 ERROR [11] WebService.setRidePat - Error in setRidePat
+System.Data.SqlClient.SqlException (0x80131904): Must declare the scalar variable "@Area".
+   ב-  DbService.GetObjectScalarByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 151
+   ב-  RidePat.setRidePat(RidePat ridePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 336
+   ב-  WebService.setRidePat(RidePat RidePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 178
+ClientConnectionId:f12eee6d-bb63-4d78-bb3f-0b34b4bdb3b8
+Error Number:137,State:2,Class:15
+2020-01-31 15:26:22,900 ERROR [17] WebService.writeToLog - Successful login ;for user: 0524842888
+2020-01-31 15:31:27,017 ERROR [18] WebService.setRidePat - Error in setRidePat
+System.Data.SqlClient.SqlException (0x80131904): Must declare the scalar variable "@Area".
+   ב-  DbService.GetObjectScalarByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 151
+   ב-  RidePat.setRidePat(RidePat ridePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 336
+   ב-  WebService.setRidePat(RidePat RidePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 178
+ClientConnectionId:f238831f-ba73-44f8-a216-2e3e73e7d3a3
+Error Number:137,State:2,Class:15
+2020-01-31 15:32:39,122 ERROR [17] WebService.writeToLog - Successful login ;for user: 0524842888
+2020-01-31 15:33:32,995 ERROR [18] WebService.setRidePat - Error in setRidePat
+System.Data.SqlClient.SqlException (0x80131904): The INSERT statement conflicted with the FOREIGN KEY constraint "FK__RidePat__Area__3A179ED3". The conflict occurred in database "r2rdb_testing", table "dbo.Area", column 'AreaName'.
+The statement has been terminated.
+   ב-  DbService.GetObjectScalarByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 151
+   ב-  RidePat.setRidePat(RidePat ridePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 336
+   ב-  WebService.setRidePat(RidePat RidePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 178
+ClientConnectionId:2ce64a60-e421-45fc-a6fd-d7061839f8b6
+Error Number:547,State:0,Class:16
+2020-01-31 15:35:31,331 ERROR [17] WebService.writeToLog - Successful login ;for user: 0524842888
+2020-01-31 18:37:49,260 ERROR [64] WebService.writeToLog - Successful login ;for user: 0524842888

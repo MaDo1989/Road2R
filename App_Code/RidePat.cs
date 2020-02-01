@@ -210,14 +210,87 @@ public class RidePat
         // TODO: Add constructor logic here
         //
     }
+    private string CheckLocationForRidepatArea(string origin,string destination)
+    {
+        //ארז – ירושלים
+        //ארז - מרכז
+        //ארז - צפון
+        //תרקומיא – מרכז
+        //אזור המרכז
+        //מרכז - ירושליים
+        //צפון - מרכז
+        //אזור הצפון
+
+
+//        דרום
+//מרכז
+//מרכז - ירושליים
+//מרכז - דרום
+//צפון
+//צפון - מרכז
+
+        //get locations area
+        Location l = new Location();
+        string originArea = l.GetAreaForPoint(origin);
+        string destinationArea = l.GetAreaForPoint(destination);
+        string areaForRidepat = originArea;
+        if (origin == "ארז")
+        {
+            switch (destinationArea)
+            {
+                case "מרכז":
+                case "מרכז-דרום":
+                case "צפון-מרכז":
+                    areaForRidepat = "ארז - מרכז";
+                    break;
+                case "מרכז - ירושליים":
+                case "דרום":
+                    areaForRidepat = "ארז – ירושלים";
+                    break;
+                case "צפון":
+                    areaForRidepat = "ארז - צפון";
+                    break;
+                default:
+                    areaForRidepat = originArea;;
+                    break;
+            }
+        }
+        else if(destination == "ארז")
+        {
+            switch (originArea)
+            {
+                case "מרכז":
+                case "מרכז-דרום":
+                case "צפון-מרכז":
+                    areaForRidepat = "ארז - מרכז";
+                    break;
+                case "מרכז - ירושליים":
+                case "דרום":
+                    areaForRidepat = "ארז – ירושלים";
+                    break;
+                case "צפון":
+                    areaForRidepat = "ארז - צפון";
+                    break;
+                default:
+                    areaForRidepat = originArea; ;
+                    break;
+            }
+        }
+        else if(origin== "תרקומיא" || destination=="תרקומיא")
+        {
+            areaForRidepat = "תרקומיא – מרכז";
+        }
+        return areaForRidepat;
+    }
     //לשנות את  isAnonymous
+
     public int setRidePat(RidePat ridePat, string func,bool isAnonymous, int numberOfRides, string repeatRideEvery)
     {
         
         DbService db = new DbService();
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
-        SqlParameter[] cmdParams = new SqlParameter[7];
+        SqlParameter[] cmdParams = new SqlParameter[8];
         try
         {
             Pat = ridePat.Pat;
@@ -225,6 +298,7 @@ public class RidePat
             origin.Name = ridePat.Origin.Name;
             Location destination = new Location();
             destination.Name = ridePat.Destination.Name;
+            Area = CheckLocationForRidepatArea(origin.Name, destination.Name);
             Date = ridePat.Date;
             Coordinator = new Volunteer();
             Coordinator.DisplayName = ridePat.Coordinator.DisplayName;
@@ -238,6 +312,7 @@ public class RidePat
             cmdParams[3] = cmd.Parameters.AddWithValue("@date", Date);
             cmdParams[4] = cmd.Parameters.AddWithValue("@remark", Remark);
             cmdParams[5] = cmd.Parameters.AddWithValue("@onlyEscort", OnlyEscort);
+            cmdParams[7] = cmd.Parameters.AddWithValue("@Area", Area);
         }
         catch (Exception ex)
         {
@@ -255,7 +330,7 @@ public class RidePat
                 }
                 cmdParams[6] = cmd.Parameters.AddWithValue("@coordinator", Coordinator.DisplayName);
 
-                string query = "insert into RidePat (Patient,Origin,Destination,PickupTime,Coordinator,Remark,OnlyEscort) values (@pat,@origin,@destination,@date,@coordinator,@remark,@onlyEscort);SELECT SCOPE_IDENTITY();";
+                string query = "insert into RidePat (Patient,Origin,Destination,PickupTime,Coordinator,Remark,OnlyEscort,Area) values (@pat,@origin,@destination,@date,@coordinator,@remark,@onlyEscort,@Area);SELECT SCOPE_IDENTITY();";
                 RidePatNum = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
 
                 if (Escorts.Count > 0 && RidePatNum != 0)
@@ -314,7 +389,7 @@ public class RidePat
             Status = db.GetObjectScalarByQuery(query).ToString();
             if (Status != "ממתינה לשיבוץ" && !isAnonymous) throw new Exception("נסיעה זו כבר הוקצתה לנהג ואין אפשרות לערוך אותה");
             cmdParams[6] = cmd.Parameters.AddWithValue("@ridePatNum", RidePatNum);
-            query = "update RidePat set Patient=@pat,Origin=@origin,Destination=@destination,PickupTime=@date,Remark=@remark,OnlyEscort=@onlyEscort where RidePatNum=@ridePatNum";
+            query = "update RidePat set Patient=@pat,Origin=@origin,Destination=@destination,PickupTime=@date,Remark=@remark,OnlyEscort=@onlyEscort,Area=@Area where RidePatNum=@ridePatNum";
             int res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
 
             if (res > 0)
@@ -951,8 +1026,46 @@ public class RidePat
         #endregion
     }
 
-    
+    public List<RidePat> getRidepats()
+    {
+        string query = "select * from ridepat where pickuptime>=getdate() and Area is null"; // Get ALL FUTURE RidePats, even if cancelled
+        List<RidePat> ridePats = new List<RidePat>();
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+            RidePat rp = new RidePat();
+            rp.RidePatNum = (int)dr["RidePatNum"];
+            Location origin = new Location();
+            origin.Name = dr["Origin"].ToString();
+            Location destination = new Location();
+            destination.Name = dr["Destination"].ToString();
+            rp.Origin = origin;
+            rp.Destination = destination;
+            ridePats.Add(rp);
+        }
+        return ridePats;
+    }
+    public void setRidepatsArea()
+    {
+        List<RidePat> ridePats = getRidepats();
+        DbService db = new DbService();
+        foreach (RidePat rp in ridePats)
+        {
+            try
+            {
+                string area = CheckLocationForRidepatArea(rp.Origin.Name, rp.Destination.Name);
+                string query = "update ridepat set Area=" + "N'" + area + "'" + " WHERE ridepatnum=" + rp.RidePatNum;
+                int res = db.ExecuteQuery(query);
+            }
+            catch (Exception ex)
+            {
 
+                throw;
+            }
+            
+        }
+    }
 
     public int CombineRideRidePat(int rideId, int ridePatId)
     {

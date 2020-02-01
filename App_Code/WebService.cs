@@ -122,6 +122,22 @@ public class WebService : System.Web.Services.WebService
         }
     }
     [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string ChangeRidepatAreas()
+    {
+        try
+        {
+            RidePat rp = new RidePat();
+            rp.setRidepatsArea();
+            return j.Serialize("");
+        }
+        catch (Exception e)
+        {
+            Log.Error("Error in getAreas", e);
+            throw new Exception("שגיאה בשליפת אזורים");
+        }
+    }
+    [WebMethod]
     public int setVolunteerPrefs(int Id, List<string> PrefLocation, List<string> PrefArea, List<string> PrefTime, int AvailableSeats)
     {
         try

@@ -334,6 +334,21 @@ public class Location
         return areas;
     }
 
+    public string GetAreaForPoint(string point)
+    {
+        string area = "";
+        string pointNew = point.Replace("'", "''");
+        string query = "select * from Location where Name=N'"+ pointNew + "'";
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+            area = dr["Area"].ToString();
+        }
+        return area;
+    }
+
     public List<Location> getBarrierListForView(bool active)
     {
         #region DB functions

@@ -394,17 +394,17 @@ public class Volunteer
         query += "delete from PreferredLocation_Volunteer where VolunteerId = " + id + "; ";
         db.ExecuteQuery(query);
 
-        foreach (string location in PrefLocation) //insert Location Preferences to DB
-        {
-            db = new DbService();
-            cmd = new SqlCommand();
-            cmd.CommandType = CommandType.Text;
-            SqlParameter[] locationParams = new SqlParameter[2];
-            locationParams[0] = cmd.Parameters.AddWithValue("@location", location);
-            locationParams[1] = cmd.Parameters.AddWithValue("@Id", id);
-            query = "insert into PreferredLocation_Volunteer (PreferredLocation,VolunteerId) values (@location,@id);";
-            res += db.ExecuteQuery(query, cmd.CommandType, locationParams);
-        }
+        //foreach (string location in PrefLocation) //insert Location Preferences to DB
+        //{
+        //    db = new DbService();
+        //    cmd = new SqlCommand();
+        //    cmd.CommandType = CommandType.Text;
+        //    SqlParameter[] locationParams = new SqlParameter[2];
+        //    locationParams[0] = cmd.Parameters.AddWithValue("@location", location);
+        //    locationParams[1] = cmd.Parameters.AddWithValue("@Id", id);
+        //    query = "insert into PreferredLocation_Volunteer (PreferredLocation,VolunteerId) values (@location,@id);";
+        //    res += db.ExecuteQuery(query, cmd.CommandType, locationParams);
+        //}
 
         foreach (string area in PrefArea) //insert Area Preferences to DB
         {
