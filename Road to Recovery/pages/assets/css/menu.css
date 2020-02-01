@@ -521,7 +521,7 @@ body.fixed-left .side-menu.left {
   color: #3bafda;
 }
 #wrapper.enlarged .footer {
-  right: 70px;
+  right: 0px;
 }
 #wrapper.right-bar-enabled .right-bar {
   left: 0;

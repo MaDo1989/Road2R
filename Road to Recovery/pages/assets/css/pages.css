@@ -1305,6 +1305,14 @@ h3.timeline-title {
     width: 10% !important;
 }
 
+.dateCustomWidth {
+    width: 8% !important;
+}
+
+.timeCustomWidth {
+    width: 5% !important;
+}
+
 .middle {
     vertical-align: middle !important;
 }
