@@ -684,13 +684,38 @@ public class RidePat
         {
             if (maxDays == -1)
             {
+                
                 query = "select * from RPView where Convert(date,pickuptime)>=CONVERT(date, getdate()) and Status!=N'הגענו ליעד';"; // Get ALL FUTURE RidePats, even if cancelled
             }
+            
             else query = "select * from RPView where DATEDIFF(day,getdate(),pickuptime)<=" + maxDays + " and Convert(date,pickuptime)>=CONVERT(date, getdate()) and Status!=N'הגענו ליעד';";
         }
         else if (volunteerId == -2)
         {
-            query = "select * from RPView"; //get ALL ridePats
+            if (maxDays == -2) // get this week
+            {
+                var thisSunday = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
+               
+                var endDate = thisSunday.AddDays(7).Date;
+
+                string thisSundayString = thisSunday.ToString("yyyy-MM-dd");
+                string endDateString = endDate.ToString("yyyy-MM-dd");
+
+                query = "select * from RPView where pickuptime >= Convert(datetime,'" + thisSundayString + "') AND pickuptime < Convert(datetime,'" + endDateString + "');";
+            } else if (maxDays == -3) // get next week
+            {
+                var thisSunday = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
+
+                var nextSunday = thisSunday.AddDays(7).Date;
+
+                var endDate = nextSunday.AddDays(7).Date;
+
+                string nextSundayString = nextSunday.ToString("yyyy-MM-dd");
+                string endDateString = endDate.ToString("yyyy-MM-dd");
+
+                query = "select * from RPView where pickuptime >= Convert(datetime,'" + nextSundayString + "') AND pickuptime < Convert(datetime,'" + endDateString + "');";
+            }
+            else query = "select * from RPView"; //get ALL ridePats
         }
         else
         {

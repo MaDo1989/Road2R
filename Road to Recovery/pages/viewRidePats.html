@@ -269,6 +269,7 @@
             checkCookie();
             allRidesFromDB = [];
 
+
             var active = JSON.parse(localStorage.active);
             $("#activeRidePats").prop('checked', active);
             var today = JSON.parse(localStorage.today);
@@ -473,7 +474,9 @@
                     alert("Error in GetRidePatView: " + err.responseText);
                 }
             });
+
         }
+
 
 
 
@@ -639,10 +642,11 @@
 
                                     <li class="active">כל ההסעות</li>
                                 </ol>
-                                <h4 class="page-title">כל ההסעות&nbsp&nbsp
-                                <i data-toggle="tooltip" title="All Rides جميع السفريات">
-                                    <img src="../../Media/היסטורית הסעות.png" height="25" width="25"/>
-                                </i>
+                                <h4 class="page-title">
+                                    כל ההסעות&nbsp&nbsp
+                                    <i data-toggle="tooltip" title="All Rides جميع السفريات">
+                                        <img src="../../Media/היסטורית הסעות.png" height="25" width="25" />
+                                    </i>
                                 </h4>
                             </div>
                         </div>
@@ -655,21 +659,21 @@
                             <div class="card-box table-responsive">
 
                                 <!--<div class="row">
-        <div class="col-sm-8">
-            <h4 class="m-t-0 header-title"><b>טבלת הסעות חולים</b></h4>
-            <p class="text-muted font-13 m-b-30">
-                מבט כללי על ההסעות חולים שבוצעו, ניתן לצפות בפרטים נוספים בלחיצה על כפתור ההרחבה.
-            </p>
-        </div>
-        <div class="col-sm-5 text-right">
-            <button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button> צפייה
-            <button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button> עריכה
-            <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button> מחיקה
-            <button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo'></i></button> שחזור
-            <button type='button' class='btn btn-icon waves-effect waves-light btn-default btn-sm m-b-5' id='reactive' title='הסעה בוצעה'><i class='fa fa-check'></i></button> בוצעה
-            <button type='button' class='btn btn-icon waves-effect waves-light btn-info btn-sm m-b-5' id='reactive' title='משובצת'><i class='fa fa-check'></i></button>משובצת
-        </div>
-    </div>-->
+                    <div class="col-sm-8">
+                        <h4 class="m-t-0 header-title"><b>טבלת הסעות חולים</b></h4>
+                        <p class="text-muted font-13 m-b-30">
+                            מבט כללי על ההסעות חולים שבוצעו, ניתן לצפות בפרטים נוספים בלחיצה על כפתור ההרחבה.
+                        </p>
+                    </div>
+                    <div class="col-sm-5 text-right">
+                        <button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button> צפייה
+                        <button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button> עריכה
+                        <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button> מחיקה
+                        <button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo'></i></button> שחזור
+                        <button type='button' class='btn btn-icon waves-effect waves-light btn-default btn-sm m-b-5' id='reactive' title='הסעה בוצעה'><i class='fa fa-check'></i></button> בוצעה
+                        <button type='button' class='btn btn-icon waves-effect waves-light btn-info btn-sm m-b-5' id='reactive' title='משובצת'><i class='fa fa-check'></i></button>משובצת
+                    </div>
+                </div>-->
                                 <div class="row">
                                     <div class="col-sm-8 checkbox checkbox-primary text-left">
                                         <input id="activeRidePats" type="checkbox" onchange="saveFilters()">
@@ -681,7 +685,7 @@
                                             דרישות של היום בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
                                         </label>
                                         <input id="UnassignedRidePats" type="checkbox" onchange="saveFilters()">
-                                        <label data-toggle="tooltip" data-placement="bottom" title="Waiting for a driver only  طلبات تنتظر لتنسيق فقط"  for="UnassignedRidePats">
+                                        <label data-toggle="tooltip" data-placement="bottom" title="Waiting for a driver only  طلبات تنتظر لتنسيق فقط" for="UnassignedRidePats">
                                             דרישות ממתינות לשיבוץ בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
                                         </label>
                                         <input id="MyRidePats" type="checkbox" onchange="saveFilters()">
@@ -689,7 +693,7 @@
                                             דרישות שלי בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
                                         </label>
                                         <input id="PastRidePats" type="checkbox" onchange="saveFilters()">
-                                        <label data-toggle="tooltip" data-placement="bottom"  title="Show past rides عرض السفريات السابقة" for="PastRidePats">
+                                        <label data-toggle="tooltip" data-placement="bottom" title="Show past rides عرض السفريات السابقة" for="PastRidePats">
                                             הצג נסיעות עבר  &nbsp;&nbsp;|&nbsp;&nbsp;
                                         </label>
                                     </div>
@@ -724,27 +728,26 @@
                         </div>
                     </div>
 
+                    
 
+                            </div>
+                            <!-- end container -->
 
+                        </div>
+                        <!-- end content -->
+                        <!-- FOOTER -->
+                        <footer class="footer text-right">
+                            2020 - 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה
+
+                        </footer>
+                        <!-- End FOOTER -->
+
+                    </div>
+                    <!-- ============================================================== -->
+                    <!-- End page content here -->
+                    <!-- ============================================================== -->
 
                 </div>
-                <!-- end container -->
-
-            </div>
-            <!-- end content -->
-            <!-- FOOTER -->
-            <footer class="footer text-right">
-                2020 - 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה
-                
-            </footer>
-            <!-- End FOOTER -->
-
-        </div>
-        <!-- ============================================================== -->
-        <!-- End page content here -->
-        <!-- ============================================================== -->
-
-    </div>
     <!-- END wrapper -->
 
 

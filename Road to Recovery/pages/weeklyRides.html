@@ -1,0 +1,674 @@
+﻿
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="KSMoving">
+    <meta name="author" content="Coderthemes">
+
+    <link rel="shortcut icon" href="assets/images/favicon_1.ico">
+
+    <title>הסעות השבוע</title>
+
+    <!-- DataTables -->
+    <link href="../plugins/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/buttons.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/fixedHeader.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/responsive.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/scroller.bootstrap.min.css" rel="stylesheet" type="text/css" />
+
+    <!-- Sweet Alert css -->
+    <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
+
+    <link href="../plugins/switchery/switchery.min.css" rel="stylesheet" />
+    <link href="assets/css/bootstrap-rtl.min.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/core.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/icons.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/components.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/pages.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/menu.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/responsive.css" rel="stylesheet" type="text/css">
+
+    <script src="assets/js/CookiesFunctions.js"></script>
+
+    <script src="assets/js/modernizr.min.js"></script>
+
+    <!--GENERAL object and additional functions-->
+    <script src="lib/lz-string.js"></script>
+    <script src="lib/master.js"></script>
+
+    <script src="assets/js/jquery.min.js"></script>
+
+    <script src="dataTables.js"></script>
+    <script src="moment.js"></script>
+    <script src="datetime-moment.js"></script>
+
+
+    <!-- Select2 css+js -->
+    <link href="assets/css/select2.css" rel="stylesheet" />
+    <script src="assets/js/select2.min.js"></script>
+    <!--<script src="lib/moment.js"></script>-->
+    <!--<script src="../plugins/moment/moment.js"></script>-->
+    <script src="lib/sorting.js"></script>
+    <script src="lib/includeHTML.js"></script>
+    <script src="https://cdn.datatables.net/plug-ins/1.10.19/sorting/date-de.js"></script>
+
+    <script>
+        var tbl;
+        var arr_rides;
+        var curr = new Date; // get current date
+        var first = curr.getDate() - curr.getDay(); // First day is the day of the month - the day of the week
+        var last = first + 6; // last day is the first day + 6
+
+        var firstday = new Date(curr.setDate(first));
+        var lastday = new Date(curr.setDate(last));
+
+        if (lastday.getDate() < firstday.getDate()) {
+            { var thisWeekFirst = lastday.getDate() + "." + (lastday.getMonth() + 2) + " - " + firstday.getDate() + "." + (firstday.getMonth() + 1) }
+        } else { var thisWeekFirst = lastday.getDate() + "." + (lastday.getMonth() + 1) + " - " + firstday.getDate() + "." + (firstday.getMonth() + 1) }
+        var locations;
+        var southLocations = []
+        var centerLocations = []
+        var northLocations = []
+        var allRides = [];
+        var weekdays = [];
+
+        $(document).ready(function () {
+
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getLocations",
+                contentType: "application/json; charset=utf-8",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-Encoding", "gzip");
+                },
+                type: "POST",
+                data: "",
+                success: function (data) {
+                    let fullList = JSON.parse(data.d)
+                    for (loc of fullList) {
+                        if (loc.Area.includes("דרום")) {
+                            southLocations.push(loc.Name);
+                        }
+                        if (loc.Area.includes("מרכז")) {
+                            centerLocations.push(loc.Name);
+                        }
+                        if (loc.Area.includes("צפון")) {
+                            northLocations.push(loc.Name);
+                        }
+                    }
+
+                    locations = {
+                        South: southLocations,
+                        Center: centerLocations,
+                        North: northLocations
+                    }
+
+                }, error: function (error) {
+                    console.log(error);
+                }
+            });
+
+
+            $('#thisWeekHeader').html("הסעות לשבוע " + thisWeekFirst)
+
+            if (localStorage.south == "undefined" || localStorage.south === undefined) {
+                localStorage.south = true;
+                $('#south').prop('checked', true);
+            } else {
+                $('#south').prop('checked', JSON.parse(localStorage.south));
+            }
+
+
+            if (localStorage.center == "undefined" || localStorage.center === undefined) {
+                localStorage.center = true;
+                $('#center').prop('checked', true);
+            } else {
+                $('#center').prop('checked', JSON.parse(localStorage.center));
+            }
+
+            if (localStorage.north == "undefined" || localStorage.north === undefined) {
+                localStorage.north = true;
+                $('#north').prop('checked', true);
+            } else {
+                $('#north').prop('checked', JSON.parse(localStorage.north));
+            }
+
+            if (localStorage.sunday == "undefined" || localStorage.sunday === undefined) {
+                localStorage.sunday = true;
+                $('#sunday').prop('checked', true);
+            } else {
+                $('#sunday').prop('checked', JSON.parse(localStorage.sunday));
+            }
+
+            if (localStorage.monday == "undefined" || localStorage.monday === undefined) {
+                localStorage.monday = true;
+                $('#monday').prop('checked', true);
+            } else {
+                $('#monday').prop('checked', JSON.parse(localStorage.sunday));
+            }
+
+            if (localStorage.tuesday == "undefined" || localStorage.tuesday === undefined) {
+                localStorage.tuesday = true;
+                $('#tuesday').prop('checked', true);
+            } else {
+                $('#tuesday').prop('checked', JSON.parse(localStorage.tuesday));
+            }
+
+            if (localStorage.wednesday == "undefined" || localStorage.wednesday === undefined) {
+                localStorage.wednesday = true;
+                $('#wednesday').prop('checked', true);
+            } else {
+                $('#wednesday').prop('checked', JSON.parse(localStorage.wednesday));
+            }
+
+            if (localStorage.thursday == "undefined" || localStorage.thursday === undefined) {
+                localStorage.thursday = true;
+                $('#thursday').prop('checked', true);
+            } else {
+                $('#thursday').prop('checked', JSON.parse(localStorage.thursday));
+            }
+
+            if (localStorage.friday == "undefined" || localStorage.friday === undefined) {
+                localStorage.friday = true;
+                $('#friday').prop('checked', true);
+            } else {
+                $('#friday').prop('checked', JSON.parse(localStorage.friday));
+            }
+
+            if (localStorage.saturday == "undefined" || localStorage.saturday === undefined) {
+                localStorage.saturday = true;
+                $('#saturday').prop('checked', true);
+            } else {
+                $('#saturday').prop('checked', JSON.parse(localStorage.saturday));
+            }
+
+            refreshTable();
+
+
+        });
+
+
+        function refreshTable() {
+
+            var south = JSON.parse(localStorage.south);
+
+            var center = JSON.parse(localStorage.center);
+
+            var north = JSON.parse(localStorage.north);
+
+            weekdays = [];
+            var sunday = JSON.parse(localStorage.sunday);
+            if (sunday)
+                weekdays.push("א");
+            var monday = JSON.parse(localStorage.monday);
+            if (monday)
+                weekdays.push("ב");
+            var tuesday = JSON.parse(localStorage.tuesday);
+            if (tuesday)
+                weekdays.push("ג");
+            var wednesday = JSON.parse(localStorage.wednesday);
+            if (wednesday)
+                weekdays.push("ד");
+            var thursday = JSON.parse(localStorage.thursday);
+            if (thursday)
+                weekdays.push("ה");
+            var friday = JSON.parse(localStorage.friday);
+            if (friday)
+                weekdays.push("ו");
+            var saturday = JSON.parse(localStorage.saturday);
+            if (saturday)
+                weekdays.push("ש");
+
+            ridesToShow = [];
+            allRides = [];
+            var volunteerId = -2 // VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
+            $('#wait').show();
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/GetRidePatView",
+                contentType: "application/json; charset=utf-8",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-Encoding", "gzip");
+                },
+                type: "POST",
+                data: JSON.stringify({ volunteerId: volunteerId, maxDays: -2 }),// -2 means this week rides
+                success: function (data) {
+                    $('#wait').hide();
+                    arr_rides = JSON.parse(data.d);
+
+
+                    for (i in arr_rides) {
+
+                        //Change date format
+                        var temp = arr_rides[i].Date.substring(arr_rides[i].Date.indexOf("(") + 1);
+                        temp = temp.substring(0, temp.indexOf(")"));
+                        var date = new Date(parseInt(temp));
+
+                        var HEBday = getDayString(date.getDay());
+
+                        if (arr_rides[i].Drivers.length != 0) {
+                            driverName = arr_rides[i].Drivers[0].DisplayName;
+                        }
+                        destinationName = arr_rides[i].Destination.Name;
+                        originName = arr_rides[i].Origin.Name;
+
+
+                        if (date.getDate() < 10) {
+                            day = "0" + date.getDate();
+                        } else day = date.getDate();
+
+
+                        if (date.getMonth() + 1 < 10) {
+                            month = "0" + (date.getMonth() + 1);
+                        } else month = date.getMonth() + 1;
+
+
+                        var d = new Date();
+                        var timezoneOffset = d.getTimezoneOffset() / 60;
+
+                        if ((date.getHours() - timezoneOffset) < 10) {
+                            hours = "0" + (date.getHours() - timezoneOffset);
+                        } else hours = (date.getHours() - timezoneOffset);
+
+                        if (date.getMinutes() < 10) {
+                            minutes = "0" + date.getMinutes();
+                        } else minutes = date.getMinutes();
+
+                        if (arr_rides[i].Pat.DisplayName.includes("אנונימי")) {
+                            patDisplayName = "חולה";
+                        } else {
+                            patDisplayName = arr_rides[i].Pat.DisplayName;
+                        }
+
+                        if (arr_rides[i].Pat.EscortedList.length != 0) {
+                            patDisplayName += " + " + arr_rides[i].Pat.EscortedList.length;
+                        }
+
+                        date2 = HEBday + " " + day + "/" + month + "/" + date.getUTCFullYear() % 2000;
+                        time = hours + ":" + minutes;
+
+
+                        if (time == "22:14") { //22:14 is the default time to show afternoon אחה''צ
+
+                            time = " אחה\"צ";
+                        }
+
+                        let southRide = false;
+                        let centerRide = false;
+                        let northRide = false;
+
+                        if (locations.South.includes(arr_rides[i].Destination.Name) || locations.South.includes(arr_rides[i].Origin.Name))
+                            southRide = true;
+                        if (locations.Center.includes(arr_rides[i].Destination.Name) || locations.Center.includes(arr_rides[i].Origin.Name))
+                            centerRide = true;
+                        if (locations.North.includes(arr_rides[i].Destination.Name) || locations.North.includes(arr_rides[i].Origin.Name))
+                            northRide = true;
+
+
+                        var Ride = {};
+
+                        if (arr_rides[i].Status == "ממתינה לשיבוץ") {
+                            drivers = arr_rides[i].Status;
+                        } else {
+                            drivers = arr_rides[i].Drivers[0].DisplayName;
+                        }
+                        
+                                Ride = {
+                                    Date: date2,
+                                    OriginName: arr_rides[i].Origin.Name,
+                                    DestinationName: arr_rides[i].Destination.Name,
+                                    Time: time,
+                                    PatDisplayName: patDisplayName,
+                                    Coordinator: arr_rides[i].Coordinator.DisplayName,
+                                    Drivers: drivers,
+                                    SouthRide: southRide,
+                                    CenterRide: centerRide,
+                                    NorthRide: northRide,
+                                    Day: date2.slice(4, 5)
+                                }
+                            
+
+                        allRides.push(Ride);
+
+
+
+                        if (south && Ride.SouthRide && weekdays.includes(Ride.Day)) {
+                            ridesToShow.push(Ride);
+                            continue;
+                        }
+                        if (center && Ride.CenterRide && weekdays.includes(Ride.Day)) {
+                            ridesToShow.push(Ride);
+                            continue;
+                        }
+                        if (north && Ride.NorthRide && weekdays.includes(Ride.Day)) {
+                            ridesToShow.push(Ride);
+                            continue;
+                        }
+
+
+                        }
+
+                        tbl = $('#weeklyRides').DataTable({
+                            pageLength: 500,
+                            bLengthChange: false,
+                            data: ridesToShow,
+                            destroy: true,
+                            columnDefs: [
+                                { "orderData": [0, 3], "targets": 0 }],
+                            columns: [
+                                { data: "Date" },
+                                { data: "OriginName" },
+                                { data: "DestinationName" },
+                                { data: "Time" },
+                                { data: "PatDisplayName" },
+                                { data: "Coordinator" },
+                                { data: "Drivers" },
+
+                            ],
+                            createdRow: function (row, data, dataIndex) {
+                                if (data.Date.includes("א") || data.Date.includes("ג") || data.Date.includes("ה") || data.Date.includes("ש"))
+                                    $(row).css('background-color', '#f1f1f1');
+                                else $(row).css('background-color', '#ffffff')
+                            },
+                            rowCallback: function (row, data, index) {
+                                if (data.Drivers == "ממתינה לשיבוץ") {
+                                    $(row).find('td:eq(6)').css('background-color', '#FBD4B4');
+                                }
+                            }
+                        });
+                    },
+                    error: function (err) {
+                        $('#wait').hide();
+                        alert("Error in GetRidePatView: " + err.responseText);
+                    }
+
+
+                });
+
+
+
+
+        }
+
+        function getDayString(num) {
+            var day;    //Create a local variable to hold the string
+            switch (num) {
+                case 0:
+                    day = "יום א'";
+                    break;
+                case 1:
+                    day = "יום ב'";
+                    break;
+                case 2:
+                    day = "יום ג'";
+                    break;
+                case 3:
+                    day = "יום ד'";
+                    break;
+                case 4:
+                    day = "יום ה'";
+                    break;
+                case 5:
+                    day = "יום ו'";
+                    break;
+                case 6:
+                    day = "יום ש'";
+                    break;
+                default:
+                    day = "Invalid day";
+            }
+            return day;
+        }
+
+        function saveFilters() {
+
+            localStorage.south = $("#south").prop('checked');
+            var south = JSON.parse(localStorage.south);
+            localStorage.center = $("#center").prop('checked');
+            var center = JSON.parse(localStorage.center);
+            localStorage.north = $("#north").prop('checked');
+            var north = JSON.parse(localStorage.north);
+            weekdays = [];
+            localStorage.sunday = $("#sunday").prop('checked');
+            var sunday = JSON.parse(localStorage.sunday);
+            if (sunday)
+                weekdays.push("א");
+            localStorage.monday = $("#monday").prop('checked');
+            var monday = JSON.parse(localStorage.monday);
+            if (monday)
+                weekdays.push("ב");
+            localStorage.tuesday = $("#tuesday").prop('checked');
+            var tuesday = JSON.parse(localStorage.tuesday);
+            if (tuesday)
+                weekdays.push("ג");
+            localStorage.wednesday = $("#wednesday").prop('checked');
+            var wednesday = JSON.parse(localStorage.wednesday);
+            if (wednesday)
+                weekdays.push("ד");
+            localStorage.thursday = $("#thursday").prop('checked');
+            var thursday = JSON.parse(localStorage.thursday);
+            if (thursday)
+                weekdays.push("ה");
+            localStorage.friday = $("#friday").prop('checked');
+            var friday = JSON.parse(localStorage.friday);
+            if (friday)
+                weekdays.push("ו");
+            localStorage.saturday = $("#saturday").prop('checked');
+            var saturday = JSON.parse(localStorage.saturday);
+            if (saturday)
+                weekdays.push("ש");
+           
+
+            ridesToShow = [];
+            tbl.clear().draw();
+
+            for (Ride of allRides) {
+                if (south && Ride.SouthRide && weekdays.includes(Ride.Day)) {
+                    ridesToShow.push(Ride);
+                    continue;
+                }
+                if (center && Ride.CenterRide && weekdays.includes(Ride.Day)) {
+                    ridesToShow.push(Ride);
+                    continue;
+                }
+                if (north && Ride.NorthRide && weekdays.includes(Ride.Day)) {
+                    ridesToShow.push(Ride);
+                    continue;
+                }
+            }
+
+
+            tbl = $('#weeklyRides').DataTable({
+                pageLength: 500,
+                bLengthChange: false,
+                data: ridesToShow,
+                destroy: true,
+                columnDefs: [
+                    { "orderData": [0, 3], "targets": 0 }],
+                columns: [
+                    { data: "Date" },
+                    { data: "OriginName" },
+                    { data: "DestinationName" },
+                    { data: "Time" },
+                    { data: "PatDisplayName" },
+                    { data: "Coordinator" },
+                    { data: "Drivers" },
+
+                ],
+                createdRow: function (row, data, dataIndex) {
+                    if (data.Date.includes("א") || data.Date.includes("ג") || data.Date.includes("ה") || data.Date.includes("ש"))
+                        $(row).css('background-color', '#f1f1f1');
+                    else $(row).css('background-color', '#ffffff')
+                },
+                rowCallback: function (row, data, index) {
+                    if (data.Drivers == "ממתינה לשיבוץ") {
+                        $(row).find('td:eq(6)').css('background-color', '#FBD4B4');
+                    }
+                }
+            });
+        }
+
+
+    </script>
+    <style>
+        #weeklyRides tbody td {
+            padding: 2px 10px;
+        }
+    </style>
+</head>
+<body class="fixed-left">
+    <div id="wrapper">
+        <div class="content">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="page-title-box">
+                            <br />
+                            <div class="text-center">
+
+                                <a href="weeklyRides.html" class="btn btn-primary waves-effect w-md waves-light m-b-10" style="font-size:25px;">הסעות לשבוע הנוכחי</a>&nbsp&nbsp&nbsp&nbsp
+                                <a href="nextweekRides.html" class="btn btn-primary waves-effect w-md waves-light m-b-10" style="font-size:20px;">הסעות לשבוע הבא</a>
+                            </div>
+                            <h4 class="page-title">
+                                תמונת הסעות שבועית&nbsp&nbsp
+                                <i>
+                                    <img src="../../Media/היסטורית הסעות.png" height="25" width="25" />
+                                </i>
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+
+                    <div class="col-sm-12">
+                        <div class="card-box table-responsive">
+                            <h3 id="thisWeekHeader"></h3>
+                            <div class="col-sm-8 checkbox checkbox-primary text-left">
+                                <input id="south" type="checkbox" onchange="saveFilters()">
+                                <label for="south">
+                                    דרום  &nbsp;&nbsp;|&nbsp;&nbsp;
+                                </label>
+                                <input id="center" type="checkbox" onchange="saveFilters()">
+                                <label for="center">
+                                    מרכז  &nbsp;&nbsp;|&nbsp;&nbsp;
+                                </label>
+                                <input id="north" type="checkbox" onchange="saveFilters()">
+                                <label for="north">
+                                    צפון
+                                </label>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <input id="sunday" type="checkbox" onchange="saveFilters()">
+                                <label for="sunday">
+                                    יום א  &nbsp;&nbsp;|&nbsp;&nbsp;
+                                </label>
+                                <input id="monday" type="checkbox" onchange="saveFilters()">
+                                <label for="monday">
+                                    יום ב  &nbsp;&nbsp;|&nbsp;&nbsp;
+                                </label>
+                                <input id="tuesday" type="checkbox" onchange="saveFilters()">
+                                <label for="tuesday">
+                                    יום ג  &nbsp;&nbsp;|&nbsp;&nbsp;
+                                </label>
+                                <input id="wednesday" type="checkbox" onchange="saveFilters()">
+                                <label for="wednesday">
+                                    יום ד  &nbsp;&nbsp;|&nbsp;&nbsp;
+                                </label>
+                                <input id="thursday" type="checkbox" onchange="saveFilters()">
+                                <label for="thursday">
+                                    יום ה  &nbsp;&nbsp;|&nbsp;&nbsp;
+                                </label>
+                                <input id="friday" type="checkbox" onchange="saveFilters()">
+                                <label for="friday">
+                                    יום ו  &nbsp;&nbsp;|&nbsp;&nbsp;
+                                </label>
+                                <input id="saturday" type="checkbox" onchange="saveFilters()">
+                                <label for="saturday">
+                                    יום ש 
+                                </label>
+
+                            </div>
+                            <div class="col-sm-4 text-right ">
+                                <button style="font-size:20px" type="button" id="createCustomer" onclick="refreshTable()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-refresh m-r-5"></span>לחצו לקבלת נתונים עדכניים</button>
+                            </div>
+                            <table id="weeklyRides" class="table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th title="Date & Day" class="dateCustomWidth">תאריך ויום</th>
+                                        <th title="نقطة الانطلاق Origin">מוצא</th>
+                                        <th title="نقطة الوصول Destination">יעד</th>
+                                        <th title="Time" class="timeCustomWidth">שעה</th>
+                                        <th title="المريض Patient">החולה</th>
+                                        <th title="Coordinator">רכז</th>
+                                        <th title="السائقين بالفرة Drivers">נהגים בנסיעה</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                            <div id="wait" style="display:none;width:69px;height:89px;position:fixed;top:50%;left:50%;padding:2px;">
+                                <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
+                            </div>
+                            <br />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer class="footer text-right" style="right:0px">
+            2020 - 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה
+        </footer>
+    </div>
+
+    <script>
+        var resizefunc = [];
+    </script>
+
+    <!-- jQuery  -->
+    <script src="assets/js/bootstrap-rtl.min.js"></script>
+    <script src="assets/js/detect.js"></script>
+    <script src="assets/js/fastclick.js"></script>
+    <script src="assets/js/jquery.slimscroll.js"></script>
+    <script src="assets/js/jquery.blockUI.js"></script>
+    <script src="assets/js/waves.js"></script>
+    <script src="assets/js/wow.min.js"></script>
+    <script src="assets/js/jquery.nicescroll.js"></script>
+    <script src="assets/js/jquery.scrollTo.min.js"></script>
+    <script src="../plugins/switchery/switchery.min.js"></script>
+
+    <!-- Datatables-->
+    <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="../plugins/datatables/dataTables.bootstrap.js"></script>
+    <script src="../plugins/datatables/dataTables.buttons.min.js"></script>
+    <script src="../plugins/datatables/buttons.bootstrap.min.js"></script>
+    <script src="../plugins/datatables/jszip.min.js"></script>
+    <script src="../plugins/datatables/pdfmake.min.js"></script>
+    <script src="../plugins/datatables/vfs_fonts.js"></script>
+    <script src="../plugins/datatables/buttons.html5.min.js"></script>
+    <script src="../plugins/datatables/buttons.print.min.js"></script>
+    <script src="../plugins/datatables/dataTables.fixedHeader.min.js"></script>
+    <script src="../plugins/datatables/dataTables.keyTable.min.js"></script>
+    <script src="../plugins/datatables/dataTables.responsive.min.js"></script>
+    <script src="../plugins/datatables/responsive.bootstrap.min.js"></script>
+    <script src="../plugins/datatables/dataTables.scroller.min.js"></script>
+
+    <!-- Datatable init js -->
+    <script src="assets/pages/datatables.init.js"></script>
+
+    <!-- Sweet Alert js -->
+    <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
+    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+
+    <script src="assets/js/jquery.core.js"></script>
+    <script src="assets/js/jquery.app.js"></script>
+    <!--<script src="cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+    <script src="cdn.datatables.net/plug-ins/1.10.19/sorting/datetime-moment.js"></script>-->
+    <!--<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>-->
+    <!--<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+    <script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+    <script src="//cdn.datatables.net/plug-ins/1.10.12/sorting/datetime-moment.js"></script>-->
+    <script type="text/javascript">
+
+    </script>
+</body>
+</html>
