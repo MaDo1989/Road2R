@@ -1,0 +1,112 @@
+﻿2020-02-01 12:53:15,636 ERROR [15] WebService.writeToLog - Successful login ;for user: 0524842888
+2020-02-01 12:53:34,215 ERROR [15] WebService.setRidePat - Error in setRidePat
+System.IndexOutOfRangeException: אין שורה במיקום 0.
+   ב-  System.Data.RBTree`1.GetNodeByIndex(Int32 userIndex)
+   ב-  System.Data.DataRowCollection.get_Item(Int32 index)
+   ב-  RidePat.GetRidePat(Int32 ridePatNum) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 599
+   ב-  RidePat.setRidePat(RidePat ridePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 450
+   ב-  WebService.setRidePat(RidePat RidePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 178
+2020-02-01 13:01:15,805 ERROR [15] WebService.setRidePat - Error in setRidePat
+System.IndexOutOfRangeException: אין שורה במיקום 0.
+   ב-  System.Data.RBTree`1.GetNodeByIndex(Int32 userIndex)
+   ב-  System.Data.DataRowCollection.get_Item(Int32 index)
+   ב-  RidePat.GetRidePat(Int32 ridePatNum) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 599
+   ב-  RidePat.setRidePat(RidePat ridePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 450
+   ב-  WebService.setRidePat(RidePat RidePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 178
+2020-02-01 14:59:22,285 ERROR [79] WebService.ChangeRidepatAreas - Error in getAreas
+System.Data.SqlClient.SqlException (0x80131904): Incorrect syntax near '('.
+   ב-  DbService.ExecuteQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 119
+   ב-  RidePat.setRidepatsArea() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1067
+   ב-  WebService.ChangeRidepatAreas() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 131
+ClientConnectionId:c33c1fa3-0794-4a2d-b04d-8ab0c105a282
+Error Number:102,State:1,Class:15
+2020-02-01 15:11:11,795 ERROR [59] WebService.ChangeRidepatAreas - Error in getAreas
+System.Data.SqlClient.SqlException (0x80131904): Incorrect syntax near '('.
+   ב-  DbService.ExecuteQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 119
+   ב-  RidePat.setRidepatsArea() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1067
+   ב-  WebService.ChangeRidepatAreas() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 131
+ClientConnectionId:c33c1fa3-0794-4a2d-b04d-8ab0c105a282
+Error Number:102,State:1,Class:15
+2020-02-01 15:15:35,354 ERROR [50] WebService.ChangeRidepatAreas - Error in getAreas
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Location.GetAreaForPoint(String point) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Location.cs:שורה 344
+   ב-  RidePat.CheckLocationForRidepatArea(String origin, String destination) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 234
+   ב-  RidePat.setRidepatsArea() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1067
+   ב-  WebService.ChangeRidepatAreas() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 131
+2020-02-01 15:35:28,431 ERROR [50] WebService.ChangeRidepatAreas - Error in getAreas
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  RidePat.getRidepats() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1038
+   ב-  RidePat.setRidepatsArea() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1054
+   ב-  WebService.ChangeRidepatAreas() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 131
+2020-02-01 15:36:18,540 ERROR [78] WebService.ChangeRidepatAreas - Error in getAreas
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  RidePat.getRidepats() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1038
+   ב-  RidePat.setRidepatsArea() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1054
+   ב-  WebService.ChangeRidepatAreas() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 131
+2020-02-01 15:37:06,472 ERROR [78] WebService.ChangeRidepatAreas - Error in getAreas
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  RidePat.getRidepats() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1038
+   ב-  RidePat.setRidepatsArea() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1054
+   ב-  WebService.ChangeRidepatAreas() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 131
+2020-02-01 15:37:32,746 ERROR [78] WebService.ChangeRidepatAreas - Error in getAreas
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  RidePat.getRidepats() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1038
+   ב-  RidePat.setRidepatsArea() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1054
+   ב-  WebService.ChangeRidepatAreas() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 131
+2020-02-01 15:38:25,905 ERROR [70] WebService.ChangeRidepatAreas - Error in getAreas
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  RidePat.getRidepats() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1038
+   ב-  RidePat.setRidepatsArea() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1054
+   ב-  WebService.ChangeRidepatAreas() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 131
+2020-02-01 16:39:51,183 ERROR [9] WebService.ChangeRidepatAreas - Error in getAreas
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Location.GetAreaForPoint(String point) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Location.cs:שורה 344
+   ב-  RidePat.CheckLocationForRidepatArea(String origin, String destination) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 234
+   ב-  RidePat.setRidepatsArea() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1067
+   ב-  WebService.ChangeRidepatAreas() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 131
+2020-02-01 16:41:31,071 ERROR [9] WebService.ChangeRidepatAreas - Error in getAreas
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Location.GetAreaForPoint(String point) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Location.cs:שורה 344
+   ב-  RidePat.CheckLocationForRidepatArea(String origin, String destination) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 234
+   ב-  RidePat.setRidepatsArea() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1067
+   ב-  WebService.ChangeRidepatAreas() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 131
+2020-02-01 16:42:01,787 ERROR [9] WebService.ChangeRidepatAreas - Error in getAreas
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Location.GetAreaForPoint(String point) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Location.cs:שורה 344
+   ב-  RidePat.CheckLocationForRidepatArea(String origin, String destination) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 234
+   ב-  RidePat.setRidepatsArea() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1067
+   ב-  WebService.ChangeRidepatAreas() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 131
+2020-02-01 16:42:31,563 ERROR [9] WebService.ChangeRidepatAreas - Error in getAreas
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Location.GetAreaForPoint(String point) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Location.cs:שורה 344
+   ב-  RidePat.CheckLocationForRidepatArea(String origin, String destination) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 234
+   ב-  RidePat.setRidepatsArea() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1067
+   ב-  WebService.ChangeRidepatAreas() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 131
+2020-02-01 16:44:33,797 ERROR [9] WebService.ChangeRidepatAreas - Error in getAreas
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Location.GetAreaForPoint(String point) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Location.cs:שורה 344
+   ב-  RidePat.CheckLocationForRidepatArea(String origin, String destination) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 234
+   ב-  RidePat.setRidepatsArea() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1067
+   ב-  WebService.ChangeRidepatAreas() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 131
+2020-02-01 16:45:25,077 ERROR [33] WebService.ChangeRidepatAreas - Error in getAreas
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  Location.GetAreaForPoint(String point) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Location.cs:שורה 344
+   ב-  RidePat.CheckLocationForRidepatArea(String origin, String destination) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 234
+   ב-  RidePat.setRidepatsArea() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1067
+   ב-  WebService.ChangeRidepatAreas() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 131
+2020-02-01 16:54:30,597 ERROR [9] WebService.ChangeRidepatAreas - Error in getAreas
+System.Data.SqlClient.SqlException (0x80131904): The UPDATE statement conflicted with the FOREIGN KEY constraint "FK__RidePat__Area__498EEC8D". The conflict occurred in database "r2rdb_prod", table "dbo.Area", column 'AreaName'.
+The statement has been terminated.
+   ב-  DbService.ExecuteQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 119
+   ב-  RidePat.setRidepatsArea() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1067
+   ב-  WebService.ChangeRidepatAreas() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 131
+ClientConnectionId:f66339e4-32c2-47df-b71c-ec2a629f19e1
+Error Number:547,State:0,Class:16
+2020-02-01 16:57:25,422 ERROR [40] WebService.ChangeRidepatAreas - Error in getAreas
+System.Data.SqlClient.SqlException (0x80131904): The UPDATE statement conflicted with the FOREIGN KEY constraint "FK__RidePat__Area__498EEC8D". The conflict occurred in database "r2rdb_prod", table "dbo.Area", column 'AreaName'.
+The statement has been terminated.
+   ב-  DbService.ExecuteQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 119
+   ב-  RidePat.setRidepatsArea() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1067
+   ב-  WebService.ChangeRidepatAreas() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 131
+ClientConnectionId:f66339e4-32c2-47df-b71c-ec2a629f19e1
+Error Number:547,State:0,Class:16

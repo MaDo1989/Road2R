@@ -385,6 +385,24 @@ public class WebService : System.Web.Services.WebService
 
     }
     [WebMethod]
+    public string GetVolunteerPrefArea(int Id)
+    {
+        try
+        {
+            Volunteer v = new Volunteer();
+            List<string> areas = v.getPrefArea(Id);
+            JavaScriptSerializer j = new JavaScriptSerializer();
+            return j.Serialize(areas);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetVolunteerPrefArea", ex);
+            throw new Exception("שגיאה בשליפת נתוני אזורים של המתנדב");
+
+        }
+    }
+
+    [WebMethod]
     public int getSpaceInCar(int ridePatNum, int driverId)
     {
         try

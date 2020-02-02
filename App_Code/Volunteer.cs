@@ -1185,6 +1185,21 @@ public class Volunteer
 
         return v;
     }
+    public List<string> getPrefArea(int id)
+    {
+        List<string> areas = new List<string>();
+        DbService db = new DbService();
+        //Get Preferred Area for Volunteer
+        string query = "select PreferredArea from PreferredArea_Volunteer where VolunteerId=" + id;
+        DataSet ds = db.GetDataSetByQuery(query);
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+            string area = dr["PreferredArea"].ToString();
+            areas.Add(area);
+        }
+        return areas;
+
+    }
     public Volunteer getVolunteerByID(int id)
     {
         #region DB functions
