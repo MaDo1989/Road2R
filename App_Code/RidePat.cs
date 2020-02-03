@@ -210,6 +210,36 @@ public class RidePat
         // TODO: Add constructor logic here
         //
     }
+    private string NEWCheckLocationForRidepatArea(string origin, string destination)
+    {
+//ארז – ירושלים
+//ארז - מרכז
+//ארז - צפון
+//תרקומיא – מרכז
+//אזור המרכז
+//מרכז - ירושלים
+//מרכז - צפון
+//אזור הצפון
+        Location l = new Location();
+        string originArea = l.GetAreaForPoint(origin);
+        string destinationArea = l.GetAreaForPoint(destination);
+        List<string> allAreas = l.getAreas();
+        string rideArea = originArea + " - " + destinationArea;
+        if (originArea==destinationArea)
+        {
+            rideArea = originArea;
+        }
+        else if(!allAreas.Contains(rideArea))
+        {
+            rideArea = destinationArea + " - " + originArea;
+            if (!allAreas.Contains(rideArea))
+            {
+                throw new ArgumentException("area not undefined");
+            }
+        }
+        return rideArea;
+    }
+    //need to change....
     private string CheckLocationForRidepatArea(string origin,string destination)
     {
         //ארז – ירושלים
@@ -233,6 +263,7 @@ public class RidePat
         Location l = new Location();
         string originArea = l.GetAreaForPoint(origin);
         string destinationArea = l.GetAreaForPoint(destination);
+
         string areaForRidepat = originArea;
         if (origin == "ארז")
         {
@@ -240,7 +271,6 @@ public class RidePat
             {
                 case "מרכז":
                 case "מרכז-דרום":
-                case "צפון-מרכז":
                     areaForRidepat = "ארז - מרכז";
                     break;
                 case "מרכז - ירושליים":
@@ -248,6 +278,7 @@ public class RidePat
                     areaForRidepat = "ארז – ירושלים";
                     break;
                 case "צפון":
+                case "צפון-מרכז":
                     areaForRidepat = "ארז - צפון";
                     break;
                 default:
@@ -280,6 +311,10 @@ public class RidePat
         {
             areaForRidepat = "תרקומיא – מרכז";
         }
+        else if ((originArea=="מרכז" && destinationArea=="צפון") || (destinationArea == "מרכז" && originArea == "צפון"))
+        {
+            areaForRidepat = "צפון-מרכז";
+        }
         return areaForRidepat;
     }
     //לשנות את  isAnonymous
@@ -298,7 +333,7 @@ public class RidePat
             origin.Name = ridePat.Origin.Name;
             Location destination = new Location();
             destination.Name = ridePat.Destination.Name;
-            Area = CheckLocationForRidepatArea(origin.Name, destination.Name);
+            Area = NEWCheckLocationForRidepatArea(origin.Name, destination.Name);
             Date = ridePat.Date;
             Coordinator = new Volunteer();
             Coordinator.DisplayName = ridePat.Coordinator.DisplayName;
@@ -1053,7 +1088,7 @@ public class RidePat
 
     public List<RidePat> getRidepats()
     {
-        string query = "select * from ridepat where pickuptime>=getdate() and Area is null"; // Get ALL FUTURE RidePats, even if cancelled
+        string query = "select * from ridepat where pickuptime>=getdate() and area<>N'מרכז'"; // Get ALL FUTURE RidePats, even if cancelled
         List<RidePat> ridePats = new List<RidePat>();
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
@@ -1079,7 +1114,7 @@ public class RidePat
         {
             try
             {
-                string area = CheckLocationForRidepatArea(rp.Origin.Name, rp.Destination.Name);
+                string area = NEWCheckLocationForRidepatArea(rp.Origin.Name, rp.Destination.Name);
                 string query = "update ridepat set Area=" + "N'" + area + "'" + " WHERE ridepatnum=" + rp.RidePatNum;
                 int res = db.ExecuteQuery(query);
             }

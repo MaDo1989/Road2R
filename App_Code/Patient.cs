@@ -720,11 +720,10 @@ public class Patient
 
         return list;
     }
-    public List<string> GetAreasForCenter()
+    public List<string> GetLocationsForArea(string areaName)
     {
-        string areaName = "מרכז";
         List<string> locations = new List<string>();
-        string query = "select * from Location where Area=N'"+areaName+"'";
+        string query = "select * from Location where Area=N'" + areaName + "'";
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         foreach (DataRow dr in ds.Tables[0].Rows)
@@ -734,48 +733,51 @@ public class Patient
 
         return locations;
     }
-    public List<Patient> getAnonymousPatientsListForCenterPoints(bool active, string origin, string dest)
+
+    public List<Patient> getAnonymousPatientsListForLocations(bool active, string origin, string dest,string area)
     {
+        //change to query with "in" 
         #region DB functions
 
-        List<string> centerLocations = GetAreasForCenter();
+        List<string> locations = GetLocationsForArea(area);
+
         string query = "";
         string text = "";
-        for (int i = 0; i < centerLocations.Count; i++)
+        for (int i = 0; i < locations.Count; i++)
         {
-            text = centerLocations[i].Replace("'", "''");
+            text = locations[i].Replace("'", "''");
             if (i == 0)
             {
                 query = "select * from Patient where ((Barrier = N'" + text + "' OR ";
             }
-            if (i == centerLocations.Count - 1)
+            if (i == locations.Count - 1)
             {
                 query += "Barrier = N'" + text + "') and Hospital = N'" + dest + "') OR ((Hospital = N'" + text + "' OR ";
             }
             else query += "Barrier = N'" + text + "' OR ";
         }
-        for (int i = 0; i < centerLocations.Count; i++)
+        for (int i = 0; i < locations.Count; i++)
         {
-            text = centerLocations[i].Replace("'", "''");
-            if (i == centerLocations.Count - 1)
+            text = locations[i].Replace("'", "''");
+            if (i == locations.Count - 1)
             {
                 query += "Hospital = N'" + text + "') and Barrier = N'" + origin + "') OR ((Hospital = N'" + text + "' OR ";
             }
             else query += "Hospital = N'" + text + "' OR ";
         }
-        for (int i = 0; i < centerLocations.Count; i++)
+        for (int i = 0; i < locations.Count; i++)
         {
-            text = centerLocations[i].Replace("'", "''");
-            if (i == centerLocations.Count - 1)
+            text = locations[i].Replace("'", "''");
+            if (i == locations.Count - 1)
             {
                 query += "Hospital = N'" + text + "') and Barrier = N'" + dest + "') OR ((Barrier = N'" + text + "' OR ";
             }
             else query += "Hospital = N'" + text + "' OR ";
         }
-        for (int i = 0; i < centerLocations.Count; i++)
+        for (int i = 0; i < locations.Count; i++)
         {
-            text = centerLocations[i].Replace("'", "''");
-            if (i == centerLocations.Count - 1)
+            text = locations[i].Replace("'", "''");
+            if (i == locations.Count - 1)
             {
                 query += "Barrier = N'" + text + "') and Hospital = N'" + origin + "')";
             }

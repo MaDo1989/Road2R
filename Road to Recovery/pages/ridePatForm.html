@@ -656,16 +656,16 @@
                 error: function (err) { alert("Error in getPatientsForAnonymous"); }
             });
         }
-        function getAnonymousPatientsListForCenterPoints(origin, destination) {
+        function getAnonymousPatientsListForArea(origin, destination,area) {
             var $select = $("#pat");
             $('#wait').show();
             $.ajax({
                 dataType: "json",
-                url: "WebService.asmx/getAnonymousPatientsListForCenterPoints",
+                url: "WebService.asmx/getAnonymousPatientsListForArea",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
                 async: false,
-                data: JSON.stringify({ active: true, origin: origin, dest: destination }),
+                data: JSON.stringify({ active: true, origin: origin, dest: destination,area:area }),
                 success: function (data) {
                     arr_pat = JSON.parse(data.d);
 
@@ -1442,11 +1442,24 @@
                         $("#dateRide").attr('disabled', 'disabled');
                         $("#dirBTN").attr('disabled', 'disabled');
                     }
-                    if (ridePat.Pat.IsAnonymous == "True" && ridePat.Pat.DisplayName.indexOf('מרכז') !== -1) {
+                    if (ridePat.Pat.IsAnonymous == "True" && (ridePat.Pat.DisplayName.indexOf('מרכז') !== -1 || ridePat.Pat.DisplayName.indexOf('ירושלים') !== -1 || ridePat.Pat.DisplayName.indexOf('דרום') !== -1 || && ridePat.Pat.DisplayName.indexOf('צפון') !== -1)) {
+                        var area = "";
+                        if(ridePat.Pat.DisplayName.indexOf('מרכז') !== -1){
+                            area="מרכז";
+                        }
+                        if(ridePat.Pat.DisplayName.indexOf('דרום') !== -1){
+                            area="דרום";
+                        }
+                        if(ridePat.Pat.DisplayName.indexOf('ירושלים') !== -1){
+                            area="ירושלים";
+                        }
+                        if(ridePat.Pat.DisplayName.indexOf('צפון') !== -1){
+                            area="צפון";
+                        }
                         var origin = ridePat.Origin.Name;
                         var destination = ridePat.Destination.Name;
                         isCenterPoint = true;
-                        getAnonymousPatientsListForCenterPoints(origin, destination);
+                        getAnonymousPatientsListForArea(origin, destination,area);
                     }
                     else if (ridePat.Pat.IsAnonymous == "True") {
 

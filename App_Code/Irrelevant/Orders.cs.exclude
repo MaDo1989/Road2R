@@ -879,7 +879,10 @@ public class Orders
     {
         #region DB functions
         DbService dbGetID = new DbService();
-        string queryGetID = "select MAX(SUBSTRING ( OrderName ,8 , 5)) as '5Dig','SHN' + SUBSTRING(CONVERT(nvarchar(10), DATEPART(YY, CONVERT(date, GETDATE()))), 3, 2) + CASE WHEN DATEPART(MONTH, CONVERT(date, GETDATE())) < 10 THEN '0' + CONVERT(nvarchar(10), DATEPART(MONTH, CONVERT(date, GETDATE()))) ELSE CONVERT(nvarchar(10), DATEPART(MONTH, CONVERT(date, GETDATE()))) END as 'initialName' from Orders where 1=1 and OrderName like '%' + SUBSTRING(CONVERT(nvarchar(10), DATEPART(YY, CONVERT(date, GETDATE()))), 3, 2) + CASE WHEN DATEPART(MONTH, CONVERT(date, GETDATE())) < 10 THEN '0' + CONVERT(nvarchar(10), DATEPART(MONTH, CONVERT(date, GETDATE()))) ELSE CONVERT(nvarchar(10), DATEPART(MONTH, CONVERT(date, GETDATE()))) END + '%' ";
+        string queryGetID = "select MAX(SUBSTRING ( OrderName ,8 , 5)) as '5Dig','SHN' + SUBSTRING(CONVERT(nvarchar(10), DATEPART(YY, CONVERT(date, GETDATE()))), 3, 2) + CASE WHEN DATEPART(MONTH, CONVERT(date, GETDATE())) < 10 THEN '0' + CONVERT(nvarchar(10), DATEPART(MONTH, CONVERT(date, GETDATE()))) ELSE CONVERT(nvarchar(10), DATEPART(MONTH, CONVERT(date, GETDATE()))) END as 'initialName' from Orders where 1=1 and OrderName 
+            
+            
+            '%' + SUBSTRING(CONVERT(nvarchar(10), DATEPART(YY, CONVERT(date, GETDATE()))), 3, 2) + CASE WHEN DATEPART(MONTH, CONVERT(date, GETDATE())) < 10 THEN '0' + CONVERT(nvarchar(10), DATEPART(MONTH, CONVERT(date, GETDATE()))) ELSE CONVERT(nvarchar(10), DATEPART(MONTH, CONVERT(date, GETDATE()))) END + '%' ";
         DataSet dsGetID = dbGetID.GetDataSetByQuery(queryGetID);
         string Dig = "";
         string initialName = "";

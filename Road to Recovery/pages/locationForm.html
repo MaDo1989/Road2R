@@ -162,7 +162,9 @@
                 success: function (data) {
                     var areas = JSON.parse(data.d);
                     for (var i = 0; i < areas.length; i++) {
-                        $('<option>', { value: areas[i], text: areas[i] }).appendTo($select);
+                        if (areas[i].indexOf("-")===-1) {
+                            $('<option>', { value: areas[i], text: areas[i] }).appendTo($select);
+                        }
                     }
                 },
                 error: function (err) { alert("Error in getArea: " + err.responseText); }
@@ -325,6 +327,7 @@
                                                             <option>בחר</option>
                                                             <option>מחסום</option>
                                                             <option>בית חולים</option>
+                                                            <option>נקודת אמצע</option>
                                                         </select>
                                                     </div>
                                                 </div>

@@ -301,12 +301,12 @@ public class WebService : System.Web.Services.WebService
 
     }
     [WebMethod]
-    public string getAnonymousPatientsListForCenterPoints(bool active, string origin, string dest)
+    public string getAnonymousPatientsListForArea(bool active, string origin, string dest,string area)
     {
         try
         {
             Patient c = new Patient();
-            List<Patient> patientsList = c.getAnonymousPatientsListForCenterPoints(active, origin, dest);
+            List<Patient> patientsList = c.getAnonymousPatientsListForLocations(active, origin, dest,area);
             return j.Serialize(patientsList);
         }
         catch (Exception ex)
