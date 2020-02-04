@@ -1,0 +1,33 @@
+﻿2020-02-03 12:10:10,096 ERROR [9] WebService.writeToLog - Successful login ;for user: 0524842888
+2020-02-03 12:32:35,014 ERROR [28] WebService.writeToLog - Successful login ;for user: 0524842888
+2020-02-03 12:33:14,412 ERROR [11] WebService.writeToLog - Successful login ;for user: 0524842888
+2020-02-03 13:35:02,469 ERROR [66] WebService.getDestinationView - Error in getDestinationView
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: TCP Provider, error: 0 - No such host is known.) ---> System.ComponentModel.Win32Exception (0x80004005): No such host is known
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, Boolean needToClose, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 76
+   ב-  Location.getDestinationsListForView(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Location.cs:שורה 247
+   ב-  WebService.getDestinationView(Boolean active) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 1148
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:11001,State:0,Class:20
+2020-02-03 13:35:05,245 ERROR [61] WebService.getAreas - Error in getAreas
+System.Data.SqlClient.SqlException (0x80131904): אירעה שגיאה הקשורה לרשת או שגיאה ספציפית למופע במהלך יצירת חיבור ל- SQL Server. השרת לא נמצא או שאינו נגיש. ודא ששם המופע נכון וש- SQL Server מוגדר לאפשר חיבורים מרחוק. (provider: TCP Provider, error: 0 - No such host is known.) ---> System.ComponentModel.Win32Exception (0x80004005): No such host is known
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, Boolean needToClose, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\DBService.cs:שורה 76
+   ב-  Location.getAreas() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\Location.cs:שורה 327
+   ב-  WebService.getAreas() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 115
+ClientConnectionId:00000000-0000-0000-0000-000000000000
+Error Number:11001,State:0,Class:20
+2020-02-03 22:58:51,238 ERROR [58] WebService.ChangeRidepatAreas - Error in getAreas
+System.ArgumentException: area not undefined
+   ב-  RidePat.NEWCheckLocationForRidepatArea(String origin, String destination) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 233
+   ב-  RidePat.setRidepatsArea() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1120
+   ב-  WebService.ChangeRidepatAreas() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 131
+2020-02-03 22:59:41,853 ERROR [58] WebService.ChangeRidepatAreas - Error in getAreas
+System.ArgumentException: area not undefined
+   ב-  RidePat.NEWCheckLocationForRidepatArea(String origin, String destination) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 233
+   ב-  RidePat.setRidepatsArea() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1120
+   ב-  WebService.ChangeRidepatAreas() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 131
+2020-02-03 23:16:01,195 ERROR [60] WebService.ChangeRidepatAreas - Error in getAreas
+System.ArgumentException: area not undefined
+   ב-  RidePat.NEWCheckLocationForRidepatArea(String origin, String destination) ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 237
+   ב-  RidePat.setRidepatsArea() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\RidePat.cs:שורה 1124
+   ב-  WebService.ChangeRidepatAreas() ב- c:\Users\ספיר כהן\Documents\GitHub\Road2R\App_Code\WebService.cs:שורה 131
+2020-02-03 23:35:23,917 ERROR [18] WebService.writeToLog - Successful login ;for user: 0524842888

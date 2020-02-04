@@ -257,8 +257,8 @@
                     var volunteer = JSON.parse(data.d);
                     GENERAL.VOLUNTEERS.setVolunteersList(volunteer);
                     var location = "";
-                    for (i in volunteer.PrefLocation) {
-                        location += volunteer.PrefLocation[i] + ", ";
+                    for (i in volunteer.PrefArea) {
+                        location += volunteer.PrefArea[i] + ", ";
                     }
                     location = location.substring(0, location.length - 2);
                     $("#PrefLocation").text(location);
@@ -558,7 +558,7 @@
                                                     <div class="col-sm-6 control-label" id="selectPreferRoute1">
                                                         <label id="PrefLocation" name="PrefLocation"></label>
                                                     </div>
-                                                </div>
+                                                </div>`
                                             </div>
                                         </div>
                                         <div class="row m-l-10 m-r-10">

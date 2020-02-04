@@ -503,14 +503,14 @@ public class Volunteer
         }
 
         //Get Preferred Location for Volunteer
-        query = "select PreferredLocation from PreferredLocation_Volunteer where VolunteerId=" + id;
-        db = new DbService();
-        ds = db.GetDataSetByQuery(query);
-        foreach (DataRow dr in ds.Tables[0].Rows)
-        {
-            string location = dr["PreferredLocation"].ToString();
-            PrefLocation.Add(location);
-        }
+        //query = "select PreferredLocation from PreferredLocation_Volunteer where VolunteerId=" + id;
+        //db = new DbService();
+        //ds = db.GetDataSetByQuery(query);
+        //foreach (DataRow dr in ds.Tables[0].Rows)
+        //{
+        //    string location = dr["PreferredLocation"].ToString();
+        //    PrefLocation.Add(location);
+        //}
 
         //Get AvailabeSeats for Volunteer
         query = "select AvailableSeats from Volunteer where Id=" + id;
