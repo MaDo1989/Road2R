@@ -264,7 +264,31 @@
         function generateCitiesErrorCB(e) {
             alert("Error in generateCities: " + e.responseText);
         }
+         function generateLocation() {
+            var $select = $("#hospital");
+            var $select1 = $("#barrier");
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getDestinationView",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                async: false,
+                data: JSON.stringify({ active: true }),
+                success: function (data) {
+                    var arr_locations = JSON.parse(data.d);
+                    arr_locations.sort();
+                    $('<option>', { value: "", text: "בחר " }).appendTo($select);
+                    $('<option>', { value: "", text: "בחר " }).appendTo($select1);
+                    for (i in arr_locations) {
 
+                        $('<option>', { value: arr_locations[i].Name, text: arr_locations[i].EnglishName }).appendTo($select);
+                        $('<option>', { value: arr_locations[i].Name, text: arr_locations[i].EnglishName }).appendTo($select1);
+
+                    }
+                },
+                error: function (err) { alert("Error in generateLocation"); }
+            });
+        }
         function generateHospital() {
             var $select = $("#hospital");
             $.ajax({
@@ -325,8 +349,9 @@
                 arr_patient = JSON.parse(GENERAL.PATIENTS.getPatientsList());
                 if (arr_customer.func == "new") {
                     document.getElementById("newEscort").disabled = true;
-                    generateBarrier();
-                    generateHospital();
+                    //generateBarrier();
+                    //generateHospital();
+                    generateLocation();
                     generateEquipment();
                     generateCities();
                     $('#escortsToShow').hide();
@@ -367,8 +392,9 @@
                     }
 
                     else {
-                        generateBarrier();
-                        generateHospital();
+                        //generateBarrier();
+                        //generateHospital();
+                        generateLocation();
                         generateEquipment();
                         generateCities();
                         //generateStatus1();
@@ -405,8 +431,9 @@
                     else {
                         GENERAL.PATIENTS.setPatientsList(JSON.stringify(patient));
                         generateEquipment();
-                        generateHospital();
-                        generateBarrier();
+                        //generateHospital();
+                        //generateBarrier();
+        generateLocation();
                         // generateHospitalPat(patient);
                         // generateBarrierPat(patient);
                         //generateStatus(patient);
@@ -998,7 +1025,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label data-toggle="tooltip" title="معبر  Border Crossing" class="col-sm-2 control-label">מחסום&nbsp;<span class="required">*</span></label>
+                                                    <label data-toggle="tooltip" title="معبر  Border Crossing" class="col-sm-2 control-label">נקודה א'&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6" id="selectBarrier">
                                                         <select id="barrier" name="barrier" class="form-control"></select>
                                                     </div>
@@ -1008,7 +1035,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label data-toggle="tooltip" title="مستشفى  Hospital" class="col-sm-2 control-label">בית חולים&nbsp;<span class="required">*</span></label>
+                                                    <label data-toggle="tooltip" title="مستشفى  Hospital" class="col-sm-2 control-label">נקודה ב'&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6" id="selectHospital">
                                                         <select id="hospital" name="hospital" class="form-control"></select>
                                                     </div>
