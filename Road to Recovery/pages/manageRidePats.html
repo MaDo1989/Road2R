@@ -63,8 +63,30 @@
         var Origin_Dest = "";
         var isAnonymous = false;
         var isAssistant = false;
-
+        var refreshTime;
+        var refreshInterval;
         $(document).ready(function () {
+            
+            if (localStorage.refreshTime == "undefined" || localStorage.refreshTime === undefined) { // Set the deafult refresh rate for 5 minutes
+                localStorage.refreshTime = '300000';
+                $('#refreshTime').val('300000')
+            } else {
+                $('#refreshTime').val(parseInt(JSON.parse(localStorage.refreshTime)));
+            }
+            refreshTime = parseInt(JSON.parse(localStorage.refreshTime));
+
+            $('#refreshTime').on('change', function () {
+                
+                localStorage.refreshTime = String(this.value);
+                refreshTime = parseInt(JSON.parse(localStorage.refreshTime));
+                clearInterval(refreshInterval);
+                refreshInterval = setInterval("refreshTable()", refreshTime);
+                
+            });
+
+
+
+
             $(document).on("change", 'select[name ="datatable-future_length"]', function () {
                 localStorage.futurePageLength = $('select[name ="datatable-future_length"]').val();
             })
@@ -160,10 +182,11 @@
                 recordsNum = JSON.parse(localStorage.getItem("futurePageLength"));
             }
 
-            tMorning = $('#datatable-morning').DataTable({"columnDefs": [{ targets: 6, className: 'text-left-strong' }]}, { "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
-            tAfternoon = $('#datatable-afternoon').DataTable({"columnDefs": [{ targets: 6, className: 'text-left-strong' }]}, { "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
+            tMorning = $('#datatable-morning').DataTable({ "stateDuration": 60 * 60, "columnDefs": [{ targets: 6, className: 'text-left-strong' }]}, { "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
+            tAfternoon = $('#datatable-afternoon').DataTable({  "stateDuration": 60 * 60, "columnDefs": [{ targets: 6, className: 'text-left-strong' }]}, { "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
             tFuture = $('#datatable-future').DataTable({
-        
+                
+                "stateDuration": 60 * 60, //saves duration state for 1 hour
                 "columnDefs": [{ targets: 7, className: 'text-left-strong' }],
                 "iDisplayLength": recordsNum,
                 "aoColumns": [{
@@ -178,13 +201,17 @@
                     null,
                     null,
                 ]},{ "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
-
+            alert("blah")
+            tMorning.state.clear();
+            tAfternoon.state.clear();
+            tFuture.state.clear();
 
             getCoors();
             refreshTable();
 
             if (!isAssistant) {
-                setInterval("refreshTable()", 400000);
+                
+                refreshInterval = setInterval("refreshTable()", refreshTime);
             }           
         });
 
@@ -308,12 +335,19 @@
 
 
                         //btnStr += showBtn;
-                        if ((arr_rides[i].Status == 'ממתינה לשיבוץ') || (arr_rides[i].Pat.IsAnonymous == "True")) btnStr += " " + editBtn; //allow editing a ridepat if no drivers are assigned to it and if its not anonymous
-                        else btnStr += " " + showBtn;
-                        if ((arr_rides[i].Status === 'שובץ נהג' || arr_rides[i].Status === 'שובץ נהג וגיבוי' || arr_rides[i].Status === 'שובץ גיבוי') && isAssistant) {
-                            btnStr += "";
-                        }
-                        else btnStr += " " + deleteBtn;
+
+
+                        //if ((arr_rides[i].Status == 'ממתינה לשיבוץ') || (arr_rides[i].Pat.IsAnonymous == "True")) btnStr += " " + editBtn; //allow editing a ridepat if no drivers are assigned to it and if its not anonymous
+                        //else btnStr += " " + showBtn;
+                        //if ((arr_rides[i].Status === 'שובץ נהג' || arr_rides[i].Status === 'שובץ נהג וגיבוי' || arr_rides[i].Status === 'שובץ גיבוי') && isAssistant) {
+                        //    btnStr += "";
+                        //}
+                        //else btnStr += " " + deleteBtn;
+                        btnStr += " " + editBtn + " " + deleteBtn;
+                        
+
+
+
                         //localStorage.setItem('IsAnonymous', JSON.stringify(arr_rides[i].Pat.IsAnonymous));
 
                         if (arr_rides[i].Status == 'שובץ גיבוי') btnStr += " " + backupBtn; //Enable option to text the secondary driver asking to assign him to primary
@@ -339,9 +373,9 @@
 
                     }
 
-                    tMorning.columns([0]).order('asc').draw();
-                    tAfternoon.columns([0]).order('asc').draw();
-                    tFuture.columns([0]).order('asc').draw();
+                    //tMorning.columns([0]).order('asc').draw();
+                    //tAfternoon.columns([0]).order('asc').draw();
+                    //tFuture.columns([0]).order('asc').draw();
 
                     $('#datatable-morning tbody').on('draw', manipulateTables());
                     $(".dataTables_empty").html("אין הסעות لا توجد سفريات No drives");
@@ -841,105 +875,117 @@
                             <div class="card-box table-responsive">
                                 <div class="row">
                                     <!--<div class="col-sm-8 checkbox checkbox-primary text-left">
-                        <input id="activeRidePats" type="checkbox" onchange="saveFilters()">
-                        <label for="activeRidePats">
-                            דרישות פעילות בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
-                        </label>
-                        <input id="TodaysRidePats" type="checkbox" onchange="saveFilters()">
-                        <label for="TodaysRidePats">
-                            דרישות של היום בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
-                        </label>
-                        <input id="UnassignedRidePats" type="checkbox" onchange="saveFilters()">
-                        <label for="UnassignedRidePats">
-                            דרישות ממתינות לשיבוץ בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
-                        </label>
-                        <input id="MyRidePats" type="checkbox" onchange="saveFilters()">
-                        <label for="MyRidePats">
-                            דרישות שלי בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
-                        </label>
-                    </div>-->
+        <input id="activeRidePats" type="checkbox" onchange="saveFilters()">
+        <label for="activeRidePats">
+            דרישות פעילות בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
+        </label>
+        <input id="TodaysRidePats" type="checkbox" onchange="saveFilters()">
+        <label for="TodaysRidePats">
+            דרישות של היום בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
+        </label>
+        <input id="UnassignedRidePats" type="checkbox" onchange="saveFilters()">
+        <label for="UnassignedRidePats">
+            דרישות ממתינות לשיבוץ בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
+        </label>
+        <input id="MyRidePats" type="checkbox" onchange="saveFilters()">
+        <label for="MyRidePats">
+            דרישות שלי בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
+        </label>
+    </div>-->
+                                    <div class="col-sm-6 text-left">
+                                        <label for="refreshTime">בחירת קצב רענון:</label>
+                                        <select id="refreshTime" name="refreshTime" class="input-sm">
+                                            <option value="60000">דקה</option>
+                                            <option value="120000">2 דקות</option>
+                                            <option value="300000">5 דקות</option>
+                                            <option value="600000">10 דקות</option>
+                                            <option value="1800000">30 דקות</option>
+                                            <option value="3600000">60 דקות</option>
+                                        </select>
+                                    </div>
+                                        <div class="col-sm-6 text-right">
 
-                                    <div class="col-sm-12 text-right ">
-                                        <button data-placement="right" data-toggle="tooltip" title="New Ride جديد " type="button" id="createCustomer" onclick="newRidePatForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>חדש</button>
+                                            <button data-placement="right" data-toggle="tooltip" title="New Ride جديد " type="button" id="createCustomer" onclick="newRidePatForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>חדש</button>
+
+                                        </div>
+                                    </div>
+
+                                    <div id="accordion" class="panel-group">
+                                        <div class="panel panel-primary">
+                                            <div class="panel-heading" id="col1">
+                                                <h4 data-toggle="tooltip" data-placement="top" title="Morning Rides  سفريات الصباح" class="panel-title"> <a href="#collapse1" data-parent="#accordion" data-toggle="collapse" class="dropdown active open">נסיעות לבוקר</a></h4>
+                                            </div>
+                                            <div class="panel-collapse collapse" id="collapse1">
+                                                <div class="panel-body">
+                                                    <table id="datatable-morning" class="table table-striped table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="middle" title="Time  الساعة">שעה</th>
+                                                                <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
+                                                                <th class="middle" title="Destination  نقطة الوصول">יעד</th>
+                                                                <th class="middle" title="Patient  المريض">החולה</th>
+                                                                <th class="middle" title="Driver  السائق">המסיע</th>
+                                                                <th class="middle" title="Status  حالة السفرية">סטטוס ההסעה</th>
+                                                                <th class="customWidth middle" title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
+                                                                <th class="middle" title="Actions  اعمال">פעולות</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody></tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="panel panel-primary">
+                                            <div class="panel-heading" id="col2">
+                                                <h4 data-toggle="tooltip" data-placement="top" title="Afternoon Rides  سفريات المساء" class="panel-title"> <a href="#collapse2" data-parent="#accordion" data-toggle="collapse">נסיעות לאחה"צ</a></h4>
+                                            </div>
+                                            <div class="panel-collapse collapse" id="collapse2">
+                                                <div class="panel-body">
+                                                    <table id="datatable-afternoon" class="table table-striped table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="middle" title="Time  الساعة">שעה</th>
+                                                                <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
+                                                                <th class="middle" title="Destination  نقطة الوصول">יעד</th>
+                                                                <th class="middle" title="Patient  المريض">החולה</th>
+                                                                <th class="middle" title="Driver  السائق">המסיע</th>
+                                                                <th class="middle" title="Status  حالة السفرية">סטטוס ההסעה</th>
+                                                                <th class="customWidth middle" title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
+                                                                <th class="middle" title="Actions  اعمال">פעולות</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody></tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="panel panel-primary">
+                                            <div class="panel-heading" id="col3">
+                                                <h4 data-toggle="tooltip" data-placement="bottom" title="Future Rides  سفريات مستقبلية" class="panel-title"> <a href="#collapse3" data-parent="#accordion" data-toggle="collapse">נסיעות עתידיות</a></h4>
+                                            </div>
+                                            <div class="panel-collapse collapse" id="collapse3">
+                                                <div class="panel-body">
+                                                    <table id="datatable-future" class="table table-striped table-bordered hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="middle" title="Date  الساعة">תאריך</th>
+                                                                <th class="middle" title="Time  الساعة">שעה</th>
+                                                                <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
+                                                                <th class="middle" title="Destination  نقطة الوصول">יעד</th>
+                                                                <th class="middle" title="Patient  المريض">החולה</th>
+                                                                <th class="middle" title="Driver  السائق">המסיע</th>
+                                                                <th class="middle" title="Status  حالة السفرية">סטטוס ההסעה</th>
+                                                                <th class="customWidth middle" title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
+                                                                <th class="middle" title="Actions  اعمال">פעולות</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody></tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-
-                                <div id="accordion" class="panel-group">
-                                    <div class="panel panel-primary">
-                                        <div class="panel-heading" id="col1">
-                                            <h4 data-toggle="tooltip" data-placement="top" title="Morning Rides  سفريات الصباح" class="panel-title"> <a href="#collapse1" data-parent="#accordion" data-toggle="collapse" class="dropdown active open">נסיעות לבוקר</a></h4>
-                                        </div>
-                                        <div class="panel-collapse collapse" id="collapse1">
-                                            <div class="panel-body">
-                                                <table id="datatable-morning" class="table table-striped table-bordered">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="middle" title="Time  الساعة">שעה</th>
-                                                            <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
-                                                            <th class="middle" title="Destination  نقطة الوصول">יעד</th>
-                                                            <th class="middle" title="Patient  المريض">החולה</th>
-                                                            <th class="middle" title="Driver  السائق">המסיע</th>
-                                                            <th class="middle" title="Status  حالة السفرية">סטטוס ההסעה</th>
-                                                            <th class="customWidth middle" title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
-                                                            <th class="middle" title="Actions  اعمال">פעולות</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody></tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="panel panel-primary">
-                                        <div class="panel-heading" id="col2">
-                                            <h4 data-toggle="tooltip" data-placement="top" title="Afternoon Rides  سفريات المساء" class="panel-title"> <a href="#collapse2" data-parent="#accordion" data-toggle="collapse">נסיעות לאחה"צ</a></h4>
-                                        </div>
-                                        <div class="panel-collapse collapse" id="collapse2">
-                                            <div class="panel-body">
-                                                <table id="datatable-afternoon" class="table table-striped table-bordered">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="middle" title="Time  الساعة">שעה</th>
-                                                            <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
-                                                            <th class="middle" title="Destination  نقطة الوصول">יעד</th>
-                                                            <th class="middle" title="Patient  المريض">החולה</th>
-                                                            <th class="middle" title="Driver  السائق">המסיע</th>
-                                                            <th class="middle" title="Status  حالة السفرية">סטטוס ההסעה</th>
-                                                            <th class="customWidth middle" title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
-                                                            <th class="middle" title="Actions  اعمال">פעולות</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody></tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="panel panel-primary">
-                                        <div class="panel-heading" id="col3">
-                                            <h4 data-toggle="tooltip" data-placement="bottom" title="Future Rides  سفريات مستقبلية" class="panel-title"> <a href="#collapse3" data-parent="#accordion" data-toggle="collapse">נסיעות עתידיות</a></h4>
-                                        </div>
-                                        <div class="panel-collapse collapse" id="collapse3">
-                                            <div class="panel-body">
-                                                <table id="datatable-future" class="table table-striped table-bordered hover">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="middle" title="Date  الساعة">תאריך</th>
-                                                            <th class="middle" title="Time  الساعة">שעה</th>
-                                                            <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
-                                                            <th class="middle" title="Destination  نقطة الوصول">יעד</th>
-                                                            <th class="middle" title="Patient  المريض">החולה</th>
-                                                            <th class="middle" title="Driver  السائق">המסיע</th>
-                                                            <th class="middle" title="Status  حالة السفرية">סטטוס ההסעה</th>
-                                                            <th class="customWidth middle" title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
-                                                            <th class="middle" title="Actions  اعمال">פעולות</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody></tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                     

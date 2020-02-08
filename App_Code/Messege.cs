@@ -608,4 +608,62 @@ public class Message
             pushANDROID.RunPushNotificationOne(coor, data, null);
         }
     }
+
+    public void changeInRide(int ridePatID, Volunteer user)
+    {
+        //get ride details and generate msg
+        RidePat rp = new RidePat();
+        var abc = rp.GetRidePat(ridePatID);
+
+        TimeZoneInfo sourceTimeZone = TimeZoneInfo.FindSystemTimeZoneById("UTC");
+        TimeZoneInfo targetTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Israel Standard Time");
+        var converted = TimeZoneInfo.ConvertTime(abc.Date, sourceTimeZone, targetTimeZone);
+        string time = converted.ToShortTimeString();
+        if (time == "22:14")
+        {
+
+            time = "אחה\"צ";
+        }
+
+        
+        var msg = "בוצע שינוי בהסעה שאתה משובץ אליה. לאחר השינוי, " + abc.Pat.DisplayName + " הינו החולה בנסיעה מ" + "" + abc.Origin.Name + " ל" + abc.Destination.Name + " בתאריך " + abc.Date.ToShortDateString() + ", בשעה " + time;
+        
+        //insert msg to db
+        //int msgID = insertMsg(1, "Anonymous Patient changed", "עדכון שם חולה בהסעה", msg, ridePatID, DateTime.Now, user.Id, "", true, false, false);
+        int msgID = insertMsg(1, "Changes in ride", "שינויים בהסעה", msg, ridePatID, DateTime.Now, user.Id, "", true, false, false);
+
+
+        Volunteer V = new Volunteer();
+        string device = V.getDeviceByID(user.Id);
+        var data = new JObject();
+        if (device == "iOS")
+        {
+            data = new JObject();
+            //PUSH IOS
+            var notification = new JObject();
+            notification.Add("title", "שינויים בהסעה");
+            notification.Add("body", msg);
+            data.Add("rideID", ridePatID);
+            data.Add("status", "Changes in ride");
+            data.Add("msgID", msgID);
+            data.Add("content-available", 1);
+            //send push
+            myPushNot pushIOS = new myPushNot();
+            pushIOS.RunPushNotificationOne(user, data, notification);
+        }
+        else
+        {
+            data = new JObject();
+            //PUSH ANDROID
+            data.Add("message", msg);
+            data.Add("title", "שינויים בהסעה");
+            data.Add("rideID", ridePatID);
+            data.Add("status", "Changes in ride");
+            data.Add("msgID", msgID);
+            data.Add("content-available", 1);
+            //send push
+            myPushNot pushANDROID = new myPushNot();
+            pushANDROID.RunPushNotificationOne(user, data, null);
+        }
+    }
 }

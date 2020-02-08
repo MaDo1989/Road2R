@@ -420,11 +420,17 @@ public class RidePat
         else if (func == "edit") //Edit existing RidePat in DB
         {
             RidePatNum = ridePat.RidePatNum;
-            string query = "select Status from RidePat where RidePatNum=" + RidePatNum;
-            Status = db.GetObjectScalarByQuery(query).ToString();
-            if (Status != "ממתינה לשיבוץ" && !isAnonymous) throw new Exception("נסיעה זו כבר הוקצתה לנהג ואין אפשרות לערוך אותה");
+
+            //string query = "select Status from RidePat where RidePatNum=" + RidePatNum;
+            //Status = db.GetObjectScalarByQuery(query).ToString();
+            //if (Status != "ממתינה לשיבוץ" && !isAnonymous) throw new Exception("נסיעה זו כבר הוקצתה לנהג ואין אפשרות לערוך אותה");
+
+            //string query = "select Status from RidePat where RidePatNum=" + RidePatNum;
+            //Status = db.GetObjectScalarByQuery(query).ToString();
+            //if (Status == "הגענו ליעד") throw new Exception("נסיעה זו כבר הגיעה ליעד ואין אפשרות לערוך אותה");
+
             cmdParams[6] = cmd.Parameters.AddWithValue("@ridePatNum", RidePatNum);
-            query = "update RidePat set Patient=@pat,Origin=@origin,Destination=@destination,PickupTime=@date,Remark=@remark,OnlyEscort=@onlyEscort,Area=@Area where RidePatNum=@ridePatNum";
+            var query = "update RidePat set Patient=@pat,Origin=@origin,Destination=@destination,PickupTime=@date,Remark=@remark,OnlyEscort=@onlyEscort,Area=@Area where RidePatNum=@ridePatNum";
             int res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
 
             if (res > 0)
@@ -461,17 +467,25 @@ public class RidePat
                 }
 
             }
+            RidePatNum = ridePat.RidePatNum;
+            Ride r = new Ride();
+            RidePat rp = GetRidePat(RidePatNum);
             if (isAnonymous && Pat.DisplayName.IndexOf("אנונימי")==-1)
             {
-                RidePatNum = ridePat.RidePatNum;
-                Ride r = new Ride();
-                RidePat rp = GetRidePat(RidePatNum);
+                
                 foreach (Volunteer driver in rp.Drivers)
                 {
                     Message m = new Message();
                     m.changeAnonymousPatient(RidePatNum,driver);
                 }
                 
+            } else if (rp.Drivers != null)
+            {
+                foreach (Volunteer driver in rp.Drivers)
+                {
+                    Message m = new Message();                    
+                        m.changeInRide(RidePatNum, driver);
+                }
             }
 
             return res;
@@ -795,10 +809,13 @@ public class RidePat
             if (maxDays == -1)
             {
                 
-                query = "select * from RPView where Convert(date,pickuptime)>=CONVERT(date, getdate()) and Status!=N'הגענו ליעד';"; // Get ALL FUTURE RidePats, even if cancelled
+                //query = "select * from RPView where Convert(date,pickuptime)>=CONVERT(date, getdate()) and Status!=N'הגענו ליעד';"; // Get ALL FUTURE RidePats, even if cancelled
+                query = "select * from RPView where Convert(date,pickuptime)>=CONVERT(date, getdate());"; // Get ALL FUTURE RidePats, even if cancelled
+
             }
-            
-            else query = "select * from RPView where DATEDIFF(day,getdate(),pickuptime)<=" + maxDays + " and Convert(date,pickuptime)>=CONVERT(date, getdate()) and Status!=N'הגענו ליעד';";
+
+            //else query = "select * from RPView where DATEDIFF(day,getdate(),pickuptime)<=" + maxDays + " and Convert(date,pickuptime)>=CONVERT(date, getdate()) and Status!=N'הגענו ליעד';";
+            else query = "select * from RPView where DATEDIFF(day,getdate(),pickuptime)<=" + maxDays + " and Convert(date,pickuptime)>=CONVERT(date, getdate());";
         }
         else if (volunteerId == -2)
         {
