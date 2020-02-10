@@ -625,9 +625,29 @@ public class Message
             time = "אחה\"צ";
         }
 
+        string escortsStr = "";
+        if (abc.Escorts.Count > 0)
+        {
+            if (abc.Escorts.Count == 1)
+            {
+                escortsStr = " עם מלווה";
+            }
+            else
+            {
+                escortsStr = " עם " + abc.Escorts.Count + " מלווים";
+            }
+
+        }
+
+        string displayName = abc.Pat.DisplayName;
+        if (abc.Pat.IsAnonymous == "True")
+        {
+            displayName = "חולה";
+        }
+
+        var msg = "בוצע שינוי בהסעה שנרשמת אליה. לאחר השינוי, " + displayName + escortsStr + ", מ" + abc.Origin.Name + " ל" + abc.Destination.Name + " ב-" + abc.Date.Day + "/" + abc.Date.Month + ", בשעה " + time;
         
-        var msg = "בוצע שינוי בהסעה שאתה משובץ אליה. לאחר השינוי, " + abc.Pat.DisplayName + " הינו החולה בנסיעה מ" + "" + abc.Origin.Name + " ל" + abc.Destination.Name + " בתאריך " + abc.Date.ToShortDateString() + ", בשעה " + time;
-        
+        //XXX
         //insert msg to db
         //int msgID = insertMsg(1, "Anonymous Patient changed", "עדכון שם חולה בהסעה", msg, ridePatID, DateTime.Now, user.Id, "", true, false, false);
         int msgID = insertMsg(1, "Changes in ride", "שינויים בהסעה", msg, ridePatID, DateTime.Now, user.Id, "", true, false, false);
