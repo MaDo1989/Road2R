@@ -1339,8 +1339,17 @@ public class Volunteer
                 throw new Exception();
             }
             db = new DbService();
-            query = "select Id from Volunteer where DisplayName=N'" + newName + "'";
-            Id = int.Parse(db.GetObjectScalarByQuery(query).ToString());
+            try
+            {
+                query = "select Id from Volunteer where DisplayName=N'" + newName + "'";
+                Id = int.Parse(db.GetObjectScalarByQuery(query).ToString());
+            }
+            catch (Exception)
+            {
+                query = "select Id from Volunteer where DisplayName=N'" + v.DisplayName + "'";
+                Id = int.Parse(db.GetObjectScalarByQuery(query).ToString());
+            }
+            
 
             db = new DbService();
             query = "update VolunType_Volunteer set VolunTypeType=@volType where VolunteerId=" + Id;

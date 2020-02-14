@@ -89,7 +89,6 @@ public class Version
     {
         #region DB functions
         string query = "select top 1 * from version order by Date DESC";
-
         List<Version> versionList = new List<Version>();
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
