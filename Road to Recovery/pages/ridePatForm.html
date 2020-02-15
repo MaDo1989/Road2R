@@ -154,14 +154,25 @@
         var isRegularPatientNoCenter = false;
         //0 means no driver is asigned to the ride
         var rideStatusForFields = 0;
+        var ridePatId;
+        var currentDriverId;
+        var RideId;
+        var driverMode = "";
+        var firstDriverBeforeSwap = true;
+            
+
         $(document).ready(function () {
+            $('#deleteDriver').hide();
+            generateDrivers()
+            $('#driversDiv').hide();
+
             $('#wait').hide();
             var pat = $("#pat").val();
             if (pat === "") {
                 $("#patientInfo").hide();
             }
             isAssistant = JSON.parse(GENERAL.USER.getIsAssistant());
-            console.log(isAssistant);
+            //console.log(isAssistant);
             var assistantName = "";
             if (isAssistant) {
                 $("#menuType").attr("w3-include-html", "HelperMenu.html");
@@ -428,7 +439,7 @@
                         data: dataString,
                         success: function (data) {
                             //SaveAddresses(0, numberOfRecords, customerID);
-                            console.log(data.d);
+                            console.log("num: " + data.d);
                             if (data.d !== 1) {
                                 swal({
                                     title: "נשמר\nلقت تمت عملية الحفظ",
@@ -436,7 +447,15 @@
                                     timer: 1000,
                                     showConfirmButton: false
                                 });
-                                setTimeout(function () { returnRidePat() }, 1001);
+                                ridePatId = data.d;
+                                currentDriverId = -1;                                
+                                $('#driversDiv').show();
+                                window.location.href = "#driversDiv";
+                                
+                                
+                                //setTimeout(function () { returnRidePat() }, 1001);
+
+
                                 if (isAssistant && pushMsg!=="") {
                                     //send messege to coordinator from assistant on new ridepat creation.
                                     sendMessegeFromAssistant(data.d, pushMsg);
@@ -1389,7 +1408,7 @@
             generateMinute();
             generateStatus();
 
-
+            $('#wait').show();
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/getRidePat",
@@ -1397,7 +1416,14 @@
                 type: "POST",
                 data: JSON.stringify({ ridePatNum: ridePatNum }),
                 success: function (data) {
+
+                    
+
+
                     var ridePat = JSON.parse(data.d);
+                    console.log(ridePat)
+                    
+
                     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(ridePat));
 
                     var temp = ridePat.Date.substring(ridePat.Date.indexOf("(") + 1, ridePat.Date.indexOf(")"))
@@ -1442,7 +1468,7 @@
                         $("#dateRide").attr('disabled', 'disabled');
                         $("#dirBTN").attr('disabled', 'disabled');
                     }
-                    if (ridePat.Pat.IsAnonymous == "True" && (ridePat.Pat.DisplayName.indexOf('מרכז') !== -1 || ridePat.Pat.DisplayName.indexOf('ארז') !== -1 ||ridePat.Pat.DisplayName.indexOf('ירושלים') !== -1 || ridePat.Pat.DisplayName.indexOf('דרום') !== -1 ||  ridePat.Pat.DisplayName.indexOf('צפון') !== -1)) {
+                    if (ridePat.Pat.IsAnonymous == "True" && (ridePat.Pat.DisplayName.indexOf('מרכז') !== -1 || ridePat.Pat.DisplayName.indexOf('ארז') !== -1 || ridePat.Pat.DisplayName.indexOf('תרקומיא') !== -1 ||ridePat.Pat.DisplayName.indexOf('ירושלים') !== -1 || ridePat.Pat.DisplayName.indexOf('דרום') !== -1 ||  ridePat.Pat.DisplayName.indexOf('צפון') !== -1)) {
                         var area = "";
                         if(ridePat.Pat.DisplayName.indexOf('מרכז') !== -1){
                             area="מרכז";
@@ -1455,6 +1481,12 @@
                         }
                         if(ridePat.Pat.DisplayName.indexOf('צפון') !== -1){
                             area="צפון";
+                        }
+                        if (ridePat.Pat.DisplayName.indexOf('ארז') !== -1) {
+                            area = "ארז";
+                        }
+                        if (ridePat.Pat.DisplayName.indexOf('תרקומיא') !== -1) {
+                            area = "תרקומיא";
                         }
                         var origin = ridePat.Origin.Name;
                         var destination = ridePat.Destination.Name;
@@ -1470,6 +1502,19 @@
                     
                     if (ridePat.OnlyEscort) $("#onlyEscort").prop('checked', true);
                     $("#ridePatNum").val(ridePat.RidePatNum);
+
+
+                    RideId = ridePat.RideNum;
+                    ridePatId = ridePat.RidePatNum;
+                    if (ridePat.Drivers.length > 0) {
+                        $('#Driver').val(ridePat.Drivers[0].Id)
+                        currentDriverId = ridePat.Drivers[0].Id;
+                        $('#deleteDriver').show();
+                    } else {
+                        currentDriverId = -1; // There is no driver assigned to the ride
+                        
+                    }
+
                     $("#pat").val(ridePat.Pat.DisplayName);
                     $("#pat").blur();
                     if (typeof arr_escort !== "undefined") {
@@ -1516,11 +1561,16 @@
                     if (ridePat.Drivers.length > 0) {
                         driverId = ridePat.Drivers[0].Id;
                     }
+                    $('#wait').hide();
+                    $('#driversDiv').show();
                 },
-                error: function (err) { alert("Error in uploadData: " + err.responseText); }
+                error: function (err) {
+                    $('#wait').hide();
+                    alert("Error in uploadData: " + err.responseText);
+                }
             });
         }
-
+        //END
         function returnRidePat() {
             //window.history.back();
             localStorage.setItem("PatientNameForRide",null);
@@ -1548,6 +1598,177 @@
                 location.href = "anonymousPatientForm.html";
             }
             else location.href = "patientForm.html";
+        }
+        
+        function generateDrivers() {
+            var $drivers = $("#Driver");
+            
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getVolunteers",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                async: false,
+                data: JSON.stringify({ active: true }),
+                success: function (data) {
+                    var arr_drivers = JSON.parse(data.d);
+                    arr_drivers.sort();
+                    for (i in arr_drivers) {                        
+                        $('<option>', { value: arr_drivers[i].Id, text: arr_drivers[i].DisplayName }).appendTo($drivers);
+                    }
+                },
+                error: function (err) { alert("Error in generateDrivers"); }
+            });
+        }
+        //HERE
+        function signDriverToRide() {
+            
+            userSelected = $('#Driver').val();
+
+            var request = {
+                ridePatId: ridePatId,
+                userId: userSelected,
+                driverType: "primary"
+            };
+            
+            var dataString = JSON.stringify(request);
+            if (currentDriverId == -1) {
+                currentDriverId = userSelected;
+                $('#wait').show();
+
+                $.ajax({ // ajax call starts
+                    url: 'WebService.asmx/AssignRideToRidePat',   // server side web service method
+                    data: dataString,                          // the parameters sent to the server
+                    type: 'POST',                              // can be also GET
+                    dataType: 'json',                          // expecting JSON datatype from the server
+                    contentType: 'application/json; charset = utf-8', // sent to the server
+                    success: signDriverSuccessCB,                // data.d id the Variable data contains the data we get from serverside
+                    error: signDriverErrorCB
+                }) // end of ajax call
+                
+                
+            } else {
+                if (currentDriverId != userSelected) {
+                    if (confirm("האם אתה בטוח שאתה רוצה לשנות את הנהג?")) {
+                        $('#wait').show();
+                        driverMode = "edit";
+                        request = {
+                            ridePatId: ridePatId, 
+                            rideId: RideId,
+                            driverId: userSelected
+                        }
+                        var dataString = JSON.stringify(request);
+                        $.ajax({ // ajax call starts
+                            url: 'WebService.asmx/LeaveRidePat',   // server side web service method
+                            data: dataString,                          // the parameters sent to the server
+                            type: 'POST',                              // can be also GET
+                            dataType: 'json',                          // expecting JSON datatype from the server
+                            contentType: 'application/json; charset = utf-8', // sent to the server
+                            success: deleteRideSuccessCB,                // data.d id the Variable data contains the data we get from serverside
+                            error: deleteRideErrorCB
+                        }) // end of ajax call
+
+                        
+                        
+                    } else {
+                        alert("הנהג לא שונה");
+                        $('#Driver').val(currentDriverId);
+                    }
+                }
+            }
+            
+
+        }
+
+        function signDriverSuccessCB()
+        {
+            $('#wait').hide();
+            swal({
+                    title: "הנהג עודכן בהצלחה",
+                    type: "success",
+                    timer: 2000,
+                    showConfirmButton: false
+            });
+
+            $('#deleteDriver').show();
+            if (firstDriverBeforeSwap) {
+                setTimeout('uploadData(ridePatId)', 2001);
+                firstDriverBeforeSwap = false;
+            }
+            
+            
+            
+        }
+        function signDriverErrorCB()
+        {
+            $('#wait').hide();
+            alert("Error signing driver");
+            
+
+        }
+
+
+        function deleteRideSuccessCB() {
+            if (driverMode == "edit") {
+                var request = {
+                    ridePatId: ridePatId,
+                    userId: userSelected,
+                    driverType: "primary"
+                };
+                var dataString = JSON.stringify(request);
+                $.ajax({ // ajax call starts
+                    url: 'WebService.asmx/AssignRideToRidePat',   // server side web service method
+                    data: dataString,                          // the parameters sent to the server
+                    type: 'POST',                              // can be also GET
+                    dataType: 'json',                          // expecting JSON datatype from the server
+                    contentType: 'application/json; charset = utf-8', // sent to the server
+                    success: signDriverSuccessCB,                // data.d id the Variable data contains the data we get from serverside
+                    error: signDriverErrorCB
+                }) // end of ajax call
+            } else if (driverMode == "delete") {
+                $('#Driver').val(0)
+                $('#wait').hide();
+                swal({
+                    title: "הנהג נמחק מההסעה בהצלחה",
+                    type: "success",
+                    timer: 1000,
+                    showConfirmButton: false
+                });
+                
+            }
+
+            driverMode = "";
+        }
+
+        function deleteRideErrorCB() {
+            $('#wait').hide();
+            alert("Error deleting driver");
+            
+        }
+
+        function deleteDriverFromRide() {
+            userSelected = $('#Driver').val();
+            if (confirm("האם אתה בטוח שאתה רוצה למחוק את הנהג מההסעה?")) {
+                $('#wait').show();
+                driverMode = "delete";
+                request = {
+                    ridePatId: ridePatId,
+                    rideId: RideId,
+                    driverId: userSelected
+                }
+                var dataString = JSON.stringify(request);
+                $.ajax({ // ajax call starts
+                    url: 'WebService.asmx/LeaveRidePat',   // server side web service method
+                    data: dataString,                          // the parameters sent to the server
+                    type: 'POST',                              // can be also GET
+                    dataType: 'json',                          // expecting JSON datatype from the server
+                    contentType: 'application/json; charset = utf-8', // sent to the server
+                    success: deleteRideSuccessCB,                // data.d id the Variable data contains the data we get from serverside
+                    error: deleteRideErrorCB
+                }) // end of ajax call
+            } else {
+
+            }
         }
     </script>
 </head>
@@ -1606,7 +1827,7 @@
                                     <li><a href="viewRidePats.html">כל ההסעות</a></li>
                                     <li data-toggle="tooltip" title="Ride   توصيل المريض" class="active">הסעת חולה</li>
                                 </ol>
-                                <h4  class="page-title">הסעת חולה&nbsp&nbsp<i data-toggle="tooltip" title="Ride   توصيل المريض" class="md md-recent-actors"></i></h4>
+                                <h4 class="page-title">הסעת חולה&nbsp&nbsp<i data-toggle="tooltip" title="Ride   توصيل المريض" class="md md-recent-actors"></i></h4>
                             </div>
                         </div>
                     </div>
@@ -1771,17 +1992,17 @@
                                         </div>
                                         <!--<div class="row m-l-10 m-r-10">
 
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">מספר הסעה</label>
-                            <div class="col-sm-6">
-                                <input id="ridePatNum" name="ridePatNum" type="text" class="form-control">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                    </div>
-                </div>-->
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">מספר הסעה</label>
+                                            <div class="col-sm-6">
+                                                <input id="ridePatNum" name="ridePatNum" type="text" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                    </div>
+                                </div>-->
                                         <!--duplicate ride section-->
                                         <div class="row m-l-10 m-r-10" id="hideOnEdit">
                                             <div class="col-sm-6">
@@ -1831,10 +2052,72 @@
                                 </div>
                             </div>
                         </form>
+                        
                     </div>
 
-                </div>
+                    <!--XXXXX-->
+
+                    <div class="row" id="driversDiv">
+                        <form class="form-horizontal" role="form" id="driverForm">
+                            <div class="col-sm-12">
+                                <hr />
+                                <div class="card-box">
+                                    <div class="row">
+                                        <h4 class="m-t-0 header-title"><b>נהג בנסיעה</b></h4>
+
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">נהג&nbsp;</label>
+                                                    <div class="col-sm-6" id="selectDriver">
+                                                        <select id="Driver" class="form-control"><option value="0">בחר נהג</option></select>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="col-sm-6">
+
+                                                <input type="button" onclick="signDriverToRide()" id="saveDriver" class="btn btn-success w-md waves-light m-b-5 m-r-15" value="Save" />
+                                                <input type="button" onclick="deleteDriverFromRide()" id="deleteDriver" class="btn btn-danger w-md waves-light m-b-5 m-r-15" value="Remove Driver" />
+
+                                                <!--<div class="form-group" id="escortDiv">
+            <label data-toggle="tooltip" title="Patient escorts" class="col-sm-2 control-label">מלווים</label>
+            <div class="col-sm-6" id="selectEscort">
             </div>
+        </div>-->
+                                            </div>
+                                            <div class="row m-l-10 m-r-10">
+                                                <div class="col-sm-12 text-center">
+                                                    <br />
+                                                    <br />
+                                                    <button type="button" onclick="returnRidePat()" class="btn btn-default waves-effect w-md m-b-5"> חזרה לניהול ההסעות שלי&nbsp<i class="ti-back-right m-r-5"></i></button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+
+
+
+
+                                            </div>
+                                        </div>
+                            </div>
+                            
+                        </form>
+
+                    </div>
+
+
+
+
+
+
+
+                </div>
+
+            </div>
+            
             <!-- end container -->
         </div>
         <!-- end content -->

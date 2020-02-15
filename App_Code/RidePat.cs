@@ -518,7 +518,7 @@ public class RidePat
                 }
             }
             if (!isAnonymous)
-            {
+            {//HERE!
                 Message m = new Message();
                 if (rp.Drivers.Count>=1)
                 {
@@ -1235,6 +1235,12 @@ public class RidePat
             m.driverSignUpToCloseRide(ridePatId, v.getVolunteerByID(userId), primary);
         }
 
+        //HERE!
+        RidePat rp = GetRidePat(ridePatId);
+        RidePatNum = rp.RidePatNum;
+        
+        m.driverAddedToRide(RidePatNum, rp.Drivers[0]);
+
 
         return RideId;
 
@@ -1267,6 +1273,11 @@ public class RidePat
             driver = "secondaryDriver";
         }
 
+        //HERE!
+        RidePat rp = GetRidePat(ridePatId);
+        RidePatNum = rp.RidePatNum;
+        Message m = new Message();
+        m.driverRemovedFromRide(RidePatNum, rp.Drivers[0]);
 
         if (driver == "secondaryDriver")
         {
@@ -1286,9 +1297,16 @@ public class RidePat
             //it's less than 24 to the ride
             res = 911;
         }
-     
-        return res;
 
+       
+        
+        
+        
+        
+        
+
+        return res;
+        
     }
 
     public int DeleteDriver(int ridePatId, int driverId)

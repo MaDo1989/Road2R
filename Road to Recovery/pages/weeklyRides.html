@@ -88,10 +88,10 @@
                 success: function (data) {
                     let fullList = JSON.parse(data.d)
                     for (loc of fullList) {
-                        if (loc.Area.includes("דרום")) {
+                        if (loc.Area.includes("דרום") || loc.Area.includes("ארז")) {
                             southLocations.push(loc.Name);
                         }
-                        if (loc.Area.includes("מרכז")) {
+                        if (loc.Area.includes("מרכז") || loc.Area.includes("תרקומיא") || loc.Area.includes("ירושלים")) {
                             centerLocations.push(loc.Name);
                         }
                         if (loc.Area.includes("צפון")) {

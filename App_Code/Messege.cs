@@ -686,4 +686,185 @@ public class Message
             pushANDROID.RunPushNotificationOne(user, data, null);
         }
     }
+
+    public void driverAddedToRide(int ridePatID, Volunteer user)
+    {
+        //get ride details and generate message
+        RidePat rp = new RidePat();
+        var abc = rp.GetRidePat(ridePatID);
+        //Volunteer coor = new Volunteer();
+        //coor = abc.Coordinator.getVolunteerByDisplayName(abc.Coordinator.DisplayName);
+
+        TimeZoneInfo sourceTimeZone = TimeZoneInfo.FindSystemTimeZoneById("UTC");
+        TimeZoneInfo targetTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Israel Standard Time");
+        var converted = TimeZoneInfo.ConvertTime(abc.Date, sourceTimeZone, targetTimeZone);
+        string time = converted.ToShortTimeString();
+        if (time == "22:14")
+        {
+
+            time = "אחה\"צ";
+        }
+        //abc.Date.ToShortDateString()
+
+        string escortsStr = "";
+        if (abc.Escorts.Count > 0)
+        {
+            if (abc.Escorts.Count == 1)
+            {
+                escortsStr = " עם מלווה";
+            }
+            else
+            {
+                escortsStr = " עם " + abc.Escorts.Count + " מלווים";
+            }
+
+        }
+
+        string displayName = abc.Pat.DisplayName;
+        if (abc.Pat.IsAnonymous == "True")
+        {
+            displayName = "חולה";
+        }
+
+        
+
+        var message = "שובצת לנסיעה: " + displayName + escortsStr + ", מ" + abc.Origin.Name + " ל" + abc.Destination.Name + " ב-" + abc.Date.Day + "/" + abc.Date.Month + ", בשעה " + time;
+
+        int userId = 0;
+        Volunteer V = new Volunteer();
+
+        //if (user != null)
+        //{
+        //    V = V.getVolunteerByID(user.Id);
+        //    userId = user.Id;
+        //    message = "נסיעה בוטלה על ידי הרכז/ת " + abc.Coordinator.DisplayName + "." + " הנסיעה בתאריך " + abc.Date.ToShortDateString() + " בשעה " + time + " עם החולה " + abc.Pat.DisplayName + " על ידי הנהג/ת " + V.DisplayName;
+        //}
+
+        //insert msg to db
+
+        int msgID = insertMsg(0, "You have been listed for a ride", "שובצת לנסיעה", message, ridePatID, DateTime.Now, userId, "", true, false, false);
+
+
+        var data = new JObject();
+
+        if (user.Device == "iOS")
+        {
+            //PUSH IOS
+            data = new JObject();
+            var notification = new JObject();
+            notification.Add("title", "שובצת לנסיעה");
+            notification.Add("body", message);
+            data.Add("rideID", ridePatID);
+            data.Add("status", "Canceled");
+            data.Add("msgID", msgID);
+            data.Add("content-available", 1);
+            //send push
+            myPushNot pushIOS = new myPushNot();
+            pushIOS.RunPushNotificationOne(user, data, notification);
+        }
+        else
+        {
+            //PUSH ANDROID
+            data = new JObject();
+            data.Add("message", message);
+            data.Add("title", "שובצת לנסיעה");
+            data.Add("rideID", ridePatID);
+            data.Add("status", "Canceled");
+            data.Add("msgID", msgID);
+            data.Add("content-available", 1);
+            //send push
+            myPushNot pushANDROID = new myPushNot();
+            pushANDROID.RunPushNotificationOne(user, data, null);
+        }
+    }
+
+    public void driverRemovedFromRide(int ridePatID, Volunteer user)
+    {
+        //get ride details and generate message
+        RidePat rp = new RidePat();
+        var abc = rp.GetRidePat(ridePatID);
+        //Volunteer coor = new Volunteer();
+        //coor = abc.Coordinator.getVolunteerByDisplayName(abc.Coordinator.DisplayName);
+
+        TimeZoneInfo sourceTimeZone = TimeZoneInfo.FindSystemTimeZoneById("UTC");
+        TimeZoneInfo targetTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Israel Standard Time");
+        var converted = TimeZoneInfo.ConvertTime(abc.Date, sourceTimeZone, targetTimeZone);
+        string time = converted.ToShortTimeString();
+        if (time == "22:14")
+        {
+
+            time = "אחה\"צ";
+        }
+        //abc.Date.ToShortDateString()
+
+        string escortsStr = "";
+        if (abc.Escorts.Count > 0)
+        {
+            if (abc.Escorts.Count == 1)
+            {
+                escortsStr = " עם מלווה";
+            }
+            else
+            {
+                escortsStr = " עם " + abc.Escorts.Count + " מלווים";
+            }
+
+        }
+
+        string displayName = abc.Pat.DisplayName;
+        if (abc.Pat.IsAnonymous == "True")
+        {
+            displayName = "חולה";
+        }
+
+
+        var message = "בוטלה הנסיעה: " + displayName + escortsStr + ", מ" + abc.Origin.Name + " ל" + abc.Destination.Name + " ב-" + abc.Date.Day + "/" + abc.Date.Month + ", בשעה " + time;
+
+        int userId = 0;
+        Volunteer V = new Volunteer();
+
+        //if (user != null)
+        //{
+        //    V = V.getVolunteerByID(user.Id);
+        //    userId = user.Id;
+        //    message = "נסיעה בוטלה על ידי הרכז/ת " + abc.Coordinator.DisplayName + "." + " הנסיעה בתאריך " + abc.Date.ToShortDateString() + " בשעה " + time + " עם החולה " + abc.Pat.DisplayName + " על ידי הנהג/ת " + V.DisplayName;
+        //}
+
+        //insert msg to db
+
+        int msgID = insertMsg(0, "Ride canceled", "נסיעה בוטלה", message, ridePatID, DateTime.Now, userId, "", true, false, false);
+
+
+        var data = new JObject();
+
+        if (user.Device == "iOS")
+        {
+            //PUSH IOS
+            data = new JObject();
+            var notification = new JObject();
+            notification.Add("title", "נסיעה בוטלה");
+            notification.Add("body", message);
+            data.Add("rideID", ridePatID);
+            data.Add("status", "Canceled");
+            data.Add("msgID", msgID);
+            data.Add("content-available", 1);
+            //send push
+            myPushNot pushIOS = new myPushNot();
+            pushIOS.RunPushNotificationOne(user, data, notification);
+        }
+        else
+        {
+            //PUSH ANDROID
+            data = new JObject();
+            data.Add("message", message);
+            data.Add("title", "נסיעה בוטלה");
+            data.Add("rideID", ridePatID);
+            data.Add("status", "Canceled");
+            data.Add("msgID", msgID);
+            data.Add("content-available", 1);
+            //send push
+            myPushNot pushANDROID = new myPushNot();
+            pushANDROID.RunPushNotificationOne(user, data, null);
+        }
+    }
 }

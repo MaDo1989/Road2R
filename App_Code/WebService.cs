@@ -289,6 +289,7 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
+            HttpResponse response = GzipMe();
             Patient c = new Patient();
             List<Patient> patientsList = c.getAnonymousPatientsList(active, origin, dest);
             return j.Serialize(patientsList);
@@ -305,6 +306,7 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
+            HttpResponse response = GzipMe();
             Patient c = new Patient();
             List<Patient> patientsList = c.getAnonymousPatientsListForLocations(active, origin, dest,area);
             return j.Serialize(patientsList);
