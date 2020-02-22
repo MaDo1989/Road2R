@@ -734,15 +734,28 @@ public class Patient
         return locations;
     }
 
+
+    private DataTable getPatientsOnTheSamePath(string origin, string destination)
+    {        
+        Location loc = new Location();
+        string originArea = loc.GetAreaForPoint(origin);
+        string destinationArea = loc.GetAreaForPoint(destination);        
+        string query = "select p.* from Patient p join location lo on p.Barrier = lo.Name join location ld on p.Hospital = ld.Name where(lo.Area = N'" + originArea + "' and ld.Area = N'" + destinationArea + "') or(lo.Area = N'" + destinationArea + "' and ld.Area = N'" + originArea + "')";
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        return ds.Tables[0];
+    }
+
     public List<Patient> getAnonymousPatientsListForLocations(bool active, string origin, string dest,string area)
     {
         //change to query with "in" 
         #region DB functions
 
-        List<string> locations = GetLocationsForArea(area);
-
+        /*
         string query = "";
         string text = "";
+
+        
         for (int i = 0; i < locations.Count; i++)
         {
             text = locations[i].Replace("'", "''");
@@ -789,12 +802,21 @@ public class Patient
             query += " and IsActive = 'true'";
         }
         query += " order by FirstNameH";
+        */
+
+
+
+
+
+        //DbService db = new DbService();
+
+        //DataSet ds = db.GetDataSetByQuery(query);
+
+        DataTable dt = getPatientsOnTheSamePath(origin, dest);
 
         List<Patient> list = new List<Patient>();
-        DbService db = new DbService();
-        DataSet ds = db.GetDataSetByQuery(query);
 
-        foreach (DataRow dr in ds.Tables[0].Rows)
+        foreach (DataRow dr in dt.Rows)
         {
             Patient p = new Patient();
             p.Id = int.Parse(dr["Id"].ToString());

@@ -334,6 +334,21 @@ public class Location
         return areas;
     }
 
+    public List<string> getNetAreas()
+    {
+        List<string> areas = new List<string>();
+        string query = "select * from Area where AreaName NOT LIKE '%-%' order by AreaName";
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+            string tmp = dr["AreaName"].ToString();
+            areas.Add(tmp);
+        }
+        return areas;
+    }
+
     public string GetAreaForPoint(string point)
     {
         string area = "";

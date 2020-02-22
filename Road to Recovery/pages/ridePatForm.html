@@ -159,6 +159,8 @@
         var RideId;
         var driverMode = "";
         var firstDriverBeforeSwap = true;
+        var drivers = [];
+        var driversID = [];
             
 
         $(document).ready(function () {
@@ -621,6 +623,9 @@
 
                     $("#pat").autocomplete({
                         source: patients
+                    });
+                    $("#driver").autocomplete({
+                        source: drivers
                     });
                     $("#patEnglishName").autocomplete({
                         source: arr_englishNames
@@ -1474,37 +1479,37 @@
                         $("#dateRide").attr('disabled', 'disabled');
                         $("#dirBTN").attr('disabled', 'disabled');
                     }
-                    if (ridePat.Pat.IsAnonymous == "True" && (ridePat.Pat.DisplayName.indexOf('מרכז') !== -1 || ridePat.Pat.DisplayName.indexOf('ארז') !== -1 || ridePat.Pat.DisplayName.indexOf('תרקומיא') !== -1 ||ridePat.Pat.DisplayName.indexOf('ירושלים') !== -1 || ridePat.Pat.DisplayName.indexOf('דרום') !== -1 ||  ridePat.Pat.DisplayName.indexOf('צפון') !== -1)) {
+                    if (ridePat.Pat.IsAnonymous == "True") {
                         var area = "";
-                        if(ridePat.Pat.DisplayName.indexOf('מרכז') !== -1){
-                            area="מרכז";
-                        }
-                        if(ridePat.Pat.DisplayName.indexOf('דרום') !== -1){
-                            area="דרום";
-                        }
-                        if(ridePat.Pat.DisplayName.indexOf('ירושלים') !== -1){
-                            area="ירושלים";
-                        }
-                        if(ridePat.Pat.DisplayName.indexOf('צפון') !== -1){
-                            area="צפון";
-                        }
-                        if (ridePat.Pat.DisplayName.indexOf('ארז') !== -1) {
-                            area = "ארז";
-                        }
-                        if (ridePat.Pat.DisplayName.indexOf('תרקומיא') !== -1) {
-                            area = "תרקומיא";
-                        }
+                        //if(ridePat.Pat.DisplayName.indexOf('מרכז') !== -1){
+                        //    area="מרכז";
+                        //}
+                        //if(ridePat.Pat.DisplayName.indexOf('דרום') !== -1){
+                        //    area="דרום";
+                        //}
+                        //if(ridePat.Pat.DisplayName.indexOf('ירושלים') !== -1){
+                        //    area="ירושלים";
+                        //}
+                        //if(ridePat.Pat.DisplayName.indexOf('צפון') !== -1){
+                        //    area="צפון";
+                        //}
+                        //if (ridePat.Pat.DisplayName.indexOf('ארז') !== -1) {
+                        //    area = "ארז";
+                        //}
+                        //if (ridePat.Pat.DisplayName.indexOf('תרקומיא') !== -1) {
+                        //    area = "תרקומיא";
+                        //}
                         var origin = ridePat.Origin.Name;
                         var destination = ridePat.Destination.Name;
                         isCenterPoint = true;
                         getAnonymousPatientsListForArea(origin, destination,area);
                     }
-                    else if (ridePat.Pat.IsAnonymous == "True") {
+                    //else if (ridePat.Pat.IsAnonymous == "True") {
 
-                        var origin = ridePat.Origin.Name;
-                        var destination = ridePat.Destination.Name;
-                        generatePatAnonymous(origin, destination);
-                    }
+                    //    var origin = ridePat.Origin.Name;
+                    //    var destination = ridePat.Destination.Name;
+                    //    generatePatAnonymous(origin, destination);
+                    //}
                     
                     if (ridePat.OnlyEscort) $("#onlyEscort").prop('checked', true);
                     $("#ridePatNum").val(ridePat.RidePatNum);
@@ -1513,7 +1518,12 @@
                     RideId = ridePat.RideNum;
                     ridePatId = ridePat.RidePatNum;
                     if (ridePat.Drivers.length > 0) {
-                        $('#Driver').val(ridePat.Drivers[0].Id)
+                        //$('#Driver').val(ridePat.Drivers[0].Id)
+
+                        var driverIDindex = driversID.indexOf(ridePat.Drivers[0].Id);
+                        
+
+                        $('#driver').val(drivers[driverIDindex])
                         currentDriverId = ridePat.Drivers[0].Id;
                         $('#deleteDriver').show();
                     } else {
@@ -1607,7 +1617,7 @@
         }
         
         function generateDrivers() {
-            var $drivers = $("#Driver");
+            //var $drivers = $("#Driver");
             
             $.ajax({
                 dataType: "json",
@@ -1623,7 +1633,10 @@
                     var arr_drivers = JSON.parse(data.d);
                     arr_drivers.sort();
                     for (i in arr_drivers) {                        
-                        $('<option>', { value: arr_drivers[i].Id, text: arr_drivers[i].DisplayName }).appendTo($drivers);
+                        //$('<option>', { value: arr_drivers[i].Id, text: arr_drivers[i].DisplayName }).appendTo($drivers);
+                        //xxxxx
+                        drivers.push(arr_drivers[i].DisplayName)
+                        driversID.push(arr_drivers[i].Id)
                     }
                 },
                 error: function (err) { alert("Error in generateDrivers"); }
@@ -1631,9 +1644,12 @@
         }
         //HERE
         function signDriverToRide() {
-            
-            userSelected = $('#Driver').val();
-            if (userSelected == 0) {
+
+            var driverIndex = drivers.indexOf($('#driver').val());
+            userSelected = driversID[driverIndex];
+            //userSelected = $('#Driver').val();
+
+            if (userSelected == undefined) {
                 swal({
                     title: "יש לבחור נהג",
                     type: "warning",
@@ -1690,7 +1706,10 @@
                         
                     } else {
                         alert("הנהג לא שונה");
-                        $('#Driver').val(currentDriverId);
+                        //$('#Driver').val(currentDriverId);
+
+                        $('#driver').val(currentDriverId);
+
                     }
                 }
             }
@@ -1744,7 +1763,10 @@
                     error: signDriverErrorCB
                 }) // end of ajax call
             } else if (driverMode == "delete") {
-                $('#Driver').val(0)
+                //$('#Driver').val(0)
+
+                $('#driver').val("")
+
                 $('#wait').hide();
                 swal({
                     title: "הנהג נמחק מההסעה בהצלחה",
@@ -1752,7 +1774,7 @@
                     timer: 1000,
                     showConfirmButton: false
                 });
-                
+                $('#deleteDriver').hide();
             }
 
             driverMode = "";
@@ -1765,7 +1787,11 @@
         }
 
         function deleteDriverFromRide() {
-            userSelected = $('#Driver').val();
+            //userSelected = $('#Driver').val();
+
+            var driverIndex = drivers.indexOf($('#driver').val());
+            userSelected = driversID[driverIndex];
+
             if (confirm("האם אתה בטוח שאתה רוצה למחוק את הנהג מההסעה?")) {
                 $('#wait').show();
                 driverMode = "delete";
@@ -2088,7 +2114,8 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">נהג&nbsp;</label>
                                                     <div class="col-sm-6" id="selectDriver">
-                                                        <select id="Driver" class="form-control"><option value="0">בחר נהג</option></select>
+                                                        <!--<select id="Driver" class="form-control"><option value="0">בחר נהג</option></select>-->
+                                                        <input placeholder="הזן שם" type="text" id="driver" name="driver" class="form-control ui-autocomplete-input" autocomplete="off" aria-required="true" aria-invalid="false">
                                                     </div>
                                                 </div>
 
