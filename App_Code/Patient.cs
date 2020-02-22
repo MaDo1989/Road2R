@@ -639,7 +639,7 @@ public class Patient
                 catch (Exception ex)
                 {
 
-                    throw;
+                    throw ex;
                 }
             }
         }
@@ -740,7 +740,7 @@ public class Patient
         Location loc = new Location();
         string originArea = loc.GetAreaForPoint(origin);
         string destinationArea = loc.GetAreaForPoint(destination);        
-        string query = "select p.* from Patient p join location lo on p.Barrier = lo.Name join location ld on p.Hospital = ld.Name where(lo.Area = N'" + originArea + "' and ld.Area = N'" + destinationArea + "') or(lo.Area = N'" + destinationArea + "' and ld.Area = N'" + originArea + "')";
+        string query = "select p.* from Patient p join location lo on p.Barrier = lo.Name join location ld on p.Hospital = ld.Name where(lo.Area = N'" + originArea + "' and ld.Area = N'" + destinationArea + "') or(lo.Area = N'" + destinationArea + "' and ld.Area = N'" + originArea + "') and (p.IsActive = 'true')";
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         return ds.Tables[0];

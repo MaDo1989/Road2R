@@ -248,22 +248,65 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    [WebMethod]
-    public string getPatients(bool active = true)
+
+
+    //XXXX
+    //This method is used for שבץ אותי
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+
+    public string GetMessi(string active)
     {
+        return active;
+        //try
+        //{
+        //    HttpResponse response = GzipMe();
+        //    //string AcceptEncoding = HttpContext.Current.Request.Headers["Accept-Encoding"];
+        //    //if (AcceptEncoding.Contains("gzip"))
+        //    //{
+        //    //    HttpResponse Response = HttpContext.Current.Response;
+        //    //    Response.Filter = new System.IO.Compression.GZipStream(Response.Filter, System.IO.Compression.CompressionMode.Compress);
+        //    //    Response.Headers.Remove("Content-Encoding");
+        //    //    Response.AppendHeader("Content-Encoding", "gzip");
+        //    //}
+
+        //    RidePat rp = new RidePat();
+        //    List<RidePat> r = rp.GetRidePatView(volunteerId, maxDays);
+        //    j.MaxJsonLength = Int32.MaxValue;
+        //    return j.Serialize(r);
+        //}
+        //catch (Exception ex)
+        //{
+        //    Log.Error("Error in GetRidePatView", ex);
+        //    throw new Exception("שגיאה בשליפת נתוני הסעות");
+        //}
+
+    }
+
+
+
+
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string getPatients(string active = "true")
+    {
+        bool activeBool = Convert.ToBoolean(active);
         try
         {
             HttpResponse response = GzipMe();
 
             Patient c = new Patient();
-            List<Patient> patientsList = c.getPatientsList(active);
+            List<Patient> patientsList = c.getPatientsList(activeBool);
             //j.MaxJsonLength = int.MaxValue;
+            j.MaxJsonLength = Int32.MaxValue;
             return j.Serialize(patientsList);
         }
         catch (Exception ex)
         {
             Log.Error("Error in getPatients", ex);
-            throw new Exception("שגיאה בשליפת נתוני חולים");
+            //throw new Exception("שגיאה בשליפת נתוני חולים");
+            throw ex;
         }
 
     }

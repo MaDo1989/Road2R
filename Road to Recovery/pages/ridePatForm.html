@@ -578,18 +578,22 @@
             return false;
         }
         function generatePat() {
+            
             var $select = $("#pat");
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/getPatients",
+                
                 contentType: "application/json; charset=utf-8",
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader("Content-Encoding", "gzip");
                 },
                 type: "POST",
                 async: false,
-                data: JSON.stringify({ active: true }),
+                data: JSON.stringify({ active: "true" }),
+                //data: "",
                 success: function (data) {
+                    
                     arr_pat = JSON.parse(data.d);
 
                     patients = [];
@@ -620,7 +624,7 @@
                     if (isAssistant) {
                         arr_pat = arr_for_assistant;
                     }
-
+                    
                     $("#pat").autocomplete({
                         source: patients
                     });
@@ -639,7 +643,11 @@
                     });
                     
                 },
-                error: function (err) { alert("Error in generatePat"); }
+                error: function (err) {
+                    alert("Error in generatePat");
+                    console.log(err);
+                    
+                }
             });
         }
 
@@ -1732,6 +1740,7 @@
                 setTimeout('uploadData(ridePatId)', 2001);
                 firstDriverBeforeSwap = false;
             }
+        
             
             
             
@@ -1747,11 +1756,13 @@
 
         function deleteRideSuccessCB() {
             if (driverMode == "edit") {
+                currentDriverId = userSelected;
                 var request = {
                     ridePatId: ridePatId,
                     userId: userSelected,
                     driverType: "primary"
                 };
+
                 var dataString = JSON.stringify(request);
                 $.ajax({ // ajax call starts
                     url: 'WebService.asmx/AssignRideToRidePat',   // server side web service method
@@ -1762,6 +1773,7 @@
                     success: signDriverSuccessCB,                // data.d id the Variable data contains the data we get from serverside
                     error: signDriverErrorCB
                 }) // end of ajax call
+
             } else if (driverMode == "delete") {
                 //$('#Driver').val(0)
 
@@ -1775,9 +1787,11 @@
                     showConfirmButton: false
                 });
                 $('#deleteDriver').hide();
+        currentDriverId = -1;
             }
 
             driverMode = "";
+           
         }
 
         function deleteRideErrorCB() {
