@@ -449,6 +449,8 @@
                                     timer: 1000,
                                     showConfirmButton: false
                                 });
+
+        //XXX WHEN RIDE SAVED:
                                 ridePatId = data.d;
                                 currentDriverId = -1;                                
                                 $('#driversDiv').show();
@@ -1650,7 +1652,8 @@
                 error: function (err) { alert("Error in generateDrivers"); }
             });
         }
-        //HERE
+
+        //XXX HERE
         function signDriverToRide() {
 
             var driverIndex = drivers.indexOf($('#driver').val());
@@ -1725,8 +1728,11 @@
 
         }
 
-        function signDriverSuccessCB()
+        function signDriverSuccessCB(data)
         {
+            
+            RideId = data.d;
+            console.log(RideId);
             $('#wait').hide();
             swal({
                     title: "הנהג עודכן בהצלחה",

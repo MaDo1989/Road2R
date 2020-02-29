@@ -250,7 +250,7 @@ public class WebService : System.Web.Services.WebService
 
 
 
-    //XXXX
+    
     //This method is used for שבץ אותי
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -918,6 +918,7 @@ public class WebService : System.Web.Services.WebService
             {
                 throw new Exception(ex.Message);
             }
+            
             else throw new Exception("שגיאה בצירוף הסעה לנסיעה");
         }
 
