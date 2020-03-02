@@ -317,7 +317,9 @@
                 type: "POST",
                 data: JSON.stringify({ volunteerId: volunteerId,maxDays:30 }),
                 success: function (data) {
+        
                     arr_rides = JSON.parse(data.d);
+
                     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
                     for (i in arr_rides) {
                         if (arr_rides[i].Coordinator.DisplayName != currentCoor) continue; //let the function run only for logged-in coordinator
@@ -399,7 +401,7 @@
                             buildTables(tFuture);
 
                         }
-
+                console.log(arr_rides[i])
                     }
 
                     //tMorning.columns([0]).order('asc').draw();
@@ -483,7 +485,10 @@
         }
 
         function buildTables(table) {
-
+        
+        if (arr_rides[i].Pat.DisplayName.includes("אנונימי")){
+        arr_rides[i].Pat.DisplayName = arr_rides[i].Pat.DisplayName.replace("אנונימי","חולה")
+        }
             if (arr_rides[i].Status.indexOf("ממתינה לשיבוץ") !==-1 ) {
                 if (isAssistant) {
                     if (table.context[0].sTableId != "datatable-future" && table.context[0].sTableId != "datatable-tomorrow") {
