@@ -450,7 +450,7 @@
                                     showConfirmButton: false
                                 });
 
-        //XXX WHEN RIDE SAVED:
+        
                                 ridePatId = data.d;
                                 currentDriverId = -1;                                
                                 $('#driversDiv').show();
@@ -1644,7 +1644,7 @@
                     arr_drivers.sort();
                     for (i in arr_drivers) {                        
                         //$('<option>', { value: arr_drivers[i].Id, text: arr_drivers[i].DisplayName }).appendTo($drivers);
-                        //xxxxx
+                        
                         drivers.push(arr_drivers[i].DisplayName)
                         driversID.push(arr_drivers[i].Id)
                     }
@@ -1653,7 +1653,7 @@
             });
         }
 
-        //XXX HERE
+        
         function signDriverToRide() {
 
             var driverIndex = drivers.indexOf($('#driver').val());
