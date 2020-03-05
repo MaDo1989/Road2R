@@ -30,6 +30,27 @@
     <link href="assets/css/menu.css" rel="stylesheet" type="text/css">
     <link href="assets/css/responsive.css" rel="stylesheet" type="text/css">
 
+    <style type="text/css">
+
+        #report {
+            position: absolute;
+            z-index: 100;
+            width: 100%;
+            height: 600px;
+            background-color: yellow;
+            padding:20px;
+            visibility:hidden;
+        }
+
+        #closeReportBTN {
+            position:relative;
+            bottom:-30px;
+            margin:0px auto;
+        }
+
+    </style>
+
+
     <script src="assets/js/CookiesFunctions.js"></script>
 
     <script src="assets/js/modernizr.min.js"></script>
@@ -511,6 +532,49 @@
         }
 
 
+        function getWeeklyThanks(rides) {
+            thanks = [];
+            for (var i = 0; i < rides.length; i++) {
+                if (rides[i].Status == "ממתינה לשיבוץ") continue;
+                var coordinator = rides[i].Coordinator.DisplayName;
+                var driver = rides[i].Drivers[0].DisplayName;
+                if (thanks[coordinator] == undefined) {
+                    thanks[coordinator] = [];
+                    thanks[coordinator][driver] = 1;
+                }
+                else {
+                    if (thanks[coordinator][driver] == undefined) {
+                        thanks[coordinator][driver] = 1;
+                    }
+                    else {
+                        thanks[coordinator][driver]++;
+                    }
+                }
+            }
+
+            return thanks;
+        }
+
+
+        function showThanks() {
+            var thanks = getWeeklyThanks(arr_rides);
+            str = "";
+            for (c in thanks) {
+                str += "<h3>" + c + "</h3>";
+                for (d in thanks[c]) {
+                    str +=  "<span>" + d + ", </span>";
+                }
+                //str = str.substring(0, str.length - 1);
+            }
+           document.getElementById("report").style.visibility = "visible";
+           document.getElementById("thanks").innerHTML = str;
+           
+        }
+
+        function closeReport() {
+            document.getElementById("report").style.visibility = "hidden";
+        }
+
     </script>
     <style>
         #weeklyRides tbody td {
@@ -534,9 +598,13 @@
                             <h4 class="page-title">
                                 תמונת הסעות שבועית&nbsp&nbsp
                                 <i>
-                                    <img src="../../Media/היסטורית הסעות.png" height="25" width="25" />
+                                    <img src="../../Media/היסטורית הסעות.png" ondblclick="showThanks()" id="reportIcon" height="25" width="25" />
                                 </i>
                             </h4>
+                            <div id="report">
+                                <div id="thanks"></div>
+                                <button onclick="closeReport()" id="closeReportBTN">Close Me</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -619,6 +687,7 @@
             2020 - 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה
         </footer>
     </div>
+
 
     <script>
         var resizefunc = [];
