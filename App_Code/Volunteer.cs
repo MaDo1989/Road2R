@@ -44,6 +44,7 @@ public class Volunteer
     int id;
     string regId;
     string lastModified;
+    string volunteerIdentity;
 
     public List<RideStatus> Statusim { get; set; }
 
@@ -865,6 +866,19 @@ public class Volunteer
         }
     }
 
+    public string VolunteerIdentity
+    {
+        get
+        {
+            return volunteerIdentity;
+        }
+
+        set
+        {
+            volunteerIdentity = value;
+        }
+    }
+
     //public string KnowsArabic
     //{
     //    get
@@ -1071,6 +1085,7 @@ public class Volunteer
         v.Address = dr["Address"].ToString();
         v.Email = dr["Email"].ToString();
         v.EnglishName = dr["EnglishName"].ToString();
+        v.VolunteerIdentity = dr["VolunteerIdentity"].ToString();
         string date = dr["JoinDate"].ToString();
         bool isAssistant = Convert.ToBoolean(dr["isAssistant"].ToString());
         if (date == "")
@@ -1139,6 +1154,8 @@ public class Volunteer
         v.RegId = dr["pnRegId"].ToString();
         v.Address = dr["Address"].ToString();
         v.Email = dr["Email"].ToString();
+        v.VolunteerIdentity = dr["VolunteerIdentity"].ToString();
+
         //v.IsAssistant= Convert.ToBoolean(dr["isAssistant"].ToString());
 
         if (dr["device"] != null)
@@ -1288,7 +1305,7 @@ public class Volunteer
         DbService db = new DbService();
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
-        SqlParameter[] cmdParams = new SqlParameter[19];
+        SqlParameter[] cmdParams = new SqlParameter[20];
         cmdParams[0] = cmd.Parameters.AddWithValue("@address", v.Address);
         cmdParams[1] = cmd.Parameters.AddWithValue("@cell", v.CellPhone);
         cmdParams[2] = cmd.Parameters.AddWithValue("@cell2", v.CellPhone2);
@@ -1309,6 +1326,7 @@ public class Volunteer
         cmdParams[16] = cmd.Parameters.AddWithValue("@UserName", v.CellPhone);
         cmdParams[17] = cmd.Parameters.AddWithValue("@englishName", v.EnglishName);
         cmdParams[18] = cmd.Parameters.AddWithValue("@isAssistant", v.IsAssistant);
+        cmdParams[19] = cmd.Parameters.AddWithValue("@volunteerIdentity", v.VolunteerIdentity);
         string newName = v.FirstNameH + " " + v.LastNameH;
         newName = newName.Replace("'", "''");
         //cmdParams[1] = cmd.Parameters.AddWithValue("@bDay", v.BirthDate);
@@ -1320,7 +1338,7 @@ public class Volunteer
             if (v.TypeVol == "רכז" || v.TypeVol == "מנהל" || v.IsAssistant)
             {
                 query = "update Volunteer set Address=@address, CellPhone=@cell,";
-                query += "CellPhone2=@cell2, CityCityName=@city, Email=@email, FirstNameA=@firstNameA, FirstNameH=@firstNameH, ";
+                query += "CellPhone2=@cell2, CityCityName=@city, Email=@email, FirstNameA=@firstNameA, FirstNameH=@firstNameH, VolunteerIdentity=@volunteerIdentity, ";
                 query += "Gender=@gender, IsActive=@IsActive, JoinDate=@jDate, KnowsArabic=@knowsArabic, LastNameA=@lastNameA, ";
                 query += "LastNameH=@lastNameH,UserName=@UserName,Password='" + password + "', Remarks=@remarks,EnglishName=@englishName,isAssistant=@isAssistant,lastModified=DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@displayName"; //, BirthDate=@bDay
 
@@ -1328,7 +1346,7 @@ public class Volunteer
             else
             {
                 query = "update Volunteer set Address=@address, CellPhone=@cell,";
-                query += "CellPhone2=@cell2, CityCityName=@city, Email=@email, FirstNameA=@firstNameA, FirstNameH=@firstNameH, ";
+                query += "CellPhone2=@cell2, CityCityName=@city, Email=@email, FirstNameA=@firstNameA, FirstNameH=@firstNameH, VolunteerIdentity=@volunteerIdentity, ";
                 query += "Gender=@gender, IsActive=@IsActive, JoinDate=@jDate, KnowsArabic=@knowsArabic, LastNameA=@lastNameA, ";
                 query += "LastNameH=@lastNameH, Remarks=@remarks,EnglishName=@englishName,isAssistant=@isAssistant,lastModified=DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@displayName"; //, BirthDate=@bDay
             }

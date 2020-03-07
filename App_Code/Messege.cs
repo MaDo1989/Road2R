@@ -389,7 +389,7 @@ public class Message
 
         var msg =  abc.Pat.DisplayName + " הינו החולה בנסיעה מ" + "" + abc.Origin.Name + " ל" + abc.Destination.Name + " בתאריך " + abc.Date.ToShortDateString() + ", בשעה " + time;
         //insert msg to db
-        int msgID = insertMsg(1, "Anonymous Patient changed", "עדכון שם חולה בהסעה", msg, ridePatID, DateTime.Now, user.Id, "", true, false, false);
+        int msgID = insertMsg(1, "Anonymous Patient changed", "עדכון נתוני הסעה", msg, ridePatID, DateTime.Now, user.Id, "", true, false, false);
 
         Volunteer V = new Volunteer();
         string device = V.getDeviceByID(user.Id);
@@ -399,7 +399,7 @@ public class Message
             data = new JObject();
             //PUSH IOS
             var notification = new JObject();
-            notification.Add("title", "עדכון שם חולה בהסעה");
+            notification.Add("title", "עדכון נתוני הסעה");
             notification.Add("body", msg);
             data.Add("rideID", ridePatID);
             data.Add("status", "Anonymous Patient changed");
@@ -414,7 +414,7 @@ public class Message
             data = new JObject();
             //PUSH ANDROID
             data.Add("message", msg);
-            data.Add("title", "עדכון שם חולה בהסעה");
+            data.Add("title", "עדכון נתוני הסעה");
             data.Add("rideID", ridePatID);
             data.Add("status", "Anonymous Patient changed");
             data.Add("msgID", msgID);

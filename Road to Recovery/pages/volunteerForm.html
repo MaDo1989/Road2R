@@ -64,11 +64,11 @@
             height: 100px;
         }
 
-        input[type=text]:focus {
+        input[type=text]:focus, input[type=number]:focus {
             background-color: #FFE684;
         }
 
-        input[type=text], input[type=checkbox], input[type=date], #typeVolunteer, #gender {
+        input[type=text], input[type=checkbox], input[type=date], input[type=number], #typeVolunteer, #gender {
             border-color: #000
         }
     </style>
@@ -255,6 +255,7 @@
                 data: JSON.stringify({ displayName: displayName }),
                 success: function (data) {
                     var volunteer = JSON.parse(data.d);
+                    console.log(volunteer)
                     GENERAL.VOLUNTEERS.setVolunteersList(volunteer);
                     var location = "";
                     for (i in volunteer.PrefArea) {
@@ -273,6 +274,8 @@
                     $("#volunteerName").val(volunteer.DisplayName);
                     $("#volunteerFirstName").val(volunteer.FirstNameH);
                     $("#volunteerLastName").val(volunteer.LastNameH);
+                    $("#VolunteerIdentity").val(volunteer.VolunteerIdentity);
+                    console.log(volunteer.VolunteerIdentity)
                     $("#volunteerEnglishName").val(volunteer.EnglishName);
                     $("#firstA").val(volunteer.FirstNameA);
                     $("#lastA").val(volunteer.LastNameA);
@@ -438,6 +441,14 @@
                                                     <label class="col-sm-2 control-label">שם באנגלית&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="volunteerEnglishName" name="patientEnglishName" type="text" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label data-toggle="tooltip" title="Volunteer ID" class="col-sm-2 control-label">תעודת זהות&nbsp;</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="VolunteerIdentity" name="VolunteerIdentity" type="text" class="form-control">
                                                     </div>
                                                 </div>
                                             </div>
@@ -685,6 +696,7 @@
 
                     var firstNameH = $("#volunteerFirstName").val();
                     var lastNameH = $("#volunteerLastName").val();
+                    var VolunteerIdentity = $("#VolunteerIdentity").val();
                     var englishName = $("#volunteerEnglishName").val();
                     var cellPhone = $("#phone1").val();
                     cellPhone = cellPhone.replace(/-/g, '');
@@ -732,7 +744,7 @@
                     volunteer = {
                         firstNameH: firstNameH, firstNameA: nameA, lastNameH: lastNameH, lastNameA: lastNameA, cellPhone: cellPhone, cellphone2: cellphone2, /*homePhone: homePhone,*/
                         city: city, address: address, email: email, joinDate: joinDate, gender: gender, KnowsArabic: knowsArabic,
-                        typeVol: typeVol, IsActive: active, Remarks: remark, DisplayName: displayName, EnglishName: englishName, IsAssistant:isHelper //birthdate: bdate,
+                        typeVol: typeVol, IsActive: active, Remarks: remark, DisplayName: displayName, EnglishName: englishName, IsAssistant: isHelper, VolunteerIdentity: VolunteerIdentity //birthdate: bdate,
                     }
                     $.ajax({
                         dataType: "json",
@@ -861,6 +873,23 @@
                 );
             }
 
+            var identityMatch = true;
+            var identity = $("#VolunteerIdentity").val();
+            if (identity != "") {
+                var re = new RegExp("^\\d{9}$");
+                
+                if (!re.test(identity)) {
+                    identityMatch = false;
+                    swal(
+                        "שים לב!",
+                        "תעודת הזהות צריכה להכיל 9 ספרות",
+                        "warning"
+                    );
+                } 
+            }
+            
+            
+
             //var jDate = $("#joinDate").val();
             //if (jDate != "") {
             //    var reg = new RegExp("[0-9]{2}\/[0-9]{2}\/[0-9]{4}");
@@ -913,7 +942,7 @@
             } else phoneMatch3 = true;
 
 
-            if (!englishNameExists || !CityExists || !volType || !gender || !phoneMatch || !phoneMatch2 || !phoneMatch3) { //|| !jdateMatch
+            if (!englishNameExists || !CityExists || !volType || !gender || !phoneMatch || !phoneMatch2 || !phoneMatch3 || !identityMatch) { //|| !jdateMatch
                 return false;
             } else return true;
         }

@@ -297,11 +297,12 @@
                 success: function (data) {
                     $('#wait').hide();
                     var arr_rides = JSON.parse(data.d);
+                    console.log(arr_rides)
                     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
                     
                     for (i in arr_rides) {
                         if (arr_rides[i].Pat.DisplayName.includes("אנונימי")) {
-                            arr_rides[i].Pat.DisplayName = arr_rides[i].Pat.DisplayName.replace("אנונימי", "חולה")
+                            arr_rides[i].Pat.DisplayName = "חולה";
                         }
                         //Change date format
                         var temp = arr_rides[i].Date.substring(arr_rides[i].Date.indexOf("(") + 1);

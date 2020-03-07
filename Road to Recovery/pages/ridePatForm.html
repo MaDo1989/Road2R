@@ -161,6 +161,7 @@
         var firstDriverBeforeSwap = true;
         var drivers = [];
         var driversID = [];
+        var addedEquipment = false;
             
 
         $(document).ready(function () {
@@ -358,7 +359,8 @@
 
                     //in case of different equipment than declared for anonymous ridepat.
                     var str = "";
-                    if (func == "edit" && anonymousName == "True" && isWaiting != "ממתינה לשיבוץ") {
+                    //if (func == "edit" && anonymousName == "True" && isWaiting != "ממתינה לשיבוץ") {
+                    if (func == "edit" && isWaiting != "ממתינה לשיבוץ") {
                         if (checkEquipment.length < checkEquipmentAnonymous.length) {
                             alert("ירד ציוד מההסעה");
                         }
@@ -369,13 +371,18 @@
                                         continue;
                                     }
                                     str += checkEquipment[i] + ", ";
+                                    addedEquipment = true;
                                 }
                             }
+                         if (addedEquipment)
+                            {
+
                             var answer = confirm("ציוד " + str + " נוסף לנסיעה\n האם להמשיך בעריכה? ");
                             if (!answer) {
                                 location.href = "manageRidePats.html";
                                 return false;
                             }
+                            }   
                         }
                     }
 
@@ -452,7 +459,21 @@
 
         
                                 ridePatId = data.d;
-                                currentDriverId = -1;                                
+                                //XXX
+                                if (ridePat.Drivers.length > 0) {
+                                    //$('#Driver').val(ridePat.Drivers[0].Id)
+
+                                    var driverIDindex = driversID.indexOf(ridePat.Drivers[0].Id);
+
+
+                                    $('#driver').val(drivers[driverIDindex])
+                                    currentDriverId = ridePat.Drivers[0].Id;
+                                    $('#deleteDriver').show();
+                                } else {
+                                    currentDriverId = -1; // There is no driver assigned to the ride
+
+                                }
+
                                 $('#driversDiv').show();
                                 window.location.href = "#driversDiv";
                                 
@@ -1481,7 +1502,7 @@
                     //editing anonymous ridepat only if a driver assigned to the ride.
                     if ((ridePat.Pat.IsAnonymous == "True") && (ridePat.Status != 'ממתינה לשיבוץ')) {
 
-                        $("#afterNoon").attr('disabled', 'disabled');
+                        //$("#afterNoon").attr('disabled', 'disabled');
                         $("#Origin").attr('disabled', 'disabled');
                         $("#Destination").attr('disabled', 'disabled');
                         //$("#hour").attr('disabled', 'disabled');

@@ -919,7 +919,7 @@
                                                 <div class="form-group">
                                                     <label data-toggle="tooltip" title="Patient ID" class="col-sm-2 control-label">תעודת זהות&nbsp;</label>
                                                     <div class="col-sm-6">
-                                                        <input id="PatientIdentity" name="PatientIdentity" min="100000000" max="999999999" type="number" class="form-control">
+                                                        <input id="PatientIdentity" name="PatientIdentity" type="text" class="form-control">
                                                     </div>
                                                 </div>
                                             </div>
@@ -1372,8 +1372,10 @@
             var englishName = $("#patientEnglishName").val();
             var firstName = $("#patientFirstName").val();
             var lastName = $("#patientLastName").val();
-            
+
             var name = true;
+
+            
             //if (!isAssistant) {
             //    if (firstName === "") {
             //        swal(
@@ -1500,8 +1502,22 @@
                 }
             } else phoneMatch3 = true;
 
+            var identityMatch = true;
+            var identity = $("#PatientIdentity").val();
+            if (identity != "") {
+                var re = new RegExp("^\\d{9}$");
 
-            if (!name || !englishNameCon || !CityExists || !barrier || !hospital || !gender || !phoneMatch || !phoneMatch2 || !phoneMatch3) {
+                if (!re.test(identity)) {
+                    identityMatch = false;
+                    swal(
+                        "שים לב!",
+                        "תעודת הזהות צריכה להכיל 9 ספרות",
+                        "warning"
+                    );
+                }
+            }
+
+            if (!name || !englishNameCon || !CityExists || !barrier || !hospital || !gender || !phoneMatch || !phoneMatch2 || !phoneMatch3 || !identityMatch) {
                 return false;
             } else return true;
         }

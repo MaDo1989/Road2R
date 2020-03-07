@@ -289,7 +289,7 @@ public class Location
         #region DB functions
         string query = "select * from Location where Type=N'בית חולים'";
         query += " and IsActive = 'True'";
-        query += " order by englishname";
+        query += " order by Name";
 
         List<Location> list = new List<Location>();
         DbService db = new DbService();
@@ -370,7 +370,7 @@ public class Location
         // where Type='מחסום'
         string query = "select * from Location where Type=N'מחסום'";
         //query += " and IsActive = 'True'";
-        query += " order by englishname";
+        query += " order by Name";
 
         List<Location> list = new List<Location>();
         DbService db = new DbService();

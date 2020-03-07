@@ -32,6 +32,7 @@ public class RidePat
     string status;
     string area;
     string shift;
+    string lastModified;
 
 
     public bool OnlyEscort { get; set; }
@@ -204,6 +205,19 @@ public class RidePat
 
     public string Area { get; set; }
 
+    public string LastModified
+    {
+        get
+        {
+            return lastModified;
+        }
+
+        set
+        {
+            lastModified = value;
+        }
+    }
+
     public RidePat()
     {
         //
@@ -365,7 +379,7 @@ public class RidePat
                 }
                 cmdParams[6] = cmd.Parameters.AddWithValue("@coordinator", Coordinator.DisplayName);
 
-                string query = "insert into RidePat (Patient,Origin,Destination,PickupTime,Coordinator,Remark,OnlyEscort,Area) values (@pat,@origin,@destination,@date,@coordinator,@remark,@onlyEscort,@Area);SELECT SCOPE_IDENTITY();";
+                string query = "insert into RidePat (Patient,Origin,Destination,PickupTime,Coordinator,Remark,OnlyEscort,Area,lastModified) values (@pat,@origin,@destination,@date,@coordinator,@remark,@onlyEscort,@Area,DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
                 RidePatNum = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
 
                 if (Escorts.Count > 0 && RidePatNum != 0)
@@ -430,7 +444,7 @@ public class RidePat
             //if (Status == "הגענו ליעד") throw new Exception("נסיעה זו כבר הגיעה ליעד ואין אפשרות לערוך אותה");
 
             cmdParams[6] = cmd.Parameters.AddWithValue("@ridePatNum", RidePatNum);
-            var query = "update RidePat set Patient=@pat,Origin=@origin,Destination=@destination,PickupTime=@date,Remark=@remark,OnlyEscort=@onlyEscort,Area=@Area where RidePatNum=@ridePatNum";
+            var query = "update RidePat set Patient=@pat,Origin=@origin,Destination=@destination,PickupTime=@date,Remark=@remark,OnlyEscort=@onlyEscort,Area=@Area,lastModified=DATEADD(hour, 2, SYSDATETIME()) where RidePatNum=@ridePatNum";
             int res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
 
             if (res > 0)
@@ -487,8 +501,8 @@ public class RidePat
                         m.changeInRide(RidePatNum, driver);
                 }
             }
-
-            return res;
+            return RidePatNum;
+            //return res;
         }
         else if (func == "delete")
         {
@@ -963,6 +977,7 @@ public class RidePat
                     rp.Shift = dr["Shift"].ToString();
                     rp.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
                     rp.Status = dr["Status"].ToString();
+                    rp.LastModified = dr["lastModified"].ToString();
                     if (rp.RideNum > 0) // if RidePat is assigned to a Ride - Take the Ride's status
                     {
                         string searchExpression = "RideRideNum = " + rp.RideNum;
