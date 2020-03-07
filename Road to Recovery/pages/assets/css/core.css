@@ -355,17 +355,19 @@ pre {
     -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
     background-color: #fafafa;
     border-radius: 2px;
-    border: 1px solid black;
+    border: 1px solid #eeeeee;
     box-shadow: none;
     color: rgba(0, 0, 0, 0.6);
     font-size: 14px;
 }
 
     .form-control:focus {
-        background: #ffe684;
+        background: #ffffff;
         border: 1px solid #e0e0e0;
         box-shadow: none;
     }
+
+
 
 .label {
     color: #ffffff !important;
