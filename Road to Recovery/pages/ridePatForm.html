@@ -152,10 +152,11 @@
         var isCenterPoint = false;
         var isCenterPatient = false;
         var isRegularPatientNoCenter = false;
+        var flagFirstOne = true;
         //0 means no driver is asigned to the ride
         var rideStatusForFields = 0;
         var ridePatId;
-        var ridePat = 0;
+        var ridePat;
         var currentDriverId;
         var RideId;
         var driverMode = "";
@@ -474,10 +475,7 @@
                                     });
                                 });
 
-
-                                if (ridePat == 0) {
-                                    currentDriverId = -1; // There is no driver assigned to the ride
-                                } else {
+                                if (!(ridePat == undefined)) {
                                     if (ridePat.Drivers.length > 0) {
                                         //$('#Driver').val(ridePat.Drivers[0].Id)
 
@@ -487,13 +485,18 @@
                                         $('#driver').val(drivers[driverIDindex])
                                         currentDriverId = ridePat.Drivers[0].Id;
                                         $('#deleteDriver').show();
+                                        flagFirstOne = false;
+                                    }
+                                } else {
+                                    currentDriverId = -1; // There is no driver assigned to the ride
                                 }
+
                                 
-                                
-                                }
-                                //else {
+
+                                //if (flagFirstOne || ridePat === undefined) {
                                 //    currentDriverId = -1; // There is no driver assigned to the ride
                                 //}
+                                
                                 
                                 
                                 
@@ -1481,7 +1484,7 @@
                     
 
                     
-                    var ridePat = JSON.parse(data.d);
+                    ridePat = JSON.parse(data.d);
                     console.log(ridePat)
                     
 

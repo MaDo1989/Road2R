@@ -1193,7 +1193,7 @@ public class RidePat
         Destination.Name = dr["Destination"].ToString();
         Date = Convert.ToDateTime(dr["PickupTime"].ToString());
         if (dr["Status"].ToString() == "שובץ נהג וגיבוי") throw new Exception("הנסיעה אליה נרשמתם כבר מלאה");
-        //XXX DOESNT GO HERE WITH MY LOGIC:
+        //XXX DOESNT GO HERE WITH MY LOGIC (always ELSE):
         if (dr["RideNum"].ToString() != "") //Ride aleady exists
         {
             RideId = int.Parse(dr["RideNum"].ToString());
