@@ -155,6 +155,7 @@
         //0 means no driver is asigned to the ride
         var rideStatusForFields = 0;
         var ridePatId;
+        var ridePat = 0;
         var currentDriverId;
         var RideId;
         var driverMode = "";
@@ -459,23 +460,41 @@
 
         
                                 ridePatId = data.d;
-                                //XXX
-                                if (ridePat.Drivers.length > 0) {
-                                    //$('#Driver').val(ridePat.Drivers[0].Id)
-
-                                    var driverIDindex = driversID.indexOf(ridePat.Drivers[0].Id);
-
-
-                                    $('#driver').val(drivers[driverIDindex])
-                                    currentDriverId = ridePat.Drivers[0].Id;
-                                    $('#deleteDriver').show();
-                                } else {
-                                    currentDriverId = -1; // There is no driver assigned to the ride
-
-                                }
-
+                                
                                 $('#driversDiv').show();
                                 window.location.href = "#driversDiv";
+
+                                $(function () {
+                                    $("#flashDiv").delay(150).animate({
+                                        "background-color": "#fc9"
+                                    }, 350, function () {
+                                        $("#flashDiv").animate({
+                                            "background-color": "#fff"
+                                        }, 200);
+                                    });
+                                });
+
+
+                                if (ridePat == 0) {
+                                    currentDriverId = -1; // There is no driver assigned to the ride
+                                } else {
+                                    if (ridePat.Drivers.length > 0) {
+                                        //$('#Driver').val(ridePat.Drivers[0].Id)
+
+                                        var driverIDindex = driversID.indexOf(ridePat.Drivers[0].Id);
+
+
+                                        $('#driver').val(drivers[driverIDindex])
+                                        currentDriverId = ridePat.Drivers[0].Id;
+                                        $('#deleteDriver').show();
+                                }
+                                
+                                
+                                }
+                                //else {
+                                //    currentDriverId = -1; // There is no driver assigned to the ride
+                                //}
+                                
                                 
                                 
                                 //setTimeout(function () { returnRidePat() }, 1001);
@@ -1814,7 +1833,7 @@
                     showConfirmButton: false
                 });
                 $('#deleteDriver').hide();
-        currentDriverId = -1;
+                currentDriverId = -1;
             }
 
             driverMode = "";
@@ -2147,7 +2166,7 @@
                             <div class="col-sm-12">
                                 <hr />
                                 <div class="card-box">
-                                    <div class="row">
+                                    <div class="row" id="flashDiv">
                                         <h4 class="m-t-0 header-title"><b>נהג בנסיעה</b></h4>
 
                                         <div class="row m-l-10 m-r-10">
