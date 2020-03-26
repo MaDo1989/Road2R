@@ -612,8 +612,27 @@
                 confirmButtonText: "حذف\nמחיקה",
                 closeOnConfirm: false
             }, function () {
+
+                
+                
+
                 var RidePat = new Object();
                 RidePat.RidePatNum = arr_details.RidePatNum;
+
+                var tempDate = data[0];
+                var tempDateReveresed = tempDate.split('/').reverse().join('/')
+
+                var date = new Date(tempDateReveresed);
+                RidePat.Date = date;
+                if (isNaN(date.getTime())) {
+
+                    var date = new Date();
+                    var tempHour = tempDate.split(':');
+                    date.setHours(tempHour[0])
+                    RidePat.Date = date;
+
+                }
+
                 var Pat = new Object();
                 Pat.DisplayName = patientNameMessage;
                 RidePat.Pat = Pat;
