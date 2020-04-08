@@ -32,7 +32,7 @@ public class WebService : System.Web.Services.WebService
     
     
     //----------------------Road to Recovery-----------------------------------------------
-    //[WebMethod]
+    //[WebMethod(EnableSession = true)]
     //[ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     //public void test(Class1 c)
     //{
@@ -48,7 +48,7 @@ public class WebService : System.Web.Services.WebService
     //    var a = 0;
     //}
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string isPrimaryStillCanceled(int driverID, int rideID)
     {
@@ -66,7 +66,7 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string backupToPrimary(int rideID, int driverID)
     {
@@ -84,7 +84,7 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string getLocations()
     {
@@ -104,7 +104,7 @@ public class WebService : System.Web.Services.WebService
             throw new Exception("שגיאה בשליפת נתוני נקודות איסוף והורדה");
         }
     }
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string getAreas()
     {
@@ -121,7 +121,7 @@ public class WebService : System.Web.Services.WebService
             throw new Exception("שגיאה בשליפת אזורים");
         }
     }
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string ChangeRidepatAreas()
     {
@@ -137,7 +137,7 @@ public class WebService : System.Web.Services.WebService
             throw new Exception("שגיאה בשליפת אזורים");
         }
     }
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public int setVolunteerPrefs(int Id, List<string> PrefLocation, List<string> PrefArea, List<string> PrefTime, int AvailableSeats)
     {
         try
@@ -153,7 +153,7 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string getescortedsListMobile(string displayName, string patientCell)
     {
         try
@@ -168,7 +168,7 @@ public class WebService : System.Web.Services.WebService
             throw new Exception("שגיאה בשליפת נתוני מלווים");
         }
     }
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string getVolunteerPrefs(int Id)
     {
         try
@@ -310,7 +310,7 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string getPatients1()
     {
         try
@@ -344,7 +344,7 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string getAnonymousPatientsListForArea(bool active, string origin, string dest,string area)
     {
         try
@@ -361,7 +361,7 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string getEquipmentForPatient(string patient)
     {
         try
@@ -379,7 +379,7 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string getCoorList()
     {
         try
@@ -396,7 +396,7 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string getCoor(string userName)
     {
         try
@@ -413,7 +413,7 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string getPatientEscorted(string displayName, string caller)
     {
         try
@@ -429,7 +429,7 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string GetVolunteerPrefArea(int Id)
     {
         try
@@ -447,7 +447,7 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public int getSpaceInCar(int ridePatNum, int driverId)
     {
         try
@@ -464,7 +464,7 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public void setEscortedStatus(string displayName, string active)// change name to SetStatus
     {
         try
@@ -511,7 +511,7 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public void setPatient(Patient patient, string func)
     {
         try
@@ -527,7 +527,7 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public void setAnonymousPatient(AnonymousPatient anonymousPatient, string func)
     {
         try
@@ -543,7 +543,7 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public void setAnonymousEscorted(string func, int patientId, int numberOfEscort)
     {
         try
@@ -558,7 +558,7 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public void setUserPassword(string userName, string password)
     {
         try
@@ -574,7 +574,7 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public void setEscorted(Escorted escorted, string func)
     {
         try
@@ -590,7 +590,7 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public void setNewVersion(string userName, string google, string appstore, DateTime date, string version, bool mandatory)
     {
         try
@@ -608,7 +608,7 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string getEscorted(string displayName, string patientName)
     {
         try
@@ -626,7 +626,7 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string getPatient(string displayName)
     {
         try
@@ -643,7 +643,7 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string getAnonymousPatient(string displayName)
     {
         try
@@ -661,7 +661,7 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string getContactType()
     {
         try
@@ -679,7 +679,7 @@ public class WebService : System.Web.Services.WebService
     }
 
 
-    //[WebMethod]
+    //[WebMethod(EnableSession = true)]
     //[ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     //public string getRidePatEscortView(string test)//Insert into same method as getRides.
     //{
@@ -721,7 +721,7 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string GetRidePat(int ridePatNum)
     {
@@ -740,7 +740,7 @@ public class WebService : System.Web.Services.WebService
     }
 
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string getMyRides(int volunteerId)
     {
@@ -761,7 +761,7 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string getMyPastRides(int volunteerId)
     {
@@ -784,7 +784,7 @@ public class WebService : System.Web.Services.WebService
 
     //used for getting all versions of the app both in the appstore and in google play
     //the results order by DESC so if we want the latest version we get the first Version in the list.
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string getVersions()
     {
@@ -802,7 +802,7 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    //[WebMethod]
+    //[WebMethod(EnableSession = true)]
     //[ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     //public string GetRidesForNotify()
     //{
@@ -813,7 +813,7 @@ public class WebService : System.Web.Services.WebService
     //    return j.Serialize(rl);
     //}
 
-    //[WebMethod]
+    //[WebMethod(EnableSession = true)]
     //[ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     //public string DeleteRide(int RidePatId)
     //{
@@ -824,7 +824,7 @@ public class WebService : System.Web.Services.WebService
     //    return j.Serialize("n");
     //}
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string CheckUser(string mobile, string regId, string device)
     {
@@ -832,6 +832,7 @@ public class WebService : System.Web.Services.WebService
         {
             Volunteer v = new Volunteer();
             v = v.getVolunteerByMobile(mobile, regId, device);
+            HttpContext.Current.Session["loggedInName"] = mobile;
             return j.Serialize(v);
         }
         catch (Exception ex)
@@ -843,7 +844,7 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string SignDriver(int ridePatId, int ridePatId2, int driverId, bool primary)
     {
@@ -901,7 +902,7 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string AssignRideToRidePat(int ridePatId, int userId, string driverType) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
     {
@@ -924,7 +925,7 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string CombineRideRidePat(int rideId, int RidePatId) //Get RideId & RidePatId - combine them
     {
@@ -980,7 +981,7 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string getAllStatus()
     {
@@ -999,7 +1000,7 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string getAllEquipment()
     {
@@ -1048,7 +1049,7 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public void setVolunteer(Volunteer volunteer, string func)
     {
         try
@@ -1096,7 +1097,7 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public void setLocation(Location location, string func)
     {
         try
@@ -1111,7 +1112,7 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string getLocation(string displayName)
     {
         try
@@ -1129,7 +1130,7 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string getVolunteers(bool active)
     {
         try
@@ -1148,7 +1149,7 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string getVolunteer(string displayName)
     {
         try
@@ -1166,7 +1167,7 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string getVolunteerTypes()
     {
         try
@@ -1185,7 +1186,7 @@ public class WebService : System.Web.Services.WebService
     #endregion
 
     #region Destinations functions
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string getDestinationView(bool active)
     {
         try
@@ -1202,7 +1203,7 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string getHospitalView(bool active)
     {
         try
@@ -1219,7 +1220,7 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string getBarrierView(bool active)
     {
         try
@@ -1236,15 +1237,16 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string confirmPush(int userId, int msgId, string status)
     {
         Message m = new Message();
-        m.insertMsg(msgId, "", status, "", 0, DateTime.Now, userId, "", true, false, false);
+        string sender = (string)HttpContext.Current.Session["loggedInName"];
+        m.insertMsg(msgId, "", status, "", 0, DateTime.Now, userId, "", true, false, false, sender);
 
         return j.Serialize("ok");
     }
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string pushAssistant(int ridepat,string cellphone, string msg)
     {
         
@@ -1266,6 +1268,13 @@ public class WebService : System.Web.Services.WebService
 
             User u = new User(uName, password);
             userInDB = u.CheckLoginDetails();
+
+
+            string loggedInName = u.getUserNameByCellphone(uName);
+
+            Session["loggedInName"] = loggedInName;
+
+            string loggedInCoord = (string)Session["loggedInName"];
         }
         catch (Exception ex)
         {
@@ -1293,7 +1302,7 @@ public class WebService : System.Web.Services.WebService
         string user = (string)HttpContext.Current.Session["userSession"];
         Log.Error(str + " ;for user: " + user);
     }
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string GetUserNameByCellphone(string uName)
     {
         string userInDB;
@@ -1310,7 +1319,7 @@ public class WebService : System.Web.Services.WebService
         }
         return j.Serialize(userInDB);
     }
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string GetUserEnglishNameByCellphone(string uName)
     {
         string userInDB;
@@ -1327,7 +1336,7 @@ public class WebService : System.Web.Services.WebService
         }
         return j.Serialize(userInDB);
     }
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string GetIsAssistantByCellphone(string uName)
     {
         bool userInDB;
@@ -1344,7 +1353,7 @@ public class WebService : System.Web.Services.WebService
         }
         return j.Serialize(userInDB);
     }
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string GetCoordinatorsList()
     {
         List<Volunteer> coors;
@@ -1361,7 +1370,7 @@ public class WebService : System.Web.Services.WebService
         }
         return j.Serialize(coors);
     }
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public void writeLog(string str)
     {
         for (int i = 0; i < 50; i++)
@@ -1372,7 +1381,7 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string getLog(int hours)
     {
         LogEntry le = new LogEntry();
@@ -1380,7 +1389,7 @@ public class WebService : System.Web.Services.WebService
         return j.Serialize(list);
     }
 
-    //[WebMethod]
+    //[WebMethod(EnableSession = true)]
     //public string getUserType(string user)
     //{
     //    JavaScriptSerializer j = new JavaScriptSerializer();
@@ -1393,7 +1402,7 @@ public class WebService : System.Web.Services.WebService
 
 
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string loginDriver(string uName, string password)
     {
         Drivers d = new Drivers(uName, password);
@@ -1402,7 +1411,7 @@ public class WebService : System.Web.Services.WebService
     }
     #endregion
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public string getCities()
     {
         try
@@ -1419,14 +1428,14 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     public int backupToPrimaryNotification(int ridePatId)
     {
         Message m = new Message();
         return m.backupToPrimary(ridePatId);
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string getR2RServers()
     {
@@ -1457,13 +1466,30 @@ public class WebService : System.Web.Services.WebService
         return Response;
     }
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string isProductionDatabase()
     {
         Auxiliary aux = new Auxiliary();
         bool ans = aux.isProductionDatabase();        
         return j.Serialize(ans);
+    }
+
+    [WebMethod(EnableSession = true)]
+    public string getMessages(string displayName)
+    {
+        try
+        {
+            Message m = new Message();
+            List<Message> messages = m.getMessages(displayName);
+            return j.Serialize(messages);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in getMessages", ex);
+            throw new Exception("שגיאה בשליפת הודעות");
+        }
+
     }
 }
 

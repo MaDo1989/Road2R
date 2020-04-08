@@ -165,6 +165,8 @@
         var driversID = [];
         var addedEquipment = false;
         var deleteDriverFlag = false;
+        var firstLoad = true;
+
 
 
 
@@ -210,6 +212,7 @@
             loadPage();
             $("#pat").blur(function () {
                 fillData();
+                getEquipmentForAnonymousPatient()
             });
 
             $("#pat").keyup(function () {
@@ -220,6 +223,7 @@
 
             $("#patArabic").blur(function () {
                 fillData();
+                getEquipmentForAnonymousPatient()
             });
 
             $("#patArabic").keyup(function () {
@@ -230,6 +234,7 @@
 
             $("#patEnglishName").blur(function () {
                 fillData();
+                getEquipmentForAnonymousPatient()
             });
 
             $("#patEnglishName").keyup(function () {
@@ -367,29 +372,44 @@
                     //in case of different equipment than declared for anonymous ridepat.
                     var str = "";
                     //if (func == "edit" && anonymousName == "True" && isWaiting != "ממתינה לשיבוץ") {
-                    if (func == "edit" && isWaiting != "ממתינה לשיבוץ") {
-                        if (checkEquipment.length < checkEquipmentAnonymous.length) {
+                    if (func == "edit" && checkEquipment.length != checkEquipmentAnonymous.length) {
+                        if (checkEquipment.length > checkEquipmentAnonymous.length) {
                             alert("ירד ציוד מההסעה");
                         }
-                        if (checkEquipment.length >= checkEquipmentAnonymous.length) {
-                            for (var j = 0; j < checkEquipmentAnonymous.length; j++) {
-                                for (var i = 0; i < checkEquipment.length; i++) {
-                                    if (checkEquipment[i] == checkEquipmentAnonymous[j]) {
-                                        continue;
-                                    }
-                                    str += checkEquipment[i] + ", ";
-                                    addedEquipment = true;
-                                }
-                            }
-                            if (addedEquipment) {
+                        if (checkEquipment.length <= checkEquipmentAnonymous.length) {
+                            //for (var j = 0; j < checkEquipmentAnonymous.length; j++) {
+                            //    for (var i = 0; i < checkEquipment.length; i++) {
+                            //        if (checkEquipment[i] == checkEquipmentAnonymous[j]) {
+                            //            continue;
+                            //        }
+                            //        str += checkEquipment[i] + ", ";
+                            //        addedEquipment = true;
+                            //    }
+                            //}
+                            //if (addedEquipment) {
 
-                                var answer = confirm("ציוד " + str + " נוסף לנסיעה\n האם להמשיך בעריכה? ");
-                                if (!answer) {
-                                    location.href = "manageRidePats.html";
-                                    return false;
-                                }
+                            //    var answer = confirm("ציוד " + str + " נוסף לנסיעה\n האם להמשיך בעריכה? ");
+                            //    if (!answer) {
+                            //        location.href = "manageRidePats.html";
+                            //        return false;
+                            //    } else {
+                            //        getEquipmentForPatient();
+                            //    }
+
+                            //}
+                            for (var i = 0; i < checkEquipmentAnonymous.length; i++) {
+                                str += checkEquipmentAnonymous[i] + ", ";
                             }
+                            var answer = confirm("נוסף ציוד לנסיעה. \nהציוד בנסיעה יהיה: " + str + " \n האם להמשיך בעריכה? ");
+                            if (!answer) {
+                                location.href = "manageRidePats.html";
+                                return false;
+                            } else {
+                                getEquipmentForPatient();
+                            }
+                            
                         }
+                        getEquipmentForPatient();
                     }
 
                     //in case of more escorts than declared for anonymous ridepat.
@@ -487,8 +507,8 @@
                                     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
                                     location.href = "ridePatForm.html"; //ridePat.name=RidePatNum
                                 }
-                                
-                                
+
+
 
                                 if (!(ridePat == undefined)) {
                                     if (ridePat.Drivers.length > 0) {
@@ -503,14 +523,14 @@
                                             //flagFirstOne = false;
                                             deleteDriverFlag = false;
                                         }
-                                        
+
 
                                     }
                                 } else if (!deleteDriverFlag) {
                                     var driverIndex = drivers.indexOf($('#driver').val());
                                     userSelected = driversID[driverIndex];
                                     deleteDriverFlag = false;
-                                } 
+                                }
 
                                 if (flagFirstOne) {
                                     currentDriverId = -1; // There is no driver assigned to the ride
@@ -1118,7 +1138,7 @@
                     "יש לבחור נהג מתוך הרשימה",
                     "warning"
                 );
-                
+
                 driverExist = false;
             }
 
@@ -1285,13 +1305,18 @@
                     //$("#Destination option[value ='" + arr_pat[i].Hospital.EnglishName.replace("'", "\\'") + "']").prop('selected', true);
                 }
                 if (arr_pat[i].IsAnonymous == "True") {
-                    getEquipmentForAnonymousPatient();
+                    //EQQQ
+                    //getEquipmentForAnonymousPatient();
                     anonymousName = "True";
                     $("#Origin").attr('disabled', 'disabled');
                     $("#Destination").attr('disabled', 'disabled');
                     //$("#dirBTN").attr('disabled', 'disabled');
                 }
-                else getEquipmentForPatient();
+                if (firstLoad) {
+                    getEquipmentForPatient();
+                    firstLoad = false;
+                }
+                //ADD HERE
                 generateEsc();
 
             } catch (e) {
@@ -1319,7 +1344,7 @@
             if (checkDate < currentDate) return false //past datetime
             else return true; //future datetime
         }
-
+        //EQQQ
         function getEquipmentForPatient() {
             //.trim().replace(/\s\s+/g, ' ')
             var dataString = $("#pat").val().trim().replace(/\s\s+/g, ' ');
@@ -1337,6 +1362,7 @@
         }
 
         function getEquipmentForPatientSuccessCB(data) {
+            checkEquipment = [];
             var arr_equipment = JSON.parse(data.d)
             var str = "";
             for (i in arr_equipment) {
@@ -1385,6 +1411,7 @@
         }
 
         function getEquipmentForAnonymousPatientSuccessCB(data) {
+            checkEquipmentAnonymous = [];
             var arr_equipment = JSON.parse(data.d)
             var str = "";
             for (i in arr_equipment) {
@@ -1666,6 +1693,7 @@
                     }
                     $('#wait').hide();
                     $('#driversDiv').show();
+                    $("#lastModified").val(ridePat.LastModified);
                 },
                 error: function (err) {
                     $('#wait').hide();
@@ -2104,6 +2132,7 @@
                                                     <label data-toggle="tooltip" title="Ride #number  رقم السفرية" class="col-sm-2 control-label">מספר הסעה</label>
                                                     <div class="col-sm-6">
                                                         <input id="ridePatNum" name="ridePatNum" type="text" class="form-control">
+                                                        <br />
                                                     </div>
                                                 </div>
                                             </div>
@@ -2111,7 +2140,14 @@
                                             </div>
                                         </div>
                                         <div class="row m-l-10 m-r-10">
-                                            <div class="col-sm-6" id="ph">
+                                            <div class="col-sm-6">
+                                                <!--HERE!-->
+                                                <div class="form-group">
+                                                    <label data-toggle="tooltip" title="Last modified" class="col-sm-2 control-label">עודכן לאחרונה</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="lastModified" name="lastModified" type="text" class="form-control" disabled>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div class="col-sm-6" id="coorDiv">
                                                 <div class="form-group">
@@ -2121,6 +2157,7 @@
                                                     </div>
                                                 </div>
                                             </div>
+
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label data-toggle="tooltip" title="Date  تاريخ السفر" class="col-sm-2 control-label">תאריך הסעה&nbsp;<span class="required">*</span></label>

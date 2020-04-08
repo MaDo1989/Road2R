@@ -54,7 +54,7 @@
     <script>
 
         var cleanPhoneNumber;
-
+        var msgTable;
 
         checkCookie();
         var allVolunteersFromDb = [];
@@ -68,7 +68,9 @@
             includeHTML();
             var userName = GENERAL.USER.getUserDisplayName();
             $("#userName").html(userName);
-
+        $("#closeModal").click(function(){
+        alert("sadsadad");
+        });
             //adds menu.html content into any "#menu" element
             //$('#menu').load('menu.html');
             //var userName = GENERAL.USER.getUserName();
@@ -137,7 +139,7 @@
                 url: "WebService.asmx/getVolunteers",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                data: JSON.stringify({active: active}),
+                data: JSON.stringify({ active: active }),
                 success: function (data) {
 
                     $('#wait').hide();
@@ -159,9 +161,12 @@
                         else {
                             var deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove' ></i></button>";
                             btnStr += " " + deleteBtn;
+
+                            var messagesBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-light btn-sm m-b-5' id='messages' title='הודעות' data-toggle='modal' data-target='#messagesModal'><i class='fa fa-envelope-o' ></i></button>";
+                            btnStr += " " + messagesBtn;
                         }
                         var cellphone2 = "";
-                        if(arr_volunteers[i].CellPhone2!=""){
+                        if (arr_volunteers[i].CellPhone2 != "") {
                             cellphone2 = arr_volunteers[i].CellPhone2;
                         }
                         else cellphone2 = arr_volunteers[i].HomePhone;
@@ -175,7 +180,7 @@
                             Buttons: btnStr,
                             LastModified: arr_volunteers[i].LastModified,
                             EnglishName: arr_volunteers[i].EnglishName
-        
+
                         }
                         allVolunteersFromDb.push(Volunteer);
                     }
@@ -224,8 +229,8 @@
                 }
             });
         }
-        function buttonsEvents(){
-        pastePhone.onpaste = cleanPhoneNumber;
+        function buttonsEvents() {
+            pastePhone.onpaste = cleanPhoneNumber;
             $('#datatable-buttons tbody').on('click', '#edit', function () {
                 var data = tbl.row($(this).parents('tr')).data();
                 arr_details = { displayName: data.DisplayName, func: "edit" };
@@ -286,6 +291,56 @@
                 });
 
             });
+            $('#datatable-buttons tbody').on('click', '#messages', function () {
+
+                $('#wait').show();
+
+                var rowData = tbl.row($(this).parents('tr')).data();
+                console.log(rowData);
+                
+
+                $('#messagesModalTitle').text("היסטוריית הודעות - " + rowData.DisplayName )
+                $.ajax({
+                    dataType: "json",
+                    url: "WebService.asmx/getMessages",
+                    contentType: "application/json; charset=utf-8",
+                    type: "POST",
+                    data: JSON.stringify({ displayName: rowData.DisplayName }),
+                    success: function (data) {
+                        var data = JSON.parse(data.d)
+                        console.log(data)
+                        if (msgTable != null) {
+                            
+                            msgTable.destroy();
+                        }
+                        
+                        msgTable = $('#messagesTable').DataTable({
+                            columnDefs: [
+                                { "targets": 3, className: 'text-left-strong' }
+                            ],
+                            order: [[1, "desc"]],
+                            pageLength: 5,
+                            data: data,
+                            columns: [
+                                { data: "DateTime" },
+                                { data: "MsgID" },
+                                { data: "ParentID" },
+                                { data: "Type" },
+                                { data: "Title" },
+                                { data: "MsgContent" },
+                                { data: "Sender" },
+                            ]
+                        });
+                        $('#wait').hide();
+                        
+                    },
+                    error: function (err) {
+                        alert("Error in getVolunteer: " + err.responseText);
+                        $('#wait').hide();
+                    }
+                });
+
+            });
         }
 
         function deactivateVolunteer(displayName, active) {
@@ -299,7 +354,7 @@
                 type: "POST",
                 data: JSON.stringify({ displayName: displayName, active: active }),
                 success: function (data) { },
-                error: function (err) { alert("Error in deactivateVolunteer: "+err.responseText); }
+                error: function (err) { alert("Error in deactivateVolunteer: " + err.responseText); }
             });
 
         }
@@ -528,6 +583,38 @@
         TableManageButtons.init();
 
     </script>
+    <!-- Modal -->
+    <div class="modal fade" id="messagesModal" tabindex="-1" role="dialog" aria-labelledby="messagesModalTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content modal-lg">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="messagesModalTitle">הודעות</h2>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table id="messagesTable" class="table table-striped table-bordered">
+                        <thead>
+                            <tr dir="rtl">
+                                <th>זמן</th>
+                                <th>מספר הודעה</th>
+                                <th>הודעת אב</th>
+                                <th>סוג</th>
+                                <th>כותרת</th>
+                                <th>תוכן</th>
+                                <th>שולח</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">סגירה</button>
 
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

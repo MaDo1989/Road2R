@@ -41,12 +41,12 @@
         var isAssistant = JSON.parse(GENERAL.USER.getIsAssistant());
         $(document).ready(function () {
             var assistantName = "";
-            if(isAssistant){
-                $("#menuType").attr("w3-include-html","HelperMenu.html");
+            if (isAssistant) {
+                $("#menuType").attr("w3-include-html", "HelperMenu.html");
                 var coorAssistant = GENERAL.USER.getCoorAssistant();
                 assistantName = GENERAL.USER.getAsistantDisplayName();
             }
-            else $("#menuType").attr("w3-include-html","menu.html");
+            else $("#menuType").attr("w3-include-html", "menu.html");
             includeHTML();
 
             $('[data-toggle="tooltip"]').tooltip({
@@ -54,20 +54,20 @@
                 placement: 'auto',
                 fallbackPlacement: 'flip',
                 container: 'body'
-                
+
             })
 
-            if(window.location.hostname.toString()=='localhost' || window.location.pathname.indexOf('test')!=-1){
+            if (window.location.hostname.toString() == 'localhost' || window.location.pathname.indexOf('test') != -1) {
                 $("#na").css("background-color", "#ffde89");
             }
-           if (window.location.href.indexOf('http://40.117.122.242/Road%20to%20Recovery/') != -1) {
+            if (window.location.href.indexOf('http://40.117.122.242/Road%20to%20Recovery/') != -1) {
                 window.location.href = "notAvailable.html";
             }
-            if(isAssistant){
+            if (isAssistant) {
                 var userName = GENERAL.USER.getAsistantAndCoorDisplayName();
                 $("#userName").html(userName);
             }
-            else{
+            else {
                 var userName = GENERAL.USER.getUserDisplayName();
                 $("#userName").html(userName);
             }
@@ -127,7 +127,7 @@
                     //GENERAL.VOLUNTEERS.setvolunteersList(arr_volunteers);
 
                     for (i in arr_patients) {
-                        
+
 
                         var equip = "";
                         for (j in arr_patients[i].Equipment) {
@@ -149,6 +149,7 @@
                         else {
                             var deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove' ></i></button>";
                             btnStr += " " + deleteBtn;
+
                         }
 
                         //if this is an anonymous patient than cellphone number not relevent.
@@ -223,7 +224,7 @@
                                         Buttons: btnStr
                                     };
                                 }
-                                
+
                             }
 
                         }
@@ -298,72 +299,75 @@
             });
         }
 
-        function buttonsEvents(){
-                    $('#datatable-buttons tbody').on('click', '#edit', function () {
-                        var data = tbl.row($(this).parents('tr')).data();
-                        arr_details = { displayName: data.DisplayName, func: "edit" };
-                        GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
-                        if (data.DisplayName.indexOf("אנונימי") != -1) {
-                            location.href = "anonymousPatientForm.html";
-                        }
-                        else location.href = "patientForm.html";
+        function buttonsEvents() {
+            $('#datatable-buttons tbody').on('click', '#edit', function () {
+                var data = tbl.row($(this).parents('tr')).data();
+                arr_details = { displayName: data.DisplayName, func: "edit" };
+                GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
+                if (data.DisplayName.indexOf("אנונימי") != -1) {
+                    location.href = "anonymousPatientForm.html";
+                }
+                else location.href = "patientForm.html";
 
+            });
+
+            $('#datatable-buttons tbody').on('click', '#show', function () {
+                var data = tbl.row($(this).parents('tr')).data();
+                arr_details = { displayName: data.DisplayName, func: "show" };
+                GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
+                location.href = "patientForm.html";
+            });
+
+            $('#datatable-buttons tbody').on('click', '#remove', function () {
+                var data = tbl.row($(this).parents('tr')).data();
+                swal({
+                    title: "هل انت متأكد?\nהאם אתם בטוחים?",
+                    type: "warning",
+                    text: "מחיקת החולה " + data.DisplayName + "\nحذف المريض " + data.DisplayName,
+                    showCancelButton: true,
+                    cancelButtonText: "الغاء\nבטל",
+                    confirmButtonClass: 'btn-warning',
+                    confirmButtonText: "حذف\nמחיקה",
+                    closeOnConfirm: false
+                }, function () {
+                    SetPatientStatus(data.DisplayName, 'false');
+                    swal({
+                        title: "تم تحويل المريض لغير فعال\nהחולה הפך ללא פעיל",
+                        timer: 1000,
+                        type: "success",
+                        showConfirmButton: false
                     });
+                    setTimeout(function () { refreshTable() }, 1001);
+                });
+            });
 
-                    $('#datatable-buttons tbody').on('click', '#show', function () {
-                        var data = tbl.row($(this).parents('tr')).data();
-                        arr_details = { displayName: data.DisplayName, func: "show" };
-                        GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
-                        location.href = "patientForm.html";
+            $('#datatable-buttons tbody').on('click', '#reactive', function () {
+                var data = tbl.row($(this).parents('tr')).data();
+                swal({
+                    title: "هل انت متأكد?\nהאם אתם בטוחים?",
+                    type: "warning",
+                    text: "שחזור החולה " + data.DisplayName + "\nاسترجاع المريض " + data.DisplayName,
+                    showCancelButton: true,
+                    cancelButtonText: "الغاء\nבטל",
+                    confirmButtonClass: 'btn-warning',
+                    confirmButtonText: "שחזר\nاسترجاع",
+                    closeOnConfirm: false
+                }, function () {
+                    SetPatientStatus(data.DisplayName, 'true');
+                    swal({
+                        title: "החולה הפך לפעיל\nتم تحويل المريض لفعال",
+                        timer: 1000,
+                        type: "success",
+                        showConfirmButton: false
                     });
+                    setTimeout(function () { refreshTable() }, 1001);
+                });
 
-                    $('#datatable-buttons tbody').on('click', '#remove', function () {
-                        var data = tbl.row($(this).parents('tr')).data();
-                        swal({
-                            title: "هل انت متأكد?\nהאם אתם בטוחים?",
-                            type: "warning",
-                            text: "מחיקת החולה " + data.DisplayName + "\nحذف المريض " + data.DisplayName,
-                            showCancelButton: true,
-                            cancelButtonText: "الغاء\nבטל",
-                            confirmButtonClass: 'btn-warning',
-                            confirmButtonText: "حذف\nמחיקה",
-                            closeOnConfirm: false
-                        }, function () {
-                            SetPatientStatus(data.DisplayName, 'false');
-                            swal({
-                                title: "تم تحويل المريض لغير فعال\nהחולה הפך ללא פעיל",
-                                timer: 1000,
-                                type: "success",
-                                showConfirmButton: false
-                            });
-                            setTimeout(function () { refreshTable() }, 1001);
-                        });
-                    });
+            });
 
-                    $('#datatable-buttons tbody').on('click', '#reactive', function () {
-                        var data = tbl.row($(this).parents('tr')).data();
-                        swal({
-                            title: "هل انت متأكد?\nהאם אתם בטוחים?",
-                            type: "warning",
-                            text: "שחזור החולה " + data.DisplayName + "\nاسترجاع المريض " + data.DisplayName,
-                            showCancelButton: true,
-                            cancelButtonText: "الغاء\nבטל",
-                            confirmButtonClass: 'btn-warning',
-                            confirmButtonText: "שחזר\nاسترجاع",
-                            closeOnConfirm: false
-                        }, function () {
-                            SetPatientStatus(data.DisplayName, 'true');
-                            swal({
-                                title: "החולה הפך לפעיל\nتم تحويل المريض لفعال",
-                                timer: 1000,
-                                type: "success",
-                                showConfirmButton: false
-                            });
-                            setTimeout(function () { refreshTable() }, 1001);
-                        });
+    
 
-                    });
-        pastePhone.onpaste = cleanPhoneNumber;
+            pastePhone.onpaste = cleanPhoneNumber;
         }
 
         function SetPatientStatus(displayName, active) {
@@ -476,7 +480,7 @@
                                     </div>
                                 </div>
                                 <table id="datatable-buttons" class="table table-striped table-bordered">
-                                    <thead >
+                                    <thead>
                                         <tr>
                                             <th title="اسم   Name">החולה</th>
                                             <th title="اسم  English Name">שם באנגלית</th>
@@ -557,5 +561,6 @@
         TableManageButtons.init();
 
     </script>
+    
 </body>
 </html>
