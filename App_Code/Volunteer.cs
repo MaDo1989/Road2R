@@ -677,17 +677,19 @@ public class Volunteer
 
     }
 
-    public int getVolunteerByMobile(string mobile)
+    public Volunteer getVolunteerByMobile(string mobile)
     {
+        Volunteer v = new Volunteer();
         int Id = -1;
         DbService db = new DbService();
-        string query = "select Id from VolunteerTypeView where CellPhone = '" + mobile + "'";
+        string query = "select Id,DisplayName from VolunteerTypeView where CellPhone = '" + mobile + "'";
         DataSet ds = db.GetDataSetByQuery(query);
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
-            Id = int.Parse(dr["Id"].ToString());
+            v.Id = int.Parse(dr["Id"].ToString());
+            v.displayName = dr["DisplayName"].ToString();
         }
-        return Id;
+        return v;
     }
 
     public Volunteer getVolunteerByMobile(string mobile, string regId,string device)

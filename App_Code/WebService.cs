@@ -913,13 +913,15 @@ public class WebService : System.Web.Services.WebService
     public string AssignRideToRidePatWithMobile(int ridePatId, string mobile, string fromDevice) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
     {
         Volunteer v = new Volunteer();
-        int Id = v.getVolunteerByMobile(mobile);
-        if (Id == -1)
+        v = v.getVolunteerByMobile(mobile);
+        Session["loggedInName"] = v.DisplayName;
+
+        if (v.Id == -1)
             throw new Exception("user not found");
         try
         {
             RidePat rp = new RidePat();
-            int res = rp.AssignRideToRidePat(ridePatId, Id, "primary");
+            int res = rp.AssignRideToRidePat(ridePatId, v.Id, "primary");
             return j.Serialize(res);
         }
         catch (Exception ex) {
