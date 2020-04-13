@@ -903,6 +903,27 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string AssignRideToRidePatWithMobile(int ridePatId, string mobile, string fromDevice) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
+    {
+        Volunteer v = new Volunteer();
+        int Id = v.getVolunteerByMobile(mobile);
+        if (Id == -1)
+            throw new Exception("user not found");
+        try
+        {
+            RidePat rp = new RidePat();
+            int res = rp.AssignRideToRidePat(ridePatId, Id, "primary");
+            return j.Serialize(res);
+        }
+        catch (Exception ex) {
+            throw new Exception("faile to assign");
+        }
+
+    }
+
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string AssignRideToRidePat(int ridePatId, int userId, string driverType) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
     {
         try

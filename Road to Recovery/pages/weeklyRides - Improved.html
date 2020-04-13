@@ -50,6 +50,14 @@
             margin:0px auto;
         }
 
+        .weeks {
+            font-size:20px;
+        }
+
+        .weekFocus {
+            font-size: 25px;
+        }
+
     </style>
 
 
@@ -77,28 +85,71 @@
     <script src="lib/includeHTML.js"></script>
     <script src="https://cdn.datatables.net/plug-ins/1.10.19/sorting/date-de.js"></script>
     <script src="registration.js"></script>
+    <script src="weeklyRidesJS.js"></script>
     <script>
+        weekPresented = "w0";
+        maxDays = -2;
+
         var tbl;
         var arr_rides;
         var curr = new Date; // get current date
-        var first = curr.getDate() - curr.getDay(); // First day is the day of the month - the day of the week
-        var last = first + 6; // last day is the first day + 6
-
-        var firstday = new Date(curr.setDate(first));
-        var lastday = new Date(curr.setDate(last));
-
-        if (lastday.getDate() < firstday.getDate()) {
-            { var thisWeekFirst = lastday.getDate() + "." + (lastday.getMonth() + 2) + " - " + firstday.getDate() + "." + (firstday.getMonth() + 1) }
-        } else { var thisWeekFirst = lastday.getDate() + "." + (lastday.getMonth() + 1) + " - " + firstday.getDate() + "." + (firstday.getMonth() + 1) }
         var locations;
-        var southLocations = []
-        var centerLocations = []
-        var northLocations = []
-        var allRides = [];
-        var weekdays = [];
+
 
         $(document).ready(function () {
             wireModals();
+            init();
+        });
+
+        function getWeeksRange() {
+            if (weekPresented == "w0") {
+                var first = curr.getDate() - curr.getDay(); // First day is the day of the month - the day of the week
+                var last = first + 6; // last day is the first day + 6
+            }
+            else if (weekPresented == "w1") {
+                var first = curr.getDate() - curr.getDay() + 7; // First day is the day of the month - the day of the week
+                var last = first + 6; // last day is the first day + 6
+
+            }
+            else {
+                alert("weekPresented:" + weekPresented + "is not supported");
+            }
+
+            var firstday = new Date(curr.setDate(first));
+            var lastday = new Date(curr.setDate(last));
+
+            if (lastday.getDate() < firstday.getDate()) {
+                { var thisWeekFirst = lastday.getDate() + "." + (lastday.getMonth() + 2) + " - " + firstday.getDate() + "." + (firstday.getMonth() + 1) }
+            } else { var thisWeekFirst = lastday.getDate() + "." + (lastday.getMonth() + 1) + " - " + firstday.getDate() + "." + (firstday.getMonth() + 1) }
+
+            return thisWeekFirst;
+        }
+
+
+
+        function handleWeeks() {
+            let id = $(this).attr("id");
+            $(".weeks").removeClass("weekFocus");
+            $("#" + id).addClass("weekFocus");
+            weekPresented = id;
+            if (id == "w0") maxDays = -2;
+            else maxDays = -3;
+            init();
+            return false;
+        }
+
+        function init() {
+
+            southLocations = []
+            centerLocations = []
+            northLocations = []
+            allRides = [];
+            weekdays = [];
+            curr = new Date; // get current date
+
+            $(".weeks").click(handleWeeks);
+
+
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/getLocations",
@@ -109,109 +160,18 @@
                 type: "POST",
                 data: "",
                 success: function (data) {
-                    let fullList = JSON.parse(data.d)
-                    for (loc of fullList) {
-                        if (loc.Area.includes("דרום") || loc.Area.includes("ארז")) {
-                            southLocations.push(loc.Name);
-                        }
-                        if (loc.Area.includes("מרכז") || loc.Area.includes("תרקומיא") || loc.Area.includes("ירושלים")) {
-                            centerLocations.push(loc.Name);
-                        }
-                        if (loc.Area.includes("צפון")) {
-                            northLocations.push(loc.Name);
-                        }
-                    }
-
-                    locations = {
-                        South: southLocations,
-                        Center: centerLocations,
-                        North: northLocations
-                    }
-
+                    locations = fillLocations(data);
                 }, error: function (error) {
                     console.log(error);
                 }
             });
 
 
-            $('#thisWeekHeader').html("הסעות לשבוע " + thisWeekFirst)
-
-            if (localStorage.south == "undefined" || localStorage.south === undefined) {
-                localStorage.south = true;
-                $('#south').prop('checked', true);
-            } else {
-                $('#south').prop('checked', JSON.parse(localStorage.south));
-            }
-
-
-            if (localStorage.center == "undefined" || localStorage.center === undefined) {
-                localStorage.center = true;
-                $('#center').prop('checked', true);
-            } else {
-                $('#center').prop('checked', JSON.parse(localStorage.center));
-            }
-
-            if (localStorage.north == "undefined" || localStorage.north === undefined) {
-                localStorage.north = true;
-                $('#north').prop('checked', true);
-            } else {
-                $('#north').prop('checked', JSON.parse(localStorage.north));
-            }
-
-            if (localStorage.sunday == "undefined" || localStorage.sunday === undefined) {
-                localStorage.sunday = true;
-                $('#sunday').prop('checked', true);
-            } else {
-                $('#sunday').prop('checked', JSON.parse(localStorage.sunday));
-            }
-
-            if (localStorage.monday == "undefined" || localStorage.monday === undefined) {
-                localStorage.monday = true;
-                $('#monday').prop('checked', true);
-            } else {
-                $('#monday').prop('checked', JSON.parse(localStorage.sunday));
-            }
-
-            if (localStorage.tuesday == "undefined" || localStorage.tuesday === undefined) {
-                localStorage.tuesday = true;
-                $('#tuesday').prop('checked', true);
-            } else {
-                $('#tuesday').prop('checked', JSON.parse(localStorage.tuesday));
-            }
-
-            if (localStorage.wednesday == "undefined" || localStorage.wednesday === undefined) {
-                localStorage.wednesday = true;
-                $('#wednesday').prop('checked', true);
-            } else {
-                $('#wednesday').prop('checked', JSON.parse(localStorage.wednesday));
-            }
-
-            if (localStorage.thursday == "undefined" || localStorage.thursday === undefined) {
-                localStorage.thursday = true;
-                $('#thursday').prop('checked', true);
-            } else {
-                $('#thursday').prop('checked', JSON.parse(localStorage.thursday));
-            }
-
-            if (localStorage.friday == "undefined" || localStorage.friday === undefined) {
-                localStorage.friday = true;
-                $('#friday').prop('checked', true);
-            } else {
-                $('#friday').prop('checked', JSON.parse(localStorage.friday));
-            }
-
-            if (localStorage.saturday == "undefined" || localStorage.saturday === undefined) {
-                localStorage.saturday = true;
-                $('#saturday').prop('checked', true);
-            } else {
-                $('#saturday').prop('checked', JSON.parse(localStorage.saturday));
-            }
-
+            $('#thisWeekHeader').html("הסעות לשבוע " + getWeeksRange());
+            initCheckBoxes()
             refreshTable();
 
-
-
-        });
+        }
 
         function refreshTable() {
 
@@ -222,30 +182,9 @@
             var north = JSON.parse(localStorage.north);
 
             weekdays = [];
-            var sunday = JSON.parse(localStorage.sunday);
-            if (sunday)
-                weekdays.push("א");
-            var monday = JSON.parse(localStorage.monday);
-            if (monday)
-                weekdays.push("ב");
-            var tuesday = JSON.parse(localStorage.tuesday);
-            if (tuesday)
-                weekdays.push("ג");
-            var wednesday = JSON.parse(localStorage.wednesday);
-            if (wednesday)
-                weekdays.push("ד");
-            var thursday = JSON.parse(localStorage.thursday);
-            if (thursday)
-                weekdays.push("ה");
-            var friday = JSON.parse(localStorage.friday);
-            if (friday)
-                weekdays.push("ו");
-            var saturday = JSON.parse(localStorage.saturday);
-            if (saturday)
-                weekdays.push("ש");
+            HebrewWeekDays(localStorage, weekdays);
 
-            ridesToShow = [];
-            allRides = [];
+
             var volunteerId = -2 // VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
             $('#wait').show();
             $.ajax({
@@ -256,12 +195,12 @@
                     xhr.setRequestHeader("Content-Encoding", "gzip");
                 },
                 type: "POST",
-                data: JSON.stringify({ volunteerId: volunteerId, maxDays: -2 }),// -2 means this week rides
+                data: JSON.stringify({ volunteerId: volunteerId, maxDays: maxDays }),// -2 means this week rides
                 success: function (data) {
+                    ridesToShow = [];
+                    allRides = [];
                     $('#wait').hide();
                     arr_rides = JSON.parse(data.d);
-
-
                     for (i in arr_rides) {
 
                         //Change date format
@@ -286,7 +225,6 @@
                         if (date.getMonth() + 1 < 10) {
                             month = "0" + (date.getMonth() + 1);
                         } else month = date.getMonth() + 1;
-
 
                         var d = new Date();
                         var timezoneOffset = 0; // The difference between UTC and Israel
@@ -337,9 +275,11 @@
                         } else {
                             drivers = arr_rides[i].Drivers[0].DisplayName;
                         }
+
                         let indetifier = -1;
                         if (arr_rides[i].Status == "ממתינה לשיבוץ")
                             indetifier = i;
+
                         Ride = {
                             RidePatNum: arr_rides[i].RidePatNum,
                             Date: date2,
@@ -356,10 +296,7 @@
                             indetifier: indetifier
                         }
                             
-
                         allRides.push(Ride);
-
-
 
                         if (south && Ride.SouthRide && weekdays.includes(Ride.Day)) {
                             ridesToShow.push(Ride);
@@ -422,74 +359,24 @@
         }
 
         function getDayString(num) {
-            var day;    //Create a local variable to hold the string
-            switch (num) {
-                case 0:
-                    day = "יום א'";
-                    break;
-                case 1:
-                    day = "יום ב'";
-                    break;
-                case 2:
-                    day = "יום ג'";
-                    break;
-                case 3:
-                    day = "יום ד'";
-                    break;
-                case 4:
-                    day = "יום ה'";
-                    break;
-                case 5:
-                    day = "יום ו'";
-                    break;
-                case 6:
-                    day = "יום ש'";
-                    break;
-                default:
-                    day = "Invalid day";
-            }
-            return day;
+
+            return (daysArr[num]);
         }
 
         function saveFilters() {
 
             localStorage.south = $("#south").prop('checked');
             var south = JSON.parse(localStorage.south);
+
             localStorage.center = $("#center").prop('checked');
             var center = JSON.parse(localStorage.center);
+
             localStorage.north = $("#north").prop('checked');
             var north = JSON.parse(localStorage.north);
-            weekdays = [];
-            localStorage.sunday = $("#sunday").prop('checked');
-            var sunday = JSON.parse(localStorage.sunday);
-            if (sunday)
-                weekdays.push("א");
-            localStorage.monday = $("#monday").prop('checked');
-            var monday = JSON.parse(localStorage.monday);
-            if (monday)
-                weekdays.push("ב");
-            localStorage.tuesday = $("#tuesday").prop('checked');
-            var tuesday = JSON.parse(localStorage.tuesday);
-            if (tuesday)
-                weekdays.push("ג");
-            localStorage.wednesday = $("#wednesday").prop('checked');
-            var wednesday = JSON.parse(localStorage.wednesday);
-            if (wednesday)
-                weekdays.push("ד");
-            localStorage.thursday = $("#thursday").prop('checked');
-            var thursday = JSON.parse(localStorage.thursday);
-            if (thursday)
-                weekdays.push("ה");
-            localStorage.friday = $("#friday").prop('checked');
-            var friday = JSON.parse(localStorage.friday);
-            if (friday)
-                weekdays.push("ו");
-            localStorage.saturday = $("#saturday").prop('checked');
-            var saturday = JSON.parse(localStorage.saturday);
-            if (saturday)
-                weekdays.push("ש");
-           
 
+            weekdays = [];
+            saveDays(weekdays);
+            
             ridesToShow = [];
             tbl.clear().draw();
 
@@ -507,7 +394,6 @@
                     continue;
                 }
             }
-
 
             tbl = $('#weeklyRides').DataTable({
                 pageLength: 500,
@@ -548,50 +434,6 @@
             });
         }
 
-
-        function getWeeklyThanks(rides) {
-            thanks = [];
-            for (var i = 0; i < rides.length; i++) {
-                if (rides[i].Status == "ממתינה לשיבוץ") continue;
-                var coordinator = rides[i].Coordinator.DisplayName;
-                var driver = rides[i].Drivers[0].DisplayName;
-                if (thanks[coordinator] == undefined) {
-                    thanks[coordinator] = [];
-                    thanks[coordinator][driver] = 1;
-                }
-                else {
-                    if (thanks[coordinator][driver] == undefined) {
-                        thanks[coordinator][driver] = 1;
-                    }
-                    else {
-                        thanks[coordinator][driver]++;
-                    }
-                }
-            }
-
-            return thanks;
-        }
-
-
-        function showThanks() {
-            var thanks = getWeeklyThanks(arr_rides);
-            str = "";
-            for (c in thanks) {
-                str += "<h3>" + c + "</h3>";
-                for (d in thanks[c]) {
-                    str +=  "<span>" + d + ", </span>";
-                }
-                //str = str.substring(0, str.length - 1);
-            }
-           document.getElementById("report").style.visibility = "visible";
-           document.getElementById("thanks").innerHTML = str;
-           
-        }
-
-        function closeReport() {
-            document.getElementById("report").style.visibility = "hidden";
-        }
-
     </script>
     <style>
         #weeklyRides tbody td {
@@ -609,8 +451,8 @@
                             <br />
                             <div class="text-center">
 
-                                <a href="weeklyRides.html" class="btn btn-primary waves-effect w-md waves-light m-b-10" style="font-size:25px;">הסעות לשבוע הנוכחי</a>&nbsp&nbsp&nbsp&nbsp
-                                <a href="nextweekRides.html" class="btn btn-primary waves-effect w-md waves-light m-b-10" style="font-size:20px;">הסעות לשבוע הבא</a>
+                                <a href="weeklyRides.html"   class="btn btn-primary waves-effect w-md waves-light m-b-10 weeks weekFocus"  id="w0">הסעות לשבוע הנוכחי</a>&nbsp&nbsp&nbsp&nbsp
+                                <a href="nextweekRides.html" class="btn btn-primary waves-effect w-md waves-light m-b-10 weeks"  id="w1">הסעות לשבוע הבא</a>
                             </div>
                             <h4 class="page-title">
                                 תמונת הסעות שבועית&nbsp&nbsp
@@ -798,12 +640,7 @@
 
     <script src="assets/js/jquery.core.js"></script>
     <script src="assets/js/jquery.app.js"></script>
-    <!--<script src="cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
-    <script src="cdn.datatables.net/plug-ins/1.10.19/sorting/datetime-moment.js"></script>-->
-    <!--<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>-->
-    <!--<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
-    <script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
-    <script src="//cdn.datatables.net/plug-ins/1.10.12/sorting/datetime-moment.js"></script>-->
+
     <script type="text/javascript">
 
     </script>
