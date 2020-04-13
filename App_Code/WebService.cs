@@ -832,7 +832,13 @@ public class WebService : System.Web.Services.WebService
         {
             Volunteer v = new Volunteer();
             v = v.getVolunteerByMobile(mobile, regId, device);
-            HttpContext.Current.Session["loggedInName"] = mobile;
+
+            User u = new User();
+            string loggedInName = u.getUserNameByCellphone(mobile);
+
+            Session["loggedInName"] = loggedInName;
+
+            //HttpContext.Current.Session["loggedInName"] = mobile;
             return j.Serialize(v);
         }
         catch (Exception ex)
