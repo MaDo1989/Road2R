@@ -1305,6 +1305,10 @@ h3.timeline-title {
     width: 10% !important;
 }
 
+.SmallcustomWidth {
+    width: 7% !important;
+}
+
 .dateCustomWidth {
     width: 8% !important;
 }

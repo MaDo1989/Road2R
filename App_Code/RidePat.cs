@@ -335,6 +335,8 @@ public class RidePat
 
     public int setRidePat(RidePat ridePat, string func,bool isAnonymous, int numberOfRides, string repeatRideEvery)
     {
+        
+
         DateTime timeRightNow = DateTime.Now;
         DbService db = new DbService();
         SqlCommand cmd = new SqlCommand();
@@ -726,6 +728,8 @@ public class RidePat
         rp.Coordinator = new Volunteer();
         rp.Coordinator.DisplayName = dr["Coordinator"].ToString();
         rp.Remark = dr["Remark"].ToString();
+        rp.LastModified = dr["lastModified"].ToString();
+
         string query2 = "select DisplayName from RidePatEscortView where RidePatNum=" + ridePatNum;
         DbService db2 = new DbService();
         DataSet ds2 = db2.GetDataSetByQuery(query2);
