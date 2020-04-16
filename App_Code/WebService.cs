@@ -931,7 +931,7 @@ public class WebService : System.Web.Services.WebService
     }
 
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string AssignRideToRidePat(int ridePatId, int userId, string driverType) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
     {
