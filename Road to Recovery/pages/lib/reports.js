@@ -1,5 +1,10 @@
 ﻿// Purpose: JS code for the reports UI
 
+
+// TODO:  auto-complete works - so take the id from select driver and use it for the query
+// Use ridePatForm.html  as an example, look for  driversID  
+// hardcode month for now, add it later
+
 // Handle a click event on one o fthe reports in the Reports-Tree
 function on_report_click(event) {
     var report_type = event.target.id;
@@ -25,10 +30,13 @@ function rp_get_fields(report_type) {
             id: "rp_vl_ride_month__name",
             type: "VOLUNTEER",
             template: 'div[name="template_VOLUNTEER"]',
-            label: "שם המתנדב",
-            default: "הזן שם"
+            post_clone: field_volunteers_post_clone
         },
-        { "id": "rp_vl_ride_month__month", "type": "MONTH", "label": "חודש", "default": "בחר חודש" }
+        {
+            id: "rp_vl_ride_month__month",
+            type: "MONTH",
+            post_clone: null
+        }
     ];
 
 }
@@ -40,7 +48,48 @@ function clone_template(template, new_id) {
     return result;
 }
 
-var drivers = ["AAA", "AAB", "BBBB", "BB8"];
+var K_CACHE = { volunteers: [] };
+
+
+
+// on_load_volunteers called when the async ajax call  has finished
+// Used to populate UI needing the volunteers list
+function loadVolunteers(on_load_volunteers) {
+
+    if (K_CACHE.volunteers.length > 1) {
+        // One time loading already done.
+        on_load_volunteers();
+        return;
+    }
+
+    $.ajax({
+        dataType: "json",
+        url: "WebService.asmx/getVolunteers",
+        contentType: "application/json; charset=utf-8",
+        type: "POST",
+        async: true,
+        data: JSON.stringify({ active: true }),
+        success: function (data) {
+            var arr_drivers = JSON.parse(data.d);
+            arr_drivers.sort();
+            for (i in arr_drivers) {
+                var entry = { label: arr_drivers[i].DisplayName, id: arr_drivers[i].Id };
+                K_CACHE.volunteers.push(entry);
+            }
+            on_load_volunteers();
+        },
+        error: function (err) { alert("Error in loadVolunteers"); }
+    });
+}
+
+// called when the async ajax call to laod volunteers has finished
+// Used to populate UI needing the volunteers list
+
+function populate_drivers_field() {
+    $("#driver").autocomplete({
+        source: K_CACHE.volunteers
+    });
+}
 
 // Given a defintition of field  build the UI for it in the Parameters panel
 // The UI is coped from a template in the page. Each field type has its own template
@@ -50,10 +99,15 @@ function rp_add_one_parameter(def) {
     field_elem.append(def.label + " XYZ");
     var clone = clone_template(def.template, "KKK");
     clone.appendTo("#" + def.id);
-    $("#driver").autocomplete({
-        source: drivers
-    });
+    if (def.post_clone) {
+        def.post_clone(def.id);
+    }
 }
+
+function field_volunteers_post_clone(id) {
+    loadVolunteers(populate_drivers_field);
+}
+
 
 function refreshTable() {
 
