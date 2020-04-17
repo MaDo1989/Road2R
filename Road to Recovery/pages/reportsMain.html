@@ -57,6 +57,8 @@
     <script src="lib/includeHTML.js"></script>
     <script src="https://cdn.datatables.net/plug-ins/1.10.19/sorting/date-de.js"></script>
 
+
+   
     <script>
         var tbl;
         var arr_rides;
@@ -113,6 +115,8 @@
                 }
             });
 
+
+            $("#rp_vl_ride_month").click(on_report_click);
 
             $('#thisWeekHeader').html("הסעות לשבוע " + thisWeekFirst)
 
@@ -192,6 +196,11 @@
 
         });
 
+        function on_report_click(event) {
+            var report_type = event.target.id;
+            $("#params_ph").text("You clicked " + report_type);
+            
+        }
 
         function refreshTable() {
 
@@ -227,10 +236,10 @@
             ridesToShow = [];
             allRides = [];
             var volunteerId = 14535;  // @@ HARDCODED for now.
-            $('#wait').show();
+            // @@ $('#wait').show();
             $.ajax({
                 dataType: "json",
-                url: "WebService.asmx/GetReportVolunteerRides",
+                url: "WebService.asmx/GetReportVolunteerRidesXXX",
                 contentType: "application/json; charset=utf-8",
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader("Content-Encoding", "gzip");
@@ -384,7 +393,7 @@
                 },
                 error: function (err) {
                     $('#wait').hide();
-                    alert("Error in GetRidePatView: " + err.responseText);
+                    // @@ alert("Error in GetRidePatView: " + err.responseText);
                 }
 
 
@@ -526,26 +535,39 @@
         <div class="content">
             <div class="container">
                 <div class="row">
-                    <div class="col-sm-12">
-                        <div class="page-title-box">
-                            <br />
-                            <div class="text-center">
+                    <div class="col-sm-2">
+                        <h1> עץ הדוחות</h1>
+                        <ul id="myUL">
+                            <li>
+                                <span>לרכז</span>
+                                <ul>
+                                    <li>מתנדבים</li>
+                                    <li>הסעות שבוטלו</li>
+                                </ul>
+                            </li>
+                            <li>
+                                <span>לעמותה</span>
+                                <ul>
+                                    <li>מתנדבים שבועי</li>
+                                    <li>מתנדבים - פר חולה</li>
+                                </ul>
+                            </li>
+                            <li>
+                                <span>למתנדב</span>
+                                <ul>
+                                    <li><a id="rp_vl_ride_month">הסעות החודש </a></li>
+                                    <li>הסעות השנה</li>
+                                </ul>
+                            </li>
+                        </ul>
 
-                                <a href="weeklyRides.html" class="btn btn-primary waves-effect w-md waves-light m-b-10" style="font-size:25px;">הסעות לשבוע הנוכחי</a>&nbsp&nbsp&nbsp&nbsp
-                                <a href="nextweekRides.html" class="btn btn-primary waves-effect w-md waves-light m-b-10" style="font-size:20px;">הסעות לשבוע הבא</a>
-                            </div>
-                            <h4 class="page-title">
-                                דוחות
-                                <i>
-                                    <img src="../../Media/היסטורית הסעות.png" height="25" width="25" />
-                                </i>
-                            </h4>
-                        </div>
                     </div>
-                </div>
-                <div class="row">
-
-                    <div class="col-sm-12">
+                    <div class="col-sm-4">
+                        <h1> פרמטרים</h1>
+                        <div id="params_ph"> </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <h1> תצוגה מקדימה</h1>
                         <div class="card-box table-responsive">
                             <h3 id="thisWeekHeader"></h3>
                             <div class="col-sm-8 checkbox checkbox-primary text-left">
@@ -614,6 +636,12 @@
                             </div>
                             <br />
                         </div>
+
+                    </div>
+                </div>
+                <div class="row">
+
+                    <div class="col-sm-12">
                     </div>
                 </div>
             </div>
