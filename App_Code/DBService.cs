@@ -159,4 +159,39 @@ public class DbService
     }
 
 
+    // Allows caller to provide a prepared command, that has the parameters already added
+    public DataSet GetDataSetBySqlCommand(SqlCommand cmd)
+    {
+        try
+        {
+            if (con.State == ConnectionState.Closed)
+            {
+                con.Open();
+            }
+
+            cmd.Connection = con;
+            DataSet ds = new DataSet();
+            adp = new SqlDataAdapter(cmd);
+
+            try
+            {
+                adp.Fill(ds);
+            }
+            catch (Exception ex)
+            {
+                //do something with the error
+                ds = null;
+            }
+            return ds;
+        }
+        catch (Exception e)
+        {
+            //Write exception to log
+            throw e;
+        }
+
+    }
+
+
+
 }

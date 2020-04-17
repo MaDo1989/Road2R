@@ -1520,5 +1520,36 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
+
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetReportVolunteerRides(int volunteerId, int maxDays)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+            //string AcceptEncoding = HttpContext.Current.Request.Headers["Accept-Encoding"];
+            //if (AcceptEncoding.Contains("gzip"))
+            //{
+            //    HttpResponse Response = HttpContext.Current.Response;
+            //    Response.Filter = new System.IO.Compression.GZipStream(Response.Filter, System.IO.Compression.CompressionMode.Compress);
+            //    Response.Headers.Remove("Content-Encoding");
+            //    Response.AppendHeader("Content-Encoding", "gzip");
+            //}
+
+            RidePat rp = new RidePat();
+            List<RidePat> r = rp.GetReportVolunteerRides(volunteerId, maxDays);
+            j.MaxJsonLength = Int32.MaxValue;
+            return j.Serialize(r);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReportVolunteerRides", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
 }
 
