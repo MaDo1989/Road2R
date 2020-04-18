@@ -915,12 +915,13 @@ public class WebService : System.Web.Services.WebService
     {
         Volunteer v = new Volunteer();
         v = v.getVolunteerByMobile(mobile);
-        Session["loggedInName"] = v.DisplayName;
+        
 
-        if (v.Id == -1)
+        if (v.Id == 0)
             throw new Exception("user not found");
         try
         {
+            Session["loggedInName"] = v.DisplayName;
             RidePat rp = new RidePat();
             int res = rp.AssignRideToRidePat(ridePatId, v.Id, "primary");
             return j.Serialize(res);
@@ -937,7 +938,8 @@ public class WebService : System.Web.Services.WebService
     public string AssignRideToRidePat(int ridePatId, int userId, string driverType) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
     {
         Volunteer v = new Volunteer();
-        Session["loggedInName"] = v.getVolunteerByID(userId);
+        v = v.getVolunteerByID(userId);
+        Session["loggedInName"] = v.DisplayName;
 
         try
         {

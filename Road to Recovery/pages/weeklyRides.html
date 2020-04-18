@@ -100,7 +100,29 @@
         $(document).ready(function () {
             wireModals();
             init();
+            wireTD();
         });
+
+        function wireTD(){
+            $(document).on('mouseover', 'td', function() {
+                    let msg = "מחיקה או שינוי בהסעה - דרך האפליקציה הסלולרית או פנו לרכז.ת"
+                    writeMsg(this,msg);                    
+                }).on('mouseout', 'td', function() {
+                    writeMsg(this,"");
+                });
+        }
+
+        function writeMsg(o, msg){
+            //var par = $(o).siblings();
+            var last = $(o).parent().children().last();
+            if (child = $(last).children()) {
+                if ($(child).hasClass("regBTN")) // already contains content
+                    return; 
+            }
+
+
+            $(last).html(msg);
+        }                    
 
         function getWeeksRange() {
             if (weekPresented == "w0") {

@@ -1,2 +1,6 @@
-﻿2020-01-18 13:46:10,899 ERROR [127] WebService.writeToLog - Successful login ;for user: 0524895999
-2020-01-18 13:47:58,254 ERROR [99] WebService.writeToLog - Successful login ;for user: 0524895999
+﻿2020-04-18 10:39:09,160 ERROR [7] WebService.writeToLog - Successful login ;for user: 0544890081
+2020-04-18 10:45:53,543 ERROR [6] WebService.writeToLog - Login failed. password: ר2רר2ר ;for user: 0544890081
+2020-04-18 10:47:29,491 ERROR [18] WebService.writeToLog - Successful login ;for user: 0544890081
+2020-04-18 10:53:50,519 ERROR [12] WebService.writeToLog - Successful login ;for user: 0544890081
+2020-04-18 10:59:43,878 ERROR [9] WebService.writeToLog - Successful login ;for user: 0544890081
+2020-04-18 11:02:45,150 ERROR [9] WebService.writeToLog - Successful login ;for user: 0544890081

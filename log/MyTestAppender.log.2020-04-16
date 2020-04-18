@@ -1,0 +1,24 @@
+﻿2020-04-16 12:24:33,007 ERROR [9] WebService.writeToLog - Successful login ;for user: 0526039425
+2020-04-16 12:25:21,577 ERROR [7] WebService.setRidePat - Error in setRidePat
+System.IndexOutOfRangeException: אין שורה במיקום 0.
+   ב-  System.Data.RBTree`1.GetNodeByIndex(Int32 userIndex)
+   ב-  System.Data.DataRowCollection.get_Item(Int32 index)
+   ב-  RidePat.GetRidePat(Int32 ridePatNum) ב- c:\Repos\Road2R\App_Code\RidePat.cs:שורה 674
+   ב-  RidePat.setRidePat(RidePat ridePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Repos\Road2R\App_Code\RidePat.cs:שורה 525
+   ב-  WebService.setRidePat(RidePat RidePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Repos\Road2R\App_Code\WebService.cs:שורה 194
+2020-04-16 16:44:06,348 ERROR [5] WebService.AssignRideToRidePat - Error in AssignRideToRidePat
+System.Exception: לנסיעה זו כבר שובץ נהג ראשי. באפשרותכם להירשם אליה כגיבוי
+   ב-  RidePat.AssignRideToRidePat(Int32 ridePatId, Int32 userId, String driverType) ב- c:\Repos\Road2R\App_Code\RidePat.cs:שורה 1227
+   ב-  WebService.AssignRideToRidePat(Int32 ridePatId, Int32 userId, String driverType) ב- c:\Repos\Road2R\App_Code\WebService.cs:שורה 941
+2020-04-16 16:44:55,282 ERROR [5] WebService.AssignRideToRidePat - Error in AssignRideToRidePat
+System.Data.SqlClient.SqlException (0x80131904): The INSERT statement conflicted with the FOREIGN KEY constraint "FKRide475152". The conflict occurred in database "r2rdb_testing", table "dbo.Volunteer", column 'Id'.
+The statement has been terminated.
+   ב-  DbService.GetObjectScalarByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Repos\Road2R\App_Code\DBService.cs:שורה 151
+   ב-  RidePat.AssignRideToRidePat(Int32 ridePatId, Int32 userId, String driverType) ב- c:\Repos\Road2R\App_Code\RidePat.cs:שורה 1248
+   ב-  WebService.AssignRideToRidePat(Int32 ridePatId, Int32 userId, String driverType) ב- c:\Repos\Road2R\App_Code\WebService.cs:שורה 941
+ClientConnectionId:df28316f-460c-4258-aeea-d85dee89f53a
+Error Number:547,State:0,Class:16
+2020-04-16 16:45:35,584 ERROR [6] WebService.AssignRideToRidePat - Error in AssignRideToRidePat
+System.Exception: A1 Yeeppee: 
+   ב-  RidePat.AssignRideToRidePat(Int32 ridePatId, Int32 userId, String driverType) ב- c:\Repos\Road2R\App_Code\RidePat.cs:שורה 1272
+   ב-  WebService.AssignRideToRidePat(Int32 ridePatId, Int32 userId, String driverType) ב- c:\Repos\Road2R\App_Code\WebService.cs:שורה 941

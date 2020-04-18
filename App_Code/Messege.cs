@@ -506,7 +506,14 @@ public class Message
             message = "הנהגת " + user.FirstNameH + " " + user.LastNameH + " ביטלה את הנסיעה מ" + abc.Origin.Name + " ל" + abc.Destination.Name + " עם החולה " + abc.Pat.DisplayName + " שמתקיימת בזמן הקרוב";
         }
         //insert msg to db
-        string sender = (string)HttpContext.Current.Session["loggedInName"];
+
+        string sender;
+        try { sender = (string)HttpContext.Current.Session["loggedInName"]; }
+        catch
+        {
+            sender = "הנהג";
+        }
+
         int msgID = insertMsg(0, "Canceled by driver", "נסיעה בוטלה על ידי נהג\\ת", message, ridePatID, System.DateTime.Now, user.Id, "", true, false, false, sender);
 
 

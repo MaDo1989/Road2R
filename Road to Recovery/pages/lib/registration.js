@@ -40,8 +40,11 @@ function verifyAvailability(ridePatNum) {
         });
         }
 
-        function buidMessage(ride) {
-            str = "הסעה ב" + ride.Time + " ב" + ride.Date + " מ" + ride.OriginName + " ל" + ride.DestinationName + " של  " + ride.PatDisplayName;
+function buidMessage(ride) {
+    var when = "<p>" + ride.Date + ", בשעה " + ride.Time + "</p>";
+    var where = "<p>" + " מ" + ride.OriginName + " ל" + ride.DestinationName  + "</p>";
+    var who = "<p>" + " של  " + ride.PatDisplayName + "</p>";
+    var str = when + where + who;
             $("#approveMsg").html(str);
         }
 
