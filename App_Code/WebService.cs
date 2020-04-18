@@ -838,7 +838,8 @@ public class WebService : System.Web.Services.WebService
 
             Session["loggedInName"] = loggedInName;
 
-            //HttpContext.Current.Session["loggedInName"] = mobile;
+            //XXX
+            //throw new Exception("CU: " + (string)Session["loggedInName"]);            //HttpContext.Current.Session["loggedInName"] = mobile;
             return j.Serialize(v);
         }
         catch (Exception ex)
@@ -935,6 +936,9 @@ public class WebService : System.Web.Services.WebService
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string AssignRideToRidePat(int ridePatId, int userId, string driverType) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
     {
+        Volunteer v = new Volunteer();
+        Session["loggedInName"] = v.getVolunteerByID(userId);
+
         try
         {
             RidePat rp = new RidePat();
@@ -948,8 +952,9 @@ public class WebService : System.Web.Services.WebService
             {
                 throw new Exception(ex.Message);
             }
-            
-            else throw new Exception("שגיאה בצירוף הסעה לנסיעה");
+
+            //          else throw new Exception("שגיאה בצירוף הסעה לנסיעה");
+            else throw ex;
         }
 
     }
@@ -1304,11 +1309,12 @@ public class WebService : System.Web.Services.WebService
             Session["loggedInName"] = loggedInName;
 
             string loggedInCoord = (string)Session["loggedInName"];
+
         }
         catch (Exception ex)
         {
 
-            throw;
+            throw ex;
         }
         HttpContext.Current.Session["userSession"] = uName;
 

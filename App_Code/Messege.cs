@@ -279,7 +279,8 @@ public class Message
         catch (Exception e)
         {
             //add to log
-            throw e;
+            throw new Exception("sender : " + sender + " ");
+           // throw e;
         }
     }
 
@@ -571,10 +572,26 @@ public class Message
         }
         //insert msg to db
         //string sender = (string)HttpContext.Current.Session["loggedInName"];
+        string sender1;
+        try
+        {
+             sender1 = (string)HttpContext.Current.Session["loggedInName"];
+        }
+        catch {
+            sender1 = "הנהג";
+        }
 
-        
 
-        int msgID = insertMsg(0, "sign by driver", "הרשמה להסעה קרובה", message, ridePatID, System.DateTime.Now, user.Id, "", true, false, false, Sender);
+
+
+        int msgID;
+        try
+        {
+            msgID = insertMsg(0, "sign by driver", "הרשמה להסעה קרובה", message, ridePatID, System.DateTime.Now, user.Id, "", true, false, false, sender1); //XXX
+        }
+        catch (Exception ex) {
+            throw new Exception("I1: " + ex.Message);
+        }
 
 
         var data = new JObject();
@@ -985,8 +1002,23 @@ public class Message
         //}
 
         //insert msg to db
-        string sender = (string)HttpContext.Current.Session["loggedInName"];
-        int msgID = insertMsg(0, "You have been listed for a ride", "שובצת לנסיעה", message, ridePatID, System.DateTime.Now, user.Id, "", true, false, false, sender);
+
+        string sender1;
+        try {  sender1 = (string)HttpContext.Current.Session["loggedInName"]; }
+        catch {
+            sender1 = "הנהג";
+        }
+
+
+
+        int msgID;
+        try
+        {
+            msgID = insertMsg(0, "You have been listed for a ride", "שובצת לנסיעה", message, ridePatID, System.DateTime.Now, user.Id, "", true, false, false, sender1);
+        }
+        catch (Exception ex) {
+            throw new Exception("insertMsg Failed: sender2: " + sender1);
+        }
 
         var data = new JObject();
 

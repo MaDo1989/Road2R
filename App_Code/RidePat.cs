@@ -1188,7 +1188,7 @@ public class RidePat
         int res = db2.ExecuteQuery(query2);
         return res;
     }
-
+   
     public int AssignRideToRidePat(int ridePatId, int userId, string driverType)
     {
         int RideId = -1;
@@ -1264,7 +1264,13 @@ public class RidePat
             {
                 primary = true;
             }
-            m.driverSignUpToCloseRide(ridePatId, v.getVolunteerByID(userId), primary);
+            try
+            {
+                m.driverSignUpToCloseRide(ridePatId, v.getVolunteerByID(userId), primary);
+            }
+            catch (Exception ex) {
+                throw new Exception("A1 " + ex.Message);
+            }
         }
 
         //HERE!
@@ -1273,7 +1279,14 @@ public class RidePat
         RidePatNum = rp.RidePatNum;
         if (Date > timeRightNow)
         {
-            m.driverAddedToRide(RidePatNum, rp.Drivers[0]);
+            try
+            {
+                m.driverAddedToRide(RidePatNum, rp.Drivers[0]);
+            }
+            catch (Exception ex) {
+                throw new Exception("A2 " + ex.Message);
+            }
+
         }
           
        
