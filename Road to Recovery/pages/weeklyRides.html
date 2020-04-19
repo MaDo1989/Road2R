@@ -58,6 +58,18 @@
             font-size: 25px;
         }
 
+        .smallTD {
+            width:110px;
+        }
+
+        .mediumTD {
+            width: 180px;
+        }
+
+        .message {
+            font-style:italic;
+        }
+
     </style>
 
 
@@ -101,6 +113,9 @@
             wireModals();
             init();
             wireTD();
+            $('.modal').on('shown.bs.modal', function () {
+                $(this).find('[autofocus]').focus();
+            });
         });
 
         function wireTD(){
@@ -117,7 +132,8 @@
             var last = $(o).parent().children().last();
             if (child = $(last).children()) {
                 if ($(child).hasClass("regBTN")) // already contains content
-                    return; 
+                    return;
+                $(last).addClass("message");
             }
 
 
@@ -184,15 +200,16 @@
                 data: "",
                 success: function (data) {
                     locations = fillLocations(data);
+                    $('#thisWeekHeader').html("הסעות לשבוע " + getWeeksRange());
+                    initCheckBoxes()
+                    refreshTable();
                 }, error: function (error) {
                     console.log(error);
                 }
             });
 
 
-            $('#thisWeekHeader').html("הסעות לשבוע " + getWeeksRange());
-            initCheckBoxes()
-            refreshTable();
+
 
         }
 
@@ -266,9 +283,14 @@
                             patDisplayName = arr_rides[i].Pat.DisplayName;
                         }
 
-                        if (arr_rides[i].Pat.EscortedList.length != 0) {
-                            patDisplayName += " + " + arr_rides[i].Pat.EscortedList.length;
+                        if (arr_rides[i].Pat.EscortedList.length == 1) {
+                            patDisplayName += " + מלווה";
                         }
+                        else if (arr_rides[i].Pat.EscortedList.length > 1) {
+                            patDisplayName += " + " + arr_rides[i].Pat.EscortedList.length + " מלווים";
+                        }
+
+                        equipment = buildEquipmentString(arr_rides[i].Pat.Equipment);
 
                         date2 = HEBday + " " + day + "/" + month + "/" + date.getUTCFullYear() % 2000;
                         time = hours + ":" + minutes;
@@ -310,6 +332,7 @@
                             DestinationName: arr_rides[i].Destination.Name,
                             Time: time,
                             PatDisplayName: patDisplayName,
+                            Equipment: equipment,
                             Coordinator: arr_rides[i].Coordinator.DisplayName,
                             Drivers: drivers,
                             SouthRide: southRide,
@@ -350,6 +373,7 @@
                                 { data: "DestinationName" },
                                 { data: "Time" },
                                 { data: "PatDisplayName" },
+                                { data: "Equipment" },
                                 { data: "Coordinator" },
                                 { data: "Drivers" },
                                 {
@@ -379,6 +403,17 @@
                         alert("Error in GetRidePatView: " + err.responseText);
                     }
                 });
+        }
+
+        function buildEquipmentString(eq) {
+            if (eq.length == 0) return "";
+            var str = "";
+            for (var i = 0; i < eq.length; i++) {
+                str += eq[i];
+                if (i < eq.length - 1)
+                    str += ", ";
+            }
+            return str;
         }
 
         function getDayString(num) {
@@ -431,6 +466,7 @@
                     { data: "DestinationName" },
                     { data: "Time" },
                     { data: "PatDisplayName" },
+                    { data: "Equipement" },
                     { data: "Coordinator" },
                     { data: "Drivers" },
                     {
@@ -546,13 +582,14 @@
                                 <thead>
                                     <tr>
                                         <th title="Date & Day" class="dateCustomWidth">תאריך ויום</th>
-                                        <th title="نقطة الانطلاق Origin">מוצא</th>
-                                        <th title="نقطة الوصول Destination">יעד</th>
+                                        <th title="نقطة الانطلاق Origin" class="smallTD">מוצא</th>
+                                        <th title="نقطة الوصول Destination" class="smallTD">יעד</th>
                                         <th title="Time" class="timeCustomWidth">שעה</th>
-                                        <th title="المريض Patient">החולה</th>
-                                        <th title="Coordinator">רכז</th>
-                                        <th title="السائقين بالفرة Drivers">נהגים בנסיעה</th>
-                                        <th title="Register">רישום להסעה</th>
+                                        <th title="المريض Patient" class="mediumTD">החולה</th>
+                                        <th title="المريض Equipment" class="mediumTD">ציוד בהסעה</th>
+                                        <th title="Coordinator" class="smallTD">רכז</th>
+                                        <th title="السائقين بالفرة Drivers" class="smallTD">נהגים בנסיעה</th>
+                                        <th title="Register" class="remark">רישום להסעה</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -579,7 +616,7 @@
                                     <p class="msg" id="approveMsg"> </p>
                                     <div class="form-group">
                                         <label for="phoneTB"><span class="glyphicon glyphicon-phone"></span>מספר הנייד</label>
-                                        <input type="text" required pattern="[0]{1}[0-9]{9}" class="form-control" id="phoneTB" placeholder="הזן את מספר הנייד ללא רווחים ומקפים"
+                                        <input type="text" required pattern="[0]{1}[0-9]{9}" class="form-control" id="phoneTB" autofocus placeholder="הזן את מספר הנייד ללא רווחים ומקפים"
                                                oninvalid="this.setCustomValidity('הזן מספר נייד בן 10 ספרות')" oninput="this.setCustomValidity('')">
                                     </div>
                                     <button type="submit" class="btn btn-success btn-block"><span class="glyphicon glyphicon-off"></span> הרשם</button>

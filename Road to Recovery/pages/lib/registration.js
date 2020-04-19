@@ -96,12 +96,5 @@ function registerDriverSuccessCB() {
                 });
                 return;
             }
-            setTimeout("init()", 2100);    
-            swal({
-                title: " להעיף מהשגיאה, נרשמת לנסיעה,תודה רבה",
-                type: "success",
-                timer: 2000,
-                showConfirmButton: false
-            });
             $('#regModal').modal('hide');
             }
