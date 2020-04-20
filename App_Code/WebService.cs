@@ -1538,8 +1538,8 @@ public class WebService : System.Web.Services.WebService
             //    Response.AppendHeader("Content-Encoding", "gzip");
             //}
 
-            RidePat rp = new RidePat();
-            List<RidePat> r = rp.GetReportVolunteerRides(volunteerId, maxDays);
+            ReportService report = new ReportService();
+            List<RidePat> r = report.GetReportVolunteerRides(volunteerId, maxDays);
             j.MaxJsonLength = Int32.MaxValue;
             return j.Serialize(r);
         }

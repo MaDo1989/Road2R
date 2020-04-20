@@ -1,11 +1,11 @@
 ﻿// Purpose: JS code for the reports UI
 
 
-// TODO:  auto-complete works - so take the id from select driver and use it for the query
-// Use ridePatForm.html  as an example, look for  driversID  
-// hardcode month for now, add it later
+// TODO: find some names (via dbveawer ) that should have old rides
+// TODO:  add mont UI, and respect in service.
 
-// Handle a click event on one o fthe reports in the Reports-Tree
+
+// Handle a click event on one of the reports in the Reports-Tree
 function on_report_click(event) {
     var report_type = event.target.id;
     populate_parameters(report_type);
@@ -82,13 +82,18 @@ function loadVolunteers(on_load_volunteers) {
     });
 }
 
+// Called when a volunteer is selected in auto-complete
+function on_volunteer_selected(event, ui) {
+    refreshTable(ui.item.id);
+    return true;
+}
 // called when the async ajax call to laod volunteers has finished
 // Used to populate UI needing the volunteers list
-
-function populate_drivers_field() {
+function populate_volunteer_field() {
     $("#driver").autocomplete({
-        source: K_CACHE.volunteers
-    });
+        source: K_CACHE.volunteers,
+        select: on_volunteer_selected
+        });
 }
 
 // Given a defintition of field  build the UI for it in the Parameters panel
@@ -105,48 +110,18 @@ function rp_add_one_parameter(def) {
 }
 
 function field_volunteers_post_clone(id) {
-    loadVolunteers(populate_drivers_field);
+    loadVolunteers(populate_volunteer_field);
 }
 
 
-function refreshTable() {
-
-    var south = JSON.parse(localStorage.south);
-
-    var center = JSON.parse(localStorage.center);
-
-    var north = JSON.parse(localStorage.north);
-
-    weekdays = [];
-    var sunday = JSON.parse(localStorage.sunday);
-    if (sunday)
-        weekdays.push("א");
-    var monday = JSON.parse(localStorage.monday);
-    if (monday)
-        weekdays.push("ב");
-    var tuesday = JSON.parse(localStorage.tuesday);
-    if (tuesday)
-        weekdays.push("ג");
-    var wednesday = JSON.parse(localStorage.wednesday);
-    if (wednesday)
-        weekdays.push("ד");
-    var thursday = JSON.parse(localStorage.thursday);
-    if (thursday)
-        weekdays.push("ה");
-    var friday = JSON.parse(localStorage.friday);
-    if (friday)
-        weekdays.push("ו");
-    var saturday = JSON.parse(localStorage.saturday);
-    if (saturday)
-        weekdays.push("ש");
-
+function refreshTable(volunteerId) {
     ridesToShow = [];
     allRides = [];
-    var volunteerId = 14535;  // @@ HARDCODED for now.
-    // @@ $('#wait').show();
+
+    $('#wait').show();
     $.ajax({
         dataType: "json",
-        url: "WebService.asmx/GetReportVolunteerRidesXXX",
+        url: "WebService.asmx/GetReportVolunteerRides",
         contentType: "application/json; charset=utf-8",
         beforeSend: function (xhr) {
             xhr.setRequestHeader("Content-Encoding", "gzip");
@@ -156,7 +131,7 @@ function refreshTable() {
         success: function (data) {
             $('#wait').hide();
             arr_rides = JSON.parse(data.d);
-
+            console.log(arr_rides);
 
             for (i in arr_rides) {
 
@@ -214,16 +189,6 @@ function refreshTable() {
                     time = " אחה\"צ";
                 }
 
-                let southRide = false;
-                let centerRide = false;
-                let northRide = false;
-
-                if (locations.South.includes(arr_rides[i].Destination.Name) || locations.South.includes(arr_rides[i].Origin.Name))
-                    southRide = true;
-                if (locations.Center.includes(arr_rides[i].Destination.Name) || locations.Center.includes(arr_rides[i].Origin.Name))
-                    centerRide = true;
-                if (locations.North.includes(arr_rides[i].Destination.Name) || locations.North.includes(arr_rides[i].Origin.Name))
-                    northRide = true;
 
 
                 var Ride = {};
@@ -242,9 +207,6 @@ function refreshTable() {
                     PatDisplayName: patDisplayName,
                     Coordinator: arr_rides[i].Coordinator.DisplayName,
                     Drivers: drivers,
-                    SouthRide: southRide,
-                    CenterRide: centerRide,
-                    NorthRide: northRide,
                     Day: date2.slice(4, 5)
                 }
 
@@ -253,18 +215,7 @@ function refreshTable() {
 
 
 
-                if (south && Ride.SouthRide && weekdays.includes(Ride.Day)) {
                     ridesToShow.push(Ride);
-                    continue;
-                }
-                if (center && Ride.CenterRide && weekdays.includes(Ride.Day)) {
-                    ridesToShow.push(Ride);
-                    continue;
-                }
-                if (north && Ride.NorthRide && weekdays.includes(Ride.Day)) {
-                    ridesToShow.push(Ride);
-                    continue;
-                }
 
 
             }

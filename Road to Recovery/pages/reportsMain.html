@@ -357,61 +357,13 @@
                         </ul>
 
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-3">
                         <h1> פרמטרים</h1>
                         <div id="params_ph"> </div>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-7">
                         <h1> תצוגה מקדימה</h1>
                         <div class="card-box table-responsive">
-                            <h3 id="thisWeekHeader"></h3>
-                            <div class="col-sm-8 checkbox checkbox-primary text-left">
-                                <input id="south" type="checkbox" onchange="saveFilters()">
-                                <label for="south">
-                                    דרום  &nbsp;&nbsp;|&nbsp;&nbsp;
-                                </label>
-                                <input id="center" type="checkbox" onchange="saveFilters()">
-                                <label for="center">
-                                    מרכז  &nbsp;&nbsp;|&nbsp;&nbsp;
-                                </label>
-                                <input id="north" type="checkbox" onchange="saveFilters()">
-                                <label for="north">
-                                    צפון
-                                </label>
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                <input id="sunday" type="checkbox" onchange="saveFilters()">
-                                <label for="sunday">
-                                    יום א  &nbsp;&nbsp;|&nbsp;&nbsp;
-                                </label>
-                                <input id="monday" type="checkbox" onchange="saveFilters()">
-                                <label for="monday">
-                                    יום ב  &nbsp;&nbsp;|&nbsp;&nbsp;
-                                </label>
-                                <input id="tuesday" type="checkbox" onchange="saveFilters()">
-                                <label for="tuesday">
-                                    יום ג  &nbsp;&nbsp;|&nbsp;&nbsp;
-                                </label>
-                                <input id="wednesday" type="checkbox" onchange="saveFilters()">
-                                <label for="wednesday">
-                                    יום ד  &nbsp;&nbsp;|&nbsp;&nbsp;
-                                </label>
-                                <input id="thursday" type="checkbox" onchange="saveFilters()">
-                                <label for="thursday">
-                                    יום ה  &nbsp;&nbsp;|&nbsp;&nbsp;
-                                </label>
-                                <input id="friday" type="checkbox" onchange="saveFilters()">
-                                <label for="friday">
-                                    יום ו  &nbsp;&nbsp;|&nbsp;&nbsp;
-                                </label>
-                                <input id="saturday" type="checkbox" onchange="saveFilters()">
-                                <label for="saturday">
-                                    יום ש
-                                </label>
-
-                            </div>
-                            <div class="col-sm-4 text-right ">
-                                <button style="font-size:20px" type="button" id="createCustomer" onclick="refreshTable()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-refresh m-r-5"></span>לחצו לקבלת נתונים עדכניים</button>
-                            </div>
                             <table id="weeklyRides" class="table table-striped table-bordered">
                                 <thead>
                                     <tr>
@@ -438,27 +390,22 @@
 
                     <div class="col-sm-12">
                         <div class="row" name="template_VOLUNTEER">
-                            <!--<form class="form-horizontal" role="form" id="driverForm">-->
-                            <div class="col-sm-12">
                                 <div class="card-box">
                                     <div class="row" id="flashDiv">
 
-                                        <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-12">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">שם המתנדב</label>
-                                                    <div class="col-sm-6" id="selectDriver">
+                                                    <label class="col-sm-4">שם המתנדב</label>
+                                                    <div class="col-sm-8" id="selectDriver">
                                                         <input placeholder="הזן שם" type="text" id="driver" name="driver" class="form-control ui-autocomplete-input" autocomplete="off" aria-required="true" aria-invalid="false">
                                                     </div>
                                                 </div>
 
                                             </div>
 
-                                        </div>
 
                                     </div>
                                 </div>
-                            </div>
                         </div>
                     </div>
                 </div>
