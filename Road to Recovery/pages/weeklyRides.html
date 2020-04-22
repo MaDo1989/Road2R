@@ -113,6 +113,7 @@
             wireModals();
             init();
             wireTD();
+            $(".weeks").click(handleWeeks);
             $('.modal').on('shown.bs.modal', function () {
                 $(this).find('[autofocus]').focus();
             });
@@ -156,11 +157,13 @@
 
             var firstday = new Date(curr.setDate(first));
             var lastday = new Date(curr.setDate(last));
-
+/*
             if (lastday.getDate() < firstday.getDate()) {
                 { var thisWeekFirst = lastday.getDate() + "." + (lastday.getMonth() + 2) + " - " + firstday.getDate() + "." + (firstday.getMonth() + 1) }
             } else { var thisWeekFirst = lastday.getDate() + "." + (lastday.getMonth() + 1) + " - " + firstday.getDate() + "." + (firstday.getMonth() + 1) }
+            */
 
+            var thisWeekFirst = lastday.getDate() + "." + (lastday.getMonth() + 1) + " - " + firstday.getDate() + "." + (firstday.getMonth() + 1);
             return thisWeekFirst;
         }
 
@@ -184,9 +187,9 @@
             northLocations = []
             allRides = [];
             weekdays = [];
-            curr = new Date; // get current date
+            curr = new Date(); // get current date
 
-            $(".weeks").click(handleWeeks);
+
 
 
             $.ajax({
@@ -245,8 +248,11 @@
 
                         //Change date format
                         var temp = arr_rides[i].Date.substring(arr_rides[i].Date.indexOf("(") + 1);
-                        temp = temp.substring(0, temp.indexOf(")"));
-                        var date = new Date(parseInt(temp));
+                        dateInt = temp.substring(0, temp.indexOf(")"));
+                        var date = new Date(parseInt(dateInt));
+
+                        var futureRide;
+                        (dateInt > Date.now()) ? futureRide = true : futureRide = false;
 
                         var HEBday = getDayString(date.getDay());
 
@@ -339,7 +345,8 @@
                             CenterRide: centerRide,
                             NorthRide: northRide,
                             Day: date2.slice(4, 5),
-                            indetifier: indetifier
+                            indetifier: indetifier,
+                            FutureRide: futureRide
                         }
                             
                         allRides.push(Ride);
@@ -360,49 +367,14 @@
 
                         }
 
-                        tbl = $('#weeklyRides').DataTable({
-                            pageLength: 500,
-                            bLengthChange: false,
-                            data: ridesToShow,
-                            destroy: true,
-                            columnDefs: [
-                                { "orderData": [0, 3], "targets": 0 }],
-                            columns: [
-                                { data: "Date" },
-                                { data: "OriginName" },
-                                { data: "DestinationName" },
-                                { data: "Time" },
-                                { data: "PatDisplayName" },
-                                { data: "Equipment" },
-                                { data: "Coordinator" },
-                                { data: "Drivers" },
-                                {
-                                    data: "indetifier",
-                                    render: function (data, type, row, meta) {
-                                        if (data != -1)
-                                            return '<button class="regBTN" id = "' + data + '"> הרשם לנסיעה הזו </button>';
-                                        else
-                                            return "";
-                                    }
-                                }
-                            ],
-                            createdRow: function (row, data, dataIndex) {
-                                if (data.Date.includes("א") || data.Date.includes("ג") || data.Date.includes("ה") || data.Date.includes("ש"))
-                                    $(row).css('background-color', '#f1f1f1');
-                                else $(row).css('background-color', '#ffffff')
-                            },
-                            rowCallback: function (row, data, index) {
-                                if (data.Drivers == "ממתינה לשיבוץ") {
-                                    $(row).find('td:eq(6)').css('background-color', '#FBD4B4');
-                                }
-                            }
-                        });
+                    renderRidesTable(ridesToShow);
                     },
                     error: function (err) {
                         $('#wait').hide();
                         alert("Error in GetRidePatView: " + err.responseText);
                     }
                 });
+                
         }
 
         function buildEquipmentString(eq) {
@@ -453,6 +425,11 @@
                 }
             }
 
+            renderRidesTable(ridesToShow);
+
+        }
+
+        function renderRidesTable(ridesToShow) {
             tbl = $('#weeklyRides').DataTable({
                 pageLength: 500,
                 bLengthChange: false,
@@ -471,10 +448,8 @@
                     { data: "Drivers" },
                     {
                         data: "indetifier",
-                          render: function (data, type, row, meta) {
-                            if (data != -1)
-                                return '<button class="regBTN" id = "' +  data + '"> הרשם לנסיעה הזו </button>' ;
-                            else
+                        render: function (data, type, row, meta) {
+                           // if (data == -1)
                                 return "";
                         }
                     }
@@ -486,8 +461,13 @@
                     else $(row).css('background-color', '#ffffff')
                 },
                 rowCallback: function (row, data, index) {
-                    if (data.Drivers == "ממתינה לשיבוץ") {
-                        $(row).find('td:eq(6)').css('background-color', '#FBD4B4');
+                    if (data.Drivers == "ממתינה לשיבוץ" && data.FutureRide) {
+                        $(row).find('td:eq(7)').css('background-color', '#FBD4B4');
+                        var btnStr = '<button class="regBTN" id = "' + data.indetifier + '"> הרשם לנסיעה הזו </button>';
+                        $(row).find('td:eq(8)').html(btnStr);
+                    }
+                    else if (data.Drivers == "ממתינה לשיבוץ") {
+                        $(row).find('td:eq(7)').html("");
                     }
                 }
             });
