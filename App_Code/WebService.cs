@@ -1352,7 +1352,7 @@ public class WebService : System.Web.Services.WebService
         catch (Exception ex)
         {
 
-            throw;
+            throw ex;
         }
         return j.Serialize(userInDB);
     }
