@@ -1,9 +1,10 @@
 ﻿// Purpose: JS code for the reports UI
 
 
-// TODO: find some names (via dbveawer ) that should have old rides
-// TODO:  add mont UI, and respect in service.
-
+// TODO: We  use אלון שדה
+// TODO: obtain month from the date-picker and respect it in service.
+// TODO: default for month as well and making this month is the end-date.
+// TODO: make sure report is per requirements:  מבנה: יום, שעה, מוצא, יעד, ק"מ, חולה ומלווים
 
 // Handle a click event on one of the reports in the Reports-Tree
 function on_report_click(event) {
@@ -34,8 +35,9 @@ function rp_get_fields(report_type) {
         },
         {
             id: "rp_vl_ride_month__month",
+            template: 'div[name="template_MONTH"]',
             type: "MONTH",
-            post_clone: null
+            post_clone: field_month_post_clone
         }
     ];
 
@@ -94,6 +96,20 @@ function populate_volunteer_field() {
         source: K_CACHE.volunteers,
         select: on_volunteer_selected
         });
+}
+
+function populate_month_field() {
+    
+    $('#select_month').datepicker({
+        format: "MM yyyy",
+        minViewMode: 1,
+        autoclose: true
+    });
+
+}
+
+function field_month_post_clone(id) {
+    populate_month_field();
 }
 
 // Given a defintition of field  build the UI for it in the Parameters panel

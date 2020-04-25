@@ -46,16 +46,14 @@
     <script src="assets/js/jquery.min.js"></script>
 
     <script src="dataTables.js"></script>
-    <script src="moment.js"></script>
-    <script src="datetime-moment.js"></script>
+    <!--<script src="moment.js"></script>
+    <script src="datetime-moment.js"></script>-->
 
 
     <!-- Select2 css+js -->
     <link href="assets/css/select2.css" rel="stylesheet" />
     <script src="assets/js/select2.min.js"></script>
-    <!--<script src="lib/moment.js"></script>-->
-    <!--<script src="../plugins/moment/moment.js"></script>-->
-    <script src="lib/sorting.js"></script>
+    <!--<script src="lib/sorting.js"></script>-->
     <script src="lib/includeHTML.js"></script>
     <script src="https://cdn.datatables.net/plug-ins/1.10.19/sorting/date-de.js"></script>
 
@@ -390,22 +388,40 @@
 
                     <div class="col-sm-12">
                         <div class="row" name="template_VOLUNTEER">
-                                <div class="card-box">
-                                    <div class="row" id="flashDiv">
+                            <div class="card-box">
+                                <div class="row" id="flashDiv">
 
-                                            <div class="col-sm-12">
-                                                <div class="form-group">
-                                                    <label class="col-sm-4">שם המתנדב</label>
-                                                    <div class="col-sm-8" id="selectDriver">
-                                                        <input placeholder="הזן שם" type="text" id="driver" name="driver" class="form-control ui-autocomplete-input" autocomplete="off" aria-required="true" aria-invalid="false">
-                                                    </div>
-                                                </div>
-
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label class="col-sm-4">שם המתנדב</label>
+                                            <div class="col-sm-8" id="selectDriver">
+                                                <input placeholder="הזן שם" type="text" id="driver" name="driver" class="form-control ui-autocomplete-input" autocomplete="off" aria-required="true" aria-invalid="false">
                                             </div>
-
+                                        </div>
 
                                     </div>
+
+
                                 </div>
+                            </div>
+                        </div>
+                        <div class="row" name="template_MONTH">
+                            <div class="card-box">
+                                <div class="row" id="flashDiv">
+
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label class="col-sm-4">חודש</label>
+                                            <div class="col-sm-8">
+                                                <input type="text" id="select_month" class="form-control" aria-required="true" aria-invalid="false">
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -457,6 +473,8 @@
     <script src="assets/js/jquery.core.js"></script>
     <script src="assets/js/jquery.app.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="../plugins/moment/moment.js"></script>
+    <script src="../plugins/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
 
     <script type="text/javascript">
 

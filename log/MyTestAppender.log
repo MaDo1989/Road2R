@@ -18,3 +18,4 @@ System.Exception: Secondary Driver lookup not implemented yet
 System.Exception: Secondary Driver lookup not implemented yet
    ב-  ReportService.GetReportVolunteerRides(Int32 volunteerId, Int32 maxDays) ב- c:\home\aamit\road2recovery\04-April-2020\App_Code\ReportService.cs:שורה 186
    ב-  WebService.GetReportVolunteerRides(Int32 volunteerId, Int32 maxDays) ב- c:\home\aamit\road2recovery\04-April-2020\App_Code\WebService.cs:שורה 1542
+2020-04-25 17:58:23,321 ERROR [19] WebService.writeToLog - Successful login ;for user: 0001112222
