@@ -176,9 +176,9 @@ function refreshTable(volunteerId) {
                     patDisplayName = arr_rides[i].Pat.DisplayName;
                 }
 
-                if (arr_rides[i].Pat.EscortedList.length != 0) {
-                    patDisplayName += " + " + arr_rides[i].Pat.EscortedList.length;
-                }
+//                if (arr_rides[i].Pat.EscortedList.length != 0) {
+//                    patDisplayName += " + " + arr_rides[i].Pat.EscortedList.length;
+//                }
 
                 date2 = HEBday + " " + day + "/" + month + "/" + date.getUTCFullYear() % 2000;
                 time = hours + ":" + minutes;

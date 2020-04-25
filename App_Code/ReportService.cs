@@ -103,15 +103,19 @@ public class ReportService
                     // {
                     if (dr["secondaryDriver"].ToString() != "")
                     {
-                        throw new Exception("Secondary Driver lookup not implemented yet");
-                        Volunteer secondary = new Volunteer();
-                        secondary.DriverType = "secondary";
-                        secondary.Id = int.Parse(dr["secondaryDriver"].ToString());
-                        string searchExpression = "Id = " + secondary.Id;
-                        DataRow[] driverRow = driverTable.Select(searchExpression);
-                        secondary.DisplayName = driverRow[0]["DisplayName"].ToString();
-                        secondary.CellPhone = driverRow[0]["CellPhone"].ToString();
-                        rp.Drivers.Add(secondary);
+                        // Do we care about these for a report? 
+                        if (false)
+                        {
+                            throw new Exception("Secondary Driver lookup not implemented yet");
+                            Volunteer secondary = new Volunteer();
+                            secondary.DriverType = "secondary";
+                            secondary.Id = int.Parse(dr["secondaryDriver"].ToString());
+                            string searchExpression = "Id = " + secondary.Id;
+                            DataRow[] driverRow = driverTable.Select(searchExpression);
+                            secondary.DisplayName = driverRow[0]["DisplayName"].ToString();
+                            secondary.CellPhone = driverRow[0]["CellPhone"].ToString();
+                            rp.Drivers.Add(secondary);
+                        }
                     }
 
                     rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
@@ -124,6 +128,14 @@ public class ReportService
 
                     }
 
+                    Patient thePatient = new Patient();
+                    thePatient.DisplayName = dr["DisplayName"].ToString();
+                    thePatient.EnglishName = dr["EnglishName"].ToString();
+                    thePatient.CellPhone = dr["CellPhone"].ToString();
+                    thePatient.IsAnonymous = dr["IsAnonymous"].ToString();
+                    thePatient.Id = int.Parse(dr["Id"].ToString());
+
+                    rp.Pat = thePatient;
 
                     Location origin = new Location();
                     origin.Name = dr["Origin"].ToString();
