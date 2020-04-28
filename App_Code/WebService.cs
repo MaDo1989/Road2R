@@ -853,6 +853,46 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string CheckVolunteerByMobile(string mobile)
+    {
+        try
+        {
+            Volunteer v = new Volunteer();
+            v = v.getVolunteerByMobile(mobile);
+            
+            return j.Serialize(v.DisplayName);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in CheckUser", ex);
+            throw new Exception("שגיאה בבדיקת נתוני משתמש");
+        }
+
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string CheckVolunteerExtendedByMobile(string mobile)
+    {
+        try
+        {
+            VolunteerExtended v = new VolunteerExtended();
+            v = v.getVolunteerExtendedByMobile(mobile);
+
+            return j.Serialize(v.DisplayName);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in CheckUser", ex);
+            throw new Exception("שגיאה בבדיקת נתוני משתמש");
+        }
+
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string SignDriver(int ridePatId, int ridePatId2, int driverId, bool primary)
     {
         try
@@ -1103,6 +1143,23 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
+    public void setVolunteerData(VolunteerExtended volunteerExtended, string username)
+    {
+        try
+        {
+            VolunteerExtended v = volunteerExtended;
+            v.setVolunteerData(v, username);
+
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in setVolunteerData", ex);
+            throw new Exception("שגיאה בעריכת מתנדב");
+        }
+
+    }
+
+    [WebMethod(EnableSession = true)]
     public void deactivateLocation(string displayName, string active)
     {
         try
@@ -1194,6 +1251,24 @@ public class WebService : System.Web.Services.WebService
             v.DisplayName = displayName;
             Volunteer volunteer = v.getVolunteer();
             return j.Serialize(volunteer);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in getVolunteer", ex);
+            throw new Exception("שגיאה בשליפת מתנדב");
+        }
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    public string getVolunteerData(string displayName) //function for data review of all volunteers
+    {
+        try
+        {
+            VolunteerExtended v = new VolunteerExtended();
+            v.DisplayName = displayName;
+            VolunteerExtended volunteerExtended = (VolunteerExtended)v.getVolunteerData();
+            return j.Serialize(volunteerExtended);
         }
         catch (Exception ex)
         {

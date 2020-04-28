@@ -1,0 +1,739 @@
+﻿<!DOCTYPE html>
+<html lang="en" dir=rtl>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="KSMoving">
+    <meta name="author" content="Coderthemes">
+    <link rel="shortcut icon" href="assets/images/favicon_1.ico">
+    <title>פרטי מתנדב</title>
+    <link href="../plugins/switchery/switchery.min.css" rel="stylesheet" />
+    <link href="assets/css/bootstrap-rtl.min.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/core.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/icons.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/components.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/pages.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/menu.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/responsive.css" rel="stylesheet" type="text/css">
+    <script src="assets/js/CookiesFunctions.js"></script>
+    <script src="assets/js/modernizr.min.js"></script>
+    <script src="assets/js/jquery.min.js"></script>
+    <!-- The jQuery library is a prerequisite for all jqSuite products -->
+    <script type="text/ecmascript" src="assets/js/jquery.min.js"></script>
+    <!-- This is the Javascript file of jqGrid -->
+    <script type="text/ecmascript" src="Guriddo_jqGrid_JS_5.2.0/js/jquery.jqGrid.min.js"></script>
+    <!-- We support more than 40 localizations -->
+    <script type="text/ecmascript" src="Guriddo_jqGrid_JS_5.2.0/js/i18n/grid.locale-he.js"></script>
+    <!-- A link to a Boostrap  and jqGrid Bootstrap CSS siles-->
+    <link href="Guriddo_jqGrid_JS_5.2.0/css/ui.jqgrid-bootstrap.css" rel="stylesheet" />
+    <!-- Sweet Alert css -->
+    <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
+    <!--GENERAL object and additional functions-->
+    <script src="lib/lz-string.js"></script>
+    <script src="lib/master.js"></script>
+    <!-- Select2 css+js -->
+    <link href="assets/css/select2.css" rel="stylesheet" />
+    <script src="assets/js/select2.min.js"></script>
+    <!--City Autocomplete-->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <style>
+        .ui-autocomplete {
+            max-height: 100px;
+            overflow-y: auto;
+            /* prevent horizontal scrollbar */
+            overflow-x: hidden;
+        }
+        /* IE 6 doesn't support max-height
+        * we use height instead, but this forces the menu to always be this tall
+        */
+        * html .ui-autocomplete {
+            height: 100px;
+        }
+
+        input[type=email]:focus, input[type=text]:focus, input[type=number]:focus, .textAreaClass:focus {
+            background-color: #FFE684;
+        }
+
+        input[type=email], input[type=text], input[type=checkbox], input[type=date], input[type=number], #typeVolunteer, #gender, #isDriving, .textAreaClass {
+            border-color: #000
+        }
+
+        .text-right {
+            text-align: right;
+        }
+    </style>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        var volunteerUploaded;
+        var volunteerUpdated;
+        var originalDisplayName;
+        $.jgrid.defaults.responsive = true;
+        $.jgrid.defaults.styleUI = 'Bootstrap';
+
+        function generateCities() {
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getCities",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                async: false,
+                data: JSON.stringify({ active: true }),
+                success: generateCitiesSuccessCB,
+                error: generateCitiesErrorCB
+            });
+        }
+
+        function generateCitiesSuccessCB(data) {
+            var arr_cities = JSON.parse(data.d);
+            cities = [];
+            for (i in arr_cities) {
+                cities.push(arr_cities[i].CityName);
+            }
+            $("#city").autocomplete({
+                source: cities
+            });
+        }
+
+        function generateCitiesErrorCB(e) {
+            alert("Error in generateCities: " + e.responseText);
+        }
+
+        function loadPage() {
+            var userName = GENERAL.USER.getUserDisplayName();
+            uploadDataVol(userName);
+            console.log(userName)
+            originalDisplayName = userName;            
+        }
+       
+        function uploadDataVol(displayName) {
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getVolunteerData",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                data: JSON.stringify({ displayName: displayName }),
+                success: function (data) {
+                    var volunteer = JSON.parse(data.d);
+                    console.log(volunteer)
+                    volunteerUploaded = {
+                        FirstNameH: volunteer.FirstNameH,
+                        LastNameH: volunteer.LastNameH,
+                        EnglishFN: volunteer.EnglishFN,
+                        EnglishLN: volunteer.EnglishLN,
+                        VolunteerIdentity: volunteer.VolunteerIdentity,
+                        CellPhone: volunteer.CellPhone,
+                        Gender: volunteer.Gender,
+                        City: volunteer.City,
+                        Email: volunteer.Email,
+                        BirthDate: volunteer.BirthDate,
+                        IsDriving: volunteer.IsDriving,
+                        HowCanHelp: volunteer.HowCanHelp,
+                        Feedback: volunteer.Feedback,
+                        Remarks: volunteer.Remarks
+                    }
+                    console.log(volunteerUploaded)
+                    var location = "";
+                    $("#volunteerFirstName").val(volunteer.FirstNameH);
+                    $("#volunteerLastName").val(volunteer.LastNameH);
+                    $("#volunteerFirstNameEnglish").val(volunteer.EnglishFN);
+                    $("#volunteerLastNameEnglish").val(volunteer.EnglishLN);
+                    $("#VolunteerIdentity").val(volunteer.VolunteerIdentity);
+                    $("#phone1").val(volunteer.CellPhone);
+                    if (volunteer.Gender == "מתנדב") {
+                        $("#gender").val("זכר");
+                    }
+                    else if (volunteer.Gender == "מתנדבת") {
+                        $("#gender").val("נקבה")
+                    }
+                    $("#city").val(volunteer.City);
+                    $("#email").val(volunteer.Email);
+                    if (volunteer.BirthDate == "1900-01-01") {
+                        document.getElementById("birthday").value = null;
+                    } else {
+                        document.getElementById("birthday").value = volunteer.BirthDate;
+                    }
+                    if (volunteer.IsDriving) {
+                        $("#isDriving").val("כן");
+                    }
+                    else {
+                        $("#isDriving").val("לא")
+                    }
+                    $("#help").val(volunteer.HowCanHelp);
+                    $("#feedback").val(volunteer.Feedback);
+                    $("#remarks").val(volunteer.Remarks);
+                    enableSave();
+                    $('#main').show()
+                },
+                error: function (err) { alert("Error in getVolunteer: " + err.responseText); }
+            });
+        }
+
+    </script>
+</head>
+<body class="fixed-left">
+
+    <div class="wrapper-page" id="login">
+        <div class="card-box">
+            <div class="text-center">
+                <img src="../../Media/R2R Logo.png" /><br /><br />
+                <h3>עדכון פרטי מתנדב.ת</h3><br />
+                <h4 class="text-right">אנא הכנס.י מספר טלפון:</h4>
+            </div>
+            <form id="loginForm" class="form-horizontal m-t-20" role="form">
+                <div class="form-group">
+                    <div class="col-xs-12">
+                        <input id="userName" name="userName" class="form-control" type="text" placeholder="מספר טלפון" required>
+                        <i class="md md-account-circle form-control-feedback l-h-34"></i>
+                    </div>
+                </div>
+                <div class="form-group text-center m-t-20">
+                    <div class="col-xs-12">
+                        <button data-toggle="tooltip" title="دخول OK" class="btn btn-primary btn-custom w-md waves-effect waves-light" type="submit" id="loginBTN">
+                            כניסה
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="container" id="main" hidden>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="page-title-box">
+                    <br />
+                    <h4 class="page-title">פרטי מתנדב.ת&nbsp&nbsp<i class="md md-recent-actors"></i></h4>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <form class="form-horizontal" role="form" id="customerForm">
+                <div class="card-box">
+                    <div class="row">
+                        <br />
+                        <p class="required">* שדה חובה</p>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">שם פרטי&nbsp;<span class="required">*</span></label>
+                                    <div class="col-sm-6">
+                                        <input id="volunteerFirstName" name="volunteerFirstName" type="text" class="form-control req">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">שם משפחה&nbsp;<span class="required">*</span></label>
+                                    <div class="col-sm-6">
+                                        <input id="volunteerLastName" name="volunteerLastName" type="text" class="form-control req">
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">שם פרטי באנגלית&nbsp;<span class="required">*</span></label>
+                                    <div class="col-sm-6">
+                                        <input id="volunteerFirstNameEnglish" name="volunteerFirstNameEnglish" type="text" class="form-control req">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">שם משפחה באנגלית&nbsp;<span class="required">*</span></label>
+                                    <div class="col-sm-6">
+                                        <input id="volunteerLastNameEnglish" name="volunteerLastNameEnglish" type="text" class="form-control req">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label data-toggle="tooltip" title="Volunteer ID" class="col-sm-4 control-label">תעודת זהות&nbsp;<span class="required">*</span></label>
+                                    <div class="col-sm-6">
+                                        <input id="VolunteerIdentity" dir="ltr" name="VolunteerIdentity" type="text" class="form-control req">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">טלפון נייד&nbsp;<span class="required">*</span></label>
+                                    <div class="col-sm-6">
+                                        <input id="phone1" dir="ltr" name="phone1" type="text" class="form-control req">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">מגדר&nbsp;<span class="required">*</span></label>
+                                    <div class="col-sm-6" id="selectgender">
+                                        <select id="gender" name="gender" class="form-control req">
+                                            <option>בחר</option>
+                                            <option>זכר</option>
+                                            <option>נקבה</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">ישוב מגורים&nbsp;<span class="required">*</span></label>
+                                    <div class="col-sm-6">
+                                        <input id="city" name="city" type="text" class="form-control req">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">E-Mail&nbsp;<span class="required">*</span></label>
+                                    <div class="col-sm-6">
+                                        <input id="email" name="email" type="email" class="form-control req">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">תאריך לידה&nbsp;<span class="required">*</span></label>
+                                    <div class="col-sm-6">
+                                        <input type="date" id="birthday" name="birthday" class="form-control req">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">מסיע&nbsp;<span class="required">*</span></label>
+                                    <div class="col-sm-6" id="selectIsDriving">
+                                        <select id="isDriving" name="isDriving" class="form-control req">
+                                            <option>בחר</option>
+                                            <option>כן</option>
+                                            <option>לא</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">כיצד תוכל.י לעזור לעמותה בדרכים נוספות (נא לפרט)</label>
+                                    <div class="col-sm-6">
+                                        <!--<input id="help" name="help" type="text" class="form-control">-->
+                                        <textarea id="help" name="help" class="form-control textAreaClass" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">משוב על פעילותך ועל "בדרך להחלמה"</label>
+                                    <div class="col-sm-6">
+                                        <!--<input id="feedback" name="feedback" type="text" class="form-control">-->
+                                        <textarea id="feedback" name="feedback" class="form-control textAreaClass" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">הערות</label>
+                                    <div class="col-sm-6">
+                                        <!--<input id="remarks" name="remarks" type="text" class="form-control">-->
+                                        <textarea id="remarks" name="remarks" class="form-control textAreaClass" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr /><br />
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group text-center">
+                                    <button type="submit" id="saveCustomer" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15" disabled><i class="ti-save m-r-5"></i>שמירה</button><button id="cancel" class="btn btn-danger waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-close m-r-5"></i>ביטול</button>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- end container -->
+    <!-- FOOTER -->
+    <footer class="footer text-right">
+        2020 - 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה
+    </footer>
+    <!-- End FOOTER -->
+    <script>
+        var resizefunc = [];
+    </script>
+    <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#loginBTN').click(function () {
+                event.preventDefault();
+                mobile = $("#userName").val();
+
+                $.ajax({
+                    dataType: "json",
+                    url: "WebService.asmx/CheckVolunteerExtendedByMobile",
+                    contentType: "application/json; charset=utf-8",
+                    type: "POST",
+                    async: false,
+                    data: JSON.stringify({ mobile: mobile }),
+                    success: function (data) {
+                        var displayName = JSON.parse(data.d);
+                        if (displayName) {
+                            console.log(displayName)
+                            $('#login').hide()
+                            swal({
+                                title: "ברוך הבא " + displayName,
+                                type: "success",
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                            GENERAL.USER.setUserDisplayName(displayName);
+
+                            loadPage();
+
+                        } else {
+                            swal({
+
+                                title: "מספר טלפון לא מוכר",
+                                text: "מספר הטלפון " + mobile + " לא מוגדר במערכת\n\nאנא בדקו שלא נפלה טעות הקלדה\nאם המספר נכון - אנא פנו לרכז.ת",
+                                type: "warning",
+                                timer: 10000,
+                                showConfirmButton: true
+                            });
+                        }
+                    },
+                    error: function (err) {
+                        alert("Error in loginUser: " + err.responseText);
+                    }
+                });
+            });
+            
+            $('.req').on('keyup change', function () {
+                enableSave();
+            });
+
+            $('#cancel').click(function () {
+                event.preventDefault();
+                var firstNameH = $("#volunteerFirstName").val();
+                var lastNameH = $("#volunteerLastName").val();
+                var englishFN = $("#volunteerFirstNameEnglish").val();
+                var englishLN = $("#volunteerLastNameEnglish").val();
+                var VolunteerIdentity = $("#VolunteerIdentity").val();
+                var cellPhone = $("#phone1").val();
+                cellPhone = cellPhone.replace(/-/g, '');
+                cellPhone = cellPhone.replace(/ /g, '');
+                if ($("#gender").val() == "זכר") {
+                    var gender = "מתנדב";
+                }
+                else if ($("#gender").val() == "נקבה") {
+                    var gender = "מתנדבת";
+                }
+                var city = $("#city").val();
+                var email = $("#email").val();
+                if ($("#birthday").val() != "") {
+                    var birthDate = $("#birthday").val();
+                } else {
+                    var birthDate = new Date("1900-01-01");
+                }
+                if ($("#isDriving").val() == "כן") {
+                    var isDriving = true;
+                }
+                else if ($("#isDriving").val() == "לא") {
+                    var isDriving = false;
+                }
+                var howCanHelp = $("#help").val();
+                var feedback = $("#feedback").val();
+                var remark = $("#remarks").val();
+
+                volunteerUpdated = {
+                    FirstNameH: firstNameH, LastNameH: lastNameH, EnglishFN: englishFN, EnglishLN: englishLN,
+                    VolunteerIdentity: VolunteerIdentity, CellPhone: cellPhone, Gender: gender, City: city, Email: email,
+                    BirthDate: birthDate, IsDriving: isDriving, HowCanHelp: howCanHelp, Feedback: feedback,
+                    Remarks: remark
+                }
+
+                if (JSON.stringify(volunteerUploaded) != JSON.stringify(volunteerUpdated)) {
+                    swal({
+                        title: "האם אתה בטוח?",
+                        text: "מספר שדות עודכנו\nיציאה ללא שמירה תאבד את הנתונים\nהאם להשאר בדף?",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "כן",
+                        cancelButtonText: "לא",
+                        closeOnConfirm: false,
+                        closeOnCancel: false
+                    },
+                        function (isConfirm) {
+                            if (isConfirm) {
+                                swal("המשך עריכה", "ניתן להמשיך בעריכה", "success");
+                            } else {
+                                window.location.href = 'VolunteerDetails.html';
+                            }
+                        });
+                } else {
+                    window.location.href = 'VolunteerDetails.html';
+                }
+            });
+
+            generateCities();
+            var errorClass = 'invalid';
+            var errorElement = 'em';
+            var $serviceForm = $('#customerForm').validate({
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    var valid = validateVolunteerInputs();
+                    if (!valid) return false;
+
+                    var firstNameH = $("#volunteerFirstName").val();
+                    var lastNameH = $("#volunteerLastName").val();
+                    var englishFN = $("#volunteerFirstNameEnglish").val();
+                    var englishLN = $("#volunteerLastNameEnglish").val();
+                    var VolunteerIdentity = $("#VolunteerIdentity").val();
+                    var cellPhone = $("#phone1").val();
+                    cellPhone = cellPhone.replace(/-/g, '');
+                    cellPhone = cellPhone.replace(/ /g, '');
+                    if ($("#gender").val() == "זכר") {
+                        var gender = "מתנדב";
+                    }
+                    else if ($("#gender").val() == "נקבה") {
+                        var gender = "מתנדבת";
+                    }
+                    var city = $("#city").val();
+                    var email = $("#email").val();
+                    if ($("#birthday").val() != "") {
+                        var birthDate = new Date($("#birthday").val());
+                    } else {
+                        var birthDate = new Date("1900-01-01");
+                    }
+                    if ($("#isDriving").val() == "כן") {
+                        var isDriving = true;
+                    }
+                    else if ($("#isDriving").val() == "לא") {
+                        var isDriving = false;
+                    }
+                    var howCanHelp = $("#help").val();
+                    var feedback = $("#feedback").val();
+                    var remark = $("#remarks").val();
+                    var displayName = $("#volunteerFirstName").val() + " " + $("#volunteerLastName").val();
+                    var englishName = $("#volunteerFirstNameEnglish").val() + " " + $("#volunteerLastNameEnglish").val();
+
+                    var volunteerExtended = {
+                        FirstNameH: firstNameH, LastNameH: lastNameH, EnglishFN: englishFN, EnglishLN: englishLN,
+                        VolunteerIdentity: VolunteerIdentity, CellPhone: cellPhone, Gender: gender, City: city, Email: email,
+                        BirthDate: birthDate, IsDriving: isDriving, HowCanHelp: howCanHelp, Feedback: feedback,
+                        Remarks: remark, DisplayName: displayName, EnglishName: englishName
+                    }
+                    volunteerUpdated = {
+                        FirstNameH: firstNameH, LastNameH: lastNameH, EnglishFN: englishFN, EnglishLN: englishLN,
+                        VolunteerIdentity: VolunteerIdentity, CellPhone: cellPhone, Gender: gender, City: city, Email: email,
+                        BirthDate: birthDate, IsDriving: isDriving, HowCanHelp: howCanHelp, Feedback: feedback,
+                        Remarks: remark
+                    }
+                    console.log(volunteerExtended);
+                    $.ajax({
+                        dataType: "json",
+                        url: "WebService.asmx/setVolunteerData",
+                        contentType: "application/json; charset=utf-8",
+                        type: "POST",
+                        async: false,
+                        data: JSON.stringify({ volunteerExtended: volunteerExtended, username: originalDisplayName }),
+                        success: function (data) {
+                            swal({
+                                title: "נשמר",
+                                type: "success",
+                                timer: 3000,
+                                showConfirmButton: false
+                            });
+                        },
+                        error: function (err) {
+                            console.log(err);
+                            swal("שגיאה בעריכת הנתונים");
+                        }
+                    });
+                    return false;
+                }
+            });
+        });
+
+        function enableSave() {
+            let empty = false;
+            var counter = 0;
+            $('.req').each(function () {
+                empty = ($(this).val().length == 0 || $(this).val() == "בחר");
+
+                if (empty) {
+                    counter++
+                }
+            });
+            console.log(counter)
+            if (counter > 0)
+                $('#saveCustomer').attr('disabled', 'disabled');
+            else
+                $('#saveCustomer').attr('disabled', false);
+        };
+
+        function validateVolunteerInputs() {
+            var firstNameHebrewValid = true;
+            var lastNameHebrewValid = true;
+            var firstNameEnglishValid = true;
+            var lastNameEnglishValid = true;
+            var identityValid = true;
+            var phoneValid = true;
+            var CityValid = true
+            var birthDateValid = true;
+
+            firstNameHebrew = $("#volunteerFirstName").val();
+            var HebrewREGEX = new RegExp("^[\u0590-\u05FF -]+$");
+            var firstNameHebrewMatch = HebrewREGEX.test(firstNameHebrew);
+            if (!firstNameHebrewMatch || firstNameHebrew.length > 16) {
+                swal(
+                    "שים לב!",
+                    "השם הפרטי שהזנת אינו חוקי\nיש להזין עד 16 תווים בעברית",
+                    "warning"
+                );
+                firstNameHebrewValid = false;
+            }
+
+            lastNameHebrew = $("#volunteerLastName").val();
+            var lastNameHebrewMatch = HebrewREGEX.test(lastNameHebrew);
+            if (!lastNameHebrewMatch || lastNameHebrew.length > 30) {
+                swal(
+                    "שים לב!",
+                    "שם המשפחה שהזנת אינו חוקי\nיש להזין עד 30 תווים בעברית",
+                    "warning"
+                );
+                lastNameHebrewValid = false;
+            }
+
+            firstNameEnglish = $("#volunteerFirstNameEnglish").val();
+            if (firstNameEnglish) {
+                var EnglishREGEX = new RegExp("^[A-Za-z -.]+$");
+                var firstNameEnglishMatch = EnglishREGEX.test(firstNameEnglish);
+                if (!firstNameEnglishMatch || firstNameEnglish.length > 16) {
+                    swal(
+                        "שים לב!",
+                        "השם הפרטי באנגלית שהזנת אינו חוקי\nיש להזין עד 16 תווים באנגלית",
+                        "warning"
+                    );
+                    firstNameEnglishValid = false;
+
+                }
+            }
+
+            lastNameEnglish = $("#volunteerLastNameEnglish").val();
+            if (lastNameEnglish) {
+                var lastNameEnglishMatch = EnglishREGEX.test(lastNameEnglish);
+                if (!lastNameEnglishMatch || lastNameEnglish.length > 30) {
+                    swal(
+                        "שים לב!",
+                        "השם המשפחה באנגלית שהזנת אינו חוקי\nיש להזין עד 30 תווים באנגלית",
+                        "warning"
+                    );
+                    lastNameEnglishValid = false;
+
+                }
+            }
+
+            var identity = $("#VolunteerIdentity").val();
+            if (identity != "") {
+                var re = new RegExp("^\\d{9}$");
+
+                if (!re.test(identity)) {
+                    swal(
+                        "שים לב!",
+                        "תעודת הזהות שהזנת אינה חוקית\nתעודת הזהות צריכה להכיל 9 ספרות",
+                        "warning"
+                    );
+                    identityValid = false;
+                }
+            }
+
+            var Phone = $("#phone1").val();
+            Phone = Phone.replace(/ /g, '');
+            Phone = Phone.replace(/-/g, '');
+            var phoneReg = new RegExp("05\\d{8}$");
+            var phoneMatch = phoneReg.test(Phone);
+            if (!phoneMatch) {
+                swal(
+                    "שים לב!",
+                    "הטלפון הנייד שהזנת אינו חוקי\nמספר הטלפון צריך להכיל 10 ספרות",
+                    "warning"
+                );
+                phoneValid = false;
+            }
+
+            var city = $("#city").val();
+            if (city != "") {
+                var cityExists = cities.includes(city)
+                if (!cityExists) {
+                    swal(
+                        "שים לב!",
+                        "הישוב שהזנת אינו חוקי\nאנא בחר ישוב מתוך הרשימה",
+                        "warning"
+                    );
+                    CityValid = false;
+                }
+            }
+
+            var birthDate = $("#birthday").val();
+            if (birthDate != "") {
+                var date = new Date($('#birthday').val());
+                var minimumDate = new Date("1930-01-01");
+                if (date < minimumDate) {
+                    swal(
+                        "שים לב!",
+                        "תאריך הלידה שהזנת אינו חוקי",
+                        "warning"
+                    );
+                    birthDateValid = false;
+                }
+            }
+
+            if (!firstNameHebrewValid || !lastNameHebrewValid || !firstNameEnglishValid || !lastNameEnglishValid || !identityValid || !phoneValid || !CityValid || !birthDateValid) {
+                return false;
+            } else return true;
+        }
+    </script>
+    <!-- jQuery  -->
+    <script src="assets/js/bootstrap-rtl.min.js"></script>
+    <script src="assets/js/detect.js"></script>
+    <script src="assets/js/fastclick.js"></script>
+    <script src="assets/js/jquery.slimscroll.js"></script>
+    <script src="assets/js/jquery.blockUI.js"></script>
+    <script src="assets/js/waves.js"></script>
+    <script src="assets/js/wow.min.js"></script>
+    <script src="assets/js/jquery.nicescroll.js"></script>
+    <script src="assets/js/jquery.scrollTo.min.js"></script>
+    <script src="../plugins/switchery/switchery.min.js"></script>
+    <!-- Sweet Alert js -->
+    <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
+    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+    <script src="assets/js/jquery.core.js"></script>
+    <script src="assets/js/jquery.app.js"></script>
+</body>
+</html>
