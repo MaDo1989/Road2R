@@ -2,9 +2,11 @@
 
 
 // TODO: We  use אלון שדה
-// TODO: obtain month from the date-picker and respect it in service.
-// TODO: default for month as well and making this month is the end-date.
+// TODO: respect teh start/end dates in the GetReportVolunteerRides() service code
+// TODO: default for month field
 // TODO: make sure report is per requirements:  מבנה: יום, שעה, מוצא, יעד, ק"מ, חולה ומלווים
+// TODO: Do teh actual post in "Print"
+// TODO: Check export to csv
 
 // Handle a click event on one of the reports in the Reports-Tree
 function on_report_click(event) {
@@ -47,6 +49,10 @@ function rp_get_fields(report_type) {
 function clone_template(template, parent_id) {
     var result = $(template).clone().prop("id", parent_id + "_field");
     result.removeAttr("name");
+    // assign unique id to the input element
+    var input = result.find("input");
+    input.prop("id", input.attr("template_id"));
+
     result.appendTo("#" + parent_id);
     result.removeClass("report_template");
     return result;
@@ -110,7 +116,7 @@ function on_volunteer_selected(event, ui) {
 // called when the async ajax call to laod volunteers has finished
 // Used to populate UI needing the volunteers list
 function populate_volunteer_field() {
-    $("#driver").autocomplete({
+    $("#select_driver").autocomplete({
         source: K_CACHE.volunteers,
         select: on_volunteer_selected
         });
@@ -118,12 +124,13 @@ function populate_volunteer_field() {
 
 function populate_month_field() {
     
-    $('#select_month').datepicker({
+    var dt = $('#select_month').datepicker({
         format: "MM yyyy",
         minViewMode: 1,
+        onClose: function () { console.log("populate_month_field()::onClose; Does not work, maybe due to duplicate IDS??"); },
         autoclose: true
     });
-
+    dt.on("changeDate", refreshPreview);
 }
 
 function field_month_post_clone(id) {
@@ -149,18 +156,33 @@ function field_volunteers_post_clone(id) {
 
 // Checks if all fileds are filled. If so refresh the report
 function refreshPreview() {
-    var volunteerId = $("#driver").attr("itemID");
-    if (volunteerId == undefined) {
-        return;
+    var selected_date = Date.parse($("#select_month").val());
+    if (selected_date) {
+        var start_month_date = moment(selected_date);
+        var end_month_date = start_month_date.clone().add(1, 'months');
+
+        var volunteerId = $("#select_driver").attr("itemID");
+        if (volunteerId) {
+            refreshTable(volunteerId,
+                start_month_date.format("YYYY-MM-DD"),
+                end_month_date.format("YYYY-MM-DD"));
+        }
     }
-    refreshTable(volunteerId, "KUKU")
 }   
 
-function refreshTable(volunteerId, month) {
+// 'start_date' :  a date formatted as YYYY-MM-DD
+// 'end_date'   :  a date formatted as YYYY-MM-DD
+function refreshTable(volunteerId, start_date, end_date) {
     ridesToShow = [];
     allRides = [];
 
     $('#wait').show();
+    var query_object = {
+        volunteerId: volunteerId,
+        start_date: start_date,
+        end_date: end_date
+    };
+
     $.ajax({
         dataType: "json",
         url: "WebService.asmx/GetReportVolunteerRides",
@@ -169,7 +191,7 @@ function refreshTable(volunteerId, month) {
             xhr.setRequestHeader("Content-Encoding", "gzip");
         },
         type: "POST",
-        data: JSON.stringify({ volunteerId: volunteerId, maxDays: -2 }),// -2 means this week rides
+        data: JSON.stringify(query_object),
         success: function (data) {
             $('#wait').hide();
             arr_rides = JSON.parse(data.d);

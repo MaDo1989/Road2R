@@ -1524,7 +1524,7 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetReportVolunteerRides(int volunteerId, int maxDays)
+    public string GetReportVolunteerRides(int volunteerId, string start_date, string end_date)
     {
         try
         {
@@ -1539,7 +1539,7 @@ public class WebService : System.Web.Services.WebService
             //}
 
             ReportService report = new ReportService();
-            List<RidePat> r = report.GetReportVolunteerRides(volunteerId, maxDays);
+            List<RidePat> r = report.GetReportVolunteerRides(volunteerId, start_date, end_date);
             j.MaxJsonLength = Int32.MaxValue;
             return j.Serialize(r);
         }

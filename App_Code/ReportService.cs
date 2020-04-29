@@ -48,7 +48,7 @@ public class ReportService
         return dt;
     }
 
-    public List<RidePat> GetReportVolunteerRides(int volunteerId, int maxDays)
+    public List<RidePat> GetReportVolunteerRides(int volunteerId, string start_date, string end_date)
     {
         if (volunteerId <= 0)
         {
