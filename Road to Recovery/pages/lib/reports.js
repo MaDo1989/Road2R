@@ -44,9 +44,11 @@ function rp_get_fields(report_type) {
 }
 
 // Makes sure we remove name from clone and set an id
-function clone_template(template, new_id) {
-    var result = $(template).clone().prop("id", new_id);
+function clone_template(template, parent_id) {
+    var result = $(template).clone().prop("id", parent_id + "_field");
     result.removeAttr("name");
+    result.appendTo("#" + parent_id);
+    result.removeClass("report_template");
     return result;
 }
 
@@ -60,6 +62,16 @@ function loadVolunteers(on_load_volunteers) {
 
     if (K_CACHE.volunteers.length > 1) {
         // One time loading already done.
+        on_load_volunteers();
+        return;
+    }
+
+    if (true) {
+        console.log("loadVolunteers: speeding up by adding one entry only in debugging")
+        var debug_entry = { label: "tt", id: 14535 };
+        K_CACHE.volunteers.push(debug_entry);
+        debug_entry = { label: "zzz", id: 14535 };
+        K_CACHE.volunteers.push(debug_entry);
         on_load_volunteers();
         return;
     }
@@ -78,6 +90,10 @@ function loadVolunteers(on_load_volunteers) {
                 var entry = { label: arr_drivers[i].DisplayName, id: arr_drivers[i].Id };
                 K_CACHE.volunteers.push(entry);
             }
+
+            var debug_entry = { label: "tt", id: 14535 };
+            K_CACHE.volunteers.push(debug_entry);
+
             on_load_volunteers();
         },
         error: function (err) { alert("Error in loadVolunteers"); }
@@ -86,7 +102,9 @@ function loadVolunteers(on_load_volunteers) {
 
 // Called when a volunteer is selected in auto-complete
 function on_volunteer_selected(event, ui) {
-    refreshTable(ui.item.id);
+    // store teh selected value on the element
+    $("#" + event.target.id).attr("itemID", ui.item.id);
+    refreshPreview();
     return true;
 }
 // called when the async ajax call to laod volunteers has finished
@@ -117,9 +135,8 @@ function field_month_post_clone(id) {
 function rp_add_one_parameter(def) {
     $("#params_ph").append($("<div>", { id: def.id }));
     var field_elem = $("#" + def.id);
-    field_elem.append(def.label + " XYZ");
-    var clone = clone_template(def.template, "KKK");
-    clone.appendTo("#" + def.id);
+    // field_elem.append(def.label + " XYZ");
+    var clone = clone_template(def.template, def.id);
     if (def.post_clone) {
         def.post_clone(def.id);
     }
@@ -130,7 +147,16 @@ function field_volunteers_post_clone(id) {
 }
 
 
-function refreshTable(volunteerId) {
+// Checks if all fileds are filled. If so refresh the report
+function refreshPreview() {
+    var volunteerId = $("#driver").attr("itemID");
+    if (volunteerId == undefined) {
+        return;
+    }
+    refreshTable(volunteerId, "KUKU")
+}   
+
+function refreshTable(volunteerId, month) {
     ridesToShow = [];
     allRides = [];
 

@@ -87,6 +87,9 @@
         input[type=text], input[type=checkbox], input[type=date], #statusRidePat, #Origin, #Destination, #hour, #minute {
             border-color: #000
         }
+        .report_template {
+           display: none;
+        }
     </style>
 
 
@@ -387,7 +390,16 @@
                 <div class="row">
 
                     <div class="col-sm-12">
-                        <div class="row" name="template_VOLUNTEER">
+                        <div class="row">
+                            <div class="col-sm-12">
+
+                                <button  data-toggle="tooltip" title="" type="button" id="cmdPrint" onclick="newRidePatForm()" class="btn btn-success waves-effect w-md waves-light m-b-5" data-original-title="Print ">
+                                <span class="glyphicon glyphicon-print m-r-5"></span>הדפס</button>
+
+                            </div>
+
+                        </div>
+                        <div class="row report_template" name="template_VOLUNTEER"  >
                             <div class="card-box">
                                 <div class="row" id="flashDiv">
 
@@ -405,7 +417,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row" name="template_MONTH">
+                        <div class="row report_template" name="template_MONTH" >
                             <div class="card-box">
                                 <div class="row" id="flashDiv">
 
