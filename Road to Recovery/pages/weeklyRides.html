@@ -188,9 +188,7 @@
             allRides = [];
             weekdays = [];
             curr = new Date(); // get current date
-
-
-
+            initLocalStorage();
 
             $.ajax({
                 dataType: "json",
@@ -218,15 +216,25 @@
 
         function refreshTable() {
 
-            var south = JSON.parse(localStorage.south);
+            if (localStorage.getItem("south") === null) 
+                var south = JSON.parse(localStorage.south);
+            else
+                var south = true;
 
-            var center = JSON.parse(localStorage.center);
+            if (localStorage.getItem("center") === null)
+                var center = JSON.parse(localStorage.center);
+            else
+                var center = true;
 
-            var north = JSON.parse(localStorage.north);
+
+            if (localStorage.getItem("north") === null)
+                var north = JSON.parse(localStorage.north);
+            else
+                var north = true;
+
 
             weekdays = [];
             HebrewWeekDays(localStorage, weekdays);
-
 
             var volunteerId = -2 // VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
             $('#wait').show();
