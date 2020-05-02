@@ -55,7 +55,7 @@
             background-color: #FFE684;
         }
 
-        input[type=email], input[type=text], input[type=checkbox], input[type=date], input[type=number], #typeVolunteer, #gender, #isDriving, .textAreaClass {
+        input[type=email], input[type=text], input[type=checkbox], input[type=date], input[type=number], #gender, #isDriving, .textAreaClass, .birthSelect {
             border-color: #000
         }
 
@@ -152,7 +152,11 @@
                         document.getElementById("birthday").value = null;
                     } else {
                         document.getElementById("birthday").value = volunteer.BirthDate;
-                    }
+                    }                    
+                    var YearMonthDay = $("#birthday").val().split("-");
+                    $("#birthdayYear").val(YearMonthDay[0]);
+                    $("#birthdayMonth").val(YearMonthDay[1]);
+                    $("#birthdayDay").val(YearMonthDay[2]);                    
                     if (volunteer.IsDriving) {
                         $("#isDriving").val("כן");
                     }
@@ -268,7 +272,7 @@
                                 <div class="form-group">
                                     <label class="col-sm-4 control-label">טלפון נייד&nbsp;<span class="required">*</span></label>
                                     <div class="col-sm-6">
-                                        <input id="phone1" dir="ltr" name="phone1" type="text" class="form-control req">
+                                        <input id="phone1" dir="ltr" name="phone1" type="text" class="form-control req" disabled>
                                     </div>
                                 </div>
                             </div>
@@ -302,12 +306,27 @@
                                 <div class="form-group">
                                     <label class="col-sm-4 control-label">E-Mail&nbsp;<span class="required">*</span></label>
                                     <div class="col-sm-6">
-                                        <input id="email" name="email" type="email" class="form-control req">
+                                        <input id="email" name="email" type="email" dir="ltr" class="form-control req">
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">תאריך לידה&nbsp;<span class="required">*</span></label>
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-4 control-label">שנה</label>
+                                        <select id="birthdayYear" name="birthdayYear" class="form-control birthSelect"></select>
+                                        <label class="col-sm-4 control-label">חודש</label>
+                                        <select id="birthdayMonth" name="birthdayMonth" class="form-control birthSelect"></select>
+                                        <label class="col-sm-4 control-label">יום</label>
+                                        <select id="birthdayDay" name="birthdayDay" class="form-control birthSelect"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-l-10 m-r-10" hidden>
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label class="col-sm-4 control-label">תאריך לידה&nbsp;<span class="required">*</span></label>
@@ -390,6 +409,9 @@
     <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
     <script>
         $(document).ready(function () {
+
+            generateBirthdaySelect()
+
             $('#loginBTN').click(function () {
                 event.preventDefault();
                 mobile = $("#userName").val();
@@ -455,6 +477,9 @@
                 }
                 var city = $("#city").val();
                 var email = $("#email").val();
+                
+                $("#birthday").val($("#birthdayYear").val() + "-" + $("#birthdayMonth").val() + "-" + $("#birthdayDay").val())
+
                 if ($("#birthday").val() != "") {
                     var birthDate = $("#birthday").val();
                 } else {
@@ -525,6 +550,9 @@
                     }
                     var city = $("#city").val();
                     var email = $("#email").val();
+
+                    $("#birthday").val($("#birthdayYear").val() + "-" + $("#birthdayMonth").val() + "-" + $("#birthdayDay").val())
+
                     if ($("#birthday").val() != "") {
                         var birthDate = new Date($("#birthday").val());
                     } else {
@@ -564,11 +592,12 @@
                         data: JSON.stringify({ volunteerExtended: volunteerExtended, username: originalDisplayName }),
                         success: function (data) {
                             swal({
-                                title: "נשמר",
+                                title: "הפרטים נשמרו\nתודה רבה",
                                 type: "success",
                                 timer: 3000,
                                 showConfirmButton: false
                             });
+                            setTimeout(function () { window.location.href = 'VolunteerDetails.html'; }, 3000);
                         },
                         error: function (err) {
                             console.log(err);
@@ -632,7 +661,7 @@
 
             firstNameEnglish = $("#volunteerFirstNameEnglish").val();
             if (firstNameEnglish) {
-                var EnglishREGEX = new RegExp("^[A-Za-z -.]+$");
+                var EnglishREGEX = new RegExp("^(?!\\.)[A-Za-z -.]+$");
                 var firstNameEnglishMatch = EnglishREGEX.test(firstNameEnglish);
                 if (!firstNameEnglishMatch || firstNameEnglish.length > 16) {
                     swal(
@@ -700,14 +729,17 @@
                 }
             }
 
+            $("#birthday").val($("#birthdayYear").val() + "-" + $("#birthdayMonth").val() + "-" + $("#birthdayDay").val())
+
             var birthDate = $("#birthday").val();
             if (birthDate != "") {
                 var date = new Date($('#birthday').val());
                 var minimumDate = new Date("1930-01-01");
-                if (date < minimumDate) {
+                var today = new Date();
+                if (date < minimumDate || (today - date) < 568025136000) { // 568025136000 in milliseconds == 18 years
                     swal(
                         "שים לב!",
-                        "תאריך הלידה שהזנת אינו חוקי",
+                        "תאריך הלידה שהזנת אינו חוקי\nשנת הלידה צריכה להיות 1930 ומעלה\nגילך צריך להיות 18 ומעלה",
                         "warning"
                     );
                     birthDateValid = false;
@@ -717,6 +749,37 @@
             if (!firstNameHebrewValid || !lastNameHebrewValid || !firstNameEnglishValid || !lastNameEnglishValid || !identityValid || !phoneValid || !CityValid || !birthDateValid) {
                 return false;
             } else return true;
+        }
+
+        function generateBirthdaySelect() {
+            var start = 1930;
+            var end = new Date().getFullYear();
+            var options = "";
+            for (var year = end; year >= start; year--) {
+                options += "<option>" + year + "</option>";
+            }
+            document.getElementById("birthdayYear").innerHTML = options;
+
+            options = "";
+            for (var month = 1; month <= 12; month++) {
+                if (month < 10) {
+                    options += "<option>0" + month + "</option>";
+
+                } else {
+                    options += "<option>" + month + "</option>";
+                }                
+            }
+            document.getElementById("birthdayMonth").innerHTML = options;
+
+            options = "";
+            for (var day = 1; day <= 31; day++) {
+                if (day < 10) {
+                    options += "<option>0" + day + "</option>";
+                } else {
+                    options += "<option>" + day + "</option>";
+                }
+            }
+            document.getElementById("birthdayDay").innerHTML = options;
         }
     </script>
     <!-- jQuery  -->
