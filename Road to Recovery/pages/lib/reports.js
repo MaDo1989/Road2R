@@ -2,33 +2,46 @@
 
 
 // TODO: We  use אלון שדה
-// TODO: respect teh start/end dates in the GetReportVolunteerRides() service code
-// TODO: default for month field
 // TODO: make sure report is per requirements:  מבנה: יום, שעה, מוצא, יעד, ק"מ, חולה ומלווים
 // TODO: Do teh actual post in "Print"
 // TODO: Check export to csv
+
+
+/* Documentation:
+ * For each report, we have different input fields.
+ * 'K_fields_map' is a global map that lists the fields to be used for each report.
+ * 
+ * When a report is selected, we create the fields per the map
+ * The creation is done by cloning a field template from the HTML into the fields div
+ * 
+ * In some cases, we do not need to show a field but as it's assumed to have a default value
+ * e.g. "Rides this year" assumes the month field is January-this-year.
+ * In this case, we create a hidden field with the same id as if it was visible.
+ * See 'rp_vl_ride_year__month'
+ * 
+ */
+
+// Current startegy for refreshing teh table, set per report type
+var S_refresh_preview = null;
 
 // Handle a click event on one of the reports in the Reports-Tree
 function on_report_click(event) {
     var report_type = event.target.id;
     populate_parameters(report_type);
-   
+    S_refresh_preview = K_strategy[report_type];
+ }
 
+
+// How to refresh the table, per each report type
+var K_strategy = {
+    "rp_vl_ride_month": rp_vl_ride_month__refresh_preview,
+    "rp_vl_ride_year": rp_vl_ride_year__refresh_preview,
 }
 
 
-function populate_parameters(report_type) {
-    $("#params_ph").text("Populating for " + report_type);
-    var fields = rp_get_fields(report_type);
-    if (fields) {
-        fields.forEach(rp_add_one_parameter);
-    }
-}
-
-// returns a list of fields per a report type
-function rp_get_fields(report_type) {
-
-    return [
+// list of fields to be used for each report-type 
+var K_fields_map = {
+    "rp_vl_ride_month": [
         {
             id: "rp_vl_ride_month__name",
             type: "VOLUNTEER",
@@ -41,7 +54,29 @@ function rp_get_fields(report_type) {
             type: "MONTH",
             post_clone: field_month_post_clone
         }
-    ];
+    ],
+    "rp_vl_ride_year": [
+        {
+            id: "rp_vl_ride_year__name",
+            type: "VOLUNTEER",
+            template: 'div[name="template_VOLUNTEER"]',
+            post_clone: field_volunteers_post_clone
+        }
+    ]
+}
+
+function populate_parameters(report_type) {
+    $("#params_ph").text("Populating for " + report_type);
+    var fields = rp_get_fields(report_type);
+    if (fields) {
+        fields.forEach(rp_add_one_parameter);
+    }
+}
+
+// returns a list of fields per a report type
+function rp_get_fields(report_type) {
+
+    return K_fields_map[report_type];
 
 }
 
@@ -122,6 +157,13 @@ function populate_volunteer_field() {
         });
 }
 
+function get_last_month_date() {
+    var prev_month = new Date();
+    prev_month.setDate(0); // 0 will result in the last day of the previous month
+    prev_month.setDate(1); 
+    return prev_month;
+}
+
 function populate_month_field() {
     
     var dt = $('#select_month').datepicker({
@@ -130,6 +172,8 @@ function populate_month_field() {
         onClose: function () { console.log("populate_month_field()::onClose; Does not work, maybe due to duplicate IDS??"); },
         autoclose: true
     });
+    // compute previous month
+    dt.datepicker('setDate', get_last_month_date());
     dt.on("changeDate", refreshPreview);
 }
 
@@ -154,8 +198,13 @@ function field_volunteers_post_clone(id) {
 }
 
 
-// Checks if all fileds are filled. If so refresh the report
+
 function refreshPreview() {
+    S_refresh_preview();
+}   
+
+// Checks if all fileds are filled. If so refresh the report
+function rp_vl_ride_month__refresh_preview() {
     var selected_date = Date.parse($("#select_month").val());
     if (selected_date) {
         var start_month_date = moment(selected_date);
@@ -169,6 +218,24 @@ function refreshPreview() {
         }
     }
 }   
+
+
+function rp_vl_ride_year__refresh_preview() {
+    var volunteerId = $("#select_driver").attr("itemID");
+    if (volunteerId) {
+        // default date range - this year up till now
+        var today = new Date();
+        var end_month_date = moment(today);
+        today.setMonth(0);
+        today.setDate(1);
+        var start_month_date = moment(today);
+
+        refreshTable(volunteerId,
+                start_month_date.format("YYYY-MM-DD"),
+                end_month_date.format("YYYY-MM-DD"));
+    }
+}   
+
 
 // 'start_date' :  a date formatted as YYYY-MM-DD
 // 'end_date'   :  a date formatted as YYYY-MM-DD

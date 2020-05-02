@@ -90,6 +90,9 @@
         .report_template {
            display: none;
         }
+        .report_hidden {
+            display: none;
+        }
     </style>
 
 
@@ -119,6 +122,7 @@
 
 
             $("#rp_vl_ride_month").click(on_report_click);
+            $("#rp_vl_ride_year").click(on_report_click);
 
             $('#thisWeekHeader').html("הסעות לשבוע " + thisWeekFirst)
 
@@ -352,7 +356,7 @@
                                 <span>למתנדב</span>
                                 <ul>
                                     <li><a id="rp_vl_ride_month">הסעות החודש </a></li>
-                                    <li>הסעות השנה</li>
+                                    <li><a id="rp_vl_ride_year">הסעות השנה </a></li>
                                 </ul>
                             </li>
                         </ul>
@@ -393,13 +397,14 @@
                         <div class="row">
                             <div class="col-sm-12">
 
-                                <button  data-toggle="tooltip" title="" type="button" id="cmdPrint" onclick="newRidePatForm()" class="btn btn-success waves-effect w-md waves-light m-b-5" data-original-title="Print ">
-                                <span class="glyphicon glyphicon-print m-r-5"></span>הדפס</button>
+                                <button data-toggle="tooltip" title="" type="button" id="cmdPrint" onclick="newRidePatForm()" class="btn btn-success waves-effect w-md waves-light m-b-5" data-original-title="Print ">
+                                    <span class="glyphicon glyphicon-print m-r-5"></span>הדפס
+                                </button>
 
                             </div>
 
                         </div>
-                        <div class="row report_template" name="template_VOLUNTEER"  >
+                        <div class="row report_template" name="template_VOLUNTEER">
                             <div class="card-box">
                                 <div class="row" id="flashDiv">
 
@@ -417,7 +422,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row report_template" name="template_MONTH" >
+                        <div class="row report_template" name="template_MONTH">
                             <div class="card-box">
                                 <div class="row" id="flashDiv">
 
@@ -434,6 +439,9 @@
 
                                 </div>
                             </div>
+                        </div>
+                        <div class="row report_template report_hidden" name="HIDDEN_MONTH">
+                            <input type="text" template_id="select_month" class="form-control" aria-required="true" aria-invalid="false">
                         </div>
                     </div>
                 </div>

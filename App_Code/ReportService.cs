@@ -24,12 +24,14 @@ public class ReportService
     }
 
 
-    private DataTable getPickupForDriver(int driverID, DbService db)
+    private DataTable getPickupForDriver(int driverID, string start_date, string end_date, DbService db)
     {
-        string query = "SELECT* FROM RPView WHERE pickuptime < CONVERT(date, getdate()) AND MainDriver =  @ID";
+        string query = "SELECT* FROM RPView WHERE pickuptime < @end_date AND pickuptime >= @start_date AND MainDriver =  @ID";
         SqlCommand cmd = new SqlCommand(query);
         cmd.CommandType = CommandType.Text;
         cmd.Parameters.Add("@ID", SqlDbType.Int).Value = driverID;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
 
         DataSet ds = db.GetDataSetBySqlCommand(cmd);
         DataTable dt = ds.Tables[0];
@@ -67,7 +69,7 @@ public class ReportService
 
         List<Escorted> el = new List<Escorted>();
 
-        DataTable pickupsTable = getPickupForDriver(volunteerId, db);
+        DataTable pickupsTable = getPickupForDriver(volunteerId, start_date, end_date, db);
         List<RidePat> rpl = new List<RidePat>();
 
         int counter = 0;
