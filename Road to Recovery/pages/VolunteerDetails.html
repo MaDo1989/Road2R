@@ -62,6 +62,10 @@
         .text-right {
             text-align: right;
         }
+
+        b {
+            color: red;
+        }
     </style>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
@@ -103,9 +107,9 @@
             var userName = GENERAL.USER.getUserDisplayName();
             uploadDataVol(userName);
             console.log(userName)
-            originalDisplayName = userName;            
+            originalDisplayName = userName;
         }
-       
+
         function uploadDataVol(displayName) {
             $.ajax({
                 dataType: "json",
@@ -148,15 +152,19 @@
                     }
                     $("#city").val(volunteer.City);
                     $("#email").val(volunteer.Email);
-                    if (volunteer.BirthDate == "1900-01-01") {
+                    if (volunteer.BirthDate == "1900-01-01" || volunteer.BirthDate == "" || volunteer.BirthDate == null) {
                         document.getElementById("birthday").value = null;
+                        $("#birthdayYear").val("בחר");
+                        $("#birthdayMonth").val("בחר");
+                        $("#birthdayDay").val("בחר");
                     } else {
                         document.getElementById("birthday").value = volunteer.BirthDate;
-                    }                    
-                    var YearMonthDay = $("#birthday").val().split("-");
-                    $("#birthdayYear").val(YearMonthDay[0]);
-                    $("#birthdayMonth").val(YearMonthDay[1]);
-                    $("#birthdayDay").val(YearMonthDay[2]);                    
+                        var YearMonthDay = $("#birthday").val().split("-");
+                        $("#birthdayYear").val(YearMonthDay[0]);
+                        $("#birthdayMonth").val(YearMonthDay[1]);
+                        $("#birthdayDay").val(YearMonthDay[2]);
+                    }
+
                     if (volunteer.IsDriving) {
                         $("#isDriving").val("כן");
                     }
@@ -211,7 +219,7 @@
             </div>
         </div>
         <div class="row">
-            <form class="form-horizontal" role="form" id="customerForm">
+            <form class="form-horizontal" role="form" id="volunteerForm">
                 <div class="card-box">
                     <div class="row">
                         <br />
@@ -386,8 +394,11 @@
                         <hr /><br />
                         <div class="row m-l-10 m-r-10">
                             <div class="col-sm-6">
-                                <div class="form-group text-center">
+                                <div id="saveButton" class="form-group text-center">
                                     <button type="submit" id="saveCustomer" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15" disabled><i class="ti-save m-r-5"></i>שמירה</button><button id="cancel" class="btn btn-danger waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-close m-r-5"></i>ביטול</button>
+                                    <br />
+                                    <b id="saveButtonDisabled">השמירה תתאפשר רק לאחר שכל שדות החובה ימולאו</b>
+                                    <hr />
                                 </div>
                             </div>
                         </div>
@@ -438,9 +449,15 @@
 
                             loadPage();
 
+                        } else if (mobile == "") {
+                            swal({
+                                title: "שדה מספר טלפון ריק",
+                                type: "warning",
+                                timer: 10000,
+                                showConfirmButton: true
+                            });
                         } else {
                             swal({
-
                                 title: "מספר טלפון לא מוכר",
                                 text: "מספר הטלפון " + mobile + " לא מוגדר במערכת\n\nאנא בדקו שלא נפלה טעות הקלדה\nאם המספר נכון - אנא פנו לרכז.ת",
                                 type: "warning",
@@ -454,7 +471,7 @@
                     }
                 });
             });
-            
+
             $('.req').on('keyup change', function () {
                 enableSave();
             });
@@ -530,9 +547,10 @@
             generateCities();
             var errorClass = 'invalid';
             var errorElement = 'em';
-            var $serviceForm = $('#customerForm').validate({
+            var $serviceForm = $('#volunteerForm').validate({
                 submitHandler: function (form, event) {
                     event.preventDefault();
+
                     var valid = validateVolunteerInputs();
                     if (!valid) return false;
 
@@ -619,10 +637,14 @@
                 }
             });
             console.log(counter)
-            if (counter > 0)
+            if (counter > 0) {
                 $('#saveCustomer').attr('disabled', 'disabled');
-            else
+                $('#saveButtonDisabled').show();
+            }
+            else {
                 $('#saveCustomer').attr('disabled', false);
+                $('#saveButtonDisabled').hide();
+            }
         };
 
         function validateVolunteerInputs() {
@@ -750,24 +772,24 @@
         function generateBirthdaySelect() {
             var start = 1930;
             var end = new Date().getFullYear();
-            var options = "";
+            var options = "<option>בחר</option>";
             for (var year = end; year >= start; year--) {
                 options += "<option>" + year + "</option>";
             }
             document.getElementById("birthdayYear").innerHTML = options;
 
-            options = "";
+            var options = "<option>בחר</option>";
             for (var month = 1; month <= 12; month++) {
                 if (month < 10) {
                     options += "<option>0" + month + "</option>";
 
                 } else {
                     options += "<option>" + month + "</option>";
-                }                
+                }
             }
             document.getElementById("birthdayMonth").innerHTML = options;
 
-            options = "";
+            var options = "<option>בחר</option>";
             for (var day = 1; day <= 31; day++) {
                 if (day < 10) {
                     options += "<option>0" + day + "</option>";
