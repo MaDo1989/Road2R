@@ -2,8 +2,8 @@
 
 
 // TODO: We  use אלון שדה
-// TODO: make sure report is per requirements:  מבנה: יום, שעה, מוצא, יעד, ק"מ, חולה ומלווים
-// TODO: Do teh actual post in "Print"
+// TODO: make sure report is per requirements: add missing fields of  , ק"מ, ומלווים
+// TODO: Do the actual post in "Print"
 // TODO: Check export to csv
 
 
@@ -26,9 +26,16 @@ var S_refresh_preview = null;
 
 // Handle a click event on one of the reports in the Reports-Tree
 function on_report_click(event) {
+
+    if (S_refresh_preview == null) {
+        // here for quick debuggign something on first click
+       }
+
+
     var report_type = event.target.id;
     populate_parameters(report_type);
     S_refresh_preview = K_strategy[report_type];
+    $("#cmdPrint").prop("disabled", true);
  }
 
 
@@ -243,6 +250,7 @@ function refreshTable(volunteerId, start_date, end_date) {
     ridesToShow = [];
     allRides = [];
 
+    $("#cmdPrint").prop("disabled", false);
     $('#wait').show();
     var query_object = {
         volunteerId: volunteerId,
@@ -360,13 +368,15 @@ function refreshTable(volunteerId, start_date, end_date) {
                     { "orderData": [0, 3], "targets": 0 }],
                 columns: [
                     { data: "Date" },
+                    { data: "Time" },
                     { data: "OriginName" },
                     { data: "DestinationName" },
-                    { data: "Time" },
                     { data: "PatDisplayName" },
-                    { data: "Coordinator" },
-                    { data: "Drivers" },
 
+                ],
+                dom: 'Bfrtip',
+                buttons: [
+                    'print'
                 ],
                 createdRow: function (row, data, dataIndex) {
                     if (data.Date.includes("א") || data.Date.includes("ג") || data.Date.includes("ה") || data.Date.includes("ש"))

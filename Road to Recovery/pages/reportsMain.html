@@ -21,7 +21,6 @@
     <link href="../plugins/datatables/responsive.bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="../plugins/datatables/scroller.bootstrap.min.css" rel="stylesheet" type="text/css" />
 
-    <!-- Sweet Alert css -->
     <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
 
     <link href="../plugins/switchery/switchery.min.css" rel="stylesheet" />
@@ -43,19 +42,19 @@
 
     <script src="lib/reports.js"></script>
 
-    <script src="assets/js/jquery.min.js"></script>
+       <script src="assets/js/jquery.min.js"></script>
 
-    <script src="dataTables.js"></script>
+       <script src="dataTables.js"></script>
     <!--<script src="moment.js"></script>
     <script src="datetime-moment.js"></script>-->
 
 
     <!-- Select2 css+js -->
-    <link href="assets/css/select2.css" rel="stylesheet" />
-    <script src="assets/js/select2.min.js"></script>
+        <link href="assets/css/select2.css" rel="stylesheet" />
+        <script src="assets/js/select2.min.js"></script>
     <!--<script src="lib/sorting.js"></script>-->
     <script src="lib/includeHTML.js"></script>
-    <script src="https://cdn.datatables.net/plug-ins/1.10.19/sorting/date-de.js"></script>
+    <!--<script src="https://cdn.datatables.net/plug-ins/1.10.19/sorting/date-de.js"></script>-->
 
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <style>
@@ -88,7 +87,7 @@
             border-color: #000
         }
         .report_template {
-           display: none;
+            display: none;
         }
         .report_hidden {
             display: none;
@@ -98,7 +97,6 @@
 
 
     <script>
-        var tbl;
         var arr_rides;
         var curr = new Date; // get current date
         var first = curr.getDate() - curr.getDay(); // First day is the day of the month - the day of the week
@@ -120,6 +118,7 @@
         $(document).ready(function () {
 
 
+            $("#cmdPrint").prop("disabled", true);
 
             $("#rp_vl_ride_month").click(on_report_click);
             $("#rp_vl_ride_year").click(on_report_click);
@@ -274,7 +273,6 @@
 
 
             ridesToShow = [];
-            tbl.clear().draw();
 
             for (Ride of allRides) {
                 if (south && Ride.SouthRide && weekdays.includes(Ride.Day)) {
@@ -290,36 +288,6 @@
                     continue;
                 }
             }
-
-
-            tbl = $('#weeklyRides').DataTable({
-                pageLength: 500,
-                bLengthChange: false,
-                data: ridesToShow,
-                destroy: true,
-                columnDefs: [
-                    { "orderData": [0, 3], "targets": 0 }],
-                columns: [
-                    { data: "Date" },
-                    { data: "OriginName" },
-                    { data: "DestinationName" },
-                    { data: "Time" },
-                    { data: "PatDisplayName" },
-                    { data: "Coordinator" },
-                    { data: "Drivers" },
-
-                ],
-                createdRow: function (row, data, dataIndex) {
-                    if (data.Date.includes("א") || data.Date.includes("ג") || data.Date.includes("ה") || data.Date.includes("ש"))
-                        $(row).css('background-color', '#f1f1f1');
-                    else $(row).css('background-color', '#ffffff')
-                },
-                rowCallback: function (row, data, index) {
-                    if (data.Drivers == "ממתינה לשיבוץ") {
-                        $(row).find('td:eq(6)').css('background-color', '#FBD4B4');
-                    }
-                }
-            });
         }
 
 
@@ -373,12 +341,10 @@
                                 <thead>
                                     <tr>
                                         <th title="Date & Day" class="dateCustomWidth">תאריך ויום</th>
+                                        <th title="Time" class="timeCustomWidth">שעה</th>
                                         <th title="نقطة الانطلاق Origin">מוצא</th>
                                         <th title="نقطة الوصول Destination">יעד</th>
-                                        <th title="Time" class="timeCustomWidth">שעה</th>
                                         <th title="المريض Patient">החולה</th>
-                                        <th title="Coordinator">רכז</th>
-                                        <th title="السائقين بالفرة Drivers">נהגים בנסיעה</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -456,9 +422,8 @@
         var resizefunc = [];
     </script>
 
-    <!-- jQuery  -->
     <script src="assets/js/bootstrap-rtl.min.js"></script>
-    <script src="assets/js/detect.js"></script>
+        <script src="assets/js/detect.js"></script>
     <script src="assets/js/fastclick.js"></script>
     <script src="assets/js/jquery.slimscroll.js"></script>
     <script src="assets/js/jquery.blockUI.js"></script>
@@ -468,7 +433,8 @@
     <script src="assets/js/jquery.scrollTo.min.js"></script>
     <script src="../plugins/switchery/switchery.min.js"></script>
 
-    <!-- Datatables-->
+
+
     <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="../plugins/datatables/dataTables.bootstrap.js"></script>
     <script src="../plugins/datatables/dataTables.buttons.min.js"></script>
@@ -482,10 +448,13 @@
     <script src="../plugins/datatables/dataTables.responsive.min.js"></script>
     <script src="../plugins/datatables/responsive.bootstrap.min.js"></script>
     <script src="../plugins/datatables/dataTables.scroller.min.js"></script>
+    <script src="../plugins/datatables/buttons.print.min.js"></script>
+
+
+
 
     <!-- Datatable init js -->
-    <script src="assets/pages/datatables.init.js"></script>
-
+    <!--    <script src="assets/pages/datatables.init.js"></script>-->
     <!-- Sweet Alert js -->
     <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
     <script src="assets/pages/jquery.sweet-alert.init.js"></script>
@@ -493,11 +462,11 @@
     <script src="assets/js/jquery.core.js"></script>
     <script src="assets/js/jquery.app.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <script src="../plugins/moment/moment.js"></script>
+        <script src="../plugins/moment/moment.js"></script>
     <script src="../plugins/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
 
     <script type="text/javascript">
 
     </script>
-</body>
+    </body>
 </html>
