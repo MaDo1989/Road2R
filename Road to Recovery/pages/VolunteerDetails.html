@@ -459,6 +459,11 @@
                 enableSave();
             });
 
+            $('.birthSelect').on('change', function () {
+                $("#birthday").val($("#birthdayYear").val() + "-" + $("#birthdayMonth").val() + "-" + $("#birthdayDay").val())
+                enableSave()
+            });
+
             $('#cancel').click(function () {
                 event.preventDefault();
                 var firstNameH = $("#volunteerFirstName").val();
@@ -477,9 +482,6 @@
                 }
                 var city = $("#city").val();
                 var email = $("#email").val();
-                
-                $("#birthday").val($("#birthdayYear").val() + "-" + $("#birthdayMonth").val() + "-" + $("#birthdayDay").val())
-
                 if ($("#birthday").val() != "") {
                     var birthDate = $("#birthday").val();
                 } else {
@@ -550,9 +552,6 @@
                     }
                     var city = $("#city").val();
                     var email = $("#email").val();
-
-                    $("#birthday").val($("#birthdayYear").val() + "-" + $("#birthdayMonth").val() + "-" + $("#birthdayDay").val())
-
                     if ($("#birthday").val() != "") {
                         var birthDate = new Date($("#birthday").val());
                     } else {
@@ -728,9 +727,6 @@
                     CityValid = false;
                 }
             }
-
-            $("#birthday").val($("#birthdayYear").val() + "-" + $("#birthdayMonth").val() + "-" + $("#birthdayDay").val())
-
             var birthDate = $("#birthday").val();
             if (birthDate != "") {
                 var date = new Date($('#birthday').val());
@@ -739,7 +735,7 @@
                 if (date < minimumDate || (today - date) < 568025136000) { // 568025136000 in milliseconds == 18 years
                     swal(
                         "שים לב!",
-                        "תאריך הלידה שהזנת אינו חוקי\nשנת הלידה צריכה להיות 1930 ומעלה\nגילך צריך להיות 18 ומעלה",
+                        "תאריך הלידה שהזנת אינו חוקי\nגילך צריך להיות 18 ומעלה",
                         "warning"
                     );
                     birthDateValid = false;
