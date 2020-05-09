@@ -1,11 +1,33 @@
 ﻿// Purpose: JS code for the reports UI
 
 
-// TODO: We  use אלון שדה
-// TODO: make sure report is per requirements: add missing fields of  , ק"מ, ומלווים
-// TODO: Do the actual post in "Print"
-// TODO: Check export to csv
+// DEBUG:  We  use אלון שדה  &  בני בורנפלד
+// new report:   פר אזור: רשימת המתנדבים      "מתנדבים שבועי"
+// TODO:  Implement GetReportRidesWeeklyPerRegion() to call  getVolunteerRidesPerWeek() and return result as an array of volunteers
+// TODO: GetReportRidesWeeklyPerRegion() is just a copy of old code now, so need to cleanit up and set values in Vounteer structure
+// TODO:  for some numeric values we need to return.
 
+// TODO: Implement UI of teh " "מתנדבים שבועי  report
+
+// TODO: make sure report is per requirements: add missing fields of  , ק"ם
+// TODO: Fix export to PDF
+// TODO: Customize print table for RTL   https://datatables.net/forums/discussion/44355/i-was-able-to-right-align-my-print-layout-how-do-i-apply-that-to-individual-columns
+// TODO: Do the actual post in "Print"
+
+
+/* Internal notes 
+ *   getContactType --> The relationship types - Father,Sister etc...
+ *  
+ *  RidePat.cs :  GetRidePatView()     
+ *  Escorted e = new Escorted();
+ *  -		ItemArray	{object[3]}	object[]
+		[0]	2123	object {int}
+		[1]	"אבו בודק בדיקה1"	object {string}
+		[2]	"0547298598"	object {string}
+
+ *   Query is "select * from RidePatEscortView where RidePatNum = 2123 "
+
+ * */
 
 /* Documentation:
  * For each report, we have different input fields.
@@ -118,7 +140,7 @@ function loadVolunteers(on_load_volunteers) {
         console.log("loadVolunteers: speeding up by adding one entry only in debugging")
         var debug_entry = { label: "tt", id: 14535 };
         K_CACHE.volunteers.push(debug_entry);
-        debug_entry = { label: "zzz", id: 14535 };
+        debug_entry = { label: "beny", id: 14430 };
         K_CACHE.volunteers.push(debug_entry);
         on_load_volunteers();
         return;
@@ -270,7 +292,7 @@ function refreshTable(volunteerId, start_date, end_date) {
         success: function (data) {
             $('#wait').hide();
             arr_rides = JSON.parse(data.d);
-            console.log(arr_rides);
+            // DEBUG console.log(arr_rides);
 
             for (i in arr_rides) {
 
@@ -309,15 +331,17 @@ function refreshTable(volunteerId, start_date, end_date) {
                     minutes = "0" + date.getMinutes();
                 } else minutes = date.getMinutes();
 
+                console.log("arr_rides @", i, arr_rides[i].Pat);
+
                 if (arr_rides[i].Pat.DisplayName.includes("אנונימי")) {
                     patDisplayName = "חולה";
                 } else {
                     patDisplayName = arr_rides[i].Pat.DisplayName;
                 }
 
-//                if (arr_rides[i].Pat.EscortedList.length != 0) {
-//                    patDisplayName += " + " + arr_rides[i].Pat.EscortedList.length;
-//                }
+                if (arr_rides[i].Pat.EscortedList.length != 0) {
+                    patDisplayName += " + " + arr_rides[i].Pat.EscortedList.length;
+                }
 
                 date2 = HEBday + " " + day + "/" + month + "/" + date.getUTCFullYear() % 2000;
                 time = hours + ":" + minutes;
@@ -376,7 +400,7 @@ function refreshTable(volunteerId, start_date, end_date) {
                 ],
                 dom: 'Bfrtip',
                 buttons: [
-                    'print'
+                    'print', 'csv', 'excel', 'pdf'
                 ],
                 createdRow: function (row, data, dataIndex) {
                     if (data.Date.includes("א") || data.Date.includes("ג") || data.Date.includes("ה") || data.Date.includes("ש"))
