@@ -6,7 +6,7 @@
     <meta name="description" content="KSMoving">
     <meta name="author" content="Coderthemes">
     <link rel="shortcut icon" href="assets/images/favicon_1.ico">
-    <title>פרטי מתנדב</title>
+    <title>פרטי מתנדב.ת</title>
     <link href="../plugins/switchery/switchery.min.css" rel="stylesheet" />
     <link href="assets/css/bootstrap-rtl.min.css" rel="stylesheet" type="text/css">
     <link href="assets/css/core.css" rel="stylesheet" type="text/css">
@@ -55,7 +55,7 @@
             background-color: #FFE684;
         }
 
-        input[type=email], input[type=text], input[type=checkbox], input[type=date], input[type=number], #gender, #isDriving, .textAreaClass, .birthSelect {
+        input[type=email], input[type=text], input[type=checkbox], input[type=date], input[type=number], #gender, #isDriving, .textAreaClass, .birthSelect, #newsLetter, #knowsArabic {
             border-color: #000
         }
 
@@ -134,7 +134,9 @@
                         IsDriving: volunteer.IsDriving,
                         HowCanHelp: volunteer.HowCanHelp,
                         Feedback: volunteer.Feedback,
-                        Remarks: volunteer.Remarks
+                        Remarks: volunteer.Remarks,
+                        NewsLetter: volunteer.NewsLetter,
+                        KnowsArabic: volunteer.KnowsArabic
                     }
                     console.log(volunteerUploaded)
                     var location = "";
@@ -164,16 +166,33 @@
                         $("#birthdayMonth").val(YearMonthDay[1]);
                         $("#birthdayDay").val(YearMonthDay[2]);
                     }
-
-                    if (volunteer.IsDriving) {
+                    if (volunteer.IsDriving == 1) {
                         $("#isDriving").val("כן");
                     }
-                    else {
+                    else if (volunteer.IsDriving == 0) {
                         $("#isDriving").val("לא")
+                    } else {
+                        $("#isDriving").val("בחר")
                     }
                     $("#help").val(volunteer.HowCanHelp);
                     $("#feedback").val(volunteer.Feedback);
                     $("#remarks").val(volunteer.Remarks);
+                    if (volunteer.NewsLetter == 1) {
+                        $("#newsLetter").val("כן");
+                    }
+                    else if (volunteer.NewsLetter == 0) {
+                        $("#newsLetter").val("לא")
+                    } else {
+                        $("#newsLetter").val("בחר")
+                    }
+                    if (volunteer.KnowsArabic == 1) {
+                        $("#knowsArabic").val("כן");
+                    }
+                    else if (volunteer.NewsLetter == 0) {
+                        $("#knowsArabic").val("לא")
+                    } else {
+                        $("#knowsArabic").val("בחר")
+                    }
                     enableSave();
                     $('#main').show()
                 },
@@ -195,7 +214,7 @@
             <form id="loginForm" class="form-horizontal m-t-20" role="form">
                 <div class="form-group">
                     <div class="col-xs-12">
-                        <input id="userName" name="userName" class="form-control" type="text" placeholder="מספר טלפון" required>
+                        <input id="userName" name="userName" class="form-control" type="text" placeholder="מספר טלפון ללא רווחים ומקפים" required>
                         <i class="md md-account-circle form-control-feedback l-h-34"></i>
                     </div>
                 </div>
@@ -213,8 +232,11 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="page-title-box">
+                    <img class="center-block" src="../../Media/R2R Logo.png" />
                     <br />
                     <h4 class="page-title">פרטי מתנדב.ת&nbsp&nbsp<i class="md md-recent-actors"></i></h4>
+                    <h5>המידע יישמר לשימושה של העמותה בלבד</h5><br />
+                    <h5>בכל שאלה או בעיה במילוי הטופס ניתן לפנות לגלית עזר סלע: <a href="mailto:galit-as@bezeqint.net">galit-as@bezeqint.net</a>&nbsp;&nbsp;050-4850577</h5>
                 </div>
             </div>
         </div>
@@ -250,7 +272,7 @@
                                 <div class="form-group">
                                     <label class="col-sm-4 control-label">שם פרטי באנגלית&nbsp;<span class="required">*</span></label>
                                     <div class="col-sm-6">
-                                        <input id="volunteerFirstNameEnglish" name="volunteerFirstNameEnglish" type="text" class="form-control req">
+                                        <input id="volunteerFirstNameEnglish" dir="ltr" name="volunteerFirstNameEnglish" type="text" class="form-control req">
                                     </div>
                                 </div>
                             </div>
@@ -260,7 +282,7 @@
                                 <div class="form-group">
                                     <label class="col-sm-4 control-label">שם משפחה באנגלית&nbsp;<span class="required">*</span></label>
                                     <div class="col-sm-6">
-                                        <input id="volunteerLastNameEnglish" name="volunteerLastNameEnglish" type="text" class="form-control req">
+                                        <input id="volunteerLastNameEnglish" dir="ltr" name="volunteerLastNameEnglish" type="text" class="form-control req">
                                     </div>
                                 </div>
                             </div>
@@ -361,6 +383,34 @@
                         <div class="row m-l-10 m-r-10">
                             <div class="col-sm-6">
                                 <div class="form-group">
+                                    <label class="col-sm-4 control-label">יודע ערבית&nbsp;<span class="required">*</span></label>
+                                    <div class="col-sm-6" id="selectKnowsArabic">
+                                        <select id="knowsArabic" name="knowsArabic" class="form-control req">
+                                            <option>בחר</option>
+                                            <option>כן</option>
+                                            <option>לא</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">מעוניין לקבל את העדכון השבועי&nbsp;<span class="required">*</span></label>
+                                    <div class="col-sm-6" id="selectNewsLetter">
+                                        <select id="newsLetter" name="newsLetter" class="form-control req">
+                                            <option>בחר</option>
+                                            <option>כן</option>
+                                            <option>לא</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
                                     <label class="col-sm-4 control-label">כיצד תוכל.י לעזור לעמותה בדרכים נוספות (נא לפרט)</label>
                                     <div class="col-sm-6">
                                         <!--<input id="help" name="help" type="text" class="form-control">-->
@@ -389,6 +439,15 @@
                                         <textarea id="remarks" name="remarks" class="form-control textAreaClass" rows="3"></textarea>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6 text-center">
+                                <a href="https://bit.ly/2RB4Pzk" target="_new"><img style="width:160px;height:80px" src="http://www.trci.org.il/wp-content/uploads/2018/02/video-pic.jpg" alt=""></a>
+                                <p>
+                                    הצטרפו אלינו עם עיגול לטובה,<br>
+                                    כסף קטן - עזרה גדולה!
+                                </p>
                             </div>
                         </div>
                         <hr /><br />
@@ -513,12 +572,24 @@
                 var howCanHelp = $("#help").val();
                 var feedback = $("#feedback").val();
                 var remark = $("#remarks").val();
+                if ($("#newsLetter").val() == "כן") {
+                    var newsLetter = true;
+                }
+                else if ($("#newsLetter").val() == "לא") {
+                    var newsLetter = false;
+                }
+                if ($("#knowsArabic").val() == "כן") {
+                    var knowsArabic = true;
+                }
+                else if ($("#knowsArabic").val() == "לא") {
+                    var knowsArabic = false;
+                }
 
                 volunteerUpdated = {
                     FirstNameH: firstNameH, LastNameH: lastNameH, EnglishFN: englishFN, EnglishLN: englishLN,
                     VolunteerIdentity: VolunteerIdentity, CellPhone: cellPhone, Gender: gender, City: city, Email: email,
                     BirthDate: birthDate, IsDriving: isDriving, HowCanHelp: howCanHelp, Feedback: feedback,
-                    Remarks: remark
+                    Remarks: remark, NewsLetter: newsLetter, KnowsArabic: knowsArabic
                 }
 
                 if (JSON.stringify(volunteerUploaded) != JSON.stringify(volunteerUpdated)) {
@@ -586,18 +657,30 @@
                     var remark = $("#remarks").val();
                     var displayName = $("#volunteerFirstName").val() + " " + $("#volunteerLastName").val();
                     var englishName = $("#volunteerFirstNameEnglish").val() + " " + $("#volunteerLastNameEnglish").val();
+                    if ($("#newsLetter").val() == "כן") {
+                        var newsLetter = true;
+                    }
+                    else if ($("#newsLetter").val() == "לא") {
+                        var newsLetter = false;
+                    }
+                    if ($("#knowsArabic").val() == "כן") {
+                    var knowsArabic = true;
+                    }
+                    else if ($("#knowsArabic").val() == "לא") {
+                    var knowsArabic = false;
+                    }
 
                     var volunteerExtended = {
                         FirstNameH: firstNameH, LastNameH: lastNameH, EnglishFN: englishFN, EnglishLN: englishLN,
                         VolunteerIdentity: VolunteerIdentity, CellPhone: cellPhone, Gender: gender, City: city, Email: email,
                         BirthDate: birthDate, IsDriving: isDriving, HowCanHelp: howCanHelp, Feedback: feedback,
-                        Remarks: remark, DisplayName: displayName, EnglishName: englishName
+                        Remarks: remark, DisplayName: displayName, EnglishName: englishName, NewsLetter: newsLetter, KnowsArabic: knowsArabic
                     }
                     volunteerUpdated = {
                         FirstNameH: firstNameH, LastNameH: lastNameH, EnglishFN: englishFN, EnglishLN: englishLN,
                         VolunteerIdentity: VolunteerIdentity, CellPhone: cellPhone, Gender: gender, City: city, Email: email,
                         BirthDate: birthDate, IsDriving: isDriving, HowCanHelp: howCanHelp, Feedback: feedback,
-                        Remarks: remark
+                        Remarks: remark, NewsLetter: newsLetter, KnowsArabic: knowsArabic
                     }
                     console.log(volunteerExtended);
                     $.ajax({
@@ -656,38 +739,41 @@
             var phoneValid = true;
             var CityValid = true
             var birthDateValid = true;
+            var eMailValid = true;
 
+            $("#volunteerFirstName").val($("#volunteerFirstName").val().trim())
             firstNameHebrew = $("#volunteerFirstName").val();
             var HebrewREGEX = new RegExp("^[\u0590-\u05FF -]+$");
             var firstNameHebrewMatch = HebrewREGEX.test(firstNameHebrew);
-            if (!firstNameHebrewMatch || firstNameHebrew.length > 16) {
+            if (!firstNameHebrewMatch || firstNameHebrew.length > 16 || firstNameHebrew.length < 2) {
                 swal(
                     "שים לב!",
-                    "השם הפרטי שהזנת אינו חוקי\nיש להזין עד 16 תווים בעברית",
+                    "השם הפרטי שהזנת אינו חוקי\nיש להזין בין 2 ל-16 תווים בעברית",
                     "warning"
                 );
                 firstNameHebrewValid = false;
             }
-
+            $("#volunteerLastName").val($("#volunteerLastName").val().trim());
             lastNameHebrew = $("#volunteerLastName").val();
             var lastNameHebrewMatch = HebrewREGEX.test(lastNameHebrew);
-            if (!lastNameHebrewMatch || lastNameHebrew.length > 30) {
+            if (!lastNameHebrewMatch || lastNameHebrew.length > 30 || lastNameHebrew.length < 2) {
                 swal(
                     "שים לב!",
-                    "שם המשפחה שהזנת אינו חוקי\nיש להזין עד 30 תווים בעברית",
+                    "שם המשפחה שהזנת אינו חוקי\nיש להזין בין 2 ל-30 תווים בעברית",
                     "warning"
                 );
                 lastNameHebrewValid = false;
             }
 
+            $("#volunteerFirstNameEnglish").val($("#volunteerFirstNameEnglish").val().trim());
             firstNameEnglish = $("#volunteerFirstNameEnglish").val();
             if (firstNameEnglish) {
                 var EnglishREGEX = new RegExp("^(?!\\.)[A-Za-z -.]+$");
                 var firstNameEnglishMatch = EnglishREGEX.test(firstNameEnglish);
-                if (!firstNameEnglishMatch || firstNameEnglish.length > 16) {
+                if (!firstNameEnglishMatch || firstNameEnglish.length > 16 || firstNameEnglish.length < 2) {
                     swal(
                         "שים לב!",
-                        "השם הפרטי באנגלית שהזנת אינו חוקי\nיש להזין עד 16 תווים באנגלית",
+                        "השם הפרטי באנגלית שהזנת אינו חוקי\nיש להזין בין 2 ל-16 תווים באנגלית",
                         "warning"
                     );
                     firstNameEnglishValid = false;
@@ -695,13 +781,14 @@
                 }
             }
 
+            $("#volunteerLastNameEnglish").val($("#volunteerLastNameEnglish").val().trim());
             lastNameEnglish = $("#volunteerLastNameEnglish").val();
             if (lastNameEnglish) {
                 var lastNameEnglishMatch = EnglishREGEX.test(lastNameEnglish);
-                if (!lastNameEnglishMatch || lastNameEnglish.length > 30) {
+                if (!lastNameEnglishMatch || lastNameEnglish.length > 30 || lastNameEnglish.length < 2) {
                     swal(
                         "שים לב!",
-                        "השם המשפחה באנגלית שהזנת אינו חוקי\nיש להזין עד 30 תווים באנגלית",
+                        "השם המשפחה באנגלית שהזנת אינו חוקי\nיש להזין בין 2 ל-30 תווים באנגלית",
                         "warning"
                     );
                     lastNameEnglishValid = false;
@@ -711,9 +798,7 @@
 
             var identity = $("#VolunteerIdentity").val();
             if (identity != "") {
-                var re = new RegExp("^\\d{9}$");
-
-                if (!re.test(identity)) {
+                if (!ValidateID(identity)) {
                     swal(
                         "שים לב!",
                         "תעודת הזהות שהזנת אינה חוקית\nתעודת הזהות צריכה להכיל 9 ספרות",
@@ -764,7 +849,20 @@
                 }
             }
 
-            if (!firstNameHebrewValid || !lastNameHebrewValid || !firstNameEnglishValid || !lastNameEnglishValid || !identityValid || !phoneValid || !CityValid || !birthDateValid) {
+            $("#email").val($("#email").val().toLowerCase());
+            var EMail = $("#email").val();
+            var EMailReg = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            var EMailMatch = EMailReg.test(EMail);
+            if (!EMailMatch) {
+                swal(
+                    "שים לב!",
+                    "כתובת המייל שהזנת אינה חוקית",
+                    "warning"
+                );
+                eMailValid = false;
+            }
+
+            if (!firstNameHebrewValid || !lastNameHebrewValid || !firstNameEnglishValid || !lastNameEnglishValid || !identityValid || !phoneValid || !CityValid || !birthDateValid || !eMailValid) {
                 return false;
             } else return true;
         }
@@ -798,6 +896,36 @@
                 }
             }
             document.getElementById("birthdayDay").innerHTML = options;
+        }
+
+        function ValidateID(str) {
+            // Just in case -> convert to string
+            var IDnum = String(str);
+            // Validate correct input
+            if ((IDnum.length > 9) || (IDnum.length < 5))
+                return false;
+            if (isNaN(IDnum))
+                return false;
+            // The number is too short - add leading 0000
+            if (IDnum.length < 9) {
+                while (IDnum.length < 9) {
+                    IDnum = '0' + IDnum;
+                }
+                $("#VolunteerIdentity").val(IDnum);
+            }
+            // CHECK THE ID NUMBER
+            var mone = 0, incNum;
+            for (var i = 0; i < 9; i++) {
+                incNum = Number(IDnum.charAt(i));
+                incNum *= (i % 2) + 1;
+                if (incNum > 9)
+                    incNum -= 9;
+                mone += incNum;
+            }
+            if (mone % 10 == 0)
+                return true;
+            else
+                return false;
         }
     </script>
     <!-- jQuery  -->

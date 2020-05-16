@@ -877,7 +877,7 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            VolunteerExtended v = new VolunteerExtended();
+            Volunteer v = new Volunteer();
             v = v.getVolunteerExtendedByMobile(mobile);
 
             return j.Serialize(v.DisplayName);
@@ -1143,11 +1143,11 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
-    public void setVolunteerData(VolunteerExtended volunteerExtended, string username)
+    public void setVolunteerData(Volunteer volunteerExtended, string username)
     {
         try
         {
-            VolunteerExtended v = volunteerExtended;
+            Volunteer v = volunteerExtended;
             v.setVolunteerData(v, username);
 
         }
@@ -1265,9 +1265,9 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            VolunteerExtended v = new VolunteerExtended();
+            Volunteer v = new Volunteer();
             v.DisplayName = displayName;
-            VolunteerExtended volunteerExtended = (VolunteerExtended)v.getVolunteerData();
+            Volunteer volunteerExtended = v.getVolunteerData();
             return j.Serialize(volunteerExtended);
         }
         catch (Exception ex)
