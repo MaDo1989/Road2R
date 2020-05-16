@@ -143,6 +143,7 @@
                         btnStr += /*showBtn + " " +*/ editBtn;
 
                         if (arr_patients[i].IsActive == false) {
+                            btnStr = "";
                             var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo' ></i></button>";
                             btnStr += " " + reactiveBtn;
                         }
@@ -365,7 +366,7 @@
 
             });
 
-    
+
 
             pastePhone.onpaste = cleanPhoneNumber;
         }
@@ -561,6 +562,6 @@
         TableManageButtons.init();
 
     </script>
-    
+
 </body>
 </html>

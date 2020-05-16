@@ -407,7 +407,7 @@
                             } else {
                                 getEquipmentForPatient();
                             }
-                            
+
                         }
                         getEquipmentForPatient();
                     }
@@ -1157,8 +1157,13 @@
                 var i = patients.indexOf($("#pat").val().trim().replace(/\s\s+/g, ' '));
                 if (i === -1) {
                     var i = patientsAssistentDisplay.indexOf($("#pat").val().trim().replace(/\s\s+/g, ' '));
-                    localStorage.PatID = patientsAssistent[i].Id;
-                    $("#patArabic").val(arr_arabNamesAssistent[i]);
+                    try {
+                        localStorage.PatID = patientsAssistent[i].Id;
+                    }
+                    catch {
+                        alert("If you see this error - please contact Alon")
+                    }
+                            $("#patArabic").val(arr_arabNamesAssistent[i]);
                     if (patientsIdentityAssistent[i] != '0') {
                         $("#PatientIdentity").val(patientsIdentityAssistent[i]);
                     }

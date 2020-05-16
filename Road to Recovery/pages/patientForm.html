@@ -424,7 +424,9 @@
                 data: JSON.stringify({ displayName: displayName }),
                 success: function (data) {
                     $('#wait').hide();
+        
                     var patient = JSON.parse(data.d);
+        console.log(patient);
                     if (patient.DisplayName === null) {
                         uploadData($("#patientFirstName").val())
                     }
@@ -464,8 +466,9 @@
                             $("#gender").val("Unknown");
                         }
                         else $("#gender").val(patient.Gender);
-                        
-                        var date = new Date(patient.BirthDate.substring(0, 10));
+                        var tmpDate = patient.BirthDate.substring(0, 10);
+                        tmpDate = tmpDate.split("/")
+                        var date = new Date(tmpDate[2], tmpDate[1], tmpDate[0]);
                         var month = date.getMonth() + 1;
                         if (month < 10) {
                             month = "0" + month;

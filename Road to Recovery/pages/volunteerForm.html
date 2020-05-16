@@ -328,14 +328,14 @@
                     $("#help").val(volunteer.HowCanHelp);
                     $("#feedback").val(volunteer.Feedback);
                     $("#remarks").val(volunteer.Remarks);
-                    if (volunteer.NewsLetter == 1) {
-                        $("#newsLetter").val("כן");
-                    }
-                    else if (volunteer.NewsLetter == 0) {
-                        $("#newsLetter").val("לא")
-                    } else {
-                        $("#newsLetter").val("בחר")
-                    }
+                    //if (volunteer.NewsLetter == 1) {
+                    //    $("#newsLetter").val("כן");
+                    //}
+                    //else if (volunteer.NewsLetter == 0) {
+                    //    $("#newsLetter").val("לא")
+                    //} else {
+                    //    $("#newsLetter").val("בחר")
+                    //}
                    
                 },
                 error: function (err) { alert("Error in getVolunteer: " + err.responseText); }
@@ -465,7 +465,7 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">שם פרטי באנגלית&nbsp;<!--<span class="required">*</span>--></label>
+                                                    <label class="col-sm-2 control-label">שם פרטי באנגלית&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="volunteerFirstNameEnglish" dir="ltr" name="volunteerFirstNameEnglish" type="text" class="form-control req englishFullName">
                                                     </div>
@@ -473,7 +473,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">שם משפחה באנגלית&nbsp;<!--<span class="required">*</span>--></label>
+                                                    <label class="col-sm-2 control-label">שם משפחה באנגלית&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="volunteerLastNameEnglish" dir="ltr" name="volunteerLastNameEnglish" type="text" class="form-control req englishFullName">
                                                     </div>
@@ -651,7 +651,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">מסיע&nbsp;<!--<span class="required">*</span>--></label>
+                                                    <label class="col-sm-2 control-label">מסיע&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6" id="selectIsDriving">
                                                         <select id="isDriving" name="isDriving" class="form-control req">
                                                             <option>בחר</option>
@@ -671,9 +671,9 @@
                                                     </div>
                                                 </div>                                                
                                             </div>
-                                            <div class="col-sm-6">
+                                            <!--<div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">מעוניין לקבל את העדכון השבועי&nbsp;<!--<span class="required">*</span>--></label>
+                                                    <label class="col-sm-2 control-label">מעוניין לקבל את העדכון השבועי&nbsp;</label>
                                                     <div class="col-sm-6" id="selectNewsLetter">
                                                         <select id="newsLetter" name="newsLetter" class="form-control req">
                                                             <option>בחר</option>
@@ -682,14 +682,14 @@
                                                         </select>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </div>-->
                                         </div>
-                                        <div class="row m-l-10 m-r-10">
+                                        <!--<div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">כיצד תוכל.י לעזור לעמותה בדרכים נוספות (נא לפרט)</label>
                                                     <div class="col-sm-6">
-                                                        <!--<input id="help" name="help" type="text" class="form-control">-->
+                                                        
                                                         <textarea id="help" name="help" class="form-control textAreaClass" rows="3"></textarea>
                                                     </div>
                                                 </div>
@@ -698,12 +698,12 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">משוב על פעילותך ועל "בדרך להחלמה"</label>
                                                     <div class="col-sm-6">
-                                                        <!--<input id="feedback" name="feedback" type="text" class="form-control">-->
+                                                        
                                                         <textarea id="feedback" name="feedback" class="form-control textAreaClass" rows="3"></textarea>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div>-->
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
 
@@ -779,6 +779,12 @@
                 // Rules for form validation
                 rules: {
 
+                    volunteerFirstNameEnglish: {
+                        required: true
+                    },
+                    volunteerLastNameEnglish: {
+                        required: true
+                    },
                     volunteerFirstName: {
                         required: true
                     },
@@ -872,24 +878,23 @@
                     else if ($("#isDriving").val() == "לא") {
                         var isDriving = false;
                     } 
-                    var howCanHelp = $("#help").val();
-                    var feedback = $("#feedback").val();
+                    //var howCanHelp = $("#help").val();
+                    //var feedback = $("#feedback").val();
                     //var remark = $("#remarks").val();
                     
                     var englishName = $("#volunteerFirstNameEnglish").val() + " " + $("#volunteerLastNameEnglish").val();
-                    if ($("#newsLetter").val() == "כן") {
-                        var newsLetter = true;
-                    }
-                    else if ($("#newsLetter").val() == "לא") {
-                        var newsLetter = false;
-                    }
+                    //if ($("#newsLetter").val() == "כן") {
+                    //    var newsLetter = true;
+                    //}
+                    //else if ($("#newsLetter").val() == "לא") {
+                    //    var newsLetter = false;
+                    //}
 
                     volunteer = {
                         firstNameH: firstNameH, firstNameA: nameA, lastNameH: lastNameH, lastNameA: lastNameA, cellPhone: cellPhone, cellphone2: cellphone2, /*homePhone: homePhone,*/
                         city: city, address: address, email: email, joinDate: joinDate, gender: gender, KnowsArabic: knowsArabic,
                         typeVol: typeVol, IsActive: active, Remarks: remark, DisplayName: displayName, EnglishName: englishName, IsAssistant: isHelper, VolunteerIdentity: VolunteerIdentity, //birthdate: bdate,
-                        EnglishFN: englishFN, EnglishLN: englishLN, BirthDate: birthDate, IsDriving: isDriving,
-                        HowCanHelp: howCanHelp, Feedback: feedback, NewsLetter: newsLetter
+                        EnglishFN: englishFN, EnglishLN: englishLN, BirthDate: birthDate, IsDriving: isDriving
                     }
                     $.ajax({
                         dataType: "json",
@@ -934,6 +939,12 @@
                 // Messages for form validation
                 messages: {
 
+                    volunteerFirstNameEnglish: {
+                        required: "יש להכניס שם פרטי באנגלית"
+                    },
+                    volunteerLastNameEnglish: {
+                        required: "יש להכניס שם משפחה באנגלית"
+                    },
                     volunteerFirstName: {
                         required: "יש להכניס שם פרטי"
                     },
@@ -980,7 +991,7 @@
             var birthDateValid = true;
             var eMailValid = true;
             var isDrivingValid = true;
-            var newsLetterValid = true;
+            //var newsLetterValid = true;
             
             if ($('#isDriving').val() == "בחר") {
                 isDrivingValid = false;
@@ -990,14 +1001,14 @@
                     "warning"
                 );
             }
-            if ($('#newsLetter').val() == "בחר") {
-                newsLetterValid = false;
-                swal(
-                    "שגיאה",
-                    "יש לבחור האם המתנדב מעוניין לקבל את העדכון השבועי",
-                    "warning"
-                );
-            }
+            //if ($('#newsLetter').val() == "בחר") {
+            //    newsLetterValid = false;
+            //    swal(
+            //        "שגיאה",
+            //        "יש לבחור האם המתנדב מעוניין לקבל את העדכון השבועי",
+            //        "warning"
+            //    );
+            //}
 
             $("#volunteerFirstName").val($("#volunteerFirstName").val().trim())
             firstNameHebrew = $("#volunteerFirstName").val();
@@ -1213,9 +1224,38 @@
                 }
             } else phoneMatch3 = true;
 
-            if (!englishNameExists || !CityExists || !volType || !gender || !phoneMatch || !phoneMatch2 || !phoneMatch3 || !firstNameHebrewValid || !lastNameHebrewValid || !firstNameEnglishValid || !lastNameEnglishValid || !identityValid || !birthDateValid || !eMailValid || !isDrivingValid || !newsLetterValid) { //|| !jdateMatch
+            if (!englishNameExists || !CityExists || !volType || !gender || !phoneMatch || !phoneMatch2 || !phoneMatch3 || !firstNameHebrewValid || !lastNameHebrewValid || !firstNameEnglishValid || !lastNameEnglishValid || !identityValid || !birthDateValid || !eMailValid || !isDrivingValid) { //|| !jdateMatch
                 return false;
             } else return true;
+        }
+        function ValidateID(str) {
+            // Just in case -> convert to string
+            var IDnum = String(str);
+            // Validate correct input
+            if ((IDnum.length > 9) || (IDnum.length < 5))
+                return false;
+            if (isNaN(IDnum))
+                return false;
+            // The number is too short - add leading 0000
+            if (IDnum.length < 9) {
+                while (IDnum.length < 9) {
+                    IDnum = '0' + IDnum;
+                }
+                $("#VolunteerIdentity").val(IDnum);
+            }
+            // CHECK THE ID NUMBER
+            var mone = 0, incNum;
+            for (var i = 0; i < 9; i++) {
+                incNum = Number(IDnum.charAt(i));
+                incNum *= (i % 2) + 1;
+                if (incNum > 9)
+                    incNum -= 9;
+                mone += incNum;
+            }
+            if (mone % 10 == 0)
+                return true;
+            else
+                return false;
         }
     </script>
 
