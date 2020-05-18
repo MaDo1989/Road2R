@@ -694,9 +694,10 @@
                     patientsIdentityAssistent = [];
                     for (i in arr_pat) {
                         //assistant cannot create anonymouse ride.
-                        if (isAssistant && arr_pat[i].IsAnonymous !== "") {
+                       
+                        if (isAssistant && arr_pat[i].IsAnonymous !== "") { //If the user is an assistant - two different lists will be made. one list of annonymous patients and one list of "regular" patients.
                             patientsIdentityAssistent.push(arr_pat[i].PatientIdentity)
-                            patientsAssistent.push(arr_pat[i]);
+                            patientsAssistent.push(arr_pat[i]); // List of annonymous patients
                             patientsAssistentDisplay.push(arr_pat[i].DisplayName.trim())
                             arr_arabNamesAssistent.push(arr_pat[i].DisplayNameA);
                             arr_englishNamesAssistent.push(arr_pat[i].EnglishName);
@@ -1154,15 +1155,19 @@
             }
             else isCenterPatient = false;
             if ($("#pat").val() != "") {
-                var i = patients.indexOf($("#pat").val().trim().replace(/\s\s+/g, ' '));
+                var fValue = $("#pat").val().trim().replace(/\s\s+/g, ' ');
+                var i = patients.indexOf(fValue);
                 if (i === -1) {
-                    var i = patientsAssistentDisplay.indexOf($("#pat").val().trim().replace(/\s\s+/g, ' '));
-                    try {
+                    var i = patientsAssistentDisplay.indexOf(fValue);
+                    if (i === -1) { // Did not find any patient with this name
+                        return;
+                    }
+                    //try {
                         localStorage.PatID = patientsAssistent[i].Id;
-                    }
-                    catch {
-                        alert("If you see this error - please contact Alon")
-                    }
+                    //}
+                    //catch {
+                    //    alert("If you see this error - please contact Alon")
+                    //}
                             $("#patArabic").val(arr_arabNamesAssistent[i]);
                     if (patientsIdentityAssistent[i] != '0') {
                         $("#PatientIdentity").val(patientsIdentityAssistent[i]);
