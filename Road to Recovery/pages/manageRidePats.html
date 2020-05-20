@@ -582,25 +582,36 @@
             var destinationNameMessage = "";
             var originNameMessage = "";
             var userName = GENERAL.USER.getUserDisplayName();
-            if (data.length == 7) {
+            if (data.length == 10) {
                 patientNameMessage = data[3];
                 originNameMessage = data[2];
                 destinationNameMessage = data[1];
                 var hour = " בשעה ";
-                if (data[0] == "אחה''צ") hour = " ";
-                msg = "מחיקת ההסעה של " + data[3] + " מ: " + data[2] + " ל: " + data[1] + ", היום בשעה " + data[0] +"\n";
-                msg += "حذف سفرية " + data[3] + " من: " + data[2] + " الى: " + data[1] + ", في " + data[0];
-                pushMsg = "נמחקה ההסעה של " + data[3] + " מ: " + data[2] + " ל: " + data[1] + ", היום בשעה " + data[0] + " ע\"י העוזר/ת " + userName;
+                if (data[0] == "אחה''צ") {
+                    msg = "מחיקת ההסעה של " + data[3] + " מ: " + data[2] + " ל: " + data[1] + ", היום אחר הצהריים";
+                    pushMsg = "נמחקה ההסעה של " + data[3] + " מ: " + data[2] + " ל: " + data[1] + ", היום אחר הצהריים  ע\"י העוזר/ת " + userName;
+                } else {
+                    msg = "מחיקת ההסעה של " + data[3] + " מ: " + data[2] + " ל: " + data[1] + ", היום בשעה " + data[0] + "\n";
+                    //msg += "حذف سفرية " + data[3] + " من: " + data[2] + " الى: " + data[1] + ", في " + data[0];
+                    pushMsg = "נמחקה ההסעה של " + data[3] + " מ: " + data[2] + " ל: " + data[1] + ", היום בשעה " + data[0] + " ע\"י העוזר/ת " + userName;
+                }
+                
             }
             else {
                 patientNameMessage = data[3];
                 originNameMessage = data[1];
                 destinationNameMessage = data[2];
                 var hour = " בשעה ";
-                if (data[0] == "אחה''צ") hour = " ";
-                msg = "מחיקת ההסעה של " + data[4] + " מ: " + data[2] + " ל: " + data[3] + ", בתאריך " + data[0] + hour + data[1];
-                msg += "حذف سفرية " + data[3] + " من: " + data[2] + " الى: " + data[1] + ", في " + data[0] + hour + data[1];
-                pushMsg = "נמחקה ההסעה של " + data[4] + " מ: " + data[2] + " ל: " + data[3] + ", בתאריך " + data[0] + hour + data[1] + " ע\"י העוזר/ת " + userName;
+                if (data[1] == "אחה''צ") {
+                    msg = "מחיקת ההסעה של " + data[4] + " מ: " + data[2] + " ל: " + data[3] + ", בתאריך " + data[0] + " בשעות אחר הצהריים";
+                    pushMsg = "נמחקה ההסעה של " + data[4] + " מ: " + data[2] + " ל: " + data[3] + ", בתאריך " + data[0] + " בשעות אחר הצהריים ע\"י העוזר/ת " + userName;
+                } else {
+                    msg = "מחיקת ההסעה של " + data[4] + " מ: " + data[2] + " ל: " + data[3] + ", בתאריך " + data[0] + hour + data[1];
+                    //msg += "حذف سفرية " + data[3] + " من: " + data[2] + " الى: " + data[1] + ", في " + data[0] + hour + data[1];
+                    pushMsg = "נמחקה ההסעה של " + data[4] + " מ: " + data[2] + " ל: " + data[3] + ", בתאריך " + data[0] + hour + data[1] + " ע\"י העוזר/ת " + userName;
+                } 
+                
+                
             }
             //var hour = " בשעה ";
             //if (data[1] == "אחה''צ") hour = " ";
