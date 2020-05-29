@@ -739,7 +739,7 @@ public class RidePat
         rp.Remark = dr["Remark"].ToString();
         rp.LastModified = dr["lastModified"].ToString();
 
-        string query2 = "select DisplayName from RidePatEscortView where RidePatNum=" + ridePatNum;
+        string query2 = "select DisplayName,Id from RidePatEscortView where RidePatNum=" + ridePatNum;
         DbService db2 = new DbService();
         DataSet ds2 = db2.GetDataSetByQuery(query2);
         foreach (DataRow r in ds2.Tables[0].Rows)
@@ -749,7 +749,7 @@ public class RidePat
                 Escorted e = new Escorted();
                 e.DisplayName = r["DisplayName"].ToString();
                 //rp.pat.EscortedList.Add(e);
-
+                e.Id = (int)r["Id"];
                 rp.Escorts.Add(e);
             }
         }

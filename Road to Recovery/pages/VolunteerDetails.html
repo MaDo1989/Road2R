@@ -55,7 +55,7 @@
             background-color: #FFE684;
         }
 
-        input[type=email], input[type=text], input[type=checkbox], input[type=date], input[type=number], #gender, #isDriving, .textAreaClass, .birthSelect, #newsLetter, #knowsArabic {
+        input[type=email], input[type=text], input[type=checkbox], input[type=date], input[type=number], #gender, #isDriving, .textAreaClass, .birthSelect, #newsLetter, #knowsArabic, .joinYear {
             border-color: #000
         }
 
@@ -136,7 +136,8 @@
                         Feedback: volunteer.Feedback,
                         Remarks: volunteer.Remarks,
                         NewsLetter: volunteer.NewsLetter,
-                        KnowsArabic: volunteer.KnowsArabic
+                        KnowsArabic: volunteer.KnowsArabic,
+                        JoinYear: volunteer.JoinYear
                     }
                     console.log(volunteerUploaded)
                     var location = "";
@@ -193,6 +194,7 @@
                     } else {
                         $("#knowsArabic").val("בחר")
                     }
+                    $("#joinYear").val(volunteer.JoinYear);
                     enableSave();
                     $('#main').show()
                 },
@@ -200,6 +202,17 @@
             });
         }
 
+        function IgulPopup() {
+            $('#IgulModal').modal('show');
+        }
+
+        function reload() {
+            window.location.href = 'VolunteerDetails.html';
+        }
+
+        function goToIgul() {
+            window.location.href = 'https://bit.ly/2RB4Pzk';
+        }
     </script>
 </head>
 <body class="fixed-left">
@@ -411,6 +424,16 @@
                         <div class="row m-l-10 m-r-10">
                             <div class="col-sm-6">
                                 <div class="form-group">
+                                    <label class="col-sm-4 control-label">שנת הצטרפות</label>
+                                    <div class="col-sm-6">
+                                        <select id="joinYear" name="joinYear" class="form-control joinYear"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
                                     <label class="col-sm-4 control-label">כיצד תוכל.י לעזור לעמותה בדרכים נוספות (נא לפרט)</label>
                                     <div class="col-sm-6">
                                         <!--<input id="help" name="help" type="text" class="form-control">-->
@@ -441,15 +464,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row m-l-10 m-r-10">
-                            <div class="col-sm-6 text-center">
-                                <a href="https://bit.ly/2RB4Pzk" target="_new"><img style="width:160px;height:80px" src="http://www.trci.org.il/wp-content/uploads/2018/02/video-pic.jpg" alt=""></a>
-                                <p>
-                                    הצטרפו אלינו עם עיגול לטובה,<br>
-                                    כסף קטן - עזרה גדולה!
-                                </p>
-                            </div>
-                        </div>
+                        
                         <hr /><br />
                         <div class="row m-l-10 m-r-10">
                             <div class="col-sm-6">
@@ -467,6 +482,40 @@
             </form>
         </div>
     </div>
+    <!-- Modal -->
+    <div class="modal fade text-center" id="IgulModal" tabindex="-1" role="dialog" aria-labelledby="IgulModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="exampleModalLabel">תודה רבה</h2>
+                    <h3>הפרטים נשמרו</h3>
+                    <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>-->
+                </div>
+                <div class="modal-body">
+                    <div class="row m-l-10 m-r-10">
+                        <div class="col-sm-12 text-center">
+                            <a href="https://bit.ly/2RB4Pzk" target="_new"><img style="width:160px;height:80px" src="http://www.trci.org.il/wp-content/uploads/2018/02/video-pic.jpg" alt=""></a>
+                            <h4>
+                                הצטרפו אלינו עם עיגול לטובה,
+                            </h4>
+                            <h4>
+                                כסף קטן - עזרה גדולה!
+                            </h4>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="modal-footer">
+                    <div class="col-sm-12 text-center">
+                        <button type="button" class="btn btn-primary" onclick="goToIgul()">להצטרפות</button>
+                        <button type="button" class="btn btn-secondary" onclick="reload()">יציאה</button>
+                    </div>
+                </div>
+                </div>
+        </div>
+    </div>
     <!-- end container -->
     <!-- FOOTER -->
     <footer class="footer text-right">
@@ -478,9 +527,11 @@
     </script>
     <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
     <script>
+        
         $(document).ready(function () {
-
+            
             generateBirthdaySelect()
+            generateJoinDateSelect()
 
             $('#loginBTN').click(function () {
                 event.preventDefault();
@@ -589,7 +640,7 @@
                     FirstNameH: firstNameH, LastNameH: lastNameH, EnglishFN: englishFN, EnglishLN: englishLN,
                     VolunteerIdentity: VolunteerIdentity, CellPhone: cellPhone, Gender: gender, City: city, Email: email,
                     BirthDate: birthDate, IsDriving: isDriving, HowCanHelp: howCanHelp, Feedback: feedback,
-                    Remarks: remark, NewsLetter: newsLetter, KnowsArabic: knowsArabic
+                    Remarks: remark, NewsLetter: newsLetter, KnowsArabic: knowsArabic, JoinYear: joinYear
                 }
 
                 if (JSON.stringify(volunteerUploaded) != JSON.stringify(volunteerUpdated)) {
@@ -664,23 +715,24 @@
                         var newsLetter = false;
                     }
                     if ($("#knowsArabic").val() == "כן") {
-                    var knowsArabic = true;
+                        var knowsArabic = true;
                     }
                     else if ($("#knowsArabic").val() == "לא") {
-                    var knowsArabic = false;
+                        var knowsArabic = false;
                     }
+                    var joinYear = $("#joinYear").val();
 
                     var volunteerExtended = {
                         FirstNameH: firstNameH, LastNameH: lastNameH, EnglishFN: englishFN, EnglishLN: englishLN,
                         VolunteerIdentity: VolunteerIdentity, CellPhone: cellPhone, Gender: gender, City: city, Email: email,
                         BirthDate: birthDate, IsDriving: isDriving, HowCanHelp: howCanHelp, Feedback: feedback,
-                        Remarks: remark, DisplayName: displayName, EnglishName: englishName, NewsLetter: newsLetter, KnowsArabic: knowsArabic
+                        Remarks: remark, DisplayName: displayName, EnglishName: englishName, NewsLetter: newsLetter, KnowsArabic: knowsArabic, JoinYear: joinYear
                     }
                     volunteerUpdated = {
                         FirstNameH: firstNameH, LastNameH: lastNameH, EnglishFN: englishFN, EnglishLN: englishLN,
                         VolunteerIdentity: VolunteerIdentity, CellPhone: cellPhone, Gender: gender, City: city, Email: email,
                         BirthDate: birthDate, IsDriving: isDriving, HowCanHelp: howCanHelp, Feedback: feedback,
-                        Remarks: remark, NewsLetter: newsLetter, KnowsArabic: knowsArabic
+                        Remarks: remark, NewsLetter: newsLetter, KnowsArabic: knowsArabic, JoinYear: joinYear
                     }
                     console.log(volunteerExtended);
                     $.ajax({
@@ -691,13 +743,14 @@
                         async: false,
                         data: JSON.stringify({ volunteerExtended: volunteerExtended, username: originalDisplayName }),
                         success: function (data) {
-                            swal({
-                                title: "הפרטים נשמרו\nתודה רבה",
-                                type: "success",
-                                timer: 3000,
-                                showConfirmButton: false
-                            });
-                            setTimeout(function () { window.location.href = 'VolunteerDetails.html'; }, 3000);
+                            //swal({
+                            //    title: "הפרטים נשמרו\nתודה רבה",
+                            //    type: "success",
+                            //    timer: 3000,
+                            //    showConfirmButton: false
+                            //});
+                            //setTimeout(function () { window.location.href = 'VolunteerDetails.html'; }, 3000);
+                            IgulPopup();
                         },
                         error: function (err) {
                             console.log(err);
@@ -798,14 +851,23 @@
 
             var identity = $("#VolunteerIdentity").val();
             if (identity != "") {
-                if (!ValidateID(identity)) {
+                var res = ValidateID(identity);
+                if (res == -1) {
                     swal(
                         "שים לב!",
-                        "תעודת הזהות שהזנת אינה חוקית\nתעודת הזהות צריכה להכיל 9 ספרות",
+                        "תעודת הזהות צריכה להכיל בין 5 ל-9 ספרות",
+                        "warning"
+                    );
+                    identityValid = false;
+                } else if (res == 0) {
+                    swal(
+                        "שים לב!",
+                        "תעודת הזהות שהזנת אינה חוקית",
                         "warning"
                     );
                     identityValid = false;
                 }
+
             }
 
             var Phone = $("#phone1").val();
@@ -866,7 +928,15 @@
                 return false;
             } else return true;
         }
-
+        function generateJoinDateSelect() {
+            var start = 2013;
+            var end = new Date().getFullYear();
+            var options = "<option>בחר</option>";
+            for (var year = end; year >= start; year--) {
+                options += "<option>" + year + "</option>";
+            }
+            document.getElementById("joinYear").innerHTML = options;
+        }
         function generateBirthdaySelect() {
             var start = 1930;
             var end = new Date().getFullYear();
@@ -903,9 +973,9 @@
             var IDnum = String(str);
             // Validate correct input
             if ((IDnum.length > 9) || (IDnum.length < 5))
-                return false;
+                return -1;
             if (isNaN(IDnum))
-                return false;
+                return -1;
             // The number is too short - add leading 0000
             if (IDnum.length < 9) {
                 while (IDnum.length < 9) {
@@ -923,9 +993,9 @@
                 mone += incNum;
             }
             if (mone % 10 == 0)
-                return true;
+                return 1;
             else
-                return false;
+                return 0;
         }
     </script>
     <!-- jQuery  -->

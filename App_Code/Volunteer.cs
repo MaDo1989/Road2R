@@ -56,7 +56,7 @@ public class Volunteer
     bool? newsLetter;
     string refered;
     string roleInR2R;
-
+    string joinYear;
 
     public List<RideStatus> Statusim { get; set; }
 
@@ -1035,6 +1035,19 @@ public class Volunteer
         }
     }
 
+    public string JoinYear
+    {
+        get
+        {
+            return joinYear;
+        }
+
+        set
+        {
+            joinYear = value;
+        }
+    }
+
 
     //public string KnowsArabic
     //{
@@ -1669,7 +1682,8 @@ public class Volunteer
         cmd.CommandType = CommandType.Text;
         SqlParameter[] cmdParams = new SqlParameter[1];
         cmdParams[0] = cmd.Parameters.AddWithValue("name", DisplayName);
-        string query = "select * from VolunteerData where displayName=@name";
+        //string query = "select * from VolunteerData where displayName=@name";
+        string query = "select * from VolunteerWI where displayName=@name";
         Volunteer v = new Volunteer();
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query, true, cmd.CommandType, cmdParams);
@@ -1710,7 +1724,7 @@ public class Volunteer
         {
             v.NewsLetter = null;
         }
-        v.Refered = dr["refered"].ToString();
+        //v.Refered = dr["refered"].ToString();
         v.RoleInR2R = dr["roleInR2R"].ToString();
         if (dr["knowsArabic"].ToString() != "")
         {
@@ -1720,6 +1734,8 @@ public class Volunteer
         {
             v.KnowsArabic = null;
         }
+        v.joinYear = dr["joinYear"].ToString();
+
         #endregion
 
         return v;
@@ -1732,7 +1748,7 @@ public class Volunteer
         DbService db = new DbService();
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
-        SqlParameter[] cmdParams = new SqlParameter[19];
+        SqlParameter[] cmdParams = new SqlParameter[20];
 
         cmdParams[0] = cmd.Parameters.AddWithValue("@firstNameH", v.FirstNameH);
         cmdParams[1] = cmd.Parameters.AddWithValue("@lastNameH", v.LastNameH);
@@ -1753,13 +1769,15 @@ public class Volunteer
         cmdParams[16] = cmd.Parameters.AddWithValue("@displayName", v.DisplayName);
         cmdParams[17] = cmd.Parameters.AddWithValue("@englishName", v.EnglishName);
         cmdParams[18] = cmd.Parameters.AddWithValue("@username", username);
+        cmdParams[19] = cmd.Parameters.AddWithValue("@joinYear", v.JoinYear);
 
         string query = "";
 
-        query = "update VolunteerData set FirstNameH=@firstNameH, LastNameH=@lastNameH, EnglishFN=@englishFN, EnglishLN=@englishLN, ";
+        //query = "update VolunteerData set FirstNameH=@firstNameH, LastNameH=@lastNameH, EnglishFN=@englishFN, EnglishLN=@englishLN, ";
+        query = "update VolunteerWI set FirstNameH=@firstNameH, LastNameH=@lastNameH, EnglishFN=@englishFN, EnglishLN=@englishLN, ";
         query += "VolunteerIdentity=@volunteerIdentity, CellPhone=@cell, Gender=@gender, CityCityName=@city, Email=@email, ";
         query += "BirthDate=@bDay, IsDriving=@isDriving, HowCanHelp=@howCanHelp, Feedback=@feedback, Remarks=@remarks, NewsLetter=@newsLetter, KnowsArabic=@knowsArabic,";
-        query += "DisplayName=@displayName, EnglishName=@englishName, lastModified=DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@username";
+        query += "DisplayName=@displayName, EnglishName=@englishName, JoinYear=@joinYear, lastModified=DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@username";
         try
         {
             res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
@@ -1779,7 +1797,8 @@ public class Volunteer
         Volunteer v = new Volunteer();
 
         DbService db = new DbService();
-        string query = "select Id,DisplayName from VolunteerData where CellPhone = '" + mobile + "'";
+        //string query = "select Id,DisplayName from VolunteerData where CellPhone = '" + mobile + "'";
+        string query = "select Id,DisplayName from VolunteerWI where CellPhone = '" + mobile + "'";
         DataSet ds = db.GetDataSetByQuery(query);
         foreach (DataRow dr in ds.Tables[0].Rows)
         {

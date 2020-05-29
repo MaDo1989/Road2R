@@ -352,14 +352,16 @@
                     //set Escorts
                     var selected = [];
                     $('#selectEscort input:checked').each(function () {
-                        selected.push($(this).attr('name'));
+                        //selected.push($(this).attr('name'));
+                        selected.push($(this).attr('id'));
                     });
 
 
                     var Escorts = [];
                     for (i in arr_escort) {
                         for (j in selected) {
-                            if (arr_escort[i].DisplayName.replace("'", "") == selected[j]) {
+                            //if (arr_escort[i].DisplayName.replace("'", "") == selected[j]) {
+                            if ("escortCB" + arr_escort[i].Id == selected[j]) {
                                 var Escorted = new Object();
                                 Escorted = arr_escort[i];
                                 Escorts.push(Escorted);
@@ -1666,7 +1668,9 @@
                                 checkEscorts.push(Escorted);
                             }
                             for (j in ridePat.Escorts) {
-                                if (arr_escort[i].DisplayName == ridePat.Escorts[j].DisplayName) {
+                                //if (arr_escort[i].DisplayName == ridePat.Escorts[j].DisplayName) {
+                                //CHECK THIS XXXXXXX
+                                if (arr_escort[i].Id == ridePat.Escorts[j].Id) {
                                     $("#escortCB" + arr_escort[i].Id).prop('checked', true);
                                 }
                             }

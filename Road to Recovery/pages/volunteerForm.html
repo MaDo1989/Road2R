@@ -1067,14 +1067,23 @@
 
             var identity = $("#VolunteerIdentity").val();
             if (identity != "") {
-                if (!ValidateID(identity)) {
+                var res = ValidateID(identity);
+                if (res == -1) {
                     swal(
                         "שים לב!",
-                        "תעודת הזהות שהזנת אינה חוקית\nתעודת הזהות צריכה להכיל 9 ספרות",
+                        "תעודת הזהות צריכה להכיל בין 5 ל-9 ספרות",
+                        "warning"
+                    );
+                    identityValid = false;
+                } else if (res == 0) {
+                    swal(
+                        "שים לב!",
+                        "תעודת הזהות שהזנת אינה חוקית",
                         "warning"
                     );
                     identityValid = false;
                 }
+
             }
 
             var birthDate = $("#birthday").val();
@@ -1233,9 +1242,9 @@
             var IDnum = String(str);
             // Validate correct input
             if ((IDnum.length > 9) || (IDnum.length < 5))
-                return false;
+                return -1;
             if (isNaN(IDnum))
-                return false;
+                return -1;
             // The number is too short - add leading 0000
             if (IDnum.length < 9) {
                 while (IDnum.length < 9) {
@@ -1253,11 +1262,10 @@
                 mone += incNum;
             }
             if (mone % 10 == 0)
-                return true;
+                return 1;
             else
-                return false;
-        }
-    </script>
+                return 0;
+        }    </script>
 
     <!-- jQuery  -->
     <script src="assets/js/bootstrap-rtl.min.js"></script>

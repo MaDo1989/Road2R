@@ -59,6 +59,10 @@
         checkCookie();
         var allVolunteersFromDb = [];
         $(document).ready(function () {
+
+        if (localStorage.activeVol == "undefined" || localStorage.activeVol === undefined)
+                localStorage.activeVol = true;
+
             if (window.location.hostname.toString() == 'localhost' || window.location.pathname.indexOf('test') != -1) {
                 $("#na").css("background-color", "#ffde89");
             }
@@ -127,9 +131,15 @@
 
         });
 
+        function ActiveMode() {
+            localStorage.activeVol = $("#activeCustomers").prop('checked');
+            
+            refreshTable();
+        }
 
         function refreshTable() {
-
+        var activeVol = JSON.parse(localStorage.activeVol);
+            $("#activeCustomers").prop('checked', activeVol);
             allVolunteersFromDb = [];
             $('#wait').show();
             checkCookie();
@@ -475,7 +485,7 @@
                                 </div>-->
                                 <div class="row">
                                     <div class="col-sm-3 checkbox checkbox-primary text-left">
-                                        <input id="activeCustomers" type="checkbox" onchange="refreshTable()" checked>
+                                        <input id="activeCustomers" type="checkbox" onchange="ActiveMode()" checked>
                                         <label for="activeCustomers">
                                             מתנדבים פעילים בלבד
                                         </label>
