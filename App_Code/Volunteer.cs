@@ -1735,6 +1735,7 @@ public class Volunteer
             v.KnowsArabic = null;
         }
         v.joinYear = dr["joinYear"].ToString();
+        v.Address = dr["address"].ToString();
 
         #endregion
 
@@ -1748,7 +1749,7 @@ public class Volunteer
         DbService db = new DbService();
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
-        SqlParameter[] cmdParams = new SqlParameter[20];
+        SqlParameter[] cmdParams = new SqlParameter[21];
 
         cmdParams[0] = cmd.Parameters.AddWithValue("@firstNameH", v.FirstNameH);
         cmdParams[1] = cmd.Parameters.AddWithValue("@lastNameH", v.LastNameH);
@@ -1765,11 +1766,19 @@ public class Volunteer
         cmdParams[12] = cmd.Parameters.AddWithValue("@feedback", v.Feedback);
         cmdParams[13] = cmd.Parameters.AddWithValue("@remarks", v.Remarks);
         cmdParams[14] = cmd.Parameters.AddWithValue("@newsLetter", v.NewsLetter);
-        cmdParams[15] = cmd.Parameters.AddWithValue("@knowsArabic", v.KnowsArabic);
+        if (v.KnowsArabic == null)
+        {
+            cmdParams[15] = cmd.Parameters.AddWithValue("@knowsArabic", DBNull.Value);
+        }
+        else
+        {
+            cmdParams[15] = cmd.Parameters.AddWithValue("@knowsArabic", v.KnowsArabic);
+        }        
         cmdParams[16] = cmd.Parameters.AddWithValue("@displayName", v.DisplayName);
         cmdParams[17] = cmd.Parameters.AddWithValue("@englishName", v.EnglishName);
         cmdParams[18] = cmd.Parameters.AddWithValue("@username", username);
         cmdParams[19] = cmd.Parameters.AddWithValue("@joinYear", v.JoinYear);
+        cmdParams[20] = cmd.Parameters.AddWithValue("@address", v.Address);
 
         string query = "";
 
@@ -1777,7 +1786,7 @@ public class Volunteer
         query = "update VolunteerWI set FirstNameH=@firstNameH, LastNameH=@lastNameH, EnglishFN=@englishFN, EnglishLN=@englishLN, ";
         query += "VolunteerIdentity=@volunteerIdentity, CellPhone=@cell, Gender=@gender, CityCityName=@city, Email=@email, ";
         query += "BirthDate=@bDay, IsDriving=@isDriving, HowCanHelp=@howCanHelp, Feedback=@feedback, Remarks=@remarks, NewsLetter=@newsLetter, KnowsArabic=@knowsArabic,";
-        query += "DisplayName=@displayName, EnglishName=@englishName, JoinYear=@joinYear, lastModified=DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@username";
+        query += "DisplayName=@displayName, EnglishName=@englishName, JoinYear=@joinYear, Address=@address, lastModified=DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@username";
         try
         {
             res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
@@ -1798,7 +1807,7 @@ public class Volunteer
 
         DbService db = new DbService();
         //string query = "select Id,DisplayName from VolunteerData where CellPhone = '" + mobile + "'";
-        string query = "select Id,DisplayName from VolunteerWI where CellPhone = '" + mobile + "'";
+        string query = "select Id,DisplayName from VolunteerWI where CellPhone = '" + mobile + "' and isactive = 1";
         DataSet ds = db.GetDataSetByQuery(query);
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
