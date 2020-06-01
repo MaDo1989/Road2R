@@ -1683,7 +1683,7 @@ public class Volunteer
         SqlParameter[] cmdParams = new SqlParameter[1];
         cmdParams[0] = cmd.Parameters.AddWithValue("name", DisplayName);
         //string query = "select * from VolunteerData where displayName=@name";
-        string query = "select * from VolunteerWI where displayName=@name";
+        string query = "select * from VolunteerGood_30_05_20 where displayName=@name";
         Volunteer v = new Volunteer();
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query, true, cmd.CommandType, cmdParams);
@@ -1783,7 +1783,7 @@ public class Volunteer
         string query = "";
 
         //query = "update VolunteerData set FirstNameH=@firstNameH, LastNameH=@lastNameH, EnglishFN=@englishFN, EnglishLN=@englishLN, ";
-        query = "update VolunteerWI set FirstNameH=@firstNameH, LastNameH=@lastNameH, EnglishFN=@englishFN, EnglishLN=@englishLN, ";
+        query = "update VolunteerGood_30_05_20 set FirstNameH=@firstNameH, LastNameH=@lastNameH, EnglishFN=@englishFN, EnglishLN=@englishLN, ";
         query += "VolunteerIdentity=@volunteerIdentity, CellPhone=@cell, Gender=@gender, CityCityName=@city, Email=@email, ";
         query += "BirthDate=@bDay, IsDriving=@isDriving, HowCanHelp=@howCanHelp, Feedback=@feedback, Remarks=@remarks, NewsLetter=@newsLetter, KnowsArabic=@knowsArabic,";
         query += "DisplayName=@displayName, EnglishName=@englishName, JoinYear=@joinYear, Address=@address, lastModified=DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@username";
@@ -1807,7 +1807,7 @@ public class Volunteer
 
         DbService db = new DbService();
         //string query = "select Id,DisplayName from VolunteerData where CellPhone = '" + mobile + "'";
-        string query = "select Id,DisplayName from VolunteerWI where CellPhone = '" + mobile + "' and isactive = 1";
+        string query = "select Id,DisplayName from VolunteerGood_30_05_20 where CellPhone = '" + mobile + "' and isactive = 1";
         DataSet ds = db.GetDataSetByQuery(query);
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
