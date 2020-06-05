@@ -59,6 +59,14 @@ public class Volunteer
     string joinYear;
     string postalCode;
 
+
+    //Delete after volunteer details project will end (written on 05/06/2020 by Alon):
+    string source;
+    string rounds;
+    string answeredPrevQues;
+    string galitRemarks;
+    //Delete until here and dont forget the properties
+
     public List<RideStatus> Statusim { get; set; }
 
     public class RideStatus
@@ -1062,6 +1070,58 @@ public class Volunteer
         }
     }
 
+    public string Source
+    {
+        get
+        {
+            return source;
+        }
+
+        set
+        {
+            source = value;
+        }
+    }
+
+    public string Rounds
+    {
+        get
+        {
+            return rounds;
+        }
+
+        set
+        {
+            rounds = value;
+        }
+    }
+
+    public string AnsweredPrevQues
+    {
+        get
+        {
+            return answeredPrevQues;
+        }
+
+        set
+        {
+            answeredPrevQues = value;
+        }
+    }
+
+    public string GalitRemarks
+    {
+        get
+        {
+            return galitRemarks;
+        }
+
+        set
+        {
+            galitRemarks = value;
+        }
+    }
+
 
     //public string KnowsArabic
     //{
@@ -1832,4 +1892,94 @@ public class Volunteer
         }
         return v;
     }
+
+    public List<Volunteer> getVolunteerDataTable() // function for volunteer data review
+    {
+        #region DB functions
+        string query = "select * from VolunteerGood_30_05_20";
+        //query += " order by firstNameH";
+
+        List<Volunteer> list = new List<Volunteer>();
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+            Volunteer v = new Volunteer();
+            v.Id = int.Parse(dr["Id"].ToString());
+            v.FirstNameH = dr["FirstNameH"].ToString();
+            v.LastNameH = dr["LastNameH"].ToString();
+            v.EnglishFN = dr["EnglishFN"].ToString();
+            v.EnglishLN = dr["EnglishLN"].ToString();
+            v.VolunteerIdentity = dr["VolunteerIdentity"].ToString();
+            v.CellPhone = dr["CellPhone"].ToString();
+            v.Gender = dr["Gender"].ToString();
+            v.City = dr["CityCityName"].ToString();
+            v.Email = dr["Email"].ToString();
+            string date = dr["BirthDate"].ToString();
+            if (date == "")
+            {
+
+            }
+            else v.BirthDate = Convert.ToDateTime(dr["BirthDate"]).ToString("dd/MM/yyyy");
+            if (dr["isDriving"].ToString() != "")
+            {
+                v.IsDriving = Convert.ToBoolean(dr["isDriving"].ToString());
+            }
+            else
+            {
+                v.IsDriving = null;
+            }
+            v.HowCanHelp = dr["HowCanHelp"].ToString();
+            v.Feedback = dr["Feedback"].ToString();
+            v.Remarks = dr["Remarks"].ToString();
+            if (dr["newsLetter"].ToString() != "")
+            {
+                v.NewsLetter = Convert.ToBoolean(dr["newsLetter"].ToString());
+            }
+            else
+            {
+                v.NewsLetter = null;
+            }
+            //v.Refered = dr["refered"].ToString();
+            v.RoleInR2R = dr["roleInR2R"].ToString();
+            if (dr["knowsArabic"].ToString() != "")
+            {
+                v.KnowsArabic = Convert.ToBoolean(dr["knowsArabic"].ToString());
+            }
+            else
+            {
+                v.KnowsArabic = null;
+            }
+            v.joinYear = dr["joinYear"].ToString();
+            v.Address = dr["address"].ToString();
+            v.PostalCode = dr["postalCode"].ToString();
+
+            if (dr["isActive"].ToString() != "")
+            {
+                v.IsActive = Convert.ToBoolean(dr["isActive"].ToString());
+            }
+            v.LastModified = dr["lastmodified"].ToString();
+            v.DisplayName = dr["displayName"].ToString();
+            v.HomePhone = dr["homePhone"].ToString();
+            string jdate = dr["JoinDate"].ToString();
+            if (jdate == "")
+            {
+
+            }
+            else v.JoinDate = Convert.ToDateTime(dr["JoinDate"].ToString());
+            v.EnglishName = dr["englishName"].ToString();
+            v.Source = dr["source"].ToString();
+            v.Rounds = dr["rounds"].ToString();
+            v.AnsweredPrevQues = dr["answeredPrevQues"].ToString();
+            v.GalitRemarks = dr["galitRemarks"].ToString();
+
+            
+            list.Add(v);
+        }
+        #endregion
+
+        return list;
+    }
+
 }

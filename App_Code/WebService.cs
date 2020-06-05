@@ -1603,5 +1603,23 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
+
+    [WebMethod(EnableSession = true)]
+    public string getVolunteerDataTable()
+    {
+        try
+        {
+            Volunteer v = new Volunteer();
+            List<Volunteer> VolunteersList = v.getVolunteerDataTable();
+            return j.Serialize(VolunteersList);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in getVolunteerDataTable", ex);
+            throw new Exception("שגיאה בשליפת טבלת מתנדבים");
+        }
+
+    }
+    
 }
 

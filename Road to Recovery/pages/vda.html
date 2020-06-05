@@ -1,0 +1,281 @@
+﻿<!DOCTYPE html>
+<html lang="en" dir=rtl>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="KSMoving">
+    <meta name="author" content="Coderthemes">
+    <link rel="shortcut icon" href="assets/images/favicon_1.ico">
+    <title>פרטי המתנדבים</title>
+    <link href="../plugins/switchery/switchery.min.css" rel="stylesheet" />
+    <link href="assets/css/bootstrap-rtl.min.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/core.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/icons.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/components.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/pages.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/menu.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/responsive.css" rel="stylesheet" type="text/css">
+    <script src="assets/js/CookiesFunctions.js"></script>
+    <script src="assets/js/modernizr.min.js"></script>
+    <script src="assets/js/jquery.min.js"></script>
+    <!-- The jQuery library is a prerequisite for all jqSuite products -->
+    <script type="text/ecmascript" src="assets/js/jquery.min.js"></script>
+    <!-- This is the Javascript file of jqGrid -->
+    <script type="text/ecmascript" src="Guriddo_jqGrid_JS_5.2.0/js/jquery.jqGrid.min.js"></script>
+    <!-- We support more than 40 localizations -->
+    <script type="text/ecmascript" src="Guriddo_jqGrid_JS_5.2.0/js/i18n/grid.locale-he.js"></script>
+    <!-- A link to a Boostrap  and jqGrid Bootstrap CSS siles-->
+    <link href="Guriddo_jqGrid_JS_5.2.0/css/ui.jqgrid-bootstrap.css" rel="stylesheet" />
+    <!-- Sweet Alert css -->
+    <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
+    <!--GENERAL object and additional functions-->
+    <script src="lib/lz-string.js"></script>
+    <script src="lib/master.js"></script>
+    <!-- Select2 css+js -->
+    <link href="assets/css/select2.css" rel="stylesheet" />
+    <script src="assets/js/select2.min.js"></script>
+    <!--City Autocomplete-->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <style>
+        .right {
+            text-align: right !important;
+        }
+        .left {
+            text-align: left !important;
+        }
+        th {
+            vertical-align: middle !important;
+        }
+    </style>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+
+        function getVolunteerDataTable() {
+            $('#wait').show();
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getVolunteerDataTable",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                success: function (data) {
+                    var volunteers = JSON.parse(data.d);
+                    console.log(volunteers)
+                    renderTable(volunteers)
+                    $('#wait').hide();
+                },
+                error: function (err) { alert("Error in getVolunteerDataTable: " + err.responseText); }
+            });
+        }
+
+
+    </script>
+</head>
+<body class="fixed-left">
+    <div id="wrapper">
+        <div class="content">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="page-title-box">
+                            <br />
+                            <h4 class="page-title">
+                                פרטי המתנדבים&nbsp&nbsp
+                            </h4>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+
+                    <div class="col-sm-12">
+                        <div class="card-box table-responsive">
+                            <h3>טבלת פרטי המתנדבים</h3>
+                            <table id="volunteers" class="table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>מספר</th>
+                                        <th>פעיל</th>
+                                        <th>עודכן לאחרונה</th>
+                                        <th>שם בעברית</th>
+                                        <th>מגדר</th>
+                                        <th>נייד</th>
+                                        <th>טלפון</th>
+                                        <th class="right">מייל</th>
+                                        <th>תעודת זהות</th>
+                                        <th>תאריך הצטרפות</th>
+                                        <th>שנת הצטרפות</th>
+                                        <th>ישוב</th>
+                                        <th>כתובת</th>
+                                        <th>מיקוד</th>
+                                        <th>תאריך לידה</th>
+                                        <th>דובר ערבית</th>
+                                        <th>הערות</th>
+                                        <th>צורת התנדבות</th>
+                                        <th>משוב</th>
+                                        <th>איך יכול.ה לסייע</th>
+                                        <th>עדכון שבועי</th>
+                                        <th class="right">שם באנגלית</th>
+                                        <th class="left">Source</th>
+                                        <th class="left">Rounds</th>
+                                        <th class="left">AnsweredPrevQues</th>                                        
+                                        <th class="left">GalitRemarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                            <div id="wait" style="display:none;width:69px;height:89px;position:fixed;top:50%;left:50%;padding:2px;">
+                                <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
+                            </div>
+                            <br />
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+        <footer class="footer text-right" style="right:0px">
+            2020 - 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה
+        </footer>
+    </div>
+    <!-- End FOOTER -->
+    <script>
+        var resizefunc = [];
+    </script>
+    <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script>
+
+        $(document).ready(function () {
+            getVolunteerDataTable();
+        });
+
+        function renderTable(volunteers) {
+            tbl = $('#volunteers').DataTable({
+                data: volunteers,
+                columnDefs: [{ targets: 7, className: 'text-left-strong' },
+                    { targets: 21, className: 'text-left-strong' },
+                    { targets: 11, width: '6%' },
+                    { targets: 12, width: '6%' },
+                    { targets: 18, width: '15%' },
+                    { targets: 19, width: '15%' },
+                    { targets: 16, width: '15%' }],
+                scrollX: true,
+                columns: [
+                    { data: "Id" },
+                    {
+                        data: "IsActive",
+                        render: function (active) {
+                            if (active) {
+                                return "כן"
+                            } else return "לא"
+                        }
+                    },
+                    { data: "LastModified" },
+                    { data: "DisplayName" },
+                    { data: "Gender" },
+                    { data: "CellPhone" },
+                    { data: "HomePhone" },
+                    { data: "Email" },
+                    { data: "VolunteerIdentity" },
+                    {
+                        data: "JoinDate",
+                        render: function (JoinDate) {
+                            if (JoinDate == "/Date(-62135596800000)/") {
+                                return "";
+                            } else return fixDate(JoinDate)                            
+                        }
+                    },
+                    { data: "JoinYear" },
+                    { data: "City" },
+                    { data: "Address" },
+                    { data: "PostalCode" },
+                    { data: "BirthDate" },
+                    {
+                        data: "KnowsArabic",
+                        render: function (active) {
+                            if (active) {
+                                return "כן"
+                            } else return "לא"
+                        }
+                    },
+                    { data: "Remarks" },
+                    {
+                        data: "IsDriving",
+                        render: function (howVol) {
+                            if (howVol) {
+                                return "הסעה"
+                            } else return "התנדבות אחרת (ללא הסעה)"
+                        }
+                    },
+                    { data: "Feedback" },
+                    { data: "HowCanHelp" },
+                    {
+                        data: "NewsLetter",
+                        render: function (NewsLetter) {
+                            if (NewsLetter) {
+                                return "כן"
+                            } else return "לא"
+                        }
+                    },
+                    { data: "EnglishName" },
+                    { data: "Source" },
+                    { data: "Rounds" },
+                    { data: "AnsweredPrevQues" },
+                    { data: "GalitRemarks" }
+
+
+
+                ]
+            })
+        }
+
+        function fixDate(date) {
+            var temp = date.substring(date.indexOf("(") + 1, date.indexOf(")"))
+            var jdate = new Date(parseInt(temp));//.toISOString();
+            var jday = jdate.getDate();
+            var jmonth = jdate.getMonth() + 1;
+            var jyear = jdate.getFullYear();
+            if (jday < 10) jday = "0" + jday;
+            if (jmonth < 10) jmonth = "0" + jmonth;
+            jdate = jday + "/" + jmonth + "/" + jyear;            
+            return jdate;
+        }
+    </script>
+    <!-- Datatables-->
+    <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="../plugins/datatables/dataTables.bootstrap.js"></script>
+    <script src="../plugins/datatables/dataTables.buttons.min.js"></script>
+    <script src="../plugins/datatables/buttons.bootstrap.min.js"></script>
+    <script src="../plugins/datatables/jszip.min.js"></script>
+    <script src="../plugins/datatables/pdfmake.min.js"></script>
+    <script src="../plugins/datatables/vfs_fonts.js"></script>
+    <script src="../plugins/datatables/buttons.html5.min.js"></script>
+    <script src="../plugins/datatables/buttons.print.min.js"></script>
+    <script src="../plugins/datatables/dataTables.fixedHeader.min.js"></script>
+    <script src="../plugins/datatables/dataTables.keyTable.min.js"></script>
+    <script src="../plugins/datatables/dataTables.responsive.min.js"></script>
+    <script src="../plugins/datatables/responsive.bootstrap.min.js"></script>
+    <script src="../plugins/datatables/dataTables.scroller.min.js"></script>
+
+    <!-- Datatable init js -->
+    <script src="assets/pages/datatables.init.js"></script>
+    <!-- jQuery  -->
+    <script src="assets/js/bootstrap-rtl.min.js"></script>
+    <script src="assets/js/detect.js"></script>
+    <script src="assets/js/fastclick.js"></script>
+    <script src="assets/js/jquery.slimscroll.js"></script>
+    <script src="assets/js/jquery.blockUI.js"></script>
+    <script src="assets/js/waves.js"></script>
+    <script src="assets/js/wow.min.js"></script>
+    <script src="assets/js/jquery.nicescroll.js"></script>
+    <script src="assets/js/jquery.scrollTo.min.js"></script>
+    <script src="../plugins/switchery/switchery.min.js"></script>
+    <!-- Sweet Alert js -->
+    <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
+    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+    <script src="assets/js/jquery.core.js"></script>
+    <script src="assets/js/jquery.app.js"></script>
+</body>
+</html>
