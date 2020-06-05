@@ -57,6 +57,7 @@ public class Volunteer
     string refered;
     string roleInR2R;
     string joinYear;
+    string postalCode;
 
     public List<RideStatus> Statusim { get; set; }
 
@@ -1048,6 +1049,19 @@ public class Volunteer
         }
     }
 
+    public string PostalCode
+    {
+        get
+        {
+            return postalCode;
+        }
+
+        set
+        {
+            postalCode = value;
+        }
+    }
+
 
     //public string KnowsArabic
     //{
@@ -1736,6 +1750,7 @@ public class Volunteer
         }
         v.joinYear = dr["joinYear"].ToString();
         v.Address = dr["address"].ToString();
+        v.PostalCode = dr["postalCode"].ToString();
 
         #endregion
 
@@ -1749,7 +1764,7 @@ public class Volunteer
         DbService db = new DbService();
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
-        SqlParameter[] cmdParams = new SqlParameter[21];
+        SqlParameter[] cmdParams = new SqlParameter[22];
 
         cmdParams[0] = cmd.Parameters.AddWithValue("@firstNameH", v.FirstNameH);
         cmdParams[1] = cmd.Parameters.AddWithValue("@lastNameH", v.LastNameH);
@@ -1779,6 +1794,7 @@ public class Volunteer
         cmdParams[18] = cmd.Parameters.AddWithValue("@username", username);
         cmdParams[19] = cmd.Parameters.AddWithValue("@joinYear", v.JoinYear);
         cmdParams[20] = cmd.Parameters.AddWithValue("@address", v.Address);
+        cmdParams[21] = cmd.Parameters.AddWithValue("@postalCode", v.PostalCode);
 
         string query = "";
 
@@ -1786,7 +1802,7 @@ public class Volunteer
         query = "update VolunteerGood_30_05_20 set FirstNameH=@firstNameH, LastNameH=@lastNameH, EnglishFN=@englishFN, EnglishLN=@englishLN, ";
         query += "VolunteerIdentity=@volunteerIdentity, CellPhone=@cell, Gender=@gender, CityCityName=@city, Email=@email, ";
         query += "BirthDate=@bDay, IsDriving=@isDriving, HowCanHelp=@howCanHelp, Feedback=@feedback, Remarks=@remarks, NewsLetter=@newsLetter, KnowsArabic=@knowsArabic,";
-        query += "DisplayName=@displayName, EnglishName=@englishName, JoinYear=@joinYear, Address=@address, lastModified=DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@username";
+        query += "DisplayName=@displayName, EnglishName=@englishName, JoinYear=@joinYear, Address=@address, PostalCode=@postalCode, lastModified=DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@username";
         try
         {
             res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);

@@ -138,7 +138,8 @@
                         NewsLetter: volunteer.NewsLetter,
                         KnowsArabic: volunteer.KnowsArabic,
                         JoinYear: volunteer.JoinYear,
-                        Address: volunteer.Address
+                        Address: volunteer.Address,
+                        PostalCode: volunteer.PostalCode
                     }
                     console.log(volunteerUploaded)
                     var location = "";
@@ -169,10 +170,10 @@
                         $("#birthdayDay").val(YearMonthDay[2]);
                     }
                     if (volunteer.IsDriving == 1) {
-                        $("#isDriving").val("כן");
+                        $("#isDriving").val("הסעה");
                     }
                     else if (volunteer.IsDriving == 0) {
-                        $("#isDriving").val("לא")
+                        $("#isDriving").val("התנדבות אחרת (ללא הסעה)")
                     } else {
                         $("#isDriving").val("בחר")
                     }
@@ -201,6 +202,7 @@
                         $("#joinYear").val(volunteer.JoinYear);
                     }
                     $("#address").val(volunteer.Address);
+                    $("#postalCode").val(volunteer.PostalCode);
                     enableSave();
                     $('#main').show()
                 },
@@ -354,6 +356,16 @@
                         <div class="row m-l-10 m-r-10">
                             <div class="col-sm-6">
                                 <div class="form-group">
+                                    <label class="col-sm-4 control-label">מיקוד&nbsp;</label>
+                                    <div class="col-sm-6">
+                                        <input id="postalCode" name="postalCode" type="text" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
                                     <label class="col-sm-4 control-label">ישוב מגורים&nbsp;<span class="required">*</span></label>
                                     <div class="col-sm-6">
                                         <input id="city" name="city" type="text" class="form-control req">
@@ -374,7 +386,7 @@
                         <div class="row m-l-10 m-r-10">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label">תאריך לידה&nbsp;<span class="required">*</span></label>
+                                    <label class="col-sm-4 control-label">תאריך לידה&nbsp;<!--<span class="required">*</span>--></label>
                                     <div class="col-sm-6">
                                         <label class="col-sm-4 control-label">שנה</label>
                                         <select id="birthdayYear" name="birthdayYear" class="form-control birthSelect"></select>
@@ -391,7 +403,7 @@
                                 <div class="form-group">
                                     <label class="col-sm-4 control-label">תאריך לידה&nbsp;<span class="required">*</span></label>
                                     <div class="col-sm-6">
-                                        <input type="date" id="birthday" name="birthday" class="form-control req">
+                                        <input type="date" id="birthday" name="birthday" class="form-control">
                                     </div>
                                 </div>
                             </div>
@@ -399,12 +411,12 @@
                         <div class="row m-l-10 m-r-10">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label">מסיע&nbsp;<span class="required">*</span></label>
+                                    <label class="col-sm-4 control-label">צורת התנדבות&nbsp;<span class="required">*</span></label>
                                     <div class="col-sm-6" id="selectIsDriving">
                                         <select id="isDriving" name="isDriving" class="form-control req">
                                             <option>בחר</option>
-                                            <option>כן</option>
-                                            <option>לא</option>
+                                            <option>הסעה</option>
+                                            <option>התנדבות אחרת (ללא הסעה)</option>
                                         </select>
                                     </div>
                                 </div>
@@ -631,10 +643,10 @@
                 } else {
                     var birthDate = new Date("1900-01-01");
                 }
-                if ($("#isDriving").val() == "כן") {
+                if ($("#isDriving").val() == "הסעה") {
                     var isDriving = true;
                 }
-                else if ($("#isDriving").val() == "לא") {
+                else if ($("#isDriving").val() == "התנדבות אחרת (ללא הסעה)") {
                     var isDriving = false;
                 }
                 var howCanHelp = $("#help").val();
@@ -660,12 +672,13 @@
                     var joinYear = $("#joinYear").val();
                 }
                 var address = $("#address").val();
+                var postalCode = $("#postalCode").val();
 
                 volunteerUpdated = {
                     FirstNameH: firstNameH, LastNameH: lastNameH, EnglishFN: englishFN, EnglishLN: englishLN,
                     VolunteerIdentity: VolunteerIdentity, CellPhone: cellPhone, Gender: gender, City: city, Email: email,
                     BirthDate: birthDate, IsDriving: isDriving, HowCanHelp: howCanHelp, Feedback: feedback,
-                    Remarks: remark, NewsLetter: newsLetter, KnowsArabic: knowsArabic, JoinYear: joinYear, Address: address
+                    Remarks: remark, NewsLetter: newsLetter, KnowsArabic: knowsArabic, JoinYear: joinYear, Address: address, PostalCode: postalCode
                 }
 
                 if (JSON.stringify(volunteerUploaded) != JSON.stringify(volunteerUpdated)) {
@@ -722,10 +735,10 @@
                     } else {
                         var birthDate = new Date("1900-01-01");
                     }
-                    if ($("#isDriving").val() == "כן") {
+                    if ($("#isDriving").val() == "הסעה") {
                         var isDriving = true;
                     }
-                    else if ($("#isDriving").val() == "לא") {
+                    else if ($("#isDriving").val() == "התנדבות אחרת (ללא הסעה)") {
                         var isDriving = false;
                     }
                     var howCanHelp = $("#help").val();
@@ -753,18 +766,19 @@
                         var joinYear = $("#joinYear").val();
                     }
                     var address = $("#address").val();
-                    
+                    var postalCode = $("#postalCode").val();
+
                     var volunteerExtended = {
                         FirstNameH: firstNameH, LastNameH: lastNameH, EnglishFN: englishFN, EnglishLN: englishLN,
                         VolunteerIdentity: VolunteerIdentity, CellPhone: cellPhone, Gender: gender, City: city, Email: email,
                         BirthDate: birthDate, IsDriving: isDriving, HowCanHelp: howCanHelp, Feedback: feedback,
-                        Remarks: remark, DisplayName: displayName, EnglishName: englishName, NewsLetter: newsLetter, KnowsArabic: knowsArabic, JoinYear: joinYear, Address: address
+                        Remarks: remark, DisplayName: displayName, EnglishName: englishName, NewsLetter: newsLetter, KnowsArabic: knowsArabic, JoinYear: joinYear, Address: address, PostalCode: postalCode
                     }
                     volunteerUpdated = {
                         FirstNameH: firstNameH, LastNameH: lastNameH, EnglishFN: englishFN, EnglishLN: englishLN,
                         VolunteerIdentity: VolunteerIdentity, CellPhone: cellPhone, Gender: gender, City: city, Email: email,
                         BirthDate: birthDate, IsDriving: isDriving, HowCanHelp: howCanHelp, Feedback: feedback,
-                        Remarks: remark, NewsLetter: newsLetter, KnowsArabic: knowsArabic, JoinYear: joinYear, Address: address
+                        Remarks: remark, NewsLetter: newsLetter, KnowsArabic: knowsArabic, JoinYear: joinYear, Address: address, PostalCode: postalCode
                     }
                     console.log(volunteerExtended);
                     $.ajax({
@@ -825,10 +839,11 @@
             var CityValid = true
             var birthDateValid = true;
             var eMailValid = true;
+            var postalValid = true;
 
             $("#volunteerFirstName").val($("#volunteerFirstName").val().trim())
             firstNameHebrew = $("#volunteerFirstName").val();
-            var HebrewREGEX = new RegExp("^[\u0590-\u05FF -]+$");
+            var HebrewREGEX = new RegExp("^[\u0590-\u05FF -']+$");
             var firstNameHebrewMatch = HebrewREGEX.test(firstNameHebrew);
             if (!firstNameHebrewMatch || firstNameHebrew.length > 16 || firstNameHebrew.length < 2) {
                 swal(
@@ -929,7 +944,16 @@
                 }
             }
             var birthDate = $("#birthday").val();
-            if (birthDate != "") {
+            var birthdayArray = [$("#birthdayDay").val(), $("#birthdayMonth").val(), $("#birthdayYear").val()];
+            var howManySelect = birthdayArray.filter(i => i == "בחר");
+            if (howManySelect.length > 0 && howManySelect.length < 3) {
+                swal(
+                    "שים לב!",
+                    "לא ניתן להזין תאריך לידה חלקי\nיש למלא שנה, חודש ויום",
+                    "warning"
+                );
+                birthDateValid = false;
+            } else if (birthDate != "") {
                 var date = new Date($('#birthday').val());
                 var minimumDate = new Date("1930-01-01");
                 var today = new Date();
@@ -956,12 +980,26 @@
                 eMailValid = false;
             }
 
-            if (!firstNameHebrewValid || !lastNameHebrewValid || !firstNameEnglishValid || !lastNameEnglishValid || !identityValid || !phoneValid || !CityValid || !birthDateValid || !eMailValid) {
+            postalCode = $("#postalCode").val();
+            var postalReg = new RegExp("^[0-9]*$");
+            var postalMatch = postalReg.test(postalCode);
+            if (postalCode) {
+                if (postalCode.length > 7 || !postalMatch) {
+                    swal(
+                        "שים לב!",
+                        "המיקוד שהזנת אינו תקין\nיש להזין עד 7 ספרות",
+                        "warning"
+                    );
+                    postalValid = false;
+                }
+            }
+
+            if (!firstNameHebrewValid || !lastNameHebrewValid || !firstNameEnglishValid || !lastNameEnglishValid || !identityValid || !phoneValid || !CityValid || !birthDateValid || !eMailValid || !postalValid) {
                 return false;
             } else return true;
         }
         function generateJoinDateSelect() {
-            var start = 2013;
+            var start = 2010;
             var end = new Date().getFullYear();
             var options = "<option>בחר</option>";
             for (var year = end; year >= start; year--) {
