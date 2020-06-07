@@ -60,7 +60,6 @@
                 type: "POST",
                 success: function (data) {
                     var volunteers = JSON.parse(data.d);
-                    console.log(volunteers)
                     renderTable(volunteers)
                     $('#wait').hide();
                 },
@@ -118,7 +117,7 @@
                                         <th class="right">שם באנגלית</th>
                                         <th class="left">Source</th>
                                         <th class="left">Rounds</th>
-                                        <th class="left">AnsweredPrevQues</th>                                        
+                                        <th class="left">AnsweredPrevQues</th>
                                         <th class="left">GalitRemarks</th>
                                     </tr>
                                 </thead>
@@ -172,7 +171,16 @@
                             } else return "לא"
                         }
                     },
-                    { data: "LastModified" },
+                    {
+                        data: "LastModified",
+                        render: function (last) {
+                            if (!last) {
+                                return "";
+                            }
+                            var date = new Date(last);
+                            return "<p style='font-size: 0.1px'>" + date.getTime() + "</p>" + last;
+                        }
+                    },
                     { data: "DisplayName" },
                     { data: "Gender" },
                     { data: "CellPhone" },
@@ -223,10 +231,7 @@
                     { data: "Source" },
                     { data: "Rounds" },
                     { data: "AnsweredPrevQues" },
-                    { data: "GalitRemarks" }
-
-
-
+                    { data: "GalitRemarks" } 
                 ]
             })
         }

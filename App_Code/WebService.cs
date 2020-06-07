@@ -1609,6 +1609,7 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
+            HttpResponse response = GzipMe();
             Volunteer v = new Volunteer();
             List<Volunteer> VolunteersList = v.getVolunteerDataTable();
             return j.Serialize(VolunteersList);
