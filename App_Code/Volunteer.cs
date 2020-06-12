@@ -565,13 +565,14 @@ public class Volunteer
             v.CellPhone = dr["CellPhone"].ToString();
             v.TypeVol = dr["VolunTypeType"].ToString();
             v.UserName = dr["UserName"].ToString();
+            v.Email = dr["Email"].ToString();
             vl.Add(v);
         }
         return vl;
     }
     public List<Volunteer> getCoordinatorsList()
     {
-        string query = "select * from VolunteerTypeView where VolunTypeType=N'רכז' and IsActive='true'";
+        string query = "select * from VolunteerTypeView where VolunTypeType=N'רכז' and IsActive='true' ORDER BY DisplayName";
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         List<Volunteer> vl = new List<Volunteer>();
@@ -1400,7 +1401,7 @@ public class Volunteer
         return v;
     }
 
-   
+
     public Volunteer getVolunteerByDisplayName(string name)
     {
         #region DB functions
@@ -1610,7 +1611,7 @@ public class Volunteer
         //cmdParams[25] = cmd.Parameters.AddWithValue("@feedback", v.Feedback);
         //cmdParams[24] = cmd.Parameters.AddWithValue("@newsLetter", v.NewsLetter);
 
-        
+
 
         string newName = v.FirstNameH + " " + v.LastNameH;
         newName = newName.Replace("'", "''");
@@ -1674,7 +1675,7 @@ public class Volunteer
                     string password = ConfigurationManager.AppSettings["password"];
                     query = "insert into Volunteer (Address, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks,EnglishName,isAssistant,UserName,Password,lastModified,EnglishFN, EnglishLN, BirthDate, IsDriving)";
                     query += " values (@address,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks,@englishName,@isAssistant,@UserName,'" + password + "',DATEADD(hour, 2, SYSDATETIME()),@englishFN, @englishLN, @birthDate, @isDriving);SELECT SCOPE_IDENTITY();";
-                    
+
                 }
                 else
                 {
@@ -1701,7 +1702,7 @@ public class Volunteer
 
     }
 
-    
+
 
     public void deactivateCustomer(string active)
     {
@@ -1848,7 +1849,7 @@ public class Volunteer
         else
         {
             cmdParams[15] = cmd.Parameters.AddWithValue("@knowsArabic", v.KnowsArabic);
-        }        
+        }
         cmdParams[16] = cmd.Parameters.AddWithValue("@displayName", v.DisplayName);
         cmdParams[17] = cmd.Parameters.AddWithValue("@englishName", v.EnglishName);
         cmdParams[18] = cmd.Parameters.AddWithValue("@username", username);
@@ -1974,12 +1975,97 @@ public class Volunteer
             v.AnsweredPrevQues = dr["answeredPrevQues"].ToString();
             v.GalitRemarks = dr["galitRemarks"].ToString();
 
-            
+
             list.Add(v);
         }
         #endregion
 
         return list;
+    }
+
+    public void setVolunteerYuval(Volunteer v, string coor, string instructions)
+    {
+
+
+
+        DbService db = new DbService();
+        SqlCommand cmd = new SqlCommand();
+        cmd.CommandType = CommandType.Text;
+        SqlParameter[] cmdParams = new SqlParameter[6];
+        cmdParams[0] = cmd.Parameters.AddWithValue("@cell", v.CellPhone);
+        cmdParams[1] = cmd.Parameters.AddWithValue("@firstNameH", v.FirstNameH);
+        cmdParams[2] = cmd.Parameters.AddWithValue("@lastNameH", v.LastNameH);
+        cmdParams[3] = cmd.Parameters.AddWithValue("@displayName", v.DisplayName);
+        cmdParams[4] = cmd.Parameters.AddWithValue("@UserName", v.CellPhone);
+        cmdParams[5] = cmd.Parameters.AddWithValue("@volType", "מתנדב");
+
+        string query = "";
+
+        try
+        {
+            query = "insert into Volunteer (UserName, CellPhone, FirstNameH, LastNameH, isActive, isAssistant, lastModified, JoinDate)";
+            query += " values (@UserName,@cell,@firstNameH,@lastNameH,1,1,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
+
+            db = new DbService();
+            Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
+
+            query = "insert into VolunType_Volunteer (VolunTypeType,VolunteerId) values (@volType," + Id + ")";
+            db = new DbService();
+            db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+        }
+        catch (SqlException ex)
+        {
+            if (ex.Message.Contains("duplicate key"))
+            {
+                throw new Exception("duplicate key");
+            }
+            else throw new Exception("error inserting to Volunteer table");
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+
+        try
+        {
+            query = "insert into VolunteerGood_30_05_20 (UserName, CellPhone, FirstNameH, LastNameH, DisplayName, isActive, isAssistant, lastModified, JoinDate)";
+            query += " values (@UserName, @cell,@firstNameH,@lastNameH,@displayName,1,1,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
+
+            db = new DbService();
+            Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
+        }
+        catch (SqlException ex)
+        {
+            throw new Exception("error inserting to VolunteerGood_30_05_20 table");
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+
+        //Send whatsapp / SMS to volunteer with link http://roadtorecovery.org.il/prod/Road%20to%20Recovery/pages/volunteerDetails.html
+
+        //Send email to admin (amir) - amir.adar@gmail.com
+        Email em = new Email();
+        string messageText = "המשתמש.ת " + v.DisplayName + " נרשם.ה למערכת.<br/>טלפון נייד: " + v.CellPhone;
+        em.sendMessageTo("New volunteer", ConfigurationManager.AppSettings["adminMail"], messageText); //Change to Amir's email
+
+        //Send email to coordinator - (coor)
+        if (coor != "")
+        {
+            messageText = "המשתמש.ת " + v.DisplayName + " נרשם.ה למערכת.<br/>טלפון נייד: " + v.CellPhone;
+            em.sendMessageTo("New volunteer", coor, messageText);
+        }
+
+        if (instructions == "True")//Send email to instructor
+        {
+            messageText = "המשתמש.ת " + v.DisplayName + " נרשם.ה למערכת.<br/>המשתמש.ת זקוק.ה להדרכה.<br/>טלפון נייד: " + v.CellPhone;
+            em.sendMessageTo("New volunteer", ConfigurationManager.AppSettings["instructorMail"], messageText); //Change to instructor's email
+        }
+
+
+
+
     }
 
 }

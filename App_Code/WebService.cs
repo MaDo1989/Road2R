@@ -1621,6 +1621,26 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
-    
+
+    [WebMethod(EnableSession = true)]
+    public void setVolunteerYuval(Volunteer volunteer, string coor, string instructions)
+    {
+        try
+        {
+            Volunteer v = volunteer;
+            v.setVolunteerYuval(v, coor, instructions);
+
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in setVolunteerYuval", ex);
+            if (ex.Message == "duplicate key")
+            {
+                throw new Exception("duplicate key");
+            }else throw new Exception("שגיאה ביצירת מתנדב חדש");
+        }
+
+    }
+
 }
 
