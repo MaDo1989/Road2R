@@ -1623,12 +1623,12 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
-    public void setVolunteerYuval(Volunteer volunteer, string coor, string instructions)
+    public void setVolunteerYuval(Volunteer volunteer, string coorEmail, string coorName, string coorPhone, string instructions)
     {
         try
         {
             Volunteer v = volunteer;
-            v.setVolunteerYuval(v, coor, instructions);
+            v.setVolunteerYuval(v, coorEmail, coorName, coorPhone, instructions);
 
         }
         catch (Exception ex)

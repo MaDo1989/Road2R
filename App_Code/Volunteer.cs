@@ -4,9 +4,11 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Web;
 using System.Web.Script.Serialization;
+using WhatsAppApi;
 
 /// <summary>
 /// Summary description for Volunteer
@@ -584,6 +586,8 @@ public class Volunteer
             v.TypeVol = dr["VolunTypeType"].ToString();
             v.UserName = dr["UserName"].ToString();
             v.EnglishName = dr["EnglishName"].ToString();
+            v.Email = dr["Email"].ToString();
+
             vl.Add(v);
         }
         return vl;
@@ -1983,28 +1987,42 @@ public class Volunteer
         return list;
     }
 
-    public void setVolunteerYuval(Volunteer v, string coor, string instructions)
+    public void setVolunteerYuval(Volunteer v, string coorEmail, string coorName, string coorPhone, string instructions)
     {
+        //string longurl = "https://secure.telemessage.com/jsp/receiveSMS.jsp?userid=972524895999&password=Asdfghjkl12345";
+        //var uriBuilder = new UriBuilder(longurl);
+        //var SMSquery = HttpUtility.ParseQueryString(uriBuilder.Query);
+        //SMSquery["to"] = "972524895999";
+        //SMSquery["text"] = "Lets see if it works";
+        //uriBuilder.Query = SMSquery.ToString();
+        //longurl = uriBuilder.ToString();
+
+        //WebRequest wr = WebRequest.Create(longurl);
+        //HttpWebResponse response = (HttpWebResponse)wr.GetResponse();
+        //Console.WriteLine(response.StatusDescription);
+
+        //// "http://somesite.com:80/news.php?article=1&lang=en&action=login1&attempts=11"
 
 
 
         DbService db = new DbService();
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
-        SqlParameter[] cmdParams = new SqlParameter[6];
+        SqlParameter[] cmdParams = new SqlParameter[7];
         cmdParams[0] = cmd.Parameters.AddWithValue("@cell", v.CellPhone);
         cmdParams[1] = cmd.Parameters.AddWithValue("@firstNameH", v.FirstNameH);
         cmdParams[2] = cmd.Parameters.AddWithValue("@lastNameH", v.LastNameH);
         cmdParams[3] = cmd.Parameters.AddWithValue("@displayName", v.DisplayName);
-        cmdParams[4] = cmd.Parameters.AddWithValue("@UserName", v.CellPhone);
-        cmdParams[5] = cmd.Parameters.AddWithValue("@volType", "מתנדב");
+        cmdParams[4] = cmd.Parameters.AddWithValue("@gender", v.Gender);
+        cmdParams[5] = cmd.Parameters.AddWithValue("@UserName", v.CellPhone);
+        cmdParams[6] = cmd.Parameters.AddWithValue("@volType", "מתנדב");
 
         string query = "";
 
         try
         {
-            query = "insert into Volunteer (UserName, CellPhone, FirstNameH, LastNameH, isActive, isAssistant, lastModified, JoinDate)";
-            query += " values (@UserName,@cell,@firstNameH,@lastNameH,1,1,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
+            query = "insert into Volunteer (UserName, CellPhone, FirstNameH, LastNameH, Gender, isActive, isAssistant, lastModified, JoinDate)";
+            query += " values (@UserName,@cell,@firstNameH,@lastNameH,@gender,1,1,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
 
             db = new DbService();
             Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
@@ -2028,8 +2046,8 @@ public class Volunteer
 
         try
         {
-            query = "insert into VolunteerGood_30_05_20 (UserName, CellPhone, FirstNameH, LastNameH, DisplayName, isActive, isAssistant, lastModified, JoinDate)";
-            query += " values (@UserName, @cell,@firstNameH,@lastNameH,@displayName,1,1,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
+            query = "insert into VolunteerGood_30_05_20 (UserName, CellPhone, FirstNameH, LastNameH, Gender, DisplayName, isActive, isAssistant, lastModified, JoinDate)";
+            query += " values (@UserName, @cell,@firstNameH,@lastNameH,@displayName,@gender,1,1,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
 
             db = new DbService();
             Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
@@ -2043,28 +2061,79 @@ public class Volunteer
             throw e;
         }
 
-        //Send whatsapp / SMS to volunteer with link http://roadtorecovery.org.il/prod/Road%20to%20Recovery/pages/volunteerDetails.html
-
-        //Send email to admin (amir) - amir.adar@gmail.com
         Email em = new Email();
-        string messageText = "המשתמש.ת " + v.DisplayName + " נרשם.ה למערכת.<br/>טלפון נייד: " + v.CellPhone;
-        em.sendMessageTo("New volunteer", ConfigurationManager.AppSettings["adminMail"], messageText); //Change to Amir's email
+        string messageText = "";
 
-        //Send email to coordinator - (coor)
-        if (coor != "")
+
+        //Send whatsapp / SMS to volunteer
+        //string WAMessage = "שלום " + v.DisplayName + "! <br/>";
+        //WAMessage += "תודה על הצטרפותך לפעילות שלנו. עוד פרטים ניתן לקרוא באתר העמותה בכתובת: <br/>";
+        //WAMessage += "www.roadtorecovery.org.il/?lang=he/ <br/>";
+        //WAMessage += "כדי להשלים את ההצטרפות: <br/>";
+        //WAMessage += "1. נא למלא את פרטיך האישיים בדף פרטי מתנדב.ת בכתובת: <br/>";
+        //WAMessage += "http://roadtorecovery.org.il/prod/Road%20to%20Recovery/pages/volunteerDetails.html <br/>";
+        //WAMessage += "2.	נא להוריד ולהתקין את האפליקציה הסלולרית למתנדב.ת. <br/>";
+        //WAMessage += "אם יש לך טלפון אנדרואיד: https://play.google.com/store/apps/details?id=il.Road.to.Recovery&hl=en <br/>";
+        //WAMessage += "אייפון: גלשו לאפל סטור, הקלידו את שם האפליקציה (בדרך להחלמה) בשורת החיפוש. <br/>";
+        //WAMessage += "3. עם סיום ההקתנה, פתח.י את האפליקציה והגדיר.י את ההעדפות שלך (מאיפה, לאן ומתי להסיע) <br/>";
+        //WAMessage += "דף עם תשובות לשאלות נפוצות לגבי השימוש באפליקציה נמצא ב:  http://www.roadtorecovery.org.il/Site/he/faq.html <br/><br/>";
+        //WAMessage += "אם נתקלת בבעיה, האנשים הבאים ישמחו לעזור: <br/>";
+        //WAMessage += "הרכז שלך - " + coorName + ", " + coorPhone + "<br/>";
+        //WAMessage += "מרכז המחשוב בעמותה - אמיר הדר, 0547298599 <br/><br/>";
+        //WAMessage += "!הסעות מוצלחות <br/><br/>";
+        //WAMessage += "יובל רוט";
+
+        //string WAMessage = "שלום " + v.DisplayName + "! <br/>";
+        //WAMessage += "תודה על הצטרפותך לפעילות שלנו. עוד פרטים ניתן לקרוא באתר העמותה בכתובת: <br/>";
+        //WAMessage += "www.roadtorecovery.org.il/?lang=he/ <br/>";
+        //WAMessage += "כדי להשלים את ההצטרפות: <br/><br/>";
+        //WAMessage += "&nbsp;&nbsp;1. נא למלא את פרטיך האישיים בדף פרטי מתנדב.ת בכתובת: <br/>";
+        //WAMessage += "&nbsp;&nbsp;http://roadtorecovery.org.il/prod/Road%20to%20Recovery/pages/volunteerDetails.html <br/><br/>";
+        //WAMessage += "&nbsp;&nbsp;2. נא להוריד ולהתקין את האפליקציה הסלולרית למתנדב.ת. <br/>";
+        //WAMessage += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;אם יש לך טלפון אנדרואיד: https://play.google.com/store/apps/details?id=il.Road.to.Recovery&hl=en <br/>";
+        //WAMessage += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;אייפון: גלשו לאפל סטור, הקלידו את שם האפליקציה (בדרך להחלמה) בשורת החיפוש. <br/><br/>";
+        //WAMessage += "&nbsp;&nbsp;3. עם סיום ההקתנה, פתח.י את האפליקציה והגדיר.י את ההעדפות שלך (מאיפה, לאן ומתי להסיע) <br/><br/>";
+        //WAMessage += "&nbsp;&nbsp;4. דף עם תשובות לשאלות נפוצות לגבי השימוש באפליקציה נמצא ב:  http://www.roadtorecovery.org.il/Site/he/faq.html <br/><br/>";
+        //WAMessage += "אם נתקלת בבעיה, האנשים הבאים ישמחו לעזור: <br/>";
+        //WAMessage += "&nbsp;&nbsp;- הרכז שלך - " + coorName + ", " + coorPhone + "<br/>";
+        //WAMessage += "&nbsp;&nbsp;- מרכז המחשוב בעמותה - אמיר הדר, 0547298599 <br/><br/>";
+        //WAMessage += "!הסעות מוצלחות <br/><br/>";
+        //WAMessage += "יובל רוט";
+
+        //em.sendMessageTo("New volunteer", "alonsa87@gmail.com", WAMessage);
+
+        ////Send email to admin (amir) - amir.adar@gmail.com
+        //messageText = "המשתמש.ת " + v.DisplayName + " נרשם.ה למערכת.<br/>טלפון נייד: " + v.CellPhone;
+        //em.sendMessageTo("New volunteer", ConfigurationManager.AppSettings["adminMail"], messageText); //Change to Amir's email
+
+        //Send email to coordinator - (coorEmail)
+        if (coorEmail != "")
         {
-            messageText = "המשתמש.ת " + v.DisplayName + " נרשם.ה למערכת.<br/>טלפון נייד: " + v.CellPhone;
-            em.sendMessageTo("New volunteer", coor, messageText);
+            messageText = "שלום " + coorName + "! <br/>";
+            if (v.Gender == "מתנדבת")
+            {
+                messageText += v.DisplayName + " - מתנדבת חדשה, הצטרפה אלינו. <br/>";
+                messageText += "הטלפון שלה: " + v.CellPhone + " <br/>";
+                messageText += "היא מצפה לשיחה איתך. <br/><br/>";
+            }
+            else
+            {
+                messageText += v.DisplayName + " - מתנדב חדש, הצטרף אלינו. <br/>";
+                messageText += "הטלפון שלו: " + v.CellPhone + " <br/>";
+                messageText += "הוא מצפה לשיחה איתך. <br/><br/>";
+            }
+            messageText += "בברכה, <br/>";
+            messageText += "יובל רוט <br/>";
+            em.sendMessageTo("New volunteer", coorEmail, messageText);
         }
 
-        if (instructions == "True")//Send email to instructor
-        {
-            messageText = "המשתמש.ת " + v.DisplayName + " נרשם.ה למערכת.<br/>המשתמש.ת זקוק.ה להדרכה.<br/>טלפון נייד: " + v.CellPhone;
-            em.sendMessageTo("New volunteer", ConfigurationManager.AppSettings["instructorMail"], messageText); //Change to instructor's email
-        }
+        //if (instructions == "True")//Send email to instructor
+        //{
+        //    messageText = "המשתמש.ת " + v.DisplayName + " נרשם.ה למערכת.<br/>המשתמש.ת מעוניין.ת בהדרכה.<br/>טלפון נייד: " + v.CellPhone;
+        //    em.sendMessageTo("New volunteer", ConfigurationManager.AppSettings["instructorMail"], messageText); //Change to instructor's email
+        //}
 
-
-
+        
 
     }
 

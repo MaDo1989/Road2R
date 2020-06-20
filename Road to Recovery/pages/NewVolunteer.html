@@ -6,7 +6,7 @@
     <meta name="description" content="KSMoving">
     <meta name="author" content="Coderthemes">
     <link rel="shortcut icon" href="assets/images/favicon_1.ico">
-    <title>הזנת מתנדב חדש</title>
+    <title>פרטי מתנדב.ת חדש.ה</title>
     <link href="../plugins/switchery/switchery.min.css" rel="stylesheet" />
     <link href="assets/css/bootstrap-rtl.min.css" rel="stylesheet" type="text/css">
     <link href="assets/css/core.css" rel="stylesheet" type="text/css">
@@ -55,7 +55,7 @@
             background-color: #FFE684;
         }
 
-        input[type=email], input[type=text], input[type=checkbox], input[type=date], input[type=number], #instructions, #coorSelect {
+        input[type=email], input[type=text], input[type=checkbox], input[type=date], input[type=number], #instructions, #coorSelect, #gender {
             border-color: #000
         }
 
@@ -65,6 +65,10 @@
 
         b {
             color: red;
+        }
+
+        .bold {
+            font-weight: bold;
         }
     </style>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -79,9 +83,10 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="page-title-box">
-                    <img class="center-block" src="../../Media/R2R Logo.png" />
+                    <img class="text-right" src="../../Media/R2R Logo.png" />
                     <br />
-                    <h4 class="page-title">הזנת מתנדב חדש&nbsp&nbsp<i class="md md-recent-actors"></i></h4>
+                    <br />
+                    <h3 class="page-title bold">פרטי מתנדב.ת חדש.ה</h3>
                 </div>
             </div>
         </div>
@@ -90,11 +95,11 @@
                 <div class="card-box">
                     <div class="row">
                         <br />
-                        <p class="required">* שדה חובה</p>
+                        <p class="required">* חובה למלא את כל השדות</p>
                         <div class="row m-l-10 m-r-10">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label">שם פרטי&nbsp;<span class="required">*</span></label>
+                                    <label class="col-sm-4 control-label">שם פרטי&nbsp;<!--<span class="required">*</span>--></label>
                                     <div class="col-sm-6">
                                         <input id="volunteerFirstName" name="volunteerFirstName" type="text" class="form-control req">
                                     </div>
@@ -104,7 +109,7 @@
                         <div class="row m-l-10 m-r-10">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label">שם משפחה&nbsp;<span class="required">*</span></label>
+                                    <label class="col-sm-4 control-label">שם משפחה&nbsp;<!--<span class="required">*</span>--></label>
                                     <div class="col-sm-6">
                                         <input id="volunteerLastName" name="volunteerLastName" type="text" class="form-control req">
                                     </div>
@@ -114,7 +119,21 @@
                         <div class="row m-l-10 m-r-10">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label">טלפון נייד&nbsp;<span class="required">*</span></label>
+                                    <label class="col-sm-4 control-label">מגדר&nbsp;<!--<span class="required">*</span>--></label>
+                                    <div class="col-sm-6" id="genderSelect">
+                                        <select id="gender" name="gender" class="form-control req">
+                                            <option>בחר</option>
+                                            <option>זכר</option>
+                                            <option>נקבה</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">טלפון נייד&nbsp;<!--<span class="required">*</span>--></label>
                                     <div class="col-sm-6">
                                         <input id="phone1" dir="ltr" name="phone1" type="text" class="form-control req">
                                     </div>
@@ -124,7 +143,7 @@
                         <div class="row m-l-10 m-r-10">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label">רכז&nbsp;<span class="required">*</span></label>
+                                    <label class="col-sm-4 control-label">רכז&nbsp;<!--<span class="required">*</span>--></label>
                                     <div class="col-sm-6">
                                         <select id="coorSelect" name="coorSelect" class="form-control req">
                                             <option>בחר</option>
@@ -136,7 +155,7 @@
                         <div class="row m-l-10 m-r-10">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label">צריך הדרכה?&nbsp;<span class="required">*</span></label>
+                                    <label class="col-sm-4 control-label">מעוניינ.ת בהדרכה?&nbsp;<!--<span class="required">*</span>--></label>
                                     <div class="col-sm-6" id="needInstructions">
                                         <select id="instructions" name="instructions" class="form-control req">
                                             <option>בחר</option>
@@ -147,7 +166,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <hr /><br />
                         <div class="row m-l-10 m-r-10">
                             <div class="col-sm-6">
@@ -183,7 +202,7 @@
         function generateCoorList() {
             $.ajax({
                 dataType: "json",
-                url: "WebService.asmx/getCoorList",
+                url: "WebService.asmx/getCoordinatorsList",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
                 async: false,
@@ -193,14 +212,15 @@
         }
 
         function generateCoorListSuccessCB(data) {
-            var arr_coor = JSON.parse(data.d);            
+            var arr_coor = JSON.parse(data.d);  
+            console.log(arr_coor)
             for (i in arr_coor) {
                 coor.push(arr_coor[i].DisplayName);
                 coorEmails.push(arr_coor[i].Email);
             }
             $.each(coor, function (key, value) {
                 $('#coorSelect')
-                    .append($('<option>', { value: coorEmails[key] })
+                    .append($('<option>', { value: coorEmails[key], cellphone: arr_coor[key].CellPhone })
                         .text(value));
             });
         }
@@ -210,7 +230,7 @@
         }
 
         function reload() {
-            window.location.href = 'yuval.html';
+            window.location.href = 'NewVolunteer.html';
         }
 
         $(document).ready(function () {
@@ -232,6 +252,12 @@
                     var firstNameH = $("#volunteerFirstName").val();
                     var lastNameH = $("#volunteerLastName").val();
                     var displayName = firstNameH + " " + lastNameH;
+                    if ($("#gender").val() == "זכר") {
+                        var gender = "מתנדב";
+                    }
+                    else if ($("#gender").val() == "נקבה") {
+                        var gender = "מתנדבת";
+                    }
                     var cellPhone = $("#phone1").val();
                     cellPhone = cellPhone.replace(/-/g, '');
                     cellPhone = cellPhone.replace(/ /g, '');
@@ -241,10 +267,13 @@
                     else if ($("#instructions").val() == "לא") {
                         var instructions = false;
                     }                   
-                    var coordinator = $("#coorSelect").val();
+                    var coordinatorEmail = $("#coorSelect").val();
+                    var coordinatorName = $('#coorSelect option:selected').text();
+                    var coordinatorPhone = $('#coorSelect option:selected').attr("cellphone");
+
                    
                     var volunteer = {
-                        FirstNameH: firstNameH, LastNameH: lastNameH, DisplayName: displayName,
+                        FirstNameH: firstNameH, LastNameH: lastNameH, DisplayName: displayName, Gender: gender,
                         CellPhone: cellPhone
                     }
                     console.log(volunteer);
@@ -255,7 +284,7 @@
                         contentType: "application/json; charset=utf-8",
                         type: "POST",
                         async: false,
-                        data: JSON.stringify({ volunteer: volunteer, coor: coordinator, instructions: instructions }),
+                        data: JSON.stringify({ volunteer: volunteer, coorEmail: coordinatorEmail, coorName: coordinatorName, coorPhone: coordinatorPhone, instructions: instructions }),
                         success: function (data) {
                             swal({
                                 title: "הפרטים נשמרו\nתודה רבה",
@@ -263,7 +292,7 @@
                                 timer: 3000,
                                 showConfirmButton: false
                             });
-                            setTimeout(function () { window.location.href = 'yuval.html'; }, 3000);
+                            setTimeout(function () { window.location.href = 'NewVolunteer.html'; }, 3000);
                         },
                         error: function (err) {
                             console.log(err);
