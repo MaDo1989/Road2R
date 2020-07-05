@@ -3,9 +3,6 @@
 // 05-07: Focus on reports content, Use UI as-is fix it later.
 //  ==> finish all services is the goal.
 
-// TODAY: Return real results from GetReportVolunteerWeekly()  based on actual date ==> cs
-// TODAY: Display in table real results from   GetReportVolunteerWeekly()  ==> js
-
 // Park: 06-06 : working  on week picker by customizing datepicker
 // see comments at end of  populate_week_field() - need to fix it
 // Then we can start implement the repot of amute week
@@ -116,7 +113,7 @@ var K_fields_map = {
         {
             id: "rp_amuta_vls_per_pat__patient",
             type: "PATIENT",
-            template: 'div[name="template_patient"]',
+            template: 'div[name="template_PATIENT"]',
             post_clone: field_patient_post_clone
         }
     ]
@@ -150,7 +147,10 @@ function clone_template(template, parent_id) {
     return result;
 }
 
-var K_CACHE = { volunteers: [] };
+var K_CACHE = {
+    volunteers: [],
+    patients: []
+};
 
 
 
@@ -291,9 +291,69 @@ function field_week_post_clone(id) {
 
 
 function field_patient_post_clone(id) {
-    populate_patient_field();
+    loadPatients(populate_patient_field)
 }
 
+
+// Called when a volunteer is selected in auto-complete
+function on_patient_selected(event, ui) {
+    // store the selected value on the element
+    $("#" + event.target.id).attr("itemID", ui.item.id);
+    refreshPreview();
+    return true;
+}
+// called when the async ajax call to laod volunteers has finished
+// Used to populate UI needing the volunteers list
+function populate_patient_field() {
+    $("#select_patient").autocomplete({
+        source: K_CACHE.patients,
+        select: on_patient_selected
+    });
+}
+
+
+// on_load_patients called when the async ajax call  has finished
+// Used to populate UI needing the patients list
+function loadPatients(on_load_patients) {
+
+    if (K_CACHE.patients.length > 1) {
+        // One time loading already done.
+        on_load_patients();
+        return;
+    }
+
+    if (true) {
+        console.log("loadPatients: speeding up by adding one entry only in debugging")
+        var debug_entry = { label: "tt", id: 22 };
+        K_CACHE.patients.push(debug_entry);
+        debug_entry = { label: "ganem", id: 21 };
+        K_CACHE.patients.push(debug_entry);
+        on_load_patients();
+        return;
+    }
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetPatientsDisplayNames",
+        contentType: "application/json; charset=utf-8",
+        type: "POST",
+        async: true,
+        data: JSON.stringify({ active: true }),
+        success: function (data) {
+            var arr_patients = JSON.parse(data.d);
+            for (i in arr_patients) {
+                var entry = { label: arr_patients[i].Name, id: arr_patients[i].ID };
+                K_CACHE.patients.push(entry);
+            }
+
+            var debug_entry = { label: "tt", id: 14535 };
+            K_CACHE.patients.push(debug_entry);
+
+            on_load_patients();
+        },
+        error: function (err) { alert("Error in loadVolunteers"); }
+    });
+}
 
 function refreshPreview() {
     S_refresh_preview();
@@ -344,11 +404,6 @@ function rp_amuta_vls_week__refresh_preview() {
         start_week_date, end_week_date);
   
 }   
-
-
-function rp_amuta_vls_per_pat__refresh_preview() {
-    alert("TBD");
-}
 
 
 // 'start_date' :  a date formatted as YYYY-MM-DD
@@ -409,6 +464,68 @@ function refresh_amuta_vls_week_Table(start_date, end_date) {
 
 }
 
+
+function rp_amuta_vls_per_pat__refresh_preview() {
+    var patient = $("#select_patient").attr("itemID");
+    refresh_amuta_vls_per_pat_Table(patient);
+}
+
+function refresh_amuta_vls_per_pat_Table(patient) {
+    $("#cmdPrint").prop("disabled", false);
+    $('#wait').show();
+    var query_object = {
+        patient: patient
+    };
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportVolunteersPerPatient",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            $('#wait').hide();
+            arr_rides = JSON.parse(data.d);
+            hide_all_tables();
+
+            $('#div_table_amuta_vls_per_pat').show();
+            tbl = $('#table_amuta_vls_per_pat').DataTable({
+                pageLength: 500,
+                bLengthChange: false,
+                data: arr_rides,
+                destroy: true,
+                columnDefs: [
+                    { "orderData": [0, 1], "targets": 0 }],
+                columns: [
+                    { data: "Date" },
+                    { data: "Volunteer" },
+                    { data: "Origin" },
+                    { data: "Destination" }
+
+                ],
+                dom: 'Bfrtip',
+                buttons: [
+                    'print', 'csv', 'excel', 'pdf'
+                ],
+                createdRow: function (row, data, dataIndex) {
+                    $(row).css('background-color', '#f1f1f1');
+                },
+                rowCallback: function (row, data, index) {
+                }
+            });
+        },
+        error: function (err) {
+            $('#wait').hide();
+            // @@ alert("Error in GetRidePatView: " + err.responseText);
+        }
+
+
+    });
+
+}
 
 
 // 'start_date' :  a date formatted as YYYY-MM-DD
@@ -574,7 +691,8 @@ function refreshTable(volunteerId, start_date, end_date) {
 function hide_all_tables() {
     $('#div_weeklyRides').hide();
     $('#div_table_amuta_vls_week').hide();
-}
+    $('#div_table_amuta_vls_per_pat').hide();
+ }
 
 
 function load_location() {

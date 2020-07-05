@@ -100,6 +100,49 @@ public class ReportsWebService : System.Web.Services.WebService
 
     }
 
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetReportVolunteersPerPatient(int patient)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            ReportService report = new ReportService();
+            List<ReportService.VolunteerPerPatient> r = report.GetReportVolunteersPerPatient(patient);
+            j.MaxJsonLength = Int32.MaxValue;
+            return j.Serialize(r);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReportVolunteerWeekly", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetPatientsDisplayNames()
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            ReportService report = new ReportService();
+            List<ReportService.NameIDPair> r = report.GetPatientsDisplayNames();
+            j.MaxJsonLength = Int32.MaxValue;
+            return j.Serialize(r);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetPatientsDisplayNames", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
+
 
 }
 

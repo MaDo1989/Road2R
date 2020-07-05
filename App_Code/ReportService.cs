@@ -10,11 +10,26 @@ using System.Web;
 public class ReportService
 {
 
+    public class NameIDPair
+    {
+        public string Name { get; set; }
+        public string ID { get; set; }
+    }
+
     public class VolunteerPerRegion
     {
       
         public string Volunteer { get; set; }
         public string Region { get; set; }
+    }
+
+    public class VolunteerPerPatient
+    {
+        public string Volunteer { get; set; }
+        public string Date { get; set; }
+        public string Origin { get; set; }
+        public string Destination { get; set; }
+
     }
 
     private DataTable getDriverByID(int driverID, DbService db)
@@ -125,10 +140,75 @@ ORDER BY Area ASC";            ;
 
         foreach (DataRow dr in dt.Rows)
         {
-            VolunteerPerRegion p = new VolunteerPerRegion();
-            p.Volunteer = dr["DisplayName"].ToString();
-            p.Region = dr["Area"].ToString();
-            result.Add(p);
+            VolunteerPerRegion obj = new VolunteerPerRegion();
+            obj.Volunteer = dr["DisplayName"].ToString();
+            obj.Region = dr["Area"].ToString();
+            result.Add(obj);
+        }
+
+        return result;
+    }
+
+    internal List<NameIDPair> GetPatientsDisplayNames()
+    {
+        DbService db = new DbService();
+
+        string query =
+ @"select Id, DisplayName 
+FROM Patient
+order BY DisplayName ASC
+";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        List<NameIDPair> result = new List<NameIDPair>();
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            NameIDPair obj = new NameIDPair();
+            obj.Name = dr["DisplayName"].ToString();
+            obj.ID = dr["Id"].ToString();
+            result.Add(obj);
+        }
+
+        return result;
+    }
+
+    internal List<VolunteerPerPatient> GetReportVolunteersPerPatient(int patient)
+    {
+        DbService db = new DbService();
+
+        string query =
+@"SELECT pickuptime, Origin, Destination, Volunteer.DisplayName
+From (
+SELECT pickuptime, Origin, Destination, MainDriver FROM RidePat 
+INNER JOIN Patient ON RidePat.Patient=Patient.DisplayName
+and MainDriver is not null
+and Patient.Id = @patient
+) as BUFF
+INNER JOIN Volunteer ON BUFF.MainDriver=Volunteer.Id";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@patient", SqlDbType.Int).Value = patient;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        List<VolunteerPerPatient> result = new List<VolunteerPerPatient>();
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            VolunteerPerPatient obj = new VolunteerPerPatient();
+            obj.Volunteer = dr["DisplayName"].ToString();
+            obj.Origin = dr["Origin"].ToString();
+            obj.Destination = dr["Destination"].ToString();
+            obj.Date = dr["pickuptime"].ToString();
+            result.Add(obj);
         }
 
         return result;
