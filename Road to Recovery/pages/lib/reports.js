@@ -73,7 +73,8 @@ var K_strategy = {
     "rp_vl_ride_month": rp_vl_ride_month__refresh_preview,
     "rp_vl_ride_year": rp_vl_ride_year__refresh_preview,
     "rp_amuta_vls_week": rp_amuta_vls_week__refresh_preview,
-    "rp_amuta_vls_per_pat": rp_amuta_vls_per_pat__refresh_preview
+    "rp_amuta_vls_per_pat": rp_amuta_vls_per_pat__refresh_preview,
+    "rp_amuta_vls_km": rp_amuta_vls_km__refresh_preview
 }
 
 
@@ -115,6 +116,14 @@ var K_fields_map = {
             type: "PATIENT",
             template: 'div[name="template_PATIENT"]',
             post_clone: field_patient_post_clone
+        }
+    ],
+    "rp_amuta_vls_km": [
+        {
+            id: "rp_amuta_vls_per_km__year",
+            type: "YEAR",
+            template: 'div[name="template_YEAR"]',
+            post_clone: field_year_post_clone
         }
     ]
 }
@@ -236,6 +245,14 @@ function populate_month_field() {
 
 function field_month_post_clone(id) {
     populate_month_field();
+}
+
+
+function field_year_post_clone(id) {
+    var today = new Date();
+    $('#select_year').val(today.getFullYear() - 1);
+
+    rp_amuta_vls_km__refresh_preview();
 }
 
 // Given a defintition of field  build the UI for it in the Parameters panel
@@ -405,6 +422,16 @@ function rp_amuta_vls_week__refresh_preview() {
   
 }   
 
+function rp_amuta_vls_km__refresh_preview() {
+    var selected_date = Date.parse($("#select_year").val());
+    var m = moment(selected_date);
+    var start_week_date = m.startOf('year').format("YYYY-MM-DD");
+    var end_week_date = m.endOf('year').format("YYYY-MM-DD");
+
+    refresh_amuta_vls_km_Table(
+        start_week_date, end_week_date);
+}   
+
 
 // 'start_date' :  a date formatted as YYYY-MM-DD
 // 'end_date'   :  a date formatted as YYYY-MM-DD
@@ -463,6 +490,68 @@ function refresh_amuta_vls_week_Table(start_date, end_date) {
     });
 
 }
+
+// 'start_date' :  a date formatted as YYYY-MM-DD
+// 'end_date'   :  a date formatted as YYYY-MM-DD
+function refresh_amuta_vls_km_Table(start_date, end_date) {
+    $("#cmdPrint").prop("disabled", false);
+    $('#wait').show();
+    var query_object = {
+        start_date: start_date,
+        end_date: end_date
+    };
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportVolunteersKM",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            $('#wait').hide();
+            arr_rides = JSON.parse(data.d);
+            hide_all_tables();
+
+            $('#div_table_amuta_vls_km').show();
+            tbl = $('#table_amuta_vls_km').DataTable({
+                pageLength: 500,
+                bLengthChange: false,
+                data: arr_rides,
+                destroy: true,
+                columnDefs: [
+                    { "orderData": [0, 1], "targets": 0 }],
+                columns: [
+                    { data: "Date" },
+                    { data: "Volunteer" },
+                    { data: "Patient" },
+                    { data: "Origin" },
+                    { data: "Destination" }
+
+                ],
+                dom: 'Bfrtip',
+                buttons: [
+                    'print', 'csv', 'excel', 'pdf'
+                ],
+                createdRow: function (row, data, dataIndex) {
+                    $(row).css('background-color', '#f1f1f1');
+                },
+                rowCallback: function (row, data, index) {
+                }
+            });
+        },
+        error: function (err) {
+            $('#wait').hide();
+            // @@ alert("Error in GetRidePatView: " + err.responseText);
+        }
+
+
+    });
+
+}
+
 
 
 function rp_amuta_vls_per_pat__refresh_preview() {
@@ -692,6 +781,7 @@ function hide_all_tables() {
     $('#div_weeklyRides').hide();
     $('#div_table_amuta_vls_week').hide();
     $('#div_table_amuta_vls_per_pat').hide();
+    $('#div_table_amuta_vls_km').hide();
  }
 
 

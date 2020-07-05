@@ -32,6 +32,16 @@ public class ReportService
 
     }
 
+    public class VolunteerKM
+    {
+        public string Volunteer { get; set; }
+        public string Date { get; set; }
+        public string Origin { get; set; }
+        public string Destination { get; set; }
+        public string Patient { get; set; }
+
+    }
+
     private DataTable getDriverByID(int driverID, DbService db)
     {
         string query = "select Id,DisplayName,CellPhone from Volunteer where Id = @ID";
@@ -143,6 +153,43 @@ ORDER BY Area ASC";            ;
             VolunteerPerRegion obj = new VolunteerPerRegion();
             obj.Volunteer = dr["DisplayName"].ToString();
             obj.Region = dr["Area"].ToString();
+            result.Add(obj);
+        }
+
+        return result;
+    }
+
+
+    internal List<VolunteerKM> GetReportVolunteersKM(string start_date, string end_date)
+    {
+        DbService db = new DbService();
+
+        string query =
+ @"SELECT pickuptime, Origin, Destination, MainDriver, Patient.DisplayName FROM RidePat 
+INNER JOIN Patient ON RidePat.Patient=Patient.DisplayName
+and MainDriver is not null
+AND RidePat.pickuptime < @end_date
+AND RidePat.pickuptime >= @start_date
+ORDER BY MainDriver ASC";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        List<VolunteerKM> result = new List<ReportService.VolunteerKM>();
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            ReportService.VolunteerKM obj = new ReportService.VolunteerKM();
+            obj.Volunteer = dr["MainDriver"].ToString();
+            obj.Patient = dr["DisplayName"].ToString();
+            obj.Origin = dr["Origin"].ToString();
+            obj.Destination = dr["Destination"].ToString();
+            obj.Date = dr["pickuptime"].ToString();
             result.Add(obj);
         }
 
