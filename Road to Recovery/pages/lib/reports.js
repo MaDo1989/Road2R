@@ -1,5 +1,12 @@
 ﻿// Purpose: JS code for the reports UI
 
+// 05-07: Focus on reports content, Use UI as-is fix it later.
+//  ==> finish all services is the goal.
+
+// Park: 06-06 : working  on week picker by customizing datepicker
+// see comments at end of  populate_week_field() - need to fix it
+// Then we can start implement the repot of amute week
+
 
 // DEBUG:  We  use אלון שדה  &  בני בורנפלד
 // new report:   פר אזור: רשימת המתנדבים      "מתנדבים שבועי"
@@ -65,6 +72,8 @@ function on_report_click(event) {
 var K_strategy = {
     "rp_vl_ride_month": rp_vl_ride_month__refresh_preview,
     "rp_vl_ride_year": rp_vl_ride_year__refresh_preview,
+    "rp_amuta_vls_week": rp_amuta_vls_week__refresh_preview,
+    "rp_amuta_vls_per_pat": rp_amuta_vls_per_pat__refresh_preview
 }
 
 
@@ -90,6 +99,22 @@ var K_fields_map = {
             type: "VOLUNTEER",
             template: 'div[name="template_VOLUNTEER"]',
             post_clone: field_volunteers_post_clone
+        }
+    ],
+    "rp_amuta_vls_week": [
+        {
+            id: "rp_amuta_vls_week__week",
+            type: "WEEK",
+            template: 'div[name="template_WEEK"]',
+            post_clone: field_week_post_clone
+        }
+    ],
+    "rp_amuta_vls_per_pat": [
+        {
+            id: "rp_amuta_vls_per_pat__patient",
+            type: "PATIENT",
+            template: 'div[name="template_patient"]',
+            post_clone: field_patient_post_clone
         }
     ]
 }
@@ -227,12 +252,81 @@ function field_volunteers_post_clone(id) {
 }
 
 
+function populate_week_field() {
+    // https://stackoverflow.com/a/9402266
+
+   dt =  $("#select_week").datepicker({
+        dateFormat: "yy-mm-dd",
+        showOtherMonths: true,
+        selectOtherMonths: true,
+        changeMonth: true,
+        changeYear: true,
+        showWeek: true,
+        beforeShow: function (dateText, inst) {
+
+            //  $(".datepicker-days").find("tr").addClass('ui-state-hover')
+            console.log("before");
+            $(document).on('mouseenter', '.datepicker-days',
+                function () { console.log($(this)) ;  $(this).find('td a').addClass('ui-state-hover'); });
+            $(document).on('mouseleave', '.datepicker-days tr',
+                function () { $(this).find('td a').removeClass('ui-state-hover'); });
+
+            // for week highighting
+            $(".datepicker-days tr").live("mousemove", function () {
+                console.log($(this));
+                $(this).find("td a").addClass("ui-state-hover");
+                $(this).find(".ui-datepicker-week-col").addClass("ui-state-hover");
+            });
+            $(".ui-datepicker-calendar tr").live("mouseleave", function () {
+                $(this).find("td a").removeClass("ui-state-hover");
+                $(this).find(".ui-datepicker-week-col").removeClass("ui-state-hover");
+            });
+        },
+        onClose: function (dateText, inst) {
+            var wk = $.datepicker.iso8601Week(new Date(dateText));
+            if (parseInt(wk) < 10) {
+                wk = "0" + wk;
+            }
+            var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+
+            if (isNaN(wk)) {
+                $(this).val("");
+            } else {
+                $(this).val(year + ";" + wk);
+            }
+
+            // disable live listeners so they dont impact other instances
+            $(".ui-datepicker-calendar tr").die("mousemove");
+            $(".ui-datepicker-calendar tr").die("mouseleave");
+
+        }
+   });
+
+    dt.on("show", function (e) {
+
+        // This is working. Need to  do it for the tr and support mouseleave and hide()
+
+        console.log("Show", e);
+        $(document).on('mouseenter', '.datepicker-days',
+            function () { console.log($(this)); $(this).find('td a').addClass('ui-state-hover'); });
+    });
+}
+
+function field_week_post_clone(id) {
+    populate_week_field();
+}
+
+
+function field_patient_post_clone(id) {
+    populate_patient_field();
+}
+
 
 function refreshPreview() {
     S_refresh_preview();
 }   
 
-// Checks if all fileds are filled. If so refresh the report
+// Checks if all fields are filled. If so refresh the report
 function rp_vl_ride_month__refresh_preview() {
     var selected_date = Date.parse($("#select_month").val());
     if (selected_date) {
@@ -266,6 +360,28 @@ function rp_vl_ride_year__refresh_preview() {
 }   
 
 
+function rp_amuta_vls_week__refresh_preview() {
+    alert("TBD");
+    var volunteerId = $("#select_driver").attr("itemID");
+    if (volunteerId) {
+        // default date range - this year up till now
+        var today = new Date();
+        var end_month_date = moment(today);
+        today.setMonth(0);
+        today.setDate(1);
+        var start_month_date = moment(today);
+
+        refreshTable(volunteerId,
+            start_month_date.format("YYYY-MM-DD"),
+            end_month_date.format("YYYY-MM-DD"));
+    }
+}   
+
+
+function rp_amuta_vls_per_pat__refresh_preview() {
+    alert("TBD");
+}
+
 // 'start_date' :  a date formatted as YYYY-MM-DD
 // 'end_date'   :  a date formatted as YYYY-MM-DD
 function refreshTable(volunteerId, start_date, end_date) {
@@ -282,7 +398,7 @@ function refreshTable(volunteerId, start_date, end_date) {
 
     $.ajax({
         dataType: "json",
-        url: "WebService.asmx/GetReportVolunteerRides",
+        url: "ReportsWebService.asmx/GetReportVolunteerRides",
         contentType: "application/json; charset=utf-8",
         beforeSend: function (xhr) {
             xhr.setRequestHeader("Content-Encoding", "gzip");

@@ -290,12 +290,13 @@ AND RidePat.pickuptime >= '2020-1-01'
 
                         Volunteer primary = new Volunteer();
                         primary.DriverType = "Primary";
-
+/* @@
                         primary.Id = int.Parse(dr["MainDriver"].ToString());
                         DataRow driverRow = driverTable.Rows[0];
                         primary.DisplayName = driverRow["DisplayName"].ToString();
                         primary.CellPhone = driverRow["CellPhone"].ToString();
                         rp.Drivers.Add(primary);
+@@ */
                     }
 
 
@@ -311,10 +312,13 @@ AND RidePat.pickuptime >= '2020-1-01'
                             secondary.DriverType = "secondary";
                             secondary.Id = int.Parse(dr["secondaryDriver"].ToString());
                             string searchExpression = "Id = " + secondary.Id;
+/* @@ 
                             DataRow[] driverRow = driverTable.Select(searchExpression);
                             secondary.DisplayName = driverRow[0]["DisplayName"].ToString();
                             secondary.CellPhone = driverRow[0]["CellPhone"].ToString();
                             rp.Drivers.Add(secondary);
+
+    @@ */
                         }
                     }
 
@@ -338,6 +342,7 @@ AND RidePat.pickuptime >= '2020-1-01'
                     rp.Pat = thePatient;
 
                     rp.Pat.EscortedList = new List<Escorted>();
+/* @@
                     string escortSearchExpression = "RidePatNum = " + rp.RidePatNum;
                     DataRow[] escortRow = escortTable.Select(escortSearchExpression);
                     foreach (DataRow row in escortRow)
@@ -347,6 +352,8 @@ AND RidePat.pickuptime >= '2020-1-01'
                         e.DisplayName = row[1].ToString();
                         rp.Pat.EscortedList.Add(e);
                     }
+                    @@ */
+
 
 
                     Location origin = new Location();
@@ -371,6 +378,7 @@ AND RidePat.pickuptime >= '2020-1-01'
                     rp.Status = dr["Status"].ToString();
                     if (rp.RideNum > 0) // if RidePat is assigned to a Ride - Take the Ride's status
                     {
+/* @@ 
                         string searchExpression = "RideRideNum = " + rp.RideNum;
                         DataRow[] rideRow = rideTable.Select(searchExpression);
                         //rideRow = rideRow.OrderBy(x => x.TimeOfDay).ToList();
@@ -389,7 +397,7 @@ AND RidePat.pickuptime >= '2020-1-01'
                             throw err;
                         }
 
-
+@@ */
                     }
 
                     rpl.Add(rp);
