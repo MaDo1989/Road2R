@@ -131,11 +131,11 @@ AND RidePat.pickuptime >= '2020-1-01'
 
         string query =
  @"select DISTINCT DisplayName,  Area
-From(SELECT Volunteer.DisplayName, RidePat.Area
-FROM RidePat
-INNER JOIN Volunteer ON RidePat.MainDriver = Volunteer.Id
-AND RidePat.pickuptime <  @end_date
-AND RidePat.pickuptime >=  @start_date) AS BUFF
+From(SELECT Volunteer.DisplayName, RPView.Area
+FROM RPView
+INNER JOIN Volunteer ON RPView.MainDriver = Volunteer.Id
+AND RPView.pickuptime <  @end_date
+AND RPView.pickuptime >=  @start_date) AS BUFF
 ORDER BY Area ASC";            ;
  
         SqlCommand cmd = new SqlCommand(query);
@@ -167,15 +167,15 @@ ORDER BY Area ASC";            ;
         string query =
  @"select pickuptime, Origin, Destination, Volunteer.DisplayName, PatName
 from 
-( SELECT pickuptime, Origin, Destination, MainDriver, Patient.DisplayName AS PatName FROM RidePat 
-INNER JOIN Patient ON RidePat.Patient=Patient.DisplayName
-AND pickuptime >= '2019-1-01'
+( SELECT pickuptime, Origin, Destination, MainDriver, DisplayName AS PatName FROM RPView 
+WHERE pickuptime >= '2019-1-01'
 and MainDriver is not null
-AND RidePat.pickuptime < @end_date
-AND RidePat.pickuptime >= @start_date
+AND RPView.pickuptime < @end_date
+AND RPView.pickuptime >= @start_date
 ) AS BUFF
 INNER JOIN Volunteer ON MainDriver=Volunteer.Id
-ORDER BY Volunteer.DisplayName ASC";
+ORDER BY Volunteer.DisplayName ASC
+";
 
         SqlCommand cmd = new SqlCommand(query);
         cmd.CommandType = CommandType.Text;
@@ -237,10 +237,10 @@ order BY DisplayName ASC
         string query =
 @"SELECT pickuptime, Origin, Destination, Volunteer.DisplayName
 From (
-SELECT pickuptime, Origin, Destination, MainDriver FROM RidePat 
-INNER JOIN Patient ON RidePat.Patient=Patient.DisplayName
+SELECT pickuptime, Origin, Destination, MainDriver FROM RPView  
+WHERE pickuptime >= '2019-1-01'
 and MainDriver is not null
-and Patient.Id = @patient
+and Id = @patient
 ) as BUFF
 INNER JOIN Volunteer ON BUFF.MainDriver=Volunteer.Id";
 
