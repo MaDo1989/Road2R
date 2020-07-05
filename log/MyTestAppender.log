@@ -1,1 +1,9 @@
 ﻿2020-07-05 11:00:29,798 ERROR [33] WebService.writeToLog - Successful login ;for user: 0001112222
+2020-07-05 13:10:32,780 ERROR [30] ReportsWebService.GetReportVolunteerWeekly - Error in GetReportVolunteerWeekly
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  ReportService.GetReportVolunteerWeekly(String start_date, String end_date) ב- c:\home\aamit\road2recovery\04-April-2020\App_Code\ReportService.cs:שורה 122
+   ב-  ReportsWebService.GetReportVolunteerWeekly(String start_date, String end_date) ב- c:\home\aamit\road2recovery\04-April-2020\App_Code\ReportsWebService.cs:שורה 91
+2020-07-05 13:10:39,707 ERROR [39] ReportsWebService.GetReportVolunteerWeekly - Error in GetReportVolunteerWeekly
+System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
+   ב-  ReportService.GetReportVolunteerWeekly(String start_date, String end_date) ב- c:\home\aamit\road2recovery\04-April-2020\App_Code\ReportService.cs:שורה 122
+   ב-  ReportsWebService.GetReportVolunteerWeekly(String start_date, String end_date) ב- c:\home\aamit\road2recovery\04-April-2020\App_Code\ReportsWebService.cs:שורה 91

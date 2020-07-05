@@ -3,6 +3,9 @@
 // 05-07: Focus on reports content, Use UI as-is fix it later.
 //  ==> finish all services is the goal.
 
+// TODAY: Return real results from GetReportVolunteerWeekly()  based on actual date ==> cs
+// TODAY: Display in table real results from   GetReportVolunteerWeekly()  ==> js
+
 // Park: 06-06 : working  on week picker by customizing datepicker
 // see comments at end of  populate_week_field() - need to fix it
 // Then we can start implement the repot of amute week
@@ -261,55 +264,25 @@ function populate_week_field() {
         selectOtherMonths: true,
         changeMonth: true,
         changeYear: true,
-        showWeek: true,
-        beforeShow: function (dateText, inst) {
-
-            //  $(".datepicker-days").find("tr").addClass('ui-state-hover')
-            console.log("before");
-            $(document).on('mouseenter', '.datepicker-days',
-                function () { console.log($(this)) ;  $(this).find('td a').addClass('ui-state-hover'); });
-            $(document).on('mouseleave', '.datepicker-days tr',
-                function () { $(this).find('td a').removeClass('ui-state-hover'); });
-
-            // for week highighting
-            $(".datepicker-days tr").live("mousemove", function () {
-                console.log($(this));
-                $(this).find("td a").addClass("ui-state-hover");
-                $(this).find(".ui-datepicker-week-col").addClass("ui-state-hover");
-            });
-            $(".ui-datepicker-calendar tr").live("mouseleave", function () {
-                $(this).find("td a").removeClass("ui-state-hover");
-                $(this).find(".ui-datepicker-week-col").removeClass("ui-state-hover");
-            });
-        },
-        onClose: function (dateText, inst) {
-            var wk = $.datepicker.iso8601Week(new Date(dateText));
-            if (parseInt(wk) < 10) {
-                wk = "0" + wk;
-            }
-            var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
-
-            if (isNaN(wk)) {
-                $(this).val("");
-            } else {
-                $(this).val(year + ";" + wk);
-            }
-
-            // disable live listeners so they dont impact other instances
-            $(".ui-datepicker-calendar tr").die("mousemove");
-            $(".ui-datepicker-calendar tr").die("mouseleave");
-
-        }
+         showWeek: true,
+         autoclose: true,
    });
 
     dt.on("show", function (e) {
 
         // This is working. Need to  do it for the tr and support mouseleave and hide()
 
-        console.log("Show", e);
-        $(document).on('mouseenter', '.datepicker-days',
-            function () { console.log($(this)); $(this).find('td a').addClass('ui-state-hover'); });
+        //console.log("Show", e);
+        //$(document).on('mouseenter', '.datepicker-days',
+        //    function () { console.log($(this)); $(this).find('td a').addClass('ui-state-hover'); });
     });
+
+    // DEBUG: set date to March
+    dt.datepicker('setDate', new Date(2020, 2));
+    dt.on("changeDate", function (e) {
+        refreshPreview();
+    });
+
 }
 
 function field_week_post_clone(id) {
@@ -361,26 +334,82 @@ function rp_vl_ride_year__refresh_preview() {
 
 
 function rp_amuta_vls_week__refresh_preview() {
-    alert("TBD");
-    var volunteerId = $("#select_driver").attr("itemID");
-    if (volunteerId) {
-        // default date range - this year up till now
-        var today = new Date();
-        var end_month_date = moment(today);
-        today.setMonth(0);
-        today.setDate(1);
-        var start_month_date = moment(today);
+    var selected_date = Date.parse($("#select_week").val());
+    var m = moment(selected_date);
+    var start_week_date = m.startOf('week').format("YYYY-MM-DD");
+    var end_week_date = m.endOf('week').format("YYYY-MM-DD");
 
-        refreshTable(volunteerId,
-            start_month_date.format("YYYY-MM-DD"),
-            end_month_date.format("YYYY-MM-DD"));
-    }
+
+    refresh_amuta_vls_week_Table(
+        start_week_date, end_week_date);
+  
 }   
 
 
 function rp_amuta_vls_per_pat__refresh_preview() {
     alert("TBD");
 }
+
+
+// 'start_date' :  a date formatted as YYYY-MM-DD
+// 'end_date'   :  a date formatted as YYYY-MM-DD
+function refresh_amuta_vls_week_Table(start_date, end_date) {
+    $("#cmdPrint").prop("disabled", false);
+    $('#wait').show();
+    var query_object = {
+        start_date: start_date,
+        end_date: end_date
+    };
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportVolunteerWeekly",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            $('#wait').hide();
+            arr_rides = JSON.parse(data.d);
+            hide_all_tables();
+
+            $('#div_table_amuta_vls_week').show();
+            tbl = $('#table_amuta_vls_week').DataTable({
+                pageLength: 500,
+                bLengthChange: false,
+                data: arr_rides,
+                destroy: true,
+                columnDefs: [
+                    { "orderData": [0, 1], "targets": 0 }],
+                columns: [
+                    { data: "Region" },
+                    { data: "Volunteer" }
+
+                ],
+                dom: 'Bfrtip',
+                buttons: [
+                    'print', 'csv', 'excel', 'pdf'
+                ],
+                createdRow: function (row, data, dataIndex) {
+                        $(row).css('background-color', '#f1f1f1');
+                },
+                rowCallback: function (row, data, index) {
+                }
+            });
+        },
+        error: function (err) {
+            $('#wait').hide();
+            // @@ alert("Error in GetRidePatView: " + err.responseText);
+        }
+
+
+    });
+
+}
+
+
 
 // 'start_date' :  a date formatted as YYYY-MM-DD
 // 'end_date'   :  a date formatted as YYYY-MM-DD
@@ -390,6 +419,8 @@ function refreshTable(volunteerId, start_date, end_date) {
 
     $("#cmdPrint").prop("disabled", false);
     $('#wait').show();
+    hide_all_tables();
+    $('#div_weeklyRides').show();
     var query_object = {
         volunteerId: volunteerId,
         start_date: start_date,
@@ -538,12 +569,12 @@ function refreshTable(volunteerId, start_date, end_date) {
 
     });
 
+ }
 
-
-
+function hide_all_tables() {
+    $('#div_weeklyRides').hide();
+    $('#div_table_amuta_vls_week').hide();
 }
-
-
 
 
 function load_location() {

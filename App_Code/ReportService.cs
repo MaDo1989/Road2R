@@ -10,6 +10,12 @@ using System.Web;
 public class ReportService
 {
 
+    public class VolunteerPerRegion
+    {
+      
+        public string Volunteer { get; set; }
+        public string Region { get; set; }
+    }
 
     private DataTable getDriverByID(int driverID, DbService db)
     {
@@ -38,6 +44,8 @@ public class ReportService
         return dt;
     }
 
+    
+    //@@ TODO:  Maybe ths is not needed?
     private DataTable getVolunteerRidesPerWeek(string start_date, string end_date, DbService db)
     {
         /*
@@ -92,6 +100,39 @@ AND RidePat.pickuptime >= '2020-1-01'
         return dt;
     }
 
+    internal List<VolunteerPerRegion> GetReportVolunteerWeekly(string start_date, string end_date)
+    {
+        DbService db = new DbService();
+
+        string query =
+ @"select DISTINCT DisplayName,  Area
+From(SELECT Volunteer.DisplayName, RidePat.Area
+FROM RidePat
+INNER JOIN Volunteer ON RidePat.MainDriver = Volunteer.Id
+AND RidePat.pickuptime <  @end_date
+AND RidePat.pickuptime >=  @start_date) AS BUFF
+ORDER BY Area ASC";            ;
+ 
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        List<VolunteerPerRegion> result = new List<VolunteerPerRegion>();
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            VolunteerPerRegion p = new VolunteerPerRegion();
+            p.Volunteer = dr["DisplayName"].ToString();
+            p.Region = dr["Area"].ToString();
+            result.Add(p);
+        }
+
+        return result;
+    }
 
     public List<RidePat> GetReportVolunteerRides(int volunteerId, string start_date, string end_date)
     {
@@ -260,6 +301,7 @@ AND RidePat.pickuptime >= '2020-1-01'
     }
 
 
+    //@@ TODO:  Maybe ths is not needed?
     public List<RidePat> GetReportRidesWeeklyPerRegion(string start_date, string end_date)
     {
         DbService db = new DbService();
