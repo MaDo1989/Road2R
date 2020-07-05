@@ -251,7 +251,12 @@ function field_month_post_clone(id) {
 function field_year_post_clone(id) {
     var today = new Date();
     $('#select_year').val(today.getFullYear() - 1);
+    $("#select_year").change(on_year_change);
 
+    rp_amuta_vls_km__refresh_preview();
+}
+
+function on_year_change() {
     rp_amuta_vls_km__refresh_preview();
 }
 
@@ -437,6 +442,7 @@ function rp_amuta_vls_km__refresh_preview() {
 // 'end_date'   :  a date formatted as YYYY-MM-DD
 function refresh_amuta_vls_week_Table(start_date, end_date) {
     $("#cmdPrint").prop("disabled", false);
+    hide_all_tables();
     $('#wait').show();
     var query_object = {
         start_date: start_date,
@@ -455,7 +461,6 @@ function refresh_amuta_vls_week_Table(start_date, end_date) {
         success: function (data) {
             $('#wait').hide();
             arr_rides = JSON.parse(data.d);
-            hide_all_tables();
 
             $('#div_table_amuta_vls_week').show();
             tbl = $('#table_amuta_vls_week').DataTable({
@@ -495,6 +500,7 @@ function refresh_amuta_vls_week_Table(start_date, end_date) {
 // 'end_date'   :  a date formatted as YYYY-MM-DD
 function refresh_amuta_vls_km_Table(start_date, end_date) {
     $("#cmdPrint").prop("disabled", false);
+    hide_all_tables();
     $('#wait').show();
     var query_object = {
         start_date: start_date,
@@ -513,7 +519,6 @@ function refresh_amuta_vls_km_Table(start_date, end_date) {
         success: function (data) {
             $('#wait').hide();
             arr_rides = JSON.parse(data.d);
-            hide_all_tables();
 
             $('#div_table_amuta_vls_km').show();
             tbl = $('#table_amuta_vls_km').DataTable({
@@ -561,6 +566,7 @@ function rp_amuta_vls_per_pat__refresh_preview() {
 
 function refresh_amuta_vls_per_pat_Table(patient) {
     $("#cmdPrint").prop("disabled", false);
+    hide_all_tables();
     $('#wait').show();
     var query_object = {
         patient: patient
@@ -578,7 +584,6 @@ function refresh_amuta_vls_per_pat_Table(patient) {
         success: function (data) {
             $('#wait').hide();
             arr_rides = JSON.parse(data.d);
-            hide_all_tables();
 
             $('#div_table_amuta_vls_per_pat').show();
             tbl = $('#table_amuta_vls_per_pat').DataTable({

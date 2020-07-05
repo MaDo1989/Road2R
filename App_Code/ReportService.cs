@@ -165,12 +165,17 @@ ORDER BY Area ASC";            ;
         DbService db = new DbService();
 
         string query =
- @"SELECT pickuptime, Origin, Destination, MainDriver, Patient.DisplayName FROM RidePat 
+ @"select pickuptime, Origin, Destination, Volunteer.DisplayName, PatName
+from 
+( SELECT pickuptime, Origin, Destination, MainDriver, Patient.DisplayName AS PatName FROM RidePat 
 INNER JOIN Patient ON RidePat.Patient=Patient.DisplayName
+AND pickuptime >= '2019-1-01'
 and MainDriver is not null
 AND RidePat.pickuptime < @end_date
 AND RidePat.pickuptime >= @start_date
-ORDER BY MainDriver ASC";
+) AS BUFF
+INNER JOIN Volunteer ON MainDriver=Volunteer.Id
+ORDER BY Volunteer.DisplayName ASC";
 
         SqlCommand cmd = new SqlCommand(query);
         cmd.CommandType = CommandType.Text;
@@ -185,8 +190,8 @@ ORDER BY MainDriver ASC";
         foreach (DataRow dr in dt.Rows)
         {
             ReportService.VolunteerKM obj = new ReportService.VolunteerKM();
-            obj.Volunteer = dr["MainDriver"].ToString();
-            obj.Patient = dr["DisplayName"].ToString();
+            obj.Volunteer = dr["DisplayName"].ToString();
+            obj.Patient = dr["PatName"].ToString();
             obj.Origin = dr["Origin"].ToString();
             obj.Destination = dr["Destination"].ToString();
             obj.Date = dr["pickuptime"].ToString();

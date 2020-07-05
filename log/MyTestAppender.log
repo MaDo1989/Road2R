@@ -7,3 +7,9 @@ System.NullReferenceException: ההפניה לאובייקט לא הוגדרה �
 System.NullReferenceException: ההפניה לאובייקט לא הוגדרה למופע של אובייקט.
    ב-  ReportService.GetReportVolunteerWeekly(String start_date, String end_date) ב- c:\home\aamit\road2recovery\04-April-2020\App_Code\ReportService.cs:שורה 122
    ב-  ReportsWebService.GetReportVolunteerWeekly(String start_date, String end_date) ב- c:\home\aamit\road2recovery\04-April-2020\App_Code\ReportsWebService.cs:שורה 91
+2020-07-05 18:30:06,810 ERROR [21] ReportsWebService.GetReportVolunteersKM - Error in GetReportVolunteerWeekly
+System.ArgumentException: עמודה 'MainDriver' אינה שייכת לטבלה Table.
+   ב-  System.Data.DataRow.GetDataColumn(String columnName)
+   ב-  System.Data.DataRow.get_Item(String columnName)
+   ב-  ReportService.GetReportVolunteersKM(String start_date, String end_date) ב- c:\home\aamit\road2recovery\04-April-2020\App_Code\ReportService.cs:שורה 193
+   ב-  ReportsWebService.GetReportVolunteersKM(String start_date, String end_date) ב- c:\home\aamit\road2recovery\04-April-2020\App_Code\ReportsWebService.cs:שורה 133
