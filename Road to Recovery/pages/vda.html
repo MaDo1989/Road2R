@@ -59,8 +59,9 @@
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
                 success: function (data) {
-                    var volunteers = JSON.parse(data.d);
-                    renderTable(volunteers)
+                    var volunteers = JSON.parse(data.d);        
+                    console.log(volunteers)
+                    renderTable(volunteers)                    
                     $('#wait').hide();
                 },
                 error: function (err) { alert("Error in getVolunteerDataTable: " + err.responseText); }
@@ -177,7 +178,12 @@
                             if (!last) {
                                 return "";
                             }
-                            var date = new Date(last);
+
+                            lastArray = last.split(' ');
+                            lastArray[0] = lastArray[0].split(/\//).reverse().join('/');
+                            lastArray = lastArray[0] + " " + lastArray[1];                            
+
+                            var date = new Date(lastArray);
                             return "<p style='font-size: 0.1px'>" + date.getTime() + "</p>" + last;
                         }
                     },

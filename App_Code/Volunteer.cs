@@ -2080,6 +2080,12 @@ public class Volunteer
             v.AnsweredPrevQues = dr["answeredPrevQues"].ToString();
             v.GalitRemarks = dr["galitRemarks"].ToString();
 
+            v.WorkingWithCoor = dr["workingWithCoor"].ToString();
+            v.WorkingWithPat = dr["workingWithPat"].ToString();
+            v.HowToRecruit = dr["howToRecruit"].ToString();
+            v.HowKeepInTouch = dr["howKeepInTouch"].ToString();
+            v.NewsLetterRemarks = dr["newsLetterRemarks"].ToString();
+            v.GasRemarks = dr["gasRemarks"].ToString();
 
             list.Add(v);
         }
