@@ -8,6 +8,8 @@ using System.Globalization;
 using System.Web.Script.Services;
 using log4net;
 using System.Web.UI;
+using System.Configuration;
+using System.Collections;
 
 /// <summary>
 /// Summary description for WebService
@@ -1623,12 +1625,14 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
-    public void setVolunteerYuval(Volunteer volunteer, string coorEmail, string coorName, string coorPhone, string instructions)
+    //public void setVolunteerYuval(Volunteer volunteer, string coorEmail, string coorName, string coorPhone, string instructions)
+    public void setVolunteerYuval(Volunteer volunteer, List<Volunteer> coordinators, string instructions)
     {
         try
         {
             Volunteer v = volunteer;
-            v.setVolunteerYuval(v, coorEmail, coorName, coorPhone, instructions);
+            //v.setVolunteerYuval(v, coorEmail, coorName, coorPhone, instructions);
+            v.setVolunteerYuval(v, coordinators, instructions);
 
         }
         catch (Exception ex)
@@ -1639,6 +1643,74 @@ public class WebService : System.Web.Services.WebService
                 throw new Exception("duplicate key");
             }else throw new Exception("שגיאה ביצירת מתנדב חדש");
         }
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string WelcomePage(string VolunteerMobile, List<string> CoordinatorMobiles) //For multiple coordinators
+    {
+        try
+        {
+            User u = new User();
+            string VolunteerName = u.getUserNameByCellphone(VolunteerMobile);
+            string CIOName = ConfigurationManager.AppSettings["CIOName"];
+            string CIOPhone = ConfigurationManager.AppSettings["CIOPhone"];
+            List<string> names = new List<string>();
+            names.Add(VolunteerName);
+            names.Add(CIOName);
+            names.Add(CIOPhone);
+            foreach (string item in CoordinatorMobiles)
+            {
+                string CoordinatorName = u.getUserNameByCellphone(item);
+                names.Add(CoordinatorName);
+            };
+
+            
+            
+            return j.Serialize(names);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in WelcomePage method", ex);
+            throw new Exception("שגיאה בבדיקת נתוני משתמש");
+        }
+
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string WelcomePage2(string VolunteerMobile, string CoordinatorMobile) //For one coordinator
+    {
+        try
+        {
+            User u = new User();
+            string VolunteerName = u.getUserNameByCellphone(VolunteerMobile);
+            string CIOName = ConfigurationManager.AppSettings["CIOName"];
+            string CIOPhone = ConfigurationManager.AppSettings["CIOPhone"];
+            List<string> names = new List<string>();
+            names.Add(VolunteerName);
+            names.Add(CIOName);
+            names.Add(CIOPhone);
+            string CoordinatorName;
+            if (CoordinatorMobile == "NoCoor")
+            {
+                CoordinatorName = "NoCoor";
+            }
+            else
+            {
+                CoordinatorName = u.getUserNameByCellphone(CoordinatorMobile);
+            }                      
+            names.Add(CoordinatorName);
+            return j.Serialize(names);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in WelcomePage method", ex);
+            throw new Exception("שגיאה בבדיקת נתוני משתמש");
+        }
+
 
     }
 

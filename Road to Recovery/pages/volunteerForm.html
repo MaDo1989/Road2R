@@ -1012,7 +1012,7 @@
 
             $("#volunteerFirstName").val($("#volunteerFirstName").val().trim())
             firstNameHebrew = $("#volunteerFirstName").val();
-            var HebrewREGEX = new RegExp("^[\u0590-\u05FF -]+$");
+            var HebrewREGEX = new RegExp("^[\u0590-\u05FF '-]+$");
             var firstNameHebrewMatch = HebrewREGEX.test(firstNameHebrew);
             if (!firstNameHebrewMatch || firstNameHebrew.length > 16 || firstNameHebrew.length < 2) {
                 swal(

@@ -139,7 +139,13 @@
                         KnowsArabic: volunteer.KnowsArabic,
                         JoinYear: volunteer.JoinYear,
                         Address: volunteer.Address,
-                        PostalCode: volunteer.PostalCode
+                        PostalCode: volunteer.PostalCode,
+                        WorkingWithCoor: volunteer.WorkingWithCoor,
+                        WorkingWithPat: volunteer.WorkingWithPat,
+                        HowToRecruit: volunteer.HowToRecruit,                        
+                        HowKeepInTouch: volunteer.HowKeepInTouch,
+                        NewsLetterRemarks: volunteer.NewsLetterRemarks,
+                        GasRemarks: volunteer.GasRemarks
                     }
                     console.log(volunteerUploaded)
                     var location = "";
@@ -159,9 +165,9 @@
                     $("#email").val(volunteer.Email);
                     if (volunteer.BirthDate == "1900-01-01" || volunteer.BirthDate == "" || volunteer.BirthDate == null) {
                         document.getElementById("birthday").value = null;
-                        $("#birthdayYear").val("בחר");
-                        $("#birthdayMonth").val("בחר");
-                        $("#birthdayDay").val("בחר");
+                        $("#birthdayYear").val("בחר.י");
+                        $("#birthdayMonth").val("בחר.י");
+                        $("#birthdayDay").val("בחר.י");
                     } else {
                         document.getElementById("birthday").value = volunteer.BirthDate;
                         var YearMonthDay = $("#birthday").val().split("-");
@@ -175,7 +181,7 @@
                     else if (volunteer.IsDriving == 0) {
                         $("#isDriving").val("התנדבות אחרת (ללא הסעה)")
                     } else {
-                        $("#isDriving").val("בחר")
+                        $("#isDriving").val("בחר.י")
                     }
                     $("#help").val(volunteer.HowCanHelp);
                     $("#feedback").val(volunteer.Feedback);
@@ -186,7 +192,7 @@
                     else if (volunteer.NewsLetter == 0) {
                         $("#newsLetter").val("לא")
                     } else {
-                        $("#newsLetter").val("בחר")
+                        $("#newsLetter").val("בחר.י")
                     }
                     if (volunteer.KnowsArabic == 1) {
                         $("#knowsArabic").val("כן");
@@ -194,15 +200,23 @@
                     else if (volunteer.KnowsArabic == 0) {
                         $("#knowsArabic").val("לא")
                     } else {
-                        $("#knowsArabic").val("בחר")
+                        $("#knowsArabic").val("בחר.י")
                     }
                     if (volunteer.JoinYear == "" || volunteer.BirthDate == null) {
-                        $("#joinYear").val("בחר");
+                        $("#joinYear").val("בחר.י");
                     } else {
                         $("#joinYear").val(volunteer.JoinYear);
                     }
                     $("#address").val(volunteer.Address);
                     $("#postalCode").val(volunteer.PostalCode);
+
+                    $("#workingWithCoor").val(volunteer.WorkingWithCoor);
+                    $("#workingWithPat").val(volunteer.WorkingWithPat);
+                    $("#howToRecruit").val(volunteer.HowToRecruit);
+                    $("#howKeepInTouch").val(volunteer.HowKeepInTouch);
+                    $("#newsLetterRemarks").val(volunteer.NewsLetterRemarks);
+                    $("#gasRemarks").val(volunteer.GasRemarks);
+
                     enableSave();
                     $('#main').show()
                 },
@@ -335,7 +349,7 @@
                                     <label class="col-sm-4 control-label">מגדר&nbsp;<span class="required">*</span></label>
                                     <div class="col-sm-6" id="selectgender">
                                         <select id="gender" name="gender" class="form-control req">
-                                            <option>בחר</option>
+                                            <option>בחר.י</option>
                                             <option>זכר</option>
                                             <option>נקבה</option>
                                         </select>
@@ -414,7 +428,7 @@
                                     <label class="col-sm-4 control-label">צורת התנדבות&nbsp;<span class="required">*</span></label>
                                     <div class="col-sm-6" id="selectIsDriving">
                                         <select id="isDriving" name="isDriving" class="form-control req">
-                                            <option>בחר</option>
+                                            <option>בחר.י</option>
                                             <option>הסעה</option>
                                             <option>התנדבות אחרת (ללא הסעה)</option>
                                         </select>
@@ -428,7 +442,7 @@
                                     <label class="col-sm-4 control-label">ידיעת ערבית&nbsp;</label>
                                     <div class="col-sm-6" id="selectKnowsArabic">
                                         <select id="knowsArabic" name="knowsArabic" class="form-control">
-                                            <option>בחר</option>
+                                            <option>בחר.י</option>
                                             <option>כן</option>
                                             <option>לא</option>
                                         </select>
@@ -442,7 +456,7 @@
                                     <label class="col-sm-4 control-label">מעוניין לקבל את העדכון השבועי&nbsp;<span class="required">*</span></label>
                                     <div class="col-sm-6" id="selectNewsLetter">
                                         <select id="newsLetter" name="newsLetter" class="form-control req">
-                                            <option>בחר</option>
+                                            <option>בחר.י</option>
                                             <option>כן</option>
                                             <option>לא</option>
                                         </select>
@@ -471,10 +485,74 @@
                                 </div>
                             </div>
                         </div>
+                        <h3>משוב</h3>
                         <div class="row m-l-10 m-r-10">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label">משוב על פעילותך ועל "בדרך להחלמה"</label>
+                                    <label class="col-sm-4 control-label">עבודה מול הרכזים (כולל האפליקציה)</label>
+                                    <div class="col-sm-6">
+                                        <textarea id="workingWithCoor" name="workingWithCoor" class="form-control textAreaClass" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">הממשק עם החולים</label>
+                                    <div class="col-sm-6">
+                                        <textarea id="workingWithPat" name="workingWithPat" class="form-control textAreaClass" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <h4>עבודה עם המתנדבים:</h4>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">איך נגייס עוד מתנדבים</label>
+                                    <div class="col-sm-6">
+                                        <textarea id="howToRecruit" name="howToRecruit" class="form-control textAreaClass" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">איך נשמור קשר עם המתנדבים</label>
+                                    <div class="col-sm-6">
+                                        <textarea id="howKeepInTouch" name="howKeepInTouch" class="form-control textAreaClass" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <h4>עבודה מול העמותה:</h4>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">המכתב השבועי</label>
+                                    <div class="col-sm-6">
+                                        <textarea id="newsLetterRemarks" name="newsLetterRemarks" class="form-control textAreaClass" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">החזרי דלק</label>
+                                    <div class="col-sm-6">
+                                        <textarea id="gasRemarks" name="gasRemarks" class="form-control textAreaClass" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <h4>כללי:</h4>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">משוב כללי</label>
                                     <div class="col-sm-6">
                                         <!--<input id="feedback" name="feedback" type="text" class="form-control">-->
                                         <textarea id="feedback" name="feedback" class="form-control textAreaClass" rows="3"></textarea>
@@ -493,7 +571,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <hr /><br />
                         <div class="row m-l-10 m-r-10">
                             <div class="col-sm-6">
@@ -665,19 +742,47 @@
                 } else {
                     var knowsArabic = null;
                 }
-                if ($("#joinYear").val() == "בחר") {
+                if ($("#joinYear").val() == "בחר.י") {
                     var joinYear = "";
                 } else {
                     var joinYear = $("#joinYear").val();
                 }
                 var address = $("#address").val();
                 var postalCode = $("#postalCode").val();
+                var workingWithCoor = $("#workingWithCoor").val();
+                var workingWithPat = $("#workingWithPat").val();
+                var howToRecruit = $("#howToRecruit").val();
+                var howKeepInTouch = $("#howKeepInTouch").val();
+                var newsLetterRemarks = $("#newsLetterRemarks").val();
+                var gasRemarks = $("#gasRemarks").val();
+
 
                 volunteerUpdated = {
-                    FirstNameH: firstNameH, LastNameH: lastNameH, EnglishFN: englishFN, EnglishLN: englishLN,
-                    VolunteerIdentity: VolunteerIdentity, CellPhone: cellPhone, Gender: gender, City: city, Email: email,
-                    BirthDate: birthDate, IsDriving: isDriving, HowCanHelp: howCanHelp, Feedback: feedback,
-                    Remarks: remark, NewsLetter: newsLetter, KnowsArabic: knowsArabic, JoinYear: joinYear, Address: address, PostalCode: postalCode
+                    FirstNameH: firstNameH,
+                    LastNameH: lastNameH,
+                    EnglishFN: englishFN,
+                    EnglishLN: englishLN,
+                    VolunteerIdentity: VolunteerIdentity,
+                    CellPhone: cellPhone,
+                    Gender: gender,
+                    City: city,
+                    Email: email,
+                    BirthDate: birthDate,
+                    IsDriving: isDriving,
+                    HowCanHelp: howCanHelp,
+                    Feedback: feedback,
+                    Remarks: remark,
+                    NewsLetter: newsLetter,
+                    KnowsArabic: knowsArabic,
+                    JoinYear: joinYear,
+                    Address: address,
+                    PostalCode: postalCode,
+                    WorkingWithCoor: workingWithCoor,
+                    WorkingWithPat: workingWithPat,
+                    HowToRecruit: howToRecruit,
+                    HowKeepInTouch: howKeepInTouch,
+                    NewsLetterRemarks: newsLetterRemarks,
+                    GasRemarks: gasRemarks
                 }
 
                 if (JSON.stringify(volunteerUploaded) != JSON.stringify(volunteerUpdated)) {
@@ -759,25 +864,75 @@
                     } else {
                         var knowsArabic = null;
                     }
-                    if ($("#joinYear").val() == "בחר") {
+                    if ($("#joinYear").val() == "בחר.י") {
                         var joinYear = "";
                     } else {
                         var joinYear = $("#joinYear").val();
                     }
                     var address = $("#address").val();
                     var postalCode = $("#postalCode").val();
+                    var workingWithCoor = $("#workingWithCoor").val();
+                    var workingWithPat = $("#workingWithPat").val();
+                    var howToRecruit = $("#howToRecruit").val();
+                    var howKeepInTouch = $("#howKeepInTouch").val();
+                    var newsLetterRemarks = $("#newsLetterRemarks").val();
+                    var gasRemarks = $("#gasRemarks").val();
 
                     var volunteerExtended = {
-                        FirstNameH: firstNameH, LastNameH: lastNameH, EnglishFN: englishFN, EnglishLN: englishLN,
-                        VolunteerIdentity: VolunteerIdentity, CellPhone: cellPhone, Gender: gender, City: city, Email: email,
-                        BirthDate: birthDate, IsDriving: isDriving, HowCanHelp: howCanHelp, Feedback: feedback,
-                        Remarks: remark, DisplayName: displayName, EnglishName: englishName, NewsLetter: newsLetter, KnowsArabic: knowsArabic, JoinYear: joinYear, Address: address, PostalCode: postalCode
+                        FirstNameH: firstNameH,
+                        LastNameH: lastNameH,
+                        EnglishFN: englishFN,
+                        EnglishLN: englishLN,
+                        VolunteerIdentity: VolunteerIdentity,
+                        CellPhone: cellPhone,
+                        Gender: gender,
+                        City: city,
+                        Email: email,
+                        BirthDate: birthDate,
+                        IsDriving: isDriving,
+                        HowCanHelp: howCanHelp,
+                        Feedback: feedback,
+                        Remarks: remark,
+                        DisplayName: displayName,
+                        EnglishName: englishName,
+                        NewsLetter: newsLetter,
+                        KnowsArabic: knowsArabic,
+                        JoinYear: joinYear,
+                        Address: address,
+                        PostalCode: postalCode,
+                        WorkingWithCoor: workingWithCoor,
+                        WorkingWithPat: workingWithPat,
+                        HowToRecruit: howToRecruit,
+                        HowKeepInTouch: howKeepInTouch,
+                        NewsLetterRemarks: newsLetterRemarks,
+                        GasRemarks: gasRemarks
                     }
                     volunteerUpdated = {
-                        FirstNameH: firstNameH, LastNameH: lastNameH, EnglishFN: englishFN, EnglishLN: englishLN,
-                        VolunteerIdentity: VolunteerIdentity, CellPhone: cellPhone, Gender: gender, City: city, Email: email,
-                        BirthDate: birthDate, IsDriving: isDriving, HowCanHelp: howCanHelp, Feedback: feedback,
-                        Remarks: remark, NewsLetter: newsLetter, KnowsArabic: knowsArabic, JoinYear: joinYear, Address: address, PostalCode: postalCode
+                        FirstNameH: firstNameH,
+                        LastNameH: lastNameH,
+                        EnglishFN: englishFN,
+                        EnglishLN: englishLN,
+                        VolunteerIdentity: VolunteerIdentity,
+                        CellPhone: cellPhone,
+                        Gender: gender,
+                        City: city,
+                        Email: email,
+                        BirthDate: birthDate,
+                        IsDriving: isDriving,
+                        HowCanHelp: howCanHelp,
+                        Feedback: feedback,
+                        Remarks: remark,
+                        NewsLetter: newsLetter,
+                        KnowsArabic: knowsArabic,
+                        JoinYear: joinYear,
+                        Address: address,
+                        PostalCode: postalCode,
+                        WorkingWithCoor: workingWithCoor,
+                        WorkingWithPat: workingWithPat,
+                        HowToRecruit: howToRecruit,
+                        HowKeepInTouch: howKeepInTouch,
+                        NewsLetterRemarks: newsLetterRemarks,
+                        GasRemarks: gasRemarks
                     }
                     console.log(volunteerExtended);
                     $.ajax({
@@ -811,7 +966,7 @@
             let empty = false;
             var counter = 0;
             $('.req').each(function () {
-                empty = ($(this).val().length == 0 || $(this).val() == "בחר");
+                empty = ($(this).val().length == 0 || $(this).val() == "בחר.י");
 
                 if (empty) {
                     counter++
@@ -842,7 +997,7 @@
 
             $("#volunteerFirstName").val($("#volunteerFirstName").val().trim())
             firstNameHebrew = $("#volunteerFirstName").val();
-            var HebrewREGEX = new RegExp("^[\u0590-\u05FF -']+$");
+            var HebrewREGEX = new RegExp("^[\u0590-\u05FF '-]+$");
             var firstNameHebrewMatch = HebrewREGEX.test(firstNameHebrew);
             if (!firstNameHebrewMatch || firstNameHebrew.length > 16 || firstNameHebrew.length < 2) {
                 swal(
@@ -936,7 +1091,7 @@
                 if (!cityExists) {
                     swal(
                         "שים לב!",
-                        "הישוב שהזנת אינו תקין\nאנא בחר ישוב מתוך הרשימה",
+                        "הישוב שהזנת אינו תקין\nאנא בחר.י ישוב מתוך הרשימה",
                         "warning"
                     );
                     CityValid = false;
@@ -944,7 +1099,7 @@
             }
             var birthDate = $("#birthday").val();
             var birthdayArray = [$("#birthdayDay").val(), $("#birthdayMonth").val(), $("#birthdayYear").val()];
-            var howManySelect = birthdayArray.filter(i => i == "בחר");
+            var howManySelect = birthdayArray.filter(i => i == "בחר.י");
             if (howManySelect.length > 0 && howManySelect.length < 3) {
                 swal(
                     "שים לב!",
@@ -1000,7 +1155,7 @@
         function generateJoinDateSelect() {
             var start = 2010;
             var end = new Date().getFullYear();
-            var options = "<option>בחר</option>";
+            var options = "<option>בחר.י</option>";
             for (var year = end; year >= start; year--) {
                 options += "<option>" + year + "</option>";
             }
@@ -1009,13 +1164,13 @@
         function generateBirthdaySelect() {
             var start = 1930;
             var end = new Date().getFullYear();
-            var options = "<option>בחר</option>";
+            var options = "<option>בחר.י</option>";
             for (var year = end; year >= start; year--) {
                 options += "<option>" + year + "</option>";
             }
             document.getElementById("birthdayYear").innerHTML = options;
 
-            var options = "<option>בחר</option>";
+            var options = "<option>בחר.י</option>";
             for (var month = 1; month <= 12; month++) {
                 if (month < 10) {
                     options += "<option>0" + month + "</option>";
@@ -1026,7 +1181,7 @@
             }
             document.getElementById("birthdayMonth").innerHTML = options;
 
-            var options = "<option>בחר</option>";
+            var options = "<option>בחר.י</option>";
             for (var day = 1; day <= 31; day++) {
                 if (day < 10) {
                     options += "<option>0" + day + "</option>";

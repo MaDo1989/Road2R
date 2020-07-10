@@ -86,7 +86,7 @@
                     <img class="text-right" src="../../Media/R2R Logo.png" />
                     <br />
                     <br />
-                    <h3 class="page-title bold">פרטי מתנדב.ת חדש.ה</h3>
+                    
                 </div>
             </div>
         </div>
@@ -94,6 +94,8 @@
             <form class="form-horizontal" role="form" id="volunteerForm">
                 <div class="card-box">
                     <div class="row">
+                        <h3 class="page-title bold">פרטי מתנדב.ת חדש.ה</h3>
+                        <br />
                         <br />
                         <p class="required">* חובה למלא את כל השדות</p>
                         <div class="row m-l-10 m-r-10">
@@ -122,7 +124,7 @@
                                     <label class="col-sm-4 control-label">מגדר&nbsp;<!--<span class="required">*</span>--></label>
                                     <div class="col-sm-6" id="genderSelect">
                                         <select id="gender" name="gender" class="form-control req">
-                                            <option>בחר</option>
+                                            <option>בחר.י</option>
                                             <option>זכר</option>
                                             <option>נקבה</option>
                                         </select>
@@ -140,25 +142,49 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row m-l-10 m-r-10">
+
+
+
+
+
+                        <!--<div class="row m-l-10 m-r-10">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label">רכז&nbsp;<!--<span class="required">*</span>--></label>
+                                    <label class="col-sm-4 control-label">רכז&nbsp;</label>
                                     <div class="col-sm-6">
                                         <select id="coorSelect" name="coorSelect" class="form-control req">
-                                            <option>בחר</option>
+                                            <option>בחר.י</option>
                                         </select>
                                     </div>
                                 </div>
                             </div>
+                        </div>-->
+
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">רכז&nbsp;<!--<span class="required">*</span>--></label>
+                                    <div class="col-sm-6 checkboxlist">
+                                        <!--<select id="coorCheckbox" name="coorCheckbox" class="form-control">
+                                            <option>בחר.י</option>
+                                        </select>-->
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
+
+
+
+
+
                         <div class="row m-l-10 m-r-10">
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label class="col-sm-4 control-label">מעוניינ.ת בהדרכה?&nbsp;<!--<span class="required">*</span>--></label>
                                     <div class="col-sm-6" id="needInstructions">
                                         <select id="instructions" name="instructions" class="form-control req">
-                                            <option>בחר</option>
+                                            <option>בחר.י</option>
                                             <option>כן</option>
                                             <option>לא</option>
                                         </select>
@@ -173,7 +199,7 @@
                                 <div id="saveButton" class="form-group text-center">
                                     <button id="saveCustomer" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15" disabled><i class="ti-save m-r-5"></i>שמירה</button><button id="cancel" class="btn btn-danger waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-close m-r-5"></i>ביטול</button>
                                     <br />
-                                    <b id="saveButtonDisabled">השמירה תתאפשר רק לאחר שכל שדות החובה ימולאו</b>
+                                    <b id="saveButtonDisabled">השמירה תתאפשר רק לאחר שכל השדות ימולאו</b>
                                     <hr />
                                 </div>
                             </div>
@@ -218,10 +244,14 @@
                 coor.push(arr_coor[i].DisplayName);
                 coorEmails.push(arr_coor[i].Email);
             }
-            $.each(coor, function (key, value) {
-                $('#coorSelect')
-                    .append($('<option>', { value: coorEmails[key], cellphone: arr_coor[key].CellPhone })
-                        .text(value));
+            //$.each(coor, function (key, value) {
+            //    $('#coorSelect')
+            //        .append($('<option>', { value: coorEmails[key], cellphone: arr_coor[key].CellPhone })
+            //            .text(value));
+            //});
+
+            $.each(coor, function (index) {
+                $('.checkboxlist').append("<input type='checkbox' name='coo' value='" + coorEmails[index] + "' cellphone='" + arr_coor[index].CellPhone + "' displayname='" + coor[index] + "' /> " + coor[index] + "<br/>");
             });
         }
 
@@ -267,9 +297,24 @@
                     else if ($("#instructions").val() == "לא") {
                         var instructions = false;
                     }                   
-                    var coordinatorEmail = $("#coorSelect").val();
-                    var coordinatorName = $('#coorSelect option:selected').text();
-                    var coordinatorPhone = $('#coorSelect option:selected').attr("cellphone");
+
+                    //var coordinatorEmail = $("#coorSelect").val();
+                    //var coordinatorName = $('#coorSelect option:selected').text();
+                    //var coordinatorPhone = $('#coorSelect option:selected').attr("cellphone");
+
+
+                    var coordinators = [];
+                    $("input[name='coo']:checked").each(function () {
+                        var coordinatorEmail = this.value;
+                        var coordinatorName = this.attributes.displayname.nodeValue;
+                        var coordinatorPhone = this.attributes.cellphone.nodeValue;
+                        var coordinator = {
+                            Email: coordinatorEmail,
+                            DisplayName: coordinatorName,
+                            CellPhone: coordinatorPhone
+                        };
+                        coordinators.push(coordinator)
+                    });
 
                    
                     var volunteer = {
@@ -284,7 +329,8 @@
                         contentType: "application/json; charset=utf-8",
                         type: "POST",
                         async: false,
-                        data: JSON.stringify({ volunteer: volunteer, coorEmail: coordinatorEmail, coorName: coordinatorName, coorPhone: coordinatorPhone, instructions: instructions }),
+                        //data: JSON.stringify({ volunteer: volunteer, coorEmail: coordinatorEmail, coorName: coordinatorName, coorPhone: coordinatorPhone, instructions: instructions }),
+                        data: JSON.stringify({ volunteer: volunteer, coordinators: coordinators, instructions: instructions }),
                         success: function (data) {
                             swal({
                                 title: "הפרטים נשמרו\nתודה רבה",
@@ -311,7 +357,7 @@
             let empty = false;
             var counter = 0;
             $('.req').each(function () {
-                empty = ($(this).val().length == 0 || $(this).val() == "בחר");
+                empty = ($(this).val().length == 0 || $(this).val() == "בחר.י");
 
                 if (empty) {
                     counter++
@@ -335,7 +381,7 @@
 
             $("#volunteerFirstName").val($("#volunteerFirstName").val().trim())
             firstNameHebrew = $("#volunteerFirstName").val();
-            var HebrewREGEX = new RegExp("^[\u0590-\u05FF -']+$");
+            var HebrewREGEX = new RegExp("^[\u0590-\u05FF '-]+$");
             var firstNameHebrewMatch = HebrewREGEX.test(firstNameHebrew);
             if (!firstNameHebrewMatch || firstNameHebrew.length > 16 || firstNameHebrew.length < 2) {
                 swal(

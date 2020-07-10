@@ -1310,6 +1310,7 @@ public class RidePat
 
     public int LeaveRidePat(int ridePatId, int rideId, int driverId)
     {
+       
         int res = -1;
         DateTime timeRightNow = DateTime.Now;
         string driver = "";
@@ -1336,7 +1337,11 @@ public class RidePat
             driver = "secondaryDriver";
         }
 
-        //HERE!
+
+
+        // HERE!
+
+        //return ridePatId;
         RidePat rp = GetRidePat(ridePatId);
         RidePatNum = rp.RidePatNum;
         Message m = new Message();

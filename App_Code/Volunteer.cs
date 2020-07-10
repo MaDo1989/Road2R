@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -61,6 +62,12 @@ public class Volunteer
     string joinYear;
     string postalCode;
 
+    string workingWithCoor;
+    string workingWithPat;
+    string howToRecruit;
+    string howKeepInTouch;
+    string newsLetterRemarks;
+    string gasRemarks;
 
     //Delete after volunteer details project will end (written on 05/06/2020 by Alon):
     string source;
@@ -1127,6 +1134,84 @@ public class Volunteer
         }
     }
 
+    public string WorkingWithCoor
+    {
+        get
+        {
+            return workingWithCoor;
+        }
+
+        set
+        {
+            workingWithCoor = value;
+        }
+    }
+
+    public string WorkingWithPat
+    {
+        get
+        {
+            return workingWithPat;
+        }
+
+        set
+        {
+            workingWithPat = value;
+        }
+    }
+
+    public string HowToRecruit
+    {
+        get
+        {
+            return howToRecruit;
+        }
+
+        set
+        {
+            howToRecruit = value;
+        }
+    }
+
+    public string HowKeepInTouch
+    {
+        get
+        {
+            return howKeepInTouch;
+        }
+
+        set
+        {
+            howKeepInTouch = value;
+        }
+    }
+
+    public string NewsLetterRemarks
+    {
+        get
+        {
+            return newsLetterRemarks;
+        }
+
+        set
+        {
+            newsLetterRemarks = value;
+        }
+    }
+
+    public string GasRemarks
+    {
+        get
+        {
+            return gasRemarks;
+        }
+
+        set
+        {
+            gasRemarks = value;
+        }
+    }
+
 
     //public string KnowsArabic
     //{
@@ -1816,6 +1901,12 @@ public class Volunteer
         v.joinYear = dr["joinYear"].ToString();
         v.Address = dr["address"].ToString();
         v.PostalCode = dr["postalCode"].ToString();
+        v.WorkingWithCoor = dr["workingWithCoor"].ToString();
+        v.WorkingWithPat = dr["workingWithPat"].ToString();
+        v.HowToRecruit = dr["howToRecruit"].ToString();
+        v.HowKeepInTouch = dr["howKeepInTouch"].ToString();
+        v.NewsLetterRemarks = dr["newsLetterRemarks"].ToString();
+        v.GasRemarks = dr["gasRemarks"].ToString();
 
         #endregion
 
@@ -1829,7 +1920,7 @@ public class Volunteer
         DbService db = new DbService();
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
-        SqlParameter[] cmdParams = new SqlParameter[22];
+        SqlParameter[] cmdParams = new SqlParameter[28];
 
         cmdParams[0] = cmd.Parameters.AddWithValue("@firstNameH", v.FirstNameH);
         cmdParams[1] = cmd.Parameters.AddWithValue("@lastNameH", v.LastNameH);
@@ -1861,13 +1952,23 @@ public class Volunteer
         cmdParams[20] = cmd.Parameters.AddWithValue("@address", v.Address);
         cmdParams[21] = cmd.Parameters.AddWithValue("@postalCode", v.PostalCode);
 
+        cmdParams[22] = cmd.Parameters.AddWithValue("@workingWithCoor", v.WorkingWithCoor);
+        cmdParams[23] = cmd.Parameters.AddWithValue("@workingWithPat", v.WorkingWithPat);
+        cmdParams[24] = cmd.Parameters.AddWithValue("@howToRecruit", v.HowToRecruit);
+        cmdParams[25] = cmd.Parameters.AddWithValue("@howKeepInTouch", v.HowKeepInTouch);
+        cmdParams[26] = cmd.Parameters.AddWithValue("@newsLetterRemarks", v.NewsLetterRemarks);
+        cmdParams[27] = cmd.Parameters.AddWithValue("@gasRemarks", v.GasRemarks);
+
+
         string query = "";
 
         //query = "update VolunteerData set FirstNameH=@firstNameH, LastNameH=@lastNameH, EnglishFN=@englishFN, EnglishLN=@englishLN, ";
         query = "update VolunteerGood_30_05_20 set FirstNameH=@firstNameH, LastNameH=@lastNameH, EnglishFN=@englishFN, EnglishLN=@englishLN, ";
         query += "VolunteerIdentity=@volunteerIdentity, CellPhone=@cell, Gender=@gender, CityCityName=@city, Email=@email, ";
         query += "BirthDate=@bDay, IsDriving=@isDriving, HowCanHelp=@howCanHelp, Feedback=@feedback, Remarks=@remarks, NewsLetter=@newsLetter, KnowsArabic=@knowsArabic,";
-        query += "DisplayName=@displayName, EnglishName=@englishName, JoinYear=@joinYear, Address=@address, PostalCode=@postalCode, lastModified=DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@username";
+        query += "DisplayName=@displayName, EnglishName=@englishName, JoinYear=@joinYear, Address=@address, PostalCode=@postalCode,";
+        query += "workingWithCoor=@workingWithCoor, workingWithPat=@workingWithPat, howToRecruit=@howToRecruit, howKeepInTouch=@howKeepInTouch,";
+        query += "newsLetterRemarks=@newsLetterRemarks, gasRemarks=@gasRemarks, lastModified =DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@username";
         try
         {
             res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
@@ -1987,22 +2088,9 @@ public class Volunteer
         return list;
     }
 
-    public void setVolunteerYuval(Volunteer v, string coorEmail, string coorName, string coorPhone, string instructions)
+    //public void setVolunteerYuval(Volunteer v, string coorEmail, string coorName, string coorPhone, string instructions)
+    public void setVolunteerYuval(Volunteer v, List<Volunteer> coordinators, string instructions)
     {
-        //string longurl = "https://secure.telemessage.com/jsp/receiveSMS.jsp?userid=972524895999&password=Asdfghjkl12345";
-        //var uriBuilder = new UriBuilder(longurl);
-        //var SMSquery = HttpUtility.ParseQueryString(uriBuilder.Query);
-        //SMSquery["to"] = "972524895999";
-        //SMSquery["text"] = "Lets see if it works";
-        //uriBuilder.Query = SMSquery.ToString();
-        //longurl = uriBuilder.ToString();
-
-        //WebRequest wr = WebRequest.Create(longurl);
-        //HttpWebResponse response = (HttpWebResponse)wr.GetResponse();
-        //Console.WriteLine(response.StatusDescription);
-
-        //// "http://somesite.com:80/news.php?article=1&lang=en&action=login1&attempts=11"
-
 
 
         DbService db = new DbService();
@@ -2016,6 +2104,8 @@ public class Volunteer
         cmdParams[4] = cmd.Parameters.AddWithValue("@gender", v.Gender);
         cmdParams[5] = cmd.Parameters.AddWithValue("@UserName", v.CellPhone);
         cmdParams[6] = cmd.Parameters.AddWithValue("@volType", "מתנדב");
+
+        
 
         string query = "";
 
@@ -2064,76 +2154,90 @@ public class Volunteer
         Email em = new Email();
         string messageText = "";
 
-
-        //Send whatsapp / SMS to volunteer
-        //string WAMessage = "שלום " + v.DisplayName + "! <br/>";
-        //WAMessage += "תודה על הצטרפותך לפעילות שלנו. עוד פרטים ניתן לקרוא באתר העמותה בכתובת: <br/>";
-        //WAMessage += "www.roadtorecovery.org.il/?lang=he/ <br/>";
-        //WAMessage += "כדי להשלים את ההצטרפות: <br/>";
-        //WAMessage += "1. נא למלא את פרטיך האישיים בדף פרטי מתנדב.ת בכתובת: <br/>";
-        //WAMessage += "http://roadtorecovery.org.il/prod/Road%20to%20Recovery/pages/volunteerDetails.html <br/>";
-        //WAMessage += "2.	נא להוריד ולהתקין את האפליקציה הסלולרית למתנדב.ת. <br/>";
-        //WAMessage += "אם יש לך טלפון אנדרואיד: https://play.google.com/store/apps/details?id=il.Road.to.Recovery&hl=en <br/>";
-        //WAMessage += "אייפון: גלשו לאפל סטור, הקלידו את שם האפליקציה (בדרך להחלמה) בשורת החיפוש. <br/>";
-        //WAMessage += "3. עם סיום ההקתנה, פתח.י את האפליקציה והגדיר.י את ההעדפות שלך (מאיפה, לאן ומתי להסיע) <br/>";
-        //WAMessage += "דף עם תשובות לשאלות נפוצות לגבי השימוש באפליקציה נמצא ב:  http://www.roadtorecovery.org.il/Site/he/faq.html <br/><br/>";
-        //WAMessage += "אם נתקלת בבעיה, האנשים הבאים ישמחו לעזור: <br/>";
-        //WAMessage += "הרכז שלך - " + coorName + ", " + coorPhone + "<br/>";
-        //WAMessage += "מרכז המחשוב בעמותה - אמיר הדר, 0547298599 <br/><br/>";
-        //WAMessage += "!הסעות מוצלחות <br/><br/>";
-        //WAMessage += "יובל רוט";
-
-        //string WAMessage = "שלום " + v.DisplayName + "! <br/>";
-        //WAMessage += "תודה על הצטרפותך לפעילות שלנו. עוד פרטים ניתן לקרוא באתר העמותה בכתובת: <br/>";
-        //WAMessage += "www.roadtorecovery.org.il/?lang=he/ <br/>";
-        //WAMessage += "כדי להשלים את ההצטרפות: <br/><br/>";
-        //WAMessage += "&nbsp;&nbsp;1. נא למלא את פרטיך האישיים בדף פרטי מתנדב.ת בכתובת: <br/>";
-        //WAMessage += "&nbsp;&nbsp;http://roadtorecovery.org.il/prod/Road%20to%20Recovery/pages/volunteerDetails.html <br/><br/>";
-        //WAMessage += "&nbsp;&nbsp;2. נא להוריד ולהתקין את האפליקציה הסלולרית למתנדב.ת. <br/>";
-        //WAMessage += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;אם יש לך טלפון אנדרואיד: https://play.google.com/store/apps/details?id=il.Road.to.Recovery&hl=en <br/>";
-        //WAMessage += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;אייפון: גלשו לאפל סטור, הקלידו את שם האפליקציה (בדרך להחלמה) בשורת החיפוש. <br/><br/>";
-        //WAMessage += "&nbsp;&nbsp;3. עם סיום ההקתנה, פתח.י את האפליקציה והגדיר.י את ההעדפות שלך (מאיפה, לאן ומתי להסיע) <br/><br/>";
-        //WAMessage += "&nbsp;&nbsp;4. דף עם תשובות לשאלות נפוצות לגבי השימוש באפליקציה נמצא ב:  http://www.roadtorecovery.org.il/Site/he/faq.html <br/><br/>";
-        //WAMessage += "אם נתקלת בבעיה, האנשים הבאים ישמחו לעזור: <br/>";
-        //WAMessage += "&nbsp;&nbsp;- הרכז שלך - " + coorName + ", " + coorPhone + "<br/>";
-        //WAMessage += "&nbsp;&nbsp;- מרכז המחשוב בעמותה - אמיר הדר, 0547298599 <br/><br/>";
-        //WAMessage += "!הסעות מוצלחות <br/><br/>";
-        //WAMessage += "יובל רוט";
-
-        //em.sendMessageTo("New volunteer", "alonsa87@gmail.com", WAMessage);
-
-        ////Send email to admin (amir) - amir.adar@gmail.com
-        //messageText = "המשתמש.ת " + v.DisplayName + " נרשם.ה למערכת.<br/>טלפון נייד: " + v.CellPhone;
-        //em.sendMessageTo("New volunteer", ConfigurationManager.AppSettings["adminMail"], messageText); //Change to Amir's email
-
         //Send email to coordinator - (coorEmail)
-        if (coorEmail != "")
+        //if (coorEmail != "")
+        //{
+        //    messageText = "שלום " + coorName + "! <br/>";
+        //    if (v.Gender == "מתנדבת")
+        //    {
+        //        messageText += v.DisplayName + " - מתנדבת חדשה, הצטרפה אלינו. <br/>";
+        //        messageText += "הטלפון שלה: " + v.CellPhone + " <br/>";
+        //        messageText += "היא מצפה לשיחה איתך. <br/><br/>";
+        //    }
+        //    else
+        //    {
+        //        messageText += v.DisplayName + " - מתנדב חדש, הצטרף אלינו. <br/>";
+        //        messageText += "הטלפון שלו: " + v.CellPhone + " <br/>";
+        //        messageText += "הוא מצפה לשיחה איתך. <br/><br/>";
+        //    }
+        //    messageText += "בברכה, <br/>";
+        //    messageText += "יובל רוט <br/>";
+        //    em.sendMessageTo("New volunteer", coorEmail, messageText);
+        //}
+
+        //string longurl = ConfigurationManager.AppSettings["SMSserver"] + "&" + ConfigurationManager.AppSettings["SMSpass"];
+        //var uriBuilder = new UriBuilder(longurl);
+        //var SMSquery = HttpUtility.ParseQueryString(uriBuilder.Query);
+        //SMSquery["to"] = "972" + v.cellPhone.Substring(1, v.cellPhone.Length - 1);
+        //string SMSmessage = "להשלמת ההצטרפות לעמותת 'בדרך להחלמה' לחץ על הקישור הבא: http://roadtorecovery.org.il/test/Road%20to%20Recovery/pages/Welcome.html?vol=" + v.CellPhone + "&coor=" + coorPhone;
+        //SMSquery["text"] = SMSmessage;
+        //uriBuilder.Query = SMSquery.ToString();
+        //longurl = uriBuilder.ToString();
+
+        //WebRequest wr = WebRequest.Create(longurl);
+        //HttpWebResponse response = (HttpWebResponse)wr.GetResponse();
+        //Console.WriteLine(response.StatusDescription);
+
+        foreach (Volunteer coor in coordinators)
         {
-            messageText = "שלום " + coorName + "! <br/>";
-            if (v.Gender == "מתנדבת")
+            
+            if (coor.Email != "")
             {
-                messageText += v.DisplayName + " - מתנדבת חדשה, הצטרפה אלינו. <br/>";
-                messageText += "הטלפון שלה: " + v.CellPhone + " <br/>";
-                messageText += "היא מצפה לשיחה איתך. <br/><br/>";
+                messageText = "<table width='100%' border='0' cellspacing='0' cellpadding='0'><tr><td align='right'>";
+                messageText += "שלום " + coor.DisplayName + "! <br/>";
+                if (v.Gender == "מתנדבת")
+                {
+                    messageText += v.DisplayName + " - מתנדבת חדשה, הצטרפה אלינו. <br/>";
+                    messageText += "הטלפון שלה: " + v.CellPhone + " <br/>";
+                    messageText += "היא מצפה לשיחה איתך. <br/><br/>";
+                }
+                else
+                {
+                    messageText += v.DisplayName + " - מתנדב חדש, הצטרף אלינו. <br/>";
+                    messageText += "הטלפון שלו: " + v.CellPhone + " <br/>";
+                    messageText += "הוא מצפה לשיחה איתך. <br/><br/>";
+                }
+                messageText += "בברכה, <br/>";
+                messageText += "יובל רוט <br/></td></tr></table>";
+                em.sendMessageTo("New volunteer", coor.Email, messageText);
             }
-            else
-            {
-                messageText += v.DisplayName + " - מתנדב חדש, הצטרף אלינו. <br/>";
-                messageText += "הטלפון שלו: " + v.CellPhone + " <br/>";
-                messageText += "הוא מצפה לשיחה איתך. <br/><br/>";
-            }
-            messageText += "בברכה, <br/>";
-            messageText += "יובל רוט <br/>";
-            em.sendMessageTo("New volunteer", coorEmail, messageText);
         }
+
+        string longurl = ConfigurationManager.AppSettings["SMSserver"] + "&" + ConfigurationManager.AppSettings["SMSpass"];
+        var uriBuilder = new UriBuilder(longurl);
+        var SMSquery = HttpUtility.ParseQueryString(uriBuilder.Query);
+        SMSquery["to"] = "972" + v.cellPhone.Substring(1, v.cellPhone.Length - 1);
+        string SMSmessage = "להשלמת ההצטרפות לעמותת 'בדרך להחלמה' לחץ על הקישור הבא: http://roadtorecovery.org.il/test/Road%20to%20Recovery/pages/Welcome.html?vol=" + v.CellPhone;
+
+        foreach (Volunteer coor in coordinators)
+        {
+            SMSmessage += "&coor=" + coor.CellPhone;
+        }
+
+        SMSquery["text"] = SMSmessage;
+        uriBuilder.Query = SMSquery.ToString();
+        longurl = uriBuilder.ToString();
+
+        WebRequest wr = WebRequest.Create(longurl);
+        HttpWebResponse response = (HttpWebResponse)wr.GetResponse();
+        Console.WriteLine(response.StatusDescription);
+
 
         //if (instructions == "True")//Send email to instructor
         //{
         //    messageText = "המשתמש.ת " + v.DisplayName + " נרשם.ה למערכת.<br/>המשתמש.ת מעוניין.ת בהדרכה.<br/>טלפון נייד: " + v.CellPhone;
         //    em.sendMessageTo("New volunteer", ConfigurationManager.AppSettings["instructorMail"], messageText); //Change to instructor's email
         //}
-
-        
 
     }
 

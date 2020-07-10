@@ -577,6 +577,7 @@ public class Message
         {
             message = "הנהגת " + user.FirstNameH + " " + user.LastNameH + " נרשמה להסעה מ" + abc.Origin.Name + " ל" + abc.Destination.Name + " עם החולה " + abc.Pat.DisplayName + " כ" + driverType + " בתאריך " + abc.Date.ToShortDateString() + " ושעה " + time + ".";
         }
+
         //insert msg to db
         //string sender = (string)HttpContext.Current.Session["loggedInName"];
         string sender1;
@@ -1113,7 +1114,15 @@ public class Message
         //}
 
         //insert msg to db
-        string sender = (string)HttpContext.Current.Session["loggedInName"];
+        string sender = "unknown";
+        if (HttpContext.Current.Session["loggedInName"] != null)
+        {
+            sender = (string)HttpContext.Current.Session["loggedInName"];
+
+        }
+        
+
+
         int msgID = insertMsg(0, "Ride canceled", "נסיעה בוטלה", message, ridePatID, System.DateTime.Now, user.Id, "", true, false, false, sender);
 
 
