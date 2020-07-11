@@ -1,5 +1,9 @@
 ﻿// Purpose: JS code for the reports UI
 
+//  11-07:  Use 'label' in K_fiels_map to display the title
+
+
+
 // 05-07: Focus on reports content, Use UI as-is fix it later.
 //  ==> finish all services is the goal.
 
@@ -84,6 +88,7 @@ var K_fields_map = {
         {
             id: "rp_vl_ride_month__name",
             type: "VOLUNTEER",
+            label: "הסעות החודש",
             template: 'div[name="template_VOLUNTEER"]',
             post_clone: field_volunteers_post_clone
         },
@@ -91,6 +96,7 @@ var K_fields_map = {
             id: "rp_vl_ride_month__month",
             template: 'div[name="template_MONTH"]',
             type: "MONTH",
+            label: "מתנדבים החודש",
             post_clone: field_month_post_clone
         }
     ],
@@ -98,6 +104,7 @@ var K_fields_map = {
         {
             id: "rp_vl_ride_year__name",
             type: "VOLUNTEER",
+            label: "מתנדבים שנתי",
             template: 'div[name="template_VOLUNTEER"]',
             post_clone: field_volunteers_post_clone
         }
@@ -106,6 +113,7 @@ var K_fields_map = {
         {
             id: "rp_amuta_vls_week__week",
             type: "WEEK",
+            label: "מתנדבים - שבועי",
             template: 'div[name="template_WEEK"]',
             post_clone: field_week_post_clone
         }
@@ -114,6 +122,7 @@ var K_fields_map = {
         {
             id: "rp_amuta_vls_per_pat__patient",
             type: "PATIENT",
+            label: "מתנדבים פר חולה",
             template: 'div[name="template_PATIENT"]',
             post_clone: field_patient_post_clone
         }
@@ -122,6 +131,7 @@ var K_fields_map = {
         {
             id: "rp_amuta_vls_per_km__year",
             type: "YEAR",
+            label: "מתנדבים - שנתי",
             template: 'div[name="template_YEAR"]',
             post_clone: field_year_post_clone
         }
@@ -129,7 +139,7 @@ var K_fields_map = {
 }
 
 function populate_parameters(report_type) {
-    $("#params_ph").text("Populating for " + report_type);
+    // $("#params_ph").text("Populating for " + report_type);
     var fields = rp_get_fields(report_type);
     if (fields) {
         fields.forEach(rp_add_one_parameter);
@@ -173,7 +183,7 @@ function loadVolunteers(on_load_volunteers) {
         return;
     }
 
-    if (true) {
+    if (false) {
         console.log("loadVolunteers: speeding up by adding one entry only in debugging")
         var debug_entry = { label: "tt", id: 14535 };
         K_CACHE.volunteers.push(debug_entry);
@@ -300,7 +310,7 @@ function populate_week_field() {
     });
 
     // DEBUG: set date to March
-    dt.datepicker('setDate', new Date(2020, 2));
+    dt.datepicker('setDate', new Date(2020, 6));
     dt.on("changeDate", function (e) {
         refreshPreview();
     });
@@ -344,7 +354,7 @@ function loadPatients(on_load_patients) {
         return;
     }
 
-    if (true) {
+    if (false) {
         console.log("loadPatients: speeding up by adding one entry only in debugging")
         var debug_entry = { label: "tt", id: 22 };
         K_CACHE.patients.push(debug_entry);
