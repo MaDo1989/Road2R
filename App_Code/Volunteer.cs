@@ -68,6 +68,7 @@ public class Volunteer
     string howKeepInTouch;
     string newsLetterRemarks;
     string gasRemarks;
+    bool? igulLetova;
 
     //Delete after volunteer details project will end (written on 05/06/2020 by Alon):
     string source;
@@ -1212,6 +1213,21 @@ public class Volunteer
         }
     }
 
+    public bool? IgulLetova
+    {
+        get
+        {
+            return igulLetova;
+        }
+
+        set
+        {
+            igulLetova = value;
+        }
+    }
+
+
+
 
     //public string KnowsArabic
     //{
@@ -1907,7 +1923,14 @@ public class Volunteer
         v.HowKeepInTouch = dr["howKeepInTouch"].ToString();
         v.NewsLetterRemarks = dr["newsLetterRemarks"].ToString();
         v.GasRemarks = dr["gasRemarks"].ToString();
-
+        if (dr["IgulLetova"].ToString() != "")
+        {
+            v.IgulLetova = Convert.ToBoolean(dr["IgulLetova"].ToString());
+        }
+        else
+        {
+            v.IgulLetova = null;
+        }
         #endregion
 
         return v;
@@ -1920,7 +1943,7 @@ public class Volunteer
         DbService db = new DbService();
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
-        SqlParameter[] cmdParams = new SqlParameter[28];
+        SqlParameter[] cmdParams = new SqlParameter[29];
 
         cmdParams[0] = cmd.Parameters.AddWithValue("@firstNameH", v.FirstNameH);
         cmdParams[1] = cmd.Parameters.AddWithValue("@lastNameH", v.LastNameH);
@@ -1958,6 +1981,15 @@ public class Volunteer
         cmdParams[25] = cmd.Parameters.AddWithValue("@howKeepInTouch", v.HowKeepInTouch);
         cmdParams[26] = cmd.Parameters.AddWithValue("@newsLetterRemarks", v.NewsLetterRemarks);
         cmdParams[27] = cmd.Parameters.AddWithValue("@gasRemarks", v.GasRemarks);
+        
+        if (v.IgulLetova == null)
+        {
+            cmdParams[28] = cmd.Parameters.AddWithValue("@IgulLetova", DBNull.Value);
+        }
+        else
+        {
+            cmdParams[28] = cmd.Parameters.AddWithValue("@IgulLetova", v.IgulLetova);
+        }
 
 
         string query = "";
@@ -1968,7 +2000,7 @@ public class Volunteer
         query += "BirthDate=@bDay, IsDriving=@isDriving, HowCanHelp=@howCanHelp, Feedback=@feedback, Remarks=@remarks, NewsLetter=@newsLetter, KnowsArabic=@knowsArabic,";
         query += "DisplayName=@displayName, EnglishName=@englishName, JoinYear=@joinYear, Address=@address, PostalCode=@postalCode,";
         query += "workingWithCoor=@workingWithCoor, workingWithPat=@workingWithPat, howToRecruit=@howToRecruit, howKeepInTouch=@howKeepInTouch,";
-        query += "newsLetterRemarks=@newsLetterRemarks, gasRemarks=@gasRemarks, lastModified =DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@username";
+        query += "newsLetterRemarks=@newsLetterRemarks, gasRemarks=@gasRemarks, IgulLetova=@IgulLetova, lastModified =DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@username";
         try
         {
             res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);

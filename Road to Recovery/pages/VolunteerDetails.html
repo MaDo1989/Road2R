@@ -55,7 +55,7 @@
             background-color: #FFE684;
         }
 
-        input[type=email], input[type=text], input[type=checkbox], input[type=date], input[type=number], #gender, #isDriving, .textAreaClass, .birthSelect, #newsLetter, #knowsArabic, .joinYear {
+        input[type=email], input[type=text], input[type=checkbox], input[type=date], input[type=number], #gender, #isDriving, .textAreaClass, .birthSelect, #newsLetter, #knowsArabic, .joinYear, #IgulLetova {
             border-color: #000
         }
 
@@ -142,10 +142,11 @@
                         PostalCode: volunteer.PostalCode,
                         WorkingWithCoor: volunteer.WorkingWithCoor,
                         WorkingWithPat: volunteer.WorkingWithPat,
-                        HowToRecruit: volunteer.HowToRecruit,                        
+                        HowToRecruit: volunteer.HowToRecruit,
                         HowKeepInTouch: volunteer.HowKeepInTouch,
                         NewsLetterRemarks: volunteer.NewsLetterRemarks,
-                        GasRemarks: volunteer.GasRemarks
+                        GasRemarks: volunteer.GasRemarks,
+                        IgulLetova: volunteer.IgulLetova
                     }
                     console.log(volunteerUploaded)
                     var location = "";
@@ -216,7 +217,14 @@
                     $("#howKeepInTouch").val(volunteer.HowKeepInTouch);
                     $("#newsLetterRemarks").val(volunteer.NewsLetterRemarks);
                     $("#gasRemarks").val(volunteer.GasRemarks);
-
+                    if (volunteer.IgulLetova == 1) {
+                        $("#IgulLetova").val("כבר מעגל.ת לטובה");
+                    }
+                    else if (volunteer.IgulLetova == 0) {
+                        $("#IgulLetova").val("עדיין לא")
+                    } else {
+                        $("#IgulLetova").val("בחר.י")
+                    }
                     enableSave();
                     $('#main').show()
                 },
@@ -467,6 +475,20 @@
                         <div class="row m-l-10 m-r-10">
                             <div class="col-sm-6">
                                 <div class="form-group">
+                                    <label class="col-sm-4 control-label">עיגול לטובה&nbsp;</label>
+                                    <div class="col-sm-6" id="selectIgulLetova">
+                                        <select id="IgulLetova" name="IgulLetova" class="form-control">
+                                            <option>בחר.י</option>
+                                            <option>כבר מעגל.ת לטובה</option>
+                                            <option>עדיין לא</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-l-10 m-r-10">
+                            <div class="col-sm-6">
+                                <div class="form-group">
                                     <label class="col-sm-4 control-label">שנת הצטרפות</label>
                                     <div class="col-sm-6">
                                         <select id="joinYear" name="joinYear" class="form-control joinYear"></select>
@@ -596,8 +618,8 @@
                     <h2 class="modal-title" id="exampleModalLabel">תודה רבה</h2>
                     <h3>הפרטים נשמרו</h3>
                     <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-    </button>-->
+                        <span aria-hidden="true">&times;</span>
+                    </button>-->
                 </div>
                 <div class="modal-body">
                     <div class="row m-l-10 m-r-10">
@@ -611,7 +633,7 @@
                             </h4>
                         </div>
                     </div>
-                    
+
                 </div>
                 <div class="modal-footer">
                     <div class="col-sm-12 text-center">
@@ -619,7 +641,7 @@
                         <button type="button" class="btn btn-secondary" onclick="reload()">יציאה</button>
                     </div>
                 </div>
-                </div>
+            </div>
         </div>
     </div>
     <!-- end container -->
@@ -633,7 +655,7 @@
     </script>
     <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
     <script>
-        
+
         $(document).ready(function () {
             generateBirthdaySelect()
             generateJoinDateSelect()
@@ -755,7 +777,14 @@
                 var howKeepInTouch = $("#howKeepInTouch").val();
                 var newsLetterRemarks = $("#newsLetterRemarks").val();
                 var gasRemarks = $("#gasRemarks").val();
-
+                if ($("#IgulLetova").val() == "כבר מעגל.ת לטובה") {
+                    var IgulLetova = true;
+                }
+                else if ($("#IgulLetova").val() == "עדיין לא") {
+                    var IgulLetova = false;
+                } else {
+                    var IgulLetova = null;
+                }
 
                 volunteerUpdated = {
                     FirstNameH: firstNameH,
@@ -782,7 +811,8 @@
                     HowToRecruit: howToRecruit,
                     HowKeepInTouch: howKeepInTouch,
                     NewsLetterRemarks: newsLetterRemarks,
-                    GasRemarks: gasRemarks
+                    GasRemarks: gasRemarks,
+                    IgulLetova: IgulLetova
                 }
 
                 if (JSON.stringify(volunteerUploaded) != JSON.stringify(volunteerUpdated)) {
@@ -877,6 +907,14 @@
                     var howKeepInTouch = $("#howKeepInTouch").val();
                     var newsLetterRemarks = $("#newsLetterRemarks").val();
                     var gasRemarks = $("#gasRemarks").val();
+                    if ($("#IgulLetova").val() == "כבר מעגל.ת לטובה") {
+                        var IgulLetova = true;
+                    }
+                    else if ($("#IgulLetova").val() == "עדיין לא") {
+                        var IgulLetova = false;
+                    } else {
+                        var IgulLetova = null;
+                    }
 
                     var volunteerExtended = {
                         FirstNameH: firstNameH,
@@ -905,7 +943,8 @@
                         HowToRecruit: howToRecruit,
                         HowKeepInTouch: howKeepInTouch,
                         NewsLetterRemarks: newsLetterRemarks,
-                        GasRemarks: gasRemarks
+                        GasRemarks: gasRemarks,
+                        IgulLetova: IgulLetova
                     }
                     volunteerUpdated = {
                         FirstNameH: firstNameH,
@@ -932,7 +971,8 @@
                         HowToRecruit: howToRecruit,
                         HowKeepInTouch: howKeepInTouch,
                         NewsLetterRemarks: newsLetterRemarks,
-                        GasRemarks: gasRemarks
+                        GasRemarks: gasRemarks,
+                        IgulLetova: IgulLetova
                     }
                     console.log(volunteerExtended);
                     $.ajax({
