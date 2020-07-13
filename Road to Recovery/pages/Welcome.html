@@ -68,7 +68,9 @@
                 כדי להשלים את ההצטרפות: <br />
                 <ol>
                     <li>
-                        נא למלא את פרטיך האישיים בדף פרטי מתנדב.ת: <a href="http://roadtorecovery.org.il/test/Road%20to%20Recovery/pages/volunteerDetails.html">(הקליק.י פה)</a>
+                        נא למלא את פרטיך האישיים בדף פרטי מתנדב.ת: <a href="http://roadtorecovery.org.il/prod/Road%20to%20Recovery/pages/volunteerDetails.html">(הקליק.י פה)</a>
+                        <!--נא למלא את פרטיך האישיים בדף פרטי מתנדב.ת: <a href="http://roadtorecovery.org.il/test/Road%20to%20Recovery/pages/volunteerDetails.html">(הקליק.י פה)</a>-->
+
                     </li>
                     <li>
                         נא להוריד ולהתקין את האפליקציה הסלולרית למתנדב.ת. <br />
@@ -184,8 +186,8 @@
                 }
             } else {
                 $('#coordinator').text("הרכזים שלך:");
-                for (var i = 3, j = 0; i < names.length; i++) {
-                    $('#coordinator').append("<br />" + names[i] + ", " + CoorMobiles[j])
+                for (var i = 3, j = 0; i < names.length; i++, j++) {
+                    $('#coordinator').append("<br />" + names[i] + ", " + CoorMobiles[j].slice(0, 3) + "-" + CoorMobiles[j].slice(3))
                 }
             }
             $('#Hello').show();

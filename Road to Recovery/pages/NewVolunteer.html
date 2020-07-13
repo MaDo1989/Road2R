@@ -343,7 +343,7 @@
                         error: function (err) {
                             console.log(err);
                             if (err.responseJSON.Message == "duplicate key") {
-                                swal("מספר הטלפון הנייד כבר קיים במערכת");
+                                swal("לא ניתן להוסיף מתנדב.ת עם מספר טלפון זה - המספר כבר מוגדר במערכת");
                             }else swal("שגיאה בעריכת הנתונים");
                         }
                     });

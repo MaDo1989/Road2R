@@ -2174,7 +2174,7 @@ public class Volunteer
 
         try
         {
-            query = "insert into VolunteerGood_30_05_20 (UserName, CellPhone, FirstNameH, LastNameH, Gender, DisplayName, isActive, isAssistant, lastModified, JoinDate)";
+            query = "insert into VolunteerGood_30_05_20 (UserName, CellPhone, FirstNameH, LastNameH, DisplayName, Gender, isActive, isAssistant, lastModified, JoinDate)";
             query += " values (@UserName, @cell,@firstNameH,@lastNameH,@displayName,@gender,1,1,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
 
             db = new DbService();
@@ -2255,7 +2255,8 @@ public class Volunteer
         var uriBuilder = new UriBuilder(longurl);
         var SMSquery = HttpUtility.ParseQueryString(uriBuilder.Query);
         SMSquery["to"] = "972" + v.cellPhone.Substring(1, v.cellPhone.Length - 1);
-        string SMSmessage = "להשלמת ההצטרפות לעמותת 'בדרך להחלמה' לחץ על הקישור הבא: http://roadtorecovery.org.il/test/Road%20to%20Recovery/pages/Welcome.html?vol=" + v.CellPhone;
+        string SMSmessage = "להשלמת ההצטרפות לעמותת 'בדרך להחלמה' לחץ על הקישור הבא: http://roadtorecovery.org.il/prod/Road%20to%20Recovery/pages/Welcome.html?vol=" + v.CellPhone;
+        //string SMSmessage = "להשלמת ההצטרפות לעמותת 'בדרך להחלמה' לחץ על הקישור הבא: http://roadtorecovery.org.il/test/Road%20to%20Recovery/pages/Welcome.html?vol=" + v.CellPhone;
 
         foreach (Volunteer coor in coordinators)
         {
