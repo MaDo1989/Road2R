@@ -1,0 +1,26 @@
+﻿2020-04-11 10:52:36,176 ERROR [5] WebService.writeToLog - Successful login ;for user: 0544890081
+2020-04-11 17:05:38,811 ERROR [24] WebService.writeToLog - Successful login ;for user: 0544890081
+2020-04-11 17:06:11,280 ERROR [26] WebService.getAllStatus - Error in getAllStatus
+System.Data.SqlClient.SqlException (0x80131904): חיבור עם השרת נוצר בהצלחה, אך לאחר מכן אירעה שגיאה במשך תהליך הכניסה. (provider: TCP Provider, error: 0 - An existing connection was forcibly closed by the remote host.) ---> System.ComponentModel.Win32Exception (0x80004005): An existing connection was forcibly closed by the remote host
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, Boolean needToClose, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Repos\Road2R\App_Code\DBService.cs:שורה 76
+   ב-  Status.getAllStatus() ב- c:\Repos\Road2R\App_Code\Irrelevant\Status.cs:שורה 26
+   ב-  WebService.getAllStatus() ב- c:\Repos\Road2R\App_Code\WebService.cs:שורה 991
+ClientConnectionId:d9c41244-9f8a-4c4e-ba6f-500e885be877
+Error Number:10054,State:0,Class:20
+2020-04-11 17:21:27,731 ERROR [24] WebService.AssignRideToRidePat - Error in AssignRideToRidePat
+System.Data.SqlClient.SqlException (0x80131904): The INSERT statement conflicted with the FOREIGN KEY constraint "FKRide475152". The conflict occurred in database "r2rdb_testing", table "dbo.Volunteer", column 'Id'.
+The statement has been terminated.
+   ב-  DbService.GetObjectScalarByQuery(String sqlQuery, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Repos\Road2R\App_Code\DBService.cs:שורה 151
+   ב-  RidePat.AssignRideToRidePat(Int32 ridePatId, Int32 userId, String driverType) ב- c:\Repos\Road2R\App_Code\RidePat.cs:שורה 1244
+   ב-  WebService.AssignRideToRidePat(Int32 ridePatId, Int32 userId, String driverType) ב- c:\Repos\Road2R\App_Code\WebService.cs:שורה 911
+ClientConnectionId:96b99707-3ed2-461d-b685-8d6fd1b57c6e
+Error Number:547,State:0,Class:16
+2020-04-11 20:11:58,770 ERROR [20] WebService.writeToLog - Successful login ;for user: 0544890081
+2020-04-11 21:45:37,704 ERROR [23] WebService.writeToLog - Successful login ;for user: 0544890081
+2020-04-11 21:45:58,071 ERROR [16] WebService.setRidePat - Error in setRidePat
+System.IndexOutOfRangeException: אין שורה במיקום 0.
+   ב-  System.Data.RBTree`1.GetNodeByIndex(Int32 userIndex)
+   ב-  System.Data.DataRowCollection.get_Item(Int32 index)
+   ב-  RidePat.GetRidePat(Int32 ridePatNum) ב- c:\Repos\Road2R\App_Code\RidePat.cs:שורה 672
+   ב-  RidePat.setRidePat(RidePat ridePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Repos\Road2R\App_Code\RidePat.cs:שורה 523
+   ב-  WebService.setRidePat(RidePat RidePat, String func, Boolean isAnonymous, Int32 numberOfRides, String repeatRideEvery) ב- c:\Repos\Road2R\App_Code\WebService.cs:שורה 194

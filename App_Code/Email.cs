@@ -21,7 +21,8 @@ public class Email
     Dictionary<string, string> subjects = new Dictionary<string, string>{
       {"problem","בעיה מדווחת מהאפליקציה"},
       {"registration","בקשה לרישום"},
-      {"Assistant change","שינוי ע\"י עוזר" }
+      {"Assistant change","שינוי ע\"י עוזר" },
+      {"New volunteer","הרשמת מתנדב.ת חדש.ה" }
     };
 
 	public Email()
@@ -43,7 +44,7 @@ public class Email
         MailMessage message = new MailMessage();
         string systemMail = ConfigurationManager.AppSettings["systemMail"];
         string adminMail = ConfigurationManager.AppSettings["adminMail"];
-        message.To.Add(new MailAddress(adminMail));
+        message.To.Add(new MailAddress(adminMail)); //כתובת לשלוח אליה
 
         message.IsBodyHtml = true;
         try
@@ -73,4 +74,34 @@ public class Email
 
     }
 
+    public void sendMessageTo(string type, string toEmail, string messageText)
+    {
+
+        MailMessage message = new MailMessage();
+        string systemMail = ConfigurationManager.AppSettings["systemMail"];
+        string adminMail = ConfigurationManager.AppSettings["adminMail"];
+        message.To.Add(toEmail); 
+
+        message.IsBodyHtml = true;
+        try
+        {
+            message.Subject = subjects[type];
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("no such type: " + type + ", " + ex.Message);
+        }
+        StringBuilder sb = new StringBuilder();
+
+        message.Body = messageText;
+        try
+        {
+            sendMail(message);
+        }
+        catch (Exception ex)
+        {
+            throw (ex);
+        }
+
+    }
 }

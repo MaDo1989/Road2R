@@ -1,0 +1,16 @@
+﻿2020-04-13 06:22:47,175 ERROR [12] WebService.getLocations - Error in getLocations
+System.Data.SqlClient.SqlException (0x80131904): חיבור עם השרת נוצר בהצלחה, אך לאחר מכן אירעה שגיאה במשך לחיצת הידיים המתבצעת לפני הכניסה. (provider: TCP Provider, error: 0 - An existing connection was forcibly closed by the remote host.) ---> System.ComponentModel.Win32Exception (0x80004005): An existing connection was forcibly closed by the remote host
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, Boolean needToClose, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Repos\Road2R\App_Code\DBService.cs:שורה 76
+   ב-  Location.getHospitalListForView(Boolean active) ב- c:\Repos\Road2R\App_Code\Location.cs:שורה 296
+   ב-  WebService.getLocations() ב- c:\Repos\Road2R\App_Code\WebService.cs:שורה 95
+ClientConnectionId:3f5b3932-0382-4ad0-b500-16c4dde5c214
+Error Number:10054,State:0,Class:20
+2020-04-13 06:23:01,193 ERROR [10] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): חיבור עם השרת נוצר בהצלחה, אך לאחר מכן אירעה שגיאה במשך תהליך הכניסה. (provider: TCP Provider, error: 0 - An existing connection was forcibly closed by the remote host.) ---> System.ComponentModel.Win32Exception (0x80004005): An existing connection was forcibly closed by the remote host
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, Boolean needToClose, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Repos\Road2R\App_Code\DBService.cs:שורה 76
+   ב-  Location.getLocationsEnglishName() ב- c:\Repos\Road2R\App_Code\Location.cs:שורה 461
+   ב-  RidePat.GetRidePatView(Int32 volunteerId, Int32 maxDays) ב- c:\Repos\Road2R\App_Code\RidePat.cs:שורה 825
+   ב-  WebService.GetRidePatView(Int32 volunteerId, Int32 maxDays) ב- c:\Repos\Road2R\App_Code\WebService.cs:שורה 712
+ClientConnectionId:fb3624a4-3af0-45e2-9c84-d5661a8efa27
+Error Number:10054,State:0,Class:20
+2020-04-13 15:10:05,113 ERROR [8] WebService.writeToLog - Successful login ;for user: 0544890081

@@ -133,6 +133,9 @@ public class User
 
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
+        if (ds.Tables[0].Rows.Count == 0) {
+            throw new Exception("user not found");
+        }
         DataRow dr = ds.Tables[0].Rows[0];
         string userName = dr["DisplayName"].ToString();
         string userEnglishName = dr["EnglishName"].ToString();

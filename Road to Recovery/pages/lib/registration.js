@@ -10,6 +10,11 @@
             });
 
             $("#regForm").submit(function () {
+                GetUserNameByCellphone();
+                return false;
+            });
+
+            $("#nameConfForm").submit(function () {
                 registerDriver();
                 return false;
             });
@@ -40,14 +45,46 @@ function verifyAvailability(ridePatNum) {
         });
         }
 
-        function buidMessage(ride) {
-            str = "הסעה ב" + ride.Time + " ב" + ride.Date + " מ" + ride.OriginName + " ל" + ride.DestinationName + " של  " + ride.PatDisplayName;
+function buidMessage(ride) {
+    var when = "<p>" + ride.Date + ", בשעה " + ride.Time + "</p>";
+    var where = "<p>" + " מ" + ride.OriginName + " ל" + ride.DestinationName  + "</p>";
+    var who = "<p>" + " של  " + ride.PatDisplayName + "</p>";
+    var str = when + where + who;
             $("#approveMsg").html(str);
         }
 
         function handleExisting() {
             $("#existsModal").modal();
         }
+
+        function GetUserNameByCellphone() {
+            var request = {
+                uName: $("#phoneTB").val()
+            };
+            var dataString = JSON.stringify(request);
+
+            $.ajax({ // ajax call starts
+                url: 'WebService.asmx/GetUserNameByCellphone',   // server side web service method
+                data: dataString,                          // the parameters sent to the server
+                type: 'POST',                              // can be also GET
+                dataType: 'json',                          // expecting JSON datatype from the server
+                contentType: 'application/json; charset = utf-8', // sent to the server
+                success: getUnameSCB,                // data.d id the Variable data contains the data we get from serverside
+                error: registerDriverErrorCB
+            }); // end of ajax call
+
+            return false;
+
+}
+
+function getUnameSCB(data) {
+    $('#regModal').modal('hide');
+    var name = JSON.parse(data.d);
+    var text = "הנהג " + name + " מעוניין להרשם להסעה";
+    $("#nameConfirmationModal").modal();
+    $("#nameConfMsg").html(text);
+}
+
 
         function registerDriver() {
 
@@ -81,7 +118,7 @@ function registerDriverSuccessCB() {
                 timer: 2000,
                 showConfirmButton: false
             });
-            $('#regModal').modal('hide');
+            $("#nameConfirmationModal").modal('hide');
         }
 
         function registerDriverErrorCB(err) {
@@ -93,12 +130,5 @@ function registerDriverSuccessCB() {
                 });
                 return;
             }
-            setTimeout("init()", 2100);    
-            swal({
-                title: " להעיף מהשגיאה, נרשמת לנסיעה,תודה רבה",
-                type: "success",
-                timer: 2000,
-                showConfirmButton: false
-            });
             $('#regModal').modal('hide');
             }

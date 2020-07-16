@@ -1,5 +1,15 @@
 ﻿daysArr = { 0: "יום א'", 1: "יום ב'", 2: "יום ג'", 3: "יום ד'", 4: "יום ה'", 5: "יום ו'", 6: "יום ש'", };
 
+
+function initLocalStorage() {
+    lsArr = ["north", "center", "south", "sunday", "monday", "tuesday", "wednesday","thursday", "friday", "saturday"];
+    for (var i = 0; i < lsArr.length; i++) {
+        if (localStorage.getItem(lsArr[i]) === null)
+            localStorage[lsArr[i]] = true;
+    }
+}
+
+
 function fillLocations(data) {
     let fullList = JSON.parse(data.d);
     for (loc of fullList) {
@@ -26,7 +36,7 @@ function fillLocations(data) {
 
 function initCheckBoxes() {
 
-    initCB(localStorage.south,    '#south');
+    initCB(localStorage.south,     '#south');
     initCB(localStorage.center,    '#center');
     initCB(localStorage.north,     '#north');
     initCB(localStorage.sunday,    '#sunday');

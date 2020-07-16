@@ -40,6 +40,10 @@
         var allPatientsFromDB = [];
         var isAssistant = JSON.parse(GENERAL.USER.getIsAssistant());
         $(document).ready(function () {
+
+            if (localStorage.activePat == "undefined" || localStorage.activePat === undefined)
+                localStorage.activePat = true;
+
             var assistantName = "";
             if (isAssistant) {
                 $("#menuType").attr("w3-include-html", "HelperMenu.html");
@@ -84,7 +88,7 @@
             //});
 
             refreshTable();
-
+            
             //var pastePhone = document.getElementById('pastePhone');
 
             //cleanPhoneNumber = function (e) {
@@ -106,11 +110,19 @@
 
         });
 
+        function ActiveMode() {
+            localStorage.activePat = $("#activePatient").prop('checked');
+            
+            refreshTable();
+        }
 
         function refreshTable() {
             allPatientsFromDB = [];
             $('#wait').show();
             checkCookie();
+            var activePat = JSON.parse(localStorage.activePat);
+            $("#activePatient").prop('checked', activePat);
+            
             var active = $("#activePatient").prop('checked');
             $.ajax({
                 dataType: "json",
@@ -143,6 +155,7 @@
                         btnStr += /*showBtn + " " +*/ editBtn;
 
                         if (arr_patients[i].IsActive == false) {
+                            btnStr = "";
                             var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo' ></i></button>";
                             btnStr += " " + reactiveBtn;
                         }
@@ -365,7 +378,7 @@
 
             });
 
-    
+
 
             pastePhone.onpaste = cleanPhoneNumber;
         }
@@ -470,7 +483,7 @@
                             <div class="card-box table-responsive">
                                 <div class="row">
                                     <div class="col-sm-3 checkbox checkbox-primary text-left">
-                                        <input id="activePatient" type="checkbox" onchange="refreshTable()" checked>
+                                        <input id="activePatient" type="checkbox" onchange="ActiveMode()" checked>
                                         <label data-placement="left" data-toggle="tooltip" title="مرضى فعالون فقط   Active Patients only" for="activePatient">
                                             חולים פעילים בלבד
                                         </label>
@@ -561,6 +574,6 @@
         TableManageButtons.init();
 
     </script>
-    
+
 </body>
 </html>

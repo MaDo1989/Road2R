@@ -352,14 +352,16 @@
                     //set Escorts
                     var selected = [];
                     $('#selectEscort input:checked').each(function () {
-                        selected.push($(this).attr('name'));
+                        //selected.push($(this).attr('name'));
+                        selected.push($(this).attr('id'));
                     });
 
 
                     var Escorts = [];
                     for (i in arr_escort) {
                         for (j in selected) {
-                            if (arr_escort[i].DisplayName.replace("'", "") == selected[j]) {
+                            //if (arr_escort[i].DisplayName.replace("'", "") == selected[j]) {
+                            if ("escortCB" + arr_escort[i].Id == selected[j]) {
                                 var Escorted = new Object();
                                 Escorted = arr_escort[i];
                                 Escorts.push(Escorted);
@@ -407,7 +409,7 @@
                             } else {
                                 getEquipmentForPatient();
                             }
-                            
+
                         }
                         getEquipmentForPatient();
                     }
@@ -694,9 +696,10 @@
                     patientsIdentityAssistent = [];
                     for (i in arr_pat) {
                         //assistant cannot create anonymouse ride.
-                        if (isAssistant && arr_pat[i].IsAnonymous !== "") {
+                       
+                        if (isAssistant && arr_pat[i].IsAnonymous !== "") { //If the user is an assistant - two different lists will be made. one list of annonymous patients and one list of "regular" patients.
                             patientsIdentityAssistent.push(arr_pat[i].PatientIdentity)
-                            patientsAssistent.push(arr_pat[i]);
+                            patientsAssistent.push(arr_pat[i]); // List of annonymous patients
                             patientsAssistentDisplay.push(arr_pat[i].DisplayName.trim())
                             arr_arabNamesAssistent.push(arr_pat[i].DisplayNameA);
                             arr_englishNamesAssistent.push(arr_pat[i].EnglishName);
@@ -1154,11 +1157,20 @@
             }
             else isCenterPatient = false;
             if ($("#pat").val() != "") {
-                var i = patients.indexOf($("#pat").val().trim().replace(/\s\s+/g, ' '));
+                var fValue = $("#pat").val().trim().replace(/\s\s+/g, ' ');
+                var i = patients.indexOf(fValue);
                 if (i === -1) {
-                    var i = patientsAssistentDisplay.indexOf($("#pat").val().trim().replace(/\s\s+/g, ' '));
-                    localStorage.PatID = patientsAssistent[i].Id;
-                    $("#patArabic").val(arr_arabNamesAssistent[i]);
+                    var i = patientsAssistentDisplay.indexOf(fValue);
+                    if (i === -1) { // Did not find any patient with this name
+                        return;
+                    }
+                    //try {
+                        localStorage.PatID = patientsAssistent[i].Id;
+                    //}
+                    //catch {
+                    //    alert("If you see this error - please contact Alon")
+                    //}
+                            $("#patArabic").val(arr_arabNamesAssistent[i]);
                     if (patientsIdentityAssistent[i] != '0') {
                         $("#PatientIdentity").val(patientsIdentityAssistent[i]);
                     }
@@ -1656,7 +1668,9 @@
                                 checkEscorts.push(Escorted);
                             }
                             for (j in ridePat.Escorts) {
-                                if (arr_escort[i].DisplayName == ridePat.Escorts[j].DisplayName) {
+                                //if (arr_escort[i].DisplayName == ridePat.Escorts[j].DisplayName) {
+                                //CHECK THIS XXXXXXX
+                                if (arr_escort[i].Id == ridePat.Escorts[j].Id) {
                                     $("#escortCB" + arr_escort[i].Id).prop('checked', true);
                                 }
                             }
@@ -2252,7 +2266,7 @@
                                             <div class="col-sm-6">
 
                                                 <!--<input type="button" onclick="signDriverToRide()" id="saveDriver" class="btn btn-success w-md waves-light m-b-5 m-r-15" value="Save Driver" />-->
-                                                <input type="button" onclick="deleteDriverFromRide()" id="deleteDriver" class="btn btn-danger w-md waves-light m-b-5 m-r-15" value="Remove Driver" />
+                                                <input type="button" onclick="deleteDriverFromRide()" id="deleteDriver" class="btn btn-danger w-md waves-light m-b-5 m-r-15" value="הסרת נהג" />
 
                                                 <!--<div class="form-group" id="escortDiv">
                                                     <label data-toggle="tooltip" title="Patient escorts" class="col-sm-2 control-label">מלווים</label>

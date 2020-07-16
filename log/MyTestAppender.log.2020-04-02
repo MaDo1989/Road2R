@@ -1,0 +1,57 @@
+﻿2020-04-02 19:30:35,183 ERROR [9] WebService.GetRidePatView - Error in GetRidePatView
+System.ArgumentException: עמודה 'lastModified' אינה שייכת לטבלה Table.
+   ב-  RidePat.GetRidePatView(Int32 volunteerId, Int32 maxDays) ב- c:\Repos\Road2R\App_Code\RidePat.cs:שורה 1031
+   ב-  WebService.GetRidePatView(Int32 volunteerId, Int32 maxDays) ב- c:\Repos\Road2R\App_Code\WebService.cs:שורה 712
+2020-04-02 19:30:50,046 ERROR [9] WebService.GetRidePatView - Error in GetRidePatView
+System.ArgumentException: עמודה 'lastModified' אינה שייכת לטבלה Table.
+   ב-  RidePat.GetRidePatView(Int32 volunteerId, Int32 maxDays) ב- c:\Repos\Road2R\App_Code\RidePat.cs:שורה 1031
+   ב-  WebService.GetRidePatView(Int32 volunteerId, Int32 maxDays) ב- c:\Repos\Road2R\App_Code\WebService.cs:שורה 712
+2020-04-02 19:33:08,768 ERROR [10] WebService.getLocations - Error in getLocations
+System.Data.SqlClient.SqlException (0x80131904): Cannot open database "r2rdb_test" requested by the login. The login failed.
+Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, Boolean needToClose, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Repos\Road2R\App_Code\DBService.cs:שורה 76
+   ב-  Location.getHospitalListForView(Boolean active) ב- c:\Repos\Road2R\App_Code\Location.cs:שורה 296
+   ב-  WebService.getLocations() ב- c:\Repos\Road2R\App_Code\WebService.cs:שורה 95
+ClientConnectionId:3f06311d-2c71-4d5f-85cb-776981b1747d
+Error Number:4060,State:2,Class:11
+2020-04-02 19:33:20,414 ERROR [7] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): Cannot open database "r2rdb_test" requested by the login. The login failed.
+Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, Boolean needToClose, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Repos\Road2R\App_Code\DBService.cs:שורה 76
+   ב-  Location.getLocationsEnglishName() ב- c:\Repos\Road2R\App_Code\Location.cs:שורה 461
+   ב-  RidePat.GetRidePatView(Int32 volunteerId, Int32 maxDays) ב- c:\Repos\Road2R\App_Code\RidePat.cs:שורה 825
+   ב-  WebService.GetRidePatView(Int32 volunteerId, Int32 maxDays) ב- c:\Repos\Road2R\App_Code\WebService.cs:שורה 712
+ClientConnectionId:4ca9e508-b36b-467a-94a1-97ee7fcee51c
+Error Number:4060,State:2,Class:11
+2020-04-02 19:35:01,724 ERROR [9] WebService.getLocations - Error in getLocations
+System.Data.SqlClient.SqlException (0x80131904): Cannot open database "r2rdb_test" requested by the login. The login failed.
+Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, Boolean needToClose, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Repos\Road2R\App_Code\DBService.cs:שורה 76
+   ב-  Location.getHospitalListForView(Boolean active) ב- c:\Repos\Road2R\App_Code\Location.cs:שורה 296
+   ב-  WebService.getLocations() ב- c:\Repos\Road2R\App_Code\WebService.cs:שורה 95
+ClientConnectionId:286f068e-3d71-47f0-8d53-c7c9487441fd
+Error Number:4060,State:2,Class:11
+2020-04-02 19:36:15,799 ERROR [10] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): חיבור עם השרת נוצר בהצלחה, אך לאחר מכן אירעה שגיאה במשך תהליך הכניסה. (provider: TCP Provider, error: 0 - An existing connection was forcibly closed by the remote host.) ---> System.ComponentModel.Win32Exception (0x80004005): An existing connection was forcibly closed by the remote host
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, Boolean needToClose, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Repos\Road2R\App_Code\DBService.cs:שורה 76
+   ב-  Location.getLocationsEnglishName() ב- c:\Repos\Road2R\App_Code\Location.cs:שורה 461
+   ב-  RidePat.GetRidePatView(Int32 volunteerId, Int32 maxDays) ב- c:\Repos\Road2R\App_Code\RidePat.cs:שורה 825
+   ב-  WebService.GetRidePatView(Int32 volunteerId, Int32 maxDays) ב- c:\Repos\Road2R\App_Code\WebService.cs:שורה 712
+ClientConnectionId:7ce0570e-4a3e-48de-bcbc-3310c91edb96
+Error Number:10054,State:0,Class:20
+2020-04-02 19:37:34,158 ERROR [11] WebService.getLocations - Error in getLocations
+System.Data.SqlClient.SqlException (0x80131904): חיבור עם השרת נוצר בהצלחה, אך לאחר מכן אירעה שגיאה במשך תהליך הכניסה. (provider: TCP Provider, error: 0 - An existing connection was forcibly closed by the remote host.) ---> System.ComponentModel.Win32Exception (0x80004005): An existing connection was forcibly closed by the remote host
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, Boolean needToClose, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Repos\Road2R\App_Code\DBService.cs:שורה 76
+   ב-  Location.getHospitalListForView(Boolean active) ב- c:\Repos\Road2R\App_Code\Location.cs:שורה 296
+   ב-  WebService.getLocations() ב- c:\Repos\Road2R\App_Code\WebService.cs:שורה 95
+ClientConnectionId:6189f056-f35b-4aa3-a583-c29593c2da8a
+Error Number:10054,State:0,Class:20
+2020-04-02 19:37:45,885 ERROR [7] WebService.GetRidePatView - Error in GetRidePatView
+System.Data.SqlClient.SqlException (0x80131904): Cannot open database "r2rdb_test" requested by the login. The login failed.
+Login failed for user 'benny'.
+   ב-  DbService.GetDataSetByQuery(String sqlQuery, Boolean needToClose, CommandType cmdType, SqlParameter[] parametersArray) ב- c:\Repos\Road2R\App_Code\DBService.cs:שורה 76
+   ב-  Location.getLocationsEnglishName() ב- c:\Repos\Road2R\App_Code\Location.cs:שורה 461
+   ב-  RidePat.GetRidePatView(Int32 volunteerId, Int32 maxDays) ב- c:\Repos\Road2R\App_Code\RidePat.cs:שורה 825
+   ב-  WebService.GetRidePatView(Int32 volunteerId, Int32 maxDays) ב- c:\Repos\Road2R\App_Code\WebService.cs:שורה 712
+ClientConnectionId:d463f2ed-a36e-48ff-8998-4b47ed4b27a6
+Error Number:4060,State:2,Class:11

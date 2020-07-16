@@ -8,6 +8,8 @@ using System.Globalization;
 using System.Web.Script.Services;
 using log4net;
 using System.Web.UI;
+using System.Configuration;
+using System.Collections;
 
 /// <summary>
 /// Summary description for WebService
@@ -838,8 +840,49 @@ public class WebService : System.Web.Services.WebService
 
             Session["loggedInName"] = loggedInName;
 
-            //HttpContext.Current.Session["loggedInName"] = mobile;
+            //XXX
+            //throw new Exception("CU: " + (string)Session["loggedInName"]);            //HttpContext.Current.Session["loggedInName"] = mobile;
             return j.Serialize(v);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in CheckUser", ex);
+            throw new Exception("שגיאה בבדיקת נתוני משתמש");
+        }
+
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string CheckVolunteerByMobile(string mobile)
+    {
+        try
+        {
+            Volunteer v = new Volunteer();
+            v = v.getVolunteerByMobile(mobile);
+            
+            return j.Serialize(v.DisplayName);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in CheckUser", ex);
+            throw new Exception("שגיאה בבדיקת נתוני משתמש");
+        }
+
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string CheckVolunteerExtendedByMobile(string mobile)
+    {
+        try
+        {
+            Volunteer v = new Volunteer();
+            v = v.getVolunteerExtendedByMobile(mobile);
+
+            return j.Serialize(v.DisplayName);
         }
         catch (Exception ex)
         {
@@ -914,12 +957,13 @@ public class WebService : System.Web.Services.WebService
     {
         Volunteer v = new Volunteer();
         v = v.getVolunteerByMobile(mobile);
-        Session["loggedInName"] = v.DisplayName;
+        
 
-        if (v.Id == -1)
+        if (v.Id == 0)
             throw new Exception("user not found");
         try
         {
+            Session["loggedInName"] = v.DisplayName;
             RidePat rp = new RidePat();
             int res = rp.AssignRideToRidePat(ridePatId, v.Id, "primary");
             return j.Serialize(res);
@@ -931,10 +975,14 @@ public class WebService : System.Web.Services.WebService
     }
 
 
-    [WebMethod]
+    [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string AssignRideToRidePat(int ridePatId, int userId, string driverType) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
     {
+        Volunteer v = new Volunteer();
+        v = v.getVolunteerByID(userId);
+        Session["loggedInName"] = v.DisplayName;
+
         try
         {
             RidePat rp = new RidePat();
@@ -948,8 +996,9 @@ public class WebService : System.Web.Services.WebService
             {
                 throw new Exception(ex.Message);
             }
-            
-            else throw new Exception("שגיאה בצירוף הסעה לנסיעה");
+
+            //          else throw new Exception("שגיאה בצירוף הסעה לנסיעה");
+            else throw ex;
         }
 
     }
@@ -1096,6 +1145,23 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
+    public void setVolunteerData(Volunteer volunteerExtended, string username)
+    {
+        try
+        {
+            Volunteer v = volunteerExtended;
+            v.setVolunteerData(v, username);
+
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in setVolunteerData", ex);
+            throw new Exception("שגיאה בעריכת מתנדב");
+        }
+
+    }
+
+    [WebMethod(EnableSession = true)]
     public void deactivateLocation(string displayName, string active)
     {
         try
@@ -1187,6 +1253,24 @@ public class WebService : System.Web.Services.WebService
             v.DisplayName = displayName;
             Volunteer volunteer = v.getVolunteer();
             return j.Serialize(volunteer);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in getVolunteer", ex);
+            throw new Exception("שגיאה בשליפת מתנדב");
+        }
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    public string getVolunteerData(string displayName) //function for data review of all volunteers
+    {
+        try
+        {
+            Volunteer v = new Volunteer();
+            v.DisplayName = displayName;
+            Volunteer volunteerExtended = v.getVolunteerData();
+            return j.Serialize(volunteerExtended);
         }
         catch (Exception ex)
         {
@@ -1304,11 +1388,12 @@ public class WebService : System.Web.Services.WebService
             Session["loggedInName"] = loggedInName;
 
             string loggedInCoord = (string)Session["loggedInName"];
+
         }
         catch (Exception ex)
         {
 
-            throw;
+            throw ex;
         }
         HttpContext.Current.Session["userSession"] = uName;
 
@@ -1344,7 +1429,7 @@ public class WebService : System.Web.Services.WebService
         catch (Exception ex)
         {
 
-            throw;
+            throw ex;
         }
         return j.Serialize(userInDB);
     }
@@ -1521,6 +1606,113 @@ public class WebService : System.Web.Services.WebService
 
     }
 
+    [WebMethod(EnableSession = true)]
+    public string getVolunteerDataTable()
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+            Volunteer v = new Volunteer();
+            List<Volunteer> VolunteersList = v.getVolunteerDataTable();
+            return j.Serialize(VolunteersList);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in getVolunteerDataTable", ex);
+            throw new Exception("שגיאה בשליפת טבלת מתנדבים");
+        }
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    //public void setVolunteerYuval(Volunteer volunteer, string coorEmail, string coorName, string coorPhone, string instructions)
+    public void setVolunteerYuval(Volunteer volunteer, List<Volunteer> coordinators, string instructions)
+    {
+        try
+        {
+            Volunteer v = volunteer;
+            //v.setVolunteerYuval(v, coorEmail, coorName, coorPhone, instructions);
+            v.setVolunteerYuval(v, coordinators, instructions);
+
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in setVolunteerYuval", ex);
+            if (ex.Message == "duplicate key")
+            {
+                throw new Exception("duplicate key");
+            }else throw new Exception("שגיאה ביצירת מתנדב חדש");
+        }
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string WelcomePage(string VolunteerMobile, List<string> CoordinatorMobiles) //For multiple coordinators
+    {
+        try
+        {
+            User u = new User();
+            string VolunteerName = u.getUserNameByCellphone(VolunteerMobile);
+            string CIOName = ConfigurationManager.AppSettings["CIOName"];
+            string CIOPhone = ConfigurationManager.AppSettings["CIOPhone"];
+            List<string> names = new List<string>();
+            names.Add(VolunteerName);
+            names.Add(CIOName);
+            names.Add(CIOPhone);
+            foreach (string item in CoordinatorMobiles)
+            {
+                string CoordinatorName = u.getUserNameByCellphone(item);
+                names.Add(CoordinatorName);
+            };
+
+            
+            
+            return j.Serialize(names);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in WelcomePage method", ex);
+            throw new Exception("שגיאה בבדיקת נתוני משתמש");
+        }
+
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string WelcomePage2(string VolunteerMobile, string CoordinatorMobile) //For one coordinator
+    {
+        try
+        {
+            User u = new User();
+            string VolunteerName = u.getUserNameByCellphone(VolunteerMobile);
+            string CIOName = ConfigurationManager.AppSettings["CIOName"];
+            string CIOPhone = ConfigurationManager.AppSettings["CIOPhone"];
+            List<string> names = new List<string>();
+            names.Add(VolunteerName);
+            names.Add(CIOName);
+            names.Add(CIOPhone);
+            string CoordinatorName;
+            if (CoordinatorMobile == "NoCoor")
+            {
+                CoordinatorName = "NoCoor";
+            }
+            else
+            {
+                CoordinatorName = u.getUserNameByCellphone(CoordinatorMobile);
+            }                      
+            names.Add(CoordinatorName);
+            return j.Serialize(names);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in WelcomePage method", ex);
+            throw new Exception("שגיאה בבדיקת נתוני משתמש");
+        }
+
+
+    }
 
 }
 
