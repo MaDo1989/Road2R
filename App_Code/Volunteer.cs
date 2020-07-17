@@ -582,7 +582,7 @@ public class Volunteer
     }
     public List<Volunteer> getCoordinatorsList()
     {
-        string query = "select * from VolunteerTypeView where VolunTypeType=N'רכז' and IsActive='true' ORDER BY DisplayName";
+        string query = "select * from VolunteerTypeView where VolunTypeType=N'רכז' and IsActive='true' and RoleInR2R=N'רכז איזור' ORDER BY DisplayName";
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         List<Volunteer> vl = new List<Volunteer>();
@@ -1943,7 +1943,7 @@ public class Volunteer
         DbService db = new DbService();
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
-        SqlParameter[] cmdParams = new SqlParameter[29];
+        SqlParameter[] cmdParams = new SqlParameter[27];
 
         cmdParams[0] = cmd.Parameters.AddWithValue("@firstNameH", v.FirstNameH);
         cmdParams[1] = cmd.Parameters.AddWithValue("@lastNameH", v.LastNameH);
@@ -1958,49 +1958,50 @@ public class Volunteer
         cmdParams[10] = cmd.Parameters.AddWithValue("@isDriving", v.IsDriving);
         cmdParams[11] = cmd.Parameters.AddWithValue("@howCanHelp", v.HowCanHelp);
         cmdParams[12] = cmd.Parameters.AddWithValue("@feedback", v.Feedback);
-        cmdParams[13] = cmd.Parameters.AddWithValue("@remarks", v.Remarks);
-        cmdParams[14] = cmd.Parameters.AddWithValue("@newsLetter", v.NewsLetter);
+        //cmdParams[13] = cmd.Parameters.AddWithValue("@remarks", v.Remarks);
+        cmdParams[13] = cmd.Parameters.AddWithValue("@newsLetter", v.NewsLetter);
         if (v.KnowsArabic == null)
         {
-            cmdParams[15] = cmd.Parameters.AddWithValue("@knowsArabic", DBNull.Value);
+            cmdParams[14] = cmd.Parameters.AddWithValue("@knowsArabic", DBNull.Value);
         }
         else
         {
-            cmdParams[15] = cmd.Parameters.AddWithValue("@knowsArabic", v.KnowsArabic);
+            cmdParams[14] = cmd.Parameters.AddWithValue("@knowsArabic", v.KnowsArabic);
         }
-        cmdParams[16] = cmd.Parameters.AddWithValue("@displayName", v.DisplayName);
-        cmdParams[17] = cmd.Parameters.AddWithValue("@englishName", v.EnglishName);
-        cmdParams[18] = cmd.Parameters.AddWithValue("@username", username);
-        cmdParams[19] = cmd.Parameters.AddWithValue("@joinYear", v.JoinYear);
-        cmdParams[20] = cmd.Parameters.AddWithValue("@address", v.Address);
-        cmdParams[21] = cmd.Parameters.AddWithValue("@postalCode", v.PostalCode);
+        cmdParams[15] = cmd.Parameters.AddWithValue("@displayName", v.DisplayName);
+        cmdParams[16] = cmd.Parameters.AddWithValue("@englishName", v.EnglishName);
+        cmdParams[17] = cmd.Parameters.AddWithValue("@username", username);
+        cmdParams[18] = cmd.Parameters.AddWithValue("@joinYear", v.JoinYear);
+        cmdParams[19] = cmd.Parameters.AddWithValue("@address", v.Address);
+        cmdParams[20] = cmd.Parameters.AddWithValue("@postalCode", v.PostalCode);
 
-        cmdParams[22] = cmd.Parameters.AddWithValue("@workingWithCoor", v.WorkingWithCoor);
-        cmdParams[23] = cmd.Parameters.AddWithValue("@workingWithPat", v.WorkingWithPat);
-        cmdParams[24] = cmd.Parameters.AddWithValue("@howToRecruit", v.HowToRecruit);
-        cmdParams[25] = cmd.Parameters.AddWithValue("@howKeepInTouch", v.HowKeepInTouch);
-        cmdParams[26] = cmd.Parameters.AddWithValue("@newsLetterRemarks", v.NewsLetterRemarks);
-        cmdParams[27] = cmd.Parameters.AddWithValue("@gasRemarks", v.GasRemarks);
+        cmdParams[21] = cmd.Parameters.AddWithValue("@workingWithCoor", v.WorkingWithCoor);
+        cmdParams[22] = cmd.Parameters.AddWithValue("@workingWithPat", v.WorkingWithPat);
+        cmdParams[23] = cmd.Parameters.AddWithValue("@howToRecruit", v.HowToRecruit);
+        cmdParams[24] = cmd.Parameters.AddWithValue("@howKeepInTouch", v.HowKeepInTouch);
+        cmdParams[25] = cmd.Parameters.AddWithValue("@newsLetterRemarks", v.NewsLetterRemarks);
+        //cmdParams[26] = cmd.Parameters.AddWithValue("@gasRemarks", v.GasRemarks);
         
         if (v.IgulLetova == null)
         {
-            cmdParams[28] = cmd.Parameters.AddWithValue("@IgulLetova", DBNull.Value);
+            cmdParams[26] = cmd.Parameters.AddWithValue("@IgulLetova", DBNull.Value);
         }
         else
         {
-            cmdParams[28] = cmd.Parameters.AddWithValue("@IgulLetova", v.IgulLetova);
+            cmdParams[26] = cmd.Parameters.AddWithValue("@IgulLetova", v.IgulLetova);
         }
 
 
         string query = "";
 
         //query = "update VolunteerData set FirstNameH=@firstNameH, LastNameH=@lastNameH, EnglishFN=@englishFN, EnglishLN=@englishLN, ";
+        //Remarks=@remarks, gasRemarks=@gasRemarks,
         query = "update VolunteerGood_30_05_20 set FirstNameH=@firstNameH, LastNameH=@lastNameH, EnglishFN=@englishFN, EnglishLN=@englishLN, ";
         query += "VolunteerIdentity=@volunteerIdentity, CellPhone=@cell, Gender=@gender, CityCityName=@city, Email=@email, ";
-        query += "BirthDate=@bDay, IsDriving=@isDriving, HowCanHelp=@howCanHelp, Feedback=@feedback, Remarks=@remarks, NewsLetter=@newsLetter, KnowsArabic=@knowsArabic,";
+        query += "BirthDate=@bDay, IsDriving=@isDriving, HowCanHelp=@howCanHelp, Feedback=@feedback, NewsLetter=@newsLetter, KnowsArabic=@knowsArabic,";
         query += "DisplayName=@displayName, EnglishName=@englishName, JoinYear=@joinYear, Address=@address, PostalCode=@postalCode,";
         query += "workingWithCoor=@workingWithCoor, workingWithPat=@workingWithPat, howToRecruit=@howToRecruit, howKeepInTouch=@howKeepInTouch,";
-        query += "newsLetterRemarks=@newsLetterRemarks, gasRemarks=@gasRemarks, IgulLetova=@IgulLetova, lastModified =DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@username";
+        query += "newsLetterRemarks=@newsLetterRemarks, IgulLetova=@IgulLetova, lastModified =DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@username";
         try
         {
             res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
@@ -2182,7 +2183,19 @@ public class Volunteer
         }
         catch (SqlException ex)
         {
-            throw new Exception("error inserting to VolunteerGood_30_05_20 table");
+            //throw new Exception("error inserting to VolunteerGood_30_05_20 table");
+            try
+            {
+                query = "insert into VolunteerGood_30_05_20 (Id, UserName, CellPhone, FirstNameH, LastNameH, DisplayName, Gender, isActive, isAssistant, lastModified, JoinDate)";
+                query += " values ((select max(id) + 1 from VolunteerGood_30_05_20), @UserName, @cell,@firstNameH,@lastNameH,@displayName,@gender,1,1,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
+
+                db = new DbService();
+                db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams);
+            }
+            catch (SqlException ex2)
+            {
+                throw new Exception("error inserting to VolunteerGood_30_05_20 table " + ex2.Message);
+            }
         }
         catch (Exception e)
         {
