@@ -57,6 +57,10 @@
 // Current startegy for refreshing teh table, set per report type
 var S_refresh_preview = null;
 
+
+console.log("Shalom");
+
+
 // Handle a click event on one of the reports in the Reports-Tree
 function on_report_click(event) {
 
@@ -68,7 +72,6 @@ function on_report_click(event) {
     var report_type = event.target.id;
     populate_parameters(report_type);
     S_refresh_preview = K_strategy[report_type];
-    $("#cmdPrint").prop("disabled", true);
  }
 
 
@@ -139,7 +142,8 @@ var K_fields_map = {
 }
 
 function populate_parameters(report_type) {
-    // $("#params_ph").text("Populating for " + report_type);
+ //   $("#params_ph").text("Populating for " + report_type);
+    $("#params_ph").empty();
     var fields = rp_get_fields(report_type);
     if (fields) {
         fields.forEach(rp_add_one_parameter);
@@ -294,26 +298,22 @@ function populate_week_field() {
         dateFormat: "yy-mm-dd",
         showOtherMonths: true,
         selectOtherMonths: true,
-        changeMonth: true,
-        changeYear: true,
-         showWeek: true,
-         autoclose: true,
    });
 
-    dt.on("show", function (e) {
+    //@@ dt.on("show", function (e) {
 
         // This is working. Need to  do it for the tr and support mouseleave and hide()
 
         //console.log("Show", e);
         //$(document).on('mouseenter', '.datepicker-days',
         //    function () { console.log($(this)); $(this).find('td a').addClass('ui-state-hover'); });
-    });
+    //@@ });
 
     // DEBUG: set date to March
     dt.datepicker('setDate', new Date(2020, 6));
     dt.on("changeDate", function (e) {
-        refreshPreview();
-    });
+     refreshPreview();
+  });
 
 }
 
@@ -451,7 +451,6 @@ function rp_amuta_vls_km__refresh_preview() {
 // 'start_date' :  a date formatted as YYYY-MM-DD
 // 'end_date'   :  a date formatted as YYYY-MM-DD
 function refresh_amuta_vls_week_Table(start_date, end_date) {
-    $("#cmdPrint").prop("disabled", false);
     hide_all_tables();
     $('#wait').show();
     var query_object = {
@@ -509,7 +508,6 @@ function refresh_amuta_vls_week_Table(start_date, end_date) {
 // 'start_date' :  a date formatted as YYYY-MM-DD
 // 'end_date'   :  a date formatted as YYYY-MM-DD
 function refresh_amuta_vls_km_Table(start_date, end_date) {
-    $("#cmdPrint").prop("disabled", false);
     hide_all_tables();
     $('#wait').show();
     var query_object = {
@@ -575,7 +573,6 @@ function rp_amuta_vls_per_pat__refresh_preview() {
 }
 
 function refresh_amuta_vls_per_pat_Table(patient) {
-    $("#cmdPrint").prop("disabled", false);
     hide_all_tables();
     $('#wait').show();
     var query_object = {
@@ -638,7 +635,6 @@ function refreshTable(volunteerId, start_date, end_date) {
     ridesToShow = [];
     allRides = [];
 
-    $("#cmdPrint").prop("disabled", false);
     $('#wait').show();
     hide_all_tables();
     $('#div_weeklyRides').show();
