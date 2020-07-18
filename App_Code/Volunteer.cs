@@ -69,6 +69,7 @@ public class Volunteer
     string newsLetterRemarks;
     string gasRemarks;
     bool? igulLetova;
+    string role;
 
     //Delete after volunteer details project will end (written on 05/06/2020 by Alon):
     string source;
@@ -582,7 +583,7 @@ public class Volunteer
     }
     public List<Volunteer> getCoordinatorsList()
     {
-        string query = "select * from VolunteerTypeView where VolunTypeType=N'רכז' and IsActive='true' and RoleInR2R=N'רכז איזור' ORDER BY DisplayName";
+        string query = "select * from VolunteerTypeView where VolunTypeType=N'רכז' and IsActive='true' and RoleInR2R like N'%רכז%' ORDER BY DisplayName";
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         List<Volunteer> vl = new List<Volunteer>();
@@ -1226,6 +1227,19 @@ public class Volunteer
         }
     }
 
+    public string Role
+    {
+        get
+        {
+            return role;
+        }
+
+        set
+        {
+            role = value;
+        }
+    }
+
 
 
 
@@ -1685,7 +1699,7 @@ public class Volunteer
         DbService db = new DbService();
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
-        SqlParameter[] cmdParams = new SqlParameter[24];
+        SqlParameter[] cmdParams = new SqlParameter[25];
         cmdParams[0] = cmd.Parameters.AddWithValue("@address", v.Address);
         cmdParams[1] = cmd.Parameters.AddWithValue("@cell", v.CellPhone);
         cmdParams[2] = cmd.Parameters.AddWithValue("@cell2", v.CellPhone2);
@@ -1712,6 +1726,7 @@ public class Volunteer
         cmdParams[21] = cmd.Parameters.AddWithValue("@englishLN", v.EnglishLN);
         cmdParams[22] = cmd.Parameters.AddWithValue("@birthDate", v.BirthDate);
         cmdParams[23] = cmd.Parameters.AddWithValue("@isDriving", v.IsDriving);
+        cmdParams[24] = cmd.Parameters.AddWithValue("@role", v.Role);
         //cmdParams[24] = cmd.Parameters.AddWithValue("@howCanHelp", v.HowCanHelp);
         //cmdParams[25] = cmd.Parameters.AddWithValue("@feedback", v.Feedback);
         //cmdParams[24] = cmd.Parameters.AddWithValue("@newsLetter", v.NewsLetter);
@@ -1732,7 +1747,7 @@ public class Volunteer
                 query += "CellPhone2=@cell2, CityCityName=@city, Email=@email, FirstNameA=@firstNameA, FirstNameH=@firstNameH, VolunteerIdentity=@volunteerIdentity, ";
                 query += "Gender=@gender, IsActive=@IsActive, JoinDate=@jDate, KnowsArabic=@knowsArabic, LastNameA=@lastNameA, ";
                 query += "EnglishFN=@englishFN, EnglishLN=@englishLN, BirthDate=@birthDate, IsDriving=@isDriving, ";
-                query += "LastNameH=@lastNameH,UserName=@UserName,Password='" + password + "', Remarks=@remarks,EnglishName=@englishName,isAssistant=@isAssistant,lastModified=DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@displayName"; //, BirthDate=@bDay
+                query += "LastNameH=@lastNameH,UserName=@UserName,Password='" + password + "', Remarks=@remarks,EnglishName=@englishName,isAssistant=@isAssistant,RoleInR2R=@role,lastModified=DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@displayName"; //, BirthDate=@bDay
 
             }
             else
@@ -1741,7 +1756,7 @@ public class Volunteer
                 query += "CellPhone2=@cell2, CityCityName=@city, Email=@email, FirstNameA=@firstNameA, FirstNameH=@firstNameH, VolunteerIdentity=@volunteerIdentity, ";
                 query += "Gender=@gender, IsActive=@IsActive, JoinDate=@jDate, KnowsArabic=@knowsArabic, LastNameA=@lastNameA, ";
                 query += "EnglishFN=@englishFN, EnglishLN=@englishLN, BirthDate=@birthDate, IsDriving=@isDriving, ";
-                query += "LastNameH=@lastNameH, Remarks=@remarks,EnglishName=@englishName,isAssistant=@isAssistant,lastModified=DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@displayName"; //, BirthDate=@bDay
+                query += "LastNameH=@lastNameH, Remarks=@remarks,EnglishName=@englishName,isAssistant=@isAssistant,RoleInR2R=@role,lastModified=DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@displayName"; //, BirthDate=@bDay
             }
             res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
 

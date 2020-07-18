@@ -1714,5 +1714,21 @@ public class WebService : System.Web.Services.WebService
 
     }
 
+    [WebMethod(EnableSession = true)]
+    public string getRoles()
+    {
+        try
+        {
+            Role c = new Role();
+            List<Role> rolesList = c.getRolesList();
+            return j.Serialize(rolesList);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in getRoles", ex);
+            throw new Exception("שגיאה בשליפת ערים");
+        }
+
+    }
 }
 

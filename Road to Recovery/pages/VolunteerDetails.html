@@ -597,8 +597,13 @@
                         <div class="row m-l-10 m-r-10">
                             <div class="col-sm-6">
                                 <div class="form-group text-center">
-                                    אנא קרא.י את תקנון האתיקה (<a href="#">הקליק.י פה</a>).<br />
-                                    אנא קרא.י את הוראות הבטיחות (<a href="#">הקליק.י פה</a>).<br />
+                                    אנא קרא.י את תקנון האתיקה <a href="../../Media/ethics.pdf" target="_blank">(הקליק.י פה)</a>.<br />
+                                    אנא קרא.י את הוראות הבטיחות <a href="../../Media/safety_instructions.pdf" target="_blank">(הקליק.י פה)</a>.<br />
+                                    <br />
+                                    <input type="checkbox" id="ethics" name="ethicsAndSafety">
+                                    <label for="ethics"> קראתי את תקנון האתיקה והבנתי אותו &nbsp;<span class="required">*</span></label><br>
+                                    <input type="checkbox" id="safety" name="ethicsAndSafety">
+                                    <label for="safety"> קראתי את הוראות הבטיחות והבנתי אותם &nbsp;<span class="required">*</span></label><br>
 
                                 </div>
                             </div>
@@ -724,7 +729,11 @@
 
             $('.birthSelect').on('change', function () {
                 $("#birthday").val($("#birthdayYear").val() + "-" + $("#birthdayMonth").val() + "-" + $("#birthdayDay").val())
-                enableSave()
+                enableSave();
+            });
+
+            $('input:checkbox').on('change', function () {
+                enableSave();
             });
 
             $('#cancel').click(function () {
@@ -1014,6 +1023,7 @@
         function enableSave() {
             let empty = false;
             var counter = 0;
+            var checked = $('input[name="ethicsAndSafety"]:checked').length;
             $('.req').each(function () {
                 empty = ($(this).val().length == 0 || $(this).val() == "בחר.י");
 
@@ -1026,7 +1036,7 @@
                 $('#saveCustomer').attr('disabled', 'disabled');
                 $('#saveButtonDisabled').show();
             }
-            else {
+            else if (checked == 2) {
                 $('#saveCustomer').attr('disabled', false);
                 $('#saveButtonDisabled').hide();
             }

@@ -68,9 +68,10 @@
             background-color: #FFE684;
         }
 
-        input[type=text], input[type=checkbox], input[type=date], input[type=number], #typeVolunteer, #gender, #isDriving, .textAreaClass, .birthSelect, #newsLetter, #knowsArabic {
+        input[type=text], input[type=checkbox], input[type=date], input[type=number], #typeVolunteer, #gender, #isDriving, .textAreaClass, .birthSelect, #newsLetter, #knowsArabic, #role {
             border-color: #000
         }
+        
     </style>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <!--City Autocomplete-->
@@ -229,8 +230,8 @@
                         $("#ArabSpeaking").attr('disabled', 'disabled');
                         // initializeSelect2();
                     }
-                    else{
-                         $("#volunteerFirstName").attr('disabled', 'disabled');
+                    else {
+                        $("#volunteerFirstName").attr('disabled', 'disabled');
                         $("#volunteerLastName").attr('disabled', 'disabled');
                     }
                 }
@@ -296,6 +297,9 @@
                     $("#HomePhone").val(volunteer.HomePhone);
                     $("#email").val(volunteer.Email);
                     $("#typeVolunteer").val(volunteer.TypeVol);
+                    if (volunteer.TypeVol == "רכז") {
+                        $('#RoleHiddenDiv').show();
+                    }
                     if (volunteer.Gender == "זכר") {
                         $("#gender").val("מתנדב");
                     }
@@ -328,6 +332,22 @@
                     $("#help").val(volunteer.HowCanHelp);
                     $("#feedback").val(volunteer.Feedback);
                     $("#remarks").val(volunteer.Remarks);
+                    if (volunteer.RoleInR2R == " ") {
+                        $("#role").val("בחר.י");
+                    } else {
+                        $.ajax({
+                            dataType: "json",
+                            url: "WebService.asmx/getRoles",
+                            contentType: "application/json; charset=utf-8",
+                            type: "POST",
+                            async: false,
+                            success: generateRolesSuccessCB,
+                            error: generateRolesErrorCB
+                        });
+                    rolesGenerated = true;
+                        $("#role").val(volunteer.RoleInR2R);
+                    }
+                    
                     //if (volunteer.NewsLetter == 1) {
                     //    $("#newsLetter").val("כן");
                     //}
@@ -336,7 +356,7 @@
                     //} else {
                     //    $("#newsLetter").val("בחר")
                     //}
-                   
+
                 },
                 error: function (err) { alert("Error in getVolunteer: " + err.responseText); }
             });
@@ -431,7 +451,7 @@
                                     <div class="row">
                                         <h4 class="m-t-0 header-title"><b>פרטי מתנדב</b></h4>
                                         <!--<p class="text-muted font-13 m-b-30">
-    יצירת, צפייה ועריכת מתנדב. לחץ על כפתור חזרה בכדי לצפות בכל הלקוחות.-->
+                                        יצירת, צפייה ועריכת מתנדב. לחץ על כפתור חזרה בכדי לצפות בכל הלקוחות.-->
                                         <br />
 
                                         <div class="col-md-6 checkbox checkbox-primary text-left">
@@ -622,8 +642,8 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">תאריך הצטרפות </label>
                                                     <!--<div class="col-sm-6">
-                    <input id="joinDate" name="joinDate" type="text" placeholder="dd/mm/yyyy" class="form-control">
-                </div>-->
+                                                        <input id="joinDate" name="joinDate" type="text" placeholder="dd/mm/yyyy" class="form-control">
+                                                    </div>-->
                                                     <div class="col-sm-6">
                                                         <input type="date" id="joinDate" placeholder="dd/mm/yyyy" class="form-control">
                                                     </div>
@@ -649,6 +669,7 @@
                                                     </div>
                                                 </div>
                                             </div>
+
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">מסיע&nbsp;<span class="required">*</span></label>
@@ -669,7 +690,21 @@
                                                     <div class="col-sm-6">
                                                         <input type="date" id="birthday" name="birthday" class="form-control req">
                                                     </div>
-                                                </div>                                                
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6" id="RoleHiddenDiv" hidden>
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">תיאור תפקיד<!--&nbsp;<span class="required">*</span>--></label>
+                                                    <div class="col-sm-6" id="roleDiv">
+                                                        <select id="role" name="role" class="form-control">
+                                                            <option>בחר.י</option>
+                                                            <option> </option>
+                                                            <option> </option>
+                                                            <option> </option>
+                                                            <option> </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <!--<div class="col-sm-6">
                                                 <div class="form-group">
@@ -689,7 +724,7 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">כיצד תוכל.י לעזור לעמותה בדרכים נוספות (נא לפרט)</label>
                                                     <div class="col-sm-6">
-                                                        
+
                                                         <textarea id="help" name="help" class="form-control textAreaClass" rows="3"></textarea>
                                                     </div>
                                                 </div>
@@ -698,7 +733,7 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">משוב על פעילותך ועל "בדרך להחלמה"</label>
                                                     <div class="col-sm-6">
-                                                        
+
                                                         <textarea id="feedback" name="feedback" class="form-control textAreaClass" rows="3"></textarea>
                                                     </div>
                                                 </div>
@@ -752,7 +787,46 @@
     <!--Validators-->
     <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
     <script>
+        var rolesGenerated = false;
+        function generateRolesSuccessCB(data) {
+            var roles = JSON.parse(data.d);
+            console.log(roles);
+            $('#role').children().remove()
+            $('#role')
+                .append($("<option></option>")
+                    .attr("value", "בחר.י")
+                    .text("בחר.י"));
+            $.each(roles, function (key, value) {
+                $('#role')
+                    .append($("<option></option>")
+                        .attr("value", value.RoleName)
+                        .text(value.RoleName));
+            });
+        }
+
+        function generateRolesErrorCB(e) {
+            alert("Error in generateRoles: " + e.responseText);
+        }
+
         $(document).ready(function () {
+
+            $("#role").on("click", function () {
+                if (!rolesGenerated) {
+                    $.ajax({
+                        dataType: "json",
+                        url: "WebService.asmx/getRoles",
+                        contentType: "application/json; charset=utf-8",
+                        type: "POST",
+                        async: false,
+                        success: generateRolesSuccessCB,
+                        error: generateRolesErrorCB
+                    });
+                }
+                rolesGenerated = true;
+            });
+
+        
+            
 
             includeHTML();
             if (window.location.hostname.toString() == 'localhost' || window.location.pathname.indexOf('test') != -1) {
@@ -835,12 +909,12 @@
                     var cellphone2 = $("#phone2").val();
                     if (cellphone2 != "") {
                         cellphone2 = cellphone2.replace(/-/g, '');
-                        cellphone2 = cellphone2.replace(/ /g, '');      
+                        cellphone2 = cellphone2.replace(/ /g, '');
                     }
                     //var homePhone = $("#HomePhone").val();
                     //if (homePhone != "") {
                     //    homePhone = homePhone.replace(/-/g, '');
-                    //    homePhone = homePhone.replace(/ /g, '');      
+                    //    homePhone = homePhone.replace(/ /g, '');
                     //}
                     var nameA = $("#firstA").val();
                     var lastNameA = $("#lastA").val();
@@ -871,17 +945,17 @@
                     } else {
                         birthDate = new Date("1900-01-01");
                     }
-                    
+
                     if ($("#isDriving").val() == "כן") {
                         var isDriving = true;
                     }
                     else if ($("#isDriving").val() == "לא") {
                         var isDriving = false;
-                    } 
+                    }
                     //var howCanHelp = $("#help").val();
                     //var feedback = $("#feedback").val();
                     //var remark = $("#remarks").val();
-                    
+
                     var englishName = $("#volunteerFirstNameEnglish").val() + " " + $("#volunteerLastNameEnglish").val();
                     //if ($("#newsLetter").val() == "כן") {
                     //    var newsLetter = true;
@@ -889,12 +963,17 @@
                     //else if ($("#newsLetter").val() == "לא") {
                     //    var newsLetter = false;
                     //}
+                    var role = " ";
+                    if ($("#role").val() != "בחר.י") {
+                        role = $("#role").val()
+                    };
+
 
                     volunteer = {
                         firstNameH: firstNameH, firstNameA: nameA, lastNameH: lastNameH, lastNameA: lastNameA, cellPhone: cellPhone, cellphone2: cellphone2, /*homePhone: homePhone,*/
                         city: city, address: address, email: email, joinDate: joinDate, gender: gender, KnowsArabic: knowsArabic,
                         typeVol: typeVol, IsActive: active, Remarks: remark, DisplayName: displayName, EnglishName: englishName, IsAssistant: isHelper, VolunteerIdentity: VolunteerIdentity, //birthdate: bdate,
-                        EnglishFN: englishFN, EnglishLN: englishLN, BirthDate: birthDate, IsDriving: isDriving
+                        EnglishFN: englishFN, EnglishLN: englishLN, BirthDate: birthDate, IsDriving: isDriving, Role: role
                     }
                     $.ajax({
                         dataType: "json",
@@ -927,9 +1006,9 @@
                             //            showConfirmButton: false
                             //        });
                             //}
-         
+
                         }
-                        
+
                     });
                     //END OF Insert Product Code
 
@@ -992,7 +1071,7 @@
             var eMailValid = true;
             var isDrivingValid = true;
             //var newsLetterValid = true;
-            
+
             if ($('#isDriving').val() == "בחר") {
                 isDrivingValid = false;
                 swal(
@@ -1116,7 +1195,7 @@
 
             //END OF NEW
 
-            if(englishName==""){
+            if (englishName == "") {
                 englishNameExists = false;
                 swal(
                     "שגיאה",
@@ -1126,7 +1205,7 @@
             }
             if (city == "") {
                 CityExists = true;
-                
+
             }
             if (!CityExists) {
                 for (i in cities) {
@@ -1169,7 +1248,7 @@
             //var identity = $("#VolunteerIdentity").val();
             //if (identity != "") {
             //    var re = new RegExp("^\\d{9}$");
-                
+
             //    if (!re.test(identity)) {
             //        identityMatch = false;
             //        swal(
@@ -1177,10 +1256,10 @@
             //            "תעודת הזהות צריכה להכיל 9 ספרות",
             //            "warning"
             //        );
-            //    } 
+            //    }
             //}
-            
-            
+
+
 
             //var jDate = $("#joinDate").val();
             //if (jDate != "") {
@@ -1265,7 +1344,7 @@
                 return 1;
             else
                 return 0;
-        }    </script>
+        }</script>
 
     <!-- jQuery  -->
     <script src="assets/js/bootstrap-rtl.min.js"></script>
@@ -1404,12 +1483,12 @@
                 }
             }
 
-            
+
             $(".englishFullName").keyup(function () {
                 $('#volunteerEnglishName').val($('#volunteerFirstNameEnglish').val() + " " + $('#volunteerLastNameEnglish').val())
             });
-            
-        
+
+
             loadPage();
         });
     </script>
