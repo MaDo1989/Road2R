@@ -144,6 +144,13 @@ var K_fields_map = {
 function populate_parameters(report_type) {
  //   $("#params_ph").text("Populating for " + report_type);
     $("#params_ph").empty();
+    let report_link = $("#" + report_type);
+
+    hide_all_tables();
+    // Mark the current in bold
+    $(".report_link_cls").css("font-weight", "normal");
+    report_link.css("font-weight", "bold");
+    $("#report_title").html(report_link.text());
     var fields = rp_get_fields(report_type);
     if (fields) {
         fields.forEach(rp_add_one_parameter);
@@ -486,7 +493,7 @@ function refresh_amuta_vls_week_Table(start_date, end_date) {
                 ],
                 dom: 'Bfrtip',
                 buttons: [
-                    'print', 'csv', 'excel', 'pdf'
+                    'csv', 'excel', 'pdf'
                 ],
                 createdRow: function (row, data, dataIndex) {
                         $(row).css('background-color', '#f1f1f1');
@@ -546,7 +553,7 @@ function refresh_amuta_vls_km_Table(start_date, end_date) {
                 ],
                 dom: 'Bfrtip',
                 buttons: [
-                    'print', 'csv', 'excel', 'pdf'
+                   'csv', 'excel', 'pdf'
                 ],
                 createdRow: function (row, data, dataIndex) {
                     $(row).css('background-color', '#f1f1f1');
@@ -609,7 +616,7 @@ function refresh_amuta_vls_per_pat_Table(patient) {
                 ],
                 dom: 'Bfrtip',
                 buttons: [
-                    'print', 'csv', 'excel', 'pdf'
+                     'csv', 'excel', 'pdf'
                 ],
                 createdRow: function (row, data, dataIndex) {
                     $(row).css('background-color', '#f1f1f1');
@@ -764,7 +771,7 @@ function refreshTable(volunteerId, start_date, end_date) {
                 ],
                 dom: 'Bfrtip',
                 buttons: [
-                    'print', 'csv', 'excel', 'pdf'
+                     'csv', 'excel', 'pdf'
                 ],
                 createdRow: function (row, data, dataIndex) {
                     if (data.Date.includes("א") || data.Date.includes("ג") || data.Date.includes("ה") || data.Date.includes("ש"))
