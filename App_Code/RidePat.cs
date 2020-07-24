@@ -1525,6 +1525,9 @@ public class RidePat
     }
 
 
+
+
+
     //Irrelevant
     #region GetRidePatEscortView
     //public List<RidePat> GetRidePatEscortView()
