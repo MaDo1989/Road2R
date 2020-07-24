@@ -507,7 +507,7 @@
                                 </div>
                             </div>
                         </div>
-                        <h3>משוב</h3>
+                        <h3>משוב (השדות מוגבלים ל-500 תווים)</h3>
                         <div class="row m-l-10 m-r-10">
                             <div class="col-sm-6">
                                 <div class="form-group">
@@ -596,15 +596,15 @@
                         <hr /><br />
                         <div class="row m-l-10 m-r-10">
                             <div class="col-sm-6">
-                                <div class="form-group text-center">
+                                <div class="form-group">
                                     אנא קרא.י את תקנון האתיקה <a href="../../Media/ethics.pdf" target="_blank">(הקליק.י פה)</a>.<br />
-                                    אנא קרא.י את הוראות הבטיחות <a href="../../Media/safety_instructions.pdf" target="_blank">(הקליק.י פה)</a>.<br />
-                                    <br />
-                                    <input type="checkbox" id="ethics" name="ethicsAndSafety">
+                                    <input type="checkbox" id="ethics" name="ethicsAndSafety" onchange="saveCheckBox()">
                                     <label for="ethics"> קראתי את תקנון האתיקה והבנתי אותו &nbsp;<span class="required">*</span></label><br>
-                                    <input type="checkbox" id="safety" name="ethicsAndSafety">
+                                    <br />
+                                    אנא קרא.י את הוראות הבטיחות <a href="../../Media/safety_instructions.pdf" target="_blank">(הקליק.י פה)</a>.<br />
+                                    <input type="checkbox" id="safety" name="ethicsAndSafety" onchange="saveCheckBox()">
                                     <label for="safety"> קראתי את הוראות הבטיחות והבנתי אותם &nbsp;<span class="required">*</span></label><br>
-
+                                    <br />
                                 </div>
                             </div>
                         </div>
@@ -671,6 +671,7 @@
     <script>
 
         $(document).ready(function () {
+            
             generateBirthdaySelect()
             generateJoinDateSelect()
 
@@ -1018,7 +1019,22 @@
                     return false;
                 }
             });
+
+            var ethics = (localStorage.getItem("ethics") == 'true');
+            var safety = (localStorage.getItem("safety") == 'true');
+
+            $("#ethics").prop("checked", ethics);
+            $("#safety").prop("checked", safety);
         });
+
+        function saveCheckBox() {
+            localStorage.ethics = $("#ethics").prop('checked');
+            //var ethics = JSON.parse(localStorage.ethics);
+
+            localStorage.safety = $("#safety").prop('checked');
+            //var safety = JSON.parse(localStorage.safety);
+
+        }
 
         function enableSave() {
             let empty = false;
