@@ -1726,7 +1726,7 @@ public class WebService : System.Web.Services.WebService
         catch (Exception ex)
         {
             Log.Error("Error in getRoles", ex);
-            throw new Exception("שגיאה בשליפת ערים");
+            throw new Exception("שגיאה בשליפת תפקידים");
         }
 
     }

@@ -1,2 +1,4 @@
 web.config
 Web.config
+*.log
+*.pubxml
