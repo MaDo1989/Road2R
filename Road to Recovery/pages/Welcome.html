@@ -1,0 +1,225 @@
+﻿<!DOCTYPE html>
+<html lang="en" dir=rtl>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="KSMoving">
+    <meta name="author" content="Coderthemes">
+    <link rel="shortcut icon" href="assets/images/favicon_1.ico">
+    <title>מתנדב.ת חדש.ה</title>
+    <link href="../plugins/switchery/switchery.min.css" rel="stylesheet" />
+    <link href="assets/css/bootstrap-rtl.min.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/core.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/icons.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/components.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/pages.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/menu.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/responsive.css" rel="stylesheet" type="text/css">
+    <script src="assets/js/CookiesFunctions.js"></script>
+    <script src="assets/js/modernizr.min.js"></script>
+    <script src="assets/js/jquery.min.js"></script>
+    <!-- The jQuery library is a prerequisite for all jqSuite products -->
+    <script type="text/ecmascript" src="assets/js/jquery.min.js"></script>
+    <!-- This is the Javascript file of jqGrid -->
+    <script type="text/ecmascript" src="Guriddo_jqGrid_JS_5.2.0/js/jquery.jqGrid.min.js"></script>
+    <!-- We support more than 40 localizations -->
+    <script type="text/ecmascript" src="Guriddo_jqGrid_JS_5.2.0/js/i18n/grid.locale-he.js"></script>
+    <!-- A link to a Boostrap  and jqGrid Bootstrap CSS siles-->
+    <link href="Guriddo_jqGrid_JS_5.2.0/css/ui.jqgrid-bootstrap.css" rel="stylesheet" />
+    <!-- Sweet Alert css -->
+    <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
+    <!--GENERAL object and additional functions-->
+    <script src="lib/lz-string.js"></script>
+    <script src="lib/master.js"></script>
+    <!-- Select2 css+js -->
+    <link href="assets/css/select2.css" rel="stylesheet" />
+    <script src="assets/js/select2.min.js"></script>
+    <!--City Autocomplete-->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <style>
+        body {
+            font-size: 18px;
+            overflow-wrap: break-word;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="fixed-left">
+    <div class="container" id="main">
+        <!--hidden-->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="page-title-box">
+                    <img class="text-right" src="../../Media/R2R Logo.png" />
+                </div>
+            </div>
+        </div>
+        <div class="row" id="Hello" hidden>
+            <div class="card-box">
+                <h3 class="page-title bold" id="volunteerHello"></h3>
+                <br />
+                <br />
+                תודה על הצטרפותך לפעילות שלנו. עוד פרטים ניתן לקרוא באתר העמותה: <a href="http://www.roadtorecovery.org.il/?lang=he">(הקליק.י פה)</a><br /><br />
+                כדי להשלים את ההצטרפות: <br />
+                <ol>
+                    <li>
+                        נא למלא את פרטיך האישיים בדף פרטי מתנדב.ת: <a href="http://roadtorecovery.org.il/prod/Road%20to%20Recovery/pages/volunteerDetails.html">(הקליק.י פה)</a>
+                        <!--נא למלא את פרטיך האישיים בדף פרטי מתנדב.ת: <a href="http://roadtorecovery.org.il/test/Road%20to%20Recovery/pages/volunteerDetails.html">(הקליק.י פה)</a>-->
+
+                    </li>
+                    <li>
+                        נא להוריד ולהתקין את האפליקציה הסלולרית למתנדב.ת. <br />
+                        אם יש לך טלפון אנדרואיד: <a href="https://play.google.com/store/apps/details?id=il.Road.to.Recovery&hl=en">(הקליק.י פה)</a> <br />
+                        אייפון: גלשו לאפל סטור, הקלידו את שם האפליקציה (בדרך להחלמה) בשורת החיפוש.
+                    </li>
+                    <li>
+                        עם סיום ההתקנה, פתח.י את האפליקציה והגדיר.י את ההעדפות שלך (מאיפה, לאן ומתי להסיע). <br />
+                    </li>
+                    <li>
+                        דף עם תשובות לשאלות נפוצות לגבי השימוש באפליקציה:  <a href="http://www.roadtorecovery.org.il/Site/he/faq.html">(הקליק.י פה)</a>
+                    </li>
+                </ol>
+                <br />
+                <span id="help">אם נתקלת בבעיה, האנשים הבאים ישמחו לעזור: </span><br />
+                <ul>
+                    <li id="coorLI"><span id="coordinator">הרכז שלך</span></li>
+                    <li><span id="CIO">מנהל המחשוב של העמותה</span></li>
+                </ul>
+                <br />
+                הסעות מוצלחות!
+                <br /><br />
+                יובל רוט
+                <br /><br /><br /><br />
+            </div>
+        </div>
+        <div class="row" id="errorDiv" hidden>
+            <div class="card-box">
+                <h1 class="text-center">אירעה שגיאה</h1>
+                <h2 class="text-center">הקישור שנשלח אליך אינו תקין</h2>
+            </div>
+        </div>
+    </div>
+    <!-- end container -->
+    <!-- FOOTER -->
+    <footer class="footer text-right">
+        2020 - 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה
+    </footer>
+    <!-- End FOOTER -->
+    <script>
+        var resizefunc = [];
+    </script>
+    <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script>
+        let params = new URLSearchParams(location.search);
+
+
+        CoorMobiles = params.getAll('coor');
+
+        VolMobile = params.get('vol');
+
+
+        function generatePage() {
+
+            if (CoorMobiles.length > 1) {
+                if (VolMobile == null) {
+                    $('#errorDiv').show();
+                } else {
+                    $.ajax({
+                        dataType: "json",
+                        url: "WebService.asmx/WelcomePage",
+                        contentType: "application/json; charset=utf-8",
+                        type: "POST",
+                        data: JSON.stringify({ VolunteerMobile: VolMobile, CoordinatorMobiles: CoorMobiles }),
+                        async: false,
+                        success: generatePageSuccessCB,
+                        error: generatePageErrorCB
+                    });
+                }
+            } else {
+                if (CoorMobiles.length == 0) {
+                    CoorMobile = "NoCoor";
+                } else {
+                    CoorMobile = params.get('coor');
+                }
+                
+                if (VolMobile == null) {
+                    $('#errorDiv').show();
+                } else {
+                    $.ajax({
+                        dataType: "json",
+                        url: "WebService.asmx/WelcomePage2",
+                        contentType: "application/json; charset=utf-8",
+                        type: "POST",
+                        data: JSON.stringify({ VolunteerMobile: VolMobile, CoordinatorMobile: CoorMobile }),
+                        async: false,
+                        success: generatePageSuccessCB,
+                        error: generatePageErrorCB
+                    });
+                }
+            }
+
+
+        }
+
+        function generatePageSuccessCB(data) {
+            var names = JSON.parse(data.d);
+            console.log(names)
+            CIOName = names[1];
+            CIOPhone = names[2];
+            VolName = names[0];
+            CoorName = names[3];
+            $('#volunteerHello').text("שלום " + VolName + "!")
+            CIOPhone = CIOPhone.slice(0, 3) + "-" + CIOPhone.slice(3);
+            $('#CIO').text("מרכז המחשוב בעמותה - " + CIOName + ", " + CIOPhone);
+            if (names.length <= 4) {
+                if (names[3] != "NoCoor") {
+                    CoorMobile = CoorMobile.slice(0, 3) + "-" + CoorMobile.slice(3);
+                    $('#coordinator').text("הרכז שלך - " + CoorName + ", " + CoorMobile);
+                } else {
+                    $('#coorLI').hide();
+                    $('#help').text("אם נתקלת בבעיה: ")
+                }
+            } else {
+                $('#coordinator').text("הרכזים שלך:");
+                for (var i = 3, j = 0; i < names.length; i++, j++) {
+                    $('#coordinator').append("<br />" + names[i] + ", " + CoorMobiles[j].slice(0, 3) + "-" + CoorMobiles[j].slice(3))
+                }
+            }
+            $('#Hello').show();
+        }
+
+        function generatePageErrorCB(e) {
+            $('#Hello').hide();
+            $('#errorDiv').show();
+            console.log("Error in generatePage: " + e.responseText);
+        }
+
+        $(document).ready(function () {
+            $.jgrid.defaults.responsive = true;
+            $.jgrid.defaults.styleUI = 'Bootstrap';
+            generatePage();
+        });
+    </script>
+    <!-- jQuery  -->
+    <script src="assets/js/bootstrap-rtl.min.js"></script>
+    <script src="assets/js/detect.js"></script>
+    <script src="assets/js/fastclick.js"></script>
+    <script src="assets/js/jquery.slimscroll.js"></script>
+    <script src="assets/js/jquery.blockUI.js"></script>
+    <script src="assets/js/waves.js"></script>
+    <script src="assets/js/wow.min.js"></script>
+    <script src="assets/js/jquery.nicescroll.js"></script>
+    <script src="assets/js/jquery.scrollTo.min.js"></script>
+    <script src="../plugins/switchery/switchery.min.js"></script>
+    <!-- Sweet Alert js -->
+    <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
+    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+    <script src="assets/js/jquery.core.js"></script>
+    <script src="assets/js/jquery.app.js"></script>
+</body>
+</html>

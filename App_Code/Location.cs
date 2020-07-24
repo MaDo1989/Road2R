@@ -289,7 +289,7 @@ public class Location
         #region DB functions
         string query = "select * from Location where Type=N'בית חולים'";
         query += " and IsActive = 'True'";
-        query += " order by englishname";
+        query += " order by Name";
 
         List<Location> list = new List<Location>();
         DbService db = new DbService();
@@ -334,6 +334,21 @@ public class Location
         return areas;
     }
 
+    public List<string> getNetAreas()
+    {
+        List<string> areas = new List<string>();
+        string query = "select * from Area where AreaName NOT LIKE '%-%' order by AreaName";
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+            string tmp = dr["AreaName"].ToString();
+            areas.Add(tmp);
+        }
+        return areas;
+    }
+
     public string GetAreaForPoint(string point)
     {
         string area = "";
@@ -355,7 +370,7 @@ public class Location
         // where Type='מחסום'
         string query = "select * from Location where Type=N'מחסום'";
         //query += " and IsActive = 'True'";
-        query += " order by englishname";
+        query += " order by Name";
 
         List<Location> list = new List<Location>();
         DbService db = new DbService();

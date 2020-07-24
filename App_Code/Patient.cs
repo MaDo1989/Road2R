@@ -639,7 +639,7 @@ public class Patient
                 catch (Exception ex)
                 {
 
-                    throw;
+                    throw ex;
                 }
             }
         }
@@ -734,15 +734,28 @@ public class Patient
         return locations;
     }
 
+
+    private DataTable getPatientsOnTheSamePath(string origin, string destination)
+    {        
+        Location loc = new Location();
+        string originArea = loc.GetAreaForPoint(origin);
+        string destinationArea = loc.GetAreaForPoint(destination);        
+        string query = "select p.* from Patient p join location lo on p.Barrier = lo.Name join location ld on p.Hospital = ld.Name where(lo.Area = N'" + originArea + "' and ld.Area = N'" + destinationArea + "') or(lo.Area = N'" + destinationArea + "' and ld.Area = N'" + originArea + "') and (p.IsActive = 'true')";
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        return ds.Tables[0];
+    }
+
     public List<Patient> getAnonymousPatientsListForLocations(bool active, string origin, string dest,string area)
     {
         //change to query with "in" 
         #region DB functions
 
-        List<string> locations = GetLocationsForArea(area);
-
+        /*
         string query = "";
         string text = "";
+
+        
         for (int i = 0; i < locations.Count; i++)
         {
             text = locations[i].Replace("'", "''");
@@ -789,12 +802,21 @@ public class Patient
             query += " and IsActive = 'true'";
         }
         query += " order by FirstNameH";
+        */
+
+
+
+
+
+        //DbService db = new DbService();
+
+        //DataSet ds = db.GetDataSetByQuery(query);
+
+        DataTable dt = getPatientsOnTheSamePath(origin, dest);
 
         List<Patient> list = new List<Patient>();
-        DbService db = new DbService();
-        DataSet ds = db.GetDataSetByQuery(query);
 
-        foreach (DataRow dr in ds.Tables[0].Rows)
+        foreach (DataRow dr in dt.Rows)
         {
             Patient p = new Patient();
             p.Id = int.Parse(dr["Id"].ToString());
@@ -829,27 +851,69 @@ public class Patient
             }
             else p.PatientIdentity = int.Parse(dr["PatientIdentity"].ToString());
 
-            //set equipment
-            List<string> el = new List<string>();
-            db = new DbService();
-            SqlCommand cmd = new SqlCommand();
-            cmd.Parameters.AddWithValue("@displayName", p.DisplayName);
-            cmd.CommandType = CommandType.Text;
-            query = "select EquipmentName from EquipmentForPatientView where PatientName=@displayName";
-            DataSet ds2 = db.GetDataSetByQuery(query, true, cmd.CommandType, cmd.Parameters[0]);
-            foreach (DataRow row in ds2.Tables[0].Rows)
-            {
-                string e = row["EquipmentName"].ToString();
-                el.Add(e);
-            }
-            p.Equipment = el;
+            ////set equipment
+            //List<string> el = new List<string>();
+            //db = new DbService();
+            //SqlCommand cmd = new SqlCommand();
+            //cmd.Parameters.AddWithValue("@displayName", p.DisplayName);
+            //cmd.CommandType = CommandType.Text;
+            //query = "select EquipmentName from EquipmentForPatientView where PatientName=@displayName";
+            //DataSet ds2 = db.GetDataSetByQuery(query, true, cmd.CommandType, cmd.Parameters[0]);
+            //foreach (DataRow row in ds2.Tables[0].Rows)
+            //{
+            //    string e = row["EquipmentName"].ToString();
+            //    el.Add(e);
+            //}
+            //p.Equipment = el;
 
             list.Add(p);
         }
         #endregion
 
+        list = getEquipmentForAnon(list);
+
         return list;
     }
+
+
+    //-------------------------------------------------------
+    //-- Benny optimization
+    //----------------------------------------
+
+    private List<Patient> getEquipmentForAnon(List<Patient> pList) {
+
+         
+
+        //set equipment
+        List<string> el = new List<string>();
+        DbService db = new DbService();
+        SqlCommand cmd = new SqlCommand();
+        cmd.CommandType = CommandType.Text;
+        string query = "select id, EquipmentName from EquipmentForPatientView";
+        DataSet ds2 = db.GetDataSetByQuery(query, true, cmd.CommandType);
+
+        Dictionary<int, List<string>> elist = new Dictionary<int, List<string>>();
+               
+        foreach (DataRow row in ds2.Tables[0].Rows)
+        {
+            string e = row["EquipmentName"].ToString();
+            int id = Convert.ToInt32(row["Id"]);
+            if (!elist.ContainsKey(id)) {
+                elist.Add(id, new List<string>());
+            }
+            elist[id].Add(e);
+        }
+
+        for (int i = 0; i < pList.Count; i++) {
+            if (elist.ContainsKey(pList[i].Id)){ 
+                pList[i].equipment = elist[pList[i].Id];
+            }
+        }
+
+        return pList;
+      
+    }
+
 
     public Patient getPatient()
     {

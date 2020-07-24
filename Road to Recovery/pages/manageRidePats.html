@@ -65,6 +65,8 @@
         var isAssistant = false;
         var refreshTime;
         var refreshInterval;
+        var tomorrowDate = new Date()
+        tomorrowDate.setDate(tomorrowDate.getDate() + 1)
         $(document).ready(function () {
             
             if (localStorage.refreshTime == "undefined" || localStorage.refreshTime === undefined) { // Set the deafult refresh rate for 5 minutes
@@ -182,12 +184,12 @@
                 recordsNum = JSON.parse(localStorage.getItem("futurePageLength"));
             }
 
-            tMorning = $('#datatable-morning').DataTable({ "stateDuration": 60 * 60, "columnDefs": [{ targets: 6, className: 'text-left-strong' }]}, { "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
-            tAfternoon = $('#datatable-afternoon').DataTable({  "stateDuration": 60 * 60, "columnDefs": [{ targets: 6, className: 'text-left-strong' }]}, { "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
+            tMorning = $('#datatable-morning').DataTable({ "stateDuration": 60 * 60, "columnDefs": [{ targets: 7, className: 'text-left-strong' }]}, { "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
+            tAfternoon = $('#datatable-afternoon').DataTable({  "stateDuration": 60 * 60, "columnDefs": [{ targets: 7, className: 'text-left-strong' }]}, { "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
             tFuture = $('#datatable-future').DataTable({
                 
                 "stateDuration": 60 * 60, //saves duration state for 1 hour
-                "columnDefs": [{ targets: 7, className: 'text-left-strong' }],
+                "columnDefs": [{ targets: 8, className: 'text-left-strong' }],
                 "iDisplayLength": recordsNum,
                 "aoColumns": [{
                     "sType": "customdatesort"
@@ -200,11 +202,33 @@
                     null,
                     null,
                     null,
+                    null,
                 ]},{ "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
-            
+
+            tTomorrow = $('#datatable-tomorrow').DataTable({
+
+                "stateDuration": 60 * 60, //saves duration state for 1 hour
+                "columnDefs": [{ targets: 8, className: 'text-left-strong' }],
+                "iDisplayLength": recordsNum,
+                "aoColumns": [{
+                    "sType": "customdatesort"
+                },
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                ]
+            }, { "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
+
             tMorning.state.clear();
             tAfternoon.state.clear();
             tFuture.state.clear();
+            tTomorrow.state.clear();
 
             getCoors();
             refreshTable();
@@ -281,6 +305,7 @@
             tMorning.clear().draw();
             tAfternoon.clear().draw();
             tFuture.clear().draw();
+            tTomorrow.clear().draw();
 
             var volunteerId = -1 // VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
 
@@ -294,7 +319,9 @@
                 type: "POST",
                 data: JSON.stringify({ volunteerId: volunteerId,maxDays:30 }),
                 success: function (data) {
+        
                     arr_rides = JSON.parse(data.d);
+
                     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
                     for (i in arr_rides) {
                         if (arr_rides[i].Coordinator.DisplayName != currentCoor) continue; //let the function run only for logged-in coordinator
@@ -352,7 +379,11 @@
 
                         if (arr_rides[i].Status == 'שובץ גיבוי') btnStr += " " + backupBtn; //Enable option to text the secondary driver asking to assign him to primary
 
+                        //XXX Checks which table and add the row to the correct one
+                        
                         //tables rows building
+                        
+                        
                         if (date.toLocaleDateString() == new Date().toLocaleDateString()) //today's rides
                         {
                             if (date.getHours() < splitHour) //morning rides
@@ -364,13 +395,15 @@
                                 buildTables(tAfternoon);
                             }
                         }
-                        else //futrue rides
+                        else if (date.toLocaleDateString() == tomorrowDate.toLocaleDateString()) { //tomorrow rides
+                            buildTables(tTomorrow);
+                        } else //futrue rides
                         {
-                            
+
                             buildTables(tFuture);
 
                         }
-
+                console.log(arr_rides[i])
                     }
 
                     //tMorning.columns([0]).order('asc').draw();
@@ -432,28 +465,47 @@
                         backupToPrimaryButton(this);
                     });
 
+
+                    $('#datatable-tomorrow tbody').on('click', '#edit', function () {
+                        editButton(this);
+                    });
+
+                    $('#datatable-tomorrow tbody').on('click', '#show', function () {
+                        showButton(this);
+                    });
+
+                    $('#datatable-tomorrow tbody').on('click', '#remove', function () {
+                        confirmDelete(this, tTomorrow);
+                    });
+
+                    $('#datatable-tomorrow tbody').on('click', '#backup', function () {
+                        backupToPrimaryButton(this);
+                    });
                 },
                 error: function (err) { alert("Error in GetRidePatView: " + err.responseText); }
             });
         }
 
         function buildTables(table) {
-
+        
+        if (arr_rides[i].Pat.DisplayName.includes("אנונימי")){
+        arr_rides[i].Pat.DisplayName = "חולה";
+        }
             if (arr_rides[i].Status.indexOf("ממתינה לשיבוץ") !==-1 ) {
                 if (isAssistant) {
-                    if (table.context[0].sTableId != "datatable-future") {
-                        table.row.add([time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, "אין!<br/>None!",  "Waiting for a driver", arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                    if (table.context[0].sTableId != "datatable-future" && table.context[0].sTableId != "datatable-tomorrow") {
+                        table.row.add([time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, "אין!<br/>None!",  "Waiting for a driver", arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                     }
                     else {
-                        table.row.add([date2, time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, "אין!<br/>None!", "Waiting for a driver",arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add([date2, time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, "אין!<br/>None!", "Waiting for a driver", arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                     }
                 }
                 else {
-                    if (table.context[0].sTableId != "datatable-future") {
-                        table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!<br/>None!", arr_rides[i].Status,arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                    if (table.context[0].sTableId != "datatable-future" && table.context[0].sTableId != "datatable-tomorrow") {
+                        table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!<br/>None!", arr_rides[i].Status,arr_rides[i].LastModified.slice(0, -3),arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                     }
                     else {
-                        table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!<br/>None!", arr_rides[i].Status,arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!<br/>None!", arr_rides[i].Status,arr_rides[i].LastModified.slice(0, -3),arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                     }
                 }
             }
@@ -493,19 +545,19 @@
                     if(arr_rides[i].Status=="עיכוב במחסום"){
                         s='Delay at the border';
                     }
-                    if (table.context[0].sTableId != "datatable-future") {
-                        table.row.add([time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, drivers, s,arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                    if (table.context[0].sTableId != "datatable-future" && table.context[0].sTableId != "datatable-tomorrow") {
+                        table.row.add([time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, drivers, s,arr_rides[i].LastModified.slice(0, -3),arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                     }
                     else {
-                        table.row.add([date2, time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, drivers, s,arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add([date2, time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, drivers, s,arr_rides[i].LastModified.slice(0, -3),arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                     }
                 }
                 else {
-                    if (table.context[0].sTableId != "datatable-future") {
-                        table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status,arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                    if (table.context[0].sTableId != "datatable-future" && table.context[0].sTableId != "datatable-tomorrow") {
+                        table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status,arr_rides[i].LastModified.slice(0, -3),arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                     }
                     else {
-                        table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status,arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status,arr_rides[i].LastModified.slice(0, -3),arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                     }
                 }
   
@@ -530,25 +582,36 @@
             var destinationNameMessage = "";
             var originNameMessage = "";
             var userName = GENERAL.USER.getUserDisplayName();
-            if (data.length == 7) {
+            if (data.length == 10) {
                 patientNameMessage = data[3];
                 originNameMessage = data[2];
                 destinationNameMessage = data[1];
                 var hour = " בשעה ";
-                if (data[0] == "אחה''צ") hour = " ";
-                msg = "מחיקת ההסעה של " + data[3] + " מ: " + data[2] + " ל: " + data[1] + ", היום בשעה " + data[0] +"\n";
-                msg += "حذف سفرية " + data[3] + " من: " + data[2] + " الى: " + data[1] + ", في " + data[0];
-                pushMsg = "נמחקה ההסעה של " + data[3] + " מ: " + data[2] + " ל: " + data[1] + ", היום בשעה " + data[0] + " ע\"י העוזר/ת " + userName;
+                if (data[0] == "אחה''צ") {
+                    msg = "מחיקת ההסעה של " + data[3] + " מ: " + data[2] + " ל: " + data[1] + ", היום אחר הצהריים";
+                    pushMsg = "נמחקה ההסעה של " + data[3] + " מ: " + data[2] + " ל: " + data[1] + ", היום אחר הצהריים  ע\"י העוזר/ת " + userName;
+                } else {
+                    msg = "מחיקת ההסעה של " + data[3] + " מ: " + data[2] + " ל: " + data[1] + ", היום בשעה " + data[0] + "\n";
+                    //msg += "حذف سفرية " + data[3] + " من: " + data[2] + " الى: " + data[1] + ", في " + data[0];
+                    pushMsg = "נמחקה ההסעה של " + data[3] + " מ: " + data[2] + " ל: " + data[1] + ", היום בשעה " + data[0] + " ע\"י העוזר/ת " + userName;
+                }
+                
             }
             else {
-                patientNameMessage = data[4];
-                originNameMessage = data[2];
-                destinationNameMessage = data[3];
+                patientNameMessage = data[3];
+                originNameMessage = data[1];
+                destinationNameMessage = data[2];
                 var hour = " בשעה ";
-                if (data[1] == "אחה''צ") hour = " ";
-                msg = "מחיקת ההסעה של " + data[4] + " מ: " + data[2] + " ל: " + data[3] + ", בתאריך " + data[0] + hour + data[1];
-                msg += "حذف سفرية " + data[3] + " من: " + data[2] + " الى: " + data[1] + ", في " + data[0] + hour + data[1];
-                pushMsg = "נמחקה ההסעה של " + data[4] + " מ: " + data[2] + " ל: " + data[3] + ", בתאריך " + data[0] + hour + data[1] + " ע\"י העוזר/ת " + userName;
+                if (data[1] == "אחה''צ") {
+                    msg = "מחיקת ההסעה של " + data[4] + " מ: " + data[2] + " ל: " + data[3] + ", בתאריך " + data[0] + " בשעות אחר הצהריים";
+                    pushMsg = "נמחקה ההסעה של " + data[4] + " מ: " + data[2] + " ל: " + data[3] + ", בתאריך " + data[0] + " בשעות אחר הצהריים ע\"י העוזר/ת " + userName;
+                } else {
+                    msg = "מחיקת ההסעה של " + data[4] + " מ: " + data[2] + " ל: " + data[3] + ", בתאריך " + data[0] + hour + data[1];
+                    //msg += "حذف سفرية " + data[3] + " من: " + data[2] + " الى: " + data[1] + ", في " + data[0] + hour + data[1];
+                    pushMsg = "נמחקה ההסעה של " + data[4] + " מ: " + data[2] + " ל: " + data[3] + ", בתאריך " + data[0] + hour + data[1] + " ע\"י העוזר/ת " + userName;
+                } 
+                
+                
             }
             //var hour = " בשעה ";
             //if (data[1] == "אחה''צ") hour = " ";
@@ -562,8 +625,31 @@
                 confirmButtonText: "حذف\nמחיקה",
                 closeOnConfirm: false
             }, function () {
+
+                
+                
+
                 var RidePat = new Object();
                 RidePat.RidePatNum = arr_details.RidePatNum;
+                 
+                var tempDate = data[0];
+                if (tempDate == "אחה''צ") {
+                    tempDate = "01/01/1970"; // Fictional date for deletion
+                }
+                var tempDateReveresed = tempDate.split('/').reverse().join('/')
+
+                var date = new Date(tempDateReveresed);
+                RidePat.Date = date;
+                if (isNaN(date.getTime())) {
+
+                    var date = new Date();
+                    var tempHour = tempDate.split(':');
+                    date.setHours(tempHour[0])
+                    RidePat.Date = date;
+
+                }
+                
+
                 var Pat = new Object();
                 Pat.DisplayName = patientNameMessage;
                 RidePat.Pat = Pat;
@@ -626,11 +712,11 @@
 
 
         function manipulateTables() {
-
-
+            
             tableMorning = document.getElementById("datatable-morning");
             tableAfternoon = document.getElementById("datatable-afternoon");
             tableFuture = document.getElementById("datatable-future");
+            tableTomorrow = document.getElementById("datatable-future");
 
             tdarr = tableMorning.getElementsByTagName("td"); //Morning functions
             tAnonymouse = tableMorning.getElementsByTagName("tr");//for anonymouse patient
@@ -748,6 +834,37 @@
                     tdarr[j].style.color = "white";
                 }
             }
+
+            //TOMORROW!!!
+            tdarr = tableTomorrow.getElementsByTagName("td"); //Future functions
+            tAnonymouse = tableTomorrow.getElementsByTagName("tr");//for anonymouse patient
+            //NOT hardCoded for painting a row with a driver and anonymous patient.
+            tTomorrow.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                var data = this.data();
+                if (data != undefined) {
+                    if (data[9] == "True" && (data[5].indexOf("אין") !== -1)) {
+                        var row = tTomorrow
+                            .row(rowIdx)
+                            .node();
+                        $(row).css("background-color", "#FFEF8F");
+                    }
+                    //else if ((data[2].indexOf("מרכז") !== -1 || data[3].indexOf("מרכז") !== -1 || data[2].indexOf("center") !== -1 || data[3].indexOf("center") !== -1) && data[5].indexOf("אין") === -1) {
+                    //    var row = tFuture
+                    //        .row(rowIdx)
+                    //        .node();
+                    //    $(row).css("background-color", "#dbb20b");
+                    //}
+                }
+            });
+
+
+            for (var j = 0; j < tdarr.length; j++) {
+                if (tdarr[j].innerHTML.indexOf("הגענו ליעד") !== -1) {
+                    tdarr[j].style.backgroundColor = "green";
+                    tdarr[j].style.color = "white";
+                }
+            }
+
 
             //hardCoded for painting a row with a driver and anonymous patient.
             //for (var j = 0; j < tAnonymouse.length; j++) {
@@ -910,81 +1027,113 @@
                                         </div>
                                     </div>
 
-                                    <div id="accordion" class="panel-group">
-                                        <div class="panel panel-primary">
-                                            <div class="panel-heading" id="col1">
-                                                <h4 data-toggle="tooltip" data-placement="top" title="Morning Rides  سفريات الصباح" class="panel-title"> <a href="#collapse1" data-parent="#accordion" data-toggle="collapse" class="dropdown active open">נסיעות לבוקר</a></h4>
-                                            </div>
-                                            <div class="panel-collapse collapse" id="collapse1">
-                                                <div class="panel-body">
-                                                    <table id="datatable-morning" class="table table-striped table-bordered">
-                                                        <thead>
-                                                            <tr>
-                                                                <th class="middle" title="Time  الساعة">שעה</th>
-                                                                <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
-                                                                <th class="middle" title="Destination  نقطة الوصول">יעד</th>
-                                                                <th class="middle" title="Patient  المريض">החולה</th>
-                                                                <th class="middle" title="Driver  السائق">המסיע</th>
-                                                                <th class="middle" title="Status  حالة السفرية">סטטוס ההסעה</th>
-                                                                <th class="customWidth middle" title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
-                                                                <th class="middle" title="Actions  اعمال">פעולות</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody></tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
+                                <div id="accordion" class="panel-group">
+                                    <div class="panel panel-primary">
+                                        <div class="panel-heading" id="col1">
+                                            <h4 data-toggle="tooltip" data-placement="top" title="Morning Rides  سفريات الصباح" class="panel-title"> <a href="#collapse1" data-parent="#accordion" data-toggle="collapse" class="dropdown active open">נסיעות לבוקר</a></h4>
                                         </div>
-                                        <div class="panel panel-primary">
-                                            <div class="panel-heading" id="col2">
-                                                <h4 data-toggle="tooltip" data-placement="top" title="Afternoon Rides  سفريات المساء" class="panel-title"> <a href="#collapse2" data-parent="#accordion" data-toggle="collapse">נסיעות לאחה"צ</a></h4>
-                                            </div>
-                                            <div class="panel-collapse collapse" id="collapse2">
-                                                <div class="panel-body">
-                                                    <table id="datatable-afternoon" class="table table-striped table-bordered">
-                                                        <thead>
-                                                            <tr>
-                                                                <th class="middle" title="Time  الساعة">שעה</th>
-                                                                <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
-                                                                <th class="middle" title="Destination  نقطة الوصول">יעד</th>
-                                                                <th class="middle" title="Patient  المريض">החולה</th>
-                                                                <th class="middle" title="Driver  السائق">המסיע</th>
-                                                                <th class="middle" title="Status  حالة السفرية">סטטוס ההסעה</th>
-                                                                <th class="customWidth middle" title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
-                                                                <th class="middle" title="Actions  اعمال">פעולות</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody></tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="panel panel-primary">
-                                            <div class="panel-heading" id="col3">
-                                                <h4 data-toggle="tooltip" data-placement="bottom" title="Future Rides  سفريات مستقبلية" class="panel-title"> <a href="#collapse3" data-parent="#accordion" data-toggle="collapse">נסיעות עתידיות</a></h4>
-                                            </div>
-                                            <div class="panel-collapse collapse" id="collapse3">
-                                                <div class="panel-body">
-                                                    <table id="datatable-future" class="table table-striped table-bordered hover">
-                                                        <thead>
-                                                            <tr>
-                                                                <th class="middle" title="Date  الساعة">תאריך</th>
-                                                                <th class="middle" title="Time  الساعة">שעה</th>
-                                                                <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
-                                                                <th class="middle" title="Destination  نقطة الوصول">יעד</th>
-                                                                <th class="middle" title="Patient  المريض">החולה</th>
-                                                                <th class="middle" title="Driver  السائق">המסיע</th>
-                                                                <th class="middle" title="Status  حالة السفرية">סטטוס ההסעה</th>
-                                                                <th class="customWidth middle" title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
-                                                                <th class="middle" title="Actions  اعمال">פעולות</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody></tbody>
-                                                    </table>
-                                                </div>
+                                        <div class="panel-collapse collapse" id="collapse1">
+                                            <div class="panel-body">
+                                                <table id="datatable-morning" class="table table-striped table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="middle" title="Time  الساعة">שעה</th>
+                                                            <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
+                                                            <th class="middle" title="Destination  نقطة الوصول">יעד</th>
+                                                            <th class="middle" title="Patient  المريض">החולה</th>
+                                                            <th class="middle" title="Driver  السائق">המסיע</th>
+                                                            <th class="middle" title="Status  حالة السفرية">סטטוס ההסעה</th>
+                                                            <th class="customWidth middle" title="Last modified">עודכן לאחרונה</th>
+                                                            <th class="customWidth middle" title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
+                                                            <th class="SmallcustomWidth  middle" title="Actions  اعمال">פעולות</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                </table>
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="panel panel-primary">
+                                        <div class="panel-heading" id="col2">
+                                            <h4 data-toggle="tooltip" data-placement="top" title="Afternoon Rides  سفريات المساء" class="panel-title"> <a href="#collapse2" data-parent="#accordion" data-toggle="collapse">נסיעות לאחה"צ</a></h4>
+                                        </div>
+                                        <div class="panel-collapse collapse" id="collapse2">
+                                            <div class="panel-body">
+                                                <table id="datatable-afternoon" class="table table-striped table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="middle" title="Time  الساعة">שעה</th>
+                                                            <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
+                                                            <th class="middle" title="Destination  نقطة الوصول">יעד</th>
+                                                            <th class="middle" title="Patient  المريض">החולה</th>
+                                                            <th class="middle" title="Driver  السائق">המסיע</th>
+                                                            <th class="middle" title="Status  حالة السفرية">סטטוס ההסעה</th>
+                                                            <th class="customWidth middle" title="Last modified">עודכן לאחרונה</th>
+                                                            <th class="customWidth middle" title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
+                                                            <th class="SmallcustomWidth middle" title="Actions  اعمال">פעולות</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="panel panel-primary">
+                                        <div class="panel-heading" id="col4">
+                                            <h4 data-toggle="tooltip" data-placement="bottom" title="Tomorrow Rides" class="panel-title"> <a href="#collapse4" data-parent="#accordion" data-toggle="collapse">נסיעות למחר</a></h4>
+                                        </div>
+                                        <div class="panel-collapse collapse" id="collapse4">
+                                            <div class="panel-body">
+                                                <table id="datatable-tomorrow" class="table table-striped table-bordered hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="middle" title="Date  الساعة">תאריך</th>
+                                                            <th class="middle" title="Time  الساعة">שעה</th>
+                                                            <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
+                                                            <th class="middle" title="Destination  نقطة الوصول">יעד</th>
+                                                            <th class="middle" title="Patient  المريض">החולה</th>
+                                                            <th class="middle" title="Driver  السائق">המסיע</th>
+                                                            <th class="middle" title="Status  حالة السفرية">סטטוס ההסעה</th>
+                                                            <th class="customWidth middle" title="Last modified">עודכן לאחרונה</th>
+                                                            <th class="customWidth middle" title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
+                                                            <th class="SmallcustomWidth middle" title="Actions  اعمال">פעולות</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="panel panel-primary">
+                                        <div class="panel-heading" id="col3">
+                                            <h4 data-toggle="tooltip" data-placement="bottom" title="Future Rides  سفريات مستقبلية" class="panel-title"> <a href="#collapse3" data-parent="#accordion" data-toggle="collapse">נסיעות עתידיות</a></h4>
+                                        </div>
+                                        <div class="panel-collapse collapse" id="collapse3">
+                                            <div class="panel-body">
+                                                <table id="datatable-future" class="table table-striped table-bordered hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="middle" title="Date  الساعة">תאריך</th>
+                                                            <th class="middle" title="Time  الساعة">שעה</th>
+                                                            <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
+                                                            <th class="middle" title="Destination  نقطة الوصول">יעד</th>
+                                                            <th class="middle" title="Patient  المريض">החולה</th>
+                                                            <th class="middle" title="Driver  السائق">המסיע</th>
+                                                            <th class="middle" title="Status  حالة السفرية">סטטוס ההסעה</th>
+                                                            <th class="customWidth middle" title="Last modified">עודכן לאחרונה</th>
+                                                            <th class="customWidth middle" title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
+                                                            <th class="SmallcustomWidth middle" title="Actions  اعمال">פעולות</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
                                 </div>
                         </div>
                     </div>
@@ -1062,7 +1211,7 @@
     <script type="text/javascript">
 
         TableManageButtons.init();
-
+        
     </script>
 </body>
 </html>

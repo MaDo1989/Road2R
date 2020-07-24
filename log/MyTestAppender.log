@@ -1,17 +1,6 @@
-﻿2020-01-18 13:46:10,899 ERROR [127] WebService.writeToLog - Successful login ;for user: 0524895999
-2020-01-18 13:47:58,254 ERROR [99] WebService.writeToLog - Successful login ;for user: 0524895999
-2020-02-15 18:27:00,007 ERROR [8] WebService.writeToLog - Login failed. password: ר2רר2ר ;for user: 0544890081
-2020-02-15 18:27:04,916 ERROR [8] WebService.writeToLog - Successful login ;for user: 0544890081
-2020-02-15 18:28:33,968 ERROR [8] WebService.writeToLog - Login failed. password: ר2רר2ר ;for user: 0544890081
-2020-02-15 18:28:39,224 ERROR [8] WebService.writeToLog - Successful login ;for user: 0544890081
-2020-02-15 18:32:24,174 ERROR [9] WebService.writeToLog - Successful login ;for user: 0544890081
-2020-02-15 18:34:07,916 ERROR [9] WebService.writeToLog - Successful login ;for user: 0544890081
-2020-02-15 19:37:16,341 ERROR [18] WebService.writeToLog - Successful login ;for user: 0544890081
-2020-02-15 19:39:15,300 ERROR [3] WebService.getPatientsForAnonymous - Error in getPatientsForAnonymous
-System.FormatException: מחרוזת קלט לא היתה בתבנית הנכונה.
-   ב-  System.Number.StringToNumber(String str, NumberStyles options, NumberBuffer& number, NumberFormatInfo info, Boolean parseDecimal)
-   ב-  System.Number.ParseInt32(String s, NumberStyles style, NumberFormatInfo info)
-   ב-  System.Convert.ToInt32(String value)
-   ב-  Patient.addEquipmentToPatientsList(List`1 pList) ב- c:\Repos\Road2R\App_Code\Patient.cs:שורה 740
-   ב-  Patient.getAnonymousPatientsList(Boolean active, String origin, String dest) ב- c:\Repos\Road2R\App_Code\Patient.cs:שורה 721
-   ב-  WebService.getPatientsForAnonymous(Boolean active, String origin, String dest) ב- c:\Repos\Road2R\App_Code\WebService.cs:שורה 293
+﻿2020-04-18 10:39:09,160 ERROR [7] WebService.writeToLog - Successful login ;for user: 0544890081
+2020-04-18 10:45:53,543 ERROR [6] WebService.writeToLog - Login failed. password: ר2רר2ר ;for user: 0544890081
+2020-04-18 10:47:29,491 ERROR [18] WebService.writeToLog - Successful login ;for user: 0544890081
+2020-04-18 10:53:50,519 ERROR [12] WebService.writeToLog - Successful login ;for user: 0544890081
+2020-04-18 10:59:43,878 ERROR [9] WebService.writeToLog - Successful login ;for user: 0544890081
+2020-04-18 11:02:45,150 ERROR [9] WebService.writeToLog - Successful login ;for user: 0544890081

@@ -81,11 +81,11 @@
             height: 100px;
         }
 
-        input[type=text]:focus {
+        input[type=text]:focus, input[type=number]:focus {
             background-color: #FFE684;
         }
 
-        input[type=text], input[type=checkbox], input[type=date] {
+        input[type=text], input[type=checkbox], input[type=date], input[type=number] {
             border-color: #000
         }
 
@@ -424,7 +424,9 @@
                 data: JSON.stringify({ displayName: displayName }),
                 success: function (data) {
                     $('#wait').hide();
+        
                     var patient = JSON.parse(data.d);
+        console.log(patient);
                     if (patient.DisplayName === null) {
                         uploadData($("#patientFirstName").val())
                     }
@@ -464,8 +466,9 @@
                             $("#gender").val("Unknown");
                         }
                         else $("#gender").val(patient.Gender);
-                        
-                        var date = new Date(patient.BirthDate.substring(0, 10));
+                        var tmpDate = patient.BirthDate.substring(0, 10);
+                        tmpDate = tmpDate.split("/")
+                        var date = new Date(tmpDate[2], tmpDate[1], tmpDate[0]);
                         var month = date.getMonth() + 1;
                         if (month < 10) {
                             month = "0" + month;
@@ -919,7 +922,7 @@
                                                 <div class="form-group">
                                                     <label data-toggle="tooltip" title="Patient ID" class="col-sm-2 control-label">תעודת זהות&nbsp;</label>
                                                     <div class="col-sm-6">
-                                                        <input id="PatientIdentity" name="PatientIdentity" min="100000000" max="999999999" type="number" class="form-control">
+                                                        <input id="PatientIdentity" name="PatientIdentity" type="text" class="form-control">
                                                     </div>
                                                 </div>
                                             </div>
@@ -1372,8 +1375,10 @@
             var englishName = $("#patientEnglishName").val();
             var firstName = $("#patientFirstName").val();
             var lastName = $("#patientLastName").val();
-            
+
             var name = true;
+
+            
             //if (!isAssistant) {
             //    if (firstName === "") {
             //        swal(
@@ -1500,8 +1505,22 @@
                 }
             } else phoneMatch3 = true;
 
+            var identityMatch = true;
+            var identity = $("#PatientIdentity").val();
+            if (identity != "") {
+                var re = new RegExp("^\\d{9}$");
 
-            if (!name || !englishNameCon || !CityExists || !barrier || !hospital || !gender || !phoneMatch || !phoneMatch2 || !phoneMatch3) {
+                if (!re.test(identity)) {
+                    identityMatch = false;
+                    swal(
+                        "שים לב!",
+                        "תעודת הזהות צריכה להכיל 9 ספרות",
+                        "warning"
+                    );
+                }
+            }
+
+            if (!name || !englishNameCon || !CityExists || !barrier || !hospital || !gender || !phoneMatch || !phoneMatch2 || !phoneMatch3 || !identityMatch) {
                 return false;
             } else return true;
         }

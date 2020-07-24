@@ -231,6 +231,19 @@ public class Escorted
         }
     }
 
+    public int Id1
+    {
+        get
+        {
+            return id;
+        }
+
+        set
+        {
+            id = value;
+        }
+    }
+
     public Escorted(Patient _pat, string _displayName, string _firstNameH, string _firstNameA, string _lastNameH, string _lastNameA,
      string _addrees, string _cellPhone, string _cellPhone2, string _homePhone, string _status, string _contactType, string _gender)
     {

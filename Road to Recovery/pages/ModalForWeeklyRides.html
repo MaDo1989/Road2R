@@ -1,0 +1,91 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <link href="registration.css" rel="stylesheet" />
+
+</head>
+<body>
+
+    <div class="container">
+        <h2>Modal Login Example</h2>
+        <!-- Trigger the modal with a button -->
+        <button type="button" class="btn btn-default btn-lg regBTN" id="0">Login</button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="regModal" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header" style="padding:35px 50px;">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4><span class="glyphicon glyphicon-road"></span> רישום להסעה </h4>
+                    </div>
+                    <div class="modal-body" style="padding:40px 50px;">
+                        <form role="form" id="regForm">
+                            <p class="msg" id="approveMsg"> </p>
+                            <div class="form-group">
+                                <label for="phoneTB"><span class="glyphicon glyphicon-phone"></span>מספר הנייד</label>
+                                <input type="text" required pattern="[0]{1}[0-9]{9}" class="form-control" id="phoneTB" placeholder="הזן את מספר הנייד ללא רווחים ומקפים"
+                                       oninvalid="this.setCustomValidity('הזן מספר נייד בן 10 ספרות')" oninput="this.setCustomValidity('')">
+                            </div>
+                            <button type="submit" class="btn btn-success btn-block"><span class="glyphicon glyphicon-off"></span> הרשם</button>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger btn-default pull-left" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> בטל</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="modal fade" id="existsModal" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header" style="padding:35px 50px;">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4><span class="glyphicon glyphicon-road"></span> רישום להסעה </h4>
+                    </div>
+                    <div class="modal-body" style="padding:40px 50px;">
+                        <form role="form" id="existsForm">
+                            <p class="msg">  להסעה זו כבר שובץ נהג, ודאו שאתם לוחצים על הכפתור הירוק עליו רשום לחצו לקבלת נתונים עדכניים בדף לפני ניסיון לרישום </p>
+                            <button type="submit" class="btn btn-success btn-block"><span class="glyphicon glyphicon-off"></span> אישור</button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <script src="registration.js"></script>
+    <script>
+
+        arr_rides = [
+            {
+                ridePatNum: 1418,
+                Date: "יום חמישי ה23 למאי 2020",
+                OriginName: "תרקומיא",
+                DestinationName: "שיבא",
+                Time: "9:30",
+                PatDisplayName: "אחמד אבו אל רביע",
+            }
+        ]
+$(document).ready(function(){
+    wireModals();
+});
+
+
+
+    </script>
+
+</body>
+</html>

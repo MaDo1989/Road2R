@@ -133,6 +133,9 @@ public class User
 
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
+        if (ds.Tables[0].Rows.Count == 0) {
+            throw new Exception("user not found");
+        }
         DataRow dr = ds.Tables[0].Rows[0];
         string userName = dr["DisplayName"].ToString();
         string userEnglishName = dr["EnglishName"].ToString();
@@ -142,6 +145,24 @@ public class User
         return userName;
         #endregion
     }
+
+    public string getUserNameById(int userid)
+    {
+        #region DB functions
+        string query = "select displayName from Volunteer where Id ='" + userid + "'";
+
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        DataRow dr = ds.Tables[0].Rows[0];
+        string userName = dr["DisplayName"].ToString();
+        //string userEnglishName = dr["EnglishName"].ToString();
+        //User u = new User();
+        //u.EnglishName = userEnglishName;
+        //u.UserName = userName;
+        return userName;
+        #endregion
+    }
+
     public string getUserEnglishNameByCellphone(string cellphone)
     {
         #region DB functions
