@@ -119,13 +119,14 @@
 
         $(document).ready(function () {
 
+            init_reports_page();
 
             $("#rp_vl_ride_month").click(on_report_click);
             $("#rp_vl_ride_year").click(on_report_click);
             $("#rp_amuta_vls_week").click(on_report_click);
             $("#rp_amuta_vls_per_pat").click(on_report_click);
             $("#rp_amuta_vls_km").click(on_report_click);
-
+    
            
 
             if (localStorage.south == "undefined" || localStorage.south === undefined) {
@@ -274,23 +275,6 @@
             if (saturday)
                 weekdays.push("ש");
 
-
-            ridesToShow = [];
-
-            for (Ride of allRides) {
-                if (south && Ride.SouthRide && weekdays.includes(Ride.Day)) {
-                    ridesToShow.push(Ride);
-                    continue;
-                }
-                if (center && Ride.CenterRide && weekdays.includes(Ride.Day)) {
-                    ridesToShow.push(Ride);
-                    continue;
-                }
-                if (north && Ride.NorthRide && weekdays.includes(Ride.Day)) {
-                    ridesToShow.push(Ride);
-                    continue;
-                }
-            }
         }
 
 
@@ -305,10 +289,8 @@
     <div id="wrapper">
         <div class="topbar">
 
-
-
             <!-- Navbar -->
-            <div class="navbar navbar-default" role="navigation">
+            <div id="na" class="navbar navbar-default" role="navigation">
                 <div class="container">
                     <div class="">
                         <!--Expend/Collaps Side Menue-->
@@ -322,64 +304,22 @@
                         <!-- LOGO -->
                         <div class="pull-left">
                             <div class="text-center">
-                                <a href="manageRidePats.html" class="logo"><span>בדרך להחלמה</span></a>
+                                <a href="manageRidePats.html" class="logo"><span>בדרך להחלמה</span>&nbsp&nbsp&nbsp</a>
                             </div>
                         </div>
 
-
-
-                        <!--Search-->
-                        <!--<form role="search" class="navbar-right app-search pull-right hidden-xs">
-                        <input type="text" placeholder="חיפוש..." class="form-control app-search-input">
-                        <a href=""><i class="fa fa-search"></i></a>
-                    </form>-->
+                        <div class="pull-right">
+                            <a href="passwordForm.html"> <span class="logo" id="userName"></span>&nbsp;<span style="color:#3BAFDA" class="logo" id="databaseType"></span></a>
+                        </div>
                     </div>
                     <!--/.nav-collapse -->
                 </div>
             </div>
         </div>
-        <div class="left side-menu">
+        <!-- ========== Right Sidebar Start ========== -->
+        <div w3-include-html="menu.html"></div>
+        <!-- Right Sidebar End -->
 
-            <div class="sidebar-inner slimscrollleft">
-
-                <div id="sidebar-menu">
-
-                    <ul>
-                        <li>
-                            <a href="viewVolunteer.html" class="waves-effect waves-primary">
-                                <i class="md md-person"></i><span> ניהול מתנדבים</span>
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="viewPatient.html" class="waves-effect waves-primary">
-                                <i class="md md-recent-actors"></i><span> ניהול חולים</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="viewRidePats.html" class="waves-effect waves-primary">
-                                <i class="md md-today"></i><span> כל ההסעות</span>
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="manageRidePats.html" class="waves-effect waves-primary">
-                                <i class="md md-today"></i><span> ניהול ההסעות שלי</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="waves-effect waves-primary" onclick="deleteCookie()">
-                                <i class="md md-remove-circle-outline"></i><span>התנתקות מהמערכת</span>
-                            </a>
-                        </li>
-                    </ul>
-                    <div class="clearfix"></div>
-                </div>
-
-                <div class="clearfix"></div>
-            </div>
-
-        </div>
         <div class="content-page">
 
             <div class="content">
@@ -389,12 +329,12 @@
                             <h1> עץ הדוחות</h1>
                             <ul id="myUL">
                                 <!--  <li>
-          <span>לרכז</span>
-          <ul>
-              <li>מתנדבים</li>
-              <li>הסעות שבוטלו</li>
-          </ul>
-      </li>   -->
+                                <span>לרכז</span>
+                                <ul>
+                                    <li>מתנדבים</li>
+                                    <li>הסעות שבוטלו</li>
+                                </ul>
+                            </li>   -->
                                 <li>
                                     <span>לעמותה</span>
                                     <ul>

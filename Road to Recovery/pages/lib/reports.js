@@ -57,8 +57,23 @@
 // Current startegy for refreshing teh table, set per report type
 var S_refresh_preview = null;
 
+function init_reports_page() {
+    includeHTML();
+    set_banner_debug_data();
+}
 
-console.log("Shalom");
+
+function set_banner_debug_data() {
+    if (!JSON.parse(localStorage.getItem("isProductionDatabase"))) {
+        $("#databaseType").text("Test database ")
+    }
+    else {
+        $("#databaseType").text("Production database")
+    }
+    if (window.location.hostname.toString() == 'localhost' || window.location.pathname.indexOf('test') != -1) {
+        $("#na").css("background-color", "#ffde89");
+    }
+}
 
 
 // Handle a click event on one of the reports in the Reports-Tree

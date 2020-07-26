@@ -2,3 +2,10 @@ web.config
 Web.config
 *.log
 *.pubxml
+04-April-2020.sln
+.vs/04-April-2020/config/applicationhost.config
+.vs/04-April-2020/v16/.suo
+log/MyTestAppender.log.*
+packages/
+log/MyTestAppender.log
+
