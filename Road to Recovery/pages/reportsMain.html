@@ -92,6 +92,12 @@
         .report_hidden {
             display: none;
         }
+        .report_link_cls {
+            cursor: pointer;
+        }
+        .report_tree_UL {
+            padding-right: 1.5em;
+        }
     </style>
 
 
@@ -327,7 +333,7 @@
                     <div class="row">
                         <div class="col-sm-2">
                             <h1> עץ הדוחות</h1>
-                            <ul id="myUL">
+                            <ul id="myUL" class="report_tree_UL">
                                 <!--  <li>
                                 <span>לרכז</span>
                                 <ul>
@@ -336,16 +342,16 @@
                                 </ul>
                             </li>   -->
                                 <li>
-                                    <span>לעמותה</span>
-                                    <ul>
+                                    <span style="font-weight: bold;">לעמותה</span>
+                                    <ul class="report_tree_UL">
                                         <li><a class="report_link_cls" id="rp_amuta_vls_week">מתנדבים שבועי</a></li>
                                         <li><a class="report_link_cls" id="rp_amuta_vls_per_pat">מתנדבים - פר חולה</a></li>
                                         <li><a class="report_link_cls" id="rp_amuta_vls_km">מתנדבים – שנתי</a></li>
                                     </ul>
                                 </li>
                                 <li>
-                                    <span>למתנדב</span>
-                                    <ul>
+                                    <span style="font-weight: bold;">למתנדב</span>
+                                    <ul class="report_tree_UL">
                                         <li><a class="report_link_cls" id="rp_vl_ride_month">הסעות החודש </a></li>
                                         <li><a class="report_link_cls" id="rp_vl_ride_year">הסעות השנה </a></li>
                                     </ul>
@@ -428,8 +434,8 @@
 
                                     <div class="col-sm-12">
                                         <div class="form-group">
-                                            <label class="col-sm-4">שם המתנדב</label>
-                                            <div class="col-sm-8" id="selectDriver">
+                                            <label class="col-sm-2"  style="padding: 0.5em 0px;">מתנדב</label>
+                                            <div class="col-sm-10" id="selectDriver">
                                                 <input placeholder="הזן שם" type="text" template_id="select_driver" class="form-control ui-autocomplete-input" autocomplete="off" aria-required="true" aria-invalid="false">
                                             </div>
                                         </div>
@@ -446,8 +452,8 @@
 
                                     <div class="col-sm-12">
                                         <div class="form-group">
-                                            <label class="col-sm-4">חודש</label>
-                                            <div class="col-sm-8">
+                                            <label class="col-sm-2"  style="padding: 0.5em 0px;">חודש</label>
+                                            <div class="col-sm-10">
                                                 <input type="text" template_id="select_month" class="form-control" aria-required="true" aria-invalid="false">
                                             </div>
                                         </div>
@@ -464,9 +470,9 @@
 
                                     <div class="col-sm-12">
                                         <div class="form-group">
-                                            <label class="col-sm-4">שבוע</label>
-                                            <div class="col-sm-8">
-                                                <input type="text" template_id="select_week" class="form-control" aria-required="true" aria-invalid="false">
+                                            <label class="col-sm-2"  style="padding: 0.5em 0px;">שבוע</label>
+                                            <div class="col-sm-10">
+                                                <input type="date" template_id="select_week"  placeholder="..." class="form-control">
                                             </div>
                                         </div>
 
@@ -482,8 +488,8 @@
 
                                     <div class="col-sm-12">
                                         <div class="form-group">
-                                            <label class="col-sm-4">חולה</label>
-                                            <div class="col-sm-8">
+                                            <label class="col-sm-2"  style="padding: 0.5em 0px;">חולה</label>
+                                            <div class="col-sm-10">
                                                 <input type="text" template_id="select_patient" class="form-control" aria-required="true" aria-invalid="false">
                                             </div>
                                         </div>
@@ -500,9 +506,12 @@
 
                                     <div class="col-sm-12">
                                         <div class="form-group">
-                                            <label class="col-sm-4">שנה</label>
-                                            <div class="col-sm-8">
-                                                <input type="text" template_id="select_year" class="form-control" aria-required="true" aria-invalid="false">
+                                            <label class="col-sm-2"  style="padding: 0.5em 0px;">שנה</label>
+                                            <div class="col-sm-10">
+                                                <select template_id="select_year" class="form-control">
+                                                    <option value="2020" selected>2020</option>
+                                                    <option value="2019">2019</option>
+                                                </select>
                                             </div>
                                         </div>
 

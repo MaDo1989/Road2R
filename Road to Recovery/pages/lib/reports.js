@@ -1,7 +1,5 @@
 ﻿// Purpose: JS code for the reports UI
 
-//  11-07:  Use 'label' in K_fiels_map to display the title
-
 
 
 // 05-07: Focus on reports content, Use UI as-is fix it later.
@@ -106,7 +104,6 @@ var K_fields_map = {
         {
             id: "rp_vl_ride_month__name",
             type: "VOLUNTEER",
-            label: "הסעות החודש",
             template: 'div[name="template_VOLUNTEER"]',
             post_clone: field_volunteers_post_clone
         },
@@ -114,7 +111,6 @@ var K_fields_map = {
             id: "rp_vl_ride_month__month",
             template: 'div[name="template_MONTH"]',
             type: "MONTH",
-            label: "מתנדבים החודש",
             post_clone: field_month_post_clone
         }
     ],
@@ -122,16 +118,21 @@ var K_fields_map = {
         {
             id: "rp_vl_ride_year__name",
             type: "VOLUNTEER",
-            label: "מתנדבים שנתי",
             template: 'div[name="template_VOLUNTEER"]',
             post_clone: field_volunteers_post_clone
+        },
+        {
+            id: "rp_vl_ride_year__year",
+            type: "YEAR",
+            template: 'div[name="template_YEAR"]',
+            post_clone: rp_vl_ride_year__field_year_post_clone
         }
+
     ],
     "rp_amuta_vls_week": [
         {
             id: "rp_amuta_vls_week__week",
             type: "WEEK",
-            label: "מתנדבים - שבועי",
             template: 'div[name="template_WEEK"]',
             post_clone: field_week_post_clone
         }
@@ -140,7 +141,6 @@ var K_fields_map = {
         {
             id: "rp_amuta_vls_per_pat__patient",
             type: "PATIENT",
-            label: "מתנדבים פר חולה",
             template: 'div[name="template_PATIENT"]',
             post_clone: field_patient_post_clone
         }
@@ -149,7 +149,6 @@ var K_fields_map = {
         {
             id: "rp_amuta_vls_per_km__year",
             type: "YEAR",
-            label: "מתנדבים - שנתי",
             template: 'div[name="template_YEAR"]',
             post_clone: field_year_post_clone
         }
@@ -186,6 +185,8 @@ function clone_template(template, parent_id) {
     // assign unique id to the input element
     var input = result.find("input");
     input.prop("id", input.attr("template_id"));
+    var select = result.find("select");
+    select.prop("id", select.attr("template_id"));
 
     result.appendTo("#" + parent_id);
     result.removeClass("report_template");
@@ -287,13 +288,16 @@ function field_month_post_clone(id) {
 function field_year_post_clone(id) {
     var today = new Date();
     $('#select_year').val(today.getFullYear() - 1);
-    $("#select_year").change(on_year_change);
+    $("#select_year").change(rp_amuta_vls_km__refresh_preview);
 
     rp_amuta_vls_km__refresh_preview();
 }
 
-function on_year_change() {
-    rp_amuta_vls_km__refresh_preview();
+function rp_vl_ride_year__field_year_post_clone(id) {
+    var today = new Date();
+    $('#select_year').val(today.getFullYear());
+    $("#select_year").change(rp_vl_ride_year__refresh_preview);
+
 }
 
 // Given a defintition of field  build the UI for it in the Parameters panel
@@ -314,14 +318,21 @@ function field_volunteers_post_clone(id) {
 
 
 function populate_week_field() {
+
+    $("#select_week").change(function () {
+        refreshPreview();
+    });
+
     // https://stackoverflow.com/a/9402266
 
+    /*
    dt =  $("#select_week").datepicker({
         dateFormat: "yy-mm-dd",
         showOtherMonths: true,
         selectOtherMonths: true,
    });
 
+*/
     //@@ dt.on("show", function (e) {
 
         // This is working. Need to  do it for the tr and support mouseleave and hide()
@@ -332,11 +343,13 @@ function populate_week_field() {
     //@@ });
 
     // DEBUG: set date to March
+    /* 
     dt.datepicker('setDate', new Date(2020, 6));
     dt.on("changeDate", function (e) {
      refreshPreview();
   });
 
+*/
 }
 
 function field_week_post_clone(id) {
@@ -433,16 +446,25 @@ function rp_vl_ride_month__refresh_preview() {
 function rp_vl_ride_year__refresh_preview() {
     var volunteerId = $("#select_driver").attr("itemID");
     if (volunteerId) {
-        // default date range - this year up till now
+        var end_date;
+        var selected_year = new Date( $("#select_year").val());
+        var start_date = moment(selected_year);
+        
+        // this year end today, not on 31-Dec 
         var today = new Date();
-        var end_month_date = moment(today);
-        today.setMonth(0);
-        today.setDate(1);
-        var start_month_date = moment(today);
+        if (today.getFullYear() == selected_year.getFullYear()) {
+            // this year end today, not on 31-Dec 
+            end_date = moment(today);
+        }
+        else {
+            selected_year.setMonth(11);
+            selected_year.setDate(31);
+            end_date = moment(selected_year);
+        }
 
         refreshTable(volunteerId,
-                start_month_date.format("YYYY-MM-DD"),
-                end_month_date.format("YYYY-MM-DD"));
+                start_date.format("YYYY-MM-DD"),
+                end_date.format("YYYY-MM-DD"));
     }
 }   
 
@@ -509,12 +531,7 @@ function refresh_amuta_vls_week_Table(start_date, end_date) {
                 dom: 'Bfrtip',
                 buttons: [
                     'csv', 'excel', 'pdf'
-                ],
-                createdRow: function (row, data, dataIndex) {
-                        $(row).css('background-color', '#f1f1f1');
-                },
-                rowCallback: function (row, data, index) {
-                }
+                ]
             });
         },
         error: function (err) {
@@ -569,12 +586,7 @@ function refresh_amuta_vls_km_Table(start_date, end_date) {
                 dom: 'Bfrtip',
                 buttons: [
                    'csv', 'excel', 'pdf'
-                ],
-                createdRow: function (row, data, dataIndex) {
-                    $(row).css('background-color', '#f1f1f1');
-                },
-                rowCallback: function (row, data, index) {
-                }
+                ]
             });
         },
         error: function (err) {
@@ -632,12 +644,7 @@ function refresh_amuta_vls_per_pat_Table(patient) {
                 dom: 'Bfrtip',
                 buttons: [
                      'csv', 'excel', 'pdf'
-                ],
-                createdRow: function (row, data, dataIndex) {
-                    $(row).css('background-color', '#f1f1f1');
-                },
-                rowCallback: function (row, data, index) {
-                }
+                ]
             });
         },
         error: function (err) {
@@ -787,17 +794,7 @@ function refreshTable(volunteerId, start_date, end_date) {
                 dom: 'Bfrtip',
                 buttons: [
                      'csv', 'excel', 'pdf'
-                ],
-                createdRow: function (row, data, dataIndex) {
-                    if (data.Date.includes("א") || data.Date.includes("ג") || data.Date.includes("ה") || data.Date.includes("ש"))
-                        $(row).css('background-color', '#f1f1f1');
-                    else $(row).css('background-color', '#ffffff')
-                },
-                rowCallback: function (row, data, index) {
-                    if (data.Drivers == "ממתינה לשיבוץ") {
-                        $(row).find('td:eq(6)').css('background-color', '#FBD4B4');
-                    }
-                }
+                ]
             });
         },
         error: function (err) {
