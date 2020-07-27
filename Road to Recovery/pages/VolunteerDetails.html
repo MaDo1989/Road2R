@@ -671,7 +671,7 @@
     <script>
 
         $(document).ready(function () {
-            
+
             generateBirthdaySelect()
             generateJoinDateSelect()
 
@@ -1033,13 +1033,14 @@
 
             localStorage.safety = $("#safety").prop('checked');
             //var safety = JSON.parse(localStorage.safety);
-
+            
         }
 
         function enableSave() {
             let empty = false;
             var counter = 0;
             var checked = $('input[name="ethicsAndSafety"]:checked').length;
+            console.log("checked: " + checked)
             $('.req').each(function () {
                 empty = ($(this).val().length == 0 || $(this).val() == "בחר.י");
 
@@ -1055,6 +1056,9 @@
             else if (checked == 2) {
                 $('#saveCustomer').attr('disabled', false);
                 $('#saveButtonDisabled').hide();
+            } else {
+                $('#saveCustomer').attr('disabled', 'disabled');
+                $('#saveButtonDisabled').show(); 
             }
         };
 
