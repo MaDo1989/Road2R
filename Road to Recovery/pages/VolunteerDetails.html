@@ -1033,13 +1033,14 @@
 
             localStorage.safety = $("#safety").prop('checked');
             //var safety = JSON.parse(localStorage.safety);
-            
+
         }
 
         function enableSave() {
             let empty = false;
             var counter = 0;
             var checked = $('input[name="ethicsAndSafety"]:checked').length;
+            checked = 2; //THIS LINE WAS ADDED BECAUSE AMIR ASKED THAT THE TWO CHECKBOXES WILL NOT BE MANDATORY **FOR NOW**
             console.log("checked: " + checked)
             $('.req').each(function () {
                 empty = ($(this).val().length == 0 || $(this).val() == "בחר.י");
@@ -1058,7 +1059,7 @@
                 $('#saveButtonDisabled').hide();
             } else {
                 $('#saveCustomer').attr('disabled', 'disabled');
-                $('#saveButtonDisabled').show(); 
+                $('#saveButtonDisabled').show();
             }
         };
 
