@@ -166,7 +166,7 @@
         var addedEquipment = false;
         var deleteDriverFlag = false;
         var firstLoad = true;
-
+        var hospitals = [];
 
 
 
@@ -505,18 +505,20 @@
                         //    });
                         //}
 
-                        
-                        
+
+
                         //END NEW
 
 
                     }
                     else {
+
                         RidePat = {
                             RidePatNum: RidePatNum, Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Date: date, Remark: Remark,
                             Escorts: Escorts, OnlyEscort: OnlyEscort
                         }
                     }
+
                     var request = { RidePat: RidePat, func: func, isAnonymous: isAnonymous, numberOfRides: numberOfRides, repeatRideEvery: repeatRide }
                     var dataString = JSON.stringify(request);
                     localStorage.setItem("PatientNameForRide", null);
@@ -531,87 +533,124 @@
                             //SaveAddresses(0, numberOfRecords, customerID);
                             console.log("num: " + data.d);
                             if (data.d !== 1) {
-                                swal({
-                                    title: "נשמר\nلقت تمت عملية الحفظ",
-                                    type: "success",
-                                    timer: 1000,
-                                    showConfirmButton: false
+                                var rideNumber = data.d;
+                                //$('#Modal').modal('show');
+                                var returnDriveExist = false;
+
+                                tmpOrigin = Origin;
+                                Origin = Destination;
+                                Destination = tmpOrigin;
+                                RidePatBack = {
+                                    Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Remark: Remark, Escorts: Escorts, Date: date, OnlyEscort: OnlyEscort
+                                }
+
+                                $.ajax({
+                                    dataType: "json",
+                                    url: "WebService.asmx/CheckRidePat",
+                                    contentType: "application/json; charset=utf-8",
+                                    type: "POST",
+                                    async: false,
+                                    data: JSON.stringify({ RidePatBack }),
+                                    success: function (data) {
+                                        returnDriveExist = JSON.parse(data.d);
+                                        console.log(returnDriveExist)
+                                        var DestIsHospital = hospitals.includes(request.RidePat.Destination.Name);
+
+                                        if (DestIsHospital && !returnDriveExist) {
+                                            swal({
+                                                title: "הנסיעה נשמרה",
+                                                text: "האם ליצור נסיעת חזור?",
+                                                type: "success",
+                                                //timer: 1000,
+                                                showConfirmButton: true,
+                                                showCancelButton: true,
+                                                //confirmButtonClass: "btn-danger",
+                                                confirmButtonText: "כן",
+                                                cancelButtonText: "לא",
+                                                closeOnConfirm: true,
+                                                closeOnCancel: false
+                                            },
+                                                function (isConfirm) {
+                                                    if (isConfirm) {
+                                                        returnRide();
+                                                        $("#afterNoon").attr('checked', 'checked');
+                                                        checkAfternoon();
+                                                    } else {
+                                                        addDriver(rideNumber);
+                                                    }
+                                                });
+                                        } else {
+                                            swal({
+                                                title: "נשמר\nلقت تمت عملية الحفظ",
+                                                type: "success",
+                                                timer: 1000,
+                                                showConfirmButton: false
+                                            });
+                                            addDriver(rideNumber);
+                                        }
+                                    },
+                                    error: function (err) { alert("Error in CheckRidePat: " + err.responseText); }
                                 });
 
+                                
+
+                                
 
 
 
 
 
+                                //var tmpDriverName = $('#driver').val();
+                                //var driverIndex = drivers.indexOf($('#driver').val());
+                                //userSelected = driversID[driverIndex];
+
+                                //ridePatId = data.d;
 
 
-
-
-                                var tmpDriverName = $('#driver').val();
-                                var driverIndex = drivers.indexOf($('#driver').val());
-                                userSelected = driversID[driverIndex];
-
-                                ridePatId = data.d;
-
-                                //$('#driversDiv').show();
-                                //window.location.href = "#driversDiv";
-
-                                //$(function () {
-                                //    $("#flashDiv").delay(150).animate({
-                                //        "background-color": "#fc9"
-                                //    }, 350, function () {
-                                //        $("#flashDiv").animate({
-                                //            "background-color": "#fff"
-                                //        }, 200);
-                                //    });
-                                //});
-                                if (arr_customer.func == "new") {
-                                    arr_details = { RidePatNum: ridePatId, func: "edit" }; //ridePat.name=RidePatNum
-                                    GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
-                                    location.href = "ridePatForm.html"; //ridePat.name=RidePatNum
-                                }
-
-
-
-                                if (!(ridePat == undefined)) {
-                                    if (ridePat.Drivers.length > 0) {
-                                        //$('#Driver').val(ridePat.Drivers[0].Id)
-                                        flagFirstOne = false;
-                                        var driverIDindex = driversID.indexOf(ridePat.Drivers[0].Id);
-
-                                        if (!deleteDriverFlag) {
-                                            $('#driver').val(drivers[driverIDindex])
-                                            currentDriverId = ridePat.Drivers[0].Id;
-                                            $('#deleteDriver').show();
-                                            //flagFirstOne = false;
-                                            deleteDriverFlag = false;
-                                        }
-
-
-                                    }
-                                } else if (!deleteDriverFlag) {
-                                    var driverIndex = drivers.indexOf($('#driver').val());
-                                    userSelected = driversID[driverIndex];
-                                    deleteDriverFlag = false;
-                                }
-
-                                if (flagFirstOne) {
-                                    currentDriverId = -1; // There is no driver assigned to the ride
-                                    flagFirstOne = false;
-                                }
-
-
-                                signDriverToRide()
-                                $('#driver').val(tmpDriverName)
-                                //if (flagFirstOne || ridePat === undefined) {
-                                //    currentDriverId = -1; // There is no driver assigned to the ride
+                                //if (arr_customer.func == "new") {
+                                //    arr_details = { RidePatNum: ridePatId, func: "edit" }; //ridePat.name=RidePatNum
+                                //    GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
+                                //    location.href = "ridePatForm.html"; //ridePat.name=RidePatNum
                                 //}
-                                //setTimeout(function () { returnRidePat() }, 1001);
 
-                                if (isAssistant && pushMsg !== "") {
-                                    //send messege to coordinator from assistant on new ridepat creation.
-                                    sendMessegeFromAssistant(data.d, pushMsg);
-                                }
+
+
+                                //if (!(ridePat == undefined)) {
+                                //    if (ridePat.Drivers.length > 0) {
+                                //        //$('#Driver').val(ridePat.Drivers[0].Id)
+                                //        flagFirstOne = false;
+                                //        var driverIDindex = driversID.indexOf(ridePat.Drivers[0].Id);
+
+                                //        if (!deleteDriverFlag) {
+                                //            $('#driver').val(drivers[driverIDindex])
+                                //            currentDriverId = ridePat.Drivers[0].Id;
+                                //            $('#deleteDriver').show();
+                                //            //flagFirstOne = false;
+                                //            deleteDriverFlag = false;
+                                //        }
+
+
+                                //    }
+                                //} else if (!deleteDriverFlag) {
+                                //    var driverIndex = drivers.indexOf($('#driver').val());
+                                //    userSelected = driversID[driverIndex];
+                                //    deleteDriverFlag = false;
+                                //}
+
+                                //if (flagFirstOne) {
+                                //    currentDriverId = -1; // There is no driver assigned to the ride
+                                //    flagFirstOne = false;
+                                //}
+
+
+                                //signDriverToRide()
+                                //$('#driver').val(tmpDriverName)
+
+
+                                //if (isAssistant && pushMsg !== "") {
+                                //    //send messege to coordinator from assistant on new ridepat creation.
+                                //    sendMessegeFromAssistant(data.d, pushMsg);
+                                //}
                             }
                             else {
                                 data.d = data.d.toString();
@@ -623,6 +662,7 @@
                                     "קיימת כבר הסעה בתאריך " + date + " עם אותו החולה ואותן נקודות האיסוף\nيوجد سفرية بالتاريخ (التاريخ) مع نفس المريض ونفس نقطة الالتقاء",
                                     "warning"
                                 );
+
                             }
 
 
@@ -631,6 +671,7 @@
 
                         },
                         error: function (err) {
+                            console.log(err);
                             swal(
                                 "خطأ\nשגיאה",
                                 "משהו השתבש, צא ונסה שנית\nحدث خطأ ما، الرجاء الخروج والدخول مرة اخرى",
@@ -669,7 +710,90 @@
 
 
             });
+
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getHospitalView",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                async: false,
+                data: JSON.stringify({ active: true }),
+                success: function (data) {
+                    arr_hospitals = JSON.parse(data.d);
+                    for (i in arr_hospitals) {
+                        hospitals.push(arr_hospitals[i].Name)
+                    }
+                    console.log(hospitals)
+                },
+                error: function (err) { alert("Error in getHospitalView: " + err.responseText); }
+            });
+
         });
+
+        function returnRide() {
+            ridePatNum = " ";
+            arr_details = { ridePatNum: ridePatNum, func: "new" };
+            GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
+
+            switchDir();
+
+
+        }
+
+        function addDriver(data) {
+            var tmpDriverName = $('#driver').val();
+            var driverIndex = drivers.indexOf($('#driver').val());
+            userSelected = driversID[driverIndex];
+
+            ridePatId = data;
+
+
+            if (arr_customer.func == "new") {
+                arr_details = { RidePatNum: ridePatId, func: "edit" }; //ridePat.name=RidePatNum
+                GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
+                location.href = "ridePatForm.html"; //ridePat.name=RidePatNum
+            }
+
+
+
+            if (!(ridePat == undefined)) {
+                if (ridePat.Drivers.length > 0) {
+                    //$('#Driver').val(ridePat.Drivers[0].Id)
+                    flagFirstOne = false;
+                    var driverIDindex = driversID.indexOf(ridePat.Drivers[0].Id);
+
+                    if (!deleteDriverFlag) {
+                        $('#driver').val(drivers[driverIDindex])
+                        currentDriverId = ridePat.Drivers[0].Id;
+                        $('#deleteDriver').show();
+                        //flagFirstOne = false;
+                        deleteDriverFlag = false;
+                    }
+
+
+                }
+            } else if (!deleteDriverFlag) {
+                var driverIndex = drivers.indexOf($('#driver').val());
+                userSelected = driversID[driverIndex];
+                deleteDriverFlag = false;
+            }
+
+            if (flagFirstOne) {
+                currentDriverId = -1; // There is no driver assigned to the ride
+                flagFirstOne = false;
+            }
+
+
+            signDriverToRide()
+            $('#driver').val(tmpDriverName)
+
+
+            if (isAssistant && pushMsg !== "") {
+                //send messege to coordinator from assistant on new ridepat creation.
+                sendMessegeFromAssistant(data, pushMsg);
+            }
+        }
+
         function sendMessegeFromAssistant(ridepat, msg) {
             var user = GENERAL.USER.getUserName();
             $.ajax({
@@ -2371,7 +2495,35 @@
                 </div>
 
             </div>
+            <!-- Modal -->
+            <!--<div class="modal fade text-center" id="IgulModal" tabindex="-1" role="dialog" aria-labelledby="IgulModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title" id="exampleModalLabel">תודה רבה</h2>
+                            <h3>הפרטים נשמרו</h3>
 
+                        </div>
+                        <div class="modal-body">
+                            <div class="row m-l-10 m-r-10">
+                                <div class="col-sm-12 text-center">
+
+                                    <h4>
+                                        האם תהיה מעוניין ליצור נסיעת חזרה?
+                                    </h4>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <div class="col-sm-12 text-center">
+                                <button type="button" class="btn btn-primary" onclick="goToIgul()">כן</button>
+                                <button type="button" class="btn btn-secondary" onclick="reload()">לא</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>-->
             <!-- end container -->
         </div>
         <!-- end content -->
