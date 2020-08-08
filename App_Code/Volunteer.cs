@@ -1876,9 +1876,10 @@ public class Volunteer
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
         SqlParameter[] cmdParams = new SqlParameter[1];
-        cmdParams[0] = cmd.Parameters.AddWithValue("name", DisplayName);
+        //cmdParams[0] = cmd.Parameters.AddWithValue("name", DisplayName);
+        cmdParams[0] = cmd.Parameters.AddWithValue("CellPhone", CellPhone);
         //string query = "select * from VolunteerData where displayName=@name";
-        string query = "select * from VolunteerGood_30_05_20 where displayName=@name";
+        string query = "select * from VolunteerGood_30_05_20 where CellPhone=@CellPhone";
         Volunteer v = new Volunteer();
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query, true, cmd.CommandType, cmdParams);

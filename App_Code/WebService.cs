@@ -1263,13 +1263,16 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
-    public string getVolunteerData(string displayName) //function for data review of all volunteers
+    // Benny changed the parameter from displayname to cellphone
+    public string getVolunteerData(string cellphone) //function for data review of all volunteers
     {
         try
         {
             Volunteer v = new Volunteer();
-            v.DisplayName = displayName;
+            //v.DisplayName = displayName;
+            v.CellPhone = cellphone;
             Volunteer volunteerExtended = v.getVolunteerData();
+
             return j.Serialize(volunteerExtended);
         }
         catch (Exception ex)

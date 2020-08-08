@@ -116,7 +116,8 @@
                 url: "WebService.asmx/getVolunteerData",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                data: JSON.stringify({ displayName: displayName }),
+                //data: JSON.stringify({ displayName: displayName }),
+                data: JSON.stringify({ cellphone: mobile }),
                 success: function (data) {
                     var volunteer = JSON.parse(data.d);
                     console.log(volunteer)
@@ -574,7 +575,7 @@
                         <div class="row m-l-10 m-r-10">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label">הצעות ייעול</label>
+                                    <label class="col-sm-4 control-label">הערות</label>
                                     <div class="col-sm-6">
                                         <!--<input id="feedback" name="feedback" type="text" class="form-control">-->
                                         <textarea id="feedback" name="feedback" class="form-control textAreaClass" rows="3"></textarea>
