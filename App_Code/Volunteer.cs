@@ -2016,7 +2016,7 @@ public class Volunteer
         query += "BirthDate=@bDay, IsDriving=@isDriving, HowCanHelp=@howCanHelp, Feedback=@feedback, NewsLetter=@newsLetter, KnowsArabic=@knowsArabic,";
         query += "DisplayName=@displayName, EnglishName=@englishName, JoinYear=@joinYear, Address=@address, PostalCode=@postalCode,";
         query += "workingWithCoor=@workingWithCoor, workingWithPat=@workingWithPat, howToRecruit=@howToRecruit, howKeepInTouch=@howKeepInTouch,";
-        query += "newsLetterRemarks=@newsLetterRemarks, IgulLetova=@IgulLetova, lastModified =DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@username";
+        query += "newsLetterRemarks=@newsLetterRemarks, IgulLetova=@IgulLetova, lastModified =DATEADD(hour, 2, SYSDATETIME()) where cellphone=@cell";
         try
         {
             res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
