@@ -88,6 +88,13 @@
         input[type=text], input[type=checkbox], input[type=date], #statusRidePat, #Origin, #Destination, #hour, #minute {
             border-color: #000
         }
+
+        .saveHighlight {
+            border: 10px solid yellow !important;
+            color: yellow !important;
+            transform: scaleY(1.25) scaleX(1.25);
+            
+        }
     </style>
     <!--<script src="https://code.jquery.com/jquery-1.12.4.js"></script>-->
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -171,6 +178,7 @@
 
 
         $(document).ready(function () {
+            $('#saveCustomer').removeClass("saveHighlight");
             $('#deleteDriver').hide();
             generateDrivers()
             //$('#driversDiv').hide();
@@ -343,7 +351,7 @@
                     //}
 
 
-                   
+
 
 
                     var Coordinator = new Object();
@@ -529,7 +537,7 @@
                         var request = { RidePat: RidePat, func: func, isAnonymous: isAnonymous, numberOfRides: numberOfRides, repeatRideEvery: repeatRide }
                     }
 
-                    
+
                     var dataString = JSON.stringify(request);
                     localStorage.setItem("PatientNameForRide", null);
                     $.ajax({
@@ -592,7 +600,7 @@
                                                         returnRide();
                                                         $("#afterNoon").attr('checked', 'checked');
                                                         checkAfternoon();
-                                                        //HERE?
+                                                        $('#saveCustomer').addClass("saveHighlight");
                                                     } else {
                                                         addDriver(rideNumber);
                                                     }
@@ -610,9 +618,9 @@
                                     error: function (err) { alert("Error in CheckRidePat: " + err.responseText); }
                                 });
 
-                                
 
-                                
+
+
 
 
 
@@ -758,7 +766,7 @@
             if (isThisAReturnDrive) {
                 $("#driver").val("");
                 $('#deleteDriver').hide();
-                
+
             }
 
         }
@@ -1941,7 +1949,7 @@
                         var returnDriveExist = false;
 
                         //tmpOrigin = $('#Origin').val();
-                        Pat = { DisplayName: ridePat.Pat.DisplayName, Id: localStorage.PatID};
+                        Pat = { DisplayName: ridePat.Pat.DisplayName, Id: localStorage.PatID };
                         Origin = { Name: ridePat.Destination.Name };
                         Destination = { Name: ridePat.Origin.Name };
                         Coordinator = { DisplayName: ridePat.Coordinator.DisplayName }
@@ -1986,8 +1994,7 @@
                                                 returnRide();
                                                 $("#afterNoon").attr('checked', 'checked');
                                                 checkAfternoon();
-
-                                                //HERE?
+                                                $('#saveCustomer').addClass("saveHighlight");
                                             } else {
                                                 //addDriver(rideNumber);
                                             }
@@ -2040,7 +2047,7 @@
 
 
 
-            
+
 
 
 
@@ -2202,7 +2209,7 @@
         function signDriverErrorCB() {
             $('#wait').hide();
             //alert("Error signing driver");
-            
+
         }
 
 
