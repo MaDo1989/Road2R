@@ -1726,6 +1726,8 @@ public class Volunteer
         cmdParams[21] = cmd.Parameters.AddWithValue("@englishLN", v.EnglishLN);
         cmdParams[22] = cmd.Parameters.AddWithValue("@birthDate", v.BirthDate);
         cmdParams[23] = cmd.Parameters.AddWithValue("@isDriving", v.IsDriving);
+        if (v.Role == null)
+            v.Role = "ללא תפקיד";
         cmdParams[24] = cmd.Parameters.AddWithValue("@role", v.Role);
         //cmdParams[24] = cmd.Parameters.AddWithValue("@howCanHelp", v.HowCanHelp);
         //cmdParams[25] = cmd.Parameters.AddWithValue("@feedback", v.Feedback);
