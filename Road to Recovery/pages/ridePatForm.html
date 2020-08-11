@@ -602,7 +602,7 @@
                                                         $('#saveCustomer').addClass("saveHighlight");
                                                     } else {
                                                         localStorage.setItem("ReturnRidePatFlag", false);
-                                                        alert("changed to false")
+                                                        //alert("changed to false")
                                                         addDriver(rideNumber);
                                                     }
                                                 });
@@ -1981,7 +1981,7 @@
                                 var DestIsHospital = hospitals.includes(ridePat.Destination.Name);
                                 var ReturnRidePatFlag = (localStorage.getItem("ReturnRidePatFlag") == 'true');
                                 //maybe currentDriverId != -1       
-                                alert(ReturnRidePatFlag);
+                                //alert(ReturnRidePatFlag);
                                 if (DestIsHospital && !returnDriveExist && ReturnRidePatFlag) {
                                     swal({
                                         title: "הנסיעה נשמרה",
