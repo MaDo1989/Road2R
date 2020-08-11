@@ -93,7 +93,6 @@
             border: 10px solid yellow !important;
             color: yellow !important;
             transform: scaleY(1.25) scaleX(1.25);
-            
         }
     </style>
     <!--<script src="https://code.jquery.com/jquery-1.12.4.js"></script>-->
@@ -584,7 +583,7 @@
                                         if (DestIsHospital && !returnDriveExist && isDriver) {
                                             swal({
                                                 title: "הנסיעה נשמרה",
-                                                text: "האם ליצור נסיעת חזור?",
+                                                text: "האם ליצור הסעת החזרה?\n(אפשר לשנות פרטים בהחזרה, ובסוף יש להקיש על מקש שמירה)",
                                                 type: "success",
                                                 //timer: 1000,
                                                 showConfirmButton: true,
@@ -602,6 +601,8 @@
                                                         checkAfternoon();
                                                         $('#saveCustomer').addClass("saveHighlight");
                                                     } else {
+                                                        localStorage.setItem("ReturnRidePatFlag", false);
+                                                        //alert("changed to false")
                                                         addDriver(rideNumber);
                                                     }
                                                 });
@@ -772,6 +773,7 @@
         }
 
         function addDriver(data) {
+            
             var tmpDriverName = $('#driver').val();
             var driverIndex = drivers.indexOf($('#driver').val());
             userSelected = driversID[driverIndex];
@@ -780,6 +782,7 @@
 
 
             if (arr_customer.func == "new") {
+                
                 arr_details = { RidePatNum: ridePatId, func: "edit" }; //ridePat.name=RidePatNum
                 GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
                 location.href = "ridePatForm.html"; //ridePat.name=RidePatNum
@@ -812,6 +815,7 @@
             if (flagFirstOne || isThisAReturnDrive) {
                 currentDriverId = -1; // There is no driver assigned to the ride
                 flagFirstOne = false;
+                
             }
 
 
@@ -1947,7 +1951,9 @@
                         var rideNumber = rideData;
 
                         var returnDriveExist = false;
-
+                        if ($('#driver').val() != "") {
+                            localStorage.setItem("ReturnRidePatFlag", true);
+                        }
                         //tmpOrigin = $('#Origin').val();
                         Pat = { DisplayName: ridePat.Pat.DisplayName, Id: localStorage.PatID };
                         Origin = { Name: ridePat.Destination.Name };
@@ -1973,11 +1979,13 @@
                                 returnDriveExist = JSON.parse(data.d);
                                 console.log(returnDriveExist)
                                 var DestIsHospital = hospitals.includes(ridePat.Destination.Name);
-
-                                if (DestIsHospital && !returnDriveExist) {
+                                var ReturnRidePatFlag = (localStorage.getItem("ReturnRidePatFlag") == 'true');
+                                //maybe currentDriverId != -1       
+                                //alert(ReturnRidePatFlag);
+                                if (DestIsHospital && !returnDriveExist && ReturnRidePatFlag) {
                                     swal({
                                         title: "הנסיעה נשמרה",
-                                        text: "האם ליצור נסיעת חזור?",
+                                        text: "האם ליצור הסעת החזרה?\n(אפשר לשנות פרטים בהחזרה, ובסוף יש להקיש על מקש שמירה)",
                                         type: "success",
                                         //timer: 1000,
                                         showConfirmButton: true,
@@ -1989,15 +1997,20 @@
                                         closeOnCancel: true
                                     },
                                         function (isConfirm) {
+                                            
                                             if (isConfirm) {
                                                 isThisAReturnDrive = true;
                                                 returnRide();
                                                 $("#afterNoon").attr('checked', 'checked');
                                                 checkAfternoon();
                                                 $('#saveCustomer').addClass("saveHighlight");
+                                                localStorage.setItem("ReturnRidePatFlag", true);
                                             } else {
+                                                //localStorage.setItem("ReturnRidePatFlag", true);
+                                                //alert("changed to true")
                                                 //addDriver(rideNumber);
                                             }
+                                            //localStorage.setItem("ReturnRidePatFlag", false);
                                         });
                                 } else {
                                     //swal({
