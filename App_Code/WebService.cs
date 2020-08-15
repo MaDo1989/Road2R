@@ -1742,5 +1742,14 @@ public class WebService : System.Web.Services.WebService
         return r.CheckRidePat(RidePatBack, false);
         //return j.Serialize(d);
     }
+
+    [WebMethod(EnableSession = true)]
+    public string getReturnRidePat(RidePat RidePat)
+    {
+        RidePat r = new RidePat();
+
+        r = r.getReturnRidePat(RidePat, false);
+        return j.Serialize(r);
+    }
 }
 

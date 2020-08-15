@@ -596,6 +596,8 @@ public class Volunteer
             v.UserName = dr["UserName"].ToString();
             v.EnglishName = dr["EnglishName"].ToString();
             v.Email = dr["Email"].ToString();
+            v.Id = Convert.ToInt32(dr["Id"]);
+            
 
             vl.Add(v);
         }

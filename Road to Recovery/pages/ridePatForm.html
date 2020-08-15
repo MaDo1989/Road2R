@@ -177,6 +177,7 @@
 
 
         $(document).ready(function () {
+            GetCoordinatorsList();
             $('#saveCustomer').removeClass("saveHighlight");
             $('#deleteDriver').hide();
             generateDrivers()
@@ -2300,6 +2301,23 @@
             } else {
 
             }
+        }
+
+        function GetCoordinatorsList() {
+            coordList = [];
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/GetCoordinatorsList",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                async: false,
+                success: function (data) {
+                    var coors = JSON.parse(data.d);                    
+                    coordList = coors;
+                    console.log(coordList);
+                },
+                error: function (err) { alert("Error in GetCoordinatorsList: " + err.responseText); }
+            });
         }
     </script>
 </head>

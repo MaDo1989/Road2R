@@ -1524,7 +1524,118 @@ public class RidePat
 
     }
 
+    public RidePat getReturnRidePat(RidePat ridePat, bool isAnonymous)
+    {
+        Location tmp = new Location();
+        Hashtable locations = tmp.getLocationsEnglishName();
+        string[] date = ridePat.Date.ToString().Split(' ');
+        DateTime date1 = Convert.ToDateTime(date[0]);
+        if (!isAnonymous)
+        {
+            //Switching origin and destination:
+            string originName = ridePat.Destination.Name.Replace("'", "''");
+            string destName = ridePat.Origin.Name.Replace("'", "''");
+            string patName = ridePat.Pat.DisplayName.Replace("'", "''");
 
+            string query = "select * from RPView where Origin=N'" + originName + "' and Destination=N'" + destName + "' and cast(PickupTime as date)='" + date1.ToString("yyyy-MM-dd") + "' and DisplayName=N'" + patName + "'";
+            DbService db = new DbService();
+            DataSet ds = db.GetDataSetByQuery(query);
+            if (ds.Tables[0].Rows.Count == 0)
+            {
+                return null;
+            }
+
+            RidePat rp = new RidePat();
+            rp.pat = new Patient();
+            DataRow dr = ds.Tables[0].Rows[0];
+
+            rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
+            if (dr["RideNum"].ToString() != null)
+            {
+                if (dr["RideNum"].ToString() != "")
+                {
+                    rp.RideNum = int.Parse(dr["RideNum"].ToString());
+                }
+            }
+            else rp.RideNum = -1;
+            rp.OnlyEscort = Convert.ToBoolean(dr["OnlyEscort"].ToString());
+            rp.pat.DisplayName = dr["DisplayName"].ToString();
+            rp.pat.IsAnonymous = dr["IsAnonymous"].ToString();
+            rp.Drivers = new List<Volunteer>();
+            if (dr["MainDriver"].ToString() != "")
+            {
+                Volunteer v1 = new Volunteer();
+                v1.Id = int.Parse(dr["MainDriver"].ToString());
+                v1.RegId = v1.GetVolunteerRegById(v1.Id);
+                v1.DriverType = "Primary";
+
+                string query3 = "select DisplayName from volunteer where id=" + v1.Id;
+                DbService db3 = new DbService();
+                DataSet ds3 = db3.GetDataSetByQuery(query3);
+                if (ds3.Tables[0].Rows.Count != 0)
+                {
+                    DataRow dr3 = ds3.Tables[0].Rows[0];
+                    v1.DisplayName = dr3["DisplayName"].ToString();
+                }
+
+                rp.Drivers.Add(v1);
+
+            }
+            if (dr["secondaryDriver"].ToString() != "")
+            {
+                Volunteer v2 = new Volunteer();
+                v2.Id = int.Parse(dr["secondaryDriver"].ToString());
+                v2.RegId = v2.GetVolunteerRegById(v2.Id);
+                v2.DriverType = "Secondary";
+                rp.Drivers.Add(v2);
+            }
+            //rp.pat.EscortedList = new List<Escorted>();
+            rp.Escorts = new List<Escorted>();
+            Location origin = new Location();
+            origin.Name = dr["Origin"].ToString();
+            if (locations[origin.Name] == null)
+            {
+                origin.EnglishName = "";
+            }
+            else origin.EnglishName = locations[origin.Name].ToString();
+            rp.Origin = origin;
+            Location dest = new Location();
+            dest.Name = dr["Destination"].ToString();
+            if (locations[dest.Name] == null)
+            {
+                dest.EnglishName = "";
+            }
+            else dest.EnglishName = locations[dest.Name].ToString();
+            rp.Destination = dest;
+            rp.Area = dr["Area"].ToString();
+            rp.Shift = dr["Shift"].ToString();
+            rp.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
+            rp.Status = dr["Status"].ToString();
+            rp.Coordinator = new Volunteer();
+            rp.Coordinator.DisplayName = dr["Coordinator"].ToString();
+            rp.Remark = dr["Remark"].ToString();
+            rp.LastModified = dr["lastModified"].ToString();
+
+            string query2 = "select DisplayName,Id from RidePatEscortView where RidePatNum=" + rp.ridePatNum;
+            DbService db2 = new DbService();
+            DataSet ds2 = db2.GetDataSetByQuery(query2);
+            foreach (DataRow r in ds2.Tables[0].Rows)
+            {
+                if (r["DisplayName"].ToString() != "")
+                {
+                    Escorted e = new Escorted();
+                    e.DisplayName = r["DisplayName"].ToString();
+                    //rp.pat.EscortedList.Add(e);
+                    e.Id = (int)r["Id"];
+                    rp.Escorts.Add(e);
+                }
+            }
+
+            return rp;
+
+        }
+        else return null;
+    }
 
 
 
