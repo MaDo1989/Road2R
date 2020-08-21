@@ -71,6 +71,7 @@
         var returnRidePat;
         var returnRidePatMsg = ""
         var dateReturn;
+        var returnDriverMsg;
 
         function wiringDataTables() {
             //manage button clicks on tables
@@ -414,6 +415,7 @@
 
                     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
                     for (i in arr_rides) {
+
                         if (arr_rides[i].Coordinator.DisplayName != currentCoor) continue; //let the function run only for logged-in coordinator
 
                         //Change date format
@@ -515,7 +517,7 @@
             if (arr_rides[i].Pat.DisplayName.includes("אנונימי")) {
                 arr_rides[i].Pat.DisplayName = "חולה";
             }
-            if (arr_rides[i].Status.indexOf("ממתינה לשיבוץ") !== -1) {
+            if (arr_rides[i].Status.indexOf("ממתינה לשיבוץ") !== -1 || arr_rides[i].Status.indexOf("אין נסיעת הלוך") !== -1) {
                 if (isAssistant) {
                     if (table.context[0].sTableId != "datatable-future" && table.context[0].sTableId != "datatable-tomorrow") {
                         table.row.add([time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, "אין!<br/>None!", "Waiting for a driver", arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
@@ -645,15 +647,15 @@
                                 } else minutes = date.getMinutes();
                                 hours = date.getHours();
                                 time = "בשעה " + hours + ":" + minutes;
-                                if (hours == "22" && minutes == "14") time = "אחה''צ"; //22:14 means afternoon
+                                if (hours == "22" && minutes == "14") time = "אחר הצהריים"; //22:14 means afternoon
                                 dateReturn = time;
-                                driver = "";
+                                returnRidePatMsg = "האם למחוק גם את ההחזרה של " + patName + " מ" + returnRidePat.Origin.Name + " ל" + returnRidePat.Destination.Name + " " + time;
+                                $('#DriverReturnRidePatMsg').html("");
                                 if (returnRidePat.Drivers.length != 0) {
-                                    driver = " עם הנהג.ת " + returnRidePat.Drivers[0].DisplayName;
-                                    console.log(driver);
-
+                                    returnDriverMsg = returnRidePat.Drivers[0].DisplayName + " נרשם להחזרה הזו!";
+                                    console.log(returnDriverMsg);
+                                    $('#DriverReturnRidePatMsg').html("<h5 style='color:red; font-weight: bold;'>שימו לב!</h5><h5>" + returnRidePat.Drivers[0].DisplayName + " נרשם להחזרה הזו!</h5>");
                                 }
-                                returnRidePatMsg = "יש נסיעה חזרה של " + patName + " מ: " + returnRidePat.Origin.Name + " ל: " + returnRidePat.Destination.Name + " " + time + driver;
                             }
                         },
                         error: function (err) { alert("Error in CheckRidePat: " + err.responseText); }
@@ -705,7 +707,7 @@
 
 
             }
-            
+
             swal({
                 title: "هل انت متأكد?\nהאם אתם בטוחים?",
                 type: "warning",
@@ -820,6 +822,13 @@
             });
 
             for (var j = 0; j < tdarr.length; j++) {
+                if (tdarr[j].innerHTML.indexOf("אין נסיעת הלוך") !== -1) {
+                    tdarr[j].style.backgroundColor = "#FFEF8F";
+                }
+            }
+
+
+            for (var j = 0; j < tdarr.length; j++) {
                 if (tdarr[j].innerHTML.indexOf("אין!") !== -1) {
                     tdarr[j].style.backgroundColor = "red";
                 }
@@ -862,6 +871,12 @@
                     }
                 }
             });
+
+            for (var j = 0; j < tdarr.length; j++) {
+                if (tdarr[j].innerHTML.indexOf("אין נסיעת הלוך") !== -1) {
+                    tdarr[j].style.backgroundColor = "#FFEF8F";
+                }
+            }
 
             for (var j = 0; j < tdarr.length; j++) {
                 if (tdarr[j].innerHTML.indexOf("אין!") !== -1) {
@@ -911,6 +926,11 @@
                 }
             });
 
+            for (var j = 0; j < tdarr.length; j++) {
+                if (tdarr[j].innerHTML.indexOf("אין נסיעת הלוך") !== -1) {
+                    tdarr[j].style.backgroundColor = "#FFEF8F";
+                }
+            }
 
             for (var j = 0; j < tdarr.length; j++) {
                 if (tdarr[j].innerHTML.indexOf("הגענו ליעד") !== -1) {
@@ -941,6 +961,11 @@
                 }
             });
 
+            for (var j = 0; j < tdarr.length; j++) {
+                if (tdarr[j].innerHTML.indexOf("אין נסיעת הלוך") !== -1) {
+                    tdarr[j].style.backgroundColor = "#FFEF8F";
+                }
+            }
 
             for (var j = 0; j < tdarr.length; j++) {
                 if (tdarr[j].innerHTML.indexOf("הגענו ליעד") !== -1) {
@@ -982,10 +1007,13 @@
                         showConfirmButton: false
                     });
 
-
                     if (returnRidePat) {
-                        $("#returnRidePatMsg").text(returnRidePatMsg);
-                        $("#messagesModal").modal();                        
+                        if (returnRidePat && returnRidePat.Coordinator.DisplayName != GENERAL.USER.getUserDisplayName()) {
+                            closeModal()
+                        } else {
+                            $("#returnRidePatMsg").text(returnRidePatMsg);
+                            $("#messagesModal").modal();
+                        }                        
                     }
                     else {
                         setTimeout(function () { refreshTable() }, 1001);
@@ -1030,11 +1058,34 @@
             deleteRidePat(RidePat, 'delete');
             returnRidePat = null;
             $('#messagesModal').modal('toggle');
+            $('#DriverReturnRidePatMsg').html("");
         }
 
         function closeModal() {
-            $('#messagesModal').modal('toggle');
-            setTimeout(function () { refreshTable() }, 1001);
+            $('#messagesModal').modal('hide');
+            $('#DriverReturnRidePatMsg').html("");
+
+
+            newStatus = "אין נסיעת הלוך"
+            ReturnRidePatNum = returnRidePat.RidePatNum
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/changeRidePatStatus",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                //async: false,
+                data: JSON.stringify({ newStatus: newStatus, ridePatNum: ReturnRidePatNum }),
+                success: function (data) {
+                    console.log(data.d)
+                    setTimeout(function () { refreshTable() }, 1001);
+                },
+                error: function (err) {
+
+                    alert("Error in changeRidePatStatus: " + err.responseText);
+                }
+            });
+
+            //setTimeout(function () { refreshTable() }, 1001);
         }
     </script>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -1045,10 +1096,8 @@
     <![endif]-->
     <style>
         .centerHeader {
-            
             text-align: center;
         }
-
     </style>
 </head>
 
@@ -1352,13 +1401,14 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2 class="modal-title centerHeader" id="messagesModalTitle">נמצאה הסעה חזור - האם למחוק גם אותה?</h2>
+                    <h2 class="modal-title centerHeader" id="messagesModalTitle">נמצאה הסעה חזור</h2>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <h5 id="returnRidePatMsg" class="centerHeader"></h5>
+                    <h5 id="DriverReturnRidePatMsg" class="centerHeader"></h5>
                 </div>
                 <div class="modal-footer">
                     <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">ביטול</button>-->

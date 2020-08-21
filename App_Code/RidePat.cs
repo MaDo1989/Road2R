@@ -949,6 +949,7 @@ public class RidePat
                     }
 
                     rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
+
                     try
                     {
                         rp.RideNum = int.Parse(dr["RideNum"].ToString());
@@ -1004,7 +1005,7 @@ public class RidePat
                     rp.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
                     rp.Status = dr["Status"].ToString();
                     rp.LastModified = dr["lastModified"].ToString();
-                    if (rp.RideNum > 0) // if RidePat is assigned to a Ride - Take the Ride's status
+                    if (rp.RideNum > 0 && rp.Status != "אין נסיעת הלוך ויש נהג משובץ") // if RidePat is assigned to a Ride - Take the Ride's status
                     {
                         string searchExpression = "RideRideNum = " + rp.RideNum;
                         DataRow[] rideRow = rideTable.Select(searchExpression);
@@ -1637,6 +1638,21 @@ public class RidePat
         else return null;
     }
 
+    public int changeRidePatStatus(string newStatus, string ridePatNum)
+    {
+        SqlCommand cmd = new SqlCommand();
+        cmd.CommandType = CommandType.Text;
+        SqlParameter[] cmdParams = new SqlParameter[2];
+        cmdParams[0] = cmd.Parameters.AddWithValue("@ridePatNum", ridePatNum);
+        cmdParams[1] = cmd.Parameters.AddWithValue("@newStatus", newStatus);
+
+        
+        string query = "update RidePat set status = @newStatus where RidePatNum = @ridePatNum";
+
+        DbService db = new DbService();
+
+        return db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+    }
 
 
     //Irrelevant

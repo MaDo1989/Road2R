@@ -1751,5 +1751,22 @@ public class WebService : System.Web.Services.WebService
         r = r.getReturnRidePat(RidePat, false);
         return j.Serialize(r);
     }
+
+    [WebMethod(EnableSession = true)]
+    public string changeRidePatStatus(string newStatus, string ridePatNum)
+    {
+        try
+        {
+            RidePat rp = new RidePat();
+            
+            return j.Serialize(rp.changeRidePatStatus(newStatus, ridePatNum));
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in changeRidePatStatus", ex);
+            throw new Exception("שגיאה בשינוי סטאטוס להסעה");
+        }
+
+    }
 }
 
