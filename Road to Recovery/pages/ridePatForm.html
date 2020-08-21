@@ -94,6 +94,10 @@
             color: yellow !important;
             transform: scaleY(1.25) scaleX(1.25);
         }
+
+        .centerHeader {
+            text-align: center;
+        }
     </style>
     <!--<script src="https://code.jquery.com/jquery-1.12.4.js"></script>-->
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -174,7 +178,9 @@
         var firstLoad = true;
         var hospitals = [];
         var isThisAReturnDrive = false;
-
+        var rideNumberForNo;
+        var secondModal = false;
+        var CoordinatorForReturn;
 
         $(document).ready(function () {
             GetCoordinatorsList();
@@ -552,6 +558,7 @@
                             console.log("num: " + data.d);
                             if (data.d !== 1) {
                                 var rideNumber = data.d;
+                                rideNumberForNo = rideNumber;
                                 //$('#Modal').modal('show');
                                 var returnDriveExist = false;
 
@@ -582,31 +589,34 @@
                                         var DestIsHospital = hospitals.includes(request.RidePat.Destination.Name);
 
                                         if (DestIsHospital && !returnDriveExist && isDriver) {
-                                            swal({
-                                                title: "הנסיעה נשמרה",
-                                                text: "האם ליצור הסעת החזרה?\n(אפשר לשנות פרטים בהחזרה, ובסוף יש להקיש על מקש שמירה)",
-                                                type: "success",
-                                                //timer: 1000,
-                                                showConfirmButton: true,
-                                                showCancelButton: true,
-                                                //confirmButtonClass: "btn-danger",
-                                                confirmButtonText: "כן",
-                                                cancelButtonText: "לא",
-                                                closeOnConfirm: true,
-                                                closeOnCancel: false
-                                            },
-                                                function (isConfirm) {
-                                                    if (isConfirm) {
-                                                        returnRide();
-                                                        $("#afterNoon").attr('checked', 'checked');
-                                                        checkAfternoon();
-                                                        $('#saveCustomer').addClass("saveHighlight");
-                                                    } else {
-                                                        localStorage.setItem("ReturnRidePatFlag", false);
-                                                        //alert("changed to false")
-                                                        addDriver(rideNumber);
-                                                    }
-                                                });
+                                            $("#Modal").modal();
+
+
+                                            //swal({
+                                            //    title: "הנסיעה נשמרה",
+                                            //    text: "האם ליצור הסעת החזרה?\n(אפשר לשנות פרטים בהחזרה, ובסוף יש להקיש על מקש שמירה)",
+                                            //    type: "success",
+                                            //    //timer: 1000,
+                                            //    showConfirmButton: true,
+                                            //    showCancelButton: true,
+                                            //    //confirmButtonClass: "btn-danger",
+                                            //    confirmButtonText: "כן",
+                                            //    cancelButtonText: "לא",
+                                            //    closeOnConfirm: true,
+                                            //    closeOnCancel: false
+                                            //},
+                                            //    function (isConfirm) {
+                                            //        if (isConfirm) {
+                                            //            returnRide();
+                                            //            $("#afterNoon").attr('checked', 'checked');
+                                            //            checkAfternoon();
+                                            //            $('#saveCustomer').addClass("saveHighlight");
+                                            //        } else {
+                                            //            localStorage.setItem("ReturnRidePatFlag", false);
+                                            //            //alert("changed to false")
+                                            //            addDriver(rideNumber);
+                                            //        }
+                                            //    });
                                         } else {
                                             swal({
                                                 title: "נשמר\nلقت تمت عملية الحفظ",
@@ -774,7 +784,7 @@
         }
 
         function addDriver(data) {
-            
+
             var tmpDriverName = $('#driver').val();
             var driverIndex = drivers.indexOf($('#driver').val());
             userSelected = driversID[driverIndex];
@@ -783,7 +793,7 @@
 
 
             if (arr_customer.func == "new") {
-                
+
                 arr_details = { RidePatNum: ridePatId, func: "edit" }; //ridePat.name=RidePatNum
                 GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
                 location.href = "ridePatForm.html"; //ridePat.name=RidePatNum
@@ -816,7 +826,7 @@
             if (flagFirstOne || isThisAReturnDrive) {
                 currentDriverId = -1; // There is no driver assigned to the ride
                 flagFirstOne = false;
-                
+
             }
 
 
@@ -1981,38 +1991,42 @@
                                 console.log(returnDriveExist)
                                 var DestIsHospital = hospitals.includes(ridePat.Destination.Name);
                                 var ReturnRidePatFlag = (localStorage.getItem("ReturnRidePatFlag") == 'true');
-                                //maybe currentDriverId != -1       
+                                //maybe currentDriverId != -1
                                 //alert(ReturnRidePatFlag);
                                 if (DestIsHospital && !returnDriveExist && ReturnRidePatFlag) {
-                                    swal({
-                                        title: "הנסיעה נשמרה",
-                                        text: "האם ליצור הסעת החזרה?\n(אפשר לשנות פרטים בהחזרה, ובסוף יש להקיש על מקש שמירה)",
-                                        type: "success",
-                                        //timer: 1000,
-                                        showConfirmButton: true,
-                                        showCancelButton: true,
-                                        //confirmButtonClass: "btn-danger",
-                                        confirmButtonText: "כן",
-                                        cancelButtonText: "לא",
-                                        closeOnConfirm: true,
-                                        closeOnCancel: true
-                                    },
-                                        function (isConfirm) {
-                                            
-                                            if (isConfirm) {
-                                                isThisAReturnDrive = true;
-                                                returnRide();
-                                                $("#afterNoon").attr('checked', 'checked');
-                                                checkAfternoon();
-                                                $('#saveCustomer').addClass("saveHighlight");
-                                                localStorage.setItem("ReturnRidePatFlag", true);
-                                            } else {
-                                                //localStorage.setItem("ReturnRidePatFlag", true);
-                                                //alert("changed to true")
-                                                //addDriver(rideNumber);
-                                            }
-                                            //localStorage.setItem("ReturnRidePatFlag", false);
-                                        });
+                                    secondModal = true;
+                                    $("#Modal").modal();
+
+
+                                    //swal({
+                                    //    title: "הנסיעה נשמרה",
+                                    //    text: "האם ליצור הסעת החזרה?\n(אפשר לשנות פרטים בהחזרה, ובסוף יש להקיש על מקש שמירה)",
+                                    //    type: "success",
+                                    //    //timer: 1000,
+                                    //    showConfirmButton: true,
+                                    //    showCancelButton: true,
+                                    //    //confirmButtonClass: "btn-danger",
+                                    //    confirmButtonText: "כן",
+                                    //    cancelButtonText: "לא",
+                                    //    closeOnConfirm: true,
+                                    //    closeOnCancel: true
+                                    //},
+                                    //    function (isConfirm) {
+
+                                    //        if (isConfirm) {
+                                    //            isThisAReturnDrive = true;
+                                    //            returnRide();
+                                    //            $("#afterNoon").attr('checked', 'checked');
+                                    //            checkAfternoon();
+                                    //            $('#saveCustomer').addClass("saveHighlight");
+                                    //            localStorage.setItem("ReturnRidePatFlag", true);
+                                    //        } else {
+                                    //            //localStorage.setItem("ReturnRidePatFlag", true);
+                                    //            //alert("changed to true")
+                                    //            //addDriver(rideNumber);
+                                    //        }
+                                    //        //localStorage.setItem("ReturnRidePatFlag", false);
+                                    //    });
                                 } else {
                                     //swal({
                                     //    title: "נשמר\nلقت تمت عملية الحفظ",
@@ -2312,8 +2326,17 @@
                 type: "POST",
                 async: false,
                 success: function (data) {
-                    var coors = JSON.parse(data.d);                    
+                    var coors = JSON.parse(data.d);
                     coordList = coors;
+                    for (i in coordList) {
+                        $("#selectCoordinatorForReturn").append("<option value='" + coordList[i].DisplayName + "'>" + coordList[i].DisplayName + "</option>")
+
+                    }
+                    if (localStorage.getItem("CoordinatorForReturn")) {
+                        $("#selectCoordinatorForReturn").val(localStorage.getItem("CoordinatorForReturn"));
+                    } else {
+                        $("#selectCoordinatorForReturn").val(GENERAL.USER.getUserDisplayName());
+                    }
                     console.log(coordList);
                 },
                 error: function (err) { alert("Error in GetCoordinatorsList: " + err.responseText); }
@@ -2709,27 +2732,81 @@
         </footer>
         <!-- End FOOTER -->
     </div>
-    <!-- ============================================================== -->
-    <!-- End page content here -->
-    <!-- ============================================================== -->
-    </div>
     <!-- END wrapper -->
-    <!--<script type="text/javascript">
-        //DatePicker
+    <div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="ModalTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h1 class="modal-title centerHeader" id="ModalTitle">הנסיעה נשמרה</h1>
 
-
-
-        $(document).ready(function () {
-
-
-            //if (JSON.parse(GENERAL.RIDEPAT.getRidePatList()).length != 0) {
-            //    arr_customer = JSON.parse(GENERAL.RIDEPAT.getRidePatList());
-            //    if (arr_customer.func != "show") {
-            //    }
-            //}
-
-
-        });
-    </script>-->
+                </div>
+                <div class="modal-body">
+                    <h3 class="centerHeader">האם ליצור הסעת החזרה?</h3>
+                    <h4 class="centerHeader">(אפשר לשנות פרטים בהחזרה, ובסוף יש להקיש על מקש שמירה)</h4>
+                    <div class="form-group">
+                        <div>
+                            <br />
+                            <div class="col-sm-6">
+                                <label for="selectCoordinatorForReturn">ליצור את הסעת החזרה עבור הרכז.ת: </label>
+                            </div>
+                            <div class="col-sm-6">
+                                <select class="form-control" id="selectCoordinatorForReturn">
+                                    <option>בחר.י</option>
+                                </select><br />
+                            </div>
+                        </div><br />
+                    </div>
+                </div>
+                <div class="modal-footer centerHeader">
+                    <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">ביטול</button>-->
+                    <button type="button" class="btn btn-secondary" onclick="chooseNo()">לא</button>
+                    <button type="button" class="btn btn-warning" onclick="chooseYes()">כן</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
+<script>
+    function chooseYes() {
+        if (secondModal) {
+            isThisAReturnDrive = true;
+            localStorage.setItem("ReturnRidePatFlag", true);
+        }
+        returnRide();
+        $("#afterNoon").attr('checked', 'checked');
+        checkAfternoon();
+        $('#saveCustomer').addClass("saveHighlight");
+
+        CoordinatorForReturn = $("#selectCoordinatorForReturn").val();
+        if (CoordinatorForReturn != "בחר.י") {
+            $("#coordinator").val(CoordinatorForReturn);
+            localStorage.setItem("CoordinatorForReturn", CoordinatorForReturn);
+
+        } else {
+            swal({
+                title: "יש לבחור רכז.ת מהרשימה",
+                type: "warning",
+                showConfirmButton: true
+            });
+            return;
+        }
+
+        $('#Modal').modal('toggle');
+    }
+
+    function chooseNo() {
+
+        if (!secondModal) {
+            localStorage.setItem("ReturnRidePatFlag", false);
+            //alert("changed to false")
+            addDriver(rideNumberForNo);
+        }
+
+        $('#Modal').modal('toggle');
+    }
+</script>
+
