@@ -517,7 +517,7 @@
             if (arr_rides[i].Pat.DisplayName.includes("אנונימי")) {
                 arr_rides[i].Pat.DisplayName = "חולה";
             }
-            if (arr_rides[i].Status.indexOf("ממתינה לשיבוץ") !== -1 || arr_rides[i].Status.indexOf("אין נסיעת הלוך") !== -1) {
+            if (arr_rides[i].Status.indexOf("ממתינה לשיבוץ") !== -1 || (arr_rides[i].Status.indexOf("אין נסיעת הלוך") !== -1 && arr_rides[i].Status.indexOf("ויש נהג משובץ") === -1)) {
                 if (isAssistant) {
                     if (table.context[0].sTableId != "datatable-future" && table.context[0].sTableId != "datatable-tomorrow") {
                         table.row.add([time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, "אין!<br/>None!", "Waiting for a driver", arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
@@ -1008,12 +1008,15 @@
                     });
 
                     if (returnRidePat) {
-                        if (returnRidePat && returnRidePat.Coordinator.DisplayName != GENERAL.USER.getUserDisplayName()) {
-                            closeModal()
+                        if (returnRidePat.Coordinator.DisplayName != GENERAL.USER.getUserDisplayName() || hospitals.includes(returnRidePat.Destination.Name)) {
+                            //closeModal()
+                            $('#messagesModal').modal('hide');
+                            $('#DriverReturnRidePatMsg').html("");
+                            setTimeout(function () { refreshTable() }, 1001);
                         } else {
                             $("#returnRidePatMsg").text(returnRidePatMsg);
                             $("#messagesModal").modal();
-                        }                        
+                        }
                     }
                     else {
                         setTimeout(function () { refreshTable() }, 1001);

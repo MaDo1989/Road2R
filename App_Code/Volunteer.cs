@@ -583,7 +583,7 @@ public class Volunteer
     }
     public List<Volunteer> getCoordinatorsList()
     {
-        string query = "select * from VolunteerTypeView where VolunTypeType=N'רכז' and IsActive='true' and RoleInR2R like N'%רכז%' ORDER BY DisplayName";
+        string query = "select * from VolunteerTypeView where (VolunTypeType=N'רכז' OR VolunTypeType=N'מנהל') and IsActive='true' and RoleInR2R like N'%רכז%' ORDER BY DisplayName";
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         List<Volunteer> vl = new List<Volunteer>();

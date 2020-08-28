@@ -797,6 +797,11 @@
                 arr_details = { RidePatNum: ridePatId, func: "edit" }; //ridePat.name=RidePatNum
                 GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
                 location.href = "ridePatForm.html"; //ridePat.name=RidePatNum
+
+
+                //if ($('#duplicateRidePat').prop('checked')) {
+                   
+                //}
             }
 
 
@@ -867,6 +872,12 @@
             return [day, month, year].join('/');
         }
         function PrintRides(repeatRide, num) {
+            var duplicateDetails = {
+                repeatRide: $('#repeatRide').val(),
+                numberOfRides: $('#numberOfRides').val()
+            }
+            localStorage.setItem("duplicateRidePat", JSON.stringify(duplicateDetails));
+
             var datesToPrint = num + " הסעות חדשות יווצרו בתאריכים:\n";
             var dateRide = $("#dateRide").val();
             var hours = $("#hour").val();
@@ -1722,6 +1733,18 @@
                 $("#Equipment").attr('disabled', 'disabled');
                 if (arr_customer.func == "edit" || arr_customer.func == "show") {
 
+                    if (localStorage.getItem("duplicateRidePat") != null) {
+                        duplicateRidePat = localStorage.getItem("duplicateRidePat");
+                        duplicateRidePat = JSON.parse(duplicateRidePat);
+                        $('#repeatRide').val(duplicateRidePat.repeatRide);
+                        $('#numberOfRides').val(duplicateRidePat.numberOfRides);
+                        $("#duplicateRidePat").prop("checked", true);
+                        $('#hideDuplicate').show();
+                        console.log(duplicateRidePat)
+
+                        localStorage.removeItem("duplicateRidePat");
+                    }
+
                     uploadData(arr_customer.RidePatNum);
                     $("#hideOnEdit").addClass('duplicateDisplay');
 
@@ -2142,7 +2165,7 @@
 
 
         function signDriverToRide() {
-
+            
             //var driverIndex = drivers.indexOf($('#driver').val());
             //userSelected = driversID[driverIndex];
             //userSelected = $('#Driver').val();
@@ -2328,7 +2351,11 @@
                 success: function (data) {
                     var coors = JSON.parse(data.d);
                     coordList = coors;
+                    $("#selectCoordinatorForReturn").append("<option value='" + GENERAL.USER.getUserDisplayName() + "'>" + GENERAL.USER.getUserDisplayName() + "</option>")
                     for (i in coordList) {
+                        if (coordList[i].DisplayName == GENERAL.USER.getUserDisplayName()) {
+                            continue;
+                        }
                         $("#selectCoordinatorForReturn").append("<option value='" + coordList[i].DisplayName + "'>" + coordList[i].DisplayName + "</option>")
 
                     }
