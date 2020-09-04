@@ -1768,5 +1768,34 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string AssignMultiRideToRidePat(int ridePatId, int userId, string driverType, int numberOfRides, string repeatRide) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
+    {
+        Volunteer v = new Volunteer();
+        v = v.getVolunteerByID(userId);
+        Session["loggedInName"] = v.DisplayName;
+
+        try
+        {
+            int firstRide = ridePatId - numberOfRides + 1;
+            RidePat rp = new RidePat();
+            int res = rp.AssignMultiRideToRidePat(firstRide, userId, driverType, numberOfRides, repeatRide);
+            return j.Serialize(res);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in AssignMultiRideToRidePat", ex);
+            if (ex.Message == "נסיעה זו בוטלה, תודה על הרצון לעזור")
+            {
+                throw new Exception(ex.Message);
+            }
+
+            //          else throw new Exception("שגיאה בצירוף הסעה לנסיעה");
+            else throw ex;
+        }
+
+    }
 }
 

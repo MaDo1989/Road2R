@@ -323,6 +323,9 @@
                         if (!validRides) return false;
                     }
 
+                    localStorage.setItem("numberOfRides", numberOfRides);
+                    localStorage.setItem("repeatRide", repeatRide);
+
 
                     var RidePatNum = $("#ridePatNum").val();
                     var Pat = new Object();
@@ -790,6 +793,8 @@
             userSelected = driversID[driverIndex];
 
             ridePatId = data;
+
+            localStorage.setItem("ridePatId", ridePatId);
 
 
             if (arr_customer.func == "new") {
@@ -2180,26 +2185,59 @@
                 return;
             }
 
-            var request = {
-                ridePatId: ridePatId,
-                userId: userSelected,
-                driverType: "primary"
-            };
+            checkNumberOfRides = JSON.parse(localStorage.getItem("numberOfRides", numberOfRides));
+            
+            //localStorage.getItem("repeatRide", repeatRide);
+            localStorage.removeItem("numberOfRides");
+            localStorage.removeItem("repeatRide");
 
+            if (checkNumberOfRides == 1) {
+                var request = {
+                    ridePatId: ridePatId,
+                    userId: userSelected,
+                    driverType: "primary"
+                };
+            }
+            else {
+                var request = {
+                    ridePatId: JSON.parse(localStorage.getItem("ridePatId", ridePatId)),
+                    userId: userSelected,
+                    driverType: "primary",
+                    numberOfRides: checkNumberOfRides,
+                    repeatRide: ""
+                };
+                localStorage.removeItem("ridePatId");
+            }
             var dataString = JSON.stringify(request);
             if (currentDriverId == -1) {
                 currentDriverId = userSelected;
                 $('#wait').show();
 
-                $.ajax({ // ajax call starts
-                    url: 'WebService.asmx/AssignRideToRidePat',   // server side web service method
-                    data: dataString,                          // the parameters sent to the server
-                    type: 'POST',                              // can be also GET
-                    dataType: 'json',                          // expecting JSON datatype from the server
-                    contentType: 'application/json; charset = utf-8', // sent to the server
-                    success: signDriverSuccessCB,                // data.d id the Variable data contains the data we get from serverside
-                    error: signDriverErrorCB
-                }) // end of ajax call
+                if (checkNumberOfRides == 1) {
+                    $.ajax({ // ajax call starts
+                        url: 'WebService.asmx/AssignRideToRidePat',   // server side web service method
+                        data: dataString,                          // the parameters sent to the server
+                        type: 'POST',                              // can be also GET
+                        dataType: 'json',                          // expecting JSON datatype from the server
+                        contentType: 'application/json; charset = utf-8', // sent to the server
+                        success: signDriverSuccessCB,                // data.d id the Variable data contains the data we get from serverside
+                        error: signDriverErrorCB
+                    }) // end of ajax call
+                }
+                else {
+                    console.log(dataString)
+                    $.ajax({ // ajax call starts
+                        url: 'WebService.asmx/AssignMultiRideToRidePat',   // server side web service method
+                        data: dataString,                          // the parameters sent to the server
+                        type: 'POST',                              // can be also GET
+                        dataType: 'json',                          // expecting JSON datatype from the server
+                        contentType: 'application/json; charset = utf-8', // sent to the server
+                        success: signDriverSuccessCB,                // data.d id the Variable data contains the data we get from serverside
+                        error: signDriverErrorCB
+                    }) // end of ajax call
+                }
+
+                
 
 
             } else {
