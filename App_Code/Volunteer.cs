@@ -2034,6 +2034,41 @@ public class Volunteer
         {
             throw new Exception();
         }
+
+        Email em = new Email();
+        string messageText = "";
+        string newsLetterMail = ConfigurationManager.AppSettings["newsLetterMail"];
+        string wantsNewsLetter = "";
+        if (v.NewsLetter == true)
+        {
+            wantsNewsLetter = "כן";
+        }
+        else
+        {
+            wantsNewsLetter = "לא";
+
+        }
+
+
+        messageText = "<table width='100%' border='0' cellspacing='0' cellpadding='0'><tr><td align='right'>";
+        messageText += "שלום <br/>";
+        if (v.Gender == "מתנדבת")
+        {
+            messageText += "המתנדבת " + v.DisplayName + " עדכנה את פרטיה והיא " + wantsNewsLetter + " מעוניינת לקבל את העדכון השבועי.<br/>";
+            messageText += "כתובת המייל שלה: " + v.Email + " <br/><br/>";
+            
+        }
+        else
+        {
+            messageText += "המתנדב " + v.DisplayName + " עדכן את פרטיו והוא " + wantsNewsLetter + " מעוניין לקבל את העדכון השבועי.<br/>";
+            messageText += "כתובת המייל שלו: " + v.Email + " <br/><br/>";
+        }
+
+        messageText += "</td></tr></table>";
+        em.sendMessageTo("New volunteer", newsLetterMail, messageText);
+
+
+
     }
 
     public Volunteer getVolunteerExtendedByMobile(string mobile)
@@ -2171,7 +2206,7 @@ public class Volunteer
         try
         {
             query = "insert into Volunteer (UserName, CellPhone, FirstNameH, LastNameH, Gender, isActive, isAssistant, lastModified, JoinDate)";
-            query += " values (@UserName,@cell,@firstNameH,@lastNameH,@gender,1,1,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
+            query += " values (@UserName,@cell,@firstNameH,@lastNameH,@gender,1,0,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
 
             db = new DbService();
             Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
@@ -2196,7 +2231,7 @@ public class Volunteer
         try
         {
             query = "insert into VolunteerGood_30_05_20 (UserName, CellPhone, FirstNameH, LastNameH, DisplayName, Gender, isActive, isAssistant, lastModified, JoinDate)";
-            query += " values (@UserName, @cell,@firstNameH,@lastNameH,@displayName,@gender,1,1,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
+            query += " values (@UserName, @cell,@firstNameH,@lastNameH,@displayName,@gender,1,0,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
 
             db = new DbService();
             Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
@@ -2207,7 +2242,7 @@ public class Volunteer
             try
             {
                 query = "insert into VolunteerGood_30_05_20 (Id, UserName, CellPhone, FirstNameH, LastNameH, DisplayName, Gender, isActive, isAssistant, lastModified, JoinDate)";
-                query += " values ((select max(id) + 1 from VolunteerGood_30_05_20), @UserName, @cell,@firstNameH,@lastNameH,@displayName,@gender,1,1,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
+                query += " values ((select max(id) + 1 from VolunteerGood_30_05_20), @UserName, @cell,@firstNameH,@lastNameH,@displayName,@gender,1,0,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
 
                 db = new DbService();
                 db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams);
