@@ -1009,10 +1009,10 @@
 
                     if (returnRidePat) {
                         if (returnRidePat.Coordinator.DisplayName != GENERAL.USER.getUserDisplayName() || hospitals.includes(returnRidePat.Destination.Name)) {
-                            //closeModal()
-                            $('#messagesModal').modal('hide');
-                            $('#DriverReturnRidePatMsg').html("");
-                            setTimeout(function () { refreshTable() }, 1001);
+                            closeModal()
+                            //$('#messagesModal').modal('hide');
+                            //$('#DriverReturnRidePatMsg').html("");
+                            //setTimeout(function () { refreshTable() }, 1001);
                         } else {
                             $("#returnRidePatMsg").text(returnRidePatMsg);
                             $("#messagesModal").modal();

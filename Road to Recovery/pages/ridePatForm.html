@@ -325,6 +325,8 @@
 
                     localStorage.setItem("numberOfRides", numberOfRides);
                     localStorage.setItem("repeatRide", repeatRide);
+                    localStorage.setItem("dateForReturnRepeat", $("#dateRide").val());
+                    
 
 
                     var RidePatNum = $("#ridePatNum").val();
@@ -2844,6 +2846,13 @@
         returnRide();
         $("#afterNoon").attr('checked', 'checked');
         checkAfternoon();
+
+        dateForReturnRepeat = localStorage.getItem("dateForReturnRepeat");
+        alert(dateForReturnRepeat);
+        localStorage.removeItem("dateForReturnRepeat");
+        $("#dateRide").val(dateForReturnRepeat)
+
+
         $('#saveCustomer').addClass("saveHighlight");
 
         CoordinatorForReturn = $("#selectCoordinatorForReturn").val();

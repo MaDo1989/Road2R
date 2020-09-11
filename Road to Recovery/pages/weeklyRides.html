@@ -329,7 +329,7 @@
 
                         var Ride = {};
 
-                        if (arr_rides[i].Status == "ממתינה לשיבוץ") {
+                        if (arr_rides[i].Status == "ממתינה לשיבוץ" || arr_rides[i].Status == "אין נסיעת הלוך" || arr_rides[i].Status == "אין נסיעת הלוך ויש נהג משובץ") {
                             drivers = arr_rides[i].Status;
                         } else {
                             drivers = arr_rides[i].Drivers[0].DisplayName;
