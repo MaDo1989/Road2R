@@ -1008,14 +1008,18 @@
                     });
 
                     if (returnRidePat) {
-                        if (returnRidePat.Coordinator.DisplayName != GENERAL.USER.getUserDisplayName() || hospitals.includes(returnRidePat.Destination.Name)) {
-                            closeModal()
-                            //$('#messagesModal').modal('hide');
-                            //$('#DriverReturnRidePatMsg').html("");
-                            //setTimeout(function () { refreshTable() }, 1001);
+                        if (hospitals.includes(returnRidePat.Destination.Name)) {
+                            $('#messagesModal').modal('hide');
+                            $('#DriverReturnRidePatMsg').html("");
+                            setTimeout(function () { refreshTable() }, 1001);
                         } else {
-                            $("#returnRidePatMsg").text(returnRidePatMsg);
-                            $("#messagesModal").modal();
+                            if (returnRidePat.Coordinator.DisplayName != GENERAL.USER.getUserDisplayName()) {
+                                closeModal()
+                            } else {
+                                $("#returnRidePatMsg").text(returnRidePatMsg);
+                                $("#messagesModal").modal();
+                            }
+                            
                         }
                     }
                     else {
