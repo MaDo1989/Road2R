@@ -221,4 +221,23 @@ public class User
         }
         #endregion
     }
+
+    public bool CheckIfEnglishDisplayNameExists(string DisplayName)
+    {
+        #region DB functions
+        string query = "select * from Volunteer where EnglishName='" + DisplayName + "'";
+
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        DataTable dt = ds.Tables[0];
+        if (dt != null && dt.Rows.Count > 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+        #endregion
+    }
 }

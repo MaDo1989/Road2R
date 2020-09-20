@@ -1720,7 +1720,7 @@ public class Volunteer
         cmdParams[14] = cmd.Parameters.AddWithValue("@remarks", v.Remarks);
         cmdParams[15] = cmd.Parameters.AddWithValue("@displayName", v.DisplayName);
         cmdParams[16] = cmd.Parameters.AddWithValue("@UserName", v.CellPhone);
-        cmdParams[17] = cmd.Parameters.AddWithValue("@englishName", v.EnglishName);
+        
         cmdParams[18] = cmd.Parameters.AddWithValue("@isAssistant", v.IsAssistant);
         cmdParams[19] = cmd.Parameters.AddWithValue("@volunteerIdentity", v.VolunteerIdentity);
 
@@ -1745,12 +1745,31 @@ public class Volunteer
         if (func == "edit")
         {
             string displayQuery = "";
+            string EnglishDisplayQuery = "";
+
             User u = new User();
             string newDisplayName = v.FirstNameH + " " + v.LastNameH;
-            if (u.CheckIfDisplayNameExists(newDisplayName))
+            string existingDisplayName = u.getUserNameByCellphone(v.CellPhone);
+            
+            if (existingDisplayName != newDisplayName && u.CheckIfDisplayNameExists(newDisplayName))
             {
                 displayQuery = "DisplayName = N'" + newDisplayName + "_" + v.CellPhone + "',";
             }
+
+
+            string EnglishNewDisplayName = v.EnglishFN + " " + v.EnglishLN;
+            string existingEnglishDisplayName = u.getUserEnglishNameByCellphone(v.CellPhone);
+            if (EnglishNewDisplayName != existingEnglishDisplayName && u.CheckIfEnglishDisplayNameExists(EnglishNewDisplayName))
+            {
+                
+                cmdParams[17] = cmd.Parameters.AddWithValue("@englishName", EnglishNewDisplayName + "_" + v.CellPhone);
+            }
+            else
+            {
+                cmdParams[17] = cmd.Parameters.AddWithValue("@englishName", v.EnglishName);
+
+            }
+
             string password = ConfigurationManager.AppSettings["password"];
             if (v.TypeVol == "רכז" || v.TypeVol == "מנהל" || v.IsAssistant)
             {
@@ -1800,7 +1819,7 @@ public class Volunteer
         }
         else if (func == "new")
         {
-
+            cmdParams[17] = cmd.Parameters.AddWithValue("@englishName", v.EnglishName);
             try
             {
                 if (v.TypeVol == "רכז" || v.TypeVol == "מנהל" || v.IsAssistant)
