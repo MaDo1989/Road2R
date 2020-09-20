@@ -1744,6 +1744,13 @@ public class Volunteer
         string query = "";
         if (func == "edit")
         {
+            string displayQuery = "";
+            User u = new User();
+            string newDisplayName = v.FirstNameH + " " + v.LastNameH;
+            if (u.CheckIfDisplayNameExists(newDisplayName))
+            {
+                displayQuery = "DisplayName = N'" + newDisplayName + "_" + v.CellPhone + "',";
+            }
             string password = ConfigurationManager.AppSettings["password"];
             if (v.TypeVol == "רכז" || v.TypeVol == "מנהל" || v.IsAssistant)
             {
@@ -1751,6 +1758,7 @@ public class Volunteer
                 query += "CellPhone2=@cell2, CityCityName=@city, Email=@email, FirstNameA=@firstNameA, FirstNameH=@firstNameH, VolunteerIdentity=@volunteerIdentity, ";
                 query += "Gender=@gender, IsActive=@IsActive, JoinDate=@jDate, KnowsArabic=@knowsArabic, LastNameA=@lastNameA, ";
                 query += "EnglishFN=@englishFN, EnglishLN=@englishLN, BirthDate=@birthDate, IsDriving=@isDriving, ";
+                query += displayQuery;
                 query += "LastNameH=@lastNameH,UserName=@UserName,Password='" + password + "', Remarks=@remarks,EnglishName=@englishName,isAssistant=@isAssistant,RoleInR2R=@role,lastModified=DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@displayName"; //, BirthDate=@bDay
 
             }
@@ -1760,6 +1768,7 @@ public class Volunteer
                 query += "CellPhone2=@cell2, CityCityName=@city, Email=@email, FirstNameA=@firstNameA, FirstNameH=@firstNameH, VolunteerIdentity=@volunteerIdentity, ";
                 query += "Gender=@gender, IsActive=@IsActive, JoinDate=@jDate, KnowsArabic=@knowsArabic, LastNameA=@lastNameA, ";
                 query += "EnglishFN=@englishFN, EnglishLN=@englishLN, BirthDate=@birthDate, IsDriving=@isDriving, ";
+                query += displayQuery;
                 query += "LastNameH=@lastNameH, Remarks=@remarks,EnglishName=@englishName,isAssistant=@isAssistant,RoleInR2R=@role,lastModified=DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@displayName"; //, BirthDate=@bDay
             }
             res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
