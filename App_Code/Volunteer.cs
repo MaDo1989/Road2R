@@ -1755,6 +1755,11 @@ public class Volunteer
             {
                 displayQuery = "DisplayName = N'" + newDisplayName + "_" + v.CellPhone + "',";
             }
+            else if (existingDisplayName != newDisplayName)
+            {
+                displayQuery = "DisplayName = N'" + newDisplayName + "',";
+            }
+            
 
 
             string EnglishNewDisplayName = v.EnglishFN + " " + v.EnglishLN;
