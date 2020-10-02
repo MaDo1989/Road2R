@@ -341,7 +341,7 @@ public class RidePat
         DbService db = new DbService();
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
-        SqlParameter[] cmdParams = new SqlParameter[8];
+        SqlParameter[] cmdParams = new SqlParameter[9];
         bool sendMessage = true;
         try
         {
@@ -386,8 +386,14 @@ public class RidePat
                     return 1;
                 }
                 cmdParams[6] = cmd.Parameters.AddWithValue("@coordinator", Coordinator.DisplayName);
+                User u = new User();
+                string CoordinatorID = u.getIdByUserName(Coordinator.DisplayName);
+                cmdParams[8] = cmd.Parameters.AddWithValue("@coordinatorID", CoordinatorID);
 
-                string query = "insert into RidePat (Patient,Origin,Destination,PickupTime,Coordinator,Remark,OnlyEscort,Area,lastModified) values (@pat,@origin,@destination,@date,@coordinator,@remark,@onlyEscort,@Area,DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
+
+
+
+                string query = "insert into RidePat (Patient,Origin,Destination,PickupTime,Coordinator,Remark,OnlyEscort,Area,CoordinatorId,lastModified) values (@pat,@origin,@destination,@date,@coordinator,@remark,@onlyEscort,@Area,@coordinatorID,DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
                 RidePatNum = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
 
                 if (Escorts.Count > 0 && RidePatNum != 0)
@@ -458,6 +464,9 @@ public class RidePat
             //if (Status == "הגענו ליעד") throw new Exception("נסיעה זו כבר הגיעה ליעד ואין אפשרות לערוך אותה");
 
             cmdParams[6] = cmd.Parameters.AddWithValue("@ridePatNum", RidePatNum);
+
+            cmdParams[8] = cmd.Parameters.AddWithValue("@coordinatorID", -1); //THIS IS JUST SO YOU DONT GET EXCEPTION
+
             var query = "update RidePat set Patient=@pat,Origin=@origin,Destination=@destination,PickupTime=@date,Remark=@remark,OnlyEscort=@onlyEscort,Area=@Area,lastModified=DATEADD(hour, 2, SYSDATETIME()) where RidePatNum=@ridePatNum";
             int res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
 
@@ -1145,7 +1154,7 @@ public class RidePat
         #endregion
     }
 
-    public List<RidePat> getRidepats()
+    public List<RidePat> getRidepats() //Very strange method. hopefully no body use it. (area<>N'מרכז' hard coded).
     {
         string query = "select * from ridepat where pickuptime>=getdate() and area<>N'מרכז'"; // Get ALL FUTURE RidePats, even if cancelled
         List<RidePat> ridePats = new List<RidePat>();
@@ -1266,9 +1275,9 @@ public class RidePat
 
         Message m = new Message();
         Volunteer v = new Volunteer();
-        TimeSpan hourDiff = Date - DateTime.Now;
+        TimeSpan hourDiff = Date - timeRightNow;
 
-        if (hourDiff.Hours <= 12 && (Date > timeRightNow))
+        if (hourDiff.TotalHours <= 12 && (Date > timeRightNow))
         {
             bool primary = false;
             if (driverType == "primary")

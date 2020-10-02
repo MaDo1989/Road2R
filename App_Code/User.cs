@@ -240,4 +240,18 @@ public class User
         }
         #endregion
     }
+
+    public string getIdByUserName(string displayName)
+    {
+        #region DB functions
+        string query = "select Id from Volunteer where DisplayName =N'" + displayName + "'";
+
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        DataRow dr = ds.Tables[0].Rows[0];
+        string Id = dr["Id"].ToString();
+        
+        return Id;
+        #endregion
+    }
 }
