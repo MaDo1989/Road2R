@@ -1720,7 +1720,7 @@ public class Volunteer
         cmdParams[14] = cmd.Parameters.AddWithValue("@remarks", v.Remarks);
         cmdParams[15] = cmd.Parameters.AddWithValue("@displayName", v.DisplayName);
         cmdParams[16] = cmd.Parameters.AddWithValue("@UserName", v.CellPhone);
-        cmdParams[17] = cmd.Parameters.AddWithValue("@englishName", v.EnglishName);
+        
         cmdParams[18] = cmd.Parameters.AddWithValue("@isAssistant", v.IsAssistant);
         cmdParams[19] = cmd.Parameters.AddWithValue("@volunteerIdentity", v.VolunteerIdentity);
 
@@ -1744,6 +1744,37 @@ public class Volunteer
         string query = "";
         if (func == "edit")
         {
+            string displayQuery = "";
+            string EnglishDisplayQuery = "";
+
+            User u = new User();
+            string newDisplayName = v.FirstNameH + " " + v.LastNameH;
+            string existingDisplayName = u.getUserNameByCellphone(v.CellPhone);
+            
+            if (existingDisplayName != newDisplayName && u.CheckIfDisplayNameExists(newDisplayName))
+            {
+                displayQuery = "DisplayName = N'" + newDisplayName + "_" + v.CellPhone + "',";
+            }
+            else if (existingDisplayName != newDisplayName)
+            {
+                displayQuery = "DisplayName = N'" + newDisplayName + "',";
+            }
+            
+
+
+            string EnglishNewDisplayName = v.EnglishFN + " " + v.EnglishLN;
+            string existingEnglishDisplayName = u.getUserEnglishNameByCellphone(v.CellPhone);
+            if (EnglishNewDisplayName != existingEnglishDisplayName && u.CheckIfEnglishDisplayNameExists(EnglishNewDisplayName))
+            {
+                
+                cmdParams[17] = cmd.Parameters.AddWithValue("@englishName", EnglishNewDisplayName + "_" + v.CellPhone);
+            }
+            else
+            {
+                cmdParams[17] = cmd.Parameters.AddWithValue("@englishName", v.EnglishName);
+
+            }
+
             string password = ConfigurationManager.AppSettings["password"];
             if (v.TypeVol == "רכז" || v.TypeVol == "מנהל" || v.IsAssistant)
             {
@@ -1751,6 +1782,7 @@ public class Volunteer
                 query += "CellPhone2=@cell2, CityCityName=@city, Email=@email, FirstNameA=@firstNameA, FirstNameH=@firstNameH, VolunteerIdentity=@volunteerIdentity, ";
                 query += "Gender=@gender, IsActive=@IsActive, JoinDate=@jDate, KnowsArabic=@knowsArabic, LastNameA=@lastNameA, ";
                 query += "EnglishFN=@englishFN, EnglishLN=@englishLN, BirthDate=@birthDate, IsDriving=@isDriving, ";
+                query += displayQuery;
                 query += "LastNameH=@lastNameH,UserName=@UserName,Password='" + password + "', Remarks=@remarks,EnglishName=@englishName,isAssistant=@isAssistant,RoleInR2R=@role,lastModified=DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@displayName"; //, BirthDate=@bDay
 
             }
@@ -1760,6 +1792,7 @@ public class Volunteer
                 query += "CellPhone2=@cell2, CityCityName=@city, Email=@email, FirstNameA=@firstNameA, FirstNameH=@firstNameH, VolunteerIdentity=@volunteerIdentity, ";
                 query += "Gender=@gender, IsActive=@IsActive, JoinDate=@jDate, KnowsArabic=@knowsArabic, LastNameA=@lastNameA, ";
                 query += "EnglishFN=@englishFN, EnglishLN=@englishLN, BirthDate=@birthDate, IsDriving=@isDriving, ";
+                query += displayQuery;
                 query += "LastNameH=@lastNameH, Remarks=@remarks,EnglishName=@englishName,isAssistant=@isAssistant,RoleInR2R=@role,lastModified=DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@displayName"; //, BirthDate=@bDay
             }
             res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
@@ -1791,7 +1824,7 @@ public class Volunteer
         }
         else if (func == "new")
         {
-
+            cmdParams[17] = cmd.Parameters.AddWithValue("@englishName", v.EnglishName);
             try
             {
                 if (v.TypeVol == "רכז" || v.TypeVol == "מנהל" || v.IsAssistant)

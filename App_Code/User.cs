@@ -201,4 +201,57 @@ public class User
         string type = dr["VolunTypeType"].ToString();
         return type;
     }
+
+
+    public bool CheckIfDisplayNameExists(string DisplayName)
+    {
+        #region DB functions
+        string query = "select * from Volunteer where DisplayName =N'" + DisplayName + "'";
+
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        DataTable dt = ds.Tables[0];
+        if (dt != null && dt.Rows.Count > 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+        #endregion
+    }
+
+    public bool CheckIfEnglishDisplayNameExists(string DisplayName)
+    {
+        #region DB functions
+        string query = "select * from Volunteer where EnglishName='" + DisplayName + "'";
+
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        DataTable dt = ds.Tables[0];
+        if (dt != null && dt.Rows.Count > 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+        #endregion
+    }
+
+    public string getIdByUserName(string displayName)
+    {
+        #region DB functions
+        string query = "select Id from Volunteer where DisplayName =N'" + displayName + "'";
+
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        DataRow dr = ds.Tables[0].Rows[0];
+        string Id = dr["Id"].ToString();
+        
+        return Id;
+        #endregion
+    }
 }

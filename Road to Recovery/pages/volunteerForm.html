@@ -71,7 +71,6 @@
         input[type=text], input[type=checkbox], input[type=date], input[type=number], #typeVolunteer, #gender, #isDriving, .textAreaClass, .birthSelect, #newsLetter, #knowsArabic, #role {
             border-color: #000
         }
-        
     </style>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <!--City Autocomplete-->
@@ -231,8 +230,8 @@
                         // initializeSelect2();
                     }
                     else {
-                        $("#volunteerFirstName").attr('disabled', 'disabled');
-                        $("#volunteerLastName").attr('disabled', 'disabled');
+                        //$("#volunteerFirstName").attr('disabled', 'disabled');
+                        //$("#volunteerLastName").attr('disabled', 'disabled');
                     }
                 }
                 else {
@@ -347,7 +346,7 @@
                     rolesGenerated = true;
                         $("#role").val(volunteer.RoleInR2R);
                     }
-                    
+
                     //if (volunteer.NewsLetter == 1) {
                     //    $("#newsLetter").val("כן");
                     //}
@@ -825,8 +824,8 @@
                 rolesGenerated = true;
             });
 
-        
-            
+
+
 
             includeHTML();
             if (window.location.hostname.toString() == 'localhost' || window.location.pathname.indexOf('test') != -1) {
@@ -936,7 +935,6 @@
                     var func = arr_customer.func;
                     var remark = $("#remarks").val();;
                     var displayName = arr_volunteer.displayName;
-
                     //NEW:
                     var englishFN = $("#volunteerFirstNameEnglish").val();
                     var englishLN = $("#volunteerLastNameEnglish").val();
