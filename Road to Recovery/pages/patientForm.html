@@ -344,7 +344,7 @@
 
         function loadPage() {
             localStorage.setItem('func', JSON.stringify(arr_customer.func));
-            
+
             if (JSON.parse(GENERAL.PATIENTS.getPatientsList()).length != 0) {
                 arr_patient = JSON.parse(GENERAL.PATIENTS.getPatientsList());
                 if (arr_customer.func == "new") {
@@ -360,7 +360,7 @@
                     document.getElementById("escorted").style.visibility = "visible";
                     document.getElementById("anonymouspatient").disabled = true;
                     uploadData(arr_patient.displayName.trim());
-                    
+
                     //if (arr_patient.func == "edit") {
 
                     //}
@@ -424,7 +424,7 @@
                 data: JSON.stringify({ displayName: displayName }),
                 success: function (data) {
                     $('#wait').hide();
-        
+
                     var patient = JSON.parse(data.d);
         console.log(patient);
                     if (patient.DisplayName === null) {
@@ -468,16 +468,9 @@
                         else $("#gender").val(patient.Gender);
                         var tmpDate = patient.BirthDate.substring(0, 10);
                         tmpDate = tmpDate.split("/")
-                        var date = new Date(tmpDate[2], tmpDate[1], tmpDate[0]);
-                        var month = date.getMonth() + 1;
-                        if (month < 10) {
-                            month = "0" + month;
-                        }
-                        var year = date.getFullYear();
-                        var day = date.getDate();
-                        if (day < 10) {
-                            day = "0" + day;
-                        }
+                        year = tmpDate[2];
+                        month = tmpDate[1];
+                        day = tmpDate[0];
                         date = year + "-" + month + "-" + day;
                         document.getElementById("birthDate").value = date;
                         //$("#birthDate").val(patient.BirthDate.substring(0, 10));
@@ -673,7 +666,7 @@
                     pat: patient, id: Eid, firstNameH: "אנונימי", firstNameA: "", lastNameH: "אנונימי", lastNameA: "", city: "", cellPhone: escortPhone, cellphone2: "", homePhone: "",
                     contactType: "אנונימי", gender: "Unknown", IsActive: true, EnglishName: "Unnamed"
                 }
-                
+
                 $.ajax({
                     dataType: "json",
                     url: "WebService.asmx/setEscorted",
@@ -780,7 +773,7 @@
         //        return false;
         //    }
         //}
-        
+
         function returnPatient() {
             // var displayNamePat = $("#patientDisplayName").val();
             arr_pat = JSON.parse(GENERAL.PATIENTS.getPatientsList());
@@ -1122,26 +1115,26 @@
                                                 </div>-->
 
                                             </div>
-                                                <br />
-                                                <table data-container="body" id="datatable-buttons" class="table table-striped table-bordered">
-                                                    <thead>
-                                                        <tr>
-                                                            <th title="اسم ">שם</th>
-                                                            <th title="اسم">שם באנגלית</th>
-                                                            <!--<th>שם באנגלית</th>-->
-                                                            <th title="هاتف   Phone">טלפון</th>
-                                                            <th title="بلد   City / Village">יישוב</th>
-                                                            <th title="نوع القرابة">סוג קרבה</th>
-                                                            <th title="جنس   Gender">מגדר</th>
-                                                            <th title="اعمال   Actions">פעולות</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody></tbody>
-                                                </table>
-                                                <div id="wait" style="display:none;width:69px;height:89px;position:absolute;top:50%;left:50%;padding:2px;">
-                                                    <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
-                                                </div>
+                                            <br />
+                                            <table data-container="body" id="datatable-buttons" class="table table-striped table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th title="اسم ">שם</th>
+                                                        <th title="اسم">שם באנגלית</th>
+                                                        <!--<th>שם באנגלית</th>-->
+                                                        <th title="هاتف   Phone">טלפון</th>
+                                                        <th title="بلد   City / Village">יישוב</th>
+                                                        <th title="نوع القرابة">סוג קרבה</th>
+                                                        <th title="جنس   Gender">מגדר</th>
+                                                        <th title="اعمال   Actions">פעולות</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
+                                            <div id="wait" style="display:none;width:69px;height:89px;position:absolute;top:50%;left:50%;padding:2px;">
+                                                <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
                                             </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1378,7 +1371,7 @@
 
             var name = true;
 
-            
+
             //if (!isAssistant) {
             //    if (firstName === "") {
             //        swal(
@@ -1524,7 +1517,7 @@
                 return false;
             } else return true;
         }
-    
+
     </script>
 
     <!-- jQuery  -->
