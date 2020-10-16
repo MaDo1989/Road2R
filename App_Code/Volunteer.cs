@@ -1916,7 +1916,7 @@ public class Volunteer
         //cmdParams[0] = cmd.Parameters.AddWithValue("name", DisplayName);
         cmdParams[0] = cmd.Parameters.AddWithValue("CellPhone", CellPhone);
         //string query = "select * from VolunteerData where displayName=@name";
-        string query = "select * from VolunteerGood_30_05_20 where CellPhone=@CellPhone";
+        string query = "select * from Volunteer where CellPhone=@CellPhone";
         Volunteer v = new Volunteer();
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query, true, cmd.CommandType, cmdParams);
@@ -1967,6 +1967,7 @@ public class Volunteer
         {
             v.KnowsArabic = null;
         }
+
         v.joinYear = dr["joinYear"].ToString();
         v.Address = dr["address"].ToString();
         v.PostalCode = dr["postalCode"].ToString();
@@ -2049,7 +2050,7 @@ public class Volunteer
 
         //query = "update VolunteerData set FirstNameH=@firstNameH, LastNameH=@lastNameH, EnglishFN=@englishFN, EnglishLN=@englishLN, ";
         //Remarks=@remarks, gasRemarks=@gasRemarks,
-        query = "update VolunteerGood_30_05_20 set FirstNameH=@firstNameH, LastNameH=@lastNameH, EnglishFN=@englishFN, EnglishLN=@englishLN, ";
+        query = "update Volunteer set FirstNameH=@firstNameH, LastNameH=@lastNameH, EnglishFN=@englishFN, EnglishLN=@englishLN, ";
         query += "VolunteerIdentity=@volunteerIdentity, CellPhone=@cell, Gender=@gender, CityCityName=@city, Email=@email, ";
         query += "BirthDate=@bDay, IsDriving=@isDriving, HowCanHelp=@howCanHelp, Feedback=@feedback, NewsLetter=@newsLetter, KnowsArabic=@knowsArabic,";
         query += "DisplayName=@displayName, EnglishName=@englishName, JoinYear=@joinYear, Address=@address, PostalCode=@postalCode,";
@@ -2110,7 +2111,7 @@ public class Volunteer
 
         DbService db = new DbService();
         //string query = "select Id,DisplayName from VolunteerData where CellPhone = '" + mobile + "'";
-        string query = "select Id,DisplayName from VolunteerGood_30_05_20 where CellPhone = '" + mobile + "' and isactive = 1";
+        string query = "select Id,DisplayName from Volunteer where CellPhone = '" + mobile + "' and isactive = 1";
         DataSet ds = db.GetDataSetByQuery(query);
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
@@ -2123,7 +2124,7 @@ public class Volunteer
     public List<Volunteer> getVolunteerDataTable() // function for volunteer data review
     {
         #region DB functions
-        string query = "select * from VolunteerGood_30_05_20";
+        string query = "select * from Volunteer";
         //query += " order by firstNameH";
 
         List<Volunteer> list = new List<Volunteer>();
@@ -2261,34 +2262,34 @@ public class Volunteer
             throw e;
         }
 
-        try
-        {
-            query = "insert into VolunteerGood_30_05_20 (UserName, CellPhone, FirstNameH, LastNameH, DisplayName, Gender, isActive, isAssistant, lastModified, JoinDate)";
-            query += " values (@UserName, @cell,@firstNameH,@lastNameH,@displayName,@gender,1,0,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
+        //try
+        //{
+        //    query = "insert into VolunteerGood_30_05_20 (UserName, CellPhone, FirstNameH, LastNameH, DisplayName, Gender, isActive, isAssistant, lastModified, JoinDate)";
+        //    query += " values (@UserName, @cell,@firstNameH,@lastNameH,@displayName,@gender,1,0,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
 
-            db = new DbService();
-            Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
-        }
-        catch (SqlException ex)
-        {
-            //throw new Exception("error inserting to VolunteerGood_30_05_20 table");
-            try
-            {
-                query = "insert into VolunteerGood_30_05_20 (Id, UserName, CellPhone, FirstNameH, LastNameH, DisplayName, Gender, isActive, isAssistant, lastModified, JoinDate)";
-                query += " values ((select max(id) + 1 from VolunteerGood_30_05_20), @UserName, @cell,@firstNameH,@lastNameH,@displayName,@gender,1,0,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
+        //    db = new DbService();
+        //    Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
+        //}
+        //catch (SqlException ex)
+        //{
+        //    //throw new Exception("error inserting to VolunteerGood_30_05_20 table");
+        //    try
+        //    {
+        //        query = "insert into VolunteerGood_30_05_20 (Id, UserName, CellPhone, FirstNameH, LastNameH, DisplayName, Gender, isActive, isAssistant, lastModified, JoinDate)";
+        //        query += " values ((select max(id) + 1 from VolunteerGood_30_05_20), @UserName, @cell,@firstNameH,@lastNameH,@displayName,@gender,1,0,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
 
-                db = new DbService();
-                db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams);
-            }
-            catch (SqlException ex2)
-            {
-                throw new Exception("error inserting to VolunteerGood_30_05_20 table " + ex2.Message);
-            }
-        }
-        catch (Exception e)
-        {
-            throw e;
-        }
+        //        db = new DbService();
+        //        db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams);
+        //    }
+        //    catch (SqlException ex2)
+        //    {
+        //        throw new Exception("error inserting to VolunteerGood_30_05_20 table " + ex2.Message);
+        //    }
+        //}
+        //catch (Exception e)
+        //{
+        //    throw e;
+        //}
 
         Email em = new Email();
         string messageText = "";
