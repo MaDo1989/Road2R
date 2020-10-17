@@ -2197,11 +2197,6 @@ public class Volunteer
             }
             else v.JoinDate = Convert.ToDateTime(dr["JoinDate"].ToString());
             v.EnglishName = dr["englishName"].ToString();
-            v.Source = dr["source"].ToString();
-            v.Rounds = dr["rounds"].ToString();
-            v.AnsweredPrevQues = dr["answeredPrevQues"].ToString();
-            v.GalitRemarks = dr["galitRemarks"].ToString();
-
             v.WorkingWithCoor = dr["workingWithCoor"].ToString();
             v.WorkingWithPat = dr["workingWithPat"].ToString();
             v.HowToRecruit = dr["howToRecruit"].ToString();
