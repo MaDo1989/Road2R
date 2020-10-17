@@ -2023,7 +2023,7 @@ public class Volunteer
             cmdParams[14] = cmd.Parameters.AddWithValue("@knowsArabic", v.KnowsArabic);
         }
         cmdParams[15] = cmd.Parameters.AddWithValue("@displayName", v.DisplayName);
-        cmdParams[16] = cmd.Parameters.AddWithValue("@englishName", v.EnglishName);
+        //cmdParams[16] = cmd.Parameters.AddWithValue("@englishName", v.EnglishName);
         cmdParams[17] = cmd.Parameters.AddWithValue("@username", username);
         cmdParams[18] = cmd.Parameters.AddWithValue("@joinYear", v.JoinYear);
         cmdParams[19] = cmd.Parameters.AddWithValue("@address", v.Address);
@@ -2048,12 +2048,45 @@ public class Volunteer
 
         string query = "";
 
+
+        string displayQuery = "";
+        string EnglishDisplayQuery = "";
+
+        User u = new User();
+        string newDisplayName = v.FirstNameH + " " + v.LastNameH;
+        string existingDisplayName = u.getUserNameByCellphone(v.CellPhone);
+
+        if (existingDisplayName != newDisplayName && u.CheckIfDisplayNameExists(newDisplayName))
+        {
+            displayQuery = "DisplayName = N'" + newDisplayName + "_" + v.CellPhone + "',";
+        }
+        else if (existingDisplayName != newDisplayName)
+        {
+            displayQuery = "DisplayName = N'" + newDisplayName + "',";
+        }
+
+
+
+        string EnglishNewDisplayName = v.EnglishFN + " " + v.EnglishLN;
+        string existingEnglishDisplayName = u.getUserEnglishNameByCellphone(v.CellPhone);
+        if (EnglishNewDisplayName != existingEnglishDisplayName && u.CheckIfEnglishDisplayNameExists(EnglishNewDisplayName))
+        {
+
+            cmdParams[16] = cmd.Parameters.AddWithValue("@englishName", EnglishNewDisplayName + "_" + v.CellPhone);
+        }
+        else
+        {
+            cmdParams[16] = cmd.Parameters.AddWithValue("@englishName", v.EnglishName);
+
+        }
+
         //query = "update VolunteerData set FirstNameH=@firstNameH, LastNameH=@lastNameH, EnglishFN=@englishFN, EnglishLN=@englishLN, ";
         //Remarks=@remarks, gasRemarks=@gasRemarks,
         query = "update Volunteer set FirstNameH=@firstNameH, LastNameH=@lastNameH, EnglishFN=@englishFN, EnglishLN=@englishLN, ";
         query += "VolunteerIdentity=@volunteerIdentity, CellPhone=@cell, Gender=@gender, CityCityName=@city, Email=@email, ";
         query += "BirthDate=@bDay, IsDriving=@isDriving, HowCanHelp=@howCanHelp, Feedback=@feedback, NewsLetter=@newsLetter, KnowsArabic=@knowsArabic,";
-        query += "DisplayName=@displayName, EnglishName=@englishName, JoinYear=@joinYear, Address=@address, PostalCode=@postalCode,";
+        query += displayQuery;
+        query += "EnglishName=@englishName, JoinYear=@joinYear, Address=@address, PostalCode=@postalCode,";
         query += "workingWithCoor=@workingWithCoor, workingWithPat=@workingWithPat, howToRecruit=@howToRecruit, howKeepInTouch=@howKeepInTouch,";
         query += "newsLetterRemarks=@newsLetterRemarks, IgulLetova=@IgulLetova, lastModified =DATEADD(hour, 2, SYSDATETIME()) where cellphone=@cell";
         try
