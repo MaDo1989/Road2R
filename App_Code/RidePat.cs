@@ -394,8 +394,17 @@ public class RidePat
 
                 if (newDate != new DateTime() && checkDaylightSaving)
                 {
-                    bool DateDaylightSaving = Date.IsDaylightSavingTime();
-                    bool newDateDaylightSaving = newDate.IsDaylightSavingTime();
+
+
+                    DateTime IsraelLocalDate = System.TimeZoneInfo.ConvertTime(Date, TimeZoneInfo.FindSystemTimeZoneById("Israel Standard Time"));
+                    DateTime IsraelLocalNewDate = System.TimeZoneInfo.ConvertTime(newDate, TimeZoneInfo.FindSystemTimeZoneById("Israel Standard Time"));
+
+
+                    TimeZoneInfo IsraelTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Israel Standard Time");
+
+                    bool DateDaylightSaving = IsraelTimeZone.IsDaylightSavingTime(IsraelLocalDate);
+                    bool newDateDaylightSaving = IsraelTimeZone.IsDaylightSavingTime(IsraelLocalNewDate);
+
 
                     if (DateDaylightSaving != newDateDaylightSaving)
                     {
@@ -406,7 +415,8 @@ public class RidePat
                             cmdParams[3] = cmd.Parameters.AddWithValue("@date", newDate);
                             checkDaylightSaving = false;
                         }
-                        else if (DateDaylightSaving == true && newDateDaylightSaving == false)
+                        else
+                        if (DateDaylightSaving == false && newDateDaylightSaving == true)
                         {
                             newDate = newDate.AddHours(-1);
                             ridePat.Date = newDate;
