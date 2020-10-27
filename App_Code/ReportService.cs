@@ -42,6 +42,17 @@ public class ReportService
 
     }
 
+    public class VolunteerInfo
+    {
+        public string FirstNameH { get; set; }
+        public string LastNameH { get; set; }
+        public string VolunteerIdentity { get; set; }
+        public string Email { get; set; }
+        public string Address { get; set; }
+        public string CityCityName { get; set; }
+        public string JoinDate { get; set; }
+    }
+
     private DataTable getDriverByID(int driverID, DbService db)
     {
         string query = "select Id,DisplayName,CellPhone from Volunteer where Id = @ID";
@@ -130,13 +141,13 @@ AND RidePat.pickuptime >= '2020-1-01'
         DbService db = new DbService();
 
         string query =
- @"select DISTINCT DisplayName,  Area
-From(SELECT Volunteer.DisplayName, RPView.Area
-FROM RPView
-INNER JOIN Volunteer ON RPView.MainDriver = Volunteer.Id
-AND RPView.pickuptime <  @end_date
-AND RPView.pickuptime >=  @start_date) AS BUFF
-ORDER BY Area ASC";            ;
+             @"select DISTINCT DisplayName,  Area
+            From(SELECT Volunteer.DisplayName, RPView.Area
+            FROM RPView
+            INNER JOIN Volunteer ON RPView.MainDriver = Volunteer.Id
+            AND RPView.pickuptime <  @end_date
+            AND RPView.pickuptime >=  @start_date) AS BUFF
+            ORDER BY Area ASC";     
  
         SqlCommand cmd = new SqlCommand(query);
         cmd.CommandType = CommandType.Text;
@@ -158,6 +169,45 @@ ORDER BY Area ASC";            ;
 
         return result;
     }
+
+
+    //         // FirstNameH, LastNameH ,VolunteerIdentity , Email, Address, CityCityName, JoinDate 
+    internal List<VolunteerInfo> GetReportVolunteerList(string start_date)
+    {
+        DbService db = new DbService();
+
+        string query =
+             @"select FirstNameH, LastNameH ,VolunteerIdentity , Email, Address, CityCityName, JoinDate 
+            from Volunteer v
+            where IsActive='true'
+            ";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+
+        // cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        List<VolunteerInfo> result = new List<VolunteerInfo>();
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            VolunteerInfo obj = new VolunteerInfo();
+            obj.FirstNameH = dr["FirstNameH"].ToString();
+            obj.LastNameH = dr["LastNameH"].ToString();
+            obj.VolunteerIdentity = dr["VolunteerIdentity"].ToString();
+            obj.Email = dr["Email"].ToString();
+            obj.Address = dr["Address"].ToString();
+            obj.CityCityName = dr["CityCityName"].ToString();
+            obj.JoinDate = dr["JoinDate"].ToString();
+            result.Add(obj);
+        }
+
+        return result;
+    }
+
 
 
     internal List<VolunteerKM> GetReportVolunteersKM(string start_date, string end_date)
