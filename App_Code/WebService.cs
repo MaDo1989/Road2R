@@ -10,6 +10,7 @@ using log4net;
 using System.Web.UI;
 using System.Configuration;
 using System.Collections;
+using System.Activities.Statements;
 
 /// <summary>
 /// Summary description for WebService
@@ -31,8 +32,8 @@ public class WebService : System.Web.Services.WebService
         //Uncomment the following line if using designed components 
         //InitializeComponent(); 
     }
-    
-    
+
+
     //----------------------Road to Recovery-----------------------------------------------
     //[WebMethod(EnableSession = true)]
     //[ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -97,7 +98,7 @@ public class WebService : System.Web.Services.WebService
             ll.AddRange(l.getHospitalListForView(true));
             ll.AddRange(l.getBarrierListForView(true));
 
-            
+
             return j.Serialize(ll);
         }
         catch (Exception e)
@@ -196,7 +197,7 @@ public class WebService : System.Web.Services.WebService
             int res = rp.setRidePat(RidePat, func, isAnonymous, numberOfRides, repeatRideEvery);
 
             if (res > 0 && func == "delete")
-            { 
+            {
                 string message = "";
                 message = " נסיעה מספר " + RidePat.RidePatNum + " מ" + RidePat.Origin.Name + " ל" + RidePat.Destination.Name + " עם החולה " + RidePat.Pat.DisplayName + " בוטלה.";
                 LogEntry le = new LogEntry(DateTime.Now, "info", message, 1);
@@ -252,7 +253,7 @@ public class WebService : System.Web.Services.WebService
 
 
 
-    
+
     //This method is used for שבץ אותי
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -347,13 +348,13 @@ public class WebService : System.Web.Services.WebService
 
     }
     [WebMethod(EnableSession = true)]
-    public string getAnonymousPatientsListForArea(bool active, string origin, string dest,string area)
+    public string getAnonymousPatientsListForArea(bool active, string origin, string dest, string area)
     {
         try
         {
             HttpResponse response = GzipMe();
             Patient c = new Patient();
-            List<Patient> patientsList = c.getAnonymousPatientsListForLocations(active, origin, dest,area);
+            List<Patient> patientsList = c.getAnonymousPatientsListForLocations(active, origin, dest, area);
             return j.Serialize(patientsList);
         }
         catch (Exception ex)
@@ -692,6 +693,42 @@ public class WebService : System.Web.Services.WebService
     //    return j.Serialize(r);
     //}
 
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetRidePatViewByTimeFilter(int from, int until)
+    {
+        try
+        {
+            List<RidePat> lrp = new RidePat().GetRidePatViewByTimeFilter(from, until);
+            j.MaxJsonLength = Int32.MaxValue;
+            return j.Serialize(lrp);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetRidePatViewByTimeFilter", ex);
+            throw new Exception("שגיאה בייבוא נתונים לפי חתך זמנים");
+        }
+    }
+
+    [WebMethod(EnableSession = true)]
+   // [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public void ChangeArrayOF_RidePatStatuses (string newStatus, List<int> ridePatNums)
+    {
+        try
+        {
+            new RidePat().ChangeArrayOF_RidePatStatuses(newStatus, ridePatNums);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in ChangeArrayOF_RidePatStatuses", ex);
+            throw new Exception("שגיאה במתודת שינוי סטטוס של ריד-פט");
+        }
+    }
+
+
+
+
     //This method is used for שבץ אותי
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -861,7 +898,7 @@ public class WebService : System.Web.Services.WebService
         {
             Volunteer v = new Volunteer();
             v = v.getVolunteerByMobile(mobile);
-            
+
             return j.Serialize(v.DisplayName);
         }
         catch (Exception ex)
@@ -957,7 +994,7 @@ public class WebService : System.Web.Services.WebService
     {
         Volunteer v = new Volunteer();
         v = v.getVolunteerByMobile(mobile);
-        
+
 
         if (v.Id == 0)
             throw new Exception("user not found");
@@ -968,7 +1005,8 @@ public class WebService : System.Web.Services.WebService
             int res = rp.AssignRideToRidePat(ridePatId, v.Id, "primary");
             return j.Serialize(res);
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             throw new Exception("faile to assign");
         }
 
@@ -1363,9 +1401,9 @@ public class WebService : System.Web.Services.WebService
         return j.Serialize("ok");
     }
     [WebMethod(EnableSession = true)]
-    public string pushAssistant(int ridepat,string cellphone, string msg)
+    public string pushAssistant(int ridepat, string cellphone, string msg)
     {
-        
+
         Message m = new Message();
         m.pushFromAssistant(ridepat, cellphone, msg);
         //Email e = new Email();
@@ -1400,7 +1438,7 @@ public class WebService : System.Web.Services.WebService
         }
         HttpContext.Current.Session["userSession"] = uName;
 
-        
+
         if (userInDB)
         {
             writeToLog("Successful login");
@@ -1477,7 +1515,7 @@ public class WebService : System.Web.Services.WebService
         try
         {
             Volunteer v = new Volunteer();
-            coors =  v.getCoordinatorsList();
+            coors = v.getCoordinatorsList();
 
         }
         catch (Exception ex)
@@ -1588,7 +1626,7 @@ public class WebService : System.Web.Services.WebService
     public string isProductionDatabase()
     {
         Auxiliary aux = new Auxiliary();
-        bool ans = aux.isProductionDatabase();        
+        bool ans = aux.isProductionDatabase();
         return j.Serialize(ans);
     }
 
@@ -1644,7 +1682,8 @@ public class WebService : System.Web.Services.WebService
             if (ex.Message == "duplicate key")
             {
                 throw new Exception("duplicate key");
-            }else throw new Exception("שגיאה ביצירת מתנדב חדש");
+            }
+            else throw new Exception("שגיאה ביצירת מתנדב חדש");
         }
 
     }
@@ -1669,8 +1708,8 @@ public class WebService : System.Web.Services.WebService
                 names.Add(CoordinatorName);
             };
 
-            
-            
+
+
             return j.Serialize(names);
         }
         catch (Exception ex)
@@ -1704,7 +1743,7 @@ public class WebService : System.Web.Services.WebService
             else
             {
                 CoordinatorName = u.getUserNameByCellphone(CoordinatorMobile);
-            }                      
+            }
             names.Add(CoordinatorName);
             return j.Serialize(names);
         }
@@ -1738,7 +1777,7 @@ public class WebService : System.Web.Services.WebService
     public bool CheckRidePat(RidePat RidePatBack)
     {
         RidePat r = new RidePat();
-        
+
         return r.CheckRidePat(RidePatBack, false);
         //return j.Serialize(d);
     }
@@ -1758,7 +1797,7 @@ public class WebService : System.Web.Services.WebService
         try
         {
             RidePat rp = new RidePat();
-            
+
             return j.Serialize(rp.changeRidePatStatus(newStatus, ridePatNum));
         }
         catch (Exception ex)

@@ -54,41 +54,58 @@
     <script src="lib/includeHTML.js"></script>
     <script src="https://cdn.datatables.net/plug-ins/1.10.19/sorting/date-de.js"></script>
 
+    <!-- page style  -->
+    <link href="assets/css/viewRidePats.css" rel="stylesheet" />
+
     <script>
+
+        /*
+         =======================================================
+         ||       --- !!! TEMORARY & IMPORTANT NOTE !!! ---   ||
+         ||                                                   ||
+         ||         AS FOR 29.10.2020 WHEN RECOVER A RIDEPAT  ||
+         ||              DOES NOT RECOVER ITS OLD DRIVER !    ||
+         ||                                                   ||
+         ||       --- !!! TEMORARY & IMPORTANT NOTE !!! ---   ||
+         =======================================================
+         */
+        
         checkCookie();
+
         var isAnonymous = false;
         var destinationName = "";
         var originName = "";
         var driverName = "";
         var patientName = "";
-        var allRidesFromDB=[];
+
+        let timeFilteredArr = [];
+        let ridePatNums2MarkDeleted = [];
+        let ridePatNums2MarkRecovered = [];
+
+        
+
         $(document).ready(function () {
 
             includeHTML();
+
             $('[data-toggle="tooltip"]').tooltip();
+
             if (window.location.hostname.toString() == 'localhost' || window.location.pathname.indexOf('test') != -1) {
                 $("#na").css("background-color", "#ffde89");
             }
             if (window.location.href.indexOf('http://40.117.122.242/Road%20to%20Recovery/') != -1) {
                 window.location.href = "notAvailable.html";
             }
+
             var userName = GENERAL.USER.getUserDisplayName();
+
             $("#userName").html(userName);
-            if (localStorage.active == "undefined" || localStorage.active === undefined)
-                localStorage.active = true;
 
-            if (localStorage.today == "undefined" || localStorage.today===undefined)
-                localStorage.today = false;
+            $('#importDataBtn').on('click', ImportDataByTimeFilters);
 
-            if (localStorage.unassigned == "undefined" || localStorage.unassigned===undefined)
-                localStorage.unassigned = false;
+            $('#deleteFewRidePatsBtn').on('click', MarkAsRemoved_FewRidePats);
 
-            if (localStorage.myRidePats == "undefined" || localStorage.myRidePats===undefined)
-                localStorage.myRidePats = true;
-
-            if (localStorage.pastRidePats == "undefined" || localStorage.pastRidePats===undefined)
-                localStorage.pastRidePats = false;
-
+            $('#recoverFewRidePatsBtn').on('click', Recover_FewRidePats);
 
             jQuery.extend(jQuery.fn.dataTableExt.oSort, {
                 "de_datetime-asc": function (a, b) {
@@ -191,7 +208,7 @@
                     var z = ((x < y) ? -1 : ((x > y) ? 1 : 0));
                     return z;
                 },
-        
+
                 "de_date-desc": function (a, b) {
                     var x, y;
                     if (jQuery.trim(a) !== '') {
@@ -211,27 +228,50 @@
                     return z;
                 }
             });
-            //Create a DataTable from the Table
-           // t = $('#datatable-buttons').DataTable(
-             //   {
-               //     columnDefs: [
-                 //       { type: 'de_datetime', targets: 3 },
-                   // ]
-                //} ,
-                //{ "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
+
             getCoors();
-            refreshTable();
+            ImportDataByTimeFilters();
         });
 
-        function saveFilters() {
 
-            localStorage.active = $("#activeRidePats").prop('checked');
-            localStorage.today = $("#TodaysRidePats").prop('checked');
-            localStorage.unassigned = $("#UnassignedRidePats").prop('checked');
-            localStorage.myRidePats = $("#MyRidePats").prop('checked');
-            localStorage.pastRidePats = $("#PastRidePats").prop('checked');
-            refreshTable();
+        const ImportDataByTimeFilters = () => {
+            let from = $('#from').val();
+            let until = $('#until').val();
+
+            let timeRanges = {
+                from: from,
+                until: until
+            }
+
+            $('#wait').show();
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/GetRidePatViewByTimeFilter",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                data: JSON.stringify(timeRanges),
+                success: ImportDataByTimeFilters_SCB,
+                error: ImportDataByTimeFilters_ECB
+            });
+
         }
+
+        const ImportDataByTimeFilters_SCB = (data) => {
+            $('#wait').hide();
+            data = JSON.parse(data.d);
+            timeFilteredArr = data; // run over the exist and set new value to the entire page
+            console.log('ImportDataByTimeFilters_SCB timeFilteredArr → ', timeFilteredArr);
+            refreshTable();
+
+        }
+
+        const ImportDataByTimeFilters_ECB = (data) => {
+            $('#wait').hide();
+            alert('error in ImportDataByTimeFilters');
+            //console.log(data);
+
+        }
+
 
         function getCoors() {
             $.ajax({
@@ -245,6 +285,7 @@
                 error: getCoorsErrorCB
             });
         }
+
 
         function getCoorsSuccessCB(data) {
             var arr_coor = JSON.parse(data.d);
@@ -260,301 +301,623 @@
 
         }
 
+
         function getCoorsErrorCB(e) {
             alert("Error in getCoors: " + e.responseText);
         }
 
 
         function refreshTable() {
+            //this function doesnt changeing timeFilteredArr or fetching data from the back-end
             checkCookie();
-            allRidesFromDB = [];
 
-        
-            var active = JSON.parse(localStorage.active);
-            $("#activeRidePats").prop('checked', active);
-            var today = JSON.parse(localStorage.today);
-            $("#TodaysRidePats").prop('checked', today);
-            var unassigned = JSON.parse(localStorage.unassigned);
-            $("#UnassignedRidePats").prop('checked', unassigned);
-            var myRidePats = JSON.parse(localStorage.myRidePats);
-            $("#MyRidePats").prop('checked', myRidePats);
-            var pastRidePats = JSON.parse(localStorage.pastRidePats);
-            $("#pastRidePats").prop('checked', pastRidePats)
+            ridePatNums2MarkDeleted = [];
+            ridePatNums2MarkRecovered = [];
+            $('#HeadCheckBox').prop('checked', false);
+            $('#deleteFewRidePatsBtn').prop('disabled', true);
+            $('#recoverFewRidePatsBtn').prop('disabled', true);
 
-           // t.clear().draw();
+            let rides2Render = [];
 
-            var volunteerId = -2 // VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
-            $('#wait').show();
-            $.ajax({
-                dataType: "json",
-                url: "WebService.asmx/GetRidePatView",
-                contentType: "application/json; charset=utf-8",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("Content-Encoding", "gzip");
-                },
-                type: "POST",
-                data: JSON.stringify({ volunteerId: volunteerId,maxDays:-1 }),
-                success: function (data) {
-                    $('#wait').hide();
-                    var arr_rides = JSON.parse(data.d);
-                    console.log(arr_rides)
-                    GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
-                    
-                    for (i in arr_rides) {
-                        if (arr_rides[i].Pat.DisplayName.includes("אנונימי")) {
-                            arr_rides[i].Pat.DisplayName = "חולה";
-                        }
-                        //Change date format
-                        var temp = arr_rides[i].Date.substring(arr_rides[i].Date.indexOf("(") + 1);
-                        temp = temp.substring(0, temp.indexOf(")"));
-                        var date = new Date(parseInt(temp));
-
-                        if (arr_rides[i].Drivers.length != 0) {
-                            driverName = arr_rides[i].Drivers[0].DisplayName;
-                        }
-                        destinationName = arr_rides[i].Destination.Name;
-                        originName = arr_rides[i].Origin.Name;
-                        patientName = arr_rides[i].Pat.DisplayName;
-
-                        if (date.getDate() < 10) {
-                            day = "0" + date.getDate();
-                        } else day = date.getDate();
+            let showDeleted = $("#deletedRidePats").prop('checked');
+            let unassigned = $("#UnassignedRidePats").prop('checked');
+            let myRidePats = $("#MyRidePats").prop('checked');
+            let removeCandidates = $('#RemoveCandidates').prop('checked');
 
 
-                        if (date.getMonth() + 1 < 10) {
-                            month = "0" + (date.getMonth() + 1);
-                        } else month = date.getMonth() + 1;
+            GENERAL.RIDEPAT.setRidePatList(JSON.stringify(timeFilteredArr));
 
-                        if (date.getHours() < 10) {
-                            hours = "0" + date.getHours();
-                        } else hours = date.getHours();
+            for (i in timeFilteredArr) {
+                if (timeFilteredArr[i].Pat.DisplayName.includes("אנונימי")) {
+                    timeFilteredArr[i].Pat.DisplayName = "חולה";
+                }
+                //Change date format
+                var temp = timeFilteredArr[i].Date.substring(timeFilteredArr[i].Date.indexOf("(") + 1);
+                temp = temp.substring(0, temp.indexOf(")"));
+                var date = new Date(parseInt(temp));
 
-                        if (date.getMinutes() < 10) {
-                            minutes = "0" + date.getMinutes();
-                        } else minutes = date.getMinutes();
+                if (timeFilteredArr[i].Drivers.length != 0) {
+                    driverName = timeFilteredArr[i].Drivers[0].DisplayName;
+                }
+                destinationName = timeFilteredArr[i].Destination.Name;
+                originName = timeFilteredArr[i].Origin.Name;
+                patientName = timeFilteredArr[i].Pat.DisplayName;
+
+                if (date.getDate() < 10) {
+                    day = "0" + date.getDate();
+                } else day = date.getDate();
 
 
-                        date2 = day + "/" + month + "/" + date.getUTCFullYear() % 2000 + " " + hours + ":" + minutes;
+                if (date.getMonth() + 1 < 10) {
+                    month = "0" + (date.getMonth() + 1);
+                } else month = date.getMonth() + 1;
 
-                        if (date.getHours() == 22 && date.getMinutes() == 14) { //22:14 is the default time to show afternoon אחה''צ
-                            date2 = day + "/" + month + "/" + date.getUTCFullYear() % 2000;
-                            date2 += " אחה\"צ";
-                        }
-                        if (unassigned) {
-                            // $("#activeRidePats").prop('checked', false);
-                            if (arr_rides[i].Status != "ממתינה לשיבוץ") continue;
-                        }
+                if (date.getHours() < 10) {
+                    hours = "0" + date.getHours();
+                } else hours = date.getHours();
 
-                        if (active) {
-                            // $("#UnassignedRidePats").prop('checked',false);
-                            if (arr_rides[i].Status == "בוטלה" || arr_rides[i].Status == "הסתיימה") continue;
-                        }
+                if (date.getMinutes() < 10) {
+                    minutes = "0" + date.getMinutes();
+                } else minutes = date.getMinutes();
 
-                        if (today) {
-                            // Get the current date at midnight.
-                            var now = new Date();
-                            var todayAtMidn = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-                            // Set specificDate to a specified date at midnight.
-                            var specificDateTemp = new Date(new Date(parseInt(temp)));
-                            var specificDate = new Date(specificDateTemp.getFullYear(), specificDateTemp.getMonth(), specificDateTemp.getDate());
+                date2 = day + "/" + month + "/" + date.getUTCFullYear() % 2000 + " " + hours + ":" + minutes;
 
-                            // Compare the two dates by comparing the millisecond
-                            // representations.
-                            if (todayAtMidn.getTime() != specificDate.getTime()) continue;
-                        }
+                if (date.getHours() == 22 && date.getMinutes() == 14) { //22:14 is the default time to show afternoon אחה''צ
+                    date2 = day + "/" + month + "/" + date.getUTCFullYear() % 2000;
+                    date2 += " אחה\"צ";
+                }
+                if (unassigned) {
+                    // $("#activeRidePats").prop('checked', false);
+                    if (timeFilteredArr[i].Status != "ממתינה לשיבוץ") continue;
+                }
 
-                        if (myRidePats) {
-                            if (arr_rides[i].Coordinator.DisplayName != currentCoor) continue;
-                        }
+                if (showDeleted) {
 
-                        if (!pastRidePats)
-                        {
-                            if (new Date(parseInt(temp)) < new Date()) continue;
-                        }
+                    if (timeFilteredArr[i].Status !== "נמחקה") continue;
 
-                        var btnStr = "";
-                        var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' name='" + arr_rides[i].RidePatNum + "' title='צפייה'><i class='fa fa-wpforms'></i></button>";
-                        var editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' name='" + arr_rides[i].RidePatNum + "' title='עריכה'><i class='ti-pencil'></i></button>";
-                        var deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' name='" + arr_rides[i].RidePatNum + "' title='מחיקה'><i class='fa fa-remove' ></i></button>";
-                        //btnStr += " " + showBtn;
 
-                        if (arr_rides[i].Status == 'ממתינה לשיבוץ' && arr_rides[i].Coordinator.DisplayName == currentCoor || ((arr_rides[i].Pat.IsAnonymous == "True") && arr_rides[i].Coordinator.DisplayName == currentCoor)) btnStr += " " + editBtn;
-                        else btnStr += " " + showBtn;
-                        if(arr_rides[i].Coordinator.DisplayName == currentCoor){
-                            btnStr += " " + deleteBtn;
-                        }
-                        
-                       
-                        //if (arr_rides[i].Status == "הסתיימה") {
-                        //    var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-default btn-sm m-b-5' id='reactive' title='הסתיימה'><i class='fa fa-check' ></i></button>";
-                        //    btnStr += " " + reactiveBtn;
-                        //}
-                        var Ride = {};
-                        if (arr_rides[i].Status == "ממתינה לשיבוץ"){
-                            //t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, arr_rides[i].Status, arr_rides[i].Coordinator.DisplayName, btnStr]).draw(false);
-                            Ride = {
-                                PatDisplayName:arr_rides[i].Pat.DisplayName,
-                                OriginName:arr_rides[i].Origin.Name,
-                                DestinationName:arr_rides[i].Destination.Name,
-                                Date:date2,
-                                Drivers:arr_rides[i].Status,
-        
-                                Origin_Dest:arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
-                                Coordinator:arr_rides[i].Coordinator.DisplayName,
-                                Buttons:btnStr,
-                                IsAnonymous:''
-                            }  
-                        }
-                        else {
-                            for (j in arr_rides[i].Drivers) {
-                                if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName + " " + arr_rides[i].Drivers[j].CellPhone;
-                                else secondary = arr_rides[i].Drivers[j].DisplayName + " " + arr_rides[i].Drivers[j].CellPhone;
-                            }
-                            var drivers = "";
-                            if (arr_rides[i].Drivers.length == 1) {
-                                if (primary != undefined) //Only a primary driver is assigned
-                                    drivers = "ראשי: " + primary;
-                                else //only a secondary driver is assigned
-                                    drivers = "גיבוי בלבד: " + secondary;
-                            }
-                            else if (arr_rides[i].Drivers.length == 2) //Two drivers are assigned
-                                   drivers = "ראשי: " + primary + ",<br> " + "גיבוי: " + secondary;
-                            var buttons = btnStr;
-                            //t.row.add([arr_rides[i].Pat.DisplayName, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, date2, drivers, arr_rides[i].Coordinator.DisplayName,buttons,arr_rides[i].Pat.IsAnonymous]).draw(false);
-                            
-                            Ride = {
-                                PatDisplayName:arr_rides[i].Pat.DisplayName,
-                                OriginName:arr_rides[i].Origin.Name,
-                                DestinationName:arr_rides[i].Destination.Name,
-                                Date:date2,
-                                Drivers:drivers,
-                                Coordinator:arr_rides[i].Coordinator.DisplayName,
-        
-                                Origin_Dest:arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
-        
-                                Buttons:buttons,
-                                IsAnonymous:arr_rides[i].Pat.IsAnonymous
-                            }
-                        }
-        
-                        allRidesFromDB.push(Ride);
+
+
+                } else {
+                    if (timeFilteredArr[i].Status == "בוטלה" || timeFilteredArr[i].Status == "הסתיימה" || timeFilteredArr[i].Status == 'נמחקה') continue;
+                    //בוטלה and הסתיימה are from old times -- not sure if needed anymore
+
+                }
+
+
+                if (myRidePats) {
+                    if (timeFilteredArr[i].Coordinator.DisplayName != currentCoor) continue;
+                }
+
+
+                let checkBoxStr = timeFilteredArr[i].Coordinator.DisplayName === currentCoor ?
+                    '<input class="checkBoxes" type="checkbox" onchange=RowChecked(this) />' :
+                    '<input type="checkbox" disabled />';
+
+                if (removeCandidates) {
+                    /*
+                     removeCandidates will be a ridepat which answering all the followings:
+                     1. the logged int coordinator is the coordinator of the rp[i]
+                     2. status = ממתינה לשיבוץ
+                     3. anonymouse pat
+                     4. pass rp only
+                     */
+
+                    if (timeFilteredArr[i].Coordinator.DisplayName != currentCoor) continue;
+                    if (timeFilteredArr[i].Status !== "ממתינה לשיבוץ") continue;
+                    if (!timeFilteredArr[i].Pat.IsAnonymous) continue;
+                    ridePatDate = timeFilteredArr[i].Date;
+                    ridePatDate = parseInt(ridePatDate.substring(ridePatDate.indexOf("(") + 1, ridePatDate.indexOf(")")));
+                    if (ridePatDate > Date.now()) continue;
+                }
+
+
+                var btnStr = "";
+                if (!showDeleted) {
+
+                    var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' name='" + timeFilteredArr[i].RidePatNum + "' title='צפייה'><i class='fa fa-wpforms'></i></button>";
+                    var editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' name='" + timeFilteredArr[i].RidePatNum + "' title='עריכה'><i class='ti-pencil'></i></button>";
+                    var deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' name='" + timeFilteredArr[i].RidePatNum + "' title='מחיקה'><i class='fa fa-remove' ></i></button>";
+                    //btnStr += " " + showBtn;
+
+                    if (timeFilteredArr[i].Status == 'ממתינה לשיבוץ' && timeFilteredArr[i].Coordinator.DisplayName == currentCoor || ((timeFilteredArr[i].Pat.IsAnonymous == "True") && timeFilteredArr[i].Coordinator.DisplayName == currentCoor)) btnStr += " " + editBtn;
+                    else btnStr += " " + showBtn;
+                    if (timeFilteredArr[i].Coordinator.DisplayName == currentCoor) {
+                        btnStr += " " + deleteBtn;
                     }
-                    tbl = $('#datatable-buttons').DataTable({
-                        data: allRidesFromDB,
-                        "autoWidth": false,
-                        "destroy": true,
-                        dom: 'Bfrtip',
-                        buttons: [
-                            'excel'
-                        ],
-                       
-                        columns: [
-                            { data: "PatDisplayName" },
-                            { data: "OriginName" },
-                            { data: "DestinationName" },
-                            { data: "Date" },
-                            { data: "Drivers" },
-                            { data: "Origin_Dest" },
-                            { data: "Coordinator" },
-                            { data: "Buttons" },
-                            { data: "IsAnonymous" },
-                        ],
-                        columnDefs: [
-                            { type: 'de_datetime', "targets": 3 },
-                            {"targets": [ 8],"visible": false},
-                            { "targets": 5, className: 'text-left-strong' }
-                        ],
-                        "order": [[3, "asc"]]
-                       
+                } else {
+                    let recoverBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='recover' name='" + timeFilteredArr[i].RidePatNum + "' title='שחזור'><i class='ti-share-alt'></i></button>";
+                    btnStr = recoverBtn;
+                }
+
+
+
+                let ridePat = {};
+                if (timeFilteredArr[i].Status == "ממתינה לשיבוץ") {
+
+                    ridePat = {
+                        ridePatNum: timeFilteredArr[i].RidePatNum,
+                        checkBox: checkBoxStr,
+                        PatDisplayName: timeFilteredArr[i].Pat.DisplayName,
+                        OriginName: timeFilteredArr[i].Origin.Name,
+                        DestinationName: timeFilteredArr[i].Destination.Name,
+                        Date: date2,
+                        Drivers: timeFilteredArr[i].Status,
+
+                        Origin_Dest: timeFilteredArr[i].Origin.EnglishName + " - " + timeFilteredArr[i].Destination.EnglishName,
+                        Coordinator: timeFilteredArr[i].Coordinator.DisplayName,
+                        Buttons: btnStr,
+                        IsAnonymous: '',
+                        LastModified: timeFilteredArr[i].LastModified
+                    }
+                }
+                else {
+                    for (j in timeFilteredArr[i].Drivers) {
+                        if (timeFilteredArr[i].Drivers[j].DriverType == "Primary") var primary = timeFilteredArr[i].Drivers[j].DisplayName + " " + timeFilteredArr[i].Drivers[j].CellPhone;
+                        //  else secondary = timeFilteredArr[i].Drivers[j].DisplayName + " " + timeFilteredArr[i].Drivers[j].CellPhone;
+                    }
+                    var drivers = "";
+                    if (timeFilteredArr[i].Drivers.length == 1) {
+                        if (primary != undefined) //Only a primary driver is assigned
+                            drivers = "ראשי: " + primary;
+                        //else //only a secondary driver is assigned
+                        //    drivers = "גיבוי בלבד: " + secondary;
+                    }
+                    //else if (timeFilteredArr[i].Drivers.length == 2) //Two drivers are assigned
+                    //    drivers = "ראשי: " + primary + ",<br> " + "גיבוי: " + secondary;
+                    var buttons = btnStr;
+
+                    ridePat = {
+                        ridePatNum: timeFilteredArr[i].RidePatNum,
+                        checkBox: checkBoxStr,
+                        PatDisplayName: timeFilteredArr[i].Pat.DisplayName,
+                        OriginName: timeFilteredArr[i].Origin.Name,
+                        DestinationName: timeFilteredArr[i].Destination.Name,
+                        Date: date2,
+                        Drivers: drivers,
+                        Coordinator: timeFilteredArr[i].Coordinator.DisplayName,
+
+                        Origin_Dest: timeFilteredArr[i].Origin.EnglishName + " - " + timeFilteredArr[i].Destination.EnglishName,
+
+                        Buttons: buttons,
+                        IsAnonymous: timeFilteredArr[i].Pat.IsAnonymous,
+                        LastModified: timeFilteredArr[i].LastModified
+                    }
+                }
+
+                rides2Render.push(ridePat);
+            }
+
+            tbl = $('#datatable-buttons').DataTable({
+                data: rides2Render,
+                rowId: 'ridePatNum',
+                pageLength: 50,
+                autoWidth: false,
+                destroy: true,
+                dom: 'Bfrtip',
+                buttons: [
+                    'excel'
+                ],
+
+                columns: [
+                    //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
+                    { data: "checkBox" },                                    //0
+                    { data: "PatDisplayName" },                              //1
+                    { data: "OriginName" },                                  //2
+                    { data: "DestinationName" },                             //3
+                    { data: "Date" },                                        //4
+                    { data: "Drivers" },                                     //5
+                    { data: "Origin_Dest" },                                 //6
+                    { data: "Coordinator" },                                 //7
+                    { data: "Buttons" },                                     //8
+                    { data: "LastModified" },                                //9
+                ],
+                columnDefs: [
+                    { "targets": [0], "orderable": false },
+                    { "targets": [1], createdCell: (td) => { $(td).attr('id', 'PatDisplayName') } },
+                    { "targets": [2], createdCell: (td) => { $(td).attr('id', 'OriginName') } },
+                    { "targets": [3], createdCell: (td) => { $(td).attr('id', 'DestinationName') } },
+                    { "targets": [4], createdCell: (td) => { $(td).attr('id', 'Date') } },
+                    { "targets": [4], type: 'de_datetime' },
+                    { "targets": [6], className: 'text-left-strong' },
+                    { "targets": [9], visible: false },
+
+                    /*
+                    Toggle column: <a class="toggle-vis" data-column="0">Name</a>
+
+                     */
+                ],
+                "order": [[4, "desc"]] // sort by date
+
+            });
+
+            buttonsEvents();
+        }
+
+        const HeadCheckBoxChanged = () => {
+
+            if ($('#HeadCheckBox').prop('checked')) {
+                $('.checkBoxes').prop('checked', true);
+            } else {
+                $('.checkBoxes').prop('checked', false);
+            }
+            let checkBoxes = $('.checkBoxes');
+
+
+            for (var i = 0; i < checkBoxes.length; i++) {
+                RowChecked(checkBoxes[i]);
+            }
+
+        }
+
+        const MarkAsRemoved_FewRidePats = () => {
+
+            let txt2post = `האם אתם בטוחים?
+                                        האם למחוק את כל ${ridePatNums2MarkDeleted.length} ההסעות שנבחרו ברשימה המוצגת לפניך?
+                                        `;
+            swal({
+                title: "האם אתם בטוחים?",
+                text: txt2post,
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonClass: "btn-default",
+                confirmButtonText: "מחיקה",
+                cancelButtonText: "בטל",
+                closeOnConfirm: false,
+                closeOnCancel: false
+            }, function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        dataType: "json",
+                        url: "WebService.asmx/ChangeArrayOF_RidePatStatuses",
+                        contentType: "application/json; charset=utf-8",
+                        type: "POST",
+                        data: JSON.stringify({ newStatus: 'נמחקה', ridePatNums: ridePatNums2MarkDeleted }),
+                        success: function (data) {
+                            swal({
+                                title: "ההסעות סומנו כמחוקה 🗑️",
+                                timer: 1000,
+                                type: "success",
+                                showConfirmButton: false
+                            });
+                            //right after
+
+                            setTimeout(function () {
+                                ridePatNums2MarkDeleted = [];
+                                $('#deleteFewRidePatsBtn').prop('disabled', true)
+                                ImportDataByTimeFilters();
+                            }, 1001);//literally means go fetch new data from server side with the same time frame
+                        },
+                        error: function (err) { alert("Error in deleteRidePat:" + err.responseText); }
                     });
 
-                    //t.columns([3]).order('asc').draw();
-                    buttonsEvents();
-                },
-                error: function (err) {
-                    $('#wait').hide();
-                    alert("Error in GetRidePatView: " + err.responseText);
+                } else {
+                    swal("בוטל", "אף נסיעה לא נמחקה", "error");
+                }
+            });
+        }
+
+        const Recover_FewRidePats = () => {
+
+            let txt2post = `האם אתם בטוחים?
+                                        האם למחוק את כל ${ridePatNums2MarkRecovered.length} ההסעות שנבחרו ברשימה המוצגת לפניך?
+                                        `;
+            swal({
+                title: "האם אתם בטוחים?",
+                text: txt2post,
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonClass: "btn-default",
+                confirmButtonText: "שחזר",
+                cancelButtonText: "בטל",
+                closeOnConfirm: false,
+                closeOnCancel: false
+            }, function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        dataType: "json",
+                        url: "WebService.asmx/ChangeArrayOF_RidePatStatuses",
+                        contentType: "application/json; charset=utf-8",
+                        type: "POST",
+                        data: JSON.stringify({ newStatus: 'ממתינה לשיבוץ', ridePatNums: ridePatNums2MarkRecovered }),
+                        success: function (data) {
+                            swal({
+                                title: "ההסעות שוחזרו 🗑️",
+                                timer: 1000,
+                                type: "success",
+                                showConfirmButton: false
+                            });
+                            //right after
+
+                            setTimeout(function () {
+                                ridePatNums2MarkRecovered = [];
+                                $('#recoverFewRidePatsBtn').prop('disabled', true);
+                                ImportDataByTimeFilters();
+                            }, 1001);//literally means go fetch new data from server side with the same time frame
+                        },
+                        error: function (err) { alert("Error in Recover_FewRidePats:" + err.responseText); }
+                    });
+
+                } else {
+                    swal("בוטל", "אף נסיעה לא  שוחזרה", "error");
                 }
             });
 
         }
 
+        const RowChecked = (inputElement) => { // RowChecked is implemented in the input type checkbox trow the datatable logic ↑
+
+            // note that ===> tr.id is its ridepatnum
+
+
+            let td = inputElement.parentNode;
+            let tr = td.parentNode;
+            let showDeletedRidePatsCheckBox = $('#deletedRidePats').prop('checked');
+
+            if (!showDeletedRidePatsCheckBox) {
+
+                if (inputElement.checked) {
+                    tr.style.background = 'rgb(198,220,255)';
+                    const index2check = ridePatNums2MarkDeleted.indexOf(tr.id);
+                    if (index2check === -1) ridePatNums2MarkDeleted.push(tr.id);
+                } else {
+                    tr.style.background = '';
+                    const index2remvoe = ridePatNums2MarkDeleted.indexOf(tr.id);
+                    ridePatNums2MarkDeleted.splice(index2remvoe, 1);
+                }
+
+
+                if (ridePatNums2MarkDeleted.length > 0) {
+                    $('#deleteFewRidePatsBtn').prop('disabled', false);
+
+                }
+                else {
+                    $('#deleteFewRidePatsBtn').prop('disabled', true);
+                    $('#HeadCheckBox').prop('checked', false);
+                }
+
+            } else {
+
+
+                if (inputElement.checked) {
+                    tr.style.background = 'rgb(198,220,255)';
+                    const index2check = ridePatNums2MarkRecovered.indexOf(tr.id);
+                    if (index2check === -1) ridePatNums2MarkRecovered.push(tr.id);
+                } else {
+                    tr.style.background = '';
+                    const index2remvoe = ridePatNums2MarkRecovered.indexOf(tr.id);
+                    ridePatNums2MarkRecovered.splice(index2remvoe, 1);
+                }
+
+
+                if (ridePatNums2MarkRecovered.length > 0) {
+                    $('#recoverFewRidePatsBtn').prop('disabled', false);
+                }
+                else {
+                    $('#recoverFewRidePatsBtn').prop('disabled', true);
+                    $('#HeadCheckBox').prop('checked', false);
+                }
 
 
 
-        function buttonsEvents(){
+            }
+
+
+
+        }
+
+
+        function buttonsEvents() {
+
             $(".dataTables_empty").html("אין הסעות");
 
-                    $('#datatable-buttons tbody').on('click', '#edit', function () {
-                        //var data = t.row($(this).parents('tr')).data();
-                        arr_details = { RidePatNum: this.name, func: "edit" }; //attribute name=RidePatNum
-                        GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
-                        location.href = "ridePatForm.html";
-                    });
+            $('#datatable-buttons tbody').on('click', '#edit', function () {
+                //var data = t.row($(this).parents('tr')).data();
+                arr_details = { RidePatNum: this.name, func: "edit" }; //attribute name=RidePatNum
+                GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
+                location.href = "ridePatForm.html";
+            });
 
-                    $('#datatable-buttons tbody').on('click', '#show', function () {
-                        // var data = t.row($(this).parents('tr')).data();
-                        arr_details = { RidePatNum: this.name, func: "show" };//attribute name=RidePatNum
-                        GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
-                        location.href = "ridePatForm.html";
-                    });
+            $('#datatable-buttons tbody').on('click', '#show', function () {
+                // var data = t.row($(this).parents('tr')).data();
+                arr_details = { RidePatNum: this.name, func: "show" };//attribute name=RidePatNum
+                GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
+                location.href = "ridePatForm.html";
+            });
 
-                    $('#datatable-buttons tbody').on('click', '#remove', function () {
-                        arr_details = { RidePatNum: this.name, func: "show" };//attribute name=RidePatNum
-                        var data = tbl.row($(this).parents('tr')).data();
-                        if (data[7] == "True") {
-                            isAnonymous = true;
-                        }
-                        swal({
-                            title: "האם אתם בטוחים?",
-                            type: "warning",
-                            text: "מחיקת ההסעה של " + data.PatDisplayName + " מ" + data.OriginName + " ל" + data.DestinationName + ", בתאריך " + data.Date,
-                            showCancelButton: true,
-                            cancelButtonText: "בטל",
-                            confirmButtonClass: 'btn-warning',
-                            confirmButtonText: "מחיקה",
-                            closeOnConfirm: false
-                        }, function () {
-                            var RidePat = new Object();
-                            //try to add the name of the driver in this ride. 
+            $('#deletedRidePats').on('change', function () {
 
-                            RidePat.RidePatNum = arr_details.RidePatNum;
-                            var Pat = new Object();
-                            Pat.DisplayName = patientName;
-                            RidePat.Pat = Pat;
-                            var Destination = new Object();
-                            Destination.Name = destinationName;
-                            RidePat.Destination = Destination;
-                            var Origin = new Object();
-                            Origin.Name = originName;
-                            RidePat.Origin = Origin;
-                            deleteRidePat(RidePat, 'delete');
+                let lastmodifiedColumn = tbl.column('9');
+                let showDeletedColumn = $("#deletedRidePats").prop('checked');
 
-                        });
-                    });
-        }
-        function manipulateTable() {
-            table1 = document.getElementById("datatable-buttons");//$('#datatable-buttons');
-            tdarr = table1.getElementsByTagName("td");
-            for (var j = 0; j < tdarr.length; j++) {
-                //str = tdarr[j].innerHTML;
-                if (tdarr[j].innerHTML.indexOf("08:00") !== -1) {
-                    tdarr[j].innerHTML = "אחהצ";
+                if (showDeletedColumn) {
+                    $('#deleteFewRidePatsBtn').hide();
+                    $('#recoverFewRidePatsBtn').show();
+                    lastmodifiedColumn.visible(true);
+
+                } else {
+                    $('#deleteFewRidePatsBtn').show();
+                    $('#recoverFewRidePatsBtn').hide();
+                    lastmodifiedColumn.visible(false);
                 }
+
+
+
+            });
+
+            const RecoverRidePat = (btn) => {
+
+                let ridePat_Num = btn.name;
+                let td = btn.parentNode;
+                let tr = td.parentNode;
+
+                let patientName = tr.getElementsByTagName('td').PatDisplayName.innerHTML;
+                let origin = tr.getElementsByTagName('td').OriginName.innerHTML;
+                let destenation = tr.getElementsByTagName('td').DestinationName.innerHTML;
+                let date = tr.getElementsByTagName('td').Date.innerHTML;
+
+                let txt2post = `האם אתם בטוחים לשחזר את הנסיעה של : ${patientName}
+                                                                                            מ - ${origin} ל - ${destenation}
+                                                                                            בתאריך -  ${date}`;
+
+
+                swal({
+                    title: "האם לשחזר נסיעה?",
+                    text: txt2post,
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonClass: "btn-default",
+                    confirmButtonText: "שחזור",
+                    cancelButtonText: "ביטול",
+                    closeOnConfirm: false,
+                    closeOnCancel: false
+                }, function (isConfirm) {
+                    if (isConfirm) {
+                        $.ajax({
+                            dataType: "json",
+                            url: "WebService.asmx/changeRidePatStatus",
+                            contentType: "application/json; charset=utf-8",
+                            type: "POST",
+                            data: JSON.stringify({ newStatus: 'ממתינה לשיבוץ', ridePatNum: ridePat_Num }),
+                            success: function (data) {
+                                refreshTable();
+                                swal({
+                                    title: "ההסעה שוחזרה",
+                                    timer: 1000,
+                                    type: "success",
+                                    showConfirmButton: false
+                                });
+                                //right after
+                                setTimeout(function () { ImportDataByTimeFilters() }, 1001);//literally means go fetch new data from server side with the same time frame
+                            },
+                            error: function (err) { alert("Error in RecoverRidePat:" + err.responseText); }
+                        });
+
+                    } else {
+                        swal("בוטל", " הנסיעה לא שוחזרה", "error");
+                    }
+
+
+                });
             }
+
+            $('#datatable-buttons tbody').on('click', '#recover', function () { RecoverRidePat(this); });
+
+            const MarkRidePatAsRemoved = (thisBtn) => {
+
+                let ridePatNum = thisBtn.name;
+                let td = thisBtn.parentNode;
+                let tr = td.parentNode;
+
+                let patientName = tr.getElementsByTagName('td').PatDisplayName.innerHTML;
+                let origin = tr.getElementsByTagName('td').OriginName.innerHTML;
+                let destenation = tr.getElementsByTagName('td').DestinationName.innerHTML;
+                let date = tr.getElementsByTagName('td').Date.innerHTML;
+
+                let txt2post = `האם אתם בטוחים למחוק את הנסיעה של : ${patientName}
+                                                                                                                מ - ${origin} ל - ${destenation}
+                                                                                                                בתאריך -  ${date}`;
+                let deleteMe = [];
+                deleteMe.push(ridePatNum);
+
+                swal({
+                    title: "האם אתם בטוחים?",
+                    text: txt2post,
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonClass: "btn-default",
+                    confirmButtonText: "מחיקה",
+                    cancelButtonText: "בטל",
+                    closeOnConfirm: false,
+                    closeOnCancel: false
+                }, function (isConfirm) {
+                    if (isConfirm) {
+                        $.ajax({
+                            dataType: "json",
+                            url: "WebService.asmx/ChangeArrayOF_RidePatStatuses",
+                            contentType: "application/json; charset=utf-8",
+                            type: "POST",
+                            data: JSON.stringify({ newStatus: 'נמחקה', ridePatNums: deleteMe }),
+                            success: function (data) {
+                                refreshTable();
+                                swal({
+                                    title: "ההסעה סומנה כמחוקה 🗑️",
+                                    timer: 1000,
+                                    type: "success",
+                                    showConfirmButton: false
+                                });
+                                //right after
+                                setTimeout(function () { ImportDataByTimeFilters() }, 1001);//literally means go fetch new data from server side with the same time frame
+                            },
+                            error: function (err) { alert("Error in deleteRidePat:" + err.responseText); }
+                        });
+
+                    } else {
+                        swal("בוטל", "אף נסיעה לא נמחקה", "error");
+                    }
+                });
+
+            }
+
+            $('#datatable-buttons tbody').on('click', '#remove', function () {
+                //cant use arrow function here because the value of 'this' is differ between regular function and arrow function
+                //see more here → https://dmitripavlutin.com/differences-between-arrow-and-regular-functions/
+                MarkRidePatAsRemoved(this);
+            });
+
+
+
         }
+
+        //#region the old way to delete ridepat
+        /*
+
+        $('#datatable-buttons tbody').on('click', '#remove', function () {
+            arr_details = { RidePatNum: this.name, func: "show" };//attribute name=RidePatNum
+            var data = tbl.row($(this).parents('tr')).data();
+            if (data[7] == "True") {
+                isAnonymous = true;
+            }
+            swal({
+                title: "האם אתם בטוחים?",
+                type: "warning",
+                text: "מחיקת ההסעה של " + data.PatDisplayName + " מ" + data.OriginName + " ל" + data.DestinationName + ", בתאריך " + data.Date,
+                showCancelButton: true,
+                cancelButtonText: "בטל",
+                confirmButtonClass: 'btn-warning',
+                confirmButtonText: "מחיקה",
+                closeOnConfirm: false
+            }, function () {
+                var RidePat = new Object();
+                //try to add the name of the driver in this ride.
+
+                RidePat.RidePatNum = arr_details.RidePatNum;
+                var Pat = new Object();
+                Pat.DisplayName = patientName;
+                RidePat.Pat = Pat;
+                var Destination = new Object();
+                Destination.Name = destinationName;
+                RidePat.Destination = Destination;
+                var Origin = new Object();
+                Origin.Name = originName;
+                RidePat.Origin = Origin;
+                deleteRidePat(RidePat, 'delete');
+
+            });
+        });
+}
 
         function deleteRidePat(RidePat, func) {
             checkCookie();
-            var numberOfRides= 1;
-            var repeatRide= "";
+            var numberOfRides = 1;
+            var repeatRide = "";
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/setRidePat",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                data: JSON.stringify({ RidePat: RidePat, func: func, isAnonymous: isAnonymous,numberOfRides:numberOfRides,repeatRideEvery: repeatRide}),
+                data: JSON.stringify({ RidePat: RidePat, func: func, isAnonymous: isAnonymous, numberOfRides: numberOfRides, repeatRideEvery: repeatRide }),
                 success: function (data) {
                     swal({
                         title: "ההסעה נמחקה",
@@ -567,6 +930,22 @@
                 error: function (err) { alert("Error in deleteRidePat:" + err.responseText); }
             });
 
+        }
+
+         */
+        //#endregion
+
+
+
+        function manipulateTable() {
+            table1 = document.getElementById("datatable-buttons");//$('#datatable-buttons');
+            tdarr = table1.getElementsByTagName("td");
+            for (var j = 0; j < tdarr.length; j++) {
+                //str = tdarr[j].innerHTML;
+                if (tdarr[j].innerHTML.indexOf("08:00") !== -1) {
+                    tdarr[j].innerHTML = "אחהצ";
+                }
+            }
         }
 
         function newRidePatForm() {
@@ -629,9 +1008,23 @@
         <!-- ========== Right Sidebar Start ========== -->
         <div w3-include-html="menu.html"></div>
         <!-- Right Sidebar End -->
+
+        <div id="wait">
+            <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
+        </div>
+
         <!-- ============================================================== -->
         <!-- Start page Content here -->
         <!-- ============================================================== -->
+        <!-- ============================================================== -->
+        <!-- ============================================================== -->
+        <!-- new ridepat button -->
+        <!--<div class="col-sm-4 text-right ">
+        <button data-toggle="tooltip" title="جديد  New Ride" type="button" id="createCustomer" onclick="newRidePatForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>חדש</button>
+        </div>-->
+        <!-- ============================================================== -->
+
+
         <div class="content-page">
             <!-- Start content -->
             <div class="content">
@@ -641,10 +1034,6 @@
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="page-title-box">
-                                <ol class="breadcrumb pull-right">
-
-                                    <li class="active">כל ההסעות</li>
-                                </ol>
                                 <h4 class="page-title">
                                     כל ההסעות&nbsp&nbsp
                                     <i data-toggle="tooltip" title="All Rides جميع السفريات">
@@ -655,157 +1044,212 @@
                         </div>
                     </div>
 
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h2>
+                                שליפת המידע
+                            </h2>
 
+                            <h4>
+                                שינוי בטווח הזמן של הנתונים יביא מחדש את המידע מבסיס הנתונים
+                            </h4>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div id="timeFiltersDiv" class="col-sm-10">
+                            טווח זמנים:
+                            מ -
+                            <select id="from" class="input-sm">
+                                <option value=0>היום</option>
+                                <option selected value=7>שבוע אחורה</option>
+                                <option value=31>חודש אחורה</option>
+                                <option value=365>שנה אחורה</option>
+                            </select>
+                            עד -
+                            <select id="until" class="input-sm">
+                                <option value=0>היום</option>
+                                <option value=7>שבוע קדימה</option>
+                                <option value=31>חודש קדימה</option>
+                                <option value=365>שנה קדימה</option>
+                            </select>
+                        </div>
+                        <div id="importDataDiv" class="col-sm-2">
+                            <button data-toggle="tooltip"
+                                    title="جديد  importData"
+                                    type="button"
+                                    id="importDataBtn"
+                                    class="btn btn-success waves-effect w-md waves-light">
+                                <span class="glyphicon glyphicon-filter m-r-5"></span>
+                                ייבא נתונים
+                            </button>
+                        </div>
+                    </div>
+
+                    <hr id="nice-horizontal-line" />
 
                     <div class="row">
                         <div class="col-sm-12">
-                            <div class="card-box table-responsive">
-
-                                <!--<div class="row">
-                    <div class="col-sm-8">
-                        <h4 class="m-t-0 header-title"><b>טבלת הסעות חולים</b></h4>
-                        <p class="text-muted font-13 m-b-30">
-                            מבט כללי על ההסעות חולים שבוצעו, ניתן לצפות בפרטים נוספים בלחיצה על כפתור ההרחבה.
-                        </p>
-                    </div>
-                    <div class="col-sm-5 text-right">
-                        <button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button> צפייה
-                        <button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button> עריכה
-                        <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button> מחיקה
-                        <button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo'></i></button> שחזור
-                        <button type='button' class='btn btn-icon waves-effect waves-light btn-default btn-sm m-b-5' id='reactive' title='הסעה בוצעה'><i class='fa fa-check'></i></button> בוצעה
-                        <button type='button' class='btn btn-icon waves-effect waves-light btn-info btn-sm m-b-5' id='reactive' title='משובצת'><i class='fa fa-check'></i></button>משובצת
-                    </div>
-                </div>-->
-                                <div class="row">
-                                    <div class="col-sm-8 checkbox checkbox-primary text-left">
-                                        <input id="activeRidePats" type="checkbox" onchange="saveFilters()">
-                                        <label data-toggle="tooltip" data-placement="bottom" title="Active rides only  طلبات فعالة فقط" for="activeRidePats">
-                                            דרישות פעילות בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
-                                        </label>
-                                        <input id="TodaysRidePats" type="checkbox" onchange="saveFilters()">
-                                        <label data-toggle="tooltip" data-placement="top" title="Today's rides only  طلبات اليوم فقط" for="TodaysRidePats">
-                                            דרישות של היום בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
-                                        </label>
-                                        <input id="UnassignedRidePats" type="checkbox" onchange="saveFilters()">
-                                        <label data-toggle="tooltip" data-placement="bottom" title="Waiting for a driver only  طلبات تنتظر لتنسيق فقط" for="UnassignedRidePats">
-                                            דרישות ממתינות לשיבוץ בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
-                                        </label>
-                                        <input id="MyRidePats" type="checkbox" onchange="saveFilters()">
-                                        <label data-toggle="tooltip" data-placement="bottom" title="My rides only  الطلبات الخاصة بي" for="MyRidePats">
-                                            דרישות שלי בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
-                                        </label>
-                                        <input id="PastRidePats" type="checkbox" onchange="saveFilters()">
-                                        <label data-toggle="tooltip" data-placement="bottom" title="Show past rides عرض السفريات السابقة" for="PastRidePats">
-                                            הצג נסיעות עבר  &nbsp;&nbsp;|&nbsp;&nbsp;
-                                        </label>
-                                    </div>
-
-                                    <div class="col-sm-4 text-right ">
-                                        <button data-toggle="tooltip" title="جديد  New Ride" type="button" id="createCustomer" onclick="newRidePatForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>חדש</button>
-                                    </div>
-                                </div>
-                                <table id="datatable-buttons" class="table table-striped table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <!--<th>מספר הסעה</th>-->
-                                            <th title="المريض Patient">החולה</th>
-                                            <th title="نقطة الانطلاق Origin">מוצא</th>
-                                            <th title="نقطة الوصول Destination">יעד</th>
-                                            <th title="التاريخ والساعة Date & Time">תאריך ושעה</th>
-                                            <th title="السائقين بالفرة Drivers">נהגים בנסיעה</th>
-                                            <th title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
-                                            <th title="مركز Coordinator">רכז</th>
-                                            <th title="التاريخ Actions">פעולות</th>
-                                            <!--<th style="visibility:hidden;">האם אנונימי</th>-->
-                                        </tr>
-
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
-
-                                <div id="wait" style="display:none;width:69px;height:89px;position:absolute;top:50%;left:50%;padding:2px;">
-                                    <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
-                                </div>
-                            </div>
+                            <h2>
+                                סינון המידע
+                            </h2>
+                            <h4>
+                                שינוי בפרמטרים יגרום לסינון התצוגה (אך ללא שינוי במידע)
+                            </h4>
                         </div>
                     </div>
 
-                    
+                    <div class="row">
+                        <div class="col-sm-10">
+                            <div class="checkbox checkbox-primary">
+                                <input id="deletedRidePats" type="checkbox" onchange="refreshTable()">
+                                <label data-toggle="tooltip" data-placement="bottom" title="show deleted rides" for="deletedRidePats">
+                                    הצג נסיעות שנמחקו בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
+                                </label>
 
+                                <input id="UnassignedRidePats" type="checkbox" onchange="refreshTable()">
+                                <label data-toggle="tooltip" data-placement="bottom" title="Waiting for a driver only  طلبات تنتظر لتنسيق فقط" for="UnassignedRidePats">
+                                    דרישות ממתינות לשיבוץ בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
+                                </label>
+                                <input id="MyRidePats" type="checkbox" onchange="refreshTable()" checked>
+                                <label data-toggle="tooltip" data-placement="bottom" title="My rides only  الطلبات الخاصة بي" for="MyRidePats">
+                                    דרישות שלי בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
+                                </label>
+                                <input id="RemoveCandidates" type="checkbox" onchange="refreshTable()">
+                                <label data-toggle="tooltip" data-placement="bottom" title="Show Candidates to Delete" for="RemoveCandidates">
+                                    הצג הסעות מועמדות למחיקה  &nbsp;&nbsp;
+                                </label>
                             </div>
-                            <!-- end container -->
-
                         </div>
-                        <!-- end content -->
-                        <!-- FOOTER -->
-                        <footer class="footer text-right">
-                            2020 - 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה
 
-                        </footer>
-                        <!-- End FOOTER -->
+                        <div id="deleteRidesDiv" class="col-sm-2">
+                            <button data-toggle="tooltip"
+                                    title="Delete"
+                                    type="button"
+                                    id="deleteFewRidePatsBtn"
+                                    disabled
+                                    class="btn btn-success waves-effect w-md waves-light m-b-5">
+                                <span class="glyphicon glyphicon-trash m-r-5"></span>
+                                מחק הסעות
+                            </button>
+                            <!-- ====================================================== -->
+                            <!-- ================== ↑ changeable buttons ↓ ============ -->
+                            <!-- ====================================================== -->
+                            <button data-toggle="tooltip"
+                                    title="Recover"
+                                    type="button"
+                                    id="recoverFewRidePatsBtn"
+                                    disabled
+                                    style="display: none;"
+                                    class="btn btn-success waves-effect w-md waves-light m-b-5">
+                                <span class="glyphicon glyphicon-share-alt m-r-5"></span>
+                                שחזר הסעות
+                            </button>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="card-box table-responsive">
+
+                                    <table id="datatable-buttons" class="table table-striped table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <!--<th>מספר הסעה</th>-->
+                                                <th><input id="HeadCheckBox" type="checkbox" onchange="HeadCheckBoxChanged()" /></th>
+                                                <th title="المريض Patient">החולה</th>
+                                                <th title="نقطة الانطلاق Origin">מוצא</th>
+                                                <th title="نقطة الوصول Destination">יעד</th>
+                                                <th title="التاريخ والساعة Date & Time">תאריך ושעה</th>
+                                                <th title="السائقين بالفرة Drivers">נהג</th>
+                                                <th title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
+                                                <th title="مركز Coordinator">רכז</th>
+                                                <th title="التاريخ Actions">פעולות</th>
+                                                <th title="last modifies">עודכן לאחרונה</th>
+                                                <!--<th style="visibility:hidden;">האם אנונימי</th>-->
+                                            </tr>
+
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+                        </div>
 
                     </div>
-                    <!-- ============================================================== -->
-                    <!-- End page content here -->
-                    <!-- ============================================================== -->
+
+
+                    <!-- end container -->
 
                 </div>
-    <!-- END wrapper -->
+                <!-- end content -->
+                <!-- FOOTER -->
+                <footer class="footer text-right">
+                    2020 - 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה
+
+                </footer>
+                <!-- End FOOTER -->
+
+            </div>
+            <!-- ============================================================== -->
+            <!-- End page content here -->
+            <!-- ============================================================== -->
+
+        </div>
+        <!-- END wrapper -->
 
 
 
-    <script>
-        var resizefunc = [];
-    </script>
+        <script>
+            var resizefunc = [];
+        </script>
 
-    <!-- jQuery  -->
-    <script src="assets/js/bootstrap-rtl.min.js"></script>
-    <script src="assets/js/detect.js"></script>
-    <script src="assets/js/fastclick.js"></script>
-    <script src="assets/js/jquery.slimscroll.js"></script>
-    <script src="assets/js/jquery.blockUI.js"></script>
-    <script src="assets/js/waves.js"></script>
-    <script src="assets/js/wow.min.js"></script>
-    <script src="assets/js/jquery.nicescroll.js"></script>
-    <script src="assets/js/jquery.scrollTo.min.js"></script>
-    <script src="../plugins/switchery/switchery.min.js"></script>
+        <!-- jQuery  -->
+        <script src="assets/js/bootstrap-rtl.min.js"></script>
+        <script src="assets/js/detect.js"></script>
+        <script src="assets/js/fastclick.js"></script>
+        <script src="assets/js/jquery.slimscroll.js"></script>
+        <script src="assets/js/jquery.blockUI.js"></script>
+        <script src="assets/js/waves.js"></script>
+        <script src="assets/js/wow.min.js"></script>
+        <script src="assets/js/jquery.nicescroll.js"></script>
+        <script src="assets/js/jquery.scrollTo.min.js"></script>
+        <script src="../plugins/switchery/switchery.min.js"></script>
 
-    <!-- Datatables-->
-    <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
-    <script src="../plugins/datatables/dataTables.bootstrap.js"></script>
-    <script src="../plugins/datatables/dataTables.buttons.min.js"></script>
-    <script src="../plugins/datatables/buttons.bootstrap.min.js"></script>
-    <script src="../plugins/datatables/jszip.min.js"></script>
-    <script src="../plugins/datatables/pdfmake.min.js"></script>
-    <script src="../plugins/datatables/vfs_fonts.js"></script>
-    <script src="../plugins/datatables/buttons.html5.min.js"></script>
-    <script src="../plugins/datatables/buttons.print.min.js"></script>
-    <script src="../plugins/datatables/dataTables.fixedHeader.min.js"></script>
-    <script src="../plugins/datatables/dataTables.keyTable.min.js"></script>
-    <script src="../plugins/datatables/dataTables.responsive.min.js"></script>
-    <script src="../plugins/datatables/responsive.bootstrap.min.js"></script>
-    <script src="../plugins/datatables/dataTables.scroller.min.js"></script>
+        <!-- Datatables-->
+        <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
+        <script src="../plugins/datatables/dataTables.bootstrap.js"></script>
+        <script src="../plugins/datatables/dataTables.buttons.min.js"></script>
+        <script src="../plugins/datatables/buttons.bootstrap.min.js"></script>
+        <script src="../plugins/datatables/jszip.min.js"></script>
+        <script src="../plugins/datatables/pdfmake.min.js"></script>
+        <script src="../plugins/datatables/vfs_fonts.js"></script>
+        <script src="../plugins/datatables/buttons.html5.min.js"></script>
+        <script src="../plugins/datatables/buttons.print.min.js"></script>
+        <script src="../plugins/datatables/dataTables.fixedHeader.min.js"></script>
+        <script src="../plugins/datatables/dataTables.keyTable.min.js"></script>
+        <script src="../plugins/datatables/dataTables.responsive.min.js"></script>
+        <script src="../plugins/datatables/responsive.bootstrap.min.js"></script>
+        <script src="../plugins/datatables/dataTables.scroller.min.js"></script>
 
-    <!-- Datatable init js -->
-    <script src="assets/pages/datatables.init.js"></script>
+        <!-- Datatable init js -->
+        <script src="assets/pages/datatables.init.js"></script>
 
-    <!-- Sweet Alert js -->
-    <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
-    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+        <!-- Sweet Alert js -->
+        <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
+        <script src="assets/pages/jquery.sweet-alert.init.js"></script>
 
-    <script src="assets/js/jquery.core.js"></script>
-    <script src="assets/js/jquery.app.js"></script>
-    <!--<script src="cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
-    <script src="cdn.datatables.net/plug-ins/1.10.19/sorting/datetime-moment.js"></script>-->
-    <!--<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>-->
-    <!--<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
-    <script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
-    <script src="//cdn.datatables.net/plug-ins/1.10.12/sorting/datetime-moment.js"></script>-->
-    <script type="text/javascript">
+        <script src="assets/js/jquery.core.js"></script>
+        <script src="assets/js/jquery.app.js"></script>
+        <!--<script src="cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+        <script src="cdn.datatables.net/plug-ins/1.10.19/sorting/datetime-moment.js"></script>-->
+        <!--<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>-->
+        <!--<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+        <script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+        <script src="//cdn.datatables.net/plug-ins/1.10.12/sorting/datetime-moment.js"></script>-->
+        <script type="text/javascript">
 
-        TableManageButtons.init();
+            TableManageButtons.init();
 
-    </script>
+        </script>
 </body>
 </html>
