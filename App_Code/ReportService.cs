@@ -171,7 +171,16 @@ AND RidePat.pickuptime >= '2020-1-01'
     }
 
 
-    //         // FirstNameH, LastNameH ,VolunteerIdentity , Email, Address, CityCityName, JoinDate 
+    internal string pad_with_zeros(string id)
+    {
+        int pad = id.Length - 9;
+        if ( pad > 0)
+        {
+            return new string('0', pad) + id;
+        }
+        return id;
+    }
+
     internal List<VolunteerInfo> GetReportVolunteerList(string start_date)
     {
         DbService db = new DbService();
@@ -197,11 +206,19 @@ AND RidePat.pickuptime >= '2020-1-01'
             VolunteerInfo obj = new VolunteerInfo();
             obj.FirstNameH = dr["FirstNameH"].ToString();
             obj.LastNameH = dr["LastNameH"].ToString();
-            obj.VolunteerIdentity = dr["VolunteerIdentity"].ToString();
+            string id = dr["VolunteerIdentity"].ToString();
+            obj.VolunteerIdentity = pad_with_zeros(id);
             obj.Email = dr["Email"].ToString();
             obj.Address = dr["Address"].ToString();
             obj.CityCityName = dr["CityCityName"].ToString();
-            obj.JoinDate = dr["JoinDate"].ToString();
+            if ( dr.IsNull("JoinDate") )
+            {
+                obj.JoinDate = DateTime.Now.ToString("dd/MM/yyyy");
+            } 
+            else
+            {
+                obj.JoinDate = ((DateTime)dr["JoinDate"]).ToString("dd/MM/yyyy");
+            }
             result.Add(obj);
         }
 
