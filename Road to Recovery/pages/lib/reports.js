@@ -1,5 +1,12 @@
 ﻿// Purpose: JS code for the reports UI
 
+
+// 31-Oct-20:  IMplement code after populating template_DATE_LATER_THAN, so that if radio group
+// is checked, we respect it and get all volunteers.
+// Set default date to 1/1/2020 
+
+
+
 // 020Oct : Shlomit Meler bug.
 /* 
  * This is teh code that returns empty results:
@@ -228,8 +235,14 @@ var K_fields_map = {
         {
             id: "rp_amuta_vls_list__year",
             type: "YEAR",
-            template: 'div[name="template_YEAR"]',
+            template: 'div[name="template_DATE_LATER_THAN"]',
             post_clone: rp_amuta_vls_list_field_year_post_clone
+        },
+        {
+            id: "rp_amuta_vls_list__all",
+            type: "YEAR",
+            template: 'div[name="template_ALL_VOLUNTEERS"]',
+            post_clone: rp_vl_ride_year__field_year_post_clone
         }
     ]
 }
@@ -267,6 +280,12 @@ function clone_template(template, parent_id) {
     var select = result.find("select");
     select.prop("id", select.attr("template_id"));
 
+    // if has "template_name", assign it to its name
+    var select = result.find("input[type=radio]");
+    select.prop("name", select.attr("template_name"));
+
+
+     
     result.appendTo("#" + parent_id);
     result.removeClass("report_template");
     return result;
