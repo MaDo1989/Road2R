@@ -254,6 +254,7 @@
                     arr_rides = JSON.parse(data.d);
                     for (i in arr_rides) {
 
+                        if (arr_rides[i].Status === 'נמחקה') continue; 
                         //Change date format
                         var temp = arr_rides[i].Date.substring(arr_rides[i].Date.indexOf("(") + 1);
                         dateInt = temp.substring(0, temp.indexOf(")"));
