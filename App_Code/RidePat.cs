@@ -1809,18 +1809,32 @@ public class RidePat
         DbService dbs = new DbService();
         Message msg = new Message();
         Volunteer driver2inform = new Volunteer();
+        LogEntry log;
         string query = "";
 
+        string logMsg = "נסיעה מספר ";
         try
         {
             for (int i = 0; i < ridePatNums.Count; i++)
             {
+                logMsg += ridePatNums[i] + " ";
                 query = "exec SpRidePat_UpdateStatus @newStatus=N'" + new_status + "',@ridePatNum=" + ridePatNums[i];
                 SqlDataReader sdr = dbs.GetDataReader(query);
-                if (sdr.Read())
-                {   //Update drivers:
+                
+                if (sdr.Read())         //if the query returns a value → then there is a driver to inform
+                {   //Update driver:
                     driver2inform.Id = Convert.ToInt32(sdr["MainDriver"]);
+                    driver2inform.DisplayName = Convert.ToString(sdr["DisplayName"]);
+
                     msg.coordinatorCanceledRide(ridePatNums[i], driver2inform);
+                    logMsg += "עם הנהג " + driver2inform.DisplayName + "שינתה סטטוס ל " + new_status;
+                    log = new LogEntry(DateTime.Now, "שינוי סטטוס", logMsg, 2, ridePatNums[i], false);
+
+                }
+                else
+                {
+                    logMsg += "ללא נהג שינתה סטטוס ל" + new_status;
+                    log = new LogEntry(DateTime.Now, "שינוי סטטוס", logMsg, 2, ridePatNums[i], false);
                 }
                 dbs.CloseConnection();
             }
