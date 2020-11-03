@@ -102,14 +102,14 @@ public class ReportsWebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetReportVolunteerList(string start_date)
+    public string GetReportVolunteerList(string start_date, string config)
     {
         try
         {
             HttpResponse response = GzipMe();
 
             ReportService report = new ReportService();
-            List<ReportService.VolunteerInfo> r = report.GetReportVolunteerList(start_date);
+            List<ReportService.VolunteerInfo> r = report.GetReportVolunteerList(start_date, config);
             j.MaxJsonLength = Int32.MaxValue;
             return j.Serialize(r);
         }

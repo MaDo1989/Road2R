@@ -448,7 +448,7 @@
                     <div class="col-sm-12">
                         <div class="row report_template" name="template_VOLUNTEER">
                             <div class="card-box">
-                                <div class="row" id="flashDiv">
+                                <div class="row">
 
                                     <div class="col-sm-12">
                                         <div class="form-group">
@@ -466,7 +466,7 @@
                         </div>
                         <div class="row report_template" name="template_MONTH">
                             <div class="card-box">
-                                <div class="row" id="flashDiv">
+                                <div class="row">
 
                                     <div class="col-sm-12">
                                         <div class="form-group">
@@ -484,7 +484,7 @@
                         </div>
                         <div class="row report_template" name="template_WEEK">
                             <div class="card-box">
-                                <div class="row" id="flashDiv">
+                                <div class="row">
 
                                     <div class="col-sm-12">
                                         <div class="form-group">
@@ -500,10 +500,10 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row report_template" name="template_DATE_LATER_THAN">
+                        <div class="row report_template" name="template_VOLUNTEER_LIST_RADIO">
                             <div class="card-box">
-                                <div class="row" id="flashDiv">
-                                    <div class="col-sm-1"><input type="radio" template_name="radio" checked /></div>
+                                <div class="row" >
+                                    <div class="col-sm-1"><input type="radio" template_name="radio" template_id="radio_start_date" style="margin-top: 10px" checked /></div>
                                     <div class="col-sm-11">
                                         <div class="form-group">
                                             <label class="col-sm-4" style="padding: 0.5em 0px;">הצטרפות אחרי </label>
@@ -511,28 +511,20 @@
                                                 <input type="date" template_id="select_date_later" placeholder="..." class="form-control">
                                             </div>
                                         </div>
-
                                     </div>
-
                                 </div>
-                            </div>
-                        </div>
-                        <div class="row report_template" name="template_ALL_VOLUNTEERS">
-                            <div class="card-box">
-                                <div class="row" id="flashDiv">
-                                    <div class="col-sm-1"><input type="radio" template_name="radio" /></div>
+                                <div class="row">
+                                    <div class="col-sm-1"><input type="radio" template_name="radio" template_id="radio_all" style="margin-top: 10px" /></div>
                                     <div class="col-sm-10">
-                                            <label style="padding: 0.5em 0px;"> כל המתנדבים </label>
-                                        </div>
-
+                                        <label style="padding: 0.5em 0px;"> כל המתנדבים </label>
                                     </div>
-
                                 </div>
+
                             </div>
                         </div>
                         <div class="row report_template" name="template_PATIENT">
                             <div class="card-box">
-                                <div class="row" id="flashDiv">
+                                <div class="row">
 
                                     <div class="col-sm-12">
                                         <div class="form-group">
@@ -550,8 +542,7 @@
                         </div>
                         <div class="row report_template" name="template_YEAR">
                             <div class="card-box">
-                                <div class="row" id="flashDiv">
-
+                                <div class="row">
                                     <div class="col-sm-12">
                                         <div class="form-group">
                                             <label class="col-sm-2" style="padding: 0.5em 0px;">שנה</label>

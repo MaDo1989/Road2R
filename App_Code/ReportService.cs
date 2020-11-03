@@ -181,21 +181,28 @@ AND RidePat.pickuptime >= '2020-1-01'
         return id;
     }
 
-    internal List<VolunteerInfo> GetReportVolunteerList(string start_date)
+    internal List<VolunteerInfo> GetReportVolunteerList(string start_date, string config)
     {
         DbService db = new DbService();
+        SqlCommand cmd;
+        if (config.Equals("start_date"))
+        {
+            string query = @"select FirstNameH, LastNameH ,VolunteerIdentity , Email, Address, CityCityName, JoinDate 
+                from Volunteer
+                where IsActive='true' 
+                and JoinDate >= @start_date";
+            cmd = new SqlCommand(query);
+            cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        } 
+        else
+        {
+            string query = @"select FirstNameH, LastNameH ,VolunteerIdentity , Email, Address, CityCityName, JoinDate 
+                from Volunteer
+                where IsActive='true' ";
+            cmd = new SqlCommand(query);
+        }
 
-        string query =
-             @"select FirstNameH, LastNameH ,VolunteerIdentity , Email, Address, CityCityName, JoinDate 
-            from Volunteer v
-            where IsActive='true'
-            ";
-
-        SqlCommand cmd = new SqlCommand(query);
         cmd.CommandType = CommandType.Text;
-
-        // cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
-
         DataSet ds = db.GetDataSetBySqlCommand(cmd);
         DataTable dt = ds.Tables[0];
 

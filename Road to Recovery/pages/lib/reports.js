@@ -1,7 +1,7 @@
 ﻿// Purpose: JS code for the reports UI
 
 
-// 31-Oct-20:  IMplement code after populating template_DATE_LATER_THAN, so that if radio group
+// 31-Oct-20:  Implement code after populating template_DATE_LATER_THAN, so that if radio group
 // is checked, we respect it and get all volunteers.
 // Set default date to 1/1/2020 
 
@@ -233,16 +233,10 @@ var K_fields_map = {
     ],
     "rp_amuta_vls_list": [
         {
-            id: "rp_amuta_vls_list__year",
+            id: "rp_amuta_vls_list__radio",
             type: "YEAR",
-            template: 'div[name="template_DATE_LATER_THAN"]',
-            post_clone: rp_amuta_vls_list_field_year_post_clone
-        },
-        {
-            id: "rp_amuta_vls_list__all",
-            type: "YEAR",
-            template: 'div[name="template_ALL_VOLUNTEERS"]',
-            post_clone: rp_vl_ride_year__field_year_post_clone
+            template: 'div[name="template_VOLUNTEER_LIST_RADIO"]',
+            post_clone: rp_amuta_vls_list_field_radio_post_clone
         }
     ]
 }
@@ -274,9 +268,15 @@ function rp_get_fields(report_type) {
 function clone_template(template, parent_id) {
     var result = $(template).clone().prop("id", parent_id + "_field");
     result.removeAttr("name");
+
     // assign unique id to the input element
     var input = result.find("input");
-    input.prop("id", input.attr("template_id"));
+    input.each(function () {
+        var new_id = $(this).attr("template_id");
+        if (new_id) {
+            $(this).prop("id", new_id);
+        }
+    })
     var select = result.find("select");
     select.prop("id", select.attr("template_id"));
 
@@ -391,10 +391,13 @@ function rp_amuta_vls_per_km_field_year_post_clone(id) {
     rp_amuta_vls_km__refresh_preview();
 }
 
-function rp_amuta_vls_list_field_year_post_clone(id) {
+function rp_amuta_vls_list_field_radio_post_clone(id) {
     var today = new Date();
-    $('#select_year').val(today.getFullYear());
-    $("#select_year").change(rp_amuta_vls_list__refresh_preview);
+    $('#select_date_later').val("2020-01-01");
+    $("#select_date_later").change(rp_amuta_vls_list__refresh_preview);
+
+    $("#radio_start_date").change(rp_amuta_vls_list__refresh_preview);
+    $("#radio_all").change(rp_amuta_vls_list__refresh_preview);
 
     rp_amuta_vls_list__refresh_preview();
 }
@@ -600,11 +603,13 @@ function rp_amuta_vls_km__refresh_preview() {
 }   
 
 function rp_amuta_vls_list__refresh_preview() {
-    var selected_date = Date.parse($("#select_year").val());
-    var m = moment(selected_date);
-    var start_week_date = m.startOf('year').format("YYYY-MM-DD");
+    var selected_date = $('#select_date_later').val();
+    var config = "start_date";
+    if ($("#radio_all").is(":checked")) {
+        config = "all";
+    }
 
-    refresh_amuta_vls_list_Table(start_week_date);
+    refresh_amuta_vls_list_Table(selected_date, config);
 }   
 
 
@@ -741,11 +746,12 @@ function refresh_amuta_vls_km_Table(start_date, end_date) {
 
 
 // 'start_date' :  a date formatted as YYYY-MM-DD
-function refresh_amuta_vls_list_Table(start_date, end_date) {
+function refresh_amuta_vls_list_Table(start_date, config) {
     hide_all_tables();
     $('#wait').show();
     var query_object = {
-        start_date: start_date
+        start_date: start_date,
+        config: config
     };
 
     $.ajax({
@@ -1011,6 +1017,7 @@ function hide_all_tables() {
     $('#div_table_amuta_vls_week').hide();
     $('#div_table_amuta_vls_per_pat').hide();
     $('#div_table_amuta_vls_km').hide();
+    $('#div_table_amuta_vls_list').hide();
  }
 
 
