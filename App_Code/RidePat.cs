@@ -679,7 +679,6 @@ public class RidePat
 
     public RidePat CheckRidePat_V2(RidePat ridePat, bool isAnonymous)
     {
-        //yogev - UNDER CONSTRUCTION !!!!
         string[] date = ridePat.Date.ToString().Split(' ');
         DateTime date1 = Convert.ToDateTime(date[0]);
         if (!isAnonymous)
