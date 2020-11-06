@@ -561,7 +561,63 @@
                         success: function (data) {
                             //SaveAddresses(0, numberOfRecords, customerID);
                             console.log("num: " + data.d);
-                            if (data.d !== 1) {
+
+                            if (data.d === 1) {
+                                //there is such a drive and status is not נמחקה
+
+                                data.d = data.d.toString();
+                                var temp = data.d.replace(/(?!^)(\d{2})(?=(?:\d{2})*$)/g, '/$1');
+                                //var dateToShow = data.d.replace(;
+
+                                swal(
+                                    "خطأ\nשגיאה",
+                                    "קיימת כבר הסעה בתאריך " + date + " עם אותו החולה ואותן נקודות האיסוף\nيوجد سفرية بالتاريخ (التاريخ) مع نفس المريض ونفس نقطة الالتقاء",
+                                    "warning"
+                                );
+
+                            } else if (data.d < 0 ) { //there is such a drive and status = נמחקה
+
+                                let rideNumber = data.d * -1; //retriving the rideNumber back to positive number
+                                rideNumberForNo = rideNumber;
+                                let returnDriveExist = false;
+                                tmpOrigin = Origin;
+                                Origin = Destination;
+                                Destination = tmpOrigin;
+                                RidePatBack = {
+                                    Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Remark: Remark, Escorts: Escorts, Date: date, OnlyEscort: OnlyEscort
+                                }
+                                $.ajax({
+                                    dataType: "json",
+                                    url: "WebService.asmx/CheckRidePat",
+                                    contentType: "application/json; charset=utf-8",
+                                    type: "POST",
+                                    async: false,
+                                    data: JSON.stringify({ RidePatBack }),
+                                    success: function (data) {
+
+                                        isDriver = ($('#driver').val() == "");
+
+                                        returnDriveExist = JSON.parse(data.d);
+                                        console.log(returnDriveExist)
+                                        var DestIsHospital = hospitals.includes(request.RidePat.Destination.Name);
+
+                                        if (DestIsHospital && !returnDriveExist && isDriver) {
+                                            $("#Modal").modal();
+
+                                        } else {
+                                            swal({
+                                                title: "הנסיעה שוחזרה בהצלחה / تمت استعادة الرحلة بنجاح",
+                                                type: "success",
+                                                timer: 1000,
+                                                showConfirmButton: false
+                                            });
+                                            addDriver(rideNumber);
+                                        }
+                                    },
+                                    error: function (err) { alert("Error in CheckRidePat: " + err.responseText); }
+                                });
+                            }
+                            else {
                                 var rideNumber = data.d;
                                 rideNumberForNo = rideNumber;
                                 //$('#Modal').modal('show');
@@ -694,23 +750,8 @@
                                 //    //send messege to coordinator from assistant on new ridepat creation.
                                 //    sendMessegeFromAssistant(data.d, pushMsg);
                                 //}
-                            }
-                            else {
-                                data.d = data.d.toString();
-                                var temp = data.d.replace(/(?!^)(\d{2})(?=(?:\d{2})*$)/g, '/$1');
-                                //var dateToShow = data.d.replace(;
-
-                                swal(
-                                    "خطأ\nשגיאה",
-                                    "קיימת כבר הסעה בתאריך " + date + " עם אותו החולה ואותן נקודות האיסוף\nيوجد سفرية بالتاريخ (التاريخ) مع نفس المريض ونفس نقطة الالتقاء",
-                                    "warning"
-                                );
 
                             }
-
-
-
-
 
                         },
                         error: function (err) {

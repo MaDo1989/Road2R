@@ -381,10 +381,30 @@ public class RidePat
             DateTime newDate = new DateTime();
             for (int i = 0; i < numberOfRides; i++)
             {
+                RidePat ridePatView = CheckRidePat_V2(ridePat, isAnonymous);
+                
+                /* YOGEV - REMOVED IT:
                 if (CheckRidePat(ridePat, isAnonymous))
                 {
                     return 1;
                 }
+                */
+
+                if (ridePatView.RidePatNum != 0 && ridePatView.Status != "נמחקה") 
+                {
+                    return 1; // there is an issue - don't create new drive 
+                }
+                else if (ridePatView.Status == "נמחקה")
+                {
+                    // recover the ridepat 
+                    changeRidePatStatus("ממתינה לשיבוץ", ridePatView.ridePatNum.ToString());
+
+                    //multipling in -1 = case ==>  נסיעה שוחזרה
+                    return -1 * ridePatView.ridePatNum;
+                }
+
+
+
                 cmdParams[6] = cmd.Parameters.AddWithValue("@coordinator", Coordinator.DisplayName);
                 User u = new User();
                 string CoordinatorID = u.getIdByUserName(Coordinator.DisplayName);
@@ -657,6 +677,36 @@ public class RidePat
     //    Status = _status;
     //}
 
+    public RidePat CheckRidePat_V2(RidePat ridePat, bool isAnonymous)
+    {
+        //yogev - UNDER CONSTRUCTION !!!!
+        string[] date = ridePat.Date.ToString().Split(' ');
+        DateTime date1 = Convert.ToDateTime(date[0]);
+        if (!isAnonymous)
+        {
+            string origin = ridePat.Origin.Name.Replace("'", "''");
+            string dest = ridePat.Destination.Name.Replace("'", "''");
+            string patName = ridePat.Pat.DisplayName.Replace("'", "''");
+
+            string query = "select * from RPView where Origin=N'" + origin + "' and Destination=N'" + dest + "' and cast(PickupTime as date)='" + date1.ToString("yyyy-MM-dd") + "' and DisplayName=N'" + patName + "'";
+            DbService db = new DbService();
+            DataSet ds = db.GetDataSetByQuery(query);
+            if (ds.Tables[0].Rows.Count == 0)
+            {
+                return new RidePat();
+            }
+            DataRow dr = ds.Tables[0].Rows[0];
+
+            RidePat rp2return = new RidePat();
+
+            rp2return.RidePatNum = Convert.ToInt32(dr["RidePatNum"]);
+            rp2return.Status = Convert.ToString(dr["Status"]);
+            return rp2return;
+        }
+        else return new RidePat();
+    }
+
+    /*Yogev - there is no more need in this method
     public bool CheckRidePat(RidePat ridePat, bool isAnonymous)
     {
         string[] date = ridePat.Date.ToString().Split(' ');
@@ -679,6 +729,7 @@ public class RidePat
         else return false;
     }
 
+     */
     public RidePat GetRidePat(int ridePatNum)
     {
         Location tmp = new Location();
@@ -1820,7 +1871,7 @@ public class RidePat
                 logMsg += ridePatNums[i] + " ";
                 query = "exec SpRidePat_UpdateStatus @newStatus=N'" + new_status + "',@ridePatNum=" + ridePatNums[i];
                 SqlDataReader sdr = dbs.GetDataReader(query);
-                
+
                 if (sdr.Read())         //if the query returns a value → then there is a driver to inform
                 {   //Update driver:
                     driver2inform.Id = Convert.ToInt32(sdr["MainDriver"]);

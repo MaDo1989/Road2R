@@ -712,8 +712,8 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
-   // [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public void ChangeArrayOF_RidePatStatuses (string newStatus, List<int> ridePatNums)
+    // [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public void ChangeArrayOF_RidePatStatuses(string newStatus, List<int> ridePatNums)
     {
         try
         {
@@ -1776,10 +1776,24 @@ public class WebService : System.Web.Services.WebService
     [WebMethod(EnableSession = true)]
     public bool CheckRidePat(RidePat RidePatBack)
     {
-        RidePat r = new RidePat();
+        /*OLD VERSION*/
 
-        return r.CheckRidePat(RidePatBack, false);
-        //return j.Serialize(d);
+        //RidePat r = new RidePat();
+
+        //return r.CheckRidePat(RidePatBack, false);
+        ////return j.Serialize(d);
+
+        /*NEW VERSION 06/11/2020 YOGEV*/
+        RidePat ridePatView = new RidePat().CheckRidePat_V2(RidePatBack, false);
+        if (ridePatView.RidePatNum == 0)
+        {
+            return false;                            // case there is no return drive as such at all
+        }else if (ridePatView.Status == "נמחקה")
+        {
+            return false;                           // case there is no return drive (there is one which MARKED deleted)
+        }
+        return true;                                // case there is return drive
+
     }
 
     [WebMethod(EnableSession = true)]
