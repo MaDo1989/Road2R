@@ -415,7 +415,6 @@
 
                     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
                     for (i in arr_rides) {
-                        if (arr_rides[i].Status === 'נמחקה') continue; // ← Yogev add this in order to map out rides that marked as deleted
                         if (arr_rides[i].Coordinator.DisplayName != currentCoor) continue; //let the function run only for logged-in coordinator
 
                         //Change date format
