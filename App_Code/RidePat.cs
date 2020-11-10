@@ -1169,6 +1169,7 @@ public class RidePat
 
     public List<RidePat> GetRidePatViewByTimeFilter(int from, int until)
     {
+        //this method fetches ridepat which marked removed as well
         Location tmp = new Location();
         Hashtable locations = tmp.getLocationsEnglishName();
         DataTable driverTable = getDriver();
