@@ -907,12 +907,12 @@ public class RidePat
             {
 
                 //query = "select * from RPView where Convert(date,pickuptime)>=CONVERT(date, getdate()) and Status!=N'הגענו ליעד';"; // Get ALL FUTURE RidePats, even if cancelled
-                query = "select * from RPView where Convert(date,pickuptime)>=CONVERT(date, getdate());"; // Get ALL FUTURE RidePats, even if cancelled
+                query = "select * from RPView where Convert(date,pickuptime)>=CONVERT(date, getdate()) and Status <> N'נמחקה'; "; // Get ALL FUTURE RidePats, even if cancelled
 
             }
 
             //else query = "select * from RPView where DATEDIFF(day,getdate(),pickuptime)<=" + maxDays + " and Convert(date,pickuptime)>=CONVERT(date, getdate()) and Status!=N'הגענו ליעד';";
-            else query = "select * from RPView where DATEDIFF(day,getdate(),pickuptime)<=" + maxDays + " and Convert(date,pickuptime)>=CONVERT(date, getdate());";
+            else query = "select * from RPView where DATEDIFF(day,getdate(),pickuptime)<=" + maxDays + " and Convert(date,pickuptime)>=CONVERT(date, getdate()) and Status <> N'נמחקה'; ";
         }
         else if (volunteerId == -2)
         {
@@ -925,7 +925,7 @@ public class RidePat
                 string thisSundayString = thisSunday.ToString("yyyy-MM-dd");
                 string endDateString = endDate.ToString("yyyy-MM-dd");
 
-                query = "select * from RPView where pickuptime >= Convert(datetime,'" + thisSundayString + "') AND pickuptime < Convert(datetime,'" + endDateString + "');";
+                query = "select * from RPView where pickuptime >= Convert(datetime,'" + thisSundayString + "') AND pickuptime < Convert(datetime,'" + endDateString + "') and Status <> N'נמחקה';";
             }
             else if (maxDays == -3) // get next week
             {
@@ -938,11 +938,11 @@ public class RidePat
                 string nextSundayString = nextSunday.ToString("yyyy-MM-dd");
                 string endDateString = endDate.ToString("yyyy-MM-dd");
 
-                query = "select * from RPView where pickuptime >= Convert(datetime,'" + nextSundayString + "') AND pickuptime < Convert(datetime,'" + endDateString + "');";
+                query = "select * from RPView where pickuptime >= Convert(datetime,'" + nextSundayString + "') AND pickuptime < Convert(datetime,'" + endDateString + "') and Status <> N'נמחקה';";
             }
             //Yogev ↓
-            else query = "select * from RPView where PickupTime between getDate()-100 and getDate()+50";
-            // query = "select * from RPView"; //get ALL ridePats
+            else query = "select * from RPView where PickupTime between getDate()-100 and getDate()+50 and Status <> N'נמחקה'";
+            // query = "select * from RPView"; //get ALL ridePats - MAKES THE WEB APP REALY SLOW
             //Yogev ↑
         }
         else
@@ -950,9 +950,9 @@ public class RidePat
             //query = "select * from RPView where (Status<>N'הסתיימה' or Status<>N'בוטלה') and PickupTime>= getdate()"; //Get ALL ACTIVE RidePats (used by mobile app)
             if (maxDays != -1)
             {
-                query = "select * from RPView where (Status=N'שובץ נהג' or Status=N'ממתינה לשיבוץ' or Status=N'שובץ גיבוי') and DATEDIFF(day,getdate(),pickuptime)<=" + maxDays + " and pickuptime>=getdate()"; //Get ALL ACTIVE RidePats (used by mobile app) where max days=30
+                query = "select * from RPView where (Status=N'שובץ נהג' or Status=N'ממתינה לשיבוץ' or Status=N'שובץ גיבוי') and DATEDIFF(day,getdate(),pickuptime)<=" + maxDays + " and pickuptime>=getdate() and Status <> N'נמחקה'"; //Get ALL ACTIVE RidePats (used by mobile app) where max days=30
             }
-            else query = "select * from RPView where (Status=N'שובץ נהג' or Status=N'ממתינה לשיבוץ' or Status=N'שובץ גיבוי') and PickupTime>= getdate()"; //Get ALL ACTIVE RidePats (used by mobile app)
+            else query = "select * from RPView where (Status=N'שובץ נהג' or Status=N'ממתינה לשיבוץ' or Status=N'שובץ גיבוי') and PickupTime>= getdate() and Status <> N'נמחקה'"; //Get ALL ACTIVE RidePats (used by mobile app)
         }
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
