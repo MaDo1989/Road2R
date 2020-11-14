@@ -508,10 +508,13 @@ public class Message
         //insert msg to db
 
         string sender;
-        try { sender = (string)HttpContext.Current.Session["loggedInName"]; }
-        catch
+        if ((string)HttpContext.Current.Session["loggedInName"] == null)
         {
             sender = "הנהג";
+        }
+        else
+        {
+            sender = (string)HttpContext.Current.Session["loggedInName"];
         }
 
         int msgID = insertMsg(0, "Canceled by driver", "נסיעה בוטלה על ידי נהג\\ת", message, ridePatID, System.DateTime.Now, user.Id, "", true, false, false, sender);

@@ -973,8 +973,8 @@ public class WebService : System.Web.Services.WebService
                     Message m = new Message();
                     //get driver details 
                     Volunteer V = new Volunteer();
-                    V.getVolunteerByID(driverId);
-                    m.driverCanceledRide(ridePatId, V.getVolunteerByID(driverId));
+                    V = V.getVolunteerByID(driverId);
+                    m.driverCanceledRide(ridePatId, V);
                 }
             }
 
@@ -1019,7 +1019,7 @@ public class WebService : System.Web.Services.WebService
     {
         Volunteer v = new Volunteer();
         v = v.getVolunteerByID(userId);
-        //Session["loggedInName"] = v.DisplayName; 14/11/2020 Yogev&Benny was an issue with that session of ther loggedInName
+        Session["loggedInName"] = v.DisplayName; //14/11/2020 Yogev&Benny was an issue with that session of ther loggedInName
 
         try
         {
