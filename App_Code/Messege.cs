@@ -507,8 +507,9 @@ public class Message
         }
         //insert msg to db
 
+
         string sender;
-        if ((string)HttpContext.Current.Session["loggedInName"] == null)
+        if (HttpContext.Current.Session["loggedInName"] == null)
         {
             sender = "הנהג";
         }

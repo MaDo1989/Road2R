@@ -1565,7 +1565,7 @@ public class RidePat
             DbService db = new DbService();
             res = db.ExecuteQuery(query2);
         }
-        if (hours <= 24 && (Date > timeRightNow))
+        if (hours <= 24 && (pickupTime > timeRightNow))
         {
 
             //it's less than 24 to the ride

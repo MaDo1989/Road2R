@@ -964,6 +964,7 @@ public class WebService : System.Web.Services.WebService
             int res = rp.DeleteDriver(ridePatId, driverId);
             if (res > 0)
             {
+
                 Auxiliary a = new Auxiliary();
                 string message = " הנהג/ת " + a.getDriverName(driverId) + " נמחק/ה מנסיעה מספר " + ridePatId.ToString();
                 LogEntry le = new LogEntry(DateTime.Now, "מחיקת נהג/ת", message, 2, ridePatId, false);
@@ -1084,8 +1085,8 @@ public class WebService : System.Web.Services.WebService
                 Message m = new Message();
                 //get driver details 
                 Volunteer V = new Volunteer();
-                V.getVolunteerByID(driverId);
-                m.driverCanceledRide(ridePatId, V.getVolunteerByID(driverId));
+                V = V.getVolunteerByID(driverId);
+                m.driverCanceledRide(ridePatId, V);
             }
             return j.Serialize(res);
         }
