@@ -57,6 +57,12 @@
     <!-- page style  -->
     <link href="assets/css/viewRidePats.css" rel="stylesheet" />
 
+    <style>
+        .centerHeader {
+            text-align: center;
+        }
+    </style>
+
     <script>
 
         /*
@@ -69,7 +75,7 @@
          ||       --- !!! TEMORARY & IMPORTANT NOTE !!! ---   ||
          =======================================================
          */
-        
+
         checkCookie();
 
         var isAnonymous = false;
@@ -82,7 +88,7 @@
         let ridePatNums2MarkDeleted = [];
         let ridePatNums2MarkRecovered = [];
 
-        
+
 
         $(document).ready(function () {
 
@@ -376,9 +382,6 @@
 
                     if (timeFilteredArr[i].Status !== "נמחקה") continue;
 
-
-
-
                 } else {
                     if (timeFilteredArr[i].Status == "בוטלה" || timeFilteredArr[i].Status == "הסתיימה" || timeFilteredArr[i].Status == 'נמחקה') continue;
                     //בוטלה and הסתיימה are from old times -- not sure if needed anymore
@@ -554,8 +557,8 @@
         const MarkAsRemoved_FewRidePats = () => {
 
             let txt2post = `האם אתם בטוחים?
-                                        האם למחוק את כל ${ridePatNums2MarkDeleted.length} ההסעות שנבחרו ברשימה המוצגת לפניך?
-                                        `;
+                                                האם למחוק את כל ${ridePatNums2MarkDeleted.length} ההסעות שנבחרו ברשימה המוצגת לפניך?
+                                                `;
             swal({
                 title: "האם אתם בטוחים?",
                 text: txt2post,
@@ -601,8 +604,8 @@
         const Recover_FewRidePats = () => {
 
             let txt2post = `האם אתם בטוחים?
-                                        האם למחוק את כל ${ridePatNums2MarkRecovered.length} ההסעות שנבחרו ברשימה המוצגת לפניך?
-                                        `;
+                                                האם למחוק את כל ${ridePatNums2MarkRecovered.length} ההסעות שנבחרו ברשימה המוצגת לפניך?
+                                                `;
             swal({
                 title: "האם אתם בטוחים?",
                 text: txt2post,
@@ -758,8 +761,8 @@
                 let date = tr.getElementsByTagName('td').Date.innerHTML;
 
                 let txt2post = `האם אתם בטוחים לשחזר את הנסיעה של : ${patientName}
-                                                                                            מ - ${origin} ל - ${destenation}
-                                                                                            בתאריך -  ${date}`;
+                                                                                                    מ - ${origin} ל - ${destenation}
+                                                                                                    בתאריך -  ${date}`;
 
 
                 swal({
@@ -816,8 +819,8 @@
                 let date = tr.getElementsByTagName('td').Date.innerHTML;
 
                 let txt2post = `האם אתם בטוחים למחוק את הנסיעה של : ${patientName}
-                                                                                                                מ - ${origin} ל - ${destenation}
-                                                                                                                בתאריך -  ${date}`;
+                                                                                                                        מ - ${origin} ל - ${destenation}
+                                                                                                                        בתאריך -  ${date}`;
                 let deleteMe = [];
                 deleteMe.push(ridePatNum);
 
@@ -869,6 +872,7 @@
 
 
         }
+
 
         //#region the old way to delete ridepat
         /*
@@ -936,7 +940,6 @@
         //#endregion
 
 
-
         function manipulateTable() {
             table1 = document.getElementById("datatable-buttons");//$('#datatable-buttons');
             tdarr = table1.getElementsByTagName("td");
@@ -948,6 +951,7 @@
             }
         }
 
+
         function newRidePatForm() {
             ridePatNum = " ";
             arr_details = { ridePatNum: ridePatNum, func: "new" };
@@ -955,6 +959,21 @@
             location.href = "ridePatForm.html";
         }
 
+
+        const deActivate_RemoveCandidates = () => {
+
+            let toggle = $('#deletedRidePats').prop('checked');
+
+            $('#RemoveCandidates').prop('checked', false);
+            $('#RemoveCandidates').prop('disabled', toggle);
+
+        }
+
+
+        const hasReturnDrive = (ridePat) => {
+
+            swal('haaa');
+        }
     </script>
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -969,15 +988,11 @@
 
 
 <body class="fixed-left">
-
     <!-- Begin page -->
     <div id="wrapper">
 
         <!-- Top Bar Start -->
         <div class="topbar">
-
-
-
             <!-- Navbar -->
             <div id="na" class="navbar navbar-default" role="navigation">
                 <div class="container">
@@ -1068,7 +1083,7 @@
                             </select>
                             עד -
                             <select id="until" class="input-sm">
-                                <option value=0>היום</option>
+                                <option value=1>היום</option>
                                 <option value=7>שבוע קדימה</option>
                                 <option value=31>חודש קדימה</option>
                                 <option value=365>שנה קדימה</option>
@@ -1102,7 +1117,7 @@
                     <div class="row">
                         <div class="col-sm-10">
                             <div class="checkbox checkbox-primary">
-                                <input id="deletedRidePats" type="checkbox" onchange="refreshTable()">
+                                <input id="deletedRidePats" type="checkbox" onchange="refreshTable()" onclick="deActivate_RemoveCandidates()">
                                 <label data-toggle="tooltip" data-placement="bottom" title="show deleted rides" for="deletedRidePats">
                                     הצג נסיעות שנמחקו בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
                                 </label>
@@ -1195,61 +1210,87 @@
             <!-- ============================================================== -->
 
         </div>
-        <!-- END wrapper -->
+    </div>
+    <!-- END wrapper -->
 
 
 
-        <script>
-            var resizefunc = [];
-        </script>
+    <script>
+        var resizefunc = [];
+    </script>
 
-        <!-- jQuery  -->
-        <script src="assets/js/bootstrap-rtl.min.js"></script>
-        <script src="assets/js/detect.js"></script>
-        <script src="assets/js/fastclick.js"></script>
-        <script src="assets/js/jquery.slimscroll.js"></script>
-        <script src="assets/js/jquery.blockUI.js"></script>
-        <script src="assets/js/waves.js"></script>
-        <script src="assets/js/wow.min.js"></script>
-        <script src="assets/js/jquery.nicescroll.js"></script>
-        <script src="assets/js/jquery.scrollTo.min.js"></script>
-        <script src="../plugins/switchery/switchery.min.js"></script>
+    <!-- jQuery  -->
+    <script src="assets/js/bootstrap-rtl.min.js"></script>
+    <script src="assets/js/detect.js"></script>
+    <script src="assets/js/fastclick.js"></script>
+    <script src="assets/js/jquery.slimscroll.js"></script>
+    <script src="assets/js/jquery.blockUI.js"></script>
+    <script src="assets/js/waves.js"></script>
+    <script src="assets/js/wow.min.js"></script>
+    <script src="assets/js/jquery.nicescroll.js"></script>
+    <script src="assets/js/jquery.scrollTo.min.js"></script>
+    <script src="../plugins/switchery/switchery.min.js"></script>
 
-        <!-- Datatables-->
-        <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
-        <script src="../plugins/datatables/dataTables.bootstrap.js"></script>
-        <script src="../plugins/datatables/dataTables.buttons.min.js"></script>
-        <script src="../plugins/datatables/buttons.bootstrap.min.js"></script>
-        <script src="../plugins/datatables/jszip.min.js"></script>
-        <script src="../plugins/datatables/pdfmake.min.js"></script>
-        <script src="../plugins/datatables/vfs_fonts.js"></script>
-        <script src="../plugins/datatables/buttons.html5.min.js"></script>
-        <script src="../plugins/datatables/buttons.print.min.js"></script>
-        <script src="../plugins/datatables/dataTables.fixedHeader.min.js"></script>
-        <script src="../plugins/datatables/dataTables.keyTable.min.js"></script>
-        <script src="../plugins/datatables/dataTables.responsive.min.js"></script>
-        <script src="../plugins/datatables/responsive.bootstrap.min.js"></script>
-        <script src="../plugins/datatables/dataTables.scroller.min.js"></script>
+    <!-- Datatables-->
+    <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="../plugins/datatables/dataTables.bootstrap.js"></script>
+    <script src="../plugins/datatables/dataTables.buttons.min.js"></script>
+    <script src="../plugins/datatables/buttons.bootstrap.min.js"></script>
+    <script src="../plugins/datatables/jszip.min.js"></script>
+    <script src="../plugins/datatables/pdfmake.min.js"></script>
+    <script src="../plugins/datatables/vfs_fonts.js"></script>
+    <script src="../plugins/datatables/buttons.html5.min.js"></script>
+    <script src="../plugins/datatables/buttons.print.min.js"></script>
+    <script src="../plugins/datatables/dataTables.fixedHeader.min.js"></script>
+    <script src="../plugins/datatables/dataTables.keyTable.min.js"></script>
+    <script src="../plugins/datatables/dataTables.responsive.min.js"></script>
+    <script src="../plugins/datatables/responsive.bootstrap.min.js"></script>
+    <script src="../plugins/datatables/dataTables.scroller.min.js"></script>
 
-        <!-- Datatable init js -->
-        <script src="assets/pages/datatables.init.js"></script>
+    <!-- Datatable init js -->
+    <script src="assets/pages/datatables.init.js"></script>
 
-        <!-- Sweet Alert js -->
-        <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
-        <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+    <!-- Sweet Alert js -->
+    <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
+    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
 
-        <script src="assets/js/jquery.core.js"></script>
-        <script src="assets/js/jquery.app.js"></script>
-        <!--<script src="cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
-        <script src="cdn.datatables.net/plug-ins/1.10.19/sorting/datetime-moment.js"></script>-->
-        <!--<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>-->
-        <!--<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
-        <script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
-        <script src="//cdn.datatables.net/plug-ins/1.10.12/sorting/datetime-moment.js"></script>-->
-        <script type="text/javascript">
+    <script src="assets/js/jquery.core.js"></script>
+    <script src="assets/js/jquery.app.js"></script>
+    <!--<script src="cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+    <script src="cdn.datatables.net/plug-ins/1.10.19/sorting/datetime-moment.js"></script>-->
+    <!--<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>-->
+    <!--<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+    <script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+    <script src="//cdn.datatables.net/plug-ins/1.10.12/sorting/datetime-moment.js"></script>-->
+    <script type="text/javascript">
 
-            TableManageButtons.init();
+        TableManageButtons.init();
 
-        </script>
+    </script>
+
+
+    <div class="modal fade" id="messagesModal" tabindex="-1" role="dialog" aria-labelledby="messagesModalTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title centerHeader" id="messagesModalTitle">נמצאה הסעה חזור</h2>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h5 id="returnRidePatMsg" class="centerHeader"></h5>
+                    <h5 id="DriverReturnRidePatMsg" class="centerHeader"></h5>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">ביטול</button>
+                    <button type="button" class="btn btn-warning" onclick="deleteReturn()">מחיקה</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
 </body>
 </html>

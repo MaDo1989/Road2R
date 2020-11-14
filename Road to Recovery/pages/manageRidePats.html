@@ -988,17 +988,20 @@
             //}
         }
 
-        function deleteRidePat(RidePat, func) {
+        function deleteRidePat(ridePat, func) {
             checkCookie();
-            var numberOfRides = 1;
-            var repeatRide = "";
+           // var numberOfRides = 1;
+            //var repeatRide = "";
+            let ridePatNums2MarkDeleted = [];
+            ridePatNums2MarkDeleted.push(ridePat.RidePatNum);
+            
             $.ajax({
                 dataType: "json",
-                url: "WebService.asmx/setRidePat",
+                url: "WebService.asmx/ChangeArrayOF_RidePatStatuses",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                data: JSON.stringify({ RidePat: RidePat, func: func, isAnonymous: isAnonymous, numberOfRides: numberOfRides, repeatRideEvery: repeatRide }),
-                success: function (data) {
+                data: JSON.stringify({ newStatus: 'נמחקה', ridePatNums: ridePatNums2MarkDeleted }),
+                success: function () {
                     swal({
                         title: "لقد تم حذف السفرية\nההסעה נמחקה",
                         timer: 1000,
@@ -1424,5 +1427,6 @@
             </div>
         </div>
     </div>
+
 </body>
 </html>

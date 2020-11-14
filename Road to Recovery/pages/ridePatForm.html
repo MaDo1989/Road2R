@@ -2045,6 +2045,10 @@
                         Escorts = ridePat.Escorts;
                         var temp = ridePat.Date.substring(ridePat.Date.indexOf("(") + 1, ridePat.Date.indexOf(")"))
                         var date = new Date(parseInt(temp));
+                        let now = new Date();
+                        if (date.getTime() < now.getTime()) { // getTime converts the timestemp back to int for more accurate evaluate
+                            return;
+                        }
                         OnlyEscort = ridePat.OnlyEscort;
                         RidePatBack = {
                             Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Remark: Remark, Escorts: Escorts, Date: date, OnlyEscort: OnlyEscort
@@ -2916,7 +2920,7 @@
     function chooseNo() {
 
         if (!secondModal) {
-            localStorage.setItem("ReturnRidePatFlag", false);
+        //    localStorage.setItem("ReturnRidePatFlag", false);
             //alert("changed to false")
             addDriver(rideNumberForNo);
         }

@@ -1019,7 +1019,7 @@ public class WebService : System.Web.Services.WebService
     {
         Volunteer v = new Volunteer();
         v = v.getVolunteerByID(userId);
-        Session["loggedInName"] = v.DisplayName;
+        //Session["loggedInName"] = v.DisplayName; 14/11/2020 Yogev&Benny was an issue with that session of ther loggedInName
 
         try
         {
@@ -1788,7 +1788,8 @@ public class WebService : System.Web.Services.WebService
         if (ridePatView.RidePatNum == 0)
         {
             return false;                            // case there is no return drive as such at all
-        }else if (ridePatView.Status == "נמחקה")
+        }
+        else if (ridePatView.Status == "נמחקה")
         {
             return false;                           // case there is no return drive (there is one which MARKED deleted)
         }
