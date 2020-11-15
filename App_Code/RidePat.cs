@@ -1860,7 +1860,7 @@ public class RidePat
         DbService dbs = new DbService();
         Message msg = new Message();
         Volunteer driver2inform = new Volunteer();
-        Volunteer coordinator2inform = new Volunteer();
+       // Volunteer coordinator2inform = new Volunteer();
 
         LogEntry log;
         string query = "";
@@ -1874,34 +1874,15 @@ public class RidePat
                 query = "exec SpRidePat_UpdateStatus @newStatus=N'" + new_status + "',@ridePatNum=" + ridePatNums[i];
                 SqlDataReader sdr = dbs.GetDataReader(query);
 
-                //bool flag = false;
-                //while (sdr.Read())
-                //{
-                //    flag = true;
-                //    driver2inform.Id = Convert.ToInt32(sdr["MainDriver"]);
-                //    driver2inform.DisplayName = Convert.ToString(sdr["DisplayName"]);
-
-                //    //msg.coordinatorCanceledRide(ridePatNums[i], driver2inform); //inform coordinator ?
-                //    msg.cancelRide(ridePatNums[i], driver2inform); // inform driver
-                //    logMsg += "עם הנהג " + driver2inform.DisplayName + "שינתה סטטוס ל " + new_status;
-                //    log = new LogEntry(DateTime.Now, "שינוי סטטוס", logMsg, 2, ridePatNums[i], false);
-                //}
-
-                //if (!flag)
-                //{
-                //    logMsg += "ללא נהג שינתה סטטוס ל" + new_status;
-                //    log = new LogEntry(DateTime.Now, "שינוי סטטוס", logMsg, 2, ridePatNums[i], false);
-                //}
                 if (sdr.Read())         //if the query returns a value → then there is a driver to inform
                 {   
                     //Update driver:
                     driver2inform.Id = Convert.ToInt32(sdr["MainDriver"]);
                     driver2inform.DisplayName = Convert.ToString(sdr["DisplayName"]);
                     driver2inform.RegId = Convert.ToString(sdr["pnRegId"]);
-                    coordinator2inform.Id = Convert.ToInt32(sdr["CoordinatorID"]);
-
-                    msg.cancelRide(ridePatNums[i], driver2inform); // inform driver
-                    msg.coordinatorCanceledRide(ridePatNums[i], driver2inform); //inform coordinator 
+                  
+                    msg.cancelRide(ridePatNums[i], driver2inform);               // inform driver
+                    msg.coordinatorCanceledRide(ridePatNums[i], driver2inform); //inform coordinator  -  this method fetch the coordinator to inform to by the ridePatNums and the driver2inform id
 
                     logMsg += "עם הנהג " + driver2inform.DisplayName + "שינתה סטטוס ל " + new_status;
                     log = new LogEntry(DateTime.Now, "שינוי סטטוס", logMsg, 2, ridePatNums[i], false);
