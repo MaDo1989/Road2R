@@ -1,6 +1,10 @@
 ﻿// Purpose: JS code for the reports UI
 
 
+// 24-Nov:  Avishai
+//1.  . מספר המתנדבים השונים שהסיעו בכל חודש בשנתיים האחרונות. 
+
+
 // 31-Oct-20:  Implement code after populating template_DATE_LATER_THAN, so that if radio group
 // is checked, we respect it and get all volunteers.
 // Set default date to 1/1/2020 
@@ -172,7 +176,8 @@ var K_strategy = {
     "rp_amuta_vls_week": rp_amuta_vls_week__refresh_preview,
     "rp_amuta_vls_per_pat": rp_amuta_vls_per_pat__refresh_preview,
     "rp_amuta_vls_km": rp_amuta_vls_km__refresh_preview,
-    "rp_amuta_vls_list": rp_amuta_vls_list__refresh_preview
+    "rp_amuta_vls_list": rp_amuta_vls_list__refresh_preview,
+    "rp_amuta_vls_per_month": rp_amuta_vls_per_month__refresh_preview
 }
 
 
@@ -238,7 +243,16 @@ var K_fields_map = {
             template: 'div[name="template_VOLUNTEER_LIST_RADIO"]',
             post_clone: rp_amuta_vls_list_field_radio_post_clone
         }
+    ],
+    "rp_amuta_vls_per_month": [
+        {
+            id: "rp_vl_ride_month__month",
+            template: 'div[name="template_PER_MONTH"]',
+            type: "MONTH",
+            post_clone: rp_amuta_vls_per_month__refresh_preview
+        }
     ]
+
 }
 
 function populate_parameters(report_type) {
@@ -382,6 +396,9 @@ function field_month_post_clone(id) {
     populate_month_field();
 }
 
+function empty_func(id) {
+
+}
 
 function rp_amuta_vls_per_km_field_year_post_clone(id) {
     var today = new Date();
@@ -612,6 +629,13 @@ function rp_amuta_vls_list__refresh_preview() {
     refresh_amuta_vls_list_Table(selected_date, config);
 }   
 
+function rp_amuta_vls_per_month__refresh_preview() {
+//    var selected_date = $('#select_date_later').val();
+//    var config = "start_date";
+
+    refresh_amuta_vls_per_month_Table("2019-01-01");
+}   
+
 
 // 'start_date' :  a date formatted as YYYY-MM-DD
 // 'end_date'   :  a date formatted as YYYY-MM-DD
@@ -746,6 +770,60 @@ function refresh_amuta_vls_km_Table(start_date, end_date) {
 
 
 // 'start_date' :  a date formatted as YYYY-MM-DD
+function refresh_amuta_vls_per_month_Table(start_date) {
+    hide_all_tables();
+    $('#wait').show();
+    var query_object = {
+        start_date: start_date
+    };
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportVolunteerPerMonth",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            $('#wait').hide();
+            arr_rides = JSON.parse(data.d);
+
+            $('#div_table_amuta_vls_per_month').show();
+            tbl = $('#table_amuta_vls_month').DataTable({
+                pageLength: 100,
+                bLengthChange: false,
+                data: arr_rides,
+                destroy: true,
+                columnDefs: [
+                    { "orderData": [0, 1], "targets": 0 }],
+                columns: [
+                    { data: "Year" },
+                    { data: "Month" },
+                    { data: "Count" }
+
+                ],
+                dom: 'Bfrtip',
+ 
+
+                buttons: [
+                    'csv', 'excel', 
+                ]
+            });
+        },
+        error: function (err) {
+            $('#wait').hide();
+            // @@ alert("Error in GetRidePatView: " + err.responseText);
+        }
+
+
+    });
+
+}
+
+
+// 'start_date' :  a date formatted as YYYY-MM-DD
 function refresh_amuta_vls_list_Table(start_date, config) {
     hide_all_tables();
     $('#wait').show();
@@ -776,6 +854,7 @@ function refresh_amuta_vls_list_Table(start_date, config) {
                 columnDefs: [
                     { "orderData": [0, 1], "targets": 0 }],
                 columns: [
+
                     { data: "FirstNameH" },
                     { data: "LastNameH" },
                     { data: "VolunteerIdentity" },
@@ -783,13 +862,12 @@ function refresh_amuta_vls_list_Table(start_date, config) {
                     { data: "Address" },
                     { data: "CityCityName" },
                     { data: "JoinDate" }
-
                 ],
                 dom: 'Bfrtip',
- 
+
 
                 buttons: [
-                    'csv', 'excel', 
+                    'csv', 'excel',
                 ]
             });
         },
@@ -802,6 +880,7 @@ function refresh_amuta_vls_list_Table(start_date, config) {
     });
 
 }
+
 
 
 

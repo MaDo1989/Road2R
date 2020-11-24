@@ -53,7 +53,15 @@ public class ReportService
         public string JoinDate { get; set; }
     }
 
-    private DataTable getDriverByID(int driverID, DbService db)
+    public class VolunteersPerMonthInfo
+    {
+        public string Year { get; set; }
+        public string Month { get; set; }
+        public string Count { get; set; }
+
+    }
+
+        private DataTable getDriverByID(int driverID, DbService db)
     {
         string query = "select Id,DisplayName,CellPhone from Volunteer where Id = @ID";
         SqlCommand cmd = new SqlCommand(query);
@@ -170,6 +178,40 @@ AND RidePat.pickuptime >= '2020-1-01'
         return result;
     }
 
+    internal List<VolunteersPerMonthInfo> GetReportVolunteerPerMonth(string start_date)
+    {
+        DbService db = new DbService();
+
+        string query =
+             @"SELECT count(DISTINCT MainDriver )as COUNT_G, YEAR(date) as YEAR_G, MONTH(date) as MONTH_G
+                FROM Ride 
+                where date >= @start_date
+                and date <= CURRENT_TIMESTAMP
+                GROUP BY YEAR(Date), MONTH(Date) 
+                ORDER  BY YEAR_G, MONTH_G ASC";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        List<VolunteersPerMonthInfo> result = new List<VolunteersPerMonthInfo>();
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            VolunteersPerMonthInfo obj = new VolunteersPerMonthInfo();
+            obj.Year = dr["YEAR_G"].ToString();
+            obj.Month = dr["MONTH_G"].ToString();
+            obj.Count = dr["COUNT_G"].ToString();
+            result.Add(obj);
+        }
+
+        return result;
+        
+
+    }
 
     internal string pad_with_zeros(string id)
     {
