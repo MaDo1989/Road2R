@@ -331,39 +331,6 @@ public class RidePat
         }
         return areaForRidepat;
     }
-
-    public List<RidePat> GetVolunteersRideHistory(int volunteerId)
-    {
-        string query = "exec spRideAndRidePat_GetVolunteersRideHistory @volunteerID =" + volunteerId;
-        List<RidePat> thisVolunteerRides = new List<RidePat>();
-        RidePat ridePat;
-        try
-        {
-            dbs = new DbService();
-            SqlDataReader sdr = dbs.GetDataReader(query);
-            while (sdr.Read())
-            {
-                ridePat = new RidePat();
-                ridePat.RidePatNum = Convert.ToInt32(sdr["RidePatNum"]);
-                ridePat.Pat = new Patient(Convert.ToString(sdr["Patient"]));
-                ridePat.Remark = Convert.ToString(sdr["Remark"]);
-                ridePat.Origin = new Location(Convert.ToString(sdr["Origin"]));
-                ridePat.Destination = new Location(Convert.ToString(sdr["Destination"]));
-                ridePat.Date = Convert.ToDateTime(sdr["PickupTime"]);
-                thisVolunteerRides.Add(ridePat);
-            }
-            return thisVolunteerRides;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Exception in RidePat.cs → GetVolunteersRideHistory " + ex.Message);
-        }
-        finally
-        {
-            dbs.CloseConnection();
-        }
-    }
-
     //לשנות את  isAnonymous
 
     public int setRidePat(RidePat ridePat, string func, bool isAnonymous, int numberOfRides, string repeatRideEvery)
@@ -415,7 +382,7 @@ public class RidePat
             for (int i = 0; i < numberOfRides; i++)
             {
                 RidePat ridePatView = CheckRidePat_V2(ridePat, isAnonymous);
-
+                
                 /* YOGEV - REMOVED IT:
                 if (CheckRidePat(ridePat, isAnonymous))
                 {
@@ -423,7 +390,7 @@ public class RidePat
                 }
                 */
 
-                if (ridePatView.RidePatNum != 0 && ridePatView.Status != "נמחקה")
+                if (ridePatView.RidePatNum != 0 && ridePatView.Status != "נמחקה") 
                 {
                     return 1; // there is an issue - don't create new drive 
                 }
@@ -1893,6 +1860,7 @@ public class RidePat
         DbService dbs = new DbService();
         Message msg = new Message();
         Volunteer driver2inform = new Volunteer();
+       // Volunteer coordinator2inform = new Volunteer();
 
         LogEntry log;
         string query = "";
@@ -1907,12 +1875,12 @@ public class RidePat
                 SqlDataReader sdr = dbs.GetDataReader(query);
 
                 if (sdr.Read())         //if the query returns a value → then there is a driver to inform
-                {
+                {   
                     //Update driver:
                     driver2inform.Id = Convert.ToInt32(sdr["MainDriver"]);
                     driver2inform.DisplayName = Convert.ToString(sdr["DisplayName"]);
                     driver2inform.RegId = Convert.ToString(sdr["pnRegId"]);
-
+                  
                     msg.cancelRide(ridePatNums[i], driver2inform);               // inform driver
                     msg.coordinatorCanceledRide(ridePatNums[i], driver2inform); //inform coordinator  -  this method fetch the coordinator to inform to by the ridePatNums and the driver2inform id
 
