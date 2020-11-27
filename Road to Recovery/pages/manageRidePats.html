@@ -1074,8 +1074,10 @@
             $('#messagesModal').modal('hide');
             $('#DriverReturnRidePatMsg').html("");
 
+        //הסטטוס 'אין נסיעת הלוך' עושה בעיות כיוון שלא ניתן להשתבץ אליו.
+            //newStatus = "אין נסיעת הלוך"
+            newStatus = "ממתינה לשיבוץ"
 
-            newStatus = "אין נסיעת הלוך"
             ReturnRidePatNum = returnRidePat.RidePatNum
             $.ajax({
                 dataType: "json",

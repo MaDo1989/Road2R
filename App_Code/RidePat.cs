@@ -378,6 +378,7 @@ public class RidePat
 
         if (func == "new") //Insert new RidePat to DB
         {
+            bool checkDaylightSaving = true;
             DateTime newDate = new DateTime();
             for (int i = 0; i < numberOfRides; i++)
             {
@@ -411,7 +412,30 @@ public class RidePat
                 cmdParams[8] = cmd.Parameters.AddWithValue("@coordinatorID", CoordinatorID);
 
 
+                if (newDate != new DateTime() && checkDaylightSaving)
+                {
+                    bool DateDaylightSaving = Date.IsDaylightSavingTime();
+                    bool newDateDaylightSaving = newDate.IsDaylightSavingTime();
 
+                    if (DateDaylightSaving != newDateDaylightSaving)
+                    {
+                        if (DateDaylightSaving == true && newDateDaylightSaving == false)
+                        {
+                            newDate = newDate.AddHours(1);
+                            ridePat.Date = newDate;
+                            cmdParams[3] = cmd.Parameters.AddWithValue("@date", newDate);
+                            checkDaylightSaving = false;
+                        }
+                        else if (DateDaylightSaving == true && newDateDaylightSaving == false)
+                        {
+                            newDate = newDate.AddHours(-1);
+                            ridePat.Date = newDate;
+                            cmdParams[3] = cmd.Parameters.AddWithValue("@date", newDate);
+                            checkDaylightSaving = false;
+                        }
+                    }
+                }
+                
 
                 string query = "insert into RidePat (Patient,Origin,Destination,PickupTime,Coordinator,Remark,OnlyEscort,Area,CoordinatorId,lastModified) values (@pat,@origin,@destination,@date,@coordinator,@remark,@onlyEscort,@Area,@coordinatorID,DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
                 RidePatNum = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
