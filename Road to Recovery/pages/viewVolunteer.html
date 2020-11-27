@@ -55,12 +55,13 @@
 
         var cleanPhoneNumber;
         var msgTable;
+        var historyTable;
 
         checkCookie();
         var allVolunteersFromDb = [];
         $(document).ready(function () {
 
-        if (localStorage.activeVol == "undefined" || localStorage.activeVol === undefined)
+            if (localStorage.activeVol == "undefined" || localStorage.activeVol === undefined)
                 localStorage.activeVol = true;
 
             if (window.location.hostname.toString() == 'localhost' || window.location.pathname.indexOf('test') != -1) {
@@ -72,9 +73,9 @@
             includeHTML();
             var userName = GENERAL.USER.getUserDisplayName();
             $("#userName").html(userName);
-        $("#closeModal").click(function(){
-        
-        });
+            $("#closeModal").click(function () {
+
+            });
             //adds menu.html content into any "#menu" element
             //$('#menu').load('menu.html');
             //var userName = GENERAL.USER.getUserName();
@@ -133,12 +134,12 @@
 
         function ActiveMode() {
             localStorage.activeVol = $("#activeCustomers").prop('checked');
-            
+
             refreshTable();
         }
 
         function refreshTable() {
-        var activeVol = JSON.parse(localStorage.activeVol);
+            var activeVol = JSON.parse(localStorage.activeVol);
             $("#activeCustomers").prop('checked', activeVol);
             allVolunteersFromDb = [];
             $('#wait').show();
@@ -181,7 +182,12 @@
                             cellphone2 = arr_volunteers[i].CellPhone2;
                         }
                         else cellphone2 = arr_volunteers[i].HomePhone;
+
+                        let showHistoryBtn = ' <button type="button" class="btn btn-icon waves-effect waves-light btn-light btn-sm m-b-5" id ="showHistoryBtn" title="היסטוריית הסעות" data-toggle="modal" data-target="#RidesHistoryModal"><i class="fa fa-h-square" aria-hidden="true"></i></button >';
+                        btnStr += showHistoryBtn;
+
                         var Volunteer = {
+                            Id: arr_volunteers[i].Id,
                             DisplayName: arr_volunteers[i].DisplayName,
                             TypeVol: arr_volunteers[i].TypeVol,
                             CellPhone: arr_volunteers[i].CellPhone,
@@ -198,6 +204,7 @@
 
                     tbl = $('#datatable-buttons').DataTable({
                         data: allVolunteersFromDb,
+                        rowId: 'Id',
                         "autoWidth": false,
                         "destroy": true,
                         dom: 'Bfrtip',
@@ -302,15 +309,104 @@
                 });
 
             });
+
+
+            $('#datatable-buttons tbody').on('click', '#showHistoryBtn', function () {
+
+                $('#wait').show();
+
+                var rowData = tbl.row($(this).parents('tr')).data();
+
+                $('#RidesHistoryTitle').text("היסטוריית הסעות - " + rowData.DisplayName)
+                $.ajax({
+                    dataType: "json",
+                    url: "WebService.asmx/GetVolunteersRideHistory",
+                    contentType: "application/json; charset=utf-8",
+                    type: "POST",
+                    data: JSON.stringify({ volunteerId: rowData.Id }),
+                    success: function (data) {
+                        var data = JSON.parse(data.d)
+
+                        if (historyTable != null) {
+                            historyTable.destroy();
+                        }
+
+
+                        historyTable = $('#RidesHistoryTable').DataTable({
+                            order: [[0, "desc"]],
+                            pageLength: 5,
+                            data: data,
+                            columns: [
+                                {
+                                    data: (data) => {
+                                        if (data.Date === undefined) return;
+
+                                        let fullTimeStempStr = data.Date;
+                                        let startTrim = fullTimeStempStr.indexOf('(') + 1;
+                                        let endTrim = fullTimeStempStr.indexOf(')');
+                                        let fullTimeStempNumber = fullTimeStempStr.substring(startTrim, endTrim);
+                                        let fullTimeStemp = new Date(parseInt(fullTimeStempNumber));
+
+                                        let dd = fullTimeStemp.getDate() < 10 ? "0" + fullTimeStemp.getDate() : fullTimeStemp.getDate();
+                                        dd += "/";
+                                        let mm = fullTimeStemp.getMonth() < 10 ? "0" + fullTimeStemp.getMonth() : fullTimeStemp.getMonth();
+                                        mm += "/";
+                                        let yyyy = fullTimeStemp.getFullYear();
+
+                                        return dd + mm + yyyy;
+                                    }
+                                },
+                                {
+                                    data: (data) => {
+                                        if (data.Date === undefined) return;
+                                        
+                                        let fullTimeStempStr = data.Date;
+                                        let startTrim = fullTimeStempStr.indexOf('(') + 1;
+                                        let endTrim = fullTimeStempStr.indexOf(')');
+                                        let fullTimeStempNumber = fullTimeStempStr.substring(startTrim, endTrim);
+                                        let fullTimeStemp = new Date(parseInt(fullTimeStempNumber));
+
+                                        let hh = fullTimeStemp.getHours() < 10 ? "0" + fullTimeStemp.getHours() : fullTimeStemp.getHours();
+                                        hh += ":";
+                                        let mm = fullTimeStemp.getMinutes() < 10 ? "0" + fullTimeStemp.getMinutes() : fullTimeStemp.getMinutes();
+                                        return hh + mm;
+                                    }
+                                },
+                                {
+                                    data: (data) => {
+                                        if (data.Origin === undefined || data.Destination === undefined) return;                                 
+                                        
+                                        let fullPath = data.Origin.Name + " ← " + data.Destination.Name;
+                                        return fullPath;
+                                    }
+                                },
+                                { data: "Pat.DisplayName" },
+                                { data: "Remark" },
+
+                            ]
+                        });
+                        $('#wait').hide();
+
+                    },
+                    error: function (err) {
+                        alert("Error in GetVolunteersRideHistory: " + err.responseText);
+                        $('#wait').hide();
+                    }
+                });
+
+
+            });
+
+
             $('#datatable-buttons tbody').on('click', '#messages', function () {
 
                 $('#wait').show();
 
                 var rowData = tbl.row($(this).parents('tr')).data();
-                console.log(rowData);
-                
+                //console.log(rowData);
 
-                $('#messagesModalTitle').text("היסטוריית הודעות - " + rowData.DisplayName )
+
+                $('#messagesModalTitle').text("היסטוריית הודעות - " + rowData.DisplayName)
                 $.ajax({
                     dataType: "json",
                     url: "WebService.asmx/getMessages",
@@ -319,12 +415,12 @@
                     data: JSON.stringify({ displayName: rowData.DisplayName }),
                     success: function (data) {
                         var data = JSON.parse(data.d)
-                        console.log(data)
+                        //console.log(data)
                         if (msgTable != null) {
-                            
+
                             msgTable.destroy();
                         }
-                        
+
                         msgTable = $('#messagesTable').DataTable({
                             columnDefs: [
                                 { "targets": 3, className: 'text-left-strong' }
@@ -343,7 +439,7 @@
                             ]
                         });
                         $('#wait').hide();
-                        
+
                     },
                     error: function (err) {
                         alert("Error in getVolunteer: " + err.responseText);
@@ -594,7 +690,7 @@
         TableManageButtons.init();
 
     </script>
-    <!-- Modal -->
+    <!-- ↓ Message Modal ↓   -->
     <div class="modal fade" id="messagesModal" tabindex="-1" role="dialog" aria-labelledby="messagesModalTitle" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content modal-lg">
@@ -627,5 +723,40 @@
             </div>
         </div>
     </div>
+    <!-- ↑ Message Modal ↑ -->
+    <!-- ↓ RidesHistoryModal ↓ -->
+    <div class="modal fade" id="RidesHistoryModal" tabindex="-1" role="dialog" aria-labelledby="RidesHistoryTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content modal-lg">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="RidesHistoryTitle">היסטורית הסעות</h2>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table id="RidesHistoryTable" class="table table-striped table-bordered">
+                        <thead>
+                            <tr dir="rtl">
+                                <th>תאריך</th>
+                                <th>שעה</th>
+                                <th>קו</th>
+                                <th>חולה</th>
+                                <th>הערות</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">סגירה</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ↑ RidesHistoryModal ↑  -->
+
+
 </body>
 </html>

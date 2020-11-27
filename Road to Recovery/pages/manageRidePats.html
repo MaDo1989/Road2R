@@ -75,6 +75,11 @@
 
         function wiringDataTables() {
             //manage button clicks on tables
+
+            $('#datatable-morning tbody').on('click', '#candidatesBtn', function () {
+                candidatesButton(this);
+            });
+
             $('#datatable-morning tbody').on('click', '#edit', function () {
                 editButton(this);
             });
@@ -94,6 +99,10 @@
             $('#datatable-afternoon tbody').on('click', '#edit', function () {
                 editButton(this);
             });
+            
+            $('#datatable-afternoon tbody').on('click', '#candidatesBtn', function () {
+                candidatesButton(this);
+            });
 
             $('#datatable-afternoon tbody').on('click', '#show', function () {
                 showButton(this);
@@ -105,6 +114,10 @@
 
             $('#datatable-afternoon tbody').on('click', '#backup', function () {
                 backupToPrimaryButton(this);
+            });
+
+            $('#datatable-future tbody').on('click', '#candidatesBtn', function () {
+                candidatesButton(this);
             });
 
             $('#datatable-future tbody').on('click', '#edit', function () {
@@ -123,6 +136,9 @@
                 backupToPrimaryButton(this);
             });
 
+            $('#datatable-tomorrow tbody').on('click', '#candidatesBtn', function () {
+                candidatesButton(this);
+            });
 
             $('#datatable-tomorrow tbody').on('click', '#edit', function () {
                 editButton(this);
@@ -258,47 +274,115 @@
                 recordsNum = JSON.parse(localStorage.getItem("futurePageLength"));
             }
 
-            tMorning = $('#datatable-morning').DataTable({ "stateDuration": 60 * 60, "columnDefs": [{ targets: 7, className: 'text-left-strong' }] }, { "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
-            tAfternoon = $('#datatable-afternoon').DataTable({ "stateDuration": 60 * 60, "columnDefs": [{ targets: 7, className: 'text-left-strong' }] }, { "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
-            tFuture = $('#datatable-future').DataTable({
 
-                "stateDuration": 60 * 60, //saves duration state for 1 hour
-                "columnDefs": [{ targets: 8, className: 'text-left-strong' }],
-                "iDisplayLength": recordsNum,
-                "aoColumns": [{
-                    "sType": "customdatesort"
+            /*
+                         ============================
+                         || ↓DATATABLES PROPERTIES↓||
+                         ============================
+            */
+            tMorning = $('#datatable-morning').DataTable(
+                {
+                    "stateDuration": 60 * 60,
+                    "columnDefs": [{ targets: 7, className: 'text-left-strong' }]
                 },
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                ]
-            }, { "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
-
-            tTomorrow = $('#datatable-tomorrow').DataTable({
-
-                "stateDuration": 60 * 60, //saves duration state for 1 hour
-                "columnDefs": [{ targets: 8, className: 'text-left-strong' }],
-                "iDisplayLength": recordsNum,
-                "aoColumns": [{
-                    "sType": "customdatesort"
+                {
+                    "paging": false
                 },
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                ]
-            }, { "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
+                {
+                    "visible": false,
+                    "targets": [1]
+                },
+                {
+                    "className": "dt-body-left",
+                    "targets": [3]
+                }
+            );
+
+
+            tAfternoon = $('#datatable-afternoon').DataTable(
+                {
+                    "stateDuration": 60 * 60,
+                    "columnDefs": [
+                        { "targets": [0], createdCell: (td) => { $(td).attr('id', 'rideTiming') } },
+                        { "targets": [1], createdCell: (td) => { $(td).attr('id', 'OriginName') } },
+                        { "targets": [2], createdCell: (td) => { $(td).attr('id', 'DestinationName') } },
+                        { targets: 7, className: 'text-left-strong' }
+                    ]
+                },
+                {
+                    "paging": false
+                },
+                {
+                    "visible": false,
+                    "targets": [1]
+                },
+                {
+                    "className": "dt-body-left",
+                    "targets": [3]
+                }
+            );
+
+
+            tFuture = $('#datatable-future').DataTable(
+                {
+                    "stateDuration": 60 * 60, //saves duration state for 1 hour
+                    "columnDefs": [{ targets: 8, className: 'text-left-strong' }],
+                    "iDisplayLength": recordsNum,
+                    "aoColumns": [{
+                        "sType": "customdatesort"
+                    },
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                    ]
+                }, { "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
+
+
+            tTomorrow = $('#datatable-tomorrow').DataTable(
+                {
+                    "stateDuration": 60 * 60, //saves duration state for 1 hour
+                    "columnDefs": [{ targets: 8, className: 'text-left-strong' }],
+                    "iDisplayLength": recordsNum,
+                    "aoColumns": [
+                        {
+                            "sType": "customdatesort"
+                        },
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                    ]
+                },
+                {
+                    "paging": false
+                },
+                {
+                    "visible": false,
+                    "targets": [1]
+                },
+                {
+                    "className": "dt-body-left",
+                    "targets": [3]
+                }
+            );
+
+
+            /*
+                         ============================
+                         || ↑DATATABLES PROPERTIES↑||
+                         ============================
+            */
 
             tMorning.state.clear();
             tAfternoon.state.clear();
@@ -461,10 +545,20 @@
                         //    btnStr += "";
                         //}
                         //else btnStr += " " + deleteBtn;
-                        btnStr += " " + editBtn + " " + deleteBtn;
 
 
 
+
+                        let candidatesBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='candidatesBtn' name='" + arr_rides[i].RidePatNum + "' title='הצג מועמדים לנסיעה'><i class='fa fa-car'></i></button>";
+
+
+                        btnStr += editBtn + " ";
+
+                        if (arr_rides[i].Drivers.length === 0) {
+                            btnStr += candidatesBtn + " ";
+                        }
+
+                        btnStr += deleteBtn;
 
                         //localStorage.setItem('IsAnonymous', JSON.stringify(arr_rides[i].Pat.IsAnonymous));
 
@@ -754,6 +848,21 @@
             });
         }
 
+
+        
+        const candidatesButton = (btn) => { 
+            let td = btn.parentNode;
+            let tr = td.parentNode;
+
+
+            let origin = tr.getElementsByTagName('td').OriginName.innerHTML;
+            let destenation = tr.getElementsByTagName('td').DestinationName.innerHTML;
+            let rideTiming = tr.getElementsByTagName('td').rideTiming.innerHTML;
+            let ridePatObj = { origin, destenation, rideTiming };
+            localStorage.setItem('ridePatObj', JSON.stringify(ridePatObj));
+            location.href = "viewCandidates.html";
+        }
+
         function showButton(ridePat) {
             arr_details = { RidePatNum: ridePat.name, func: "show" };//ridePat.name=RidePatNum
             GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
@@ -794,7 +903,6 @@
                 }
             });
         }
-
 
         function manipulateTables() {
 
@@ -990,11 +1098,11 @@
 
         function deleteRidePat(ridePat, func) {
             checkCookie();
-           // var numberOfRides = 1;
+            // var numberOfRides = 1;
             //var repeatRide = "";
             let ridePatNums2MarkDeleted = [];
             ridePatNums2MarkDeleted.push(ridePat.RidePatNum);
-            
+
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/ChangeArrayOF_RidePatStatuses",
@@ -1021,7 +1129,7 @@
                                 $("#returnRidePatMsg").text(returnRidePatMsg);
                                 $("#messagesModal").modal();
                             }
-                            
+
                         }
                     }
                     else {
@@ -1400,12 +1508,7 @@
     <script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
     <script src="//cdn.datatables.net/plug-ins/1.10.12/sorting/datetime-moment.js"></script>-->
     <script type="text/javascript">
-
         TableManageButtons.init();
-
-
-
-
     </script>
 
     <div class="modal fade" id="messagesModal" tabindex="-1" role="dialog" aria-labelledby="messagesModalTitle" aria-hidden="true">
