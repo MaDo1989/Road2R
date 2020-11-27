@@ -157,6 +157,22 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetVolunteersRideHistory(int volunteerId)
+    {
+        try
+        {
+            List<RidePat> ridesRecords = new RidePat().GetVolunteersRideHistory(volunteerId);
+            return j.Serialize(ridesRecords);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetVolunteersRideHistory", ex);
+            throw new Exception("שגיאה בהבאת היסטוריית הסעות של מתנדב");
+        }
+    }
+
+    [WebMethod(EnableSession = true)]
     public string getescortedsListMobile(string displayName, string patientCell)
     {
         try
