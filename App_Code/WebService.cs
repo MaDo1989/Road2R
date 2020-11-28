@@ -1868,5 +1868,71 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
+
+    #region DocumentedCall Module
+
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    [WebMethod(EnableSession = true)]
+    public string GetDocumentedCallsByDriverId(int driverId)
+    {
+        try
+        {
+            List<DocumentedCall> documentedCalls = new DocumentedCall().GetDocumentedCallsByDriverId(driverId);
+            return j.Serialize(documentedCalls);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetDocumentedCallsByDriverId", ex);
+            throw new Exception("Error in GetDocumentedCallsByDriverId ---> ex.Message: " + ex.Message);
+        }
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    public bool ChangeDocumentedCallStatus(int callId, string newValue)
+    {
+        try
+        {
+            return new DocumentedCall().ChangeDocumentedCallStatus(callId, newValue);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in ChangeDocumentedCallStatus", ex);
+            throw new Exception("Error in ChangeDocumentedCallStatus ---> ex.Message: " + ex.Message);
+        }
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    public bool DocumentNewCall(int driverId, int coordinatorId, DateTime callRecordedDate, TimeSpan callRecordedTime, string callContent)
+    {
+        /*
+         IMPORTANT NOTE!
+            THIS METHOD HAS NOT TESTED YET DUE TO THIS ISSUE:
+        "‏‏טופס הבדיקה זמין רק עבור פעולות שירות הכוללות סוגי נתונים בסיסיים כפרמטרים."
+         WILL BE TESTED AS SOON AS THE HTML PAGE WILL BE UP
+         */
+
+        try
+        {
+            return new DocumentedCall().DocumentNewCall(driverId, coordinatorId, callRecordedDate, callRecordedTime, callContent);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in DocumentNewCall", ex);
+            throw new Exception("Error in DocumentNewCall ---> ex.Message: " + ex.Message);
+        }
+
+    }
+
+
+
+
+    #endregion
+
+
 }
+
+
+
 
