@@ -1904,7 +1904,7 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
-    public bool DocumentNewCall(int driverId, int coordinatorId, DateTime callRecordedDate, TimeSpan callRecordedTime, string callContent)
+    public bool DocumentNewCall(DocumentedCall documentedCall)
     {
         /*
          IMPORTANT NOTE!
@@ -1912,18 +1912,39 @@ public class WebService : System.Web.Services.WebService
         "‏‏טופס הבדיקה זמין רק עבור פעולות שירות הכוללות סוגי נתונים בסיסיים כפרמטרים."
          WILL BE TESTED AS SOON AS THE HTML PAGE WILL BE UP
          */
-
         try
         {
-            return new DocumentedCall().DocumentNewCall(driverId, coordinatorId, callRecordedDate, callRecordedTime, callContent);
+            return new DocumentedCall().DocumentNewCall(documentedCall);
         }
         catch (Exception ex)
         {
             Log.Error("Error in DocumentNewCall", ex);
             throw new Exception("Error in DocumentNewCall ---> ex.Message: " + ex.Message);
         }
-
     }
+
+
+
+    [WebMethod(EnableSession = true)]
+    public bool UpdateDocumentedCallField(string field2update, DocumentedCall documentedCall)
+    {
+        /*
+         IMPORTANT NOTE!
+            THIS METHOD HAS NOT TESTED YET DUE TO THIS ISSUE:
+        "‏‏טופס הבדיקה זמין רק עבור פעולות שירות הכוללות סוגי נתונים בסיסיים כפרמטרים."
+         WILL BE TESTED AS SOON AS THE HTML PAGE WILL BE UP
+         */
+        try
+        {
+            return new DocumentedCall().UpdateDocumentedCallField(field2update, documentedCall);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in UpdateDocumentedCallField", ex);
+            throw new Exception("Error in UpdateDocumentedCallField ---> ex.Message: " + ex.Message);
+        }
+    }
+
 
 
 

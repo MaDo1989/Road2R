@@ -77,11 +77,11 @@ public class DocumentedCall
         }
 
     }
-    public bool DocumentNewCall(int driverId, int coordinatorId, DateTime callRecordedDate, TimeSpan callRecordedTime, string callContent)
+    public bool DocumentNewCall(DocumentedCall documentedCall)
     {
-        query = "exec spDocumentedCall_InsertCall @driverId=" + driverId;
-        query += ", @coordinatorId=" + coordinatorId + ", @callRecordedDate='" + callRecordedDate + "',";
-        query += "@callRecordedTime='" + callRecordedTime + "', @callContent=N'" + callContent + "'";
+        query = "exec spDocumentedCall_InsertCall @driverId=" + documentedCall.DriverId;
+        query += ", @coordinatorId=" + documentedCall.CoordinatorId + ", @callRecordedDate='" + documentedCall.CallRecordedDate + "',";
+        query += "@callRecordedTime='" + documentedCall.CallRecordedTime + "', @callContent=N'" + documentedCall.CallContent + "'";
 
         try
         {
@@ -98,9 +98,35 @@ public class DocumentedCall
 
     }
 
-    public bool UpdateDocumentedCallField(int callId, string feild, string newValue)
+    public bool UpdateDocumentedCallField(string field2update, DocumentedCall documentedCall)
     {
-        throw new NotImplementedException();
+        switch (field2update)
+        {
+            case "Date":
+                query = "exec spDocumentedCall_UpdateCallRecordedDate @CallId = " + documentedCall.CallId + ", @newValue='" + documentedCall.CallRecordedDate + "'";
+                break;
+            case "Time":
+                query = "exec spDocumentedCall_UpdateCallRecordedTime @CallId=" + documentedCall.CallId + ", @newValue='" + documentedCall.CallRecordedTime + "'";
+                break;
+            case "Content":
+                query = "exec spDocumentedCall_UpdateCallContent @CallId=" + documentedCall.CallId + ", @newValue=N'" + documentedCall.CallContent + "'";
+                break;
+            default:
+                throw new Exception("there was no valid field2update inserted to: UpdateDocumentedCallField(string field2update, DocumentedCall documentedCall)");
+        }
+
+        try
+        {
+            dbs = new DbService();
+
+            int res = dbs.ExecuteQuery(query);
+
+            return res > 0;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
     }
 
 }
