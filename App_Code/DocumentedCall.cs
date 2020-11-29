@@ -5,10 +5,24 @@ using System.Linq;
 using System.Web;
 
 /// <summary>
-/// Summary description for DocumentedCalls
+         /*
+         =======================================================
+         ||           ---!!!IMPORTANT NOTE!!!-- -             ||
+         ||              ********************                 ||
+         ||       for any use of this module                  ||
+         ||       use the existing stored procedures          ||
+         ||       as some of them has additional              ||
+         ||       functionallity                              ||
+         ||              ********************                 ||
+         ||           ---!!!IMPORTANT NOTE!!!-- -             ||
+         =======================================================
+         */
 /// </summary>
 public class DocumentedCall
 {
+
+
+
     //private fields
     string query;
     DbService dbs;
