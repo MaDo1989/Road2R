@@ -139,6 +139,7 @@ var S_refresh_preview = null;
 function init_reports_page() {
     includeHTML();
     set_banner_debug_data();
+    process_permissions();
 }
 
 
@@ -154,6 +155,26 @@ function set_banner_debug_data() {
     }
 }
 
+//* Purpose show UI that is available to specific users
+function process_permissions() {
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetCurrentUserEntitlements",
+        contentType: "application/json; charset=utf-8",
+        type: "POST",
+        async: true,
+        success: function (data) {
+            var permissions = JSON.parse(data.d);
+            for (a_permission of permissions) {
+                if (a_permission == "Record_NI_report") {
+                    $("#rp_special_list").show();
+                }
+            }
+        },
+        error: function (err) { alert("Error in process_permissions"); }
+    });
+
+}
 
 // Handle a click event on one of the reports in the Reports-Tree
 function on_report_click(event) {
@@ -1097,6 +1118,7 @@ function hide_all_tables() {
     $('#div_table_amuta_vls_per_pat').hide();
     $('#div_table_amuta_vls_km').hide();
     $('#div_table_amuta_vls_list').hide();
+    $('#div_table_amuta_vls_per_month').hide();
  }
 
 

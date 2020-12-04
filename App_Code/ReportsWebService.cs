@@ -106,10 +106,10 @@ public class ReportsWebService : System.Web.Services.WebService
     {
         try
         {
+            string cell_phone = (string)HttpContext.Current.Session["userSession"];
             HttpResponse response = GzipMe();
-
             ReportService report = new ReportService();
-            List<ReportService.VolunteerInfo> r = report.GetReportVolunteerList(start_date, config);
+            List<ReportService.VolunteerInfo> r = report.GetReportVolunteerList(start_date, config, cell_phone);
             j.MaxJsonLength = Int32.MaxValue;
             return j.Serialize(r);
         }
@@ -143,6 +143,7 @@ public class ReportsWebService : System.Web.Services.WebService
 
     }
 
+   
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -208,7 +209,27 @@ public class ReportsWebService : System.Web.Services.WebService
 
     }
 
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetCurrentUserEntitlements()
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
 
+            string cell_phone = (string)HttpContext.Current.Session["userSession"];
+            ReportService report = new ReportService();
+            List<string> r = report.GetCurrentUserEntitlements(cell_phone);
+
+            j.MaxJsonLength = Int32.MaxValue;
+            return j.Serialize(r);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetUserEntitlements", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+    }
 
 }
 

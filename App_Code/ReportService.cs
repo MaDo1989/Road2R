@@ -223,8 +223,17 @@ AND RidePat.pickuptime >= '2020-1-01'
         return id;
     }
 
-    internal List<VolunteerInfo> GetReportVolunteerList(string start_date, string config)
+    internal List<VolunteerInfo> GetReportVolunteerList(string start_date, string config, string cell_phone)
     {
+        List<VolunteerInfo> result = new List<VolunteerInfo>();
+
+        // This service is not to be used by everybody, check if user is entitled for it
+        List<string> permissions = this.GetCurrentUserEntitlements(cell_phone);
+        if ( !permissions.Contains("Record_NI_report"))
+        {
+            return result;   // Empty results - TODO: 404
+        }
+
         DbService db = new DbService();
         SqlCommand cmd;
         if (config.Equals("start_date"))
@@ -247,8 +256,6 @@ AND RidePat.pickuptime >= '2020-1-01'
         cmd.CommandType = CommandType.Text;
         DataSet ds = db.GetDataSetBySqlCommand(cmd);
         DataTable dt = ds.Tables[0];
-
-        List<VolunteerInfo> result = new List<VolunteerInfo>();
 
         foreach (DataRow dr in dt.Rows)
         {
@@ -345,6 +352,35 @@ order BY DisplayName ASC
 
         return result;
     }
+
+    // Purpose: Let the web app know what  is applicable for this user
+    // Returns: List of special priviliages. Can be empty if user has nothing special         
+    // Usage:
+    //       1. Who can "click the button" that records in DB the National Insurance report
+    internal List<string> GetCurrentUserEntitlements(string cell_phone)
+    {
+        List<string> result = new List<string>();
+        if (!String.IsNullOrEmpty(cell_phone))
+        {
+            DbService db = new DbService();
+
+            string query = @"select Permission FROM ReportPermissions WHERE Cellphone = @cell_phone";
+
+            SqlCommand cmd = new SqlCommand(query);
+            cmd.CommandType = CommandType.Text;
+            cmd.Parameters.Add("@cell_phone", SqlDbType.NVarChar).Value = cell_phone;
+
+            DataSet ds = db.GetDataSetBySqlCommand(cmd);
+            DataTable dt = ds.Tables[0];
+
+            foreach (DataRow dr in dt.Rows)
+            {
+                result.Add(dr["Permission"].ToString());
+            }
+        }
+        return result;
+    }
+
 
     internal List<VolunteerPerPatient> GetReportVolunteersPerPatient(int patient)
     {
