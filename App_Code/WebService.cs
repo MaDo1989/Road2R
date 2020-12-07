@@ -158,16 +158,16 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetVolunteersRideHistory(int volunteerId)
+    public string GetVolunteersDocumentedRides(int volunteerId)
     {
         try
         {
-            List<RidePat> ridesRecords = new RidePat().GetVolunteersRideHistory(volunteerId);
+            List<RidePat> ridesRecords = new RidePat().GetVolunteersDocumentedRides(volunteerId);
             return j.Serialize(ridesRecords);
         }
         catch (Exception ex)
         {
-            Log.Error("Error in GetVolunteersRideHistory", ex);
+            Log.Error("Error in GetVolunteersDocumentedRides", ex);
             throw new Exception("שגיאה בהבאת היסטוריית הסעות של מתנדב");
         }
     }
@@ -1906,12 +1906,10 @@ public class WebService : System.Web.Services.WebService
     [WebMethod(EnableSession = true)]
     public bool DocumentNewCall(DocumentedCall documentedCall)
     {
-        /*
-         IMPORTANT NOTE!
-            THIS METHOD HAS NOT TESTED YET DUE TO THIS ISSUE:
-        "‏‏טופס הבדיקה זמין רק עבור פעולות שירות הכוללות סוגי נתונים בסיסיים כפרמטרים."
-         WILL BE TESTED AS SOON AS THE HTML PAGE WILL BE UP
-         */
+        if (documentedCall.CallContent.IndexOf("'") != -1)
+        {
+            documentedCall.CallContent = documentedCall.CallContent.Replace("'", "''");
+        }
         try
         {
             return new DocumentedCall().DocumentNewCall(documentedCall);

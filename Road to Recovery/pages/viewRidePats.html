@@ -315,6 +315,10 @@
 
         function refreshTable() {
             //this function doesnt changeing timeFilteredArr or fetching data from the back-end
+            $('#wait').show();
+            setTimeout(() => { $('#wait').hide() },3000);
+
+
             checkCookie();
 
             ridePatNums2MarkDeleted = [];

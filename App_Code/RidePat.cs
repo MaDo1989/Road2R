@@ -332,7 +332,7 @@ public class RidePat
         return areaForRidepat;
     }
 
-    public List<RidePat> GetVolunteersRideHistory(int volunteerId)
+    public List<RidePat> GetVolunteersDocumentedRides(int volunteerId)
     {
         string query = "exec spRideAndRidePat_GetVolunteersRideHistory @volunteerID =" + volunteerId;
         List<RidePat> thisVolunteerRides = new List<RidePat>();

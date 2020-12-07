@@ -32,6 +32,7 @@ public class DocumentedCall
     public int CoordinatorId { get; set; }
     public DateTime CallRecordedDate { get; set; } // YYYY-MM-DD
     public TimeSpan CallRecordedTime { get; set; } // HH:MM
+    public DateTime FullDateStemp { get; set; } // for sorting in an accurate way
     public string CallContent { get; set; }
     public string CallStatus { get; set; }
     public string DriverName { get; set; }              //comes from the DocumentedCallView
@@ -58,6 +59,7 @@ public class DocumentedCall
                 documentedCall.CallContent = Convert.ToString(sdr["CallContent"]);
                 documentedCall.DriverName = Convert.ToString(sdr["DriverName"]);
                 documentedCall.CoordinatorName = Convert.ToString(sdr["CoordinatorName"]);
+                documentedCall.FullDateStemp = documentedCall.CallRecordedDate + documentedCall.CallRecordedTime;
                 documentedCalls.Add(documentedCall);
             }
             return documentedCalls;
@@ -93,8 +95,11 @@ public class DocumentedCall
     }
     public bool DocumentNewCall(DocumentedCall documentedCall)
     {
+        //→receiving date as dd/mm/yyy and need to conert to yyyy-mm-dd so the db will write the correct date:
+
+
         query = "exec spDocumentedCall_InsertCall @driverId=" + documentedCall.DriverId;
-        query += ", @coordinatorId=" + documentedCall.CoordinatorId + ", @callRecordedDate='" + documentedCall.CallRecordedDate + "',";
+        query += ", @coordinatorId=" + documentedCall.CoordinatorId + ", @callRecordedDate='" + documentedCall.CallRecordedDate.ToString("yyyy-MM-dd") + "',";
         query += "@callRecordedTime='" + documentedCall.CallRecordedTime + "', @callContent=N'" + documentedCall.CallContent + "'";
 
         try
