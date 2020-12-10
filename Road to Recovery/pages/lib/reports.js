@@ -140,6 +140,8 @@ function init_reports_page() {
     includeHTML();
     set_banner_debug_data();
     process_permissions();
+
+    init_components();
 }
 
 
@@ -176,6 +178,10 @@ function process_permissions() {
 
 }
 
+function init_components() {
+    // Datatables date-time plugin
+    $.fn.dataTable.moment('DD/MM/YYYY');
+}
 // Handle a click event on one of the reports in the Reports-Tree
 function on_report_click(event) {
 
@@ -736,6 +742,9 @@ function refresh_amuta_vls_week_Table(start_date, end_date) {
 // 'start_date' :  a date formatted as YYYY-MM-DD
 // 'end_date'   :  a date formatted as YYYY-MM-DD
 function refresh_amuta_vls_km_Table(start_date, end_date) {
+
+    
+
     hide_all_tables();
     $('#wait').show();
     var query_object = {

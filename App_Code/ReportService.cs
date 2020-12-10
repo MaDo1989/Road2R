@@ -7,6 +7,31 @@ using System.Globalization;
 using System.Linq;
 using System.Web;
 
+/* Notes:
+ * 
+ select MainDriver, Volunteer.DisplayName, Volunteer.CityCityName, Volunteer.CellPhone, Volunteer.JoinDate ,
+  sum(case when MONTH([pickuptime]) = '1' then 1 else 0 end) Jan_2020,
+  sum(case when MONTH([pickuptime]) = '2' then 1 else 0 end) Feb_2020,
+  sum(case when MONTH([pickuptime]) = '3' then 1 else 0 end) Mar_2020,
+  sum(case when MONTH([pickuptime]) = '4' then 1 else 0 end) Apr_2020,
+  sum(case when MONTH([pickuptime]) = '5' then 1 else 0 end) May_2020,
+  sum(case when MONTH([pickuptime]) = '6' then 1 else 0 end) Jun_2020,
+  sum(case when MONTH([pickuptime]) = '7' then 1 else 0 end) Jul_2020,
+  sum(case when MONTH([pickuptime]) = '8' then 1 else 0 end) Aug_2020,
+  sum(case when MONTH([pickuptime]) = '9' then 1 else 0 end) Sep_2020,
+  sum(case when MONTH([pickuptime]) = '10' then 1 else 0 end) Oct_2020,
+  sum(case when MONTH([pickuptime]) = '11' then 1 else 0 end) Nov_2020,
+  sum(case when MONTH([pickuptime]) = '12' then 1 else 0 end) Dec_2020
+FROM RPView  rp
+INNER JOIN Volunteer on Volunteer.Id = rp.MainDriver 
+WHERE pickuptime >= '2020-1-01' 
+AND pickuptime < CURRENT_TIMESTAMP
+Group BY MainDriver, Volunteer.DisplayName, Volunteer.CityCityName, Volunteer.CellPhone, Volunteer.JoinDate
+;
+
+
+  
+ */
 public class ReportService
 {
 
@@ -288,7 +313,7 @@ AND RidePat.pickuptime >= '2020-1-01'
         DbService db = new DbService();
 
         string query =
- @"select pickuptime, Origin, Destination, Volunteer.DisplayName, PatName
+ @"select convert(varchar, PickupTime, 103) AS PickupTime, Origin, Destination, Volunteer.DisplayName, PatName
 from 
 ( SELECT pickuptime, Origin, Destination, MainDriver, DisplayName AS PatName FROM RPView 
 WHERE pickuptime >= '2019-1-01'
@@ -317,7 +342,7 @@ ORDER BY Volunteer.DisplayName ASC
             obj.Patient = dr["PatName"].ToString();
             obj.Origin = dr["Origin"].ToString();
             obj.Destination = dr["Destination"].ToString();
-            obj.Date = dr["pickuptime"].ToString();
+            obj.Date = dr["PickupTime"].ToString();
             result.Add(obj);
         }
 
