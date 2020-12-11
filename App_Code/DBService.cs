@@ -5,6 +5,7 @@ using System.Web;
 using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
+using log4net;
 
 /// <summary>
 /// Summary description for DbService
@@ -16,7 +17,6 @@ public class DbService
     SqlConnection con;
 
     SqlDataAdapter adp;
-
     public DbService()
     {
         try
@@ -39,7 +39,7 @@ public class DbService
         }
     }
 
-    public DataSet GetDataSetByQuery(string sqlQuery,bool needToClose = true,CommandType cmdType = CommandType.Text, params SqlParameter[] parametersArray)
+    public DataSet GetDataSetByQuery(string sqlQuery, bool needToClose = true, CommandType cmdType = CommandType.Text, params SqlParameter[] parametersArray)
     {
         try
         {
@@ -192,6 +192,47 @@ public class DbService
 
     }
 
+    //Yogev ↓
+    public SqlDataReader GetDataReader(string query)
+    {
+        /*
+
+
+        !!!
+
+        I intentionally do not use finally and then close con here
+        BE AWARE !
+        IF USE THIS METHOD CLOSE THE CONNECTION VIA CloseConnection() METHOD
+        FROM WHERE YOU USE IT !
+
+        !!!
+
+         */
+        try
+        {
+            if (con.State == ConnectionState.Closed) { con.Open(); }
+            cmd = new SqlCommand(query, con);
+            return cmd.ExecuteReader();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("exception in DBService →  GetDataReader(string query) " + ex);
+        }
+        /*
+
+        !!!
+        
+        I intentionally do not use finally and then close con here
+        BE AWARE !
+        IF USE THIS METHOD CLOSE THE CONNECTION VIA CloseConnection() METHOD
+        FROM WHERE YOU USE IT !
+        
+        !!!
+
+
+         */
+    }
+    //Yogev ↑
 
 
 }

@@ -1,0 +1,52 @@
+﻿#wait {
+    position: fixed;
+    top: 50%;
+    left: 45%;
+    z-index: 2000;
+}
+
+
+#timeFiltersDiv {
+    text-align: center;
+}
+
+#importDataDiv {
+    padding-right: 0px;
+}
+
+#deleteRidesDiv {
+    padding-right: 0px;
+}
+
+#deleteFewRidePatsBtn, #importDataBtn, #recoverFewRidePatsBtn {
+    width: 30px;
+}
+
+/*OVER RIDES*/
+/*override swal style: */
+.sweet-alert {
+    width: 600px;
+}
+
+    .sweet-alert p {
+        font-size: 1.5em;
+        line-height: 35px;
+        font-weight: bold;
+    }
+
+    .sweet-alert h2 {
+        font-size: 35px;
+        font-weight: bold;
+    }
+
+
+#nice-horizontal-line {
+    border: 1px solid black;
+}
+/*override swal style: */
+
+/*override componenets.css*/
+table.dataTable thead > tr > th {
+    padding-left: 0px;
+}
+/*override componenets.css*/

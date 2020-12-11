@@ -79,7 +79,8 @@ public class Volunteer
     //Delete until here and dont forget the properties
 
     public List<RideStatus> Statusim { get; set; }
-
+    public int NoOfDocumentedCalls { get; set; }
+    public int NoOfDocumentedRides { get; set; }
     public class RideStatus
     {
         string name;
@@ -1383,6 +1384,9 @@ public class Volunteer
             v.TypeVol = dr["VolunTypeType"].ToString();
             v.Email = dr["Email"].ToString();
             v.Device = dr["device"].ToString();
+            v.NoOfDocumentedCalls = Convert.ToInt32(dr["NoOfDocumentedCalls"]);
+            v.NoOfDocumentedRides = Convert.ToInt32(dr["NoOfDocumentedRides"]);
+
             //v.Day1 = dr["preferDay1"].ToString();
             //v.Hour1 = dr["preferHour1"].ToString();
             //v.Day2 = dr["preferDay2"].ToString();
@@ -1416,7 +1420,10 @@ public class Volunteer
 
             v.EnglishName = dr["englishName"].ToString();
             v.LastModified = dr["lastModified"].ToString();
-
+            if (dr["isDriving"].ToString() != "")
+            {
+                v.IsDriving = Convert.ToBoolean(dr["isDriving"].ToString());
+            }
             list.Add(v);
         }
         #endregion

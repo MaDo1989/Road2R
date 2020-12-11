@@ -328,7 +328,7 @@ public class Message
 
 
     public void cancelRide(int ridePatID, Volunteer user)
-    {
+    {//this methog is to inform a DRIVER on ride cancelation !
         //get ride details and generate msg
         RidePat rp = new RidePat();
         var abc = rp.GetRidePat(ridePatID);
@@ -507,11 +507,15 @@ public class Message
         }
         //insert msg to db
 
+
         string sender;
-        try { sender = (string)HttpContext.Current.Session["loggedInName"]; }
-        catch
+        if (HttpContext.Current.Session["loggedInName"] == null)
         {
             sender = "הנהג";
+        }
+        else
+        {
+            sender = (string)HttpContext.Current.Session["loggedInName"];
         }
 
         int msgID = insertMsg(0, "Canceled by driver", "נסיעה בוטלה על ידי נהג\\ת", message, ridePatID, System.DateTime.Now, user.Id, "", true, false, false, sender);
@@ -810,12 +814,14 @@ public class Message
     }
 
     public void coordinatorCanceledRide(int ridePatID, Volunteer user)
-    {
+    {//this method is to inform a coordinator about ride cancellation
+
         //get ride details and generate message
         RidePat rp = new RidePat();
         var abc = rp.GetRidePat(ridePatID);
         Volunteer coor = new Volunteer();
         coor = abc.Coordinator.getVolunteerByDisplayName(abc.Coordinator.DisplayName);
+
 
         TimeZoneInfo sourceTimeZone = TimeZoneInfo.FindSystemTimeZoneById("UTC");
         TimeZoneInfo targetTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Israel Standard Time");
@@ -823,7 +829,6 @@ public class Message
         string time = converted.ToShortTimeString();
         if (time == "22:14")
         {
-
             time = "אחה\"צ";
         }
         //abc.Date.ToShortDateString()
@@ -837,14 +842,14 @@ public class Message
             userId = user.Id;
             message = "נסיעה בוטלה על ידי הרכז/ת " + abc.Coordinator.DisplayName + "." + " הנסיעה בתאריך " + abc.Date.ToShortDateString() + " בשעה " + time + " עם החולה " + abc.Pat.DisplayName + " על ידי הנהג/ת " + V.DisplayName;
         }
-
+     
         //insert msg to db
-        string sender = (string)HttpContext.Current.Session["loggedInName"];
-        int msgID = insertMsg(0, "Canceled by coordinator", "נסיעה בוטלה על ידי רכז/ת", message, ridePatID, System.DateTime.Now, userId, "", true, false, false, sender);
+        string sender = (string)HttpContext.Current.Session["loggedInName"];             
+        LogEntry log = new LogEntry(System.DateTime.Now, "hardware", message, 1234);
+
 
 
         var data = new JObject();
-
         if (coor.Device == "iOS")
         {
             //PUSH IOS
