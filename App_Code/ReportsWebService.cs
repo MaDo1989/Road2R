@@ -52,24 +52,15 @@ public class ReportsWebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetReportVolunteerRides(int volunteerId, string start_date, string end_date)
+    public List<ReportService.RidesForVolunteer> GetReportVolunteerRides(int volunteerId, string start_date, string end_date)
     {
         try
         {
             HttpResponse response = GzipMe();
-            //string AcceptEncoding = HttpContext.Current.Request.Headers["Accept-Encoding"];
-            //if (AcceptEncoding.Contains("gzip"))
-            //{
-            //    HttpResponse Response = HttpContext.Current.Response;
-            //    Response.Filter = new System.IO.Compression.GZipStream(Response.Filter, System.IO.Compression.CompressionMode.Compress);
-            //    Response.Headers.Remove("Content-Encoding");
-            //    Response.AppendHeader("Content-Encoding", "gzip");
-            //}
 
             ReportService report = new ReportService();
-            List<RidePat> r = report.GetReportVolunteerRides(volunteerId, start_date, end_date);
-            j.MaxJsonLength = Int32.MaxValue;
-            return j.Serialize(r);
+            List<ReportService.RidesForVolunteer> r = report.GetReportVolunteerRides(volunteerId, start_date, end_date);
+            return r;
         }
         catch (Exception ex)
         {
@@ -147,7 +138,7 @@ public class ReportsWebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetReportVolunteersPerPatient(int patient)
+    public List<ReportService.VolunteerPerPatient> GetReportVolunteersPerPatient(int patient)
     {
         try
         {
@@ -155,8 +146,7 @@ public class ReportsWebService : System.Web.Services.WebService
 
             ReportService report = new ReportService();
             List<ReportService.VolunteerPerPatient> r = report.GetReportVolunteersPerPatient(patient);
-            j.MaxJsonLength = Int32.MaxValue;
-            return j.Serialize(r);
+            return r;
         }
         catch (Exception ex)
         {
@@ -211,18 +201,14 @@ public class ReportsWebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetCurrentUserEntitlements()
+        public List<string> GetCurrentUserEntitlements()
     {
         try
         {
-            HttpResponse response = GzipMe();
-
             string cell_phone = (string)HttpContext.Current.Session["userSession"];
             ReportService report = new ReportService();
             List<string> r = report.GetCurrentUserEntitlements(cell_phone);
-
-            j.MaxJsonLength = Int32.MaxValue;
-            return j.Serialize(r);
+            return r;
         }
         catch (Exception ex)
         {

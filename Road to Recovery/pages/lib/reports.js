@@ -1,8 +1,10 @@
 ﻿// Purpose: JS code for the reports UI
 
 
+
 // 24-Nov:  Avishai
 //1.  . מספר המתנדבים השונים שהסיעו בכל חודש בשנתיים האחרונות. 
+
 
 
 // 31-Oct-20:  Implement code after populating template_DATE_LATER_THAN, so that if radio group
@@ -10,6 +12,7 @@
 // Set default date to 1/1/2020 
 
 
+//   GetRidePatViewByTimeFilter    ==>   All RIDES  
 
 // 020Oct : Shlomit Meler bug.
 /* 
@@ -166,7 +169,7 @@ function process_permissions() {
         type: "POST",
         async: true,
         success: function (data) {
-            var permissions = JSON.parse(data.d);
+            var permissions = data.d;
             for (a_permission of permissions) {
                 if (a_permission == "Record_NI_report") {
                     $("#rp_special_list").show();
@@ -938,7 +941,7 @@ function refresh_amuta_vls_per_pat_Table(patient) {
         data: JSON.stringify(query_object),
         success: function (data) {
             $('#wait').hide();
-            arr_rides = JSON.parse(data.d);
+            arr_rides = data.d;
 
             $('#div_table_amuta_vls_per_pat').show();
             tbl = $('#table_amuta_vls_per_pat').DataTable({
@@ -976,7 +979,6 @@ function refresh_amuta_vls_per_pat_Table(patient) {
 // 'end_date'   :  a date formatted as YYYY-MM-DD
 function refreshTable(volunteerId, start_date, end_date) {
     ridesToShow = [];
-    allRides = [];
 
     $('#wait').show();
     hide_all_tables();
@@ -998,61 +1000,33 @@ function refreshTable(volunteerId, start_date, end_date) {
         data: JSON.stringify(query_object),
         success: function (data) {
             $('#wait').hide();
-            arr_rides = JSON.parse(data.d);
+            arr_rides = data.d
             // DEBUG console.log(arr_rides);
 
             for (i in arr_rides) {
 
-                //Change date format
-                var temp = arr_rides[i].Date.substring(arr_rides[i].Date.indexOf("(") + 1);
-                temp = temp.substring(0, temp.indexOf(")"));
-                var date = new Date(parseInt(temp));
+                let obj = arr_rides[i];
 
-                var HEBday = getDayString(date.getDay());
-
-                if (arr_rides[i].Drivers.length != 0) {
-                    driverName = arr_rides[i].Drivers[0].DisplayName;
-                }
-                destinationName = arr_rides[i].Destination.Name;
-                originName = arr_rides[i].Origin.Name;
-
-
-                if (date.getDate() < 10) {
-                    day = "0" + date.getDate();
-                } else day = date.getDate();
-
-
-                if (date.getMonth() + 1 < 10) {
-                    month = "0" + (date.getMonth() + 1);
-                } else month = date.getMonth() + 1;
-
+                var date = moment(obj.Date, "DD/MM/YYYY HH:mm:ss", true);
+                var HEBday = getDayString(date.day());
 
                 var d = new Date();
                 var timezoneOffset = 0; // The difference between UTC and Israel
 
-                if ((date.getHours() - timezoneOffset) < 10) {
-                    hours = "0" + (date.getHours() - timezoneOffset);
-                } else hours = (date.getHours() - timezoneOffset);
 
-                if (date.getMinutes() < 10) {
-                    minutes = "0" + date.getMinutes();
-                } else minutes = date.getMinutes();
-
-                console.log("arr_rides @", i, arr_rides[i].Pat);
-
-                if (arr_rides[i].Pat.DisplayName.includes("אנונימי")) {
+                if (obj.PatDisplayName.includes("אנונימי")) {
                     patDisplayName = "חולה";
                 } else {
-                    patDisplayName = arr_rides[i].Pat.DisplayName;
+                    patDisplayName = obj.PatDisplayName;
                 }
 
-                if (arr_rides[i].Pat.EscortedList.length != 0) {
-                    patDisplayName += " + " + arr_rides[i].Pat.EscortedList.length;
-                }
+//@@                if (arr_rides[i].Pat.EscortedList.length != 0) {
+//@@                    patDisplayName += " + " + arr_rides[i].Pat.EscortedList.length;
+//@@                 }
 
-                date2 = HEBday + " " + day + "/" + month + "/" + date.getUTCFullYear() % 2000;
-                time = hours + ":" + minutes;
-
+               // date2 = HEBday + " " + day + "/" + month + "/" + date.getUTCFullYear() % 2000;
+                date2 = HEBday + " " + date.format("DD/MM/YY");
+                time = date.format("hh:mm");
 
                 if (time == "22:14") { //22:14 is the default time to show afternoon אחה''צ
 
@@ -1060,35 +1034,17 @@ function refreshTable(volunteerId, start_date, end_date) {
                 }
 
 
-
                 var Ride = {};
-
-                if (arr_rides[i].Status == "ממתינה לשיבוץ") {
-                    drivers = arr_rides[i].Status;
-                } else {
-                    drivers = arr_rides[i].Drivers[0].DisplayName;
-                }
 
                 Ride = {
                     Date: date2,
-                    OriginName: arr_rides[i].Origin.Name,
-                    DestinationName: arr_rides[i].Destination.Name,
+                    OriginName: obj.OriginName,
+                    DestinationName: obj.DestinationName,
                     Time: time,
-                    PatDisplayName: patDisplayName,
-                    Coordinator: arr_rides[i].Coordinator.DisplayName,
-                    Drivers: drivers,
-                    Day: date2.slice(4, 5)
+                    PatDisplayName: patDisplayName
                 }
-
-
-                allRides.push(Ride);
-
-
-
-                    ridesToShow.push(Ride);
-
-
-            }
+                ridesToShow.push(Ride);
+           }
 
             tbl = $('#weeklyRides').DataTable({
                 pageLength: 500,
