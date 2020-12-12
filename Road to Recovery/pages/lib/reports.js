@@ -1008,11 +1008,10 @@ function refreshTable(volunteerId, start_date, end_date) {
                 let obj = arr_rides[i];
 
                 var date = moment(obj.Date, "DD/MM/YYYY HH:mm:ss", true);
+                date.add(3, 'hours'); // TimeZone differen between UTC and Israel
                 var HEBday = getDayString(date.day());
 
                 var d = new Date();
-                var timezoneOffset = 0; // The difference between UTC and Israel
-
 
                 if (obj.PatDisplayName.includes("אנונימי")) {
                     patDisplayName = "חולה";
@@ -1026,10 +1025,9 @@ function refreshTable(volunteerId, start_date, end_date) {
 
                // date2 = HEBday + " " + day + "/" + month + "/" + date.getUTCFullYear() % 2000;
                 date2 = HEBday + " " + date.format("DD/MM/YY");
-                time = date.format("hh:mm");
+                time = date.format("HH:mm");
 
                 if (time == "22:14") { //22:14 is the default time to show afternoon אחה''צ
-
                     time = " אחה\"צ";
                 }
 
