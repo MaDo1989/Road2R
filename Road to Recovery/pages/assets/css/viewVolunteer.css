@@ -75,9 +75,12 @@ button:disabled:hover {
 #DocumentAcall_writeContent {
     width: 20vw;
 }
-/*by setting resize to vertical
+#DocumentAcall_choooseCoordinator {
+    position: relative;
+}
+    /*by setting resize to vertical
     the horizonatal is disabled*/
-#DocumentAcall_writeContent {
+#DocumentAcall_writeContent:focus {
     resize: vertical;
 }
 
@@ -87,17 +90,19 @@ button:disabled:hover {
     display: none;
 }
 
-.fixWidth{
+.fixWidth {
     width: 70px;
 }
 
-#overRideBS_modal_4changeBg{
+#overRideBS_modal_4changeBg {
     background: #f9f9f9;
 }
+
 #overRideBS_modal_4changelinesColor {
     border-top: 1px solid #948e8e;
     border-bottom: 1px solid #948e8e;
 }
+
 .futureRide {
-  color: #0022f9;
+    color: #0022f9;
 }
