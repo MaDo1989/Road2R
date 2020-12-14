@@ -676,7 +676,7 @@
                     document.getElementById('DocumentAcall_choooseCoordinator').innerHTML = cordinatorsOptions;
 
                     
-                    let contentOptions = `<option value="${preDefinedContents[0].key}" selected disabled>${preDefinedContents[0].value}</option>`;
+                    let contentOptions = `<option value="${preDefinedContents[0].key}" selected>${preDefinedContents[0].value}</option>`;
                     //could be also hidden if needed ↑
                     for (var i = 1; i < preDefinedContents.length; i++) {
                         contentOptions += `<option value="${preDefinedContents[i].key}">${preDefinedContents[i].value}</option>`;
@@ -729,7 +729,7 @@
 
             let preDefinedContents_key = parseInt($('#DocumentAcall_choooseContent').val());
             let content2pass2DB;
-            if (Number.isNaN(preDefinedContents_key)) {
+            if (preDefinedContents_key === 0) {
                 content2pass2DB = $('#DocumentAcall_writeContent').val();
             } else {
                 content2pass2DB = $('#DocumentAcall_writeContent').val().length !== 0 ? $('#DocumentAcall_writeContent').val() + " - " : "";
