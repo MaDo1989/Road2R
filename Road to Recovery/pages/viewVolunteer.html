@@ -54,14 +54,14 @@
         let DocumentedCallsTable;
         let preDefinedContents = [
             { key: 0, value: '&lt;בחר מהרשימה או הכנס.י מלל חופשי בשדה הבא&gt;' },
-            { key: 1, value: 'ירשם להסעה' },
-            { key: 2, value: 'לא נרשם להסעה' },
-            { key: 3, value: 'לא פנוי לשיחה' },
+            { key: 1, value: 'תרשם/ירשם להסעה' },
+            { key: 2, value: 'לא נרשמ.ה להסעה' },
+            { key: 3, value: 'לא פנוי.ה לשיחה' },
             { key: 4, value: 'להתקשר במועד מאוחד יותר' },
             { key: 5, value: 'לא מסיע.ה בתקופה הקרובה' },
-            { key: 6, value: 'נא למחוק מהאפליקציה' }
+            { key: 6, value: 'נא להסיר מהמערכת' }
         ];
-
+        let spanBadgeId;
         let thisVolunteerId = 0;
 
         checkCookie();
@@ -148,6 +148,11 @@
             refreshTable();
         }
 
+        const disableFutureIn_DocumentAcallDatePicker = () => {
+            let today = new Date().toISOString().split('T')[0];
+            document.getElementById('DocumentAcallDatePicker').setAttribute('max', today);
+        }
+
         const driveMode = () => {
             localStorage.driveVol = $('#drivingVolunteers').prop('checked');
             refreshTable();
@@ -206,13 +211,13 @@
                         else cellphone2 = arr_volunteers[i].HomePhone;
 
                         let showDocumentedRidesBtn = '';
-                        showDocumentedRidesBtn += arr_volunteers[i].NoOfDocumentedRides < 10 ? '&nbsp' : '';
-                        showDocumentedRidesBtn += '<span><span class="badge badge-pill badge-default">' + arr_volunteers[i].NoOfDocumentedRides + '</span>';
+                        //showDocumentedRidesBtn += arr_volunteers[i].NoOfDocumentedRides < 10 ? '&nbsp' : '';
+                        showDocumentedRidesBtn += `<span><span class="badge badge-default">${arr_volunteers[i].NoOfDocumentedRides}</span>`;
                         showDocumentedRidesBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedRidesBtn" title="תיעוד הסעות" data-toggle="modal" data-target="#documentedRidesModal"><i class="fa fa-car" aria-hidden="true"></i></button>';
                         showDocumentedRidesBtn += '</span>';
                         btnStr += showDocumentedRidesBtn;
 
-                        let showDocumentedCallsBtn = '<span><span class="badge badge-pill badge-default">' + arr_volunteers[i].NoOfDocumentedCalls + '</span>';
+                        let showDocumentedCallsBtn = `<span><span id="badgeOf_${arr_volunteers[i].Id}" class="badge badge-pill badge-default">${arr_volunteers[i].NoOfDocumentedCalls}</span>`;
                         showDocumentedCallsBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedCallsBtn" title="שיחות מתועדות" data-backdrop="static" data-keyboard="false" data-toggle="modal" data-target="#DocumentedCallsModal"><i class="fa fa-phone" aria-hidden="true"></i></button>';
                         showDocumentedCallsBtn += '</span>';
                         btnStr += showDocumentedCallsBtn;
@@ -376,9 +381,11 @@
                 $('#wait').show();
 
                 let rowData = tbl.row($(this).parents('tr')).data();
+                spanBadgeId = this.parentElement.firstChild.id;
+
                 thisVolunteerId = rowData.Id; //this variable is goobal to this page & used also in documentAcall2DB !!!
 
-                $('#DocumentedCallsTitle').text("שיחות עם - " + rowData.DisplayName)
+                $('#DocumentedCallsTitle').text("שיחות עם " + rowData.DisplayName)
 
                 $.ajax({
                     dataType: "json",
@@ -405,8 +412,11 @@
                                     data: (data) => {
                                         if (data.CallRecordedTime === undefined) return;
                                         let time = data.CallRecordedTime;
-                                        time = time.Hours + ":" + time.Minutes;
-                                        return time;
+
+                                        let hh = time.Hours < 10 ? "0" + time.Hours : time.Hours;
+                                        hh += ":";
+                                        let mm = time.Minutes < 10 ? "0" + time.Minutes : time.Minutes;
+                                        return hh + mm;
                                     }
                                 },
                                 {
@@ -452,7 +462,7 @@
 
                 let rowData = tbl.row($(this).parents('tr')).data();
 
-                $('#documentedRidesTitle').text("תיעוד הסעות - " + rowData.DisplayName)
+                $('#documentedRidesTitle').text("תיעוד הסעות " + rowData.DisplayName)
                 $.ajax({
                     dataType: "json",
                     url: "WebService.asmx/GetVolunteersDocumentedRides",
@@ -469,7 +479,7 @@
 
                         historyTable = $('#documentedRidesTable').DataTable({
                             order: [[5, "desc"]],
-                            pageLength: 5,
+                            pageLength: 10,
                             data: data,
                             columns: [
                                 {
@@ -487,6 +497,12 @@
                                         let endTrim = fullTimeStempStr.indexOf(')');
                                         let fullTimeStempNumber = fullTimeStempStr.substring(startTrim, endTrim);
                                         let fullTimeStemp = new Date(parseInt(fullTimeStempNumber));
+
+                                        if (fullTimeStemp.getMinutes() === 14) {
+                                            if (fullTimeStemp.getHours() === 19 || fullTimeStemp.getHours() === 20 || fullTimeStemp.getHours() === 21) {
+                                                return 'אחרה"צ';
+                                            }
+                                        }
 
                                         let hh = fullTimeStemp.getHours() < 10 ? "0" + fullTimeStemp.getHours() : fullTimeStemp.getHours();
                                         hh += ":";
@@ -533,6 +549,12 @@
                                         }
                                     }
                                 },
+                                { "targets": 0, width: "10%" },
+                                { "targets": 1, width: "10%" },
+                                { "targets": 2, width: "20%" },
+                                { "targets": 3, width: "25%" },
+                                { "targets": 4, width: "35%" }
+
                             ]
                         });
                         $('#wait').hide();
@@ -637,7 +659,7 @@
             $('#wait').show();
             $.ajax({
                 dataType: "json",
-                url: "WebService.asmx/GetCoordinatorsList",
+                url: "WebService.asmx/getCoordinatorsList_version_02",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
                 success: function (data) {
@@ -653,9 +675,10 @@
                     }
                     document.getElementById('DocumentAcall_choooseCoordinator').innerHTML = cordinatorsOptions;
 
-
-                    let contentOptions;
-                    for (var i = 0; i < preDefinedContents.length; i++) {
+                    
+                    let contentOptions = `<option value="${preDefinedContents[0].key}" selected>${preDefinedContents[0].value}</option>`;
+                    //could be also hidden if needed ↑
+                    for (var i = 1; i < preDefinedContents.length; i++) {
                         contentOptions += `<option value="${preDefinedContents[i].key}">${preDefinedContents[i].value}</option>`;
                     }
                     document.getElementById('DocumentAcall_choooseContent').innerHTML = contentOptions;
@@ -691,6 +714,7 @@
 
 
         const cancelCallDocument = () => {
+            $('#DocumentAcallsModal').modal('toggle');
             $('.closeBtn_DocumentAcallsModal').prop('disabled', false);
             $('#documentAcallPlusBtn').prop('disabled', false);
 
@@ -733,6 +757,56 @@
                 type: "POST",
                 data: JSON.stringify({ documentedCall }),
                 success: function (data) {
+                    // ↓ front-end cheating ↓
+
+                    //step 1: show the change on the grid right away
+
+                    /*
+                     in order to add row to this dataTable you should
+
+                     1. convert callRecordedDate to the form of → "/Date(1607810400000)/"
+                     2. convert callRecordedTime to the form of → time object with hours and minutes properties
+
+                       or else you will suffer from various errors
+                     */
+                    let DocumentedCallTable = $('#DocumentedCallTable').DataTable();
+                    documentedCall.CoordinatorName = $("#DocumentAcall_choooseCoordinator option:selected").text();
+
+
+                    let convertable_CallRecordedDate = new Date(documentedCall.CallRecordedDate);
+                    convertable_CallRecordedDate = convertable_CallRecordedDate.getTime();
+                    documentedCall.CallRecordedDate = `/Date(${convertable_CallRecordedDate})/`;
+
+                    let convertable_CallRecordedFullDateStemp = new Date(); //=now()
+                    convertable_CallRecordedFullDateStemp = convertable_CallRecordedFullDateStemp.getTime();
+                    documentedCall.FullDateStemp = `/Date(${convertable_CallRecordedFullDateStemp})/`;
+
+
+                    let convertable_CallRecordedTime = {
+                        Hours: documentedCall.CallRecordedTime[0] + documentedCall.CallRecordedTime[1],
+                        Minutes: documentedCall.CallRecordedTime[3] + documentedCall.CallRecordedTime[4]
+                    };
+
+
+                    let addRowData = {
+                        CallRecordedDate: documentedCall.CallRecordedDate,
+                        CallRecordedTime: convertable_CallRecordedTime,
+                        CoordinatorName: documentedCall.CoordinatorName,
+                        CallContent: documentedCall.CallContent,
+                        FullDateStemp: documentedCall.FullDateStemp
+                    }
+
+                    DocumentedCallTable.row.add(addRowData).draw(false);
+
+
+
+
+                    //step 2: add +1 to cals badge
+
+                    document.getElementById(spanBadgeId).innerHTML = parseInt(document.getElementById(spanBadgeId).innerHTML) + 1;
+
+                    // ↑ front-end cheating ↑
+
                     swal({
                         title: "ההודעה תועדה, תודה",
                         timer: 1500,
@@ -750,9 +824,7 @@
 
 
 
-            $('#DocumentAcallsModal').modal('toggle')  //both of them should be toggled
-            $('#DocumentedCallsModal').modal('toggle') //both of them should be toggled
-
+            $('#DocumentAcallsModal').modal('toggle');
             $('.closeBtn_DocumentAcallsModal').prop('disabled', false);
             $('#documentAcallPlusBtn').prop('disabled', false);
 
@@ -1019,10 +1091,10 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content modal-lg">
                 <div class="modal-header">
-                    <h2 class="modal-title" id="documentedRidesTitle">היסטורית הסעות</h2>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button id="overRideBS_modal_4changeClose_x" type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
+                    <h2 class="modal-title" id="documentedRidesTitle">היסטורית הסעות</h2>
                 </div>
                 <div class="modal-body">
                     <table id="documentedRidesTable" class="table table-striped table-bordered">
@@ -1039,7 +1111,7 @@
                         <tbody></tbody>
                     </table>
                 </div>
-                <div class="modal-footer">
+                <div class="text-right modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">סגירה</button>
 
                 </div>
@@ -1052,10 +1124,10 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content modal-lg">
                 <div class="modal-header">
-                    <h2 class="modal-title" id="DocumentedCallsTitle">שיחות עם</h2>
-                    <button type="button" class="close closeBtn_DocumentAcallsModal" data-dismiss="modal" aria-label="Close">
+                    <button id="overRideBS_modal_4changeClose_x" type="button" class="close closeBtn_DocumentAcallsModal" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
+                    <h2 class="modal-title" id="DocumentedCallsTitle">שיחות עם</h2>
                 </div>
                 <div class="modal-body">
                     <div class="text-right">
@@ -1094,7 +1166,7 @@
                                     <tr>
                                         <td class="rightCol">בתאריך</td>
                                         <td class="leftCol">
-                                            <input id="DocumentAcallDatePicker" type="date" />
+                                            <input name="DocumentAcallDatePicker" id="DocumentAcallDatePicker" type="date" onclick="disableFutureIn_DocumentAcallDatePicker()" />
                                         </td>
                                     </tr>
                                     <tr>
@@ -1131,7 +1203,7 @@
                             <div class="text-right modal-footer">
                                 <!-- for some reason right in bs means left -->
                                 <button type="button" class="fixWidth btn btn-secondary" onclick="documentAcall2DB()">שמירה</button>
-                                <button type="button" class="fixWidth btn btn-secondary" data-dismiss="modal" onclick="cancelCallDocument()">ביטול</button>
+                                <button type="button" class="fixWidth btn btn-secondary" onclick="cancelCallDocument()">ביטול</button>
                             </div>
                         </div>
                     </div>
