@@ -106,3 +106,12 @@ button:disabled:hover {
 .futureRide {
     color: #0022f9;
 }
+
+#DocumentedCallTable_filter {
+    margin-left: -5px;
+}
+
+/*override bs */
+#overRideBS_modal_4changeClose_x {
+    font-size: 25px;
+}
