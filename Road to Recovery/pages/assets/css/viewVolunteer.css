@@ -37,11 +37,14 @@
 
 /*
     x button on top left of
-    calls doesnt compile with
+    calls 
+    doesnt compile with
     that funcionality
     so I make him ↓
 */
-button:disabled:hover {
+button:disabled:hover,
+select:disabled:hover,
+textarea:disabled:hover {
     cursor: not-allowed;
 }
 
@@ -115,3 +118,4 @@ button:disabled:hover {
 #overRideBS_modal_4changeClose_x {
     font-size: 42px;
 }
+

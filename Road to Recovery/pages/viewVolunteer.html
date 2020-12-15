@@ -51,9 +51,9 @@
         var cleanPhoneNumber;
         var msgTable;
         let historyTable;
-        let DocumentedCallsTable;
+        let documentedCallsTable;
         let preDefinedContents = [
-            { key: 0, value: '&lt;בחר מהרשימה או הכנס.י מלל חופשי בשדה הבא&gt;' },
+            { key: 0, value: '&lt;בחר.י מהרשימה או הכנס.י מלל חופשי בשדה הבא&gt;' },
             { key: 1, value: 'תרשם/ירשם להסעה' },
             { key: 2, value: 'לא נרשמ.ה להסעה' },
             { key: 3, value: 'לא פנוי.ה לשיחה' },
@@ -91,6 +91,25 @@
             //$('#menu').load('menu.html');
             //var userName = GENERAL.USER.getUserName();
             //$("#userName").html(userName);
+
+            $('#DocumentAcall_writeContent').blur(function () {
+                let content = $('#DocumentAcall_writeContent').val();
+                content.length > 0 ?
+                    $('#DocumentAcall_choooseContent').prop('disabled', true)
+                    :
+                    $('#DocumentAcall_choooseContent').prop('disabled', false);
+
+
+            });
+
+
+            $('#DocumentAcall_choooseContent').change(function () {
+                let value = $('#DocumentAcall_choooseContent').val();
+                value > 0 ?
+                    $('#DocumentAcall_writeContent').prop('disabled', true)
+                    :
+                    $('#DocumentAcall_writeContent').prop('disabled', false);
+            });
 
             //Create a DataTable from the Table
             t = $('#datatable-buttons').DataTable({
@@ -185,7 +204,7 @@
 
                     for (i in arr_volunteers) {
                         if (driveVol === true && (!arr_volunteers[i].IsDriving)) continue;
-                        var btnStr = ""
+                        var btnStr = '';
                         //כפתור צפייה כרגע מוסתר
                         //var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button>";
                         var editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button>";
@@ -194,14 +213,14 @@
 
                         if (arr_volunteers[i].IsActive == false) {
                             btnStr = "";
-                            var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo' ></i></button>";
+                            var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo'></i></button>";
                             btnStr += " " + reactiveBtn;
                         }
                         else {
-                            var deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove' ></i></button>";
-                            btnStr += " " + deleteBtn;
+                            var deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button>";
+                            //deleteBtn is concatnating last
 
-                            var messagesBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-light btn-sm m-b-5' id='messages' title='הודעות' data-toggle='modal' data-target='#messagesModal'><i class='fa fa-envelope-o' ></i></button>";
+                            var messagesBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-light btn-sm m-b-5' id='messages' title='הודעות' data-toggle='modal' data-target='#messagesModal'><i class='fa fa-envelope-o'></i></button>";
                             btnStr += " " + messagesBtn;
                         }
                         var cellphone2 = "";
@@ -211,17 +230,31 @@
                         else cellphone2 = arr_volunteers[i].HomePhone;
 
                         let showDocumentedRidesBtn = '';
-                        //showDocumentedRidesBtn += arr_volunteers[i].NoOfDocumentedRides < 10 ? '&nbsp' : '';
-                        showDocumentedRidesBtn += `<span><span class="badge badge-default">${arr_volunteers[i].NoOfDocumentedRides}</span>`;
+                       // showDocumentedRidesBtn += arr_volunteers[i].NoOfDocumentedRides < 10 ? '&nbsp' : '';
+                        showDocumentedRidesBtn += `<span class="badge badge-default">${arr_volunteers[i].NoOfDocumentedRides}</span>`;
                         showDocumentedRidesBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedRidesBtn" title="תיעוד הסעות" data-toggle="modal" data-target="#documentedRidesModal"><i class="fa fa-car" aria-hidden="true"></i></button>';
-                        showDocumentedRidesBtn += '</span>';
                         btnStr += showDocumentedRidesBtn;
 
-                        let showDocumentedCallsBtn = `<span><span id="badgeOf_${arr_volunteers[i].Id}" class="badge badge-pill badge-default">${arr_volunteers[i].NoOfDocumentedCalls}</span>`;
+                        let showDocumentedCallsBtn = '';
+                        showDocumentedCallsBtn += `<span id="badgeOf_${arr_volunteers[i].Id}" class="badge badge-pill badge-default">${arr_volunteers[i].NoOfDocumentedCalls}</span>`;
                         showDocumentedCallsBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedCallsBtn" title="שיחות מתועדות" data-backdrop="static" data-keyboard="false" data-toggle="modal" data-target="#DocumentedCallsModal"><i class="fa fa-phone" aria-hidden="true"></i></button>';
-                        showDocumentedCallsBtn += '</span>';
+
                         btnStr += showDocumentedCallsBtn;
 
+
+
+
+                        if (arr_volunteers[i].LastModified !== "") {
+                            let fullTimeStemp = arr_volunteers[i].LastModified;
+                            let dd = parseInt(fullTimeStemp.slice(0, 2)); //parseInt removing the zero prefixes
+                            let mm = parseInt(fullTimeStemp.slice(3, 5)); //parseInt removing the zero prefixes
+                            let yyyy = fullTimeStemp.slice(6, 10);
+                            let time = fullTimeStemp.slice(-8);
+
+                            arr_volunteers[i].LastModified = `${dd}.${mm}.${yyyy} ${time}`;
+                        }
+
+                        btnStr += " " + deleteBtn;
                         var Volunteer = {
                             Id: arr_volunteers[i].Id,
                             DisplayName: arr_volunteers[i].DisplayName,
@@ -264,16 +297,14 @@
 
                         ],
                         columns: [
-                            { data: "DisplayName", width: "10%" },
-                            { data: "TypeVol", width: "5%" },
-                            { data: "CellPhone", width: "5%" },
-
-                            { data: "EnglishName", width: "10%" },
-
-                            { data: "City", width: "7%" },
-                            { data: "Remarks", width: "20%" },
-                            { data: "LastModified", width: "15%" },
-                            { data: "Buttons", width: "28%" },
+                            { data: "DisplayName", width: "10%" },         //0
+                            { data: "TypeVol", width: "5%" },              //1
+                            { data: "CellPhone", width: "5%" },            //2
+                            { data: "EnglishName", width: "10%" },         //3
+                            { data: "City", width: "10%" },                //4
+                            { data: "Remarks", width: "20%" },             //5
+                            { data: "LastModified", width: "15%" },        //6
+                            { data: "Buttons", width: "25%" },             //7
                         ],
                     });
 
@@ -295,13 +326,13 @@
 
             //Note: in getMOnth function 0=January, 1=February etc...
 
-            let dd = fullTimeStemp.getDate() < 10 ? "0" + fullTimeStemp.getDate() : fullTimeStemp.getDate();
-            dd += ".";
-            let mm = fullTimeStemp.getMonth() < 9 ? "0" + parseInt(fullTimeStemp.getMonth() + 1) : fullTimeStemp.getMonth() + 1;
-            mm += ".";
+            let dd = fullTimeStemp.getDate();
+
+            let mm = fullTimeStemp.getMonth() + 1;
+
             let yyyy = fullTimeStemp.getFullYear();
 
-            return dd + mm + yyyy;
+            return `${dd}.${mm}.${yyyy}`;
         }
 
         const ConvertDBDate2UIFullStempDate = (dateAsStr) => {
@@ -381,7 +412,14 @@
                 $('#wait').show();
 
                 let rowData = tbl.row($(this).parents('tr')).data();
-                spanBadgeId = this.parentElement.firstChild.id;
+
+                let childrenof_td = this.parentElement.children;
+
+                for (let i = 0; i < childrenof_td.length; i++) {
+                    if (childrenof_td[i].id.includes('badgeOf_')) {
+                        spanBadgeId = childrenof_td[i].id;
+                    }
+                }
 
                 thisVolunteerId = rowData.Id; //this variable is goobal to this page & used also in documentAcall2DB !!!
 
@@ -395,10 +433,10 @@
                     data: JSON.stringify({ driverId: thisVolunteerId }),
                     success: function (data) {
                         data = JSON.parse(data.d)
-                        if (DocumentedCallsTable != null) {
-                            DocumentedCallsTable.destroy();
+                        if (documentedCallsTable != null) {
+                            documentedCallsTable.destroy();
                         }
-                        DocumentedCallsTable = $('#DocumentedCallTable').DataTable({
+                        documentedCallsTable = $('#DocumentedCallsTable').DataTable({
                             order: [[4, "desc"]],
                             pageLength: 5,
                             data: data,
@@ -413,9 +451,9 @@
                                         if (data.CallRecordedTime === undefined) return;
                                         let time = data.CallRecordedTime;
 
-                                        let hh = time.Hours < 10 ? "0" + time.Hours : time.Hours;
+                                        let hh = time.Hours < 10 && time.Hours.toString().length === 1 ? "0" + time.Hours : time.Hours;
                                         hh += ":";
-                                        let mm = time.Minutes < 10 ? "0" + time.Minutes : time.Minutes;
+                                        let mm = time.Minutes < 10 && time.Minutes.toString().length === 1 ? "0" + time.Minutes : time.Minutes;
                                         return hh + mm;
                                     }
                                 },
@@ -499,7 +537,7 @@
                                         let fullTimeStemp = new Date(parseInt(fullTimeStempNumber));
 
                                         if (fullTimeStemp.getMinutes() === 14) {
-                                            if (fullTimeStemp.getHours() === 19 || fullTimeStemp.getHours() === 20 || fullTimeStemp.getHours() === 21) {
+                                            if (fullTimeStemp.getHours() === 19 || fullTimeStemp.getHours() === 20 || fullTimeStemp.getHours() === 21 || fullTimeStemp.getHours() === 22) {
                                                 return 'אחרה"צ';
                                             }
                                         }
@@ -652,6 +690,9 @@
             loggedInUser.DisplayName = localStorage.getItem('userCell');
             loggedInUser.UserType = localStorage.getItem('userType');
             $('#DocumentAcall_writeContent').val('');
+            $('#DocumentAcall_choooseContent').prop('disabled', false);
+            $('#DocumentAcall_writeContent').prop('disabled', false);
+
             $('#DocumentAcall_contentErrorMsg').hide();
             $('#DocumentAcall_CoordinatorErrorMsg').hide();
 
@@ -665,7 +706,7 @@
                 success: function (data) {
                     $('#wait').hide();
                     allCordinatorsFromDB = JSON.parse(data.d);
-                    let cordinatorsOptions = '<option value="not selected">בחר רכז.ת</option>';
+                    let cordinatorsOptions = '<option value="not selected">בחר.י רכז.ת</option>';
 
                     for (var i = 0; i < allCordinatorsFromDB.length; i++) {
                         cordinatorsOptions += `<option value="${allCordinatorsFromDB[i].Id}"`;
@@ -675,7 +716,7 @@
                     }
                     document.getElementById('DocumentAcall_choooseCoordinator').innerHTML = cordinatorsOptions;
 
-                    
+
                     let contentOptions = `<option value="${preDefinedContents[0].key}" selected>${preDefinedContents[0].value}</option>`;
                     //could be also hidden if needed ↑
                     for (var i = 1; i < preDefinedContents.length; i++) {
@@ -728,11 +769,11 @@
             documentedCall.CallRecordedTime = $('#DocumentAcallTime').val();
 
             let preDefinedContents_key = parseInt($('#DocumentAcall_choooseContent').val());
-            let content2pass2DB;
+            let content2pass2DB = '';
             if (preDefinedContents_key === 0) {
                 content2pass2DB = $('#DocumentAcall_writeContent').val();
             } else {
-                content2pass2DB = $('#DocumentAcall_writeContent').val().length !== 0 ? $('#DocumentAcall_writeContent').val() + " - " : "";
+                //content2pass2DB = $('#DocumentAcall_writeContent').val().length !== 0 ? $('#DocumentAcall_writeContent').val() + " - " : "";
                 content2pass2DB += preDefinedContents[preDefinedContents_key].value;
             }
             documentedCall.CallContent = content2pass2DB;
@@ -769,18 +810,21 @@
 
                        or else you will suffer from various errors
                      */
-                    let DocumentedCallTable = $('#DocumentedCallTable').DataTable();
+                    let documentedCallsTable = $('#DocumentedCallsTable').DataTable();
                     documentedCall.CoordinatorName = $("#DocumentAcall_choooseCoordinator option:selected").text();
 
+
+
+                    let timeOfCall = documentedCall.CallRecordedTime;
+                    let dateOfCall = documentedCall.CallRecordedDate;
+
+                    let convertable_CallRecordedFullDateStemp = new Date(`${dateOfCall}, ${timeOfCall}`);
+                    convertable_CallRecordedFullDateStemp = convertable_CallRecordedFullDateStemp.getTime();
+                    documentedCall.FullDateStemp = `/Date(${convertable_CallRecordedFullDateStemp})/`;
 
                     let convertable_CallRecordedDate = new Date(documentedCall.CallRecordedDate);
                     convertable_CallRecordedDate = convertable_CallRecordedDate.getTime();
                     documentedCall.CallRecordedDate = `/Date(${convertable_CallRecordedDate})/`;
-
-                    let convertable_CallRecordedFullDateStemp = new Date(); //=now()
-                    convertable_CallRecordedFullDateStemp = convertable_CallRecordedFullDateStemp.getTime();
-                    documentedCall.FullDateStemp = `/Date(${convertable_CallRecordedFullDateStemp})/`;
-
 
                     let convertable_CallRecordedTime = {
                         Hours: documentedCall.CallRecordedTime[0] + documentedCall.CallRecordedTime[1],
@@ -796,7 +840,7 @@
                         FullDateStemp: documentedCall.FullDateStemp
                     }
 
-                    DocumentedCallTable.row.add(addRowData).draw(false);
+                    documentedCallsTable.row.add(addRowData).draw(false);
 
 
 
@@ -1137,7 +1181,7 @@
                             <i class="fa fa-plus"></i>
                         </button>
                     </div>
-                    <table id="DocumentedCallTable" class="table table-striped table-bordered">
+                    <table id="DocumentedCallsTable" class="table table-striped table-bordered">
                         <thead>
                             <tr dir="rtl">
                                 <th>תאריך</th>
