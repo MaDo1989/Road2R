@@ -51,7 +51,7 @@
         var cleanPhoneNumber;
         var msgTable;
         let historyTable;
-        let DocumentedCallsTable;
+        let documentedCallsTable;
         let preDefinedContents = [
             { key: 0, value: '&lt;בחר.י מהרשימה או הכנס.י מלל חופשי בשדה הבא&gt;' },
             { key: 1, value: 'תרשם/ירשם להסעה' },
@@ -414,7 +414,14 @@
                 $('#wait').show();
 
                 let rowData = tbl.row($(this).parents('tr')).data();
-                spanBadgeId = this.parentElement.firstChild.id;
+
+                let childrenof_td = this.parentElement.children;
+
+                for (let i = 0; i < childrenof_td.length; i++) {
+                    if (childrenof_td[i].id.includes('badgeOf_')) {
+                        spanBadgeId = childrenof_td[i].id;
+                    }
+                }
 
                 thisVolunteerId = rowData.Id; //this variable is goobal to this page & used also in documentAcall2DB !!!
 
@@ -428,10 +435,10 @@
                     data: JSON.stringify({ driverId: thisVolunteerId }),
                     success: function (data) {
                         data = JSON.parse(data.d)
-                        if (DocumentedCallsTable != null) {
-                            DocumentedCallsTable.destroy();
+                        if (documentedCallsTable != null) {
+                            documentedCallsTable.destroy();
                         }
-                        DocumentedCallsTable = $('#DocumentedCallTable').DataTable({
+                        documentedCallsTable = $('#DocumentedCallsTable').DataTable({
                             order: [[4, "desc"]],
                             pageLength: 5,
                             data: data,
@@ -764,7 +771,7 @@
             documentedCall.CallRecordedTime = $('#DocumentAcallTime').val();
 
             let preDefinedContents_key = parseInt($('#DocumentAcall_choooseContent').val());
-            let content2pass2DB;
+            let content2pass2DB = '';
             if (preDefinedContents_key === 0) {
                 content2pass2DB = $('#DocumentAcall_writeContent').val();
             } else {
@@ -805,7 +812,7 @@
 
                        or else you will suffer from various errors
                      */
-                    let DocumentedCallTable = $('#DocumentedCallTable').DataTable();
+                    let documentedCallsTable = $('#DocumentedCallsTable').DataTable();
                     documentedCall.CoordinatorName = $("#DocumentAcall_choooseCoordinator option:selected").text();
 
 
@@ -835,7 +842,7 @@
                         FullDateStemp: documentedCall.FullDateStemp
                     }
 
-                    DocumentedCallTable.row.add(addRowData).draw(false);
+                    documentedCallsTable.row.add(addRowData).draw(false);
 
 
 
@@ -1176,7 +1183,7 @@
                             <i class="fa fa-plus"></i>
                         </button>
                     </div>
-                    <table id="DocumentedCallTable" class="table table-striped table-bordered">
+                    <table id="DocumentedCallsTable" class="table table-striped table-bordered">
                         <thead>
                             <tr dir="rtl">
                                 <th>תאריך</th>
