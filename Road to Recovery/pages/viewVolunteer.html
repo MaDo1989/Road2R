@@ -210,16 +210,14 @@
                         var editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button>";
 
                         btnStr += /*showBtn + " " +*/ editBtn;
-
+                        let deleteBtn = '';
                         if (arr_volunteers[i].IsActive == false) {
                             btnStr = "";
                             var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo'></i></button>";
                             btnStr += " " + reactiveBtn;
                         }
                         else {
-                            var deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button>";
-                            //deleteBtn is concatnating last
-
+                            deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button>";
                             var messagesBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-light btn-sm m-b-5' id='messages' title='הודעות' data-toggle='modal' data-target='#messagesModal'><i class='fa fa-envelope-o'></i></button>";
                             btnStr += " " + messagesBtn;
                         }
@@ -538,7 +536,7 @@
 
                                         if (fullTimeStemp.getMinutes() === 14) {
                                             if (fullTimeStemp.getHours() === 19 || fullTimeStemp.getHours() === 20 || fullTimeStemp.getHours() === 21 || fullTimeStemp.getHours() === 22) {
-                                                return 'אחרה"צ';
+                                                return 'אחה"צ';
                                             }
                                         }
 
