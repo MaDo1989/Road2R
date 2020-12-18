@@ -83,6 +83,7 @@ public class Volunteer
     public List<RideStatus> Statusim { get; set; }
     public int NoOfDocumentedCalls { get; set; }
     public int NoOfDocumentedRides { get; set; }
+    public int NumOfRides_last2Months { get; set; }
     public class RideStatus
     {
         string name;
@@ -1390,13 +1391,15 @@ public class Volunteer
     public List<Volunteer> getVolunteersList(bool active)
     {
         #region DB functions
-        string query = "select * from VolunteerTypeView";
-        if (active)
-        {
-            query += " where IsActive = 'True'";
-        }
 
-        query += " order by firstNameH";
+        string query = "exec spVolunteerTypeView_GetVolunteersList @isActive=" + active;
+        //string query = "select * from VolunteerTypeView";
+        //if (active)
+        //{
+        //    query += " where IsActive = 'True'";
+        //}
+
+        //query += " order by firstNameH";
 
         List<Volunteer> list = new List<Volunteer>();
         DbService db = new DbService();
@@ -1422,6 +1425,7 @@ public class Volunteer
             v.Device = dr["device"].ToString();
             v.NoOfDocumentedCalls = Convert.ToInt32(dr["NoOfDocumentedCalls"]);
             v.NoOfDocumentedRides = Convert.ToInt32(dr["NoOfDocumentedRides"]);
+            v.NumOfRides_last2Months = Convert.ToInt32(dr["NumOfRides_last2Months"]);
 
             //v.Day1 = dr["preferDay1"].ToString();
             //v.Hour1 = dr["preferHour1"].ToString();

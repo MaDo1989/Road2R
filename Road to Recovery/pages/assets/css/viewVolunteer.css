@@ -119,3 +119,16 @@ textarea:disabled:hover {
     font-size: 42px;
 }
 
+.btnWrapper-right{
+    display:inline-block;
+    width: 40px;
+}
+.btnWrapper-left {
+    display: inline-block;
+    width: 70px;
+}
+
+/*override bootstrap*/
+.badge{
+    width: 30px;
+}

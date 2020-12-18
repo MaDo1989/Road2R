@@ -207,19 +207,19 @@
                         var btnStr = '';
                         //כפתור צפייה כרגע מוסתר
                         //var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button>";
-                        var editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button>";
+                        var editBtn = "<div class='btnWrapper-right'><button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button></div>";
 
                         btnStr += /*showBtn + " " +*/ editBtn;
                         let deleteBtn = '';
                         if (arr_volunteers[i].IsActive == false) {
                             btnStr = "";
-                            var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo'></i></button>";
+                            var reactiveBtn = "<div class='btnWrapper-right'><button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo'></i></button></div>";
                             btnStr += " " + reactiveBtn;
                         }
                         else {
-                            deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button>";
-                            var messagesBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-light btn-sm m-b-5' id='messages' title='הודעות' data-toggle='modal' data-target='#messagesModal'><i class='fa fa-envelope-o'></i></button>";
-                            btnStr += " " + messagesBtn;
+                            deleteBtn = "<div class='btnWrapper-left'><button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button></div>";
+                            var messagesBtn = "<div class='btnWrapper-right'><button type='button' class='btn btn-icon waves-effect waves-light btn-light btn-sm m-b-5' id='messages' title='הודעות' data-toggle='modal' data-target='#messagesModal'><i class='fa fa-envelope-o'></i></button></div>";
+                            btnStr += messagesBtn;
                         }
                         var cellphone2 = "";
                         if (arr_volunteers[i].CellPhone2 != "") {
@@ -229,18 +229,16 @@
 
                         let showDocumentedRidesBtn = '';
                        // showDocumentedRidesBtn += arr_volunteers[i].NoOfDocumentedRides < 10 ? '&nbsp' : '';
-                        showDocumentedRidesBtn += `<span class="badge badge-default">${arr_volunteers[i].NoOfDocumentedRides}</span>`;
-                        showDocumentedRidesBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedRidesBtn" title="תיעוד הסעות" data-toggle="modal" data-target="#documentedRidesModal"><i class="fa fa-car" aria-hidden="true"></i></button>';
+                        showDocumentedRidesBtn += `<div class='btnWrapper-left'><span class="badge badge-default">${arr_volunteers[i].NoOfDocumentedRides}</span>`;
+                        showDocumentedRidesBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedRidesBtn" title="תיעוד הסעות" data-toggle="modal" data-target="#documentedRidesModal"><i class="fa fa-car" aria-hidden="true"></i></button></div>';
                         btnStr += showDocumentedRidesBtn;
 
                         let showDocumentedCallsBtn = '';
-                        showDocumentedCallsBtn += `<span id="badgeOf_${arr_volunteers[i].Id}" class="badge badge-pill badge-default">${arr_volunteers[i].NoOfDocumentedCalls}</span>`;
-                        showDocumentedCallsBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedCallsBtn" title="שיחות מתועדות" data-backdrop="static" data-keyboard="false" data-toggle="modal" data-target="#DocumentedCallsModal"><i class="fa fa-phone" aria-hidden="true"></i></button>';
+                        showDocumentedCallsBtn += `<div class='btnWrapper-left'><span id="badgeOf_${arr_volunteers[i].Id}" class="badge badge-pill badge-default">${arr_volunteers[i].NoOfDocumentedCalls}</span>`;
+                        showDocumentedCallsBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedCallsBtn" title="שיחות מתועדות" data-backdrop="static" data-keyboard="false" data-toggle="modal" data-target="#DocumentedCallsModal"><i class="fa fa-phone" aria-hidden="true"></i></button></div>';
 
                         btnStr += showDocumentedCallsBtn;
-
-
-
+                                        
 
                         if (arr_volunteers[i].LastModified !== "") {
                             let fullTimeStemp = arr_volunteers[i].LastModified;
@@ -263,8 +261,8 @@
                             Remarks: arr_volunteers[i].Remarks,
                             Buttons: btnStr,
                             LastModified: arr_volunteers[i].LastModified,
-                            EnglishName: arr_volunteers[i].EnglishName
-
+                            EnglishName: arr_volunteers[i].EnglishName,
+                            NumOfRides_last2Months: arr_volunteers[i].NumOfRides_last2Months
                         }
                         allVolunteersFromDb.push(Volunteer);
                     }
@@ -290,19 +288,20 @@
                                 targets: 3,
                                 className: 'text-left-strong'
                             },
-                            { "targets": [7], "orderable": false },
+                            { "targets": [8], "orderable": false },
 
 
                         ],
                         columns: [
-                            { data: "DisplayName", width: "10%" },         //0
-                            { data: "TypeVol", width: "5%" },              //1
-                            { data: "CellPhone", width: "5%" },            //2
-                            { data: "EnglishName", width: "10%" },         //3
-                            { data: "City", width: "10%" },                //4
-                            { data: "Remarks", width: "20%" },             //5
-                            { data: "LastModified", width: "15%" },        //6
-                            { data: "Buttons", width: "25%" },             //7
+                            { data: "DisplayName", width: "5%" },              //0
+                            { data: "TypeVol", width: "5%" },                  //1
+                            { data: "CellPhone", width: "5%" },                //2
+                            { data: "EnglishName", width: "10%" },             //3
+                            { data: "City", width: "5%" },                     //4
+                            { data: "Remarks", width: "20%" },                 //5
+                            { data: "LastModified", width: "15%" },            //6
+                            { data: "NumOfRides_last2Months", width: "5%" },   //7
+                            { data: "Buttons", width: "30%" },                 //8
                         ],
                     });
 
@@ -1005,6 +1004,7 @@
                                             <th>יישוב</th>
                                             <th style="text-align:right">הערות</th>
                                             <th>עודכן לאחרונה</th>
+                                            <th>מס' הסעות בחודשיים אחרונים</th>
                                             <th>פעולות</th>
                                         </tr>
                                     </thead>
