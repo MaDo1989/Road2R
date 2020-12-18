@@ -446,6 +446,7 @@ function rp_amuta_vls_list_field_radio_post_clone(id) {
     $("#radio_start_date").change(rp_amuta_vls_list__refresh_preview);
     $("#radio_all").change(rp_amuta_vls_list__refresh_preview);
 
+    $("#commit_to_ni_db").click(rp_amuta_vls_list__commit_to_ni_db);
     rp_amuta_vls_list__refresh_preview();
 }
 
@@ -649,14 +650,23 @@ function rp_amuta_vls_km__refresh_preview() {
         start_week_date, end_week_date);
 }   
 
-function rp_amuta_vls_list__refresh_preview() {
+function rp_amuta_vls_list__query_object() {
     var selected_date = $('#select_date_later').val();
     var config = "start_date";
     if ($("#radio_all").is(":checked")) {
         config = "all";
     }
+    return {
+        start_date: selected_date,
+        config: config
+    };
+}
 
-    refresh_amuta_vls_list_Table(selected_date, config);
+
+function rp_amuta_vls_list__refresh_preview() {
+    var query_object = rp_amuta_vls_list__query_object();
+
+    refresh_amuta_vls_list_Table(query_object);
 }   
 
 function rp_amuta_vls_per_month__refresh_preview() {
@@ -857,13 +867,9 @@ function refresh_amuta_vls_per_month_Table(start_date) {
 
 
 // 'start_date' :  a date formatted as YYYY-MM-DD
-function refresh_amuta_vls_list_Table(start_date, config) {
+function refresh_amuta_vls_list_Table(query_object) {
     hide_all_tables();
     $('#wait').show();
-    var query_object = {
-        start_date: start_date,
-        config: config
-    };
 
     $.ajax({
         dataType: "json",
@@ -1074,6 +1080,38 @@ function refreshTable(volunteerId, start_date, end_date) {
     });
 
  }
+
+function rp_amuta_vls_list__commit_to_ni_db() {
+
+    var msg = ".זהירות, פעולה זו תמנע הצגת מתנדבים אלו בדוחות הבאים"
+    if (!window.confirm(msg)) {
+        return;
+    }
+
+    var query_object = rp_amuta_vls_list__query_object();
+    $('#wait').show();
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/CommitReportedVolunteerListToNI_DB",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            $('#wait').hide();
+        },
+        error: function (err) {
+            $('#wait').hide();
+            alert("Error in rp_amuta_vls_list__commit_to_ni_db: " + err.responseText);
+        }
+
+    });
+
+}
+
 
 function hide_all_tables() {
     $('#div_weeklyRides').hide();

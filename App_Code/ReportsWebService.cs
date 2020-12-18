@@ -100,7 +100,7 @@ public class ReportsWebService : System.Web.Services.WebService
             string cell_phone = (string)HttpContext.Current.Session["userSession"];
             HttpResponse response = GzipMe();
             ReportService report = new ReportService();
-            List<ReportService.VolunteerInfo> r = report.GetReportVolunteerList(start_date, config, cell_phone);
+            List<ReportService.VolunteerInfo> r = report.GetReportVolunteerList(cell_phone, start_date, config);
             j.MaxJsonLength = Int32.MaxValue;
             return j.Serialize(r);
         }
@@ -155,6 +155,31 @@ public class ReportsWebService : System.Web.Services.WebService
         }
 
     }
+
+
+    
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string CommitReportedVolunteerListToNI_DB(string start_date, string config)
+    {
+        try
+        {
+            string cell_phone = (string)HttpContext.Current.Session["userSession"];
+            HttpResponse response = GzipMe();
+
+            ReportService report = new ReportService();
+            report.CommitReportedVolunteerListToNI_DB(cell_phone, start_date, config);
+            return "OK";
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in CommitReportedVolunteerListToNI_DB", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
