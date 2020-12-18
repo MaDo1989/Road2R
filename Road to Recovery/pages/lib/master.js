@@ -87,19 +87,17 @@ var GENERAL = {
     },
 
     PATIENTS: {
-        getPatientsList: function () {
+        getPatientsList: function () { //this name does not make sense since it get a json of {displayName: "", func: "new" || "edit" || "show"}
             return LZString.decompress(localStorage.patientsList);
         },
         setPatientsList: function (patientsList) {
             localStorage.patientsList = LZString.compress(patientsList);
-        }
+        },
+        getPatients: function () { //this will get all the exist Patients from local storage
+            return LZString.decompress(localStorage.Patients);
+        },
+        setPatients: function (Patients) { //this will set all the exist Patients into local storage
+            localStorage.Patients = LZString.compress(Patients);
+        },
     }
 };
-
-
-
-
-
-
-
-
