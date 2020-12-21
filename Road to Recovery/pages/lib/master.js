@@ -60,6 +60,7 @@ var GENERAL = {
             localStorage.volunteersList = LZString.compress(volunteersList);
         }
     },
+
     LOCATIONS: {
         getDestinationsList: function () {
             return LZString.decompress(localStorage.locationsList);
@@ -68,12 +69,13 @@ var GENERAL = {
             localStorage.locationsList = LZString.compress(locationsList);
         }
     },
+
     ESCORTED: {
         getEscortedList: function () {
             return localStorage.escortedList;
         },
         setEscortedList: function (escortedList) {
-            localStorage.escortedList =escortedList;
+            localStorage.escortedList = escortedList;
         }
     },
 
@@ -111,13 +113,21 @@ var GENERAL = {
         ajaxCall: function (funcNameInWebService, data, successCB, errorCB) {
             $.ajax({
                 dataType: "json",
-                url: `WebService.asmx/${funcNameInWebService}`,                                       
+                url: `WebService.asmx/${funcNameInWebService}`,
                 contentType: "application/json; charset=utf-8",
                 type: "POST",                                  /*WE ALWAYS USE POST*/
                 data: data,
                 success: successCB,
                 error: errorCB
             });
-}
+        }
+    },
+    USEFULL_FUNCTIONS: {
+        convertDBDate2FrontEndDate: (fullTimeStempStr) => { // fullTimeStempStr = this form → "/Date(1608581640000)/"
+            let startTrim = fullTimeStempStr.indexOf('(') + 1;
+            let endTrim = fullTimeStempStr.indexOf(')');
+            let fullTimeStempNumber = fullTimeStempStr.substring(startTrim, endTrim);
+            return new Date(parseInt(fullTimeStempNumber));
+        }
     }
 };
