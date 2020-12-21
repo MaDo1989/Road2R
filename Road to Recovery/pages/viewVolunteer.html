@@ -661,6 +661,9 @@
         }
 
         const openDocumentAcallModal = () => {
+            $('#DocumentAcallsModal').modal('show');
+
+            $('.closeBtn_DocumentAcallsModal').prop('disabled', true);
             $('#saveCallBtn').prop('disabled', false);
             $('#cancellCallBtn').prop('disabled', false);
 
@@ -716,22 +719,15 @@
                     time.minutes = now.getMinutes() < 10 ? '0' + now.getMinutes() : now.getMinutes();
 
                     document.getElementById('DocumentAcallTime').value = `${time.hours}:${time.minutes}`;
-                    $('.closeBtn_DocumentAcallsModal').prop('disabled', true);
-                    /*
-                     beacuse you cant disable the + btn right away (it will prevent to popup from show)
-                     you make js wait for one hundredth of a second before disabling it
-                     */
-                    setTimeout(() => $('#documentAcallPlusBtn').prop('disabled', true), 100);
+
+
+                    $('#documentAcallPlusBtn').prop('disabled', true);
                 },
                 error: function (err) {
                     alert("Error in GetCoordinatorsList: " + err.responseText);
                     $('#wait').hide();
                 }
             });
-
-
-
-
         }
 
         const cancelCallDocument = () => {
@@ -884,15 +880,19 @@
 
                     // ↑ front-end cheating ↑
 
-                    swal({
-                        title: "ההודעה תועדה, תודה",
-                        timer: 1500,
-                        type: "success",
-                        showConfirmButton: false
-                    }, function () {
-                        location.reload();
-                    }
-                    );
+
+
+                    //location.reload();
+
+                    //swal({
+                    //    title: "ההודעה תועדה, תודה",
+                    //    timer: 1500,
+                    //    type: "success",
+                    //    showConfirmButton: false
+                    //}, function () {
+                    //    location.reload();
+                    //}
+                    //);
                 },
                 error: function (err) { alert("Error in DocumentNewCall: " + err.responseText); }
             });
@@ -1211,7 +1211,7 @@
                     <div class="text-right">
                         <button type="button" id="documentAcallPlusBtn" class="btn btn-default"
                                 data-keyboard="false"
-                                data-toggle="modal" data-target="#DocumentAcallsModal" onclick="openDocumentAcallModal()">
+                                data-target="#DocumentAcallsModal" onclick="openDocumentAcallModal()">
                             <i class="fa fa-plus"></i>
                         </button>
                     </div>
