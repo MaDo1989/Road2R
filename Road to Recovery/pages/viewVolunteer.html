@@ -680,6 +680,9 @@
         }
 
         const openDocumentAcallModal = () => {
+            $('#saveCallBtn').prop('disabled', false);
+            $('#cancellCallBtn').prop('disabled', false);
+
 
             //get a list of all coordinators ()
             let allCordinatorsFromDB = [];
@@ -689,6 +692,7 @@
             $('#DocumentAcall_writeContent').val('');
             $('#DocumentAcall_choooseContent').prop('disabled', false);
             $('#DocumentAcall_writeContent').prop('disabled', false);
+
 
             $('#DocumentAcall_contentErrorMsg').hide();
             $('#DocumentAcall_CoordinatorErrorMsg').hide();
@@ -752,6 +756,8 @@
 
 
         const cancelCallDocument = () => {
+            $('#saveCallBtn').prop('disabled', true);
+            $('#cancellCallBtn').prop('disabled', true);
             $('#DocumentAcallsModal').modal('toggle');
             $('.closeBtn_DocumentAcallsModal').prop('disabled', false);
             $('#documentAcallPlusBtn').prop('disabled', false);
@@ -759,6 +765,11 @@
         }
 
         const documentAcall2DB = () => {
+            $('#saveCallBtn').prop('disabled', true);
+            $('#cancellCallBtn').prop('disabled', true);
+
+
+
             let documentedCall = {};
             documentedCall.DriverId = thisVolunteerId;
             documentedCall.CoordinatorId = parseInt($('#DocumentAcall_choooseCoordinator').val());
@@ -1244,8 +1255,8 @@
                             </div>
                             <div class="text-right modal-footer">
                                 <!-- for some reason right in bs means left -->
-                                <button type="button" class="fixWidth btn btn-secondary" onclick="documentAcall2DB()">שמירה</button>
-                                <button type="button" class="fixWidth btn btn-secondary" onclick="cancelCallDocument()">ביטול</button>
+                                <button type="button" id="saveCallBtn" class="fixWidth btn btn-secondary" onclick="documentAcall2DB()">שמירה</button>
+                                <button type="button" id="cancellCallBtn" class="fixWidth btn btn-secondary" onclick="cancelCallDocument()">ביטול</button>
                             </div>
                         </div>
                     </div>
