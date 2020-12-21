@@ -1,4 +1,5 @@
 ﻿checkCookie();
+let ridepat;
 
 const wiringDataTables = () => {
     //manage button clicks on tables
@@ -13,9 +14,8 @@ const wiringDataTables = () => {
 
 $(document).ready(() => {
 
-    let ridePatObj = JSON.parse(localStorage.getItem('ridePatObj')); //Yogev last mark, next step is write the panels dynamically
-    console.log(ridePatObj);
-    
+    fetchData4ThisRidepat();
+
     if (!JSON.parse(localStorage.getItem("isProductionDatabase"))) {
         $("#databaseType").text("Test database ")
     }
@@ -134,6 +134,30 @@ $(document).ready(() => {
 
 });
 
+
+
+
+const fetchData4ThisRidepat = () => {
+
+    let ridePatNum = JSON.parse(GENERAL.RIDEPAT.getRidePatNum4_viewCandidate());
+    GENERAL.FETCH_DATA.ajaxCall(
+                                'GetRidePat',
+                                JSON.stringify({ ridePatNum }),
+                                fetchData4ThisRidepat_SCB,
+                                fetchData4ThisRidepat_ECB
+    );
+}
+
+const fetchData4ThisRidepat_SCB = (data) => {
+    ridepat = JSON.parse(data.d);
+    //catch this id RideCandidates_ph
+}
+
+const fetchData4ThisRidepat_ECB = (data) => {
+    console.log('%c ↓ R2R custom error ↓', 'background: red; color: white');
+    console.log(data);
+    console.log('%c ↑ R2R custom error ↑', 'background: red; color: white');
+}
 
 
 
