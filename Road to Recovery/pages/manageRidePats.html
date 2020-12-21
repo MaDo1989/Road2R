@@ -553,11 +553,11 @@
 
 
                         btnStr += editBtn + " ";
-                        /*
+                        
                         if (arr_rides[i].Drivers.length === 0) {
                             btnStr += candidatesBtn + " ";
                         }
-                        */
+                        
                         btnStr += deleteBtn;
 
                         //localStorage.setItem('IsAnonymous', JSON.stringify(arr_rides[i].Pat.IsAnonymous));
@@ -851,15 +851,8 @@
 
         
         const candidatesButton = (btn) => { 
-            let td = btn.parentNode;
-            let tr = td.parentNode;
-
-
-            let origin = tr.getElementsByTagName('td').OriginName.innerHTML;
-            let destenation = tr.getElementsByTagName('td').DestinationName.innerHTML;
-            let rideTiming = tr.getElementsByTagName('td').rideTiming.innerHTML;
-            let ridePatObj = { origin, destenation, rideTiming };
-            localStorage.setItem('ridePatObj', JSON.stringify(ridePatObj));
+            let ridePatNum = btn.name;
+            GENERAL.RIDEPAT.setRidePatNum4_viewCandidate(JSON.stringify(ridePatNum));
             location.href = "viewCandidates.html";
         }
 

@@ -83,6 +83,12 @@ var GENERAL = {
         },
         setRidePatList: function (ridePatList) {
             localStorage.ridePatList = LZString.compress(ridePatList);
+        },
+        getRidePatNum4_viewCandidate: function () {
+            return LZString.decompress(localStorage.RidePatNum4_viewCandidate);
+        },
+        setRidePatNum4_viewCandidate: function (RidePatNum4_viewCandidate) {
+            localStorage.RidePatNum4_viewCandidate = LZString.compress(RidePatNum4_viewCandidate);
         }
     },
 
