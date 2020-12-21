@@ -105,5 +105,19 @@ var GENERAL = {
         setPatients: function (Patients) { //this will set all the exist Patients into local storage
             localStorage.Patients = LZString.compress(Patients);
         },
+    },
+
+    FETCH_DATA: {
+        ajaxCall: function (api, data, successCB, errorCB) {
+            $.ajax({
+                dataType: "json",
+                url: api,                                       /* = WebService.asmx/...*/
+                contentType: "application/json; charset=utf-8",
+                type: "POST",                                  /*WE ALWAYS USE POST*/
+                data: data,
+                success: successCB,
+                error: errorCB
+            });
+}
     }
 };
