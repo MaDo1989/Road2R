@@ -141,6 +141,49 @@
             //};
 
 
+            jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+                "de_date-asc": function (a, b) {
+                    /*a and b are a couple of dates to compare
+                    return value will be:
+                    0 if a=b
+                    1 if a > b
+                   -1 if a < b
+                    */
+                    let dateAsArr_a = $.trim(a).split('.');
+                    let dateAsArr_b = $.trim(b).split('.');
+
+                    let a_date = new Date(parseInt(dateAsArr_a[2]), parseInt(dateAsArr_a[1]), parseInt(dateAsArr_a[0]));
+                    let b_date = new Date(parseInt(dateAsArr_b[2]), parseInt(dateAsArr_b[1]), parseInt(dateAsArr_b[0]));
+
+                    a = a_date.getTime();
+                    b = b_date.getTime();
+
+                    return a === b ? 0 : a > b ? 1 : -1;
+                    //var z = ((x < y) ? -1 : ((x > y) ? 1 : 0));
+                    //return z;
+                },
+                "de_date-desc": function (a, b) {
+                    /*a and b are a couple of dates to compare
+                      return value will be:
+                      0 if a=b
+                     -1 if a > b
+                      1 if a < b
+                      */
+                    let dateAsArr_a = $.trim(a).split('.');
+                    let dateAsArr_b = $.trim(b).split('.');
+
+                    let a_date = new Date(parseInt(dateAsArr_a[2]), parseInt(dateAsArr_a[1]), parseInt(dateAsArr_a[0]));
+                    let b_date = new Date(parseInt(dateAsArr_b[2]), parseInt(dateAsArr_b[1]), parseInt(dateAsArr_b[0]));
+
+                    a = a_date.getTime();
+                    b = b_date.getTime();
+
+                    return a === b ? 0 : a > b ? -1 : 1;
+                    //var z = 0//((x < y) ? 1 : ((x > y) ? -1 : 0));
+                    //return z;
+                }
+            });
+
         });
 
         function ActiveMode() {
@@ -449,14 +492,17 @@
                                 }
                             ],
                             columnDefs: [
-                                { "targets": [4], visible: false },
+                                { "targets": [0], type: 'de_date' },
                                 /*
                                  Amir wanted a seperated columns to date and time but still sort by the full time stemps (or the acctual ticks)
                                  so my (Yogev) soolution was to
                                  1. fetch the fulltime stemp from the back-end
                                  2. render and sort by this column
                                  3. not showing it to the user
-                                 */
+                                  ↓*/
+                                { "targets": [4], visible: false },
+                                //↑
+
                             ]
 
                         });
@@ -544,14 +590,16 @@
 
                             ],
                             columnDefs: [
-                                { "targets": [5], visible: false },
+                                { "targets": [0], type: 'de_date' },
                                 /*
                                  Amir wanted a seperated columns to date and time but still sort by the full time stemps (or the acctual ticks)
                                  so my (Yogev) soolution was to
                                  1. fetch the fulltime stemp from the back-end
                                  2. render and sort by this column
                                  3. not showing it to the user
-                                 */
+                                  ↓*/
+                                { "targets": [5], visible: false },
+                                //↑
                                 {
                                     "targets": [0],
                                     render: function (data, type, full, meta) {
@@ -610,7 +658,7 @@
 
                         msgTable = $('#messagesTable').DataTable({
                             columnDefs: [
-                                { "targets": 3, className: 'text-left-strong' }
+                                { "targets": 3, className: 'text-left-strong' },
                             ],
                             order: [[1, "desc"]],
                             pageLength: 5,
