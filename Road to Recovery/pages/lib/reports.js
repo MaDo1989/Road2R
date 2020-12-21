@@ -68,7 +68,7 @@ function set_banner_debug_data() {
     else {
         $("#databaseType").text("Production database")
     }
-    if (window.location.hostname.toString() == 'localhost' || window.location.pathname.indexOf('test') != -1) {
+    if (window.location.hostname.toString() == 'localhost' || window.location.pathname.toLowerCase().indexOf('test') != -1) {
         $("#na").css("background-color", "#ffde89");
     }
 }

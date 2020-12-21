@@ -192,7 +192,7 @@
             $('[data-toggle="tooltip"]').tooltip({
                 container: 'body'
             })
-            if (window.location.hostname.toString() == 'localhost' || window.location.pathname.indexOf('test') != -1) {
+            if (window.location.hostname.toString() == 'localhost' || window.location.pathname.toLowerCase().indexOf('test') != -1) {
                 $("#na").css("background-color", "#ffde89");
             }
             if (window.location.href.indexOf('http://40.117.122.242/Road%20to%20Recovery/') != -1) {
