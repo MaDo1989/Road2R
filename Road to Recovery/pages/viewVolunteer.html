@@ -92,25 +92,6 @@
             //var userName = GENERAL.USER.getUserName();
             //$("#userName").html(userName);
 
-            $('#DocumentAcall_writeContent').blur(function () {
-                let content = $('#DocumentAcall_writeContent').val();
-                content.length > 0 ?
-                    $('#DocumentAcall_choooseContent').prop('disabled', true)
-                    :
-                    $('#DocumentAcall_choooseContent').prop('disabled', false);
-
-
-            });
-
-
-            $('#DocumentAcall_choooseContent').change(function () {
-                let value = $('#DocumentAcall_choooseContent').val();
-                value > 0 ?
-                    $('#DocumentAcall_writeContent').prop('disabled', true)
-                    :
-                    $('#DocumentAcall_writeContent').prop('disabled', false);
-            });
-
             //Create a DataTable from the Table
             t = $('#datatable-buttons').DataTable({
                 //bProcessing: true,
@@ -228,7 +209,7 @@
                         else cellphone2 = arr_volunteers[i].HomePhone;
 
                         let showDocumentedRidesBtn = '';
-                       // showDocumentedRidesBtn += arr_volunteers[i].NoOfDocumentedRides < 10 ? '&nbsp' : '';
+                        // showDocumentedRidesBtn += arr_volunteers[i].NoOfDocumentedRides < 10 ? '&nbsp' : '';
                         showDocumentedRidesBtn += `<div class='btnWrapper-left'><span class="badge badge-default">${arr_volunteers[i].NoOfDocumentedRides}</span>`;
                         showDocumentedRidesBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedRidesBtn" title="תיעוד הסעות" data-toggle="modal" data-target="#documentedRidesModal"><i class="fa fa-car" aria-hidden="true"></i></button></div>';
                         btnStr += showDocumentedRidesBtn;
@@ -238,7 +219,7 @@
                         showDocumentedCallsBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedCallsBtn" title="שיחות מתועדות" data-backdrop="static" data-keyboard="false" data-toggle="modal" data-target="#DocumentedCallsModal"><i class="fa fa-phone" aria-hidden="true"></i></button></div>';
 
                         btnStr += showDocumentedCallsBtn;
-                                        
+
 
                         if (arr_volunteers[i].LastModified !== "") {
                             let fullTimeStemp = arr_volunteers[i].LastModified;
@@ -753,8 +734,6 @@
 
         }
 
-
-
         const cancelCallDocument = () => {
             $('#saveCallBtn').prop('disabled', true);
             $('#cancellCallBtn').prop('disabled', true);
@@ -764,11 +743,57 @@
 
         }
 
+        const DocumentedAcall_writeContent_clicked = () => {
+            $('#DocumentAcall_contentErrorMsg').hide();
+            $('#saveCallBtn').prop('disabled', false);
+        }
+
+        const DocumentAcall_writeContent_blured = () => {
+
+            let content = $('#DocumentAcall_writeContent').val();
+
+            if (content.length > 0) {
+                $('#DocumentAcall_choooseContent').prop('disabled', true)
+            } else {
+                $('#DocumentAcall_choooseContent').prop('disabled', false);
+            }
+        }
+
+        const DocumentAcall_choooseCoordinator_changed = () => {
+
+            if ($('#DocumentAcall_choooseCoordinator').val() !== "not selected") {
+                $('#DocumentAcall_CoordinatorErrorMsg').hide();
+                $('#saveCallBtn').prop('disabled', false);
+            }
+        }
+
+        const DocumentAcall_choooseContent_changed = () => {
+
+            let preDefinedContents_key = parseInt($('#DocumentAcall_choooseContent').val());
+
+            if (preDefinedContents_key > 0) {
+                $('#DocumentAcall_writeContent').prop('disabled', true)
+                $('#DocumentAcall_contentErrorMsg').hide();
+                $('#saveCallBtn').prop('disabled', false);
+            } else {
+                $('#DocumentAcall_writeContent').prop('disabled', false);
+
+            }
+        }
+
+        //$('#DocumentAcall_choooseContent').change(function () {
+        //    let value = $('#DocumentAcall_choooseContent').val();
+        //    value > 0 ?
+
+        //        :
+        //        $('#DocumentAcall_writeContent').prop('disabled', false);
+        //});
+
+
+
         const documentAcall2DB = () => {
             $('#saveCallBtn').prop('disabled', true);
-            $('#cancellCallBtn').prop('disabled', true);
-
-
+            //$('#cancellCallBtn').prop('disabled', true); **if a uset still want to cancell the call...
 
             let documentedCall = {};
             documentedCall.DriverId = thisVolunteerId;
@@ -1231,21 +1256,21 @@
                                     <tr>
                                         <td class="rightCol">רכז.ת <span class="redTxt">*</span></td>
                                         <td class="leftCol">
-                                            <select id="DocumentAcall_choooseCoordinator">
+                                            <select id="DocumentAcall_choooseCoordinator" onchange="DocumentAcall_choooseCoordinator_changed()">
                                             </select>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td class="rightCol">תוכן השיחה <span class="redTxt">*</span></td>
                                         <td class="leftCol">
-                                            <select id="DocumentAcall_choooseContent">
+                                            <select id="DocumentAcall_choooseContent" onchange="DocumentAcall_choooseContent_changed()">
                                             </select>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td class="rightCol"></td>
                                         <td class="leftCol">
-                                            <textarea id="DocumentAcall_writeContent" maxlength="400" placeholder="&lt;מלל חופשי עד 400 תווים&gt;"></textarea>
+                                            <textarea onblur="DocumentAcall_writeContent_blured()" onclick="DocumentedAcall_writeContent_clicked()" id="DocumentAcall_writeContent" maxlength="400" placeholder="&lt;מלל חופשי עד 400 תווים&gt;"></textarea>
                                         </td>
                                     </tr>
                                 </table>
