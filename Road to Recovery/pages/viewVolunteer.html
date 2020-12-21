@@ -92,25 +92,6 @@
             //var userName = GENERAL.USER.getUserName();
             //$("#userName").html(userName);
 
-            $('#DocumentAcall_writeContent').blur(function () {
-                let content = $('#DocumentAcall_writeContent').val();
-                content.length > 0 ?
-                    $('#DocumentAcall_choooseContent').prop('disabled', true)
-                    :
-                    $('#DocumentAcall_choooseContent').prop('disabled', false);
-
-
-            });
-
-
-            $('#DocumentAcall_choooseContent').change(function () {
-                let value = $('#DocumentAcall_choooseContent').val();
-                value > 0 ?
-                    $('#DocumentAcall_writeContent').prop('disabled', true)
-                    :
-                    $('#DocumentAcall_writeContent').prop('disabled', false);
-            });
-
             //Create a DataTable from the Table
             t = $('#datatable-buttons').DataTable({
                 //bProcessing: true,
@@ -159,6 +140,49 @@
             //    }
             //};
 
+
+            jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+                "de_date-asc": function (a, b) {
+                    /*a and b are a couple of dates to compare
+                    return value will be:
+                    0 if a=b
+                    1 if a > b
+                   -1 if a < b
+                    */
+                    let dateAsArr_a = $.trim(a).split('.');
+                    let dateAsArr_b = $.trim(b).split('.');
+
+                    let a_date = new Date(parseInt(dateAsArr_a[2]), parseInt(dateAsArr_a[1]), parseInt(dateAsArr_a[0]));
+                    let b_date = new Date(parseInt(dateAsArr_b[2]), parseInt(dateAsArr_b[1]), parseInt(dateAsArr_b[0]));
+
+                    a = a_date.getTime();
+                    b = b_date.getTime();
+
+                    return a === b ? 0 : a > b ? 1 : -1;
+                    //var z = ((x < y) ? -1 : ((x > y) ? 1 : 0));
+                    //return z;
+                },
+                "de_date-desc": function (a, b) {
+                    /*a and b are a couple of dates to compare
+                      return value will be:
+                      0 if a=b
+                     -1 if a > b
+                      1 if a < b
+                      */
+                    let dateAsArr_a = $.trim(a).split('.');
+                    let dateAsArr_b = $.trim(b).split('.');
+
+                    let a_date = new Date(parseInt(dateAsArr_a[2]), parseInt(dateAsArr_a[1]), parseInt(dateAsArr_a[0]));
+                    let b_date = new Date(parseInt(dateAsArr_b[2]), parseInt(dateAsArr_b[1]), parseInt(dateAsArr_b[0]));
+
+                    a = a_date.getTime();
+                    b = b_date.getTime();
+
+                    return a === b ? 0 : a > b ? -1 : 1;
+                    //var z = 0//((x < y) ? 1 : ((x > y) ? -1 : 0));
+                    //return z;
+                }
+            });
 
         });
 
@@ -228,7 +252,7 @@
                         else cellphone2 = arr_volunteers[i].HomePhone;
 
                         let showDocumentedRidesBtn = '';
-                       // showDocumentedRidesBtn += arr_volunteers[i].NoOfDocumentedRides < 10 ? '&nbsp' : '';
+                        // showDocumentedRidesBtn += arr_volunteers[i].NoOfDocumentedRides < 10 ? '&nbsp' : '';
                         showDocumentedRidesBtn += `<div class='btnWrapper-left'><span class="badge badge-default">${arr_volunteers[i].NoOfDocumentedRides}</span>`;
                         showDocumentedRidesBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedRidesBtn" title="תיעוד הסעות" data-toggle="modal" data-target="#documentedRidesModal"><i class="fa fa-car" aria-hidden="true"></i></button></div>';
                         btnStr += showDocumentedRidesBtn;
@@ -238,7 +262,7 @@
                         showDocumentedCallsBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedCallsBtn" title="שיחות מתועדות" data-backdrop="static" data-keyboard="false" data-toggle="modal" data-target="#DocumentedCallsModal"><i class="fa fa-phone" aria-hidden="true"></i></button></div>';
 
                         btnStr += showDocumentedCallsBtn;
-                                        
+
 
                         if (arr_volunteers[i].LastModified !== "") {
                             let fullTimeStemp = arr_volunteers[i].LastModified;
@@ -468,14 +492,17 @@
                                 }
                             ],
                             columnDefs: [
-                                { "targets": [4], visible: false },
+                                { "targets": [0], type: 'de_date' },
                                 /*
                                  Amir wanted a seperated columns to date and time but still sort by the full time stemps (or the acctual ticks)
                                  so my (Yogev) soolution was to
                                  1. fetch the fulltime stemp from the back-end
                                  2. render and sort by this column
                                  3. not showing it to the user
-                                 */
+                                  ↓*/
+                                { "targets": [4], visible: false },
+                                //↑
+
                             ]
 
                         });
@@ -563,14 +590,16 @@
 
                             ],
                             columnDefs: [
-                                { "targets": [5], visible: false },
+                                { "targets": [0], type: 'de_date' },
                                 /*
                                  Amir wanted a seperated columns to date and time but still sort by the full time stemps (or the acctual ticks)
                                  so my (Yogev) soolution was to
                                  1. fetch the fulltime stemp from the back-end
                                  2. render and sort by this column
                                  3. not showing it to the user
-                                 */
+                                  ↓*/
+                                { "targets": [5], visible: false },
+                                //↑
                                 {
                                     "targets": [0],
                                     render: function (data, type, full, meta) {
@@ -629,7 +658,7 @@
 
                         msgTable = $('#messagesTable').DataTable({
                             columnDefs: [
-                                { "targets": 3, className: 'text-left-strong' }
+                                { "targets": 3, className: 'text-left-strong' },
                             ],
                             order: [[1, "desc"]],
                             pageLength: 5,
@@ -680,6 +709,9 @@
         }
 
         const openDocumentAcallModal = () => {
+            $('#DocumentAcallsModal').modal('show');
+
+            $('.closeBtn_DocumentAcallsModal').prop('disabled', true);
             $('#saveCallBtn').prop('disabled', false);
             $('#cancellCallBtn').prop('disabled', false);
 
@@ -735,25 +767,16 @@
                     time.minutes = now.getMinutes() < 10 ? '0' + now.getMinutes() : now.getMinutes();
 
                     document.getElementById('DocumentAcallTime').value = `${time.hours}:${time.minutes}`;
-                    $('.closeBtn_DocumentAcallsModal').prop('disabled', true);
-                    /*
-                     beacuse you cant disable the + btn right away (it will prevent to popup from show)
-                     you make js wait for one hundredth of a second before disabling it
-                     */
-                    setTimeout(() => $('#documentAcallPlusBtn').prop('disabled', true), 100);
+
+
+                    $('#documentAcallPlusBtn').prop('disabled', true);
                 },
                 error: function (err) {
                     alert("Error in GetCoordinatorsList: " + err.responseText);
                     $('#wait').hide();
                 }
             });
-
-
-
-
         }
-
-
 
         const cancelCallDocument = () => {
             $('#saveCallBtn').prop('disabled', true);
@@ -764,11 +787,57 @@
 
         }
 
+        const DocumentedAcall_writeContent_clicked = () => {
+            $('#DocumentAcall_contentErrorMsg').hide();
+            $('#saveCallBtn').prop('disabled', false);
+        }
+
+        const DocumentAcall_writeContent_blured = () => {
+
+            let content = $('#DocumentAcall_writeContent').val();
+
+            if (content.length > 0) {
+                $('#DocumentAcall_choooseContent').prop('disabled', true)
+            } else {
+                $('#DocumentAcall_choooseContent').prop('disabled', false);
+            }
+        }
+
+        const DocumentAcall_choooseCoordinator_changed = () => {
+
+            if ($('#DocumentAcall_choooseCoordinator').val() !== "not selected") {
+                $('#DocumentAcall_CoordinatorErrorMsg').hide();
+                $('#saveCallBtn').prop('disabled', false);
+            }
+        }
+
+        const DocumentAcall_choooseContent_changed = () => {
+
+            let preDefinedContents_key = parseInt($('#DocumentAcall_choooseContent').val());
+
+            if (preDefinedContents_key > 0) {
+                $('#DocumentAcall_writeContent').prop('disabled', true)
+                $('#DocumentAcall_contentErrorMsg').hide();
+                $('#saveCallBtn').prop('disabled', false);
+            } else {
+                $('#DocumentAcall_writeContent').prop('disabled', false);
+
+            }
+        }
+
+        //$('#DocumentAcall_choooseContent').change(function () {
+        //    let value = $('#DocumentAcall_choooseContent').val();
+        //    value > 0 ?
+
+        //        :
+        //        $('#DocumentAcall_writeContent').prop('disabled', false);
+        //});
+
+
+
         const documentAcall2DB = () => {
             $('#saveCallBtn').prop('disabled', true);
-            $('#cancellCallBtn').prop('disabled', true);
-
-
+            //$('#cancellCallBtn').prop('disabled', true); **if a uset still want to cancell the call...
 
             let documentedCall = {};
             documentedCall.DriverId = thisVolunteerId;
@@ -859,15 +928,19 @@
 
                     // ↑ front-end cheating ↑
 
-                    swal({
-                        title: "ההודעה תועדה, תודה",
-                        timer: 1500,
-                        type: "success",
-                        showConfirmButton: false
-                    }, function () {
-                        location.reload();
-                    }
-                    );
+
+
+                    //location.reload();
+
+                    //swal({
+                    //    title: "ההודעה תועדה, תודה",
+                    //    timer: 1500,
+                    //    type: "success",
+                    //    showConfirmButton: false
+                    //}, function () {
+                    //    location.reload();
+                    //}
+                    //);
                 },
                 error: function (err) { alert("Error in DocumentNewCall: " + err.responseText); }
             });
@@ -1186,7 +1259,7 @@
                     <div class="text-right">
                         <button type="button" id="documentAcallPlusBtn" class="btn btn-default"
                                 data-keyboard="false"
-                                data-toggle="modal" data-target="#DocumentAcallsModal" onclick="openDocumentAcallModal()">
+                                data-target="#DocumentAcallsModal" onclick="openDocumentAcallModal()">
                             <i class="fa fa-plus"></i>
                         </button>
                     </div>
@@ -1231,21 +1304,21 @@
                                     <tr>
                                         <td class="rightCol">רכז.ת <span class="redTxt">*</span></td>
                                         <td class="leftCol">
-                                            <select id="DocumentAcall_choooseCoordinator">
+                                            <select id="DocumentAcall_choooseCoordinator" onchange="DocumentAcall_choooseCoordinator_changed()">
                                             </select>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td class="rightCol">תוכן השיחה <span class="redTxt">*</span></td>
                                         <td class="leftCol">
-                                            <select id="DocumentAcall_choooseContent">
+                                            <select id="DocumentAcall_choooseContent" onchange="DocumentAcall_choooseContent_changed()">
                                             </select>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td class="rightCol"></td>
                                         <td class="leftCol">
-                                            <textarea id="DocumentAcall_writeContent" maxlength="400" placeholder="&lt;מלל חופשי עד 400 תווים&gt;"></textarea>
+                                            <textarea onblur="DocumentAcall_writeContent_blured()" onclick="DocumentedAcall_writeContent_clicked()" id="DocumentAcall_writeContent" maxlength="400" placeholder="&lt;מלל חופשי עד 400 תווים&gt;"></textarea>
                                         </td>
                                     </tr>
                                 </table>
