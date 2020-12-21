@@ -108,10 +108,10 @@ var GENERAL = {
     },
 
     FETCH_DATA: {
-        ajaxCall: function (api, data, successCB, errorCB) {
+        ajaxCall: function (funcNameInWebService, data, successCB, errorCB) {
             $.ajax({
                 dataType: "json",
-                url: api,                                       /* = WebService.asmx/...*/
+                url: `WebService.asmx/${funcNameInWebService}`,                                       
                 contentType: "application/json; charset=utf-8",
                 type: "POST",                                  /*WE ALWAYS USE POST*/
                 data: data,
