@@ -1,5 +1,5 @@
 ﻿checkCookie();
-let { convertDBDate2FrontEndDate } = GENERAL.USEFULL_FUNCTIONS;
+let { convertDBDate2FrontEndDate, getHebrew_WeekDay } = GENERAL.USEFULL_FUNCTIONS;
 let { getRidePatNum4_viewCandidate } = GENERAL.RIDEPAT;
 let { ajaxCall } = GENERAL.FETCH_DATA;
 let thisRidePat;
@@ -44,12 +44,14 @@ $(document).ready(() => {
     includeHTML();//with out this there is no side bar!
 
 
+    //#region ↓DATATABLES PROPERTIES↓|
 
-    /*
-             ============================
-             || ↓DATATABLES PROPERTIES↓||
-             ============================
-*/
+
+    /* 
+                 ============================
+                 || ↓DATATABLES PROPERTIES↓||
+                 ============================
+    */
     candidatesTable = $('#datatable-candidates').DataTable(
         {
             "stateDuration": 60 * 60,
@@ -90,10 +92,11 @@ $(document).ready(() => {
 
 
     /*
-                 ============================
-                 || ↑DATATABLES PROPERTIES↑||
-                 ============================
+                     ============================
+                     || ↑DATATABLES PROPERTIES↑||
+                     ============================
     */
+    //#endregion ↑DATATABLES PROPERTIES↑
 
 
 
@@ -116,7 +119,9 @@ const fetchData4ThisRidepat = () => {
 const fetchData4ThisRidepat_SCB = (data) => {
     thisRidePat = JSON.parse(data.d); //think if this variable should be global or local & pass throw this function below
 
+    //temp ↓
     console.log(thisRidePat);
+    //temp ↑
 
     useRidePatData();
 }
@@ -129,20 +134,38 @@ const fetchData4ThisRidepat_ECB = (data) => {
 
 
 const useRidePatData = () => {
-    
-    let date = convertDBDate2FrontEndDate(thisRidePat.Date);
-    let hh = date.getHours(); 
-    let mm = date.getMinutes();
-    //YOGEV STOPED HERE IN 22.12.2020 1:00 AM 
-    let rideCandidatesHeadLine = `מ לשיבא, היום ב6:15 בבוקר`;
-    rideCandidatesHeadLine += ` ${thisRidePat.Origin.Name} `;
-    rideCandidatesHeadLine += `ל`;
-    rideCandidatesHeadLine += ` ${thisRidePat.Destination.Name} `;
-    rideCandidatesHeadLine += ``;
-    rideCandidatesHeadLine += ``;
-    rideCandidatesHeadLine += ``;
 
-    document.getElementById('RideCandidates_ph').innerHTML = rideCandidatesHeadLine;
+    let date = convertDBDate2FrontEndDate(thisRidePat.Date);
+    let dd = date.getDate();
+    let mm = date.getMonth() + 1;
+
+    let now = new Date(Date.now());
+
+    let hours = date.getHours();
+    let minutes = date.getMinutes();
+
+    // general: מ<מוצא> ל<יעד>, <היום או יום <יום בשבוע>, <תאריך ללא שנה>> ב-<שעה> <בבוקר או רחה"צ>
+    // example:  מועמדים להסעה: מתרקומיא לשיבא, היום ב6:15 בבוקר
+    let ridePatCandidatesHeadLine = `מ${thisRidePat.Origin.Name} `;
+    ridePatCandidatesHeadLine += `ל${thisRidePat.Destination.Name} `;
+    if (dd === now.getDate() &&
+        mm === now.getMonth() + 1 &&
+        date.getFullYear() === now.getFullYear()
+    ) {
+        ridePatCandidatesHeadLine += 'היום ';
+    } else {
+        ridePatCandidatesHeadLine += `ב${getHebrew_WeekDay(date.getDay())}, ${dd}.${mm} ` ;
+    }
+
+    if (date.getMinutes() === 14) {
+        if (date.getHours() === 19 || date.getHours() === 20 || date.getHours() === 21 || date.getHours() === 22) {
+            ridePatCandidatesHeadLine += 'אחה"צ ';
+        }
+    } else {
+        ridePatCandidatesHeadLine += ` ב-${hours}:${minutes}`;
+    }
+
+    document.getElementById('RideCandidates_ph').innerHTML = ridePatCandidatesHeadLine;
 }
 
 

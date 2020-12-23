@@ -128,6 +128,19 @@ var GENERAL = {
             let endTrim = fullTimeStempStr.indexOf(')');
             let fullTimeStempNumber = fullTimeStempStr.substring(startTrim, endTrim);
             return new Date(parseInt(fullTimeStempNumber));
+        },
+        getHebrew_WeekDay: (day) => {
+            let days = [];
+            days[days.length] = "יום ראשון";
+            days[days.length] = "יום שני";
+            days[days.length] = "יום שלישי";
+            days[days.length] = "יום רביעי";
+            days[days.length] = "יום חמישי";
+            days[days.length] = "יום שישי";
+            days[days.length] = "יום שבת";
+
+            return days[day];
+
         }
     }
 };
