@@ -162,10 +162,13 @@ const useRidePatData = () => {
             ridePatCandidatesHeadLine += 'אחה"צ ';
         }
     } else {
-        ridePatCandidatesHeadLine += ` ב-${hours}:${minutes}`;
+        ridePatCandidatesHeadLine += ` ב-${hours}:${minutes < 10 ? '0' + minutes : minutes} `;
+        ridePatCandidatesHeadLine += hours <= 11 ? 'בבוקר' : 'בצהריים'
     }
 
     document.getElementById('RideCandidates_ph').innerHTML = ridePatCandidatesHeadLine;
+    //here I stop and went to develop sort by regions
+
 }
 
 

@@ -70,7 +70,7 @@ public class Volunteer
     string gasRemarks;
     bool? igulLetova;
     string role;
-    DbService dbs;
+    protected DbService dbs;
 
 
     //Delete after volunteer details project will end (written on 05/06/2020 by Alon):
