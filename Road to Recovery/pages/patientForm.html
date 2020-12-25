@@ -92,6 +92,10 @@
         #gender, #barrier, #hospital {
             border-color: #000
         }
+
+        .redTxt {
+            color: red;
+        }
     </style>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <!--City Autocomplete-->
@@ -117,17 +121,17 @@
             }
             else $("#menuType").attr("w3-include-html", "menu.html");
             includeHTML();
-            if(window.location.hostname.toString()=='localhost' || window.location.pathname.indexOf('test')!=-1){
+            if (window.location.hostname.toString() == 'localhost' || window.location.pathname.indexOf('test') != -1) {
                 $("#na").css("background-color", "#ffde89");
             }
             if (window.location.href.indexOf('http://40.117.122.242/Road%20to%20Recovery/') != -1) {
                 window.location.href = "notAvailable.html";
             }
-            if(isAssistant){
+            if (isAssistant) {
                 var userName = GENERAL.USER.getAsistantAndCoorDisplayName();
                 $("#userName").html(userName);
             }
-            else{
+            else {
                 var userName = GENERAL.USER.getUserDisplayName();
                 $("#userName").html(userName);
             }
@@ -247,24 +251,24 @@
             var arr_cities = JSON.parse(data.d);
 
             cities = [];
-           // citiesEnglish=[];
+            // citiesEnglish=[];
             for (i in arr_cities) {
                 cities.push(arr_cities[i].CityName);
-               // citiesEnglish.push(arr_cities[i].EnglishName);
+                // citiesEnglish.push(arr_cities[i].EnglishName);
             }
 
             $("#city").autocomplete({
                 source: cities
             });
             //$("#cityEnglish").autocomplete({
-              //  source: cities
+            //  source: cities
             //});
         }
 
         function generateCitiesErrorCB(e) {
             alert("Error in generateCities: " + e.responseText);
         }
-         function generateLocation() {
+        function generateLocation() {
             var $select = $("#hospital");
             var $select1 = $("#barrier");
             $.ajax({
@@ -426,7 +430,7 @@
                     $('#wait').hide();
 
                     var patient = JSON.parse(data.d);
-        console.log(patient);
+                    console.log(patient);
                     if (patient.DisplayName === null) {
                         uploadData($("#patientFirstName").val())
                     }
@@ -435,7 +439,7 @@
                         generateEquipment();
                         //generateHospital();
                         //generateBarrier();
-        generateLocation();
+                        generateLocation();
                         // generateHospitalPat(patient);
                         // generateBarrierPat(patient);
                         //generateStatus(patient);
@@ -498,8 +502,8 @@
 
                 },
                 error: function (err) {
-                alert("Error in getPatient: " + err.responseText);
-                 $('#wait').hide();
+                    alert("Error in getPatient: " + err.responseText);
+                    $('#wait').hide();
                 }
             });
         }
@@ -507,7 +511,7 @@
         function returnpatients() {
             location.href = "viewPatient.html"
         }
-         function returnanonymouspatient() {
+        function returnanonymouspatient() {
             location.href = "anonymousPatientForm.html"
         }
 
@@ -531,7 +535,7 @@
                 url: "WebService.asmx/getPatientEscorted",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                data: JSON.stringify({ displayName: patientName, caller:"patientForm"}),
+                data: JSON.stringify({ displayName: patientName, caller: "patientForm" }),
                 success: function (data) {
                     var arr_escorts = JSON.parse(data.d);
                     //GENERAL.VOLUNTEERS.setvolunteersList(arr_volunteers);
@@ -550,11 +554,11 @@
                         else {
                             var editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button>";
                             var deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove' ></i></button>";
-                            btnStr +=" " +editBtn+ " " + deleteBtn;
+                            btnStr += " " + editBtn + " " + deleteBtn;
                         }
 
 
-                        t.row.add([arr_escorts[i].DisplayName,arr_escorts[i].EnglishName, arr_escorts[i].CellPhone, arr_escorts[i].City, arr_escorts[i].ContactType, arr_escorts[i].Gender, btnStr]).draw(false);
+                        t.row.add([arr_escorts[i].DisplayName, arr_escorts[i].EnglishName, arr_escorts[i].CellPhone, arr_escorts[i].City, arr_escorts[i].ContactType, arr_escorts[i].Gender, btnStr]).draw(false);
 
                     }
 
@@ -579,7 +583,7 @@
                         swal({
                             title: "האם אתם בטוחים?",
                             type: "warning",
-                            text: "הפיכת המלווה " + data[0] + " ללא פעיל\nتحويل المرافق " + data[0] +" لغير فعال",
+                            text: "הפיכת המלווה " + data[0] + " ללא פעיל\nتحويل المرافق " + data[0] + " لغير فعال",
                             showCancelButton: true,
                             cancelButtonText: "בטל\nالغاء",
                             confirmButtonClass: 'btn-warning',
@@ -602,7 +606,7 @@
                         swal({
                             title: "האם אתם בטוחים?",
                             type: "warning",
-                            text: "שחזור המלווה " + data[0] + "\nاسترجاع المرافق " +data[0],
+                            text: "שחזור המלווה " + data[0] + "\nاسترجاع المرافق " + data[0],
                             showCancelButton: true,
                             cancelButtonText: "בטל\nالغاء",
                             confirmButtonClass: 'btn-warning',
@@ -916,6 +920,7 @@
                                                     <label data-toggle="tooltip" title="Patient ID" class="col-sm-2 control-label">תעודת זהות&nbsp;</label>
                                                     <div class="col-sm-6">
                                                         <input id="PatientIdentity" name="PatientIdentity" type="text" class="form-control">
+                                                        <span id="PatientIdentity_ErrorMsg" class="redTxt">תעודת זהות זו כבר קיימת במערכת</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1167,6 +1172,37 @@
             // DO NOT REMOVE : GLOBAL FUNCTIONS!
             var errorClass = 'invalid';
             var errorElement = 'em';
+            $('#PatientIdentity_ErrorMsg').hide();
+
+            let existingPatients = JSON.parse(GENERAL.PATIENTS.getPatients());
+
+            $('#PatientIdentity').blur(function () {
+
+                let inseredValue = parseInt($('#PatientIdentity').val());
+
+                let isExist = false;
+                for (var i = 0; i < existingPatients.length; i++) {
+
+                    if (existingPatients[i].PatientIdentity === inseredValue) {
+                        isExist = true;
+                        break;
+                    }
+                }
+                if (isExist) {
+                    $('#PatientIdentity_ErrorMsg').show()
+                    $('#saveCustomer').prop('disabled', true)
+                } else {
+                    $('#PatientIdentity_ErrorMsg').hide()
+                    $('#saveCustomer').prop('disabled', false)
+                }
+
+
+
+            });
+
+
+
+
             $('[data-toggle="tooltip"]').tooltip();
             var $serviceForm = $('#customerForm').validate({
 
@@ -1242,7 +1278,7 @@
                     }
                     var patientId = $("#PatientIdentity").val();
 
-                    if(patientId===""){
+                    if (patientId === "") {
                         patientId = 0;
                     }
                     var homePhone = $("#HomePhone").val();
@@ -1255,7 +1291,7 @@
                     var department = $("#department").val();
                     var hospital = new Object();
                     hospital.Name = $("#hospital").val();
-                   // hospital.EnglishName = $("#hospital").text();
+                    // hospital.EnglishName = $("#hospital").text();
                     var remarks = $("#remarks").val();
                     var nameA = $("#firstA").val();
                     var lastNameA = $("#lastA").val();
@@ -1264,16 +1300,16 @@
                     if (sender.indexOf("ridePatForm.html") !== -1) {
                         func = "edit";
                     }
-                    if(!isNew){
-                       func = 'edit';
+                    if (!isNew) {
+                        func = 'edit';
                     }
                     var IsActive = false;
                     if ($("#activepatient").is(':checked')) {
                         IsActive = true;
                     }
                     // if ($("#anonymouspatient").is(':checked')) {
-                   //      IsAnonymous = true;
-                   // }
+                    //      IsAnonymous = true;
+                    // }
 
                     var Pat = JSON.parse(GENERAL.PATIENTS.getPatientsList());
                     var Id = Pat.Id;
@@ -1298,7 +1334,7 @@
                     patient = {
                         firstNameH: name, firstNameA: nameA, lastNameH: lastName, lastNameA: lastNameA, cellPhone: phone, cellPhone1: phone1,
                         city: city, gender: gender, barrier: barrier, hospital: hospital, homephone: homePhone,
-                        department: department, Equipment: EquipmentArr, history: history, remarks: remarks, IsActive: IsActive, Id: Id , birthDate: Bdate,EnglishName:englishName,PatientIdentity:patientId
+                        department: department, Equipment: EquipmentArr, history: history, remarks: remarks, IsActive: IsActive, Id: Id, birthDate: Bdate, EnglishName: englishName, PatientIdentity: patientId
                     }
 
                     $.ajax({
@@ -1317,7 +1353,7 @@
                                 timer: 1000,
                                 showConfirmButton: false
                             });
-                            setTimeout(function () { uploadData(patient.firstNameH +" " +patient.lastNameH) }, 1001);
+                            setTimeout(function () { uploadData(patient.firstNameH + " " + patient.lastNameH) }, 1001);
 
                         },
                         error: function (err) {
@@ -1399,12 +1435,12 @@
                 englishNameCon = false;
             }
             else {
-               //if (isAssistant) {
-                    if (firstName === "" && lastName === "") {
-                        $("#patientFirstName").val(englishName);
-                        $("#patientLastName").val("");
-                    }
-              //}
+                //if (isAssistant) {
+                if (firstName === "" && lastName === "") {
+                    $("#patientFirstName").val(englishName);
+                    $("#patientLastName").val("");
+                }
+                //}
             }
             if (city == "") {
                 CityExists = true;

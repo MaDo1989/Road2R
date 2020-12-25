@@ -37,11 +37,14 @@
 
 /*
     x button on top left of
-    calls doesnt compile with
+    calls 
+    doesnt compile with
     that funcionality
     so I make him ↓
 */
-button:disabled:hover {
+button:disabled:hover,
+select:disabled:hover,
+textarea:disabled:hover {
     cursor: not-allowed;
 }
 
@@ -75,9 +78,12 @@ button:disabled:hover {
 #DocumentAcall_writeContent {
     width: 20vw;
 }
-/*by setting resize to vertical
+#DocumentAcall_choooseCoordinator {
+    position: relative;
+}
+    /*by setting resize to vertical
     the horizonatal is disabled*/
-#DocumentAcall_writeContent {
+#DocumentAcall_writeContent:focus {
     resize: vertical;
 }
 
@@ -87,17 +93,42 @@ button:disabled:hover {
     display: none;
 }
 
-.fixWidth{
+.fixWidth {
     width: 70px;
 }
 
-#overRideBS_modal_4changeBg{
+#overRideBS_modal_4changeBg {
     background: #f9f9f9;
 }
+
 #overRideBS_modal_4changelinesColor {
     border-top: 1px solid #948e8e;
     border-bottom: 1px solid #948e8e;
 }
+
 .futureRide {
-  color: #0022f9;
+    color: #0022f9;
+}
+
+#DocumentedCallTable_filter {
+    margin-left: -5px;
+}
+
+/*override bs */
+#overRideBS_modal_4changeClose_x {
+    font-size: 42px;
+}
+
+.btnWrapper-right{
+    display:inline-block;
+    width: 40px;
+}
+.btnWrapper-left {
+    display: inline-block;
+    width: 70px;
+}
+
+/*override bootstrap*/
+.badge{
+    width: 30px;
 }

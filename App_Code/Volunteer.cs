@@ -70,6 +70,8 @@ public class Volunteer
     string gasRemarks;
     bool? igulLetova;
     string role;
+    DbService dbs;
+
 
     //Delete after volunteer details project will end (written on 05/06/2020 by Alon):
     string source;
@@ -81,6 +83,7 @@ public class Volunteer
     public List<RideStatus> Statusim { get; set; }
     public int NoOfDocumentedCalls { get; set; }
     public int NoOfDocumentedRides { get; set; }
+    public int NumOfRides_last2Months { get; set; }
     public class RideStatus
     {
         string name;
@@ -598,11 +601,45 @@ public class Volunteer
             v.EnglishName = dr["EnglishName"].ToString();
             v.Email = dr["Email"].ToString();
             v.Id = Convert.ToInt32(dr["Id"]);
-            
+
 
             vl.Add(v);
         }
         return vl;
+    }
+
+    public List<Volunteer> getCoordinatorsList_version_02()
+    {
+        string query = "exec spVolunteerTypeView_getCoordinators";
+        List<Volunteer> coordinators = new List<Volunteer>();
+
+        try
+        {
+            dbs = new DbService();
+            SqlDataReader sdr = dbs.GetDataReader(query);
+            while (sdr.Read())
+            {
+                Volunteer v = new Volunteer();
+                v.DisplayName = sdr["DisplayName"].ToString();
+                v.CellPhone = sdr["CellPhone"].ToString();
+                v.TypeVol = sdr["VolunTypeType"].ToString();
+                v.UserName = sdr["UserName"].ToString();
+                v.EnglishName = sdr["EnglishName"].ToString();
+                v.Email = sdr["Email"].ToString();
+                v.Id = Convert.ToInt32(sdr["Id"]);
+
+                coordinators.Add(v);
+            }
+            return coordinators;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+        finally
+        {
+            dbs.CloseConnection();
+        }
     }
 
     public List<string> getVolunteerTypes()
@@ -1354,13 +1391,15 @@ public class Volunteer
     public List<Volunteer> getVolunteersList(bool active)
     {
         #region DB functions
-        string query = "select * from VolunteerTypeView";
-        if (active)
-        {
-            query += " where IsActive = 'True'";
-        }
 
-        query += " order by firstNameH";
+        string query = "exec spVolunteerTypeView_GetVolunteersList @isActive=" + active;
+        //string query = "select * from VolunteerTypeView";
+        //if (active)
+        //{
+        //    query += " where IsActive = 'True'";
+        //}
+
+        //query += " order by firstNameH";
 
         List<Volunteer> list = new List<Volunteer>();
         DbService db = new DbService();
@@ -1386,6 +1425,7 @@ public class Volunteer
             v.Device = dr["device"].ToString();
             v.NoOfDocumentedCalls = Convert.ToInt32(dr["NoOfDocumentedCalls"]);
             v.NoOfDocumentedRides = Convert.ToInt32(dr["NoOfDocumentedRides"]);
+            v.NumOfRides_last2Months = Convert.ToInt32(dr["NumOfRides_last2Months"]);
 
             //v.Day1 = dr["preferDay1"].ToString();
             //v.Hour1 = dr["preferHour1"].ToString();
@@ -1727,7 +1767,7 @@ public class Volunteer
         cmdParams[14] = cmd.Parameters.AddWithValue("@remarks", v.Remarks);
         cmdParams[15] = cmd.Parameters.AddWithValue("@displayName", v.DisplayName);
         cmdParams[16] = cmd.Parameters.AddWithValue("@UserName", v.CellPhone);
-        
+
         cmdParams[18] = cmd.Parameters.AddWithValue("@isAssistant", v.IsAssistant);
         cmdParams[19] = cmd.Parameters.AddWithValue("@volunteerIdentity", v.VolunteerIdentity);
 
@@ -1757,7 +1797,7 @@ public class Volunteer
             User u = new User();
             string newDisplayName = v.FirstNameH + " " + v.LastNameH;
             string existingDisplayName = u.getUserNameByCellphone(v.CellPhone);
-            
+
             if (existingDisplayName != newDisplayName && u.CheckIfDisplayNameExists(newDisplayName))
             {
                 displayQuery = "DisplayName = N'" + newDisplayName + "_" + v.CellPhone + "',";
@@ -1766,14 +1806,14 @@ public class Volunteer
             {
                 displayQuery = "DisplayName = N'" + newDisplayName + "',";
             }
-            
+
 
 
             string EnglishNewDisplayName = v.EnglishFN + " " + v.EnglishLN;
             string existingEnglishDisplayName = u.getUserEnglishNameByCellphone(v.CellPhone);
             if (EnglishNewDisplayName != existingEnglishDisplayName && u.CheckIfEnglishDisplayNameExists(EnglishNewDisplayName))
             {
-                
+
                 cmdParams[17] = cmd.Parameters.AddWithValue("@englishName", EnglishNewDisplayName + "_" + v.CellPhone);
             }
             else
@@ -2042,7 +2082,7 @@ public class Volunteer
         cmdParams[24] = cmd.Parameters.AddWithValue("@howKeepInTouch", v.HowKeepInTouch);
         cmdParams[25] = cmd.Parameters.AddWithValue("@newsLetterRemarks", v.NewsLetterRemarks);
         //cmdParams[26] = cmd.Parameters.AddWithValue("@gasRemarks", v.GasRemarks);
-        
+
         if (v.IgulLetova == null)
         {
             cmdParams[26] = cmd.Parameters.AddWithValue("@IgulLetova", DBNull.Value);
@@ -2130,7 +2170,7 @@ public class Volunteer
         {
             messageText += "המתנדבת " + v.DisplayName + " עדכנה את פרטיה והיא " + wantsNewsLetter + " מעוניינת לקבל את העדכון השבועי.<br/>";
             messageText += "כתובת המייל שלה: " + v.Email + " <br/><br/>";
-            
+
         }
         else
         {
@@ -2268,7 +2308,7 @@ public class Volunteer
         cmdParams[5] = cmd.Parameters.AddWithValue("@UserName", v.CellPhone);
         cmdParams[6] = cmd.Parameters.AddWithValue("@volType", "מתנדב");
 
-        
+
 
         string query = "";
 
@@ -2365,7 +2405,7 @@ public class Volunteer
 
         foreach (Volunteer coor in coordinators)
         {
-            
+
             if (coor.Email != "")
             {
                 messageText = "<table width='100%' border='0' cellspacing='0' cellpadding='0'><tr><td align='right'>";

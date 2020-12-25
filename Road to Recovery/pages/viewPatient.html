@@ -136,6 +136,7 @@
                     //alert(timeDiff);
                     $('#wait').hide();
                     var arr_patients = JSON.parse(data.d);
+                    GENERAL.PATIENTS.setPatients(JSON.stringify(arr_patients));
                     //GENERAL.VOLUNTEERS.setvolunteersList(arr_volunteers);
 
                     for (i in arr_patients) {
@@ -278,10 +279,6 @@
 
                     tbl = $('#datatable-buttons').DataTable({
                         data: allPatientsFromDB,
-                        language: {
-                            searchPlaceholder: "Search records",
-                            search: "",
-                        },
                         "autoWidth": false,
                         "destroy": true,
                         dom: 'Bfrtip',

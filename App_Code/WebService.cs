@@ -1542,6 +1542,24 @@ public class WebService : System.Web.Services.WebService
         }
         return j.Serialize(coors);
     }
+
+    
+    [WebMethod(EnableSession = true)]
+    public string getCoordinatorsList_version_02()
+    {
+        List<Volunteer> coordinators;
+        try
+        {
+            coordinators = new Volunteer().getCoordinatorsList_version_02();
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in getCoordinatorsList_version_02", ex);
+            throw new Exception("Error in getCoordinatorsList_version_02");
+        }
+        return j.Serialize(coordinators);
+    }
+
     [WebMethod(EnableSession = true)]
     public void writeLog(string str)
     {
