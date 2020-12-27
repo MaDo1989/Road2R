@@ -333,6 +333,27 @@ public class Location
         }
         return areas;
     }
+    
+    public List<Location> getAreas_AsLocationObj()
+    {//in this method I (Yogev) use area like it was location
+
+        List<Location> areas = new List<Location>();
+        string query = "select * from Area order by AreaName";
+       
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+        Location location;
+
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+            location = new Location();
+            location.Area = dr["AreaName"].ToString();
+            location.EnglishName = dr["AreaEnglishName"].ToString();
+
+            areas.Add(location);
+        }
+        return areas;
+    }
 
     public List<string> getNetAreas()
     {

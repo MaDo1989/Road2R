@@ -124,6 +124,24 @@ public class WebService : System.Web.Services.WebService
             throw new Exception("שגיאה בשליפת אזורים");
         }
     }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string getAreas_AsLocationObj()
+    {
+        try
+        {
+            List<Location> areas = new Location().getAreas_AsLocationObj(); ;
+            return j.Serialize(areas);
+        }
+        catch (Exception e)
+        {
+            Log.Error("Error in getAreas_AsLocationObj", e);
+            throw new Exception("שגיאה בשליפת אזורים כאובייקט מיקום");
+        }
+    }
+
+
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string ChangeRidepatAreas()

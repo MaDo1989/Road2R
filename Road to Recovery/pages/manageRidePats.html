@@ -99,7 +99,7 @@
             $('#datatable-afternoon tbody').on('click', '#edit', function () {
                 editButton(this);
             });
-            
+
             $('#datatable-afternoon tbody').on('click', '#candidatesBtn', function () {
                 candidatesButton(this);
             });
@@ -160,6 +160,20 @@
         $(document).ready(function () {
 
             wiringDataTables();
+
+            let allSortsSwitch = JSON.parse(localStorage.getItem('allSortsSwitch'));
+
+            if (allSortsSwitch) {
+                $('#allSortsSwitch').prop('checked', true);
+                $('#openSortsControllers').prop('disabled', false);
+                $('#allSortsLabel').html('כבה סינון');
+            } else {
+                $('#allSortsSwitch').prop('checked', false);
+                $('#openSortsControllers').prop('disabled', true);
+                $('#allSortsLabel').html('הפעל סינון');
+            }
+
+
             if (localStorage.refreshTime == "undefined" || localStorage.refreshTime === undefined) { // Set the deafult refresh rate for 5 minutes
                 localStorage.refreshTime = '300000';
                 $('#refreshTime').val('300000')
@@ -414,14 +428,6 @@
             });
         });
 
-        function saveFilters() {
-
-            localStorage.active = $("#activeRidePats").prop('checked');
-            localStorage.today = $("#TodaysRidePats").prop('checked');
-            localStorage.unassigned = $("#UnassignedRidePats").prop('checked');
-            localStorage.myRidePats = $("#MyRidePats").prop('checked');
-            refreshTable();
-        }
 
         function getCoors() {
             $.ajax({
@@ -470,13 +476,6 @@
 
             checkCookie();
 
-
-
-            var active = localStorage.active;//$("#activeRidePats").prop('checked');
-            var today = localStorage.today;//$("#TodaysRidePats").prop('checked');
-            var unassigned = localStorage.unassigned;//$("#UnassignedRidePats").prop('checked');
-            var myRidePats = localStorage.myRidePats;//$("#MyRidePats").prop('checked');
-
             tMorning.clear().draw();
             tAfternoon.clear().draw();
             tFuture.clear().draw();
@@ -496,10 +495,45 @@
                 success: function (data) {
 
                     arr_rides = JSON.parse(data.d);
+                    console.log(arr_rides);
 
                     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
                     for (i in arr_rides) {
                         if (arr_rides[i].Coordinator.DisplayName != currentCoor) continue; //let the function run only for logged-in coordinator
+
+
+
+
+                        /*
+                                checkBoxesState.erez =
+                            checkBoxesState.erez_Jerusalem = $('#Erez_Jerusalem').prop('checked');
+                            checkBoxesState.Erez_Center = $('#Erez_Center').prop('checked');
+                            checkBoxesState.erez_North = $('#Erez_North').prop('checked');
+                            checkBoxesState.erez_Tarkumia = $('#Erez_Tarkumia').prop('checked');
+            
+                            checkBoxesState.jerusalem = $('#Jerusalem').prop('checked');
+                            checkBoxesState.center = $('#Center').prop('checked');
+                            checkBoxesState.center_Jerusalem = $('#Center_Jerusalem').prop('checked');
+                            checkBoxesState.north = $('#North').prop('checked');
+                            checkBoxesState.north_Jerusalem = $('#North_Jerusalem').prop('checked');
+            
+                            checkBoxesState.north_Center = $('#North_Center').prop('checked');
+                            checkBoxesState.tarkumia = $('#Tarkumia').prop('checked');
+                            checkBoxesState.tarkumia_Jerusalem = $('#Tarkumia_Jerusalem').prop('checked');
+                            checkBoxesState.tarkumia_Center = $('#Tarkumia_Center').prop('checked');
+                            checkBoxesState.tarkumia_North = $('#Tarkumia_North').prop('checked');
+                         */
+
+                        //let allSortsSwitch = JSON.parse(localStorage.getItem('allSortsSwitch'));
+
+                        //if (allSortsSwitch) {
+                        //    if ($("#Erez").prop('checked')) {
+                        //        if (arr_rides[i].area !== 'ארז') continue;
+                        //    }
+                            
+                        //}
+                        // STOP HERE
+
 
                         //Change date format
                         var temp = arr_rides[i].Date.substring(arr_rides[i].Date.indexOf("(") + 1);
@@ -546,18 +580,13 @@
                         //}
                         //else btnStr += " " + deleteBtn;
 
-
-
-
-                        let candidatesBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='candidatesBtn' name='" + arr_rides[i].RidePatNum + "' title='הצג מועמדים לנסיעה'><i class='fa fa-car'></i></button>";
-
-
                         btnStr += editBtn + " ";
-                        
+                        /*
+                        let candidatesBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='candidatesBtn' name='" + arr_rides[i].RidePatNum + "' title='הצג מועמדים לנסיעה'><i class='fa fa-car'></i></button>";
                         if (arr_rides[i].Drivers.length === 0) {
                             btnStr += candidatesBtn + " ";
                         }
-                        
+                        */
                         btnStr += deleteBtn;
 
                         //localStorage.setItem('IsAnonymous', JSON.stringify(arr_rides[i].Pat.IsAnonymous));
@@ -604,92 +633,6 @@
                 error: function (err) { alert("Error in GetRidePatView: " + err.responseText); }
             });
         }
-
-        function buildTables(table) {
-
-            if (arr_rides[i].Pat.DisplayName.includes("אנונימי")) {
-                arr_rides[i].Pat.DisplayName = "חולה";
-            }
-            if (arr_rides[i].Status.indexOf("ממתינה לשיבוץ") !== -1 || (arr_rides[i].Status.indexOf("אין נסיעת הלוך") !== -1 && arr_rides[i].Status.indexOf("ויש נהג משובץ") === -1)) {
-                if (isAssistant) {
-                    if (table.context[0].sTableId != "datatable-future" && table.context[0].sTableId != "datatable-tomorrow") {
-                        table.row.add([time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, "אין!<br/>None!", "Waiting for a driver", arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
-                    }
-                    else {
-                        table.row.add([date2, time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, "אין!<br/>None!", "Waiting for a driver", arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
-                    }
-                }
-                else {
-                    if (table.context[0].sTableId != "datatable-future" && table.context[0].sTableId != "datatable-tomorrow") {
-                        table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!<br/>None!", arr_rides[i].Status, arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
-                    }
-                    else {
-                        table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!<br/>None!", arr_rides[i].Status, arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
-                    }
-                }
-            }
-            else { //ride has at least one drive assigned to it
-                for (j in arr_rides[i].Drivers) {
-                    var primaryCellPhone = arr_rides[i].Drivers[j].CellPhone.replace(/^([\w]{3})/, "$1-");
-                    var secondaryCellPhone = arr_rides[i].Drivers[j].CellPhone.replace(/^([\w]{3})/, "$1-");
-                    if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName + "<br/>" + primaryCellPhone;
-                    else secondary = arr_rides[i].Drivers[j].DisplayName + "<br/>" + secondaryCellPhone;
-                }
-
-                if (arr_rides[i].Drivers.length == 1) {
-                    if (primary != undefined) //Only a primary driver is assigned
-                        var drivers = "ראשי: " + primary;
-                    else //only a secondary driver is assigned
-                        drivers = "גיבוי בלבד: " + secondary;
-                }
-                else if (arr_rides[i].Drivers.length == 2) //Two drivers are assigned
-                    var drivers = "ראשי: " + primary + ",<br> " + "גיבוי: " + secondary;
-                if (isAssistant) {
-                    var s = '';
-                    if (arr_rides[i].Status == "שובץ נהג") {
-                        s = 'Driver registered';
-                    }
-                    if (arr_rides[i].Status == "יצאתי לדרך") {
-                        s = 'On my way';
-                    }
-                    if (arr_rides[i].Status == "הגעתי לנקודת האיסוף") {
-                        s = 'At the meeting pt.';
-                    }
-                    if (arr_rides[i].Status == "הגענו ליעד") {
-                        s = 'Reached destination';
-                    }
-                    if (arr_rides[i].Status == "אני אאחר") {
-                        s = "I'll be late";
-                    }
-                    if (arr_rides[i].Status == "עיכוב במחסום") {
-                        s = 'Delay at the border';
-                    }
-                    if (table.context[0].sTableId != "datatable-future" && table.context[0].sTableId != "datatable-tomorrow") {
-                        table.row.add([time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, drivers, s, arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
-                    }
-                    else {
-                        table.row.add([date2, time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, drivers, s, arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
-                    }
-                }
-                else {
-                    if (table.context[0].sTableId != "datatable-future" && table.context[0].sTableId != "datatable-tomorrow") {
-                        table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
-                    }
-                    else {
-                        table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
-                    }
-                }
-
-
-            }
-            //if (table.context[0].sTableId == "datatable-future") {
-            //    if (localStorage.futurePageLength != null && localStorage.futurePageLength != "") {
-            //        $('select[name="datatable-future_length"]').val(parseInt(localStorage.futurePageLength));
-
-            //    }
-            //}
-        }
-
 
         function confirmDelete(ridePat, table) {
             console.log(ridePat.name)
@@ -848,9 +791,7 @@
             });
         }
 
-
-        
-        const candidatesButton = (btn) => { 
+        const candidatesButton = (btn) => {
             let ridePatNum = btn.name;
             GENERAL.RIDEPAT.setRidePatNum4_viewCandidate(ridePatNum);
             location.href = "viewCandidates.html";
@@ -1175,7 +1116,7 @@
             $('#messagesModal').modal('hide');
             $('#DriverReturnRidePatMsg').html("");
 
-        //הסטטוס 'אין נסיעת הלוך' עושה בעיות כיוון שלא ניתן להשתבץ אליו.
+            //הסטטוס 'אין נסיעת הלוך' עושה בעיות כיוון שלא ניתן להשתבץ אליו.
             //newStatus = "אין נסיעת הלוך"
             newStatus = "ממתינה לשיבוץ"
 
@@ -1199,6 +1140,193 @@
 
             //setTimeout(function () { refreshTable() }, 1001);
         }
+
+        const showFiltersModal = () => {
+
+            let { ajaxCall } = GENERAL.FETCH_DATA;
+
+            ajaxCall(
+                'getAreas_AsLocationObj',
+                '',
+                getAreas_SCB,
+                getAreas_ECB
+            );
+            $('#filtersModal').modal('show');
+
+        }
+
+        const getAreas_ECB = (err) => { console.log(err); }
+
+        const getAreas_SCB = (data) => {
+
+            let listOfAreas = JSON.parse(data.d);
+
+            let checkBoxesStr = '';
+
+            for (let i = 0; i < listOfAreas.length; i++) {
+
+                checkBoxesStr += `<div>`;
+                checkBoxesStr += `<input type="checkbox" id="${listOfAreas[i].EnglishName}" value=${listOfAreas[i].Area}>`;
+                checkBoxesStr += `<label for="${listOfAreas[i].EnglishName}">&nbsp;${listOfAreas[i].Area}</label>`;
+                checkBoxesStr += `</div>`;
+            }
+
+            document.getElementById('filtersModal_placeHolder').innerHTML = checkBoxesStr;
+
+            // localStorage.setItem('checkBoxesState', JSON.stringify(checkBoxesState));
+            let checkBoxesState = JSON.parse(localStorage.getItem('checkBoxesState'));
+
+            if (checkBoxesState) {
+                $("#Erez").prop('checked', checkBoxesState.erez);
+                $('#Erez_Jerusalem').prop('checked', checkBoxesState.erez_Jerusalem);
+                $('#Erez_Center').prop('checked', checkBoxesState.Erez_Center);
+                $('#Erez_North').prop('checked', checkBoxesState.erez_North);
+                $("#Erez_Tarkumia").prop('checked', checkBoxesState.erez_Tarkumia);
+
+                $("#Jerusalem").prop('checked', checkBoxesState.jerusalem);
+                $("#Center").prop('checked', checkBoxesState.center);
+                $("#Center_Jerusalem").prop('checked', checkBoxesState.center_Jerusalem);
+                $("#North").prop('checked', checkBoxesState.north);
+                $("#North_Jerusalem").prop('checked', checkBoxesState.north_Jerusalem);
+
+                $("#North_Center").prop('checked', checkBoxesState.north_Center);
+                $("#Tarkumia").prop('checked', checkBoxesState.tarkumia);
+                $("#Tarkumia_Jerusalem").prop('checked', checkBoxesState.tarkumia_Jerusalem);
+                $("#Tarkumia_Center").prop('checked', checkBoxesState.tarkumia_Center);
+                $("#Tarkumia_North").prop('checked', checkBoxesState.tarkumia_North);
+            }
+        }
+
+
+        const saveFilters = () => {
+
+            let checkBoxesState = {};
+
+            checkBoxesState.erez = $("#Erez").prop('checked');
+            checkBoxesState.erez_Jerusalem = $('#Erez_Jerusalem').prop('checked');
+            checkBoxesState.Erez_Center = $('#Erez_Center').prop('checked');
+            checkBoxesState.erez_North = $('#Erez_North').prop('checked');
+            checkBoxesState.erez_Tarkumia = $('#Erez_Tarkumia').prop('checked');
+
+            checkBoxesState.jerusalem = $('#Jerusalem').prop('checked');
+            checkBoxesState.center = $('#Center').prop('checked');
+            checkBoxesState.center_Jerusalem = $('#Center_Jerusalem').prop('checked');
+            checkBoxesState.north = $('#North').prop('checked');
+            checkBoxesState.north_Jerusalem = $('#North_Jerusalem').prop('checked');
+
+            checkBoxesState.north_Center = $('#North_Center').prop('checked');
+            checkBoxesState.tarkumia = $('#Tarkumia').prop('checked');
+            checkBoxesState.tarkumia_Jerusalem = $('#Tarkumia_Jerusalem').prop('checked');
+            checkBoxesState.tarkumia_Center = $('#Tarkumia_Center').prop('checked');
+            checkBoxesState.tarkumia_North = $('#Tarkumia_North').prop('checked');
+
+            localStorage.setItem('checkBoxesState', JSON.stringify(checkBoxesState));
+            refreshTable();
+
+        }
+
+        const allSortsSwitch_changed = () => {
+
+            let consdierSorts_controllers = $('#allSortsSwitch').prop('checked');
+            localStorage.setItem('allSortsSwitch', JSON.stringify(consdierSorts_controllers));
+
+            if (!consdierSorts_controllers) {
+                $('#allSortsLabel').html('הפעל סינון');
+                $('#openSortsControllers').prop('disabled', true);
+                refreshTable();
+            } else {
+                $('#allSortsLabel').html('כבה סינון');
+                $('#openSortsControllers').prop('disabled', false);
+                refreshTable();
+            }
+
+        }
+
+        function buildTables(table) {
+
+            if (arr_rides[i].Pat.DisplayName.includes("אנונימי")) {
+                arr_rides[i].Pat.DisplayName = "חולה";
+            }
+            if (arr_rides[i].Status.indexOf("ממתינה לשיבוץ") !== -1 || (arr_rides[i].Status.indexOf("אין נסיעת הלוך") !== -1 && arr_rides[i].Status.indexOf("ויש נהג משובץ") === -1)) {
+                if (isAssistant) {
+                    if (table.context[0].sTableId != "datatable-future" && table.context[0].sTableId != "datatable-tomorrow") {
+                        table.row.add([time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, "אין!<br/>None!", "Waiting for a driver", arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                    }
+                    else {
+                        table.row.add([date2, time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, "אין!<br/>None!", "Waiting for a driver", arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                    }
+                }
+                else {
+                    if (table.context[0].sTableId != "datatable-future" && table.context[0].sTableId != "datatable-tomorrow") {
+                        table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!<br/>None!", arr_rides[i].Status, arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                    }
+                    else {
+                        table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!<br/>None!", arr_rides[i].Status, arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                    }
+                }
+            }
+            else { //ride has at least one drive assigned to it
+                for (j in arr_rides[i].Drivers) {
+                    var primaryCellPhone = arr_rides[i].Drivers[j].CellPhone.replace(/^([\w]{3})/, "$1-");
+                    var secondaryCellPhone = arr_rides[i].Drivers[j].CellPhone.replace(/^([\w]{3})/, "$1-");
+                    if (arr_rides[i].Drivers[j].DriverType == "Primary") var primary = arr_rides[i].Drivers[j].DisplayName + "<br/>" + primaryCellPhone;
+                    else secondary = arr_rides[i].Drivers[j].DisplayName + "<br/>" + secondaryCellPhone;
+                }
+
+                if (arr_rides[i].Drivers.length == 1) {
+                    if (primary != undefined) //Only a primary driver is assigned
+                        var drivers = "ראשי: " + primary;
+                    else //only a secondary driver is assigned
+                        drivers = "גיבוי בלבד: " + secondary;
+                }
+                else if (arr_rides[i].Drivers.length == 2) //Two drivers are assigned
+                    var drivers = "ראשי: " + primary + ",<br> " + "גיבוי: " + secondary;
+                if (isAssistant) {
+                    var s = '';
+                    if (arr_rides[i].Status == "שובץ נהג") {
+                        s = 'Driver registered';
+                    }
+                    if (arr_rides[i].Status == "יצאתי לדרך") {
+                        s = 'On my way';
+                    }
+                    if (arr_rides[i].Status == "הגעתי לנקודת האיסוף") {
+                        s = 'At the meeting pt.';
+                    }
+                    if (arr_rides[i].Status == "הגענו ליעד") {
+                        s = 'Reached destination';
+                    }
+                    if (arr_rides[i].Status == "אני אאחר") {
+                        s = "I'll be late";
+                    }
+                    if (arr_rides[i].Status == "עיכוב במחסום") {
+                        s = 'Delay at the border';
+                    }
+                    if (table.context[0].sTableId != "datatable-future" && table.context[0].sTableId != "datatable-tomorrow") {
+                        table.row.add([time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, drivers, s, arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                    }
+                    else {
+                        table.row.add([date2, time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, drivers, s, arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                    }
+                }
+                else {
+                    if (table.context[0].sTableId != "datatable-future" && table.context[0].sTableId != "datatable-tomorrow") {
+                        table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                    }
+                    else {
+                        table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                    }
+                }
+
+
+            }
+            //if (table.context[0].sTableId == "datatable-future") {
+            //    if (localStorage.futurePageLength != null && localStorage.futurePageLength != "") {
+            //        $('select[name="datatable-future_length"]').val(parseInt(localStorage.futurePageLength));
+
+            //    }
+            //}
+        }
+
     </script>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -1206,11 +1334,8 @@
     <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
     <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
-    <style>
-        .centerHeader {
-            text-align: center;
-        }
-    </style>
+
+    <link href="assets/css/manageRidePats.css" rel="stylesheet" />
 </head>
 
 
@@ -1262,15 +1387,8 @@
 
                     <!-- Page-Title -->
                     <div class="row">
-                        <div class="col-sm-12">
+                        <div class="col-sm-2">
                             <div class="page-title-box">
-                                <ol class="breadcrumb pull-right">
-
-                                    <li class="active">
-                                        ניהול ההסעות שלי
-
-                                    </li>
-                                </ol>
                                 <h4 class="page-title">
                                     ניהול ההסעות שלי&nbsp&nbsp&nbsp<i data-toggle="tooltip" title="My Rides تنسيق السفريات الخاصة بي">
                                         <img src="../../Media/הסעות להיום.png" height="25" width="25" />
@@ -1278,29 +1396,19 @@
                                 </h4>
                             </div>
                         </div>
+                        <div class="col-sm-10  text-right">
+
+                            <span id="allSortsLabel"></span>
+                            <label class="switch">
+                                <input id="allSortsSwitch" type="checkbox" checked onchange="allSortsSwitch_changed()">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-sm-12">
-                            <div class="card-box table-responsive">
+                            <div id="overRideBS_card-box" class="card-box table-responsive">
                                 <div class="row">
-                                    <!--<div class="col-sm-8 checkbox checkbox-primary text-left">
-                                        <input id="activeRidePats" type="checkbox" onchange="saveFilters()">
-                                        <label for="activeRidePats">
-                                            דרישות פעילות בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
-                                        </label>
-                                        <input id="TodaysRidePats" type="checkbox" onchange="saveFilters()">
-                                        <label for="TodaysRidePats">
-                                            דרישות של היום בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
-                                        </label>
-                                        <input id="UnassignedRidePats" type="checkbox" onchange="saveFilters()">
-                                        <label for="UnassignedRidePats">
-                                            דרישות ממתינות לשיבוץ בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
-                                        </label>
-                                        <input id="MyRidePats" type="checkbox" onchange="saveFilters()">
-                                        <label for="MyRidePats">
-                                            דרישות שלי בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
-                                        </label>
-                                    </div>-->
                                     <div class="col-sm-6 text-left">
                                         <label for="refreshTime">בחירת קצב רענון:</label>
                                         <select id="refreshTime" name="refreshTime" class="input-sm">
@@ -1312,9 +1420,29 @@
                                             <option value="3600000">60 דקות</option>
                                         </select>
                                     </div>
-                                    <div class="col-sm-6 text-right">
 
-                                        <button data-placement="right" data-toggle="tooltip" title="New Ride جديد " type="button" id="createCustomer" onclick="newRidePatForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>חדש</button>
+                                    <div class="col-sm-6 text-right">
+                                        <button data-toggle="tooltip"
+                                                data-target="#filtersModal"
+                                                id="openSortsControllers"
+                                                data-placement="top"
+                                                title="filters window"
+                                                onclick="showFiltersModal()"
+                                                class="btn btn-success waves-effect w-md waves-light m-b-5">
+                                            <span class="glyphicon glyphicon-filter m-r-5">
+                                            </span>
+                                            סינון אזורים
+                                        </button>
+
+                                        <button data-placement="top"
+                                                data-toggle="tooltip"
+                                                title="New Ride جديد "
+                                                type="button"
+                                                id="createCustomer" onclick="newRidePatForm()"
+                                                class="btn btn-success waves-effect w-md waves-light m-b-5">
+                                            <span class="glyphicon glyphicon-plus-sign m-r-5"></span>
+                                            חדש
+                                        </button>
 
                                     </div>
                                 </div>
@@ -1525,6 +1653,28 @@
             </div>
         </div>
     </div>
+
+
+
+    <!-- ↓ filtersModal ↓ -->
+    <div class="modal fade" id="filtersModal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content modal-lg">
+                <div class="modal-header">
+                    <button id="overRideBS_modal_4changeClose_x" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h2 class="modal-title" id="">ניהול הסעות - סינון מידע</h2>
+                </div>
+                <div id="filtersModal_placeHolder" class="modal-body"></div>
+                <div class="text-right modal-footer">
+                    <button type="button" onclick="saveFilters()" class="btn btn-secondary" data-dismiss="modal">סגירה ושמירה</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">ביטול</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ↑ filtersModal ↑  -->
 
 </body>
 </html>
