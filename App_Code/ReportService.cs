@@ -7,8 +7,46 @@ using System.Globalization;
 using System.Linq;
 using System.Web;
 
+/* Notes:
+ * 
+ select MainDriver, Volunteer.DisplayName, Volunteer.CityCityName, Volunteer.CellPhone, Volunteer.JoinDate ,
+  sum(case when MONTH([pickuptime]) = '1' then 1 else 0 end) Jan_2020,
+  sum(case when MONTH([pickuptime]) = '2' then 1 else 0 end) Feb_2020,
+  sum(case when MONTH([pickuptime]) = '3' then 1 else 0 end) Mar_2020,
+  sum(case when MONTH([pickuptime]) = '4' then 1 else 0 end) Apr_2020,
+  sum(case when MONTH([pickuptime]) = '5' then 1 else 0 end) May_2020,
+  sum(case when MONTH([pickuptime]) = '6' then 1 else 0 end) Jun_2020,
+  sum(case when MONTH([pickuptime]) = '7' then 1 else 0 end) Jul_2020,
+  sum(case when MONTH([pickuptime]) = '8' then 1 else 0 end) Aug_2020,
+  sum(case when MONTH([pickuptime]) = '9' then 1 else 0 end) Sep_2020,
+  sum(case when MONTH([pickuptime]) = '10' then 1 else 0 end) Oct_2020,
+  sum(case when MONTH([pickuptime]) = '11' then 1 else 0 end) Nov_2020,
+  sum(case when MONTH([pickuptime]) = '12' then 1 else 0 end) Dec_2020
+FROM RPView  rp
+INNER JOIN Volunteer on Volunteer.Id = rp.MainDriver 
+WHERE pickuptime >= '2020-1-01' 
+AND pickuptime < CURRENT_TIMESTAMP
+Group BY MainDriver, Volunteer.DisplayName, Volunteer.CityCityName, Volunteer.CellPhone, Volunteer.JoinDate
+;
+
+
+  
+ */
 public class ReportService
 {
+
+    public class RidesForVolunteer
+    {
+        public string Date { get; set; }
+        public string OriginName { get; set; }
+        public string DestinationName { get; set; }
+        public string Time { get; set; }
+        public string PatDisplayName { get; set; }
+        public string Drivers { get; set; }
+        public string Day { get; set; }
+        public string Status { get; internal set; }
+    }
+
 
     public class NameIDPair
     {
@@ -18,7 +56,7 @@ public class ReportService
 
     public class VolunteerPerRegion
     {
-      
+
         public string Volunteer { get; set; }
         public string Region { get; set; }
     }
@@ -41,6 +79,33 @@ public class ReportService
         public string Patient { get; set; }
 
     }
+
+    public class VolunteerInfo
+    {
+        public string FirstNameH { get; set; }
+        public string LastNameH { get; set; }
+        public string VolunteerIdentity { get; set; }
+        public string Email { get; set; }
+        public string Address { get; set; }
+        public string CityCityName { get; set; }
+        public string JoinDate { get; set; }
+    }
+
+    public class VolunteersPerMonthInfo
+    {
+        public string Year { get; set; }
+        public string Month { get; set; }
+        public string Count { get; set; }
+
+    }
+
+    public class INSERT_TO_NI_SQL_Objects
+    {
+        public string query { get; set; }
+
+        public SqlParameter[] sqlParameters { get; set;  }
+    }
+
 
     private DataTable getDriverByID(int driverID, DbService db)
     {
@@ -69,7 +134,7 @@ public class ReportService
         return dt;
     }
 
-    
+
     //@@ TODO:  Maybe ths is not needed?
     private DataTable getVolunteerRidesPerWeek(string start_date, string end_date, DbService db)
     {
@@ -112,6 +177,26 @@ AND RidePat.pickuptime >= '2020-1-01'
         return dt;
     }
 
+    internal string CommitReportedVolunteerListToNI_DB(string cell_phone, string start_date, string config)
+    {
+        // This service is not to be used by everybody, check if user is entitled for it
+        List<string> permissions = this.GetCurrentUserEntitlements(cell_phone);
+        if (!permissions.Contains("Record_NI_report"))
+        {
+            return "UnAuthorized";   // Empty results - TODO: 404
+        }
+
+
+        DbService db = new DbService();
+
+        INSERT_TO_NI_SQL_Objects objs = GetQueryTextForINSERT_NIVolunteerList(start_date, config);
+
+        db.ExecuteQuery(objs.query, CommandType.Text, objs.sqlParameters);
+
+        return "OK";
+
+    }
+
     private DataTable getEscorts()
     {
         DbService db = new DbService();
@@ -130,14 +215,14 @@ AND RidePat.pickuptime >= '2020-1-01'
         DbService db = new DbService();
 
         string query =
- @"select DISTINCT DisplayName,  Area
-From(SELECT Volunteer.DisplayName, RPView.Area
-FROM RPView
-INNER JOIN Volunteer ON RPView.MainDriver = Volunteer.Id
-AND RPView.pickuptime <  @end_date
-AND RPView.pickuptime >=  @start_date) AS BUFF
-ORDER BY Area ASC";            ;
- 
+             @"select DISTINCT DisplayName,  Area
+            From(SELECT Volunteer.DisplayName, RPView.Area
+            FROM RPView
+            INNER JOIN Volunteer ON RPView.MainDriver = Volunteer.Id
+            AND RPView.pickuptime <  @end_date
+            AND RPView.pickuptime >=  @start_date) AS BUFF
+            ORDER BY Area ASC";
+
         SqlCommand cmd = new SqlCommand(query);
         cmd.CommandType = CommandType.Text;
         cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
@@ -159,13 +244,161 @@ ORDER BY Area ASC";            ;
         return result;
     }
 
+    internal List<VolunteersPerMonthInfo> GetReportVolunteerPerMonth(string start_date)
+    {
+        DbService db = new DbService();
+
+        string query =
+             @"SELECT count(DISTINCT MainDriver )as COUNT_G, YEAR(date) as YEAR_G, MONTH(date) as MONTH_G
+                FROM Ride 
+                where date >= @start_date
+                and date <= CURRENT_TIMESTAMP
+                GROUP BY YEAR(Date), MONTH(Date) 
+                ORDER  BY YEAR_G, MONTH_G ASC";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        List<VolunteersPerMonthInfo> result = new List<VolunteersPerMonthInfo>();
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            VolunteersPerMonthInfo obj = new VolunteersPerMonthInfo();
+            obj.Year = dr["YEAR_G"].ToString();
+            obj.Month = dr["MONTH_G"].ToString();
+            obj.Count = dr["COUNT_G"].ToString();
+            result.Add(obj);
+        }
+
+        return result;
+
+
+    }
+
+    internal string pad_with_zeros(string id)
+    {
+        int pad = id.Length - 9;
+        if (pad > 0)
+        {
+            return new string('0', pad) + id;
+        }
+        return id;
+    }
+
+    // The interface to execute statements on DbService differes than the one to Query
+    // It should sometimes return also an array of parameters, depending on config
+    internal INSERT_TO_NI_SQL_Objects GetQueryTextForINSERT_NIVolunteerList(string start_date, string config)
+    {
+        string insert_header = @"INSERT into DeliveredNIReport  (ReportDate,DriverId)
+                                SELECT CAST(GETDATE() AS Date), Id ";
+        string query_body;
+        INSERT_TO_NI_SQL_Objects objs = new INSERT_TO_NI_SQL_Objects();
+        if (config.Equals("start_date"))
+        {
+            query_body = @"from Volunteer
+                where IsActive='true' 
+                and (JoinDate >= @start_date )
+                and not Id in (select distinct DriverId from DeliveredNIReport )
+            ";
+            objs.sqlParameters = new SqlParameter[1];
+            objs.sqlParameters[0] = new SqlParameter("@start_date", SqlDbType.Date);
+            objs.sqlParameters[0].Value = start_date;
+        }
+        else
+        {
+            query_body = @"from Volunteer
+                where IsActive='true' 
+                and not Id in (select distinct DriverId from DeliveredNIReport )";
+            objs.sqlParameters = new SqlParameter[0];   // Make downstream DbService Execute happy
+        }
+
+        objs.query = insert_header + query_body;
+        return objs;
+    }
+
+
+        internal SqlCommand BuildSqlCommandForNIVolunteerList(string start_date, string config)
+    {
+        SqlCommand cmd;
+
+        /* ATTENTION - If you change here, change also in GetQueryTextForINSERT_NIVolunteerList */
+
+        string header = "select FirstNameH, LastNameH ,VolunteerIdentity , Email, Address, CityCityName, JoinDate ";
+
+        if (config.Equals("start_date"))
+        {
+            string query_body = @"from Volunteer
+                where IsActive='true' 
+                and (JoinDate >= @start_date )
+                and not Id in (select distinct DriverId from DeliveredNIReport )
+            ";
+            cmd = new SqlCommand(header + query_body);
+            cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        }
+        else
+        {
+            string query_body = @"from Volunteer
+                where IsActive='true' 
+                and not Id in (select distinct DriverId from DeliveredNIReport )";
+            cmd = new SqlCommand(header + query_body);
+        }
+
+        cmd.CommandType = CommandType.Text;
+        return cmd;
+    }
+    internal List<VolunteerInfo> GetReportVolunteerList(string cell_phone, string start_date, string config)
+    {
+        List<VolunteerInfo> result = new List<VolunteerInfo>();
+
+        // This service is not to be used by everybody, check if user is entitled for it
+        List<string> permissions = this.GetCurrentUserEntitlements(cell_phone);
+        if ( !permissions.Contains("Record_NI_report"))
+        {
+            return result;   // Empty results - TODO: 404
+        }
+
+
+        DbService db = new DbService();
+        SqlCommand cmd = BuildSqlCommandForNIVolunteerList(start_date, config);
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            VolunteerInfo obj = new VolunteerInfo();
+            obj.FirstNameH = dr["FirstNameH"].ToString();
+            obj.LastNameH = dr["LastNameH"].ToString();
+            string id = dr["VolunteerIdentity"].ToString();
+            obj.VolunteerIdentity = pad_with_zeros(id);
+            obj.Email = dr["Email"].ToString();
+            obj.Address = dr["Address"].ToString();
+            obj.CityCityName = dr["CityCityName"].ToString();
+            if ( dr.IsNull("JoinDate") )
+            {
+                obj.JoinDate = DateTime.Now.ToString("dd/MM/yyyy");
+            } 
+            else
+            {
+                obj.JoinDate = ((DateTime)dr["JoinDate"]).ToString("dd/MM/yyyy");
+            }
+            result.Add(obj);
+        }
+
+        return result;
+    }
+
+
 
     internal List<VolunteerKM> GetReportVolunteersKM(string start_date, string end_date)
     {
         DbService db = new DbService();
 
         string query =
- @"select pickuptime, Origin, Destination, Volunteer.DisplayName, PatName
+ @"select convert(varchar, PickupTime, 103) AS PickupTime, Origin, Destination, Volunteer.DisplayName, PatName
 from 
 ( SELECT pickuptime, Origin, Destination, MainDriver, DisplayName AS PatName FROM RPView 
 WHERE pickuptime >= '2019-1-01'
@@ -194,7 +427,7 @@ ORDER BY Volunteer.DisplayName ASC
             obj.Patient = dr["PatName"].ToString();
             obj.Origin = dr["Origin"].ToString();
             obj.Destination = dr["Destination"].ToString();
-            obj.Date = dr["pickuptime"].ToString();
+            obj.Date = dr["PickupTime"].ToString();
             result.Add(obj);
         }
 
@@ -230,12 +463,41 @@ order BY DisplayName ASC
         return result;
     }
 
+    // Purpose: Let the web app know what  is applicable for this user
+    // Returns: List of special priviliages. Can be empty if user has nothing special         
+    // Usage:
+    //       1. Who can "click the button" that records in DB the National Insurance report
+    internal List<string> GetCurrentUserEntitlements(string cell_phone)
+    {
+        List<string> result = new List<string>();
+        if (!String.IsNullOrEmpty(cell_phone))
+        {
+            DbService db = new DbService();
+
+            string query = @"select Permission FROM ReportPermissions WHERE Cellphone = @cell_phone";
+
+            SqlCommand cmd = new SqlCommand(query);
+            cmd.CommandType = CommandType.Text;
+            cmd.Parameters.Add("@cell_phone", SqlDbType.NVarChar).Value = cell_phone;
+
+            DataSet ds = db.GetDataSetBySqlCommand(cmd);
+            DataTable dt = ds.Tables[0];
+
+            foreach (DataRow dr in dt.Rows)
+            {
+                result.Add(dr["Permission"].ToString());
+            }
+        }
+        return result;
+    }
+
+
     internal List<VolunteerPerPatient> GetReportVolunteersPerPatient(int patient)
     {
         DbService db = new DbService();
 
         string query =
-@"SELECT pickuptime, Origin, Destination, Volunteer.DisplayName
+@"SELECT convert(varchar, PickupTime, 103) AS PickupTime, Origin, Destination, Volunteer.DisplayName
 From (
 SELECT pickuptime, Origin, Destination, MainDriver FROM RPView  
 WHERE pickuptime >= '2019-1-01'
@@ -259,14 +521,14 @@ INNER JOIN Volunteer ON BUFF.MainDriver=Volunteer.Id";
             obj.Volunteer = dr["DisplayName"].ToString();
             obj.Origin = dr["Origin"].ToString();
             obj.Destination = dr["Destination"].ToString();
-            obj.Date = dr["pickuptime"].ToString();
+            obj.Date = dr["PickupTime"].ToString();
             result.Add(obj);
         }
 
         return result;
     }
 
-    public List<RidePat> GetReportVolunteerRides(int volunteerId, string start_date, string end_date)
+    public List<RidesForVolunteer> GetReportVolunteerRides(int volunteerId, string start_date, string end_date)
     {
         if (volunteerId <= 0)
         {
@@ -288,9 +550,8 @@ INNER JOIN Volunteer ON BUFF.MainDriver=Volunteer.Id";
 
 
         DataTable pickupsTable = getPickupForDriver(volunteerId, start_date, end_date, db);
-        List<RidePat> rpl = new List<RidePat>();
 
-        int counter = 0;
+        List<RidesForVolunteer> result = new List<RidesForVolunteer>();
 
         try
         {
@@ -298,121 +559,14 @@ INNER JOIN Volunteer ON BUFF.MainDriver=Volunteer.Id";
             {
                 try
                 {
-                    counter++;
+                    RidesForVolunteer obj = new RidesForVolunteer();
+                    obj.PatDisplayName = dr["DisplayName"].ToString();
+                    obj.OriginName = dr["Origin"].ToString();
+                    obj.DestinationName = dr["Destination"].ToString();
+                    obj.Date = dr["PickupTime"].ToString();
+                    obj.Status = dr["Status"].ToString();
 
-                    RidePat rp = new RidePat();
-                    rp.Coordinator = new Volunteer();
-                    rp.Coordinator.DisplayName = dr["Coordinator"].ToString();
-                    rp.Drivers = new List<Volunteer>();
-
-                    if (dr["MainDriver"].ToString() != "")
-                    {
-
-                        Volunteer primary = new Volunteer();
-                        primary.DriverType = "Primary";
-
-                        primary.Id = int.Parse(dr["MainDriver"].ToString());
-                        DataRow driverRow = driverTable.Rows[0];
-                        primary.DisplayName = driverRow["DisplayName"].ToString();
-                        primary.CellPhone = driverRow["CellPhone"].ToString();
-                        rp.Drivers.Add(primary);
-                    }
-
-
-                    // if (numOfDrivers > 1)
-                    // {
-                    if (dr["secondaryDriver"].ToString() != "")
-                    {
-                        // Do we care about these for a report? 
-                        if (false)
-                        {
-                            throw new Exception("Secondary Driver lookup not implemented yet");
-                            Volunteer secondary = new Volunteer();
-                            secondary.DriverType = "secondary";
-                            secondary.Id = int.Parse(dr["secondaryDriver"].ToString());
-                            string searchExpression = "Id = " + secondary.Id;
-                            DataRow[] driverRow = driverTable.Select(searchExpression);
-                            secondary.DisplayName = driverRow[0]["DisplayName"].ToString();
-                            secondary.CellPhone = driverRow[0]["CellPhone"].ToString();
-                            rp.Drivers.Add(secondary);
-                        }
-                    }
-
-                    rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
-                    try
-                    {
-                        rp.RideNum = int.Parse(dr["RideNum"].ToString());
-                    }
-                    catch (Exception)
-                    {
-
-                    }
-
-                    Patient thePatient = new Patient();
-                    thePatient.DisplayName = dr["DisplayName"].ToString();
-                    thePatient.EnglishName = dr["EnglishName"].ToString();
-                    thePatient.CellPhone = dr["CellPhone"].ToString();
-                    thePatient.IsAnonymous = dr["IsAnonymous"].ToString();
-                    thePatient.Id = int.Parse(dr["Id"].ToString());
-
-                    rp.Pat = thePatient;
-
-                    rp.Pat.EscortedList = new List<Escorted>();
-                    string escortSearchExpression = "RidePatNum = " + rp.RidePatNum;
-                    DataRow[] escortRow = escortTable.Select(escortSearchExpression);
-                    foreach (DataRow row in escortRow)
-                    {
-                        Escorted e = new Escorted();
-                        e.Id = int.Parse(row[0].ToString());
-                        e.DisplayName = row[1].ToString();
-                        rp.Pat.EscortedList.Add(e);
-                    }
-
-
-                    Location origin = new Location();
-                    origin.Name = dr["Origin"].ToString();
-                    if (locations[origin.Name] == null)
-                    {
-                        origin.EnglishName = "";
-                    }
-                    else origin.EnglishName = locations[origin.Name].ToString();
-                    rp.Origin = origin;
-                    Location dest = new Location();
-                    dest.Name = dr["Destination"].ToString();
-                    if (locations[dest.Name] == null)
-                    {
-                        dest.EnglishName = "";
-                    }
-                    else dest.EnglishName = locations[dest.Name].ToString();
-                    rp.Destination = dest;
-                    rp.Area = dr["Area"].ToString();
-                    rp.Shift = dr["Shift"].ToString();
-                    rp.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
-                    rp.Status = dr["Status"].ToString();
-                    if (rp.RideNum > 0) // if RidePat is assigned to a Ride - Take the Ride's status
-                    {
-                        string searchExpression = "RideRideNum = " + rp.RideNum;
-                        DataRow[] rideRow = rideTable.Select(searchExpression);
-                        //rideRow = rideRow.OrderBy(x => x.TimeOfDay).ToList();
-                        rp.Statuses = new List<string>();
-                        foreach (DataRow status in rideRow)
-                        {
-                            rp.Statuses.Add(status.ItemArray[0].ToString());
-                        }
-                        try
-                        {
-                            rp.Status = rp.Statuses[rp.Statuses.Count - 1];
-                        }
-                        catch (Exception err)
-                        {
-
-                            throw err;
-                        }
-
-
-                    }
-
-                    rpl.Add(rp);
+                    result.Add(obj);
                 }
                 catch (Exception ex)
                 {
@@ -423,7 +577,7 @@ INNER JOIN Volunteer ON BUFF.MainDriver=Volunteer.Id";
 
             }
 
-            return rpl;
+            return result;
         }
         catch (Exception e)
         {
@@ -471,7 +625,7 @@ INNER JOIN Volunteer ON BUFF.MainDriver=Volunteer.Id";
                         primary.CellPhone = driverRow["CellPhone"].ToString();
                         rp.Drivers.Add(primary);
 @@ */
-                    }
+    }
 
 
                     // if (numOfDrivers > 1)

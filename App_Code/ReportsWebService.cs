@@ -52,24 +52,15 @@ public class ReportsWebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetReportVolunteerRides(int volunteerId, string start_date, string end_date)
+    public List<ReportService.RidesForVolunteer> GetReportVolunteerRides(int volunteerId, string start_date, string end_date)
     {
         try
         {
             HttpResponse response = GzipMe();
-            //string AcceptEncoding = HttpContext.Current.Request.Headers["Accept-Encoding"];
-            //if (AcceptEncoding.Contains("gzip"))
-            //{
-            //    HttpResponse Response = HttpContext.Current.Response;
-            //    Response.Filter = new System.IO.Compression.GZipStream(Response.Filter, System.IO.Compression.CompressionMode.Compress);
-            //    Response.Headers.Remove("Content-Encoding");
-            //    Response.AppendHeader("Content-Encoding", "gzip");
-            //}
 
             ReportService report = new ReportService();
-            List<RidePat> r = report.GetReportVolunteerRides(volunteerId, start_date, end_date);
-            j.MaxJsonLength = Int32.MaxValue;
-            return j.Serialize(r);
+            List<ReportService.RidesForVolunteer> r = report.GetReportVolunteerRides(volunteerId, start_date, end_date);
+            return r;
         }
         catch (Exception ex)
         {
@@ -102,7 +93,52 @@ public class ReportsWebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetReportVolunteersPerPatient(int patient)
+    public string GetReportVolunteerList(string start_date, string config)
+    {
+        try
+        {
+            string cell_phone = (string)HttpContext.Current.Session["userSession"];
+            HttpResponse response = GzipMe();
+            ReportService report = new ReportService();
+            List<ReportService.VolunteerInfo> r = report.GetReportVolunteerList(cell_phone, start_date, config);
+            j.MaxJsonLength = Int32.MaxValue;
+            return j.Serialize(r);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReportVolunteerList", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetReportVolunteerPerMonth(string start_date)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            ReportService report = new ReportService();
+            List<ReportService.VolunteersPerMonthInfo> r = report.GetReportVolunteerPerMonth(start_date);
+            j.MaxJsonLength = Int32.MaxValue;
+            return j.Serialize(r);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReportVolunteerPerMonth", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
+   
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public List<ReportService.VolunteerPerPatient> GetReportVolunteersPerPatient(int patient)
     {
         try
         {
@@ -110,8 +146,7 @@ public class ReportsWebService : System.Web.Services.WebService
 
             ReportService report = new ReportService();
             List<ReportService.VolunteerPerPatient> r = report.GetReportVolunteersPerPatient(patient);
-            j.MaxJsonLength = Int32.MaxValue;
-            return j.Serialize(r);
+            return r;
         }
         catch (Exception ex)
         {
@@ -120,6 +155,31 @@ public class ReportsWebService : System.Web.Services.WebService
         }
 
     }
+
+
+    
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string CommitReportedVolunteerListToNI_DB(string start_date, string config)
+    {
+        try
+        {
+            string cell_phone = (string)HttpContext.Current.Session["userSession"];
+            HttpResponse response = GzipMe();
+
+            ReportService report = new ReportService();
+            report.CommitReportedVolunteerListToNI_DB(cell_phone, start_date, config);
+            return "OK";
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in CommitReportedVolunteerListToNI_DB", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -164,7 +224,23 @@ public class ReportsWebService : System.Web.Services.WebService
 
     }
 
-
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public List<string> GetCurrentUserEntitlements()
+    {
+        try
+        {
+            string cell_phone = (string)HttpContext.Current.Session["userSession"];
+            ReportService report = new ReportService();
+            List<string> r = report.GetCurrentUserEntitlements(cell_phone);
+            return r;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetUserEntitlements", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+    }
 
 }
 

@@ -2,6 +2,90 @@
 
 
 
+// 24-Nov:  Avishai
+//1.  . מספר המתנדבים השונים שהסיעו בכל חודש בשנתיים האחרונות. 
+
+
+
+// 31-Oct-20:  Implement code after populating template_DATE_LATER_THAN, so that if radio group
+// is checked, we respect it and get all volunteers.
+// Set default date to 1/1/2020 
+
+
+//   GetRidePatViewByTimeFilter    ==>   All RIDES  
+
+// 020Oct : Shlomit Meler bug.
+/* 
+ * This is teh code that returns empty results:
+ * 
+ *
+ ReportService.cs :   getPickupForDriver() 
+    SELECT *
+    FROM RPView
+    WHERE  MainDriver = '18312'
+    ;
+
+ I do not recall from where I copied it.
+
+need to read notes on what RPView is, and see where I copied it from.... 
+
+
+
+
+// --------------------------------------
+
+// Downhill Park:
+// 1. Export to PDF now prints in hebrew (as I created the font file), but it displayed reversed.
+// Need to look at pdfmake doc about RTL, or in data-table.
+// Also, shoudl check which font is used now in the HTML, maybe that font is better ?
+
+
+/* Instructions for printing PDF Hebrew 
+ *  https://github.com/bpampuch/pdfmake/issues/1496
+ *  
+  c.customize && c.customize(a);
+            a = d.pdfMake.createPdf(a);
+
+
+Downloaded font from:
+   https://fonts.google.com/specimen/Alef?subset=hebrew&preview.text=&preview.text_type=custom&sidebar.open=true&selection.family=Alef:wght@700
+
+
+https://pdfmake.github.io/docs/fonts/custom-fonts-client-side/vfs/
+
+
+Created vfs.js : 
+
+   git clone https://github.com/bpampuch/pdfmake.git .
+   cd examples/fonts/
+   explorer.exe  .
+   cd ..
+   node build-vfs.js
+
+and do a mnaul change to it, at teh end to regiser as .vfs
+            
+             * */
+
+/* Perf analsysis
+ 
+  http://localhost:54573/Road%20to%20Recovery/pages/WebService.asmx/GetRidePatView
+  
+    {"volunteerId":-2,"maxDays":-1}
+ 
+ RidePat.cs :  GetRidePatView() 
+    //VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
+
+
+pages\ridePatForm.html  loadPage :     if (JSON.parse(GENERAL.RIDEPAT.getRidePatList()).length != 0)
+    Does not look like anyone is using arr_customer for its actuall array.
+    But it does need to be a non-epty array for something to happen.
+    So it's enough to store just a non-empty array.
+
+
+ * */
+
+
+
 // 05-07: Focus on reports content, Use UI as-is fix it later.
 //  ==> finish all services is the goal.
 
@@ -58,6 +142,9 @@ var S_refresh_preview = null;
 function init_reports_page() {
     includeHTML();
     set_banner_debug_data();
+    process_permissions();
+
+    init_components();
 }
 
 
@@ -73,7 +160,31 @@ function set_banner_debug_data() {
     }
 }
 
+//* Purpose show UI that is available to specific users
+function process_permissions() {
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetCurrentUserEntitlements",
+        contentType: "application/json; charset=utf-8",
+        type: "POST",
+        async: true,
+        success: function (data) {
+            var permissions = data.d;
+            for (a_permission of permissions) {
+                if (a_permission == "Record_NI_report") {
+                    $("#rp_special_list").show();
+                }
+            }
+        },
+        error: function (err) { alert("Error in process_permissions"); }
+    });
 
+}
+
+function init_components() {
+    // Datatables date-time plugin
+    $.fn.dataTable.moment('DD/MM/YYYY');
+}
 // Handle a click event on one of the reports in the Reports-Tree
 function on_report_click(event) {
 
@@ -94,7 +205,9 @@ var K_strategy = {
     "rp_vl_ride_year": rp_vl_ride_year__refresh_preview,
     "rp_amuta_vls_week": rp_amuta_vls_week__refresh_preview,
     "rp_amuta_vls_per_pat": rp_amuta_vls_per_pat__refresh_preview,
-    "rp_amuta_vls_km": rp_amuta_vls_km__refresh_preview
+    "rp_amuta_vls_km": rp_amuta_vls_km__refresh_preview,
+    "rp_amuta_vls_list": rp_amuta_vls_list__refresh_preview,
+    "rp_amuta_vls_per_month": rp_amuta_vls_per_month__refresh_preview
 }
 
 
@@ -150,9 +263,26 @@ var K_fields_map = {
             id: "rp_amuta_vls_per_km__year",
             type: "YEAR",
             template: 'div[name="template_YEAR"]',
-            post_clone: field_year_post_clone
+            post_clone: rp_amuta_vls_per_km_field_year_post_clone
+        }
+    ],
+    "rp_amuta_vls_list": [
+        {
+            id: "rp_amuta_vls_list__radio",
+            type: "YEAR",
+            template: 'div[name="template_VOLUNTEER_LIST_RADIO"]',
+            post_clone: rp_amuta_vls_list_field_radio_post_clone
+        }
+    ],
+    "rp_amuta_vls_per_month": [
+        {
+            id: "rp_vl_ride_month__month",
+            template: 'div[name="template_PER_MONTH"]',
+            type: "MONTH",
+            post_clone: rp_amuta_vls_per_month__refresh_preview
         }
     ]
+
 }
 
 function populate_parameters(report_type) {
@@ -182,12 +312,24 @@ function rp_get_fields(report_type) {
 function clone_template(template, parent_id) {
     var result = $(template).clone().prop("id", parent_id + "_field");
     result.removeAttr("name");
+
     // assign unique id to the input element
     var input = result.find("input");
-    input.prop("id", input.attr("template_id"));
+    input.each(function () {
+        var new_id = $(this).attr("template_id");
+        if (new_id) {
+            $(this).prop("id", new_id);
+        }
+    })
     var select = result.find("select");
     select.prop("id", select.attr("template_id"));
 
+    // if has "template_name", assign it to its name
+    var select = result.find("input[type=radio]");
+    select.prop("name", select.attr("template_name"));
+
+
+     
     result.appendTo("#" + parent_id);
     result.removeClass("report_template");
     return result;
@@ -284,8 +426,11 @@ function field_month_post_clone(id) {
     populate_month_field();
 }
 
+function empty_func(id) {
 
-function field_year_post_clone(id) {
+}
+
+function rp_amuta_vls_per_km_field_year_post_clone(id) {
     var today = new Date();
     $('#select_year').val(today.getFullYear() - 1);
     $("#select_year").change(rp_amuta_vls_km__refresh_preview);
@@ -293,12 +438,26 @@ function field_year_post_clone(id) {
     rp_amuta_vls_km__refresh_preview();
 }
 
+function rp_amuta_vls_list_field_radio_post_clone(id) {
+    var today = new Date();
+    $('#select_date_later').val("2020-01-01");
+    $("#select_date_later").change(rp_amuta_vls_list__refresh_preview);
+
+    $("#radio_start_date").change(rp_amuta_vls_list__refresh_preview);
+    $("#radio_all").change(rp_amuta_vls_list__refresh_preview);
+
+    $("#commit_to_ni_db").click(rp_amuta_vls_list__commit_to_ni_db);
+    rp_amuta_vls_list__refresh_preview();
+}
+
+
 function rp_vl_ride_year__field_year_post_clone(id) {
     var today = new Date();
     $('#select_year').val(today.getFullYear());
     $("#select_year").change(rp_vl_ride_year__refresh_preview);
 
 }
+
 
 // Given a defintition of field  build the UI for it in the Parameters panel
 // The UI is coped from a template in the page. Each field type has its own template
@@ -491,6 +650,32 @@ function rp_amuta_vls_km__refresh_preview() {
         start_week_date, end_week_date);
 }   
 
+function rp_amuta_vls_list__query_object() {
+    var selected_date = $('#select_date_later').val();
+    var config = "start_date";
+    if ($("#radio_all").is(":checked")) {
+        config = "all";
+    }
+    return {
+        start_date: selected_date,
+        config: config
+    };
+}
+
+
+function rp_amuta_vls_list__refresh_preview() {
+    var query_object = rp_amuta_vls_list__query_object();
+
+    refresh_amuta_vls_list_Table(query_object);
+}   
+
+function rp_amuta_vls_per_month__refresh_preview() {
+//    var selected_date = $('#select_date_later').val();
+//    var config = "start_date";
+
+    refresh_amuta_vls_per_month_Table("2019-01-01");
+}   
+
 
 // 'start_date' :  a date formatted as YYYY-MM-DD
 // 'end_date'   :  a date formatted as YYYY-MM-DD
@@ -530,6 +715,29 @@ function refresh_amuta_vls_week_Table(start_date, end_date) {
                 ],
                 dom: 'Bfrtip',
                 buttons: [
+                    {
+                        extend: 'pdfHtml5',
+                        orientation: 'landscape',
+                        pageSize: 'LEGAL',
+                        customize: function (doc) {
+                            pdfMake.fonts = {
+                                hebrewFont: {
+                                    normal: 'Alef-Regular.ttf',
+                                    bold: 'Alef-Bold.ttf',
+                                    italics: 'Alef-Regular.ttf',
+                                    bolditalics: 'Alef-Bold.ttf'
+                                }
+                            };
+
+                            doc.defaultStyle = {
+                                font: 'hebrewFont'
+                            };
+                            console.log(doc);
+                        } 
+                    }
+                ],
+
+                xbuttons: [
                     'csv', 'excel', 'pdf'
                 ]
             });
@@ -547,6 +755,9 @@ function refresh_amuta_vls_week_Table(start_date, end_date) {
 // 'start_date' :  a date formatted as YYYY-MM-DD
 // 'end_date'   :  a date formatted as YYYY-MM-DD
 function refresh_amuta_vls_km_Table(start_date, end_date) {
+
+    
+
     hide_all_tables();
     $('#wait').show();
     var query_object = {
@@ -601,6 +812,118 @@ function refresh_amuta_vls_km_Table(start_date, end_date) {
 
 
 
+// 'start_date' :  a date formatted as YYYY-MM-DD
+function refresh_amuta_vls_per_month_Table(start_date) {
+    hide_all_tables();
+    $('#wait').show();
+    var query_object = {
+        start_date: start_date
+    };
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportVolunteerPerMonth",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            $('#wait').hide();
+            arr_rides = JSON.parse(data.d);
+
+            $('#div_table_amuta_vls_per_month').show();
+            tbl = $('#table_amuta_vls_month').DataTable({
+                pageLength: 100,
+                bLengthChange: false,
+                data: arr_rides,
+                destroy: true,
+                columnDefs: [
+                    { "orderData": [0, 1], "targets": 0 }],
+                columns: [
+                    { data: "Year" },
+                    { data: "Month" },
+                    { data: "Count" }
+
+                ],
+                dom: 'Bfrtip',
+ 
+
+                buttons: [
+                    'csv', 'excel', 
+                ]
+            });
+        },
+        error: function (err) {
+            $('#wait').hide();
+            // @@ alert("Error in GetRidePatView: " + err.responseText);
+        }
+
+
+    });
+
+}
+
+
+// 'start_date' :  a date formatted as YYYY-MM-DD
+function refresh_amuta_vls_list_Table(query_object) {
+    hide_all_tables();
+    $('#wait').show();
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportVolunteerList",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            $('#wait').hide();
+            arr_rides = JSON.parse(data.d);
+
+            $('#div_table_amuta_vls_list').show();
+            tbl = $('#table_amuta_vls_list').DataTable({
+                pageLength: 100,
+                bLengthChange: false,
+                data: arr_rides,
+                destroy: true,
+                columnDefs: [
+                    { "orderData": [0, 1], "targets": 0 }],
+                columns: [
+
+                    { data: "FirstNameH" },
+                    { data: "LastNameH" },
+                    { data: "VolunteerIdentity" },
+                    { data: "Email" },
+                    { data: "Address" },
+                    { data: "CityCityName" },
+                    { data: "JoinDate" }
+                ],
+                dom: 'Bfrtip',
+
+
+                buttons: [
+                    'csv', 'excel',
+                ]
+            });
+        },
+        error: function (err) {
+            $('#wait').hide();
+            // @@ alert("Error in GetRidePatView: " + err.responseText);
+        }
+
+
+    });
+
+}
+
+
+
+
+
 function rp_amuta_vls_per_pat__refresh_preview() {
     var patient = $("#select_patient").attr("itemID");
     refresh_amuta_vls_per_pat_Table(patient);
@@ -624,7 +947,7 @@ function refresh_amuta_vls_per_pat_Table(patient) {
         data: JSON.stringify(query_object),
         success: function (data) {
             $('#wait').hide();
-            arr_rides = JSON.parse(data.d);
+            arr_rides = data.d;
 
             $('#div_table_amuta_vls_per_pat').show();
             tbl = $('#table_amuta_vls_per_pat').DataTable({
@@ -662,7 +985,6 @@ function refresh_amuta_vls_per_pat_Table(patient) {
 // 'end_date'   :  a date formatted as YYYY-MM-DD
 function refreshTable(volunteerId, start_date, end_date) {
     ridesToShow = [];
-    allRides = [];
 
     $('#wait').show();
     hide_all_tables();
@@ -684,97 +1006,49 @@ function refreshTable(volunteerId, start_date, end_date) {
         data: JSON.stringify(query_object),
         success: function (data) {
             $('#wait').hide();
-            arr_rides = JSON.parse(data.d);
+            arr_rides = data.d
             // DEBUG console.log(arr_rides);
 
             for (i in arr_rides) {
 
-                //Change date format
-                var temp = arr_rides[i].Date.substring(arr_rides[i].Date.indexOf("(") + 1);
-                temp = temp.substring(0, temp.indexOf(")"));
-                var date = new Date(parseInt(temp));
+                let obj = arr_rides[i];
 
-                var HEBday = getDayString(date.getDay());
-
-                if (arr_rides[i].Drivers.length != 0) {
-                    driverName = arr_rides[i].Drivers[0].DisplayName;
-                }
-                destinationName = arr_rides[i].Destination.Name;
-                originName = arr_rides[i].Origin.Name;
-
-
-                if (date.getDate() < 10) {
-                    day = "0" + date.getDate();
-                } else day = date.getDate();
-
-
-                if (date.getMonth() + 1 < 10) {
-                    month = "0" + (date.getMonth() + 1);
-                } else month = date.getMonth() + 1;
-
+                var date = moment(obj.Date, "DD/MM/YYYY HH:mm:ss", true);
+                date.add(3, 'hours'); // TimeZone differen between UTC and Israel
+                var HEBday = getDayString(date.day());
 
                 var d = new Date();
-                var timezoneOffset = 0; // The difference between UTC and Israel
 
-                if ((date.getHours() - timezoneOffset) < 10) {
-                    hours = "0" + (date.getHours() - timezoneOffset);
-                } else hours = (date.getHours() - timezoneOffset);
-
-                if (date.getMinutes() < 10) {
-                    minutes = "0" + date.getMinutes();
-                } else minutes = date.getMinutes();
-
-                console.log("arr_rides @", i, arr_rides[i].Pat);
-
-                if (arr_rides[i].Pat.DisplayName.includes("אנונימי")) {
+                if (obj.PatDisplayName.includes("אנונימי")) {
                     patDisplayName = "חולה";
                 } else {
-                    patDisplayName = arr_rides[i].Pat.DisplayName;
+                    patDisplayName = obj.PatDisplayName;
                 }
 
-                if (arr_rides[i].Pat.EscortedList.length != 0) {
-                    patDisplayName += " + " + arr_rides[i].Pat.EscortedList.length;
-                }
+//@@                if (arr_rides[i].Pat.EscortedList.length != 0) {
+//@@                    patDisplayName += " + " + arr_rides[i].Pat.EscortedList.length;
+//@@                 }
 
-                date2 = HEBday + " " + day + "/" + month + "/" + date.getUTCFullYear() % 2000;
-                time = hours + ":" + minutes;
-
+               // date2 = HEBday + " " + day + "/" + month + "/" + date.getUTCFullYear() % 2000;
+                date2 = HEBday + " " + date.format("DD/MM/YY");
+                time = date.format("HH:mm");
 
                 if (time == "22:14") { //22:14 is the default time to show afternoon אחה''צ
-
                     time = " אחה\"צ";
                 }
 
 
-
                 var Ride = {};
-
-                if (arr_rides[i].Status == "ממתינה לשיבוץ") {
-                    drivers = arr_rides[i].Status;
-                } else {
-                    drivers = arr_rides[i].Drivers[0].DisplayName;
-                }
 
                 Ride = {
                     Date: date2,
-                    OriginName: arr_rides[i].Origin.Name,
-                    DestinationName: arr_rides[i].Destination.Name,
+                    OriginName: obj.OriginName,
+                    DestinationName: obj.DestinationName,
                     Time: time,
-                    PatDisplayName: patDisplayName,
-                    Coordinator: arr_rides[i].Coordinator.DisplayName,
-                    Drivers: drivers,
-                    Day: date2.slice(4, 5)
+                    PatDisplayName: patDisplayName
                 }
-
-
-                allRides.push(Ride);
-
-
-
-                    ridesToShow.push(Ride);
-
-
-            }
+                ridesToShow.push(Ride);
+           }
 
             tbl = $('#weeklyRides').DataTable({
                 pageLength: 500,
@@ -807,11 +1081,45 @@ function refreshTable(volunteerId, start_date, end_date) {
 
  }
 
+function rp_amuta_vls_list__commit_to_ni_db() {
+
+    var msg = ".זהירות, פעולה זו תמנע הצגת מתנדבים אלו בדוחות הבאים"
+    if (!window.confirm(msg)) {
+        return;
+    }
+
+    var query_object = rp_amuta_vls_list__query_object();
+    $('#wait').show();
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/CommitReportedVolunteerListToNI_DB",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            $('#wait').hide();
+        },
+        error: function (err) {
+            $('#wait').hide();
+            alert("Error in rp_amuta_vls_list__commit_to_ni_db: " + err.responseText);
+        }
+
+    });
+
+}
+
+
 function hide_all_tables() {
     $('#div_weeklyRides').hide();
     $('#div_table_amuta_vls_week').hide();
     $('#div_table_amuta_vls_per_pat').hide();
     $('#div_table_amuta_vls_km').hide();
+    $('#div_table_amuta_vls_list').hide();
+    $('#div_table_amuta_vls_per_month').hide();
  }
 
 
