@@ -73,6 +73,8 @@
         var dateReturn;
         var returnDriverMsg;
 
+        let arrayOF_areasObj = [];
+
         function wiringDataTables() {
             //manage button clicks on tables
 
@@ -160,19 +162,6 @@
         $(document).ready(function () {
 
             wiringDataTables();
-
-            let allSortsSwitch = JSON.parse(localStorage.getItem('allSortsSwitch'));
-
-            if (allSortsSwitch) {
-                $('#allSortsSwitch').prop('checked', true);
-                $('#openSortsControllers').prop('disabled', false);
-                $('#allSortsLabel').html('כבה סינון');
-            } else {
-                $('#allSortsSwitch').prop('checked', false);
-                $('#openSortsControllers').prop('disabled', true);
-                $('#allSortsLabel').html('הפעל סינון');
-            }
-
 
             if (localStorage.refreshTime == "undefined" || localStorage.refreshTime === undefined) { // Set the deafult refresh rate for 5 minutes
                 localStorage.refreshTime = '300000';
@@ -426,6 +415,22 @@
                 },
                 error: function (err) { alert("Error in getHospitalView: " + err.responseText); }
             });
+
+
+
+            let allSortsSwitch = JSON.parse(localStorage.getItem('allSortsSwitch'));
+
+            if (allSortsSwitch) {
+                $('#allSortsSwitch').prop('checked', true);
+                $('#openSortsControllers').prop('disabled', false);
+                $('#allSortsLabel').html('כבה סינון');
+            } else {
+                $('#allSortsSwitch').prop('checked', false);
+                $('#openSortsControllers').prop('disabled', true);
+                $('#allSortsLabel').html('הפעל סינון');
+            }
+
+
         });
 
 
@@ -493,47 +498,26 @@
                 type: "POST",
                 data: JSON.stringify({ volunteerId: volunteerId, maxDays: 30 }),
                 success: function (data) {
+                    let areasToShow_arr = JSON.parse(localStorage.getItem('areasToShow_arr'));
 
                     arr_rides = JSON.parse(data.d);
                     console.log(arr_rides);
 
                     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
+
+                    let allSortsSwitch = JSON.parse(localStorage.getItem('allSortsSwitch'));
+
                     for (i in arr_rides) {
                         if (arr_rides[i].Coordinator.DisplayName != currentCoor) continue; //let the function run only for logged-in coordinator
 
 
-
-
-                        /*
-                                checkBoxesState.erez =
-                            checkBoxesState.erez_Jerusalem = $('#Erez_Jerusalem').prop('checked');
-                            checkBoxesState.Erez_Center = $('#Erez_Center').prop('checked');
-                            checkBoxesState.erez_North = $('#Erez_North').prop('checked');
-                            checkBoxesState.erez_Tarkumia = $('#Erez_Tarkumia').prop('checked');
-            
-                            checkBoxesState.jerusalem = $('#Jerusalem').prop('checked');
-                            checkBoxesState.center = $('#Center').prop('checked');
-                            checkBoxesState.center_Jerusalem = $('#Center_Jerusalem').prop('checked');
-                            checkBoxesState.north = $('#North').prop('checked');
-                            checkBoxesState.north_Jerusalem = $('#North_Jerusalem').prop('checked');
-            
-                            checkBoxesState.north_Center = $('#North_Center').prop('checked');
-                            checkBoxesState.tarkumia = $('#Tarkumia').prop('checked');
-                            checkBoxesState.tarkumia_Jerusalem = $('#Tarkumia_Jerusalem').prop('checked');
-                            checkBoxesState.tarkumia_Center = $('#Tarkumia_Center').prop('checked');
-                            checkBoxesState.tarkumia_North = $('#Tarkumia_North').prop('checked');
-                         */
-
-                        //let allSortsSwitch = JSON.parse(localStorage.getItem('allSortsSwitch'));
-
-                        //if (allSortsSwitch) {
-                        //    if ($("#Erez").prop('checked')) {
-                        //        if (arr_rides[i].area !== 'ארז') continue;
-                        //    }
-                            
-                        //}
-                        // STOP HERE
-
+                        if (allSortsSwitch && areasToShow_arr !== null) {
+                            if (areasToShow_arr.length !== 0) {
+                                if (!areasToShow_arr.includes(arr_rides[i].Area)) {
+                                    continue;
+                                }
+                            }
+                        }
 
                         //Change date format
                         var temp = arr_rides[i].Date.substring(arr_rides[i].Date.indexOf("(") + 1);
@@ -1151,8 +1135,12 @@
                 getAreas_SCB,
                 getAreas_ECB
             );
-            $('#filtersModal').modal('show');
 
+            $('#filtersModal').modal({
+                backdrop: 'static', //prevent popup to close when clicking outside
+                keyboard: false     //prevent popup to close when press esc on the keyboard
+            })
+            $('#filtersModal').modal('show');
         }
 
         const getAreas_ECB = (err) => { console.log(err); }
@@ -1163,64 +1151,78 @@
 
             let checkBoxesStr = '';
 
+            const arrayOF_areasObj_isEmpty = localStorage.getItem('arrayOF_areasObj') === null || localStorage.getItem('arrayOF_areasObj') === 'null';
+
+            let areasFromLs = JSON.parse(localStorage.getItem('arrayOF_areasObj'));
+
+          
+            if (!arrayOF_areasObj_isEmpty && listOfAreas.length > areasFromLs.length) {
+                //case when 1 or more new areas added and ls is allready exist
+
+                for (let i = areasFromLs.length; i < listOfAreas.length; i++) { //the gap between them
+                    areasFromLs.push({
+                        hebrewName: listOfAreas[i].Area,
+                        englishName: listOfAreas[i].EnglishName,
+                        checked: false
+                    });
+                }
+                localStorage.setItem('arrayOF_areasObj', JSON.stringify(areasFromLs));
+            } else if (!arrayOF_areasObj_isEmpty && listOfAreas.length < areasFromLs.length) {
+                localStorage.setItem('arrayOF_areasObj', null);
+                location.reload();
+            }
+
             for (let i = 0; i < listOfAreas.length; i++) {
 
+                if (arrayOF_areasObj_isEmpty) {
+
+                    arrayOF_areasObj[i] = { hebrewName: listOfAreas[i].Area, englishName: listOfAreas[i].EnglishName }
+
+                    if (i === listOfAreas.length - 1) {
+                        localStorage.setItem('arrayOF_areasObj', JSON.stringify(arrayOF_areasObj));
+                    }
+                }
+
                 checkBoxesStr += `<div>`;
-                checkBoxesStr += `<input type="checkbox" id="${listOfAreas[i].EnglishName}" value=${listOfAreas[i].Area}>`;
+                checkBoxesStr += `<input type="checkbox" id="${listOfAreas[i].EnglishName}">`;
                 checkBoxesStr += `<label for="${listOfAreas[i].EnglishName}">&nbsp;${listOfAreas[i].Area}</label>`;
                 checkBoxesStr += `</div>`;
             }
-
             document.getElementById('filtersModal_placeHolder').innerHTML = checkBoxesStr;
 
-            // localStorage.setItem('checkBoxesState', JSON.stringify(checkBoxesState));
-            let checkBoxesState = JSON.parse(localStorage.getItem('checkBoxesState'));
+            if (!arrayOF_areasObj_isEmpty) {
 
-            if (checkBoxesState) {
-                $("#Erez").prop('checked', checkBoxesState.erez);
-                $('#Erez_Jerusalem').prop('checked', checkBoxesState.erez_Jerusalem);
-                $('#Erez_Center').prop('checked', checkBoxesState.Erez_Center);
-                $('#Erez_North').prop('checked', checkBoxesState.erez_North);
-                $("#Erez_Tarkumia").prop('checked', checkBoxesState.erez_Tarkumia);
+                let checkBoxesContainer = document.getElementById('filtersModal_placeHolder').children;
+                let arrayOF_areasObj = JSON.parse(localStorage.getItem('arrayOF_areasObj'));
 
-                $("#Jerusalem").prop('checked', checkBoxesState.jerusalem);
-                $("#Center").prop('checked', checkBoxesState.center);
-                $("#Center_Jerusalem").prop('checked', checkBoxesState.center_Jerusalem);
-                $("#North").prop('checked', checkBoxesState.north);
-                $("#North_Jerusalem").prop('checked', checkBoxesState.north_Jerusalem);
+                for (let i = 0; i < checkBoxesContainer.length; i++) {
+                    $(`#${arrayOF_areasObj[i].englishName}`).prop('checked', arrayOF_areasObj[i].checked);
+                }
 
-                $("#North_Center").prop('checked', checkBoxesState.north_Center);
-                $("#Tarkumia").prop('checked', checkBoxesState.tarkumia);
-                $("#Tarkumia_Jerusalem").prop('checked', checkBoxesState.tarkumia_Jerusalem);
-                $("#Tarkumia_Center").prop('checked', checkBoxesState.tarkumia_Center);
-                $("#Tarkumia_North").prop('checked', checkBoxesState.tarkumia_North);
             }
         }
 
 
         const saveFilters = () => {
 
-            let checkBoxesState = {};
+            let checkBoxesContainer = document.getElementById('filtersModal_placeHolder').children;
+            let arrayOF_areasObj = JSON.parse(localStorage.getItem('arrayOF_areasObj'));
 
-            checkBoxesState.erez = $("#Erez").prop('checked');
-            checkBoxesState.erez_Jerusalem = $('#Erez_Jerusalem').prop('checked');
-            checkBoxesState.Erez_Center = $('#Erez_Center').prop('checked');
-            checkBoxesState.erez_North = $('#Erez_North').prop('checked');
-            checkBoxesState.erez_Tarkumia = $('#Erez_Tarkumia').prop('checked');
+            let areasToShow_arr = [];
 
-            checkBoxesState.jerusalem = $('#Jerusalem').prop('checked');
-            checkBoxesState.center = $('#Center').prop('checked');
-            checkBoxesState.center_Jerusalem = $('#Center_Jerusalem').prop('checked');
-            checkBoxesState.north = $('#North').prop('checked');
-            checkBoxesState.north_Jerusalem = $('#North_Jerusalem').prop('checked');
+            for (let i = 0; i < checkBoxesContainer.length; i++) {
+                arrayOF_areasObj[i] = {
+                    ...arrayOF_areasObj[i],
+                    checked: $(`#${arrayOF_areasObj[i].englishName}`).prop('checked')
+                };
 
-            checkBoxesState.north_Center = $('#North_Center').prop('checked');
-            checkBoxesState.tarkumia = $('#Tarkumia').prop('checked');
-            checkBoxesState.tarkumia_Jerusalem = $('#Tarkumia_Jerusalem').prop('checked');
-            checkBoxesState.tarkumia_Center = $('#Tarkumia_Center').prop('checked');
-            checkBoxesState.tarkumia_North = $('#Tarkumia_North').prop('checked');
+                if ($(`#${arrayOF_areasObj[i].englishName}`).prop('checked')) {
+                    areasToShow_arr.push(arrayOF_areasObj[i].hebrewName);
+                }
+            }
 
-            localStorage.setItem('checkBoxesState', JSON.stringify(checkBoxesState));
+            localStorage.setItem('arrayOF_areasObj', JSON.stringify(arrayOF_areasObj));
+            localStorage.setItem('areasToShow_arr', JSON.stringify(areasToShow_arr));
             refreshTable();
 
         }
@@ -1423,7 +1425,6 @@
 
                                     <div class="col-sm-6 text-right">
                                         <button data-toggle="tooltip"
-                                                data-target="#filtersModal"
                                                 id="openSortsControllers"
                                                 data-placement="top"
                                                 title="filters window"
@@ -1661,9 +1662,6 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content modal-lg">
                 <div class="modal-header">
-                    <button id="overRideBS_modal_4changeClose_x" type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
                     <h2 class="modal-title" id="">ניהול הסעות - סינון מידע</h2>
                 </div>
                 <div id="filtersModal_placeHolder" class="modal-body"></div>
