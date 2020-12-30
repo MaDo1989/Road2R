@@ -18,6 +18,13 @@
     margin-left: 10px;
 }
 
+#bsModal_lowerHeadline{
+   color: red;
+}
+
+.overRideBS_label{
+    font-weight: normal;
+}
 /* cool switch */
 /*source: https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_switch*/
 .switch {

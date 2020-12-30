@@ -478,6 +478,14 @@
 
 
         function refreshTable() {
+            let areasToShow_arr = JSON.parse(localStorage.getItem('areasToShow_arr'));
+            if (areasToShow_arr !== null && areasToShow_arr.length === 0) {
+                tMorning.clear().draw();
+                tAfternoon.clear().draw();
+                tFuture.clear().draw();
+                tTomorrow.clear().draw();
+                return;
+            }
 
             checkCookie();
 
@@ -498,7 +506,6 @@
                 type: "POST",
                 data: JSON.stringify({ volunteerId: volunteerId, maxDays: 30 }),
                 success: function (data) {
-                    let areasToShow_arr = JSON.parse(localStorage.getItem('areasToShow_arr'));
 
                     arr_rides = JSON.parse(data.d);
                     console.log(arr_rides);
@@ -508,7 +515,6 @@
                     let allSortsSwitch = JSON.parse(localStorage.getItem('allSortsSwitch'));
 
                     for (i in arr_rides) {
-                        if (arr_rides[i].Coordinator.DisplayName != currentCoor) continue; //let the function run only for logged-in coordinator
 
 
                         if (allSortsSwitch && areasToShow_arr !== null) {
@@ -1155,7 +1161,7 @@
 
             let areasFromLs = JSON.parse(localStorage.getItem('arrayOF_areasObj'));
 
-          
+
             if (!arrayOF_areasObj_isEmpty && listOfAreas.length > areasFromLs.length) {
                 //case when 1 or more new areas added and ls is allready exist
 
@@ -1184,8 +1190,8 @@
                 }
 
                 checkBoxesStr += `<div>`;
-                checkBoxesStr += `<input type="checkbox" id="${listOfAreas[i].EnglishName}">`;
-                checkBoxesStr += `<label for="${listOfAreas[i].EnglishName}">&nbsp;${listOfAreas[i].Area}</label>`;
+                checkBoxesStr += `<input type="checkbox" id="${listOfAreas[i].EnglishName}" checked />`;
+                checkBoxesStr += `<label class="overRideBS_label" for="${listOfAreas[i].EnglishName}">&nbsp;${listOfAreas[i].Area}</label>`;
                 checkBoxesStr += `</div>`;
             }
             document.getElementById('filtersModal_placeHolder').innerHTML = checkBoxesStr;
@@ -1660,9 +1666,10 @@
     <!-- ↓ filtersModal ↓ -->
     <div class="modal fade" id="filtersModal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog" role="document">
-            <div class="modal-content modal-lg">
+            <div class="modal-content">
                 <div class="modal-header">
-                    <h2 class="modal-title" id="">ניהול הסעות - סינון מידע</h2>
+                    <h2 class="modal-title">ניהול הסעות - סינון מידע</h2>
+                    <h4 id="bsModal_lowerHeadline">רק אזורים מסומנים יופיעו בתצוגה</h4>
                 </div>
                 <div id="filtersModal_placeHolder" class="modal-body"></div>
                 <div class="text-right modal-footer">
