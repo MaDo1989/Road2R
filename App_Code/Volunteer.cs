@@ -2299,7 +2299,7 @@ public class Volunteer
         DbService db = new DbService();
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
-        SqlParameter[] cmdParams = new SqlParameter[7];
+        SqlParameter[] cmdParams = new SqlParameter[8];
         cmdParams[0] = cmd.Parameters.AddWithValue("@cell", v.CellPhone);
         cmdParams[1] = cmd.Parameters.AddWithValue("@firstNameH", v.FirstNameH);
         cmdParams[2] = cmd.Parameters.AddWithValue("@lastNameH", v.LastNameH);
@@ -2307,6 +2307,7 @@ public class Volunteer
         cmdParams[4] = cmd.Parameters.AddWithValue("@gender", v.Gender);
         cmdParams[5] = cmd.Parameters.AddWithValue("@UserName", v.CellPhone);
         cmdParams[6] = cmd.Parameters.AddWithValue("@volType", "מתנדב");
+        cmdParams[7] = cmd.Parameters.AddWithValue("@isDriving", 1);
 
 
 
@@ -2314,8 +2315,8 @@ public class Volunteer
 
         try
         {
-            query = "insert into Volunteer (UserName, CellPhone, FirstNameH, LastNameH, Gender, isActive, isAssistant, lastModified, JoinDate)";
-            query += " values (@UserName,@cell,@firstNameH,@lastNameH,@gender,1,0,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
+            query = "insert into Volunteer (UserName, CellPhone, FirstNameH, LastNameH, Gender, isActive, isAssistant, lastModified, JoinDate, isDriving)";
+            query += "values (@UserName,@cell,@firstNameH,@lastNameH,@gender,1,0,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()), 1);SELECT SCOPE_IDENTITY();";
 
             db = new DbService();
             Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());

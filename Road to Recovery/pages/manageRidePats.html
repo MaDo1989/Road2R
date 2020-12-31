@@ -202,7 +202,6 @@
                 window.location.href = "notAvailable.html";
             }
             isAssistant = JSON.parse(GENERAL.USER.getIsAssistant());
-            console.log(isAssistant);
             var assistantName = "";
             if (isAssistant) {
                 $("#menuType").attr("w3-include-html", "HelperMenu.html");
@@ -479,13 +478,6 @@
 
         function refreshTable() {
             let areasToShow_arr = JSON.parse(localStorage.getItem('areasToShow_arr'));
-            if (areasToShow_arr !== null && areasToShow_arr.length === 0) {
-                tMorning.clear().draw();
-                tAfternoon.clear().draw();
-                tFuture.clear().draw();
-                tTomorrow.clear().draw();
-                return;
-            }
 
             checkCookie();
 
@@ -493,6 +485,10 @@
             tAfternoon.clear().draw();
             tFuture.clear().draw();
             tTomorrow.clear().draw();
+
+            if (areasToShow_arr !== null && areasToShow_arr.length === 0) {
+                return;
+            }
 
             var volunteerId = -1 // VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
 
@@ -508,14 +504,13 @@
                 success: function (data) {
 
                     arr_rides = JSON.parse(data.d);
-                    console.log(arr_rides);
+                    
 
                     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
 
                     let allSortsSwitch = JSON.parse(localStorage.getItem('allSortsSwitch'));
 
                     for (i in arr_rides) {
-
 
                         if (allSortsSwitch && areasToShow_arr !== null) {
                             if (areasToShow_arr.length !== 0) {
@@ -1673,7 +1668,7 @@
                 </div>
                 <div id="filtersModal_placeHolder" class="modal-body"></div>
                 <div class="text-right modal-footer">
-                    <button type="button" onclick="saveFilters()" class="btn btn-secondary" data-dismiss="modal">סגירה ושמירה</button>
+                    <button type="button" onclick="saveFilters()" class="btn btn-secondary" data-dismiss="modal">שמירה וסגירה</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">ביטול</button>
                 </div>
             </div>
