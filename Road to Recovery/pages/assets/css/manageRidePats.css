@@ -6,6 +6,12 @@
     font-size: 42px;
 }*/
 
+#overRideBS_modal-dialog {
+            /*↓ this is work fine*/
+    width: fit-content;
+    margin: 0 auto;
+}
+
 #overRideBS_card-box {
     padding: 40px;
 }
