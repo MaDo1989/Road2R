@@ -285,10 +285,10 @@ var K_fields_map = {
     ],
     "rp_pil_vls_per_month": [
         {
-            id: "rp_vl_ride_month__month",
-            template: 'div[name="template_PER_MONTH"]',
-            type: "MONTH",
-            post_clone: rp_pil_vls_per_month__refresh_preview
+            id: "rp_pil_vls_per_month__year",
+            template: 'div[name="template_YTD"]',
+            type: "YEAR",
+            post_clone: rp_pil_vls_per_month__post_clone
         }
     ]
 
@@ -686,11 +686,24 @@ function rp_amuta_vls_per_month__refresh_preview() {
 }   
 
 
-function rp_pil_vls_per_month__refresh_preview() {
-    //    var selected_date = $('#select_date_later').val();
-    //    var config = "start_date";
 
-    refresh_pil_vls_per_month_Table("2020-01-01", "2020-12-31");
+function rp_pil_vls_per_month__post_clone(id)
+{
+    $("#select_year_ytd").change(rp_pil_vls_per_month__refresh_preview);
+    rp_pil_vls_per_month__refresh_preview();
+}
+
+function rp_pil_vls_per_month__refresh_preview() {
+    var selected_date = $('#select_year_ytd').val();
+    var start_date = selected_date + "-01-01";
+    var end_date = selected_date + "-12-31";
+
+    // Handle YTD
+    var this_year = new Date().getFullYear();
+    if (this_year == selected_date) {
+        end_date = moment().format('YYYY-MM-DD'); 
+    }
+    refresh_pil_vls_per_month_Table(start_date, end_date);
 }   
 
 
@@ -886,6 +899,7 @@ function refresh_amuta_vls_per_month_Table(start_date) {
 // 'start_date' :  a date formatted as YYYY-MM-DD
 function refresh_pil_vls_per_month_Table(start_date, end_date) {
     hide_all_tables();
+    console.log(start_date + " ; " + end_date);
     $('#wait').show();
     var query_object = {
         start_date: start_date,
@@ -903,7 +917,7 @@ function refresh_pil_vls_per_month_Table(start_date, end_date) {
         data: JSON.stringify(query_object),
         success: function (data) {
             $('#wait').hide();
-            arr_rides = JSON.parse(data.d);
+            arr_rides = data.d;
 
             $('#div_table_pil_vls_per_month').show();
             tbl = $('#table_pil_vls_per_month').DataTable({

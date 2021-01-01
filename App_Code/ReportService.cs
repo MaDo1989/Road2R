@@ -198,36 +198,37 @@ AND RidePat.pickuptime >= '2020-1-01'
         cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
 
         DataSet ds = db.GetDataSetBySqlCommand(cmd);
-        DataTable dt = ds.Tables[0];
 
         List<SliceVolunteersPerMonthInfo> result = new List<SliceVolunteersPerMonthInfo>();
 
-        foreach (DataRow dr in dt.Rows)
+        if (ds.Tables.Count > 0 )
         {
-            SliceVolunteersPerMonthInfo obj = new SliceVolunteersPerMonthInfo();
-            obj.DisplayName = dr["DisplayName"].ToString();
-            obj.City = dr["CityName"].ToString();
-            obj.CellPhone = dr["CellPhone"].ToString();
-            obj.JoinDate = dr["JoinDate"].ToString();
-            obj.Jan = dr["Jan"].ToString();
-            obj.Feb = dr["Feb"].ToString();
-            obj.Mar = dr["Mar"].ToString();
-            obj.Apr = dr["Apr"].ToString();
-            obj.May = dr["May"].ToString();
-            obj.Jun = dr["Jun"].ToString();
-            obj.Jul = dr["Jul"].ToString();
-            obj.Aug = dr["Aug"].ToString();
-            obj.Sep = dr["Sep"].ToString();
-            obj.Oct = dr["Oct"].ToString();
-            obj.Nov = dr["Nov"].ToString();
-            obj.Dec = dr["Dec"].ToString();
+            DataTable dt = ds.Tables[0];
+            foreach (DataRow dr in dt.Rows)
+            {
+                SliceVolunteersPerMonthInfo obj = new SliceVolunteersPerMonthInfo();
+                obj.DisplayName = dr["DisplayName"].ToString();
+                obj.City = dr["CityName"].ToString();
+                obj.CellPhone = dr["CellPhone"].ToString();
+                obj.JoinDate = dr["JoinDate"].ToString();
+                obj.Jan = dr["Jan"].ToString();
+                obj.Feb = dr["Feb"].ToString();
+                obj.Mar = dr["Mar"].ToString();
+                obj.Apr = dr["Apr"].ToString();
+                obj.May = dr["May"].ToString();
+                obj.Jun = dr["Jun"].ToString();
+                obj.Jul = dr["Jul"].ToString();
+                obj.Aug = dr["Aug"].ToString();
+                obj.Sep = dr["Sep"].ToString();
+                obj.Oct = dr["Oct"].ToString();
+                obj.Nov = dr["Nov"].ToString();
+                obj.Dec = dr["Dec"].ToString();
 
-            result.Add(obj);
+                result.Add(obj);
+            }
         }
 
         return result;
-
-
     }
 
     private DataTable getRides()

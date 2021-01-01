@@ -136,7 +136,7 @@ public class ReportsWebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetReportSliceVolunteerPerMonth(string start_date, string end_date)
+    public List<ReportService.SliceVolunteersPerMonthInfo> GetReportSliceVolunteerPerMonth(string start_date, string end_date)
     {
         try
         {
@@ -144,12 +144,11 @@ public class ReportsWebService : System.Web.Services.WebService
 
             ReportService report = new ReportService();
             List<ReportService.SliceVolunteersPerMonthInfo> r = report.GetReportSliceVolunteerPerMonth(start_date, end_date);
-            j.MaxJsonLength = Int32.MaxValue;
-            return j.Serialize(r);
+            return r;
         }
         catch (Exception ex)
         {
-            Log.Error("Error in GetReportVolunteerPerMonth", ex);
+            Log.Error("Error in SliceVolunteersPerMonthInfo", ex);
             throw new Exception("שגיאה בשליפת נתוני הסעות");
         }
 
