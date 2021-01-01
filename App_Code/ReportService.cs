@@ -9,27 +9,7 @@ using System.Web;
 
 /* Notes:
  * 
- select MainDriver, Volunteer.DisplayName, Volunteer.CityCityName, Volunteer.CellPhone, Volunteer.JoinDate ,
-  sum(case when MONTH([pickuptime]) = '1' then 1 else 0 end) Jan_2020,
-  sum(case when MONTH([pickuptime]) = '2' then 1 else 0 end) Feb_2020,
-  sum(case when MONTH([pickuptime]) = '3' then 1 else 0 end) Mar_2020,
-  sum(case when MONTH([pickuptime]) = '4' then 1 else 0 end) Apr_2020,
-  sum(case when MONTH([pickuptime]) = '5' then 1 else 0 end) May_2020,
-  sum(case when MONTH([pickuptime]) = '6' then 1 else 0 end) Jun_2020,
-  sum(case when MONTH([pickuptime]) = '7' then 1 else 0 end) Jul_2020,
-  sum(case when MONTH([pickuptime]) = '8' then 1 else 0 end) Aug_2020,
-  sum(case when MONTH([pickuptime]) = '9' then 1 else 0 end) Sep_2020,
-  sum(case when MONTH([pickuptime]) = '10' then 1 else 0 end) Oct_2020,
-  sum(case when MONTH([pickuptime]) = '11' then 1 else 0 end) Nov_2020,
-  sum(case when MONTH([pickuptime]) = '12' then 1 else 0 end) Dec_2020
-FROM RPView  rp
-INNER JOIN Volunteer on Volunteer.Id = rp.MainDriver 
-WHERE pickuptime >= '2020-1-01' 
-AND pickuptime < CURRENT_TIMESTAMP
-Group BY MainDriver, Volunteer.DisplayName, Volunteer.CityCityName, Volunteer.CellPhone, Volunteer.JoinDate
-;
-
-
+ 
   
  */
 public class ReportService
@@ -99,6 +79,27 @@ public class ReportService
 
     }
 
+    public class SliceVolunteersPerMonthInfo
+    {
+        public string DisplayName { get; set; }
+        public string City { get; set; }
+        public string CellPhone { get; set; }
+        public string JoinDate { get; set; }
+        public string Jan { get; set; }
+        public string Feb { get; set; }
+        public string Mar { get; set; }
+        public string Apr { get; set; }
+        public string May { get; set; }
+        public string Jun { get; set; }
+        public string Jul { get; set; }
+        public string Aug { get; set; }
+        public string Sep { get; set; }
+        public string Oct { get; set; }
+        public string Nov { get; set; }
+        public string Dec { get; set; }
+
+    }
+
     public class INSERT_TO_NI_SQL_Objects
     {
         public string query { get; set; }
@@ -162,6 +163,71 @@ AND RidePat.pickuptime >= '2020-1-01'
         DataSet ds = db.GetDataSetBySqlCommand(cmd);
         DataTable dt = ds.Tables[0];
         return dt;
+    }
+
+    internal List<SliceVolunteersPerMonthInfo> GetReportSliceVolunteerPerMonth(string start_date, string end_date)
+    {
+        DbService db = new DbService();
+
+        string query =
+             @"select MainDriver, Volunteer.DisplayName as DisplayName, 
+                Volunteer.CityCityName as CityName, Volunteer.CellPhone as CellPhone, 
+                 convert(varchar, Volunteer.JoinDate, 103)  as JoinDate,
+              sum(case when MONTH([pickuptime]) = '1' then 1 else 0 end) Jan,
+              sum(case when MONTH([pickuptime]) = '2' then 1 else 0 end) Feb,
+              sum(case when MONTH([pickuptime]) = '3' then 1 else 0 end) Mar,
+              sum(case when MONTH([pickuptime]) = '4' then 1 else 0 end) Apr,
+              sum(case when MONTH([pickuptime]) = '5' then 1 else 0 end) May,
+              sum(case when MONTH([pickuptime]) = '6' then 1 else 0 end) Jun,
+              sum(case when MONTH([pickuptime]) = '7' then 1 else 0 end) Jul,
+              sum(case when MONTH([pickuptime]) = '8' then 1 else 0 end) Aug,
+              sum(case when MONTH([pickuptime]) = '9' then 1 else 0 end) Sep,
+              sum(case when MONTH([pickuptime]) = '10' then 1 else 0 end) Oct,
+              sum(case when MONTH([pickuptime]) = '11' then 1 else 0 end) Nov,
+              sum(case when MONTH([pickuptime]) = '12' then 1 else 0 end) Dec
+            FROM RPView  rp
+            INNER JOIN Volunteer on Volunteer.Id = rp.MainDriver 
+            WHERE pickuptime >= @start_date 
+            AND pickuptime <= @end_date
+            Group BY MainDriver, Volunteer.DisplayName, Volunteer.CityCityName, Volunteer.CellPhone, Volunteer.JoinDate
+            ";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        List<SliceVolunteersPerMonthInfo> result = new List<SliceVolunteersPerMonthInfo>();
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            SliceVolunteersPerMonthInfo obj = new SliceVolunteersPerMonthInfo();
+            obj.DisplayName = dr["DisplayName"].ToString();
+            obj.City = dr["CityName"].ToString();
+            obj.CellPhone = dr["CellPhone"].ToString();
+            obj.JoinDate = dr["JoinDate"].ToString();
+            obj.Jan = dr["Jan"].ToString();
+            obj.Feb = dr["Feb"].ToString();
+            obj.Mar = dr["Mar"].ToString();
+            obj.Apr = dr["Apr"].ToString();
+            obj.May = dr["May"].ToString();
+            obj.Jun = dr["Jun"].ToString();
+            obj.Jul = dr["Jul"].ToString();
+            obj.Aug = dr["Aug"].ToString();
+            obj.Sep = dr["Sep"].ToString();
+            obj.Oct = dr["Oct"].ToString();
+            obj.Nov = dr["Nov"].ToString();
+            obj.Dec = dr["Dec"].ToString();
+
+            result.Add(obj);
+        }
+
+        return result;
+
+
     }
 
     private DataTable getRides()

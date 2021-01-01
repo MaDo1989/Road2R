@@ -207,7 +207,8 @@ var K_strategy = {
     "rp_amuta_vls_per_pat": rp_amuta_vls_per_pat__refresh_preview,
     "rp_amuta_vls_km": rp_amuta_vls_km__refresh_preview,
     "rp_amuta_vls_list": rp_amuta_vls_list__refresh_preview,
-    "rp_amuta_vls_per_month": rp_amuta_vls_per_month__refresh_preview
+    "rp_amuta_vls_per_month": rp_amuta_vls_per_month__refresh_preview,
+    "rp_pil_vls_per_month": rp_pil_vls_per_month__refresh_preview
 }
 
 
@@ -280,6 +281,14 @@ var K_fields_map = {
             template: 'div[name="template_PER_MONTH"]',
             type: "MONTH",
             post_clone: rp_amuta_vls_per_month__refresh_preview
+        }
+    ],
+    "rp_pil_vls_per_month": [
+        {
+            id: "rp_vl_ride_month__month",
+            template: 'div[name="template_PER_MONTH"]',
+            type: "MONTH",
+            post_clone: rp_pil_vls_per_month__refresh_preview
         }
     ]
 
@@ -677,6 +686,14 @@ function rp_amuta_vls_per_month__refresh_preview() {
 }   
 
 
+function rp_pil_vls_per_month__refresh_preview() {
+    //    var selected_date = $('#select_date_later').val();
+    //    var config = "start_date";
+
+    refresh_pil_vls_per_month_Table("2020-01-01", "2020-12-31");
+}   
+
+
 // 'start_date' :  a date formatted as YYYY-MM-DD
 // 'end_date'   :  a date formatted as YYYY-MM-DD
 function refresh_amuta_vls_week_Table(start_date, end_date) {
@@ -864,6 +881,75 @@ function refresh_amuta_vls_per_month_Table(start_date) {
     });
 
 }
+
+
+// 'start_date' :  a date formatted as YYYY-MM-DD
+function refresh_pil_vls_per_month_Table(start_date, end_date) {
+    hide_all_tables();
+    $('#wait').show();
+    var query_object = {
+        start_date: start_date,
+        end_date: end_date
+    };
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportSliceVolunteerPerMonth",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            $('#wait').hide();
+            arr_rides = JSON.parse(data.d);
+
+            $('#div_table_pil_vls_per_month').show();
+            tbl = $('#table_pil_vls_per_month').DataTable({
+                pageLength: 100,
+                bLengthChange: false,
+                data: arr_rides,
+                destroy: true,
+                columnDefs: [
+                    { "orderData": [0, 1], "targets": 0 }],
+                columns: [
+                    { data: "DisplayName" },
+                    { data: "City" },
+                    { data: "CellPhone" },
+                    { data: "JoinDate" },
+                    { data: "Jan" },
+                    { data: "Feb" },
+                    { data: "Mar" },
+                    { data: "Apr" },
+                    { data: "May" },
+                    { data: "Jun" },
+                    { data: "Jul" },
+                    { data: "Aug" },
+                    { data: "Sep" },
+                    { data: "Oct" },
+                    { data: "Nov" },
+                    { data: "Dec" }
+
+                ],
+                dom: 'Bfrtip',
+
+
+                buttons: [
+                    'csv', 'excel',
+                ]
+            });
+        },
+        error: function (err) {
+            $('#wait').hide();
+            // @@ alert("Error in GetRidePatView: " + err.responseText);
+        }
+
+
+    });
+
+}
+
 
 
 // 'start_date' :  a date formatted as YYYY-MM-DD
@@ -1120,6 +1206,7 @@ function hide_all_tables() {
     $('#div_table_amuta_vls_km').hide();
     $('#div_table_amuta_vls_list').hide();
     $('#div_table_amuta_vls_per_month').hide();
+    $("#div_table_pil_vls_per_month").hide();
  }
 
 
