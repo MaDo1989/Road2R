@@ -1,7 +1,6 @@
 ﻿// Purpose: JS code for the reports UI
 
 
-
 // 24-Nov:  Avishai
 //1.  . מספר המתנדבים השונים שהסיעו בכל חודש בשנתיים האחרונות. 
 
@@ -694,15 +693,25 @@ function rp_pil_vls_per_month__post_clone(id)
 }
 
 function rp_pil_vls_per_month__refresh_preview() {
-    var selected_date = $('#select_year_ytd').val();
-    var start_date = selected_date + "-01-01";
-    var end_date = selected_date + "-12-31";
+    var start_date, end_date;
+    var selected_year = $('#select_year_ytd').val();
 
-    // Handle YTD
-    var this_year = new Date().getFullYear();
-    if (this_year == selected_date) {
-        end_date = moment().format('YYYY-MM-DD'); 
+    if (selected_year.startsWith("20")) {
+        start_date = selected_year + "-01-01";
+        var this_year = new Date().getFullYear();
+        if (this_year == selected_year) {
+            end_date = moment().format('YYYY-MM-DD');
+        }
+        else {
+            end_date = selected_year + "-12-31";
+        }
     }
+    else {
+        start_date = moment().subtract(1, 'years').format('YYYY-MM-DD');
+        end_date = moment().format('YYYY-MM-DD');
+    }
+
+
     refresh_pil_vls_per_month_Table(start_date, end_date);
 }   
 

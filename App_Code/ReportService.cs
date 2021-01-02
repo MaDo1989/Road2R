@@ -201,7 +201,7 @@ AND RidePat.pickuptime >= '2020-1-01'
 
         List<SliceVolunteersPerMonthInfo> result = new List<SliceVolunteersPerMonthInfo>();
 
-        if (ds.Tables.Count > 0 )
+        if (ds != null && ds.Tables.Count > 0 )
         {
             DataTable dt = ds.Tables[0];
             foreach (DataRow dr in dt.Rows)
