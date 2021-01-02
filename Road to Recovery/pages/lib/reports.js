@@ -448,7 +448,7 @@ function rp_amuta_vls_per_km_field_year_post_clone(id) {
 
 function rp_amuta_vls_list_field_radio_post_clone(id) {
     var today = new Date();
-    $('#select_date_later').val("2020-01-01");
+    $('#select_date_later').val("2021-01-01");
     $("#select_date_later").change(rp_amuta_vls_list__refresh_preview);
 
     $("#radio_start_date").change(rp_amuta_vls_list__refresh_preview);
@@ -815,18 +815,26 @@ function refresh_amuta_vls_km_Table(start_date, end_date) {
         data: JSON.stringify(query_object),
         success: function (data) {
             $('#wait').hide();
-            arr_rides = JSON.parse(data.d);
+            records = JSON.parse(data.d);
 
             $('#div_table_amuta_vls_km').show();
             tbl = $('#table_amuta_vls_km').DataTable({
                 pageLength: 500,
                 bLengthChange: false,
-                data: arr_rides,
+                data: records,
                 destroy: true,
                 columnDefs: [
                     { "orderData": [0, 1], "targets": 0 }],
                 columns: [
-                    { data: "Date" },
+                    {
+                        data: "Date",
+                        render: function (data, type, row) {
+                            if (type == "display") {
+                                return build_date_with_dow_string(data);
+                            }
+                            return data;
+                        }
+                    },
                     { data: "Volunteer" },
                     { data: "Patient" },
                     { data: "Origin" },
@@ -841,7 +849,6 @@ function refresh_amuta_vls_km_Table(start_date, end_date) {
         },
         error: function (err) {
             $('#wait').hide();
-            // @@ alert("Error in GetRidePatView: " + err.responseText);
         }
 
 
@@ -1067,7 +1074,15 @@ function refresh_amuta_vls_per_pat_Table(patient) {
                 columnDefs: [
                     { "orderData": [0, 1], "targets": 0 }],
                 columns: [
-                    { data: "Date" },
+                    {
+                        data: "Date",
+                        render: function (data, type, row) {
+                            if (type == "display") {
+                                return build_date_with_dow_string(data);
+                            }
+                            return data;
+                        }
+                    },
                     { data: "Volunteer" },
                     { data: "Origin" },
                     { data: "Destination" }
@@ -1089,6 +1104,13 @@ function refresh_amuta_vls_per_pat_Table(patient) {
 
 }
 
+function build_date_with_dow_string(in_date) {
+    var date = moment(in_date, "DD/MM/YYYY", true);
+    var HEBday = getDayString(date.day());
+
+    var result = HEBday + " " + date.format("DD/MM/YY");
+    return result;
+}
 
 // 'start_date' :  a date formatted as YYYY-MM-DD
 // 'end_date'   :  a date formatted as YYYY-MM-DD
