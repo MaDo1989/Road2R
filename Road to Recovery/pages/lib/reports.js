@@ -207,7 +207,8 @@ var K_strategy = {
     "rp_amuta_vls_km": rp_amuta_vls_km__refresh_preview,
     "rp_amuta_vls_list": rp_amuta_vls_list__refresh_preview,
     "rp_amuta_vls_per_month": rp_amuta_vls_per_month__refresh_preview,
-    "rp_pil_vls_per_month": rp_pil_vls_per_month__refresh_preview
+    "rp_pil_vls_per_month": rp_pil_vls_per_month__refresh_preview,
+    "rp_pil_vl_ride_month": rp_pil_vl_ride_month__refresh_preview,
 }
 
 
@@ -289,9 +290,16 @@ var K_fields_map = {
             type: "YEAR",
             post_clone: rp_pil_vls_per_month__post_clone
         }
+    ],
+    "rp_pil_vl_ride_month": [
+        {
+            id: "rp_vl_ride_month__month",
+            template: 'div[name="template_MONTH"]',
+            type: "MONTH",
+            post_clone: rp_pil_vl_ride_month__post_clone
+        }
     ]
-
-}
+ }
 
 function populate_parameters(report_type) {
  //   $("#params_ph").text("Populating for " + report_type);
@@ -685,12 +693,33 @@ function rp_amuta_vls_per_month__refresh_preview() {
 }   
 
 
+// Checks if all fields are filled. If so refresh the report
+function rp_pil_vl_ride_month__refresh_preview() {
+    var selected_date = Date.parse($("#select_month").val());
+    if (selected_date) {
+        var start_month_date = moment(selected_date);
+        var end_month_date = start_month_date.clone().add(1, 'months');
+
+
+        refresh_pil_vl_ride_month_Table(
+                start_month_date.format("YYYY-MM-DD"),
+                end_month_date.format("YYYY-MM-DD"));
+    }
+}   
+
 
 function rp_pil_vls_per_month__post_clone(id)
 {
     $("#select_year_ytd").change(rp_pil_vls_per_month__refresh_preview);
     rp_pil_vls_per_month__refresh_preview();
 }
+
+
+function rp_pil_vl_ride_month__post_clone(id) {
+    populate_month_field();
+    rp_pil_vl_ride_month__refresh_preview();
+}
+
 
 function rp_pil_vls_per_month__refresh_preview() {
     var start_date, end_date;
@@ -980,6 +1009,55 @@ function refresh_pil_vls_per_month_Table(start_date, end_date) {
 
 }
 
+function refresh_pil_vl_ride_month_Table(start_date, end_date) {
+    hide_all_tables();
+    console.log(start_date + " ; " + end_date);
+    $('#wait').show();
+    var query_object = {
+        start_date: start_date,
+        end_date: end_date
+    };
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportSliceVolunteersCountInMonth",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            $('#wait').hide();
+            var records = data.d;
+
+            $('#div_table_pil_vl_ride_month').show();
+            tbl = $('#table_pil_vl_ride_month').DataTable({
+                pageLength: 100,
+                bLengthChange: false,
+                data: records,
+                destroy: true,
+                columnDefs: [
+                    { "orderData": [0, 1], "targets": 0 }],
+                columns: [
+                    { data: "Volunteer" },
+                    { data: "Count" },
+                ],
+                dom: 'Bfrtip',
+
+                buttons: [
+                    'csv', 'excel',
+                ]
+            });
+        },
+        error: function (err) {
+            $('#wait').hide();
+        }
+
+    });
+
+}
+
 
 
 // 'start_date' :  a date formatted as YYYY-MM-DD
@@ -1252,6 +1330,7 @@ function hide_all_tables() {
     $('#div_table_amuta_vls_list').hide();
     $('#div_table_amuta_vls_per_month').hide();
     $("#div_table_pil_vls_per_month").hide();
+    $("#div_table_pil_vl_ride_month").hide();
  }
 
 

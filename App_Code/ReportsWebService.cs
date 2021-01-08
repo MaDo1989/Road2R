@@ -155,6 +155,29 @@ public class ReportsWebService : System.Web.Services.WebService
     }
 
 
+    
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public List<ReportService.SliceVolunteersCountInMonthInfo> GetReportSliceVolunteersCountInMonth(string start_date, string end_date)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            ReportService report = new ReportService();
+            List<ReportService.SliceVolunteersCountInMonthInfo> r = report.GetReportSliceVolunteersCountInMonth(start_date, end_date);
+            return r;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReportSliceVolunteersCountInMonth", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
+
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public List<ReportService.VolunteerPerPatient> GetReportVolunteersPerPatient(int patient)

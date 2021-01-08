@@ -100,6 +100,13 @@ public class ReportService
 
     }
 
+    public class SliceVolunteersCountInMonthInfo
+    {
+        public string Volunteer { get; set; }
+        public string Count { get; set; }
+    }
+
+
     public class INSERT_TO_NI_SQL_Objects
     {
         public string query { get; set; }
@@ -226,6 +233,40 @@ AND RidePat.pickuptime >= '2020-1-01'
 
                 result.Add(obj);
             }
+        }
+
+        return result;
+    }
+
+    internal List<ReportService.SliceVolunteersCountInMonthInfo> GetReportSliceVolunteersCountInMonth(string start_date, string end_date)
+    {
+        DbService db = new DbService();
+
+        string query =
+@"SELECT Volunteer.DisplayName , count(*) as COUNT_C  
+FROM RPView 
+INNER JOIN Volunteer ON RPView.MainDriver=Volunteer.Id
+WHERE pickuptime < @end_date
+AND pickuptime >= @start_date
+and MainDriver is not null
+GROUP BY Volunteer.DisplayName 
+";
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        List<SliceVolunteersCountInMonthInfo> result = new List<SliceVolunteersCountInMonthInfo>();
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            SliceVolunteersCountInMonthInfo obj = new SliceVolunteersCountInMonthInfo();
+            obj.Volunteer = dr["DisplayName"].ToString();
+            obj.Count = dr["COUNT_C"].ToString();
+            result.Add(obj);
         }
 
         return result;
@@ -654,7 +695,7 @@ INNER JOIN Volunteer ON BUFF.MainDriver=Volunteer.Id";
     }
 
 
-    //@@ TODO:  Maybe ths is not needed?
+    //@@ TODO:  See notes on this method name in reports.js
     public List<RidePat> GetReportRidesWeeklyPerRegion(string start_date, string end_date)
     {
         DbService db = new DbService();
