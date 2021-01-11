@@ -1985,7 +1985,24 @@ public class WebService : System.Web.Services.WebService
 
     #endregion
 
+    #region System_Log Module
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    [WebMethod(EnableSession = true)]
+    public string GetLogs(string timeRange)
+    {
+        try
+        {
+            List<System_Log> logs = new System_Log().GetLogs(timeRange);
+            return j.Serialize(logs);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetLogs", ex);
+            throw new Exception("Error in GetLogs ---> ex.Message: " + ex.Message);
+        }
 
+    }
+    #endregion
 }
 
 
