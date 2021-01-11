@@ -56,6 +56,8 @@
 
     <script>
         //checkCookie();
+        let { convertDBDate2FrontEndDate } = GENERAL.USEFULL_FUNCTIONS;
+
         $(document).ready(function () {
             if (window.location.hostname.toString() == 'localhost' || window.location.pathname.toLowerCase().indexOf('test') != -1) {
                 $("#na").css("background-color", "#ffde89");
@@ -67,129 +69,65 @@
             var userName = GENERAL.USER.getUserDisplayName();
             $("#userName").html(userName);
 
-            //  $.fn.dataTable.moment('DD/MM/YY');
             jQuery.extend(jQuery.fn.dataTableExt.oSort, {
                 "de_datetime-asc": function (a, b) {
-                    var x, y;
-                    if (jQuery.trim(a) !== '') {
-                        var deDatea = jQuery.trim(a).split(' ');
-                        var deTimea = "";
-                        deTimea = deDatea[0].split(':');
-                        var deDatea2 = deDatea[1].split('.');
-                        if (typeof deTimea[2] != 'undefined') {
-                            x = (deDatea2[2] + deDatea2[1] + deDatea2[0] + deTimea[0] + deTimea[1] + deTimea[2]) * 1;
-                        } else {
-                            x = (deDatea2[2] + deDatea2[1] + deDatea2[0] + deTimea[0] + deTimea[1]) * 1;
-                        }
-                    } else {
-                        x = -Infinity; // = l'an 1000 ...
-                    }
+                    /*a and b are a couple of dates to compare
+                    return value will be:
+                    0 if a=b
+                    1 if a > b
+                   -1 if a < b
+                    */
+                    let datetime_a = $.trim(a).split(':');
+                    let datetime_b = $.trim(b).split(':');
 
-                    if (jQuery.trim(b) !== '') {
-                        var deDateb = jQuery.trim(b).split(' ');
-                        var deTimeb = "";
-                        deTimeb = deDateb[0].split(':');
-                        deDateb = deDateb[1].split('.');
-                        if (typeof deTimeb[2] != 'undefined') {
-                            y = (deDateb[2] + deDateb[1] + deDateb[0] + deTimeb[0] + deTimeb[1] + deTimeb[2]) * 1;
-                        } else {
-                            y = (deDateb[2] + deDateb[1] + deDateb[0] + deTimeb[0] + deTimeb[1]) * 1;
-                        }
-                    } else {
-                        y = -Infinity;
-                    }
-                    var z = ((x < y) ? -1 : ((x > y) ? 1 : 0));
-                    return z;
+                    let hh_a = parseInt(datetime_a[0]);
+                    let mm_a = parseInt(datetime_a[1]);
+
+                    let hh_b = parseInt(datetime_b[0]);
+                    let mm_b = parseInt(datetime_b[1]);
+
+                    let now = new Date();
+
+                    let a_dateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh_a, mm_a)
+                    let b_dateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh_b, mm_b)
+
+                    a = a_dateTime.getTime();
+                    b = b_dateTime.getTime();
+
+                    return a === b ? 0 : a > b ? 1 : -1;
                 },
-
                 "de_datetime-desc": function (a, b) {
-                    var x, y;
-                    if (jQuery.trim(a) !== '') {
-                        var deDatea = jQuery.trim(a).split(' ');
-                        var deTimea = "";
-                        deTimea = deDatea[0].split(':');
-                        var deDatea2 = deDatea[1].split('.');
-                        if (typeof deTimea[2] != 'undefined') {
-                            x = (deDatea2[2] + deDatea2[1] + deDatea2[0] + deTimea[0] + deTimea[1] + deTimea[2]) * 1;
-                        } else {
-                            x = (deDatea2[2] + deDatea2[1] + deDatea2[0] + deTimea[0] + deTimea[1]) * 1;
-                        }
-                    } else {
-                        x = Infinity;
-                    }
+                    /*a and b are a couple of dates to compare
+                      return value will be:
+                      0 if a=b
+                     -1 if a > b
+                      1 if a < b
+                      */
+                    let datetime_a = $.trim(a).split(':');
+                    let datetime_b = $.trim(b).split(':');
 
-                    if (jQuery.trim(b) !== '') {
-                        var deDateb = jQuery.trim(b).split(' ');
-                        var deTimeb = "";
-                        deTimeb = deDateb[0].split(':');
-                        deDateb = deDateb[1].split('.');
-                        if (typeof deTimeb[2] != 'undefined') {
-                            y = (deDateb[2] + deDateb[1] + deDateb[0] + deTimeb[0] + deTimeb[1] + deTimeb[2]) * 1;
-                        } else {
-                            y = (deDateb[2] + deDateb[1] + deDateb[0] + deTimeb[0] + deTimeb[1]) * 1;
-                        }
-                    } else {
-                        y = -Infinity;
-                    }
-                    var z = ((x < y) ? 1 : ((x > y) ? -1 : 0));
-                    return z;
-                },
+                    let hh_a = parseInt(datetime_a[0]);
+                    let mm_a = parseInt(datetime_a[1]);
 
-                "de_date-asc": function (a, b) {
-                    var x, y;
-                    if (jQuery.trim(a) !== '') {
-                        var deDatea = jQuery.trim(a).split('.');
-                        x = (deDatea[2] + deDatea[1] + deDatea[0]) * 1;
-                    } else {
-                        x = Infinity; // = l'an 1000 ...
-                    }
+                    let hh_b = parseInt(datetime_b[0]);
+                    let mm_b = parseInt(datetime_b[1]);
 
-                    if (jQuery.trim(b) !== '') {
-                        var deDateb = jQuery.trim(b).split('.');
-                        y = (deDateb[2] + deDateb[1] + deDateb[0]) * 1;
-                    } else {
-                        y = -Infinity;
-                    }
-                    var z = ((x < y) ? -1 : ((x > y) ? 1 : 0));
-                    return z;
-                },
+                    let now = new Date();
 
-                "de_date-desc": function (a, b) {
-                    var x, y;
-                    if (jQuery.trim(a) !== '') {
-                        var deDatea = jQuery.trim(a).split('.');
-                        x = (deDatea[2] + deDatea[1] + deDatea[0]) * 1;
-                    } else {
-                        x = -Infinity;
-                    }
+                    let a_dateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh_a, mm_a)
+                    let b_dateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh_b, mm_b)
 
-                    if (jQuery.trim(b) !== '') {
-                        var deDateb = jQuery.trim(b).split('.');
-                        y = (deDateb[2] + deDateb[1] + deDateb[0]) * 1;
-                    } else {
-                        y = Infinity;
-                    }
-                    var z = ((x < y) ? 1 : ((x > y) ? -1 : 0));
-                    return z;
+                    a = a_dateTime.getTime();
+                    b = b_dateTime.getTime();
+
+                    return a === b ? 0 : a > b ? -1 : 1;
                 }
             });
-            //Create a DataTable from the Table
-            t = $('#datatable-buttons').DataTable({
-                columnDefs: [
-                    { type: 'de_datetime', targets: 1 },
-                ],
-                "order": [[1, "asc"]],
-                "paging": true,
-                dom: 'Bfrtip',
-                buttons: [
-                    'excel'
-                ],
-               
-            });
 
 
-            //getLog();
-            refreshTable(1);
+
+
+            refreshTable('day');
         });
 
 
@@ -225,40 +163,98 @@
         }
 
 
-        function refreshTable(hours) {
-            
-            t.clear().draw();
+        function refreshTable(timeRange) {
 
-
-            var hoursObj = { hours: hours };
+            let timeRangeObj = { timeRange };
             $('#wait').show();
             $.ajax({
                 dataType: "json",
-                url: "WebService.asmx/getLog",
+                url: "WebService.asmx/GetLogs",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                data: JSON.stringify(hoursObj),
+                data: JSON.stringify(timeRangeObj),
 
-                //data: JSON.stringify({ volunteerId: -1 }), //VolunteerId -1 means get all ridePats
                 success: function (data) {
                     $('#wait').hide();
-                    var arr_log = JSON.parse(data.d);
-                    //GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
-                    var thisUser = $('#thisUser').is(':checked');
-                    var user = GENERAL.USER.getUserName();
-                    for (i in arr_log) {
+                    let logs = JSON.parse(data.d);
+                    let logs2render = [];
 
-                        if (thisUser) {
-                            if (arr_log[i].Coordinator != user) continue;
+                    for (var i in logs) {
+
+                        let editedTime;
+                        if (logs[i].TimeAdded.Minutes >= 10) {
+                            editedTime = `${logs[i].TimeAdded.Hours}:${logs[i].TimeAdded.Minutes}`
+                        } else {
+                            editedTime = `${logs[i].TimeAdded.Hours}:0${logs[i].TimeAdded.Minutes}`
                         }
 
-                        var myDate = new Date(parseInt(arr_log[i].Date.replace('/Date(', '')));
-                        var datePrint =  myDate.toTimeString().match('([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]')[0] + ' ' +myDate.getDate() + "." + (myDate.getMonth() + 1) + "." + myDate.getFullYear();
-                        t.row.add([arr_log[i].Code, datePrint,arr_log[i].Message, arr_log[i].Severity]).draw(false);
-                        
-                    }
 
-                    },
+                        //new Date(myDate.getTime() - myDate.getTimezoneOffset()*60*1000)
+
+                        let editedOldValue;
+                        let editedNewValue;
+
+                        if (logs[i].OldValue === null) {
+                            let utcTime = convertDBDate2FrontEndDate(logs[i].OldValue_AsDate);
+                            let localTime = new Date(utcTime.getTime() - utcTime.getTimezoneOffset() * 60 * 1000); //convert the utc date to the local time
+                            editedOldValue = localTime.toLocaleString('he-IL', {timeZone: 'Israel'}); // this is JUST how the datetime will be rendered
+                        } else {
+                            editedOldValue = logs[i].OldValue;
+                        }
+
+                        
+                        if (logs[i].NewValue === null) {
+                            let utcTime = convertDBDate2FrontEndDate(logs[i].NewValue_AsDate);
+                            let localTime = new Date(utcTime.getTime() - utcTime.getTimezoneOffset() * 60 * 1000); //convert the utc date to the local time
+                            editedNewValue = localTime.toLocaleString('he-IL', { timeZone: 'Israel' }); // this is JUST how the datetime will be rendered
+                        } else {
+                            editedNewValue = logs[i].NewValue;
+                        }
+ 
+
+                       
+
+                        let editedLog = {
+                            DateAdded: convertDBDate2FrontEndDate(logs[i].DateAdded).toLocaleDateString('he-IL'),
+                            TimeAdded: editedTime,
+                            TableName: logs[i].TableName,
+                            Recorde_UniqueId: logs[i].Recorde_UniqueId,
+                            ColumnName: logs[i].ColumnName,
+                            OldValue: editedOldValue,
+                            NewValue: editedNewValue,
+                        }
+
+                        logs2render.push(editedLog);
+                    }
+                    datatable_systemLog = $('#datatable_systemLog').DataTable({
+                        data: logs2render,
+                        rowId: 'Id',
+                        pageLength: 10,
+                        autoWidth: false,
+                        destroy: true,
+                        dom: 'Bfrtip',
+                        buttons: [
+                            'excel'
+                        ],
+
+                        columns: [
+                            //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
+                            { data: "DateAdded" },                              //0
+                            { data: "TimeAdded" },                              //1
+                            { data: "TableName" },                              //2
+                            { data: "Recorde_UniqueId" },                       //3
+                            { data: "ColumnName" },                             //4
+                            { data: "OldValue" },                               //5
+                            { data: "NewValue" },                               //6
+
+                        ],
+                        columnDefs: [
+                            { targets: 1, type: 'de_datetime' },
+                            { targets: [5, 6], orderable: false }
+                        ]
+
+                    });
+                },
                 error: function (err) {
                     $('#wait').hide();
                     alert("Error in getLog: " + err.responseText);
@@ -339,15 +335,16 @@
 
                                     <li class="active">יומן מערכת</li>
                                 </ol>
-                                <h4 class="page-title">יומן מערכת&nbsp&nbsp
-                                <i>
-                                    <img src="../../Media/יומן מערכת.png" height="25" width="25"/>
-                                </i>
+                                <h4 class="page-title">
+                                    יומן מערכת&nbsp&nbsp
+                                    <i>
+                                        <img src="../../Media/יומן מערכת.png" height="25" width="25" />
+                                    </i>
                                 </h4>
                             </div>
                         </div>
                     </div>
-                    
+
 
 
                     <div class="row">
@@ -355,10 +352,10 @@
                         <div class="col-sm-12">
 
                             <!--check boxs for filtering-->
-                            <input id="thisUser" type="checkbox" checked="checked" onchange="refreshTable(document.getElementById('hourSelect').value)">
-                            <label for="thisUser">
+                            <!--  <input id="thisUser" type="checkbox" checked="checked" onchange="refreshTable(document.getElementById('hourSelect').value)">-->
+                            <!--<label for="thisUser">
                                 הודעות שלי בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
-                            </label>
+                            </label>-->
                             <!--<input id="canceldRides" type="checkbox" onchange="refreshTable(document.getElementById('hourSelect').value)">
                             <label for="canceldRides">
                                 הסעות שבוטלו  &nbsp;&nbsp;|&nbsp;&nbsp;
@@ -375,23 +372,24 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <select id="hourSelect" class="form-control" aria-required="true" aria-invalid="false" onchange="refreshTable(this.value)">
-                                        <option value="1">שעה</option>
-                                        <option value="12">12 שעות</option>
-                                        <option value="24">יום אחד</option>
-                                        <option value="168">שבוע</option>
-                                        <option value="5040">חודש</option>
-                                        <option value="1000000">ללא הגבלה</option>
+                                        <option value="day">יום אחד</option>
+                                        <option value="week">שבוע</option>
+                                        <option value="month">חודש</option>
+                                        <option value="year">שנה</option>
                                     </select>
                                 </div>
 
-                                <table id="datatable-buttons" class="table table-striped table-bordered">
+                                <table id="datatable_systemLog" class="table table-striped table-bordered">
                                     <thead>
                                         <tr>
                                             <!--<th>מספר הסעה</th>-->
-                                            <th>קוד</th>
-                                            <th>תאריך ושעה</th>
-                                            <th>הודעה</th>
-                                            <th>חומרה</th>
+                                            <th>תאריך השינוי</th>
+                                            <th>שעת השינוי</th>
+                                            <th>סוג האובייקט ששונה</th>
+                                            <th>זיהוי רשומה</th>
+                                            <th>שם העמודה ששונתה</th>
+                                            <th>הערך הישן</th>
+                                            <th>הערך החדש</th>
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
