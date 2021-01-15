@@ -1094,7 +1094,8 @@ function refresh_amuta_vls_list_Table(query_object) {
                     { data: "Email" },
                     { data: "Address" },
                     { data: "CityCityName" },
-                    { data: "JoinDate" }
+                    { data: "JoinDate" },
+                    { data: "CellPhone"}
                 ],
                 dom: 'Bfrtip',
 

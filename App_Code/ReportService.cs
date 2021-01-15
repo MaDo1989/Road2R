@@ -69,6 +69,8 @@ public class ReportService
         public string Address { get; set; }
         public string CityCityName { get; set; }
         public string JoinDate { get; set; }
+        public string CellPhone { get; set; }
+
     }
 
     public class VolunteersPerMonthInfo
@@ -389,42 +391,67 @@ GROUP BY Volunteer.DisplayName
 
     internal string pad_with_zeros(string id)
     {
-        int pad = id.Length - 9;
-        if (pad > 0)
+        int pad = 9 - id.Length;
+        if (pad > 0 && pad != 9)
         {
             return new string('0', pad) + id;
         }
         return id;
     }
 
-    // The interface to execute statements on DbService differes than the one to Query
-    // It should sometimes return also an array of parameters, depending on config
-    internal INSERT_TO_NI_SQL_Objects GetQueryTextForINSERT_NIVolunteerList(string start_date, string config)
+
+    // Reusable code, for the logic to display (orupdate) the NI report volunteers
+    // Used both form teh report Table, and also in the INSERT to the DeliveredNIReport
+    internal string getQueryBodyFor_NIVolunteerList(string start_date, string config)
     {
-        string insert_header = @"INSERT into DeliveredNIReport  (ReportDate,DriverId)
-                                SELECT CAST(GETDATE() AS Date), Id ";
-        string query_body;
-        INSERT_TO_NI_SQL_Objects objs = new INSERT_TO_NI_SQL_Objects();
+        string result;
         if (config.Equals("start_date"))
         {
-            query_body = @"from Volunteer
+            result = @"from Volunteer v
+                INNER JOIN RPView rp ON rp.MainDriver=v.Id
                 where IsActive='true' 
                 and (JoinDate >= @start_date )
-                and not Id in (select distinct DriverId from DeliveredNIReport )
+                and not v.Id in (select distinct DriverId from DeliveredNIReport )
+                and rp.pickuptime >= @start_date
             ";
+
+        }
+        else
+        {
+            result = @"from Volunteer v
+                INNER JOIN RPView rp ON rp.MainDriver=v.Id
+                where IsActive='true' 
+                and not v.Id in (select distinct DriverId from DeliveredNIReport )
+                ";
+        }
+
+        return result;
+
+    }
+
+        // The interface to execute statements on DbService differes than the one to Query
+        // It should sometimes return also an array of parameters, depending on config
+        internal INSERT_TO_NI_SQL_Objects GetQueryTextForINSERT_NIVolunteerList(string start_date, string config)
+    {
+        string insert_header = @"INSERT into DeliveredNIReport   (DriverId, ReportDate) 
+                                SELECT  DISTINCT v.Id, CAST(GETDATE() AS Date) ";
+
+        string query_body = getQueryBodyFor_NIVolunteerList(start_date, config);
+
+        INSERT_TO_NI_SQL_Objects objs = new INSERT_TO_NI_SQL_Objects();
+        objs.query = insert_header + query_body;
+
+        if (config.Equals("start_date"))
+        {
             objs.sqlParameters = new SqlParameter[1];
             objs.sqlParameters[0] = new SqlParameter("@start_date", SqlDbType.Date);
             objs.sqlParameters[0].Value = start_date;
         }
         else
         {
-            query_body = @"from Volunteer
-                where IsActive='true' 
-                and not Id in (select distinct DriverId from DeliveredNIReport )";
             objs.sqlParameters = new SqlParameter[0];   // Make downstream DbService Execute happy
         }
 
-        objs.query = insert_header + query_body;
         return objs;
     }
 
@@ -433,31 +460,23 @@ GROUP BY Volunteer.DisplayName
     {
         SqlCommand cmd;
 
-        /* ATTENTION - If you change here, change also in GetQueryTextForINSERT_NIVolunteerList */
+        /* ATTENTION - If you change here, review  also GetQueryTextForINSERT_NIVolunteerList */
 
-        string header = "select FirstNameH, LastNameH ,VolunteerIdentity , Email, Address, CityCityName, JoinDate ";
+        string header = "select DISTINCT v.ID, FirstNameH, LastNameH , VolunteerIdentity , Email, Address, CityCityName, JoinDate, v.CellPhone ";
+
+        string query_body = getQueryBodyFor_NIVolunteerList(start_date, config);
+
+        cmd = new SqlCommand(header + query_body);
+        cmd.CommandType = CommandType.Text;
 
         if (config.Equals("start_date"))
         {
-            string query_body = @"from Volunteer
-                where IsActive='true' 
-                and (JoinDate >= @start_date )
-                and not Id in (select distinct DriverId from DeliveredNIReport )
-            ";
-            cmd = new SqlCommand(header + query_body);
             cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
         }
-        else
-        {
-            string query_body = @"from Volunteer
-                where IsActive='true' 
-                and not Id in (select distinct DriverId from DeliveredNIReport )";
-            cmd = new SqlCommand(header + query_body);
-        }
 
-        cmd.CommandType = CommandType.Text;
         return cmd;
     }
+
     internal List<VolunteerInfo> GetReportVolunteerList(string cell_phone, string start_date, string config)
     {
         List<VolunteerInfo> result = new List<VolunteerInfo>();
@@ -483,6 +502,7 @@ GROUP BY Volunteer.DisplayName
             string id = dr["VolunteerIdentity"].ToString();
             obj.VolunteerIdentity = pad_with_zeros(id);
             obj.Email = dr["Email"].ToString();
+            obj.CellPhone = dr["CellPhone"].ToString();
             obj.Address = dr["Address"].ToString();
             obj.CityCityName = dr["CityCityName"].ToString();
             if ( dr.IsNull("JoinDate") )
