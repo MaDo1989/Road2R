@@ -197,9 +197,7 @@
                         let editedNewValue;
 
                         if (logs[i].OldValue === null) {
-                            let utcTime = convertDBDate2FrontEndDate(logs[i].OldValue_AsDate);
-                            let localTime = new Date(utcTime.getTime() - utcTime.getTimezoneOffset() * 60 * 1000); //convert the utc date to the local time
-
+                            let localTime = convertDBDate2FrontEndDate(logs[i].OldValue_AsDate);
 
                             if (localTime.getHours() === 22 && localTime.getMinutes() === 14) {
                                 editedOldValue = localTime.toLocaleDateString('he-IL', { timeZone: 'Israel' });
@@ -213,8 +211,8 @@
 
 
                         if (logs[i].NewValue === null) {
-                            let utcTime = convertDBDate2FrontEndDate(logs[i].NewValue_AsDate);
-                            let localTime = new Date(utcTime.getTime() - utcTime.getTimezoneOffset() * 60 * 1000); //convert the utc date to the local time
+
+                            let localTime = convertDBDate2FrontEndDate(logs[i].NewValue_AsDate);
 
                             if (localTime.getHours() === 22 && localTime.getMinutes() === 14) {
                                 editedNewValue = localTime.toLocaleDateString('he-IL', { timeZone: 'Israel' });
@@ -331,8 +329,8 @@
         const GetRidePat_SCB = (data) => {
             let ridePat = JSON.parse(data.d);
 
-            let utcTime = convertDBDate2FrontEndDate(ridePat.Date);
-            let localTime = new Date(utcTime.getTime() - utcTime.getTimezoneOffset() * 60 * 1000); //convert the utc date to the local time
+            let localTime = convertDBDate2FrontEndDate(ridePat.Date);
+
 
             if (localTime.getHours() === 22 && localTime.getMinutes() === 14) {
                 localTime = localTime.toLocaleDateString('he-IL', { timeZone: 'Israel' });
