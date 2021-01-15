@@ -33,6 +33,8 @@ public class Ride
 
     public List<string> Statuses { get; set; }
 
+    string query;
+    DbService dbs;
     public List<Ride> GetRidesForNotifyfull()
     {
         string query = "select * from RideViewForNotify where statusRide=N'שובץ נהג' or statusRide=N'מלאה'";
@@ -352,7 +354,7 @@ public class Ride
         bool RidePatexists;
         bool RideExists;
         try
-        { 
+        {
             foreach (DataRow dr in ds.Tables[0].Rows)
             {
                 RideExists = false;
@@ -390,7 +392,7 @@ public class Ride
                         rp2.Pat.CellPhone = dr["CellPhone"].ToString();
                         rp2.Pat.Equipment = rp2.Pat.getEquipmentForPatient(rp2.Pat.DisplayName);
                         db = new DbService();
-                        
+
                         query = "select DisplayName,CellPhone from RidePatEscortView where RidePatNum=" + rp2.RidePatNum;
                         EscortDS = db.GetDataSetByQuery(query);
                         rp2.Pat.EscortedList = new List<Escorted>();
@@ -399,7 +401,7 @@ public class Ride
                             foreach (DataRow row in EscortDS.Tables[0].Rows)
                             {
                                 Escorted e = new Escorted();
-                                
+
                                 e.DisplayName = row["DisplayName"].ToString();
                                 e.CellPhone = row["CellPhone"].ToString();
                                 rp2.Pat.EscortedList.Add(e);
@@ -416,7 +418,7 @@ public class Ride
                         rp2.Shift = dr["Shift"].ToString();
                         rp2.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
                         //adding anonymous
-                        rp2.Pat.IsAnonymous =dr["IsAnonymous"].ToString();
+                        rp2.Pat.IsAnonymous = dr["IsAnonymous"].ToString();
                         ride.RidePats.Add(rp2);
                     }
                 }
@@ -452,7 +454,7 @@ public class Ride
                 rp.Pat.Equipment = rp.Pat.getEquipmentForPatient(rp.Pat.DisplayName);
                 rp.Pat.EscortedList = new List<Escorted>();
                 db = new DbService();
-                
+
                 query = "select DisplayName,CellPhone from RidePatEscortView where RidePatNum=" + rp.RidePatNum;
                 EscortDS = db.GetDataSetByQuery(query);
                 rp.Pat.EscortedList = new List<Escorted>();
@@ -943,5 +945,34 @@ public class Ride
     //        throw e;
     //    }
     //}
+
+
+    public string GetDriverName(int rideId)
+    {
+        query = "exec VolunteerAndRide_GetDriverName @rideNum=" + rideId;
+
+        try
+        {
+            dbs = new DbService();
+            SqlDataReader sdr = dbs.GetDataReader(query);
+            if (sdr.Read())
+            {
+                return Convert.ToString(sdr["DisplayName"]);
+            }
+            else
+            {
+                return "שגיאה בקריאת שם נהג";
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+        finally
+        {
+            dbs.CloseConnection();
+        }
+
+    }
 
 }

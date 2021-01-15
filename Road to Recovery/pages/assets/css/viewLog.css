@@ -1,0 +1,8 @@
+﻿.showDetailsAboutMe {
+    color: mediumblue;
+}
+
+.showDetailsAboutMe:hover{
+    cursor: pointer;
+    border-bottom: solid mediumblue 1px;
+}

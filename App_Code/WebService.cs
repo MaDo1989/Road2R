@@ -855,6 +855,24 @@ public class WebService : System.Web.Services.WebService
 
     }
 
+    
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetDriverName(int rideId)
+    {
+        try
+        {
+            return new Ride().GetDriverName(rideId);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetDriverName", ex);
+            throw new Exception(" שגיאה בשליפת שם נהג מהסעה");
+        }
+
+    }
+
     //used for getting all versions of the app both in the appstore and in google play
     //the results order by DESC so if we want the latest version we get the first Version in the list.
     [WebMethod(EnableSession = true)]

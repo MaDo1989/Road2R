@@ -30,6 +30,7 @@
     <link href="assets/css/responsive.css" rel="stylesheet" type="text/css">
     <!--sapir css-->
     <link href="assets/css/sapirCss.css" rel="stylesheet" />
+    <link href="assets/css/viewLog.css" rel="stylesheet" />
     <script src="assets/js/CookiesFunctions.js"></script>
 
     <script src="assets/js/modernizr.min.js"></script>
@@ -57,6 +58,7 @@
     <script>
         //checkCookie();
         let { convertDBDate2FrontEndDate } = GENERAL.USEFULL_FUNCTIONS;
+        let { ajaxCall } = GENERAL.FETCH_DATA;
 
         $(document).ready(function () {
             if (window.location.hostname.toString() == 'localhost' || window.location.pathname.toLowerCase().indexOf('test') != -1) {
@@ -88,8 +90,8 @@
 
                     let now = new Date();
 
-                    let a_dateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh_a, mm_a)
-                    let b_dateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh_b, mm_b)
+                    let a_dateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh_a, mm_a);
+                    let b_dateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh_b, mm_b);
 
                     a = a_dateTime.getTime();
                     b = b_dateTime.getTime();
@@ -178,18 +180,18 @@
                     $('#wait').hide();
                     let logs = JSON.parse(data.d);
                     let logs2render = [];
+                    let now = new Date();
 
                     for (var i in logs) {
 
                         let editedTime;
-                        if (logs[i].TimeAdded.Minutes >= 10) {
-                            editedTime = `${logs[i].TimeAdded.Hours}:${logs[i].TimeAdded.Minutes}`
-                        } else {
-                            editedTime = `${logs[i].TimeAdded.Hours}:0${logs[i].TimeAdded.Minutes}`
-                        }
+                        let utcTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), logs[i].TimeAdded.Hours, logs[i].TimeAdded.Minutes);
+                        let localTime = new Date(utcTime.getTime() - utcTime.getTimezoneOffset() * 60 * 1000); //convert the time date to the local time
+                        editedTime = localTime.toLocaleTimeString('he-IL', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });// this is JUST how the datetime will be rendered
 
-
-                        //new Date(myDate.getTime() - myDate.getTimezoneOffset()*60*1000)
 
                         let editedOldValue;
                         let editedNewValue;
@@ -197,29 +199,59 @@
                         if (logs[i].OldValue === null) {
                             let utcTime = convertDBDate2FrontEndDate(logs[i].OldValue_AsDate);
                             let localTime = new Date(utcTime.getTime() - utcTime.getTimezoneOffset() * 60 * 1000); //convert the utc date to the local time
-                            editedOldValue = localTime.toLocaleString('he-IL', {timeZone: 'Israel'}); // this is JUST how the datetime will be rendered
+
+
+                            if (localTime.getHours() === 22 && localTime.getMinutes() === 14) {
+                                editedOldValue = localTime.toLocaleDateString('he-IL', { timeZone: 'Israel' });
+                                editedOldValue += ', אחה"צ';
+                            } else {
+                                editedOldValue = localTime.toLocaleString('he-IL', { timeZone: 'Israel' }); // this is JUST how the datetime will be rendered
+                            }
                         } else {
                             editedOldValue = logs[i].OldValue;
                         }
 
-                        
+
                         if (logs[i].NewValue === null) {
                             let utcTime = convertDBDate2FrontEndDate(logs[i].NewValue_AsDate);
                             let localTime = new Date(utcTime.getTime() - utcTime.getTimezoneOffset() * 60 * 1000); //convert the utc date to the local time
-                            editedNewValue = localTime.toLocaleString('he-IL', { timeZone: 'Israel' }); // this is JUST how the datetime will be rendered
+
+                            if (localTime.getHours() === 22 && localTime.getMinutes() === 14) {
+                                editedNewValue = localTime.toLocaleDateString('he-IL', { timeZone: 'Israel' });
+                                editedNewValue += ', אחה"צ';
+                            } else {
+                                editedNewValue = localTime.toLocaleString('he-IL', { timeZone: 'Israel' }); // this is JUST how the datetime will be rendered
+                            }
+
                         } else {
                             editedNewValue = logs[i].NewValue;
-                        }
- 
 
-                       
+                        }
+
+                        let editedRecorde_UniqueId = `<span data-tableName="${logs[i].TableName}" class="showDetailsAboutMe" onclick="showDetailsAboutMe(this)">${logs[i].Recorde_UniqueId}</span>`;
+
+                        let editedColumnName;
+                        if (logs[i].ColumnName === 'RideId') {
+                            editedColumnName = 'driver';
+                            if (editedNewValue === '(null)') {
+                                editedOldValue = `<span class="showDetailsAboutMe" onclick="getDriverName(${editedOldValue});">שם הנהג הנמחק</span>`;
+                            } else if (editedOldValue === '(null)') {
+                                editedNewValue = `<span class="showDetailsAboutMe" onclick="getDriverName(${editedNewValue});">שם הנהג ששובץ</span>`;
+                            }
+
+                            //editedOldValue or editedNewValue in that case is the ride ID
+                        } else {
+                            editedColumnName = logs[i].ColumnName;
+                        }
 
                         let editedLog = {
+                            Id: logs[i].Id,
                             DateAdded: convertDBDate2FrontEndDate(logs[i].DateAdded).toLocaleDateString('he-IL'),
                             TimeAdded: editedTime,
+                            WhoChanged: logs[i].WhoChanged,
                             TableName: logs[i].TableName,
-                            Recorde_UniqueId: logs[i].Recorde_UniqueId,
-                            ColumnName: logs[i].ColumnName,
+                            Recorde_UniqueId: editedRecorde_UniqueId,
+                            ColumnName: editedColumnName,
                             OldValue: editedOldValue,
                             NewValue: editedNewValue,
                         }
@@ -241,7 +273,8 @@
                             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
                             { data: "DateAdded" },                              //0
                             { data: "TimeAdded" },                              //1
-                            { data: "TableName" },                              //2
+                            { data: "WhoChanged" },                             //2
+                            { data: "TableName" },                              //3
                             { data: "Recorde_UniqueId" },                       //3
                             { data: "ColumnName" },                             //4
                             { data: "OldValue" },                               //5
@@ -262,8 +295,59 @@
             });
         }
 
-        function getLog(hours) {
 
+
+        const getDriverName = (rideId) => {
+
+            const getDriverName_SCB = (data) => {
+                let driverName = data.d
+                swal(`הנהג הוא: ${driverName}`);
+            }
+
+            const getDriverName_ECB = (err) => {
+                console.warn(err);
+                swal('שליפת שם הנהג נכשלה');
+            }
+
+            ajaxCall('GetDriverName', JSON.stringify({ rideId }), getDriverName_SCB, getDriverName_ECB);
+        }
+
+
+        const showDetailsAboutMe = (spanElement) => {
+
+            let identifier = spanElement.innerHTML;
+
+            let tableName = spanElement.getAttribute('data-tableName');
+
+            switch (tableName) {
+                case 'RidePat':
+                    ajaxCall('GetRidePat', JSON.stringify({ ridePatNum: identifier }), GetRidePat_SCB, GetRidePat_ECB);
+                    break;
+            }
+
+
+        }
+
+        const GetRidePat_SCB = (data) => {
+            let ridePat = JSON.parse(data.d);
+
+            let utcTime = convertDBDate2FrontEndDate(ridePat.Date);
+            let localTime = new Date(utcTime.getTime() - utcTime.getTimezoneOffset() * 60 * 1000); //convert the utc date to the local time
+
+            if (localTime.getHours() === 22 && localTime.getMinutes() === 14) {
+                localTime = localTime.toLocaleDateString('he-IL', { timeZone: 'Israel' });
+                localTime += ', אחה"צ';
+            } else {
+                localTime = localTime.toLocaleString('he-IL', { timeZone: 'Israel' }); // this is JUST how the datetime will be rendered
+            }
+
+            swal(`הסעת המטופל  ${ridePat.Pat.DisplayName} מ${ridePat.Origin.Name} ל${ridePat.Destination.Name} ב${localTime}`);
+        }
+
+
+        const GetRidePat_ECB = (err) => {
+            swal("תקלה", "הבאת ההסעה מבסיס הנתונים נכשלה", "error");
+            console.warn(err);
         }
 
     </script>
@@ -385,6 +469,7 @@
                                             <!--<th>מספר הסעה</th>-->
                                             <th>תאריך השינוי</th>
                                             <th>שעת השינוי</th>
+                                            <th>שם המתנדב המשנה</th>
                                             <th>סוג האובייקט ששונה</th>
                                             <th>זיהוי רשומה</th>
                                             <th>שם העמודה ששונתה</th>
