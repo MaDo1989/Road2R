@@ -1265,6 +1265,9 @@
                 dataType: "json",
                 url: "WebService.asmx/getDestinationView",
                 contentType: "application/json; charset=utf-8",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-Encoding", "gzip");
+                },
                 type: "POST",
                 async: false,
                 data: JSON.stringify({ active: true }),
