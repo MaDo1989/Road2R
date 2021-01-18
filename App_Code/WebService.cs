@@ -484,6 +484,23 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+    [WebMethod(EnableSession = true)]    
+    public string GetVolunteerById(int id)
+    {
+        try
+        {
+            Volunteer v = new Volunteer().getVolunteerByID(id);
+            return j.Serialize(v);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetVolunteerById", ex);
+            throw new Exception("שגיאה בשליפת נתוני מתנדב");
+
+        }
+    }
+
+
     [WebMethod(EnableSession = true)]
     public int getSpaceInCar(int ridePatNum, int driverId)
     {

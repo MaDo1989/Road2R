@@ -2088,10 +2088,10 @@ public class RidePat
     /// </summary>
     private void ChangeCoordinatoor(int ridePatNum)
     {
-        string coordinatorName = (string)HttpContext.Current.Session["loggedInName"]; 
+        string loggedInName = (string)HttpContext.Current.Session["loggedInName"]; 
 
 
-        string query = "exec spRidePat_ChangeCoordinatorName @coordinatorName=N'"+coordinatorName+"', @RidePatNum=" + ridePatNum;
+        string query = "exec spRidePat_ChangeCoordinatorName @coordinatorName=N'"+ loggedInName + "', @RidePatNum=" + ridePatNum;
         SqlCommand cmd = new SqlCommand();
 
         try

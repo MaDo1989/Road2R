@@ -313,6 +313,8 @@
 
         const showDetailsAboutMe = (spanElement) => {
 
+            $('#wait').show();
+
             let identifier = spanElement.innerHTML;
 
             let tableName = spanElement.getAttribute('data-tableName');
@@ -321,12 +323,32 @@
                 case 'RidePat':
                     ajaxCall('GetRidePat', JSON.stringify({ ridePatNum: identifier }), GetRidePat_SCB, GetRidePat_ECB);
                     break;
+                case 'Volunteer':
+                    ajaxCall('GetVolunteerById', JSON.stringify({ id: identifier }), getVolunteer_SCB, getVolunteer_ECB);
+                    break;
             }
 
 
         }
+        const getVolunteer_SCB = (data) => {
+            $('#wait').hide();
+            let volunteer = JSON.parse(data.d);
+            swal(`${volunteer.DisplayName} מ${volunteer.City}`);
+        }
+
+
+        const getVolunteer_ECB = (data) => {
+
+            $('#wait').hide();
+
+            swal("תקלה", "הבאת מתנדב מבסיס הנתונים נכשלה", "error");
+            console.warn(err);
+        }
 
         const GetRidePat_SCB = (data) => {
+
+            $('#wait').hide();
+
             let ridePat = JSON.parse(data.d);
 
             let localTime = convertDBDate2FrontEndDate(ridePat.Date);
@@ -344,6 +366,7 @@
 
 
         const GetRidePat_ECB = (err) => {
+            $('#wait').hide();
             swal("תקלה", "הבאת ההסעה מבסיס הנתונים נכשלה", "error");
             console.warn(err);
         }
