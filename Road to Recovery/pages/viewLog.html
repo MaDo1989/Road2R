@@ -206,7 +206,11 @@
                                 editedOldValue = localTime.toLocaleString('he-IL', { timeZone: 'Israel' }); // this is JUST how the datetime will be rendered
                             }
                         } else {
-                            editedOldValue = logs[i].OldValue;
+                            if (logs[i].ColumnName === 'IsActive') {
+                                editedOldValue = logs[i].OldValue === '1' ? 'פעיל' : 'לא פעיל';
+                            } else {
+                                editedOldValue = logs[i].OldValue;
+                            }
                         }
 
 
@@ -222,8 +226,11 @@
                             }
 
                         } else {
-                            editedNewValue = logs[i].NewValue;
-
+                            if (logs[i].ColumnName === 'IsActive') {
+                                editedNewValue = logs[i].NewValue === '1' ? 'פעיל' : 'לא פעיל';
+                            } else {
+                                editedNewValue = logs[i].NewValue;
+                            }
                         }
 
                         let editedRecorde_UniqueId = `<span data-tableName="${logs[i].TableName}" class="showDetailsAboutMe" onclick="showDetailsAboutMe(this)">${logs[i].Recorde_UniqueId}</span>`;
@@ -241,6 +248,9 @@
                         } else {
                             editedColumnName = logs[i].ColumnName;
                         }
+
+
+
 
                         let editedLog = {
                             Id: logs[i].Id,
@@ -326,10 +336,31 @@
                 case 'Volunteer':
                     ajaxCall('GetVolunteerById', JSON.stringify({ id: identifier }), getVolunteer_SCB, getVolunteer_ECB);
                     break;
+                case 'Patient':
+                    ajaxCall('GetPatientById', JSON.stringify({ id: identifier }), getPatient_SCB, getPatient_ECB);
+                    break;
+                default:
+                    $('#wait').hide();
+                    break;
             }
 
 
         }
+
+        const getPatient_SCB = (data) => {
+            $('#wait').hide();
+            let patient = JSON.parse(data.d);
+
+            swal(`${patient.DisplayName}`);
+        }
+
+        const getPatient_ECB = (err) => {
+            $('#wait').hide();
+            swal("תקלה", "הבאת חולה מבסיס הנתונים נכשלה", "error");
+            console.warn(err);
+        }
+
+
         const getVolunteer_SCB = (data) => {
             $('#wait').hide();
             let volunteer = JSON.parse(data.d);
@@ -337,10 +368,8 @@
         }
 
 
-        const getVolunteer_ECB = (data) => {
-
+        const getVolunteer_ECB = (err) => {
             $('#wait').hide();
-
             swal("תקלה", "הבאת מתנדב מבסיס הנתונים נכשלה", "error");
             console.warn(err);
         }

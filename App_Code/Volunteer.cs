@@ -2463,7 +2463,7 @@ public class Volunteer
     }
 
     /// <summary>
-    /// ChangeCoordinatoor is a private method for changing the lastUpdateBy in the Volunteer table
+    /// ChangeLastUpdateBy is a private method for changing the lastUpdateBy in the Volunteer table
     /// this functionality is for track who was the last one who change any field in a record of 
     /// Volunteer table.
     /// ------------------------------------------------------

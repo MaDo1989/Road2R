@@ -697,6 +697,23 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
+
+    [WebMethod(EnableSession = true)]
+    public string GetPatientById(int id)
+    {
+        try
+        {
+            Patient patient = new Patient().GetPatientById(id);
+            return j.Serialize(patient);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in getPatientById", ex);
+            throw new Exception("שגיאה בשליפת חולה לפי מזהה");
+        }
+
+    }
+
     [WebMethod(EnableSession = true)]
     public string getAnonymousPatient(string displayName)
     {
