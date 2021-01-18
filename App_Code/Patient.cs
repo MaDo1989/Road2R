@@ -41,6 +41,7 @@ public class Patient
     int patientIdentity;
     string lastModified;
     List<string> equipment;
+    DbService dbs;
 
     public bool IsActive { get; set; }
 
@@ -603,7 +604,7 @@ public class Patient
                     p.BirthDate = dr["BirthDate"].ToString();
                     p.History = dr["History"].ToString();
                     p.Department = dr["Department"].ToString();
-                    if (dr["PatientIdentity"].ToString()=="")
+                    if (dr["PatientIdentity"].ToString() == "")
                     {
                         p.PatientIdentity = 0;
                     }
@@ -629,7 +630,7 @@ public class Patient
                     el = new List<string>();
                     //get equipment for patient from the same view
                     string e = dr["EquipmentName"].ToString();
-                    
+
                     p.LastModified = dr["lastModified"].ToString();
                     el.Add(e);
                     p.Equipment = el;
@@ -693,7 +694,7 @@ public class Patient
             p.Gender = dr["Gender"].ToString();
             p.Remarks = dr["Remarks"].ToString();
             p.EnglishName = dr["EnglishName"].ToString();
-            if (dr["PatientIdentity"].ToString()=="")
+            if (dr["PatientIdentity"].ToString() == "")
             {
                 p.PatientIdentity = 0;
             }
@@ -706,7 +707,7 @@ public class Patient
             cmd.Parameters.AddWithValue("@displayName", p.DisplayName);
             cmd.CommandType = CommandType.Text;
             query = "select EquipmentName from EquipmentForPatientView where PatientName=@displayName";
-            DataSet ds2 = db.GetDataSetByQuery(query,true, cmd.CommandType, cmd.Parameters[0]);
+            DataSet ds2 = db.GetDataSetByQuery(query, true, cmd.CommandType, cmd.Parameters[0]);
             foreach (DataRow row in ds2.Tables[0].Rows)
             {
                 string e = row["EquipmentName"].ToString();
@@ -736,17 +737,17 @@ public class Patient
 
 
     private DataTable getPatientsOnTheSamePath(string origin, string destination)
-    {        
+    {
         Location loc = new Location();
         string originArea = loc.GetAreaForPoint(origin);
-        string destinationArea = loc.GetAreaForPoint(destination);        
+        string destinationArea = loc.GetAreaForPoint(destination);
         string query = "select p.* from Patient p join location lo on p.Barrier = lo.Name join location ld on p.Hospital = ld.Name where(lo.Area = N'" + originArea + "' and ld.Area = N'" + destinationArea + "') or(lo.Area = N'" + destinationArea + "' and ld.Area = N'" + originArea + "') and (p.IsActive = 'true')";
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         return ds.Tables[0];
     }
 
-    public List<Patient> getAnonymousPatientsListForLocations(bool active, string origin, string dest,string area)
+    public List<Patient> getAnonymousPatientsListForLocations(bool active, string origin, string dest, string area)
     {
         //change to query with "in" 
         #region DB functions
@@ -875,14 +876,66 @@ public class Patient
         return list;
     }
 
+    public Patient GetPatientById(int id)
+    {
+        string query = "SELECT * FROM Patient WHERE ID=" + id;
+
+        try
+        {
+            dbs = new DbService();
+            SqlDataReader sdr = dbs.GetDataReader(query);
+            Patient p = new Patient();
+            if (sdr.Read())
+            {
+                p.Id = int.Parse(sdr["Id"].ToString());
+                p.DisplayName = sdr["DisplayName"].ToString();
+                p.FirstNameA = sdr["FirstNameA"].ToString();
+                p.FirstNameH = sdr["FirstNameH"].ToString();
+                p.LastNameH = sdr["LastNameH"].ToString();
+                p.LastNameA = sdr["LastNameA"].ToString();
+                p.CellPhone = sdr["CellPhone"].ToString();
+                p.CellPhone1 = sdr["CellPhone2"].ToString();
+                p.HomePhone = sdr["HomePhone"].ToString();
+                p.City = sdr["CityCityName"].ToString();
+                p.LivingArea = sdr["LivingArea"].ToString();
+                p.IsActive = Convert.ToBoolean(sdr["IsACtive"].ToString());
+                p.BirthDate = sdr["BirthDate"].ToString();
+                p.History = sdr["History"].ToString();
+                p.Department = sdr["Department"].ToString();
+                p.Barrier = new Location(sdr["Barrier"].ToString());
+                p.Hospital = new Location(sdr["Hospital"].ToString());
+                p.Gender = sdr["Gender"].ToString();
+                p.Remarks = sdr["Remarks"].ToString();
+                p.EnglishName = sdr["EnglishName"].ToString();
+                if (sdr["PatientIdentity"].ToString() == "")
+                {
+                    p.PatientIdentity = 0;
+                }
+                else p.PatientIdentity = int.Parse(sdr["PatientIdentity"].ToString());
+
+                p.Equipment = p.getEquipmentForPatient(p.displayName);
+            }
+            return p;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+        finally
+        {
+            dbs.CloseConnection();
+        }
+    }
+
 
     //-------------------------------------------------------
     //-- Benny optimization
     //----------------------------------------
 
-    private List<Patient> getEquipmentForAnon(List<Patient> pList) {
+    private List<Patient> getEquipmentForAnon(List<Patient> pList)
+    {
 
-         
+
 
         //set equipment
         List<string> el = new List<string>();
@@ -893,25 +946,28 @@ public class Patient
         DataSet ds2 = db.GetDataSetByQuery(query, true, cmd.CommandType);
 
         Dictionary<int, List<string>> elist = new Dictionary<int, List<string>>();
-               
+
         foreach (DataRow row in ds2.Tables[0].Rows)
         {
             string e = row["EquipmentName"].ToString();
             int id = Convert.ToInt32(row["Id"]);
-            if (!elist.ContainsKey(id)) {
+            if (!elist.ContainsKey(id))
+            {
                 elist.Add(id, new List<string>());
             }
             elist[id].Add(e);
         }
 
-        for (int i = 0; i < pList.Count; i++) {
-            if (elist.ContainsKey(pList[i].Id)){ 
+        for (int i = 0; i < pList.Count; i++)
+        {
+            if (elist.ContainsKey(pList[i].Id))
+            {
                 pList[i].equipment = elist[pList[i].Id];
             }
         }
 
         return pList;
-      
+
     }
 
 
@@ -976,6 +1032,7 @@ public class Patient
     public void SetPatientStatus(string active)
     {
         DbService db = new DbService();
+        ChangeLastUpdateBy(0);
         db.ExecuteQuery("UPDATE Patient SET IsActive='" + active + "', lastModified=DATEADD(hour, 2, SYSDATETIME()) WHERE DisplayName=N'" + DisplayName + "'");
 
     }
@@ -1014,6 +1071,7 @@ public class Patient
         if (func == "edit")
         {
             //DisplayName=@displayName,
+            ChangeLastUpdateBy(Id);
             cmdParams[16].ToString().Trim();
             query = "UPDATE Patient SET FirstNameH=@firstNameH,FirstNameA=@firstNameA,LastNameH=@lastNameH,";
             query += "CellPhone=@cellPhone,CellPhone2=@cellPhone2,CityCityName=@city,IsActive=@IsActive,BirthDate=@birthDate,";
@@ -1148,6 +1206,39 @@ public class Patient
         #endregion
 
         return list;
+    }
+
+
+    /// <summary>
+    /// ChangeLastUpdateBy is a private method for changing the lastUpdateBy in the Patient table
+    /// this functionality is for track who was the last one who change any field in a record of 
+    /// Patient table.
+    /// ------------------------------------------------------
+    /// the name of the last one who change a recorde is taken from the session
+    /// </summary>
+    private void ChangeLastUpdateBy(int patientId)
+    {
+        string loggedInName = (string)HttpContext.Current.Session["loggedInName"];
+
+        if (patientId == 0 && DisplayName.Length > 0)
+        {
+            Patient p = getPatient();
+            patientId = p.Id;
+        }
+
+        string query = query = "exec spPatient_ChangeLastUpdateBy @lastUpdateBy=N'" + loggedInName + "', @id=" + patientId;
+        SqlCommand cmd = new SqlCommand();
+
+        try
+        {
+            dbs = new DbService();
+            dbs.ExecuteQuery(query);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+
     }
 
 }
