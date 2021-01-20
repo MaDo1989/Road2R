@@ -2142,6 +2142,7 @@ public class Volunteer
         query += "newsLetterRemarks=@newsLetterRemarks, IgulLetova=@IgulLetova, lastModified =DATEADD(hour, 2, SYSDATETIME()) where cellphone=@cell";
         try
         {
+            ChangeLastUpdateBy(0, username);
             res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
         }
         catch (SqlException ex)
@@ -2183,7 +2184,8 @@ public class Volunteer
         }
 
         messageText += "</td></tr></table>";
-        em.sendMessageTo("New volunteer", newsLetterMail, messageText);
+
+        em.sendMessageTo("New volunteer", newsLetterMail, messageText); //doesnt works while using local host! 
 
 
 
@@ -2476,9 +2478,10 @@ public class Volunteer
         if (volunteerId == 0 && displayname.Length > 0)
         {
             Volunteer v = getVolunteerByDisplayName(displayname);
+            if (v.DisplayName == displayname) loggedInName = v.DisplayName;
             volunteerId = v.Id;
         }
-       
+
         string query = query = "exec spVolunteer_ChangeLastUpdateBy @lastUpdateBy=N'" + loggedInName + "', @id=" + volunteerId;
         SqlCommand cmd = new SqlCommand();
 
