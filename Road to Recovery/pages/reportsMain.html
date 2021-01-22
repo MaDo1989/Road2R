@@ -1,4 +1,5 @@
 ﻿
+
 <!DOCTYPE html>
 <html lang="en" dir="rtl">
 <head>
@@ -138,81 +139,6 @@
             $("#rp_pil_vls_per_month").click(on_report_click);
             $("#rp_pil_vl_ride_month").click(on_report_click);
     
-           
-
-            if (localStorage.south == "undefined" || localStorage.south === undefined) {
-                localStorage.south = true;
-                $('#south').prop('checked', true);
-            } else {
-                $('#south').prop('checked', JSON.parse(localStorage.south));
-            }
-
-
-            if (localStorage.center == "undefined" || localStorage.center === undefined) {
-                localStorage.center = true;
-                $('#center').prop('checked', true);
-            } else {
-                $('#center').prop('checked', JSON.parse(localStorage.center));
-            }
-
-            if (localStorage.north == "undefined" || localStorage.north === undefined) {
-                localStorage.north = true;
-                $('#north').prop('checked', true);
-            } else {
-                $('#north').prop('checked', JSON.parse(localStorage.north));
-            }
-
-            if (localStorage.sunday == "undefined" || localStorage.sunday === undefined) {
-                localStorage.sunday = true;
-                $('#sunday').prop('checked', true);
-            } else {
-                $('#sunday').prop('checked', JSON.parse(localStorage.sunday));
-            }
-
-            if (localStorage.monday == "undefined" || localStorage.monday === undefined) {
-                localStorage.monday = true;
-                $('#monday').prop('checked', true);
-            } else {
-                $('#monday').prop('checked', JSON.parse(localStorage.sunday));
-            }
-
-            if (localStorage.tuesday == "undefined" || localStorage.tuesday === undefined) {
-                localStorage.tuesday = true;
-                $('#tuesday').prop('checked', true);
-            } else {
-                $('#tuesday').prop('checked', JSON.parse(localStorage.tuesday));
-            }
-
-            if (localStorage.wednesday == "undefined" || localStorage.wednesday === undefined) {
-                localStorage.wednesday = true;
-                $('#wednesday').prop('checked', true);
-            } else {
-                $('#wednesday').prop('checked', JSON.parse(localStorage.wednesday));
-            }
-
-            if (localStorage.thursday == "undefined" || localStorage.thursday === undefined) {
-                localStorage.thursday = true;
-                $('#thursday').prop('checked', true);
-            } else {
-                $('#thursday').prop('checked', JSON.parse(localStorage.thursday));
-            }
-
-            if (localStorage.friday == "undefined" || localStorage.friday === undefined) {
-                localStorage.friday = true;
-                $('#friday').prop('checked', true);
-            } else {
-                $('#friday').prop('checked', JSON.parse(localStorage.friday));
-            }
-
-            if (localStorage.saturday == "undefined" || localStorage.saturday === undefined) {
-                localStorage.saturday = true;
-                $('#saturday').prop('checked', true);
-            } else {
-                $('#saturday').prop('checked', JSON.parse(localStorage.saturday));
-            }
-
-
-
 
         });
 
@@ -246,46 +172,6 @@
                     day = "Invalid day";
             }
             return day;
-        }
-
-        function saveFilters() {
-
-            localStorage.south = $("#south").prop('checked');
-            var south = JSON.parse(localStorage.south);
-            localStorage.center = $("#center").prop('checked');
-            var center = JSON.parse(localStorage.center);
-            localStorage.north = $("#north").prop('checked');
-            var north = JSON.parse(localStorage.north);
-            weekdays = [];
-            localStorage.sunday = $("#sunday").prop('checked');
-            var sunday = JSON.parse(localStorage.sunday);
-            if (sunday)
-                weekdays.push("א");
-            localStorage.monday = $("#monday").prop('checked');
-            var monday = JSON.parse(localStorage.monday);
-            if (monday)
-                weekdays.push("ב");
-            localStorage.tuesday = $("#tuesday").prop('checked');
-            var tuesday = JSON.parse(localStorage.tuesday);
-            if (tuesday)
-                weekdays.push("ג");
-            localStorage.wednesday = $("#wednesday").prop('checked');
-            var wednesday = JSON.parse(localStorage.wednesday);
-            if (wednesday)
-                weekdays.push("ד");
-            localStorage.thursday = $("#thursday").prop('checked');
-            var thursday = JSON.parse(localStorage.thursday);
-            if (thursday)
-                weekdays.push("ה");
-            localStorage.friday = $("#friday").prop('checked');
-            var friday = JSON.parse(localStorage.friday);
-            if (friday)
-                weekdays.push("ו");
-            localStorage.saturday = $("#saturday").prop('checked');
-            var saturday = JSON.parse(localStorage.saturday);
-            if (saturday)
-                weekdays.push("ש");
-
         }
 
 
@@ -590,15 +476,23 @@
                                         <label style="padding: 0.5em 0px;">    כל המתנדבים (למעט אלו שסומנו לא להציג שוב) </label>
                                     </div>
                                 </div>
+                                <div class="row" style="padding: 0.3em 0px;"></div>
+                                <div class="row">
+                                    <div class="col-sm-1"><input type="checkbox" template_id="ck_only_with_rides" value="" /> </div>
+                                    <div class="col-sm-11">
+                                        <label> הצג רק מתנדבים שהסיעו </label>
+                                    </div>
+                                </div>
+                                <div class="row" style="padding: 1.0em 0px;"></div>
                                 <div class="row">
                                     <div class="col-sm-6"><input type="button" template_id="commit_to_ni_db" value="אל תדווח שוב על מתנדבים אלו" /> </div>
                                     <div class="col-sm-6">
-                                        <label style="padding: 0.5em 0px;"> הקשה פה תמחק את המתנדבים מכל דו"ח עתידי </label>
+                                        <label> הקשה פה תמחק את המתנדבים מכל דו"ח עתידי </label>
                                     </div>
                                 </div>
 
                             </div>
-                        </div>
+                            </div>
                         <div class="row report_template" name="template_PATIENT">
                             <div class="card-box">
                                 <div class="row">

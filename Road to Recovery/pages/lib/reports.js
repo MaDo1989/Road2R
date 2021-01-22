@@ -459,6 +459,8 @@ function rp_amuta_vls_list_field_radio_post_clone(id) {
     $('#select_date_later').val("2021-01-01");
     $("#select_date_later").change(rp_amuta_vls_list__refresh_preview);
 
+    $("#ck_only_with_rides").change(rp_amuta_vls_list__refresh_preview);
+
     $("#radio_start_date").change(rp_amuta_vls_list__refresh_preview);
     $("#radio_all").change(rp_amuta_vls_list__refresh_preview);
 
@@ -667,16 +669,18 @@ function rp_amuta_vls_km__refresh_preview() {
 }   
 
 function rp_amuta_vls_list__query_object() {
+
     var selected_date = $('#select_date_later').val();
-    var config = "start_date";
+    var only_with_rides = $("#ck_only_with_rides").is(":checked");
     if ($("#radio_all").is(":checked")) {
-        config = "all";
+        selected_date = "NONE";
     }
     return {
         start_date: selected_date,
-        config: config
+        only_with_rides: only_with_rides
     };
 }
+
 
 
 function rp_amuta_vls_list__refresh_preview() {
@@ -1060,7 +1064,7 @@ function refresh_pil_vl_ride_month_Table(start_date, end_date) {
 
 
 
-// 'start_date' :  a date formatted as YYYY-MM-DD
+
 function refresh_amuta_vls_list_Table(query_object) {
     hide_all_tables();
     $('#wait').show();
@@ -1335,39 +1339,3 @@ function hide_all_tables() {
  }
 
 
-function load_location() {
-    $.ajax({
-        dataType: "json",
-        url: "WebService.asmx/getLocations",
-        contentType: "application/json; charset=utf-8",
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader("Content-Encoding", "gzip");
-        },
-        type: "POST",
-        data: "",
-        success: function (data) {
-            let fullList = JSON.parse(data.d)
-            for (loc of fullList) {
-                if (loc.Area.includes("דרום") || loc.Area.includes("ארז")) {
-                    southLocations.push(loc.Name);
-                }
-                if (loc.Area.includes("מרכז") || loc.Area.includes("תרקומיא") || loc.Area.includes("ירושלים")) {
-                    centerLocations.push(loc.Name);
-                }
-                if (loc.Area.includes("צפון")) {
-                    northLocations.push(loc.Name);
-                }
-            }
-
-            locations = {
-                South: southLocations,
-                Center: centerLocations,
-                North: northLocations
-            }
-
-        }, error: function (error) {
-            console.log(error);
-        }
-    });
-
-}
