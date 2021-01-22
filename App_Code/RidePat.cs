@@ -468,7 +468,7 @@ public class RidePat
                         }
                     }
                 }
-                
+
 
                 string query = "insert into RidePat (Patient,Origin,Destination,PickupTime,Coordinator,Remark,OnlyEscort,Area,CoordinatorId,lastModified) values (@pat,@origin,@destination,@date,@coordinator,@remark,@onlyEscort,@Area,@coordinatorID,DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
                 RidePatNum = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
@@ -525,6 +525,9 @@ public class RidePat
         else if (func == "edit") //Edit existing RidePat in DB
         {
             RidePatNum = ridePat.RidePatNum;
+            
+            //SET THE COORDINATOR NAME IN RIDEPAT TABLE TO THE LAST ONE WHO TOUCHED THIS RIDEPAT 
+            ChangeCoordinatoor(RidePatNum);
 
             //string query = "select Status from RidePat where RidePatNum=" + RidePatNum;
             //Status = db.GetObjectScalarByQuery(query).ToString();
@@ -665,6 +668,7 @@ public class RidePat
 
 
         }
+
         return RidePatNum;
 
     }
@@ -2075,6 +2079,32 @@ public class RidePat
 
     }
 
+    /// <summary>
+    /// ChangeCoordinatoor is a private method for changing the coordinator NAME! in the ridepat table
+    /// this functionality is for track who was the last coordinator who change any field in a record of 
+    /// ridepat table.
+    /// ------------------------------------------------------
+    /// the name of the coordinator is taken from the session
+    /// </summary>
+    private void ChangeCoordinatoor(int ridePatNum)
+    {
+        string loggedInName = (string)HttpContext.Current.Session["loggedInName"]; 
+
+
+        string query = "exec spRidePat_ChangeCoordinatorName @coordinatorName=N'"+ loggedInName + "', @RidePatNum=" + ridePatNum;
+        SqlCommand cmd = new SqlCommand();
+
+        try
+        {
+            dbs = new DbService();
+            dbs.ExecuteQuery(query);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+
+    }
     //Irrelevant
     #region GetRidePatEscortView
     //public List<RidePat> GetRidePatEscortView()

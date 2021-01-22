@@ -507,6 +507,7 @@ public class Volunteer
         db = new DbService();
         cmd = new SqlCommand();
         query = "update Volunteer set AvailableSeats=" + AvailableSeats + " where Id=" + id;
+        ChangeLastUpdateBy(id);
         res += db.ExecuteQuery(query);
         return res;
     }
@@ -844,6 +845,7 @@ public class Volunteer
         //dont update reg id and device type if user is rakaz on a mission
         if (regId != "i_am_spy")
         {
+            ChangeLastUpdateBy(v.Id);
             //update reg id
             db = new DbService();
             var updateRegid = "update Volunteer set pnRegId=@REGID where Id=@ID";
@@ -1791,6 +1793,7 @@ public class Volunteer
         string query = "";
         if (func == "edit")
         {
+            ChangeLastUpdateBy(0, v.DisplayName);
             string displayQuery = "";
             string EnglishDisplayQuery = "";
 
@@ -1911,6 +1914,7 @@ public class Volunteer
     public void deactivateCustomer(string active)
     {
         DbService db = new DbService();
+        ChangeLastUpdateBy(0, DisplayName);
         db.ExecuteQuery("UPDATE Volunteer SET IsActive='" + active + "', lastModified=DATEADD(hour, 2, SYSDATETIME()) WHERE displayName=N'" + DisplayName + "'");
 
     }
@@ -1944,7 +1948,7 @@ public class Volunteer
 
         string query;
         query = "update Volunteer set Password=@password where UserName=N'" + userName + "'";
-
+        ChangeLastUpdateBy(0, userName);
         res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
 
         if (res == 0)
@@ -2455,6 +2459,38 @@ public class Volunteer
         //    messageText = "המשתמש.ת " + v.DisplayName + " נרשם.ה למערכת.<br/>המשתמש.ת מעוניין.ת בהדרכה.<br/>טלפון נייד: " + v.CellPhone;
         //    em.sendMessageTo("New volunteer", ConfigurationManager.AppSettings["instructorMail"], messageText); //Change to instructor's email
         //}
+
+    }
+
+    /// <summary>
+    /// ChangeLastUpdateBy is a private method for changing the lastUpdateBy in the Volunteer table
+    /// this functionality is for track who was the last one who change any field in a record of 
+    /// Volunteer table.
+    /// ------------------------------------------------------
+    /// the name of the last one who change a recorde is taken from the session
+    /// </summary>
+    private void ChangeLastUpdateBy(int volunteerId, string displayname = "")
+    {
+        string loggedInName = (string)HttpContext.Current.Session["loggedInName"];
+
+        if (volunteerId == 0 && displayname.Length > 0)
+        {
+            Volunteer v = getVolunteerByDisplayName(displayname);
+            volunteerId = v.Id;
+        }
+       
+        string query = query = "exec spVolunteer_ChangeLastUpdateBy @lastUpdateBy=N'" + loggedInName + "', @id=" + volunteerId;
+        SqlCommand cmd = new SqlCommand();
+
+        try
+        {
+            dbs = new DbService();
+            dbs.ExecuteQuery(query);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
 
     }
 

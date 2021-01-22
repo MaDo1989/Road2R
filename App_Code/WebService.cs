@@ -484,6 +484,23 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+    [WebMethod(EnableSession = true)]    
+    public string GetVolunteerById(int id)
+    {
+        try
+        {
+            Volunteer v = new Volunteer().getVolunteerByID(id);
+            return j.Serialize(v);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetVolunteerById", ex);
+            throw new Exception("שגיאה בשליפת נתוני מתנדב");
+
+        }
+    }
+
+
     [WebMethod(EnableSession = true)]
     public int getSpaceInCar(int ridePatNum, int driverId)
     {
@@ -680,6 +697,23 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
+
+    [WebMethod(EnableSession = true)]
+    public string GetPatientById(int id)
+    {
+        try
+        {
+            Patient patient = new Patient().GetPatientById(id);
+            return j.Serialize(patient);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in getPatientById", ex);
+            throw new Exception("שגיאה בשליפת חולה לפי מזהה");
+        }
+
+    }
+
     [WebMethod(EnableSession = true)]
     public string getAnonymousPatient(string displayName)
     {
@@ -851,6 +885,24 @@ public class WebService : System.Web.Services.WebService
         {
             Log.Error("Error in getMyRides", ex);
             throw new Exception(" שגיאה בשליפת נתוני הסעות עבר");
+        }
+
+    }
+
+    
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetDriverName(int rideId)
+    {
+        try
+        {
+            return new Ride().GetDriverName(rideId);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetDriverName", ex);
+            throw new Exception(" שגיאה בשליפת שם נהג מהסעה");
         }
 
     }
@@ -1985,7 +2037,24 @@ public class WebService : System.Web.Services.WebService
 
     #endregion
 
+    #region System_Log Module
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    [WebMethod(EnableSession = true)]
+    public string GetLogs(string timeRange)
+    {
+        try
+        {
+            List<System_Log> logs = new System_Log().GetLogs(timeRange);
+            return j.Serialize(logs);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetLogs", ex);
+            throw new Exception("Error in GetLogs ---> ex.Message: " + ex.Message);
+        }
 
+    }
+    #endregion
 }
 
 
