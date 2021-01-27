@@ -235,6 +235,76 @@
 
 
             jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+
+                "de_datetime-asc": function (a, b) {
+                    /*a and b are a couple of dates to compare
+                    return value will be:
+                    0 if a=b
+                    1 if a > b
+                   -1 if a < b
+                    */
+
+                    let datetime_a = $.trim(a).split(':');
+                    let datetime_b = $.trim(b).split(':');
+
+                    let hh_a = parseInt(datetime_a[0]);
+                    let mm_a = parseInt(datetime_a[1]);
+
+                    let hh_b = parseInt(datetime_b[0]);
+                    let mm_b = parseInt(datetime_b[1]);
+
+                    let now = new Date();
+
+                    let a_dateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh_a, mm_a);
+                    let b_dateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh_b, mm_b);
+
+                    a = a_dateTime.getTime();
+                    b = b_dateTime.getTime();
+
+                    if (isNaN(a)) {
+                        a = Infinity;
+                    }
+                    if (isNaN(b)) {
+                        b = Infinity;
+                    }
+
+                    return a === b ? 0 : a > b ? 1 : -1;
+                },
+
+                "de_datetime-desc": function (a, b) {
+                    /*a and b are a couple of dates to compare
+                      return value will be:
+                      0 if a=b
+                     -1 if a > b
+                      1 if a < b
+                      */
+                    let datetime_a = $.trim(a).split(':');
+                    let datetime_b = $.trim(b).split(':');
+
+                    let hh_a = parseInt(datetime_a[0]);
+                    let mm_a = parseInt(datetime_a[1]);
+
+                    let hh_b = parseInt(datetime_b[0]);
+                    let mm_b = parseInt(datetime_b[1]);
+
+                    let now = new Date();
+
+                    let a_dateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh_a, mm_a)
+                    let b_dateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh_b, mm_b)
+
+                    a = a_dateTime.getTime();
+                    b = b_dateTime.getTime();
+
+                    if (isNaN(a)) {
+                        a = Infinity;
+                    }
+                    if (isNaN(b)) {
+                        b = Infinity;
+                    }
+
+                    return a === b ? 0 : a > b ? -1 : 1;
+                },
+
                 "customdatesort-pre": function (a) {
                     var r, x;
                     if (a === null || a === "") {
@@ -246,6 +316,7 @@
                     //console.log("[PRECALC] " + a + " becomes " + r);
                     return r;
                 },
+
                 "customdatesort-asc": function (a, b) {
                     if (a === false && b === false) {
                         return 0;
@@ -257,6 +328,7 @@
                         return a - b;
                     }
                 },
+
                 "customdatesort-desc": function (a, b) {
                     if (a === false && b === false) {
                         return 0;
@@ -268,6 +340,7 @@
                         return b - a;
                     }
                 }
+
             });
 
             //Create a DataTable from the Table
@@ -287,6 +360,7 @@
                 {
                     "stateDuration": 60 * 60,
                     "columnDefs": [
+                        { targets: 0, type: 'de_datetime' },
                         { targets: 7, className: 'text-left-strong' },
                         {
                             targets: 4, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //4 is driver column
@@ -331,7 +405,8 @@
                 {
                     "stateDuration": 60 * 60,
                     "columnDefs": [
-                        { "targets": [0], createdCell: (td) => { $(td).attr('id', 'rideTiming') } },
+                        { targets: 0, type: 'de_datetime' },
+                        { targets: [0], createdCell: (td) => { $(td).attr('id', 'rideTiming') } },
                         {
                             targets: [1], createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //1 is origin column
                                 $(cell).attr('id', 'OriginName')
@@ -386,7 +461,7 @@
                 {
                     "stateDuration": 60 * 60, //saves duration state for 1 hour
                     "columnDefs": [
-                        { targets: 8, className: 'text-left-strong' },
+                        { targets: 1, type: 'de_datetime' },
                         {
                             targets: 5, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //5 is driver column
                                 if (cellData.indexOf('אין!') !== -1) {
@@ -408,9 +483,7 @@
                                 }
                             }
                         },
-                    
-
-
+                        { targets: 8, className: 'text-left-strong' },
                     ],
                     "iDisplayLength": recordsNum,
                     "aoColumns": [
@@ -441,13 +514,13 @@
                 }
             );
 
-
-          
-
             tFuture = $('#datatable-future').DataTable(
                 {
                     "stateDuration": 60 * 60, //saves duration state for 1 hour
-                    "columnDefs": [{ targets: 8, className: 'text-left-strong' }],
+                    "columnDefs": [
+                        { targets: 8, className: 'text-left-strong' },
+                        { targets: 1, type: 'de_datetime' },
+                    ],
                     "iDisplayLength": recordsNum,
                     "aoColumns": [{
                         "sType": "customdatesort"
@@ -463,10 +536,6 @@
                         null,
                     ]
                 }, { "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
-
-
-         
-
 
             /*
                          ============================
@@ -699,7 +768,6 @@
                     //tAfternoon.columns([0]).order('asc').draw();
                     //tFuture.columns([0]).order('asc').draw();
 
-                    $('#datatable-morning tbody').on('draw', manipulateTables());
                     $(".dataTables_empty").html("אין הסעות لا توجد سفريات No drives");
 
 
