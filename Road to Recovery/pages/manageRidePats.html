@@ -282,10 +282,37 @@
                          || ↓DATATABLES PROPERTIES↓||
                          ============================
             */
+
             tMorning = $('#datatable-morning').DataTable(
                 {
                     "stateDuration": 60 * 60,
-                    "columnDefs": [{ targets: 7, className: 'text-left-strong' }]
+                    "columnDefs": [
+                        { targets: 7, className: 'text-left-strong' },
+                        {
+                            targets: 4, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //4 is driver column
+                                if (cellData.indexOf('אין!') !== -1) {
+                                    cell.style.backgroundColor = "red";
+                                    cell.style.color = "white";
+                                    cell.style.fontWeight = "bold";
+                                }
+                            }
+                        },
+                        {
+                            targets: 5, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //5 is status column
+                                if (cellData.indexOf("הגענו ליעד") !== -1) {
+                                    cell.style.backgroundColor = "green";
+                                    cell.style.color = "white";
+                                } else if (cellData.indexOf('ממתינה לשיבוץ') === -1 && rowData[9].indexOf('True') !== -1) { //rowData[9] = isAnonymous column which is hidden to the user
+                                    //in other words, if there is a driver on a ride with anonymous patient
+                                    //paint the background in a yellowish color
+                                    cell.parentElement.style.background = '#FFEF8F';
+                                }
+                            }
+                        },
+
+                    ],
+
+
                 },
                 {
                     "paging": false
@@ -299,16 +326,47 @@
                     "targets": [3]
                 }
             );
-
 
             tAfternoon = $('#datatable-afternoon').DataTable(
                 {
                     "stateDuration": 60 * 60,
                     "columnDefs": [
                         { "targets": [0], createdCell: (td) => { $(td).attr('id', 'rideTiming') } },
-                        { "targets": [1], createdCell: (td) => { $(td).attr('id', 'OriginName') } },
-                        { "targets": [2], createdCell: (td) => { $(td).attr('id', 'DestinationName') } },
-                        { targets: 7, className: 'text-left-strong' }
+                        {
+                            targets: [1], createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //1 is origin column
+                                $(cell).attr('id', 'OriginName')
+                                if (cellData.indexOf('מרכז') !== -1
+                                    || cellData.indexOf('center') !== -1
+                                    || rowData[2].indexOf('מרכז') !== -1
+                                    || rowData[2].indexOf('center') !== -1 //rowData[2] = destination
+                                ) {
+                                    cell.parentElement.style.background = '#FFEF8F';
+                                }
+                            }
+                        },
+                        { targets: [2], createdCell: (td) => { $(td).attr('id', 'DestinationName') } },
+                        { targets: 7, className: 'text-left-strong' },
+                        {
+                            targets: 4, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //4 is driver column
+                                if (cellData.indexOf('אין!') !== -1) {
+                                    cell.style.backgroundColor = "orange";
+                                    cell.style.color = "white";
+                                    cell.style.fontWeight = "bold";
+                                }
+                            }
+                        },
+                        {
+                            targets: 5, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //5 is status column
+                                if (cellData.indexOf("הגענו ליעד") !== -1) {
+                                    cell.style.backgroundColor = "green";
+                                    cell.style.color = "white";
+                                } else if (cellData.indexOf('ממתינה לשיבוץ') === -1 && rowData[9].indexOf('True') !== -1) { //rowData[9] = isAnonymous column which is hidden to the user
+                                    //in other words, if there is a driver on a ride with anonymous patient
+                                    //paint the background in a yellowish color
+                                    cell.parentElement.style.background = '#FFEF8F';
+                                }
+                            }
+                        }
                     ]
                 },
                 {
@@ -324,32 +382,36 @@
                 }
             );
 
-
-            tFuture = $('#datatable-future').DataTable(
-                {
-                    "stateDuration": 60 * 60, //saves duration state for 1 hour
-                    "columnDefs": [{ targets: 8, className: 'text-left-strong' }],
-                    "iDisplayLength": recordsNum,
-                    "aoColumns": [{
-                        "sType": "customdatesort"
-                    },
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                    ]
-                }, { "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
-
-
             tTomorrow = $('#datatable-tomorrow').DataTable(
                 {
                     "stateDuration": 60 * 60, //saves duration state for 1 hour
-                    "columnDefs": [{ targets: 8, className: 'text-left-strong' }],
+                    "columnDefs": [
+                        { targets: 8, className: 'text-left-strong' },
+                        {
+                            targets: 5, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //5 is driver column
+                                if (cellData.indexOf('אין!') !== -1) {
+                                    cell.style.backgroundColor = "orange";
+                                    cell.style.color = "white";
+                                    cell.style.fontWeight = "bold";
+                                }
+                            }
+                        },
+                        {
+                            targets: 6, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //6 is status column
+                                if (cellData.indexOf("הגענו ליעד") !== -1) {
+                                    cell.style.backgroundColor = "green";
+                                    cell.style.color = "white";
+                                } else if (cellData.indexOf('ממתינה לשיבוץ') === -1 && rowData[9].indexOf('True') !== -1) { //rowData[9] = isAnonymous column which is hidden to the user
+                                    //in other words, if there is a driver on a ride with anonymous patient
+                                    //paint the background in a yellowish color
+                                    cell.parentElement.style.background = '#FFEF8F';
+                                }
+                            }
+                        },
+                    
+
+
+                    ],
                     "iDisplayLength": recordsNum,
                     "aoColumns": [
                         {
@@ -378,6 +440,32 @@
                     "targets": [3]
                 }
             );
+
+
+          
+
+            tFuture = $('#datatable-future').DataTable(
+                {
+                    "stateDuration": 60 * 60, //saves duration state for 1 hour
+                    "columnDefs": [{ targets: 8, className: 'text-left-strong' }],
+                    "iDisplayLength": recordsNum,
+                    "aoColumns": [{
+                        "sType": "customdatesort"
+                    },
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                    ]
+                }, { "paging": false }, { "visible": false, "targets": [1] }, { "className": "dt-body-left", "targets": [3] });
+
+
+         
 
 
             /*
@@ -432,7 +520,6 @@
 
         });
 
-
         function getCoors() {
             $.ajax({
                 dataType: "json",
@@ -445,6 +532,7 @@
                 error: getCoorsErrorCB
             });
         }
+
         function sendMessegeFromAssistant(ridepat, cellphone, msg) {
             $.ajax({
                 dataType: "json",
@@ -456,9 +544,11 @@
                 error: pushAssistantErrorCB
             });
         }
+
         function pushAssistantErrorCB(error) {
             console.log(error);
         }
+
         function getCoorsSuccessCB(data) {
             var arr_coor = JSON.parse(data.d);
             var user = GENERAL.USER.getUserName();
@@ -478,6 +568,7 @@
 
         function refreshTable() {
             let areasToShow_arr = JSON.parse(localStorage.getItem('areasToShow_arr'));
+            let allSortsSwitch = JSON.parse(localStorage.getItem('allSortsSwitch'));
 
             checkCookie();
 
@@ -486,7 +577,8 @@
             tFuture.clear().draw();
             tTomorrow.clear().draw();
 
-            if (areasToShow_arr !== null && areasToShow_arr.length === 0) {
+
+            if (areasToShow_arr !== null && areasToShow_arr.length === 0 && allSortsSwitch) {
                 return;
             }
 
@@ -504,11 +596,9 @@
                 success: function (data) {
 
                     arr_rides = JSON.parse(data.d);
-                    
+
 
                     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
-
-                    let allSortsSwitch = JSON.parse(localStorage.getItem('allSortsSwitch'));
 
                     for (i in arr_rides) {
 
@@ -823,198 +913,6 @@
             });
         }
 
-        function manipulateTables() {
-
-            tableMorning = document.getElementById("datatable-morning");
-            tableAfternoon = document.getElementById("datatable-afternoon");
-            tableFuture = document.getElementById("datatable-future");
-            tableTomorrow = document.getElementById("datatable-future");
-
-            tdarr = tableMorning.getElementsByTagName("td"); //Morning functions
-            tAnonymouse = tableMorning.getElementsByTagName("tr");//for anonymouse patient
-
-            //MORNING!!!
-            //NOT hardCoded for painting a row with a driver and anonymous patient.
-            tMorning.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                var data = this.data();
-                if (data != undefined) {
-                    if (data[8] == "True" && (data[5] != "ממתינה לשיבוץ")) {
-                        var row = tMorning
-                            .row(rowIdx)
-                            .node();
-                        $(row).css("background-color", "#FFEF8F");
-                    }
-                }
-            });
-
-            for (var j = 0; j < tdarr.length; j++) {
-                if (tdarr[j].innerHTML.indexOf("אין נסיעת הלוך") !== -1) {
-                    tdarr[j].style.backgroundColor = "#FFEF8F";
-                }
-            }
-
-
-            for (var j = 0; j < tdarr.length; j++) {
-                if (tdarr[j].innerHTML.indexOf("אין!") !== -1) {
-                    tdarr[j].style.backgroundColor = "red";
-                }
-            }
-
-            for (var j = 0; j < tdarr.length; j++) {
-                if (tdarr[j].innerHTML.indexOf("גיבוי בלבד") !== -1) {
-                    tdarr[j].style.backgroundColor = "red";
-                }
-            }
-            for (var j = 0; j < tdarr.length; j++) {
-                if (tdarr[j].innerHTML.indexOf("הגענו ליעד") !== -1) {
-                    tdarr[j].style.backgroundColor = "green";
-                    tdarr[j].style.color = "white";
-                }
-            }
-
-            //when there is a reported problem
-            for (var j = 0; j < tdarr.length; j++) {
-                if (tdarr[j].innerHTML.indexOf("No data available in table") == -1 && tdarr[5].innerHTML.indexOf("שובץ נהג") == -1 && tdarr[5].innerHTML.indexOf("הגענו ליעד") == -1 && tdarr[5].innerHTML.indexOf("גיבוי בלבד") == -1 && tdarr[5].innerHTML.indexOf("שובץ נהג וגיבוי") == -1 && tdarr[5].innerHTML.indexOf("יצאתי לדרך") == -1 && tdarr[5].innerHTML.indexOf("הגעתי לנקודת האיסוף") == -1 && tdarr[5].innerHTML.indexOf("אספתי את החולה") == -1 && tdarr[5].innerHTML.indexOf("ממתינה לשיבוץ") == -1) {
-                    tdarr[5].style.backgroundColor = "#F1C232";
-                    tdarr[5].style.color = "black";
-                }
-            }
-
-            //AFTERNOON!!!!
-            tdarr = tableAfternoon.getElementsByTagName("td"); //Afternoon functions
-            tAnonymouse = tableAfternoon.getElementsByTagName("tr");//for anonymouse patient
-            //var data = tAfternoon.row().data();
-
-            //NOT hardCoded for painting a row with a driver and anonymous patient.
-            tAfternoon.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                var data = this.data();
-                if (data != undefined) {
-                    if (data[8] == "True" && (data[5] != "ממתינה לשיבוץ")) {
-                        var row = tAfternoon
-                            .row(rowIdx)
-                            .node();
-                        $(row).css("background-color", "#FFEF8F");
-                    }
-                }
-            });
-
-            for (var j = 0; j < tdarr.length; j++) {
-                if (tdarr[j].innerHTML.indexOf("אין נסיעת הלוך") !== -1) {
-                    tdarr[j].style.backgroundColor = "#FFEF8F";
-                }
-            }
-
-            for (var j = 0; j < tdarr.length; j++) {
-                if (tdarr[j].innerHTML.indexOf("אין!") !== -1) {
-                    tdarr[j].style.backgroundColor = "orange";
-                }
-            }
-            for (var j = 0; j < tdarr.length; j++) {
-                if (tdarr[j].innerHTML.indexOf("גיבוי בלבד") !== -1) {
-                    tdarr[j].style.backgroundColor = "orange";
-                }
-            }
-
-            for (var j = 0; j < tdarr.length; j++) {
-                if (tdarr[j].innerHTML.indexOf("הגענו ליעד") !== -1) {
-                    tdarr[j].style.backgroundColor = "green";
-                    tdarr[j].style.color = "white";
-                }
-            }
-            for (var j = 0; j < tdarr.length; j++) {
-                if (tdarr[j].innerHTML.indexOf("No data available in table") == -1 && tdarr[5].innerHTML.indexOf("שובץ נהג") == -1 && tdarr[5].innerHTML.indexOf("הגענו ליעד") == -1 && tdarr[5].innerHTML.indexOf("גיבוי בלבד") == -1 && tdarr[5].innerHTML.indexOf("שובץ נהג וגיבוי") == -1 && tdarr[5].innerHTML.indexOf("יצאתי לדרך") == -1 && tdarr[5].innerHTML.indexOf("הגעתי לנקודת האיסוף") == -1 && tdarr[5].innerHTML.indexOf("אספתי את החולה") == -1 && tdarr[5].innerHTML.indexOf("ממתינה לשיבוץ") == -1) {
-                    tdarr[5].style.backgroundColor = "#F1C232";
-                    tdarr[5].style.color = "black";
-                }
-            }
-
-
-
-            //FUTURE!!!
-            tdarr = tableFuture.getElementsByTagName("td"); //Future functions
-            tAnonymouse = tableFuture.getElementsByTagName("tr");//for anonymouse patient
-            //NOT hardCoded for painting a row with a driver and anonymous patient.
-            tFuture.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                var data = this.data();
-                if (data != undefined) {
-                    if (data[9] == "True" && (data[5].indexOf("אין") !== -1)) {
-                        var row = tFuture
-                            .row(rowIdx)
-                            .node();
-                        $(row).css("background-color", "#FFEF8F");
-                    }
-                    else if ((data[2].indexOf("מרכז") !== -1 || data[3].indexOf("מרכז") !== -1 || data[2].indexOf("center") !== -1 || data[3].indexOf("center") !== -1) && data[5].indexOf("אין") === -1) {
-                        var row = tFuture
-                            .row(rowIdx)
-                            .node();
-                        $(row).css("background-color", "#dbb20b");
-                    }
-                }
-            });
-
-            for (var j = 0; j < tdarr.length; j++) {
-                if (tdarr[j].innerHTML.indexOf("אין נסיעת הלוך") !== -1) {
-                    tdarr[j].style.backgroundColor = "#FFEF8F";
-                }
-            }
-
-            for (var j = 0; j < tdarr.length; j++) {
-                if (tdarr[j].innerHTML.indexOf("הגענו ליעד") !== -1) {
-                    tdarr[j].style.backgroundColor = "green";
-                    tdarr[j].style.color = "white";
-                }
-            }
-
-            //TOMORROW!!!
-            tdarr = tableTomorrow.getElementsByTagName("td"); //Future functions
-            tAnonymouse = tableTomorrow.getElementsByTagName("tr");//for anonymouse patient
-            //NOT hardCoded for painting a row with a driver and anonymous patient.
-            tTomorrow.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                var data = this.data();
-                if (data != undefined) {
-                    if (data[9] == "True" && (data[5].indexOf("אין") !== -1)) {
-                        var row = tTomorrow
-                            .row(rowIdx)
-                            .node();
-                        $(row).css("background-color", "#FFEF8F");
-                    }
-                    //else if ((data[2].indexOf("מרכז") !== -1 || data[3].indexOf("מרכז") !== -1 || data[2].indexOf("center") !== -1 || data[3].indexOf("center") !== -1) && data[5].indexOf("אין") === -1) {
-                    //    var row = tFuture
-                    //        .row(rowIdx)
-                    //        .node();
-                    //    $(row).css("background-color", "#dbb20b");
-                    //}
-                }
-            });
-
-            for (var j = 0; j < tdarr.length; j++) {
-                if (tdarr[j].innerHTML.indexOf("אין נסיעת הלוך") !== -1) {
-                    tdarr[j].style.backgroundColor = "#FFEF8F";
-                }
-            }
-
-            for (var j = 0; j < tdarr.length; j++) {
-                if (tdarr[j].innerHTML.indexOf("הגענו ליעד") !== -1) {
-                    tdarr[j].style.backgroundColor = "green";
-                    tdarr[j].style.color = "white";
-                }
-            }
-
-
-            //hardCoded for painting a row with a driver and anonymous patient.
-            //for (var j = 0; j < tAnonymouse.length; j++) {
-            //    for (var i = 0; i < tAnonymouse[j].cells.length; i++) {
-            //        if (tAnonymouse[j].cells[i].innerHTML.indexOf("שובץ נהג") !== -1 || tAnonymouse[j].cells[i].innerHTML.indexOf("גיבוי בלבד") !== -1 || tAnonymouse[j].cells[i].innerHTML.indexOf("שובץ נהג וגיבוי") !== -1) {
-            //            for (var i = 0; i < tAnonymouse[j].cells.length; i++) {
-            //                if (/*(tAnonymouse[j].cells[i].innerHTML == "True")*/ tAnonymouse[j].cells[i].innerHTML.indexOf("אנונימי") != -1) {
-            //                    tAnonymouse[j].style.backgroundColor = "#FFEF8F";
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
-        }
-
         function deleteRidePat(ridePat, func) {
             checkCookie();
             // var numberOfRides = 1;
@@ -1202,7 +1100,6 @@
 
             }
         }
-
 
         const saveFilters = () => {
 
