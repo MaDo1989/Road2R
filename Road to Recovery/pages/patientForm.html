@@ -788,6 +788,10 @@
         function createRide() {
             arr_pat = JSON.parse(GENERAL.PATIENTS.getPatientsList());
             localStorage.setItem("PatientNameForRide", JSON.stringify(arr_pat.DisplayName));
+
+            let ridepats = JSON.parse(GENERAL.RIDEPAT.getRidePatList());
+            ridepats = JSON.stringify({ ...ridepats, func: 'new' });
+            GENERAL.RIDEPAT.setRidePatList(ridepats);
             location.href = "ridePatForm.html";
         }
     </script>

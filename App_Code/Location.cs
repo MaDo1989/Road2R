@@ -262,19 +262,19 @@ public class Location
             l.IsActive =Convert.ToBoolean( dr["IsActive"].ToString());
             l.Remarks = dr["Remarks"].ToString();
             l.EnglishName = dr["EnglishName"].ToString();
-            if (dr["DestinationManager"].ToString() != "")
-            {
-                int managerId = int.Parse(dr["DestinationManager"].ToString());
-                cmdParams2[0] = cmd2.Parameters.AddWithValue("Id", managerId);
-                string query2 = "select * from DestinationManagers where Id=@Id";
-                DestinationManager m = new DestinationManager();
-                DbService db2 = new DbService();
-                DataSet ds2 = db2.GetDataSetByQuery(query2, true,cmd2.CommandType, cmdParams2);
-                DataRow dr2 = ds2.Tables[0].Rows[0];
-                l.ManagerName = dr2["FirstName"].ToString();
-                l.ManagerLastName = dr2["LastName"].ToString();
-                l.managerPhones = dr2["Phone"].ToString();
-            }
+            //if (dr["DestinationManager"].ToString() != "")
+            //{
+            //    int managerId = int.Parse(dr["DestinationManager"].ToString());
+            //    cmdParams2[0] = cmd2.Parameters.AddWithValue("Id", managerId);
+            //    string query2 = "select * from DestinationManagers where Id=@Id";
+            //    DestinationManager m = new DestinationManager();
+            //    DbService db2 = new DbService();
+            //    DataSet ds2 = db2.GetDataSetByQuery(query2, true,cmd2.CommandType, cmdParams2);
+            //    DataRow dr2 = ds2.Tables[0].Rows[0];
+            //    l.ManagerName = dr2["FirstName"].ToString();
+            //    l.ManagerLastName = dr2["LastName"].ToString();
+            //    l.managerPhones = dr2["Phone"].ToString();
+            //}
 
             list.Add(l);
         }

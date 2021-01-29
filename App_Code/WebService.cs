@@ -1432,10 +1432,13 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
+            HttpResponse response = GzipMe();
+           
             Location d = new Location();
             List<Location> destinationsList = d.getDestinationsListForView(active);
+            //j.MaxJsonLength = int.MaxValue;
+            j.MaxJsonLength = Int32.MaxValue;
             return j.Serialize(destinationsList);
-
         }
         catch (Exception ex)
         {
