@@ -424,9 +424,20 @@
                         {
                             targets: 4, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //4 is driver column
                                 if (cellData.indexOf('אין!') !== -1) {
-                                    cell.style.backgroundColor = "orange";
                                     cell.style.color = "white";
                                     cell.style.fontWeight = "bold";
+
+                                    //when the time is noon so background will be red
+                                    let now = new Date();
+                                    let nowHour = parseInt(now.toLocaleString('he-IL', { hour: '2-digit', timeZone: 'Asia/Jerusalem' }));
+
+
+                                    if (nowHour >= 12) {
+                                        cell.style.backgroundColor = "red";
+                                    } else {
+                                        cell.style.backgroundColor = "orange";
+                                    }
+
                                 }
                             }
                         },
