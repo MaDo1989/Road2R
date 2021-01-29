@@ -6,6 +6,12 @@
     font-size: 42px;
 }*/
 
+/*override bootstrap*/
+.page-title-box {
+    background: #ffffff00; /*tranparent*/
+    box-shadow: none;
+}
+
 #overRideBS_modal-dialog {
             /*↓ this is work fine*/
     width: fit-content;

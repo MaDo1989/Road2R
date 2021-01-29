@@ -60,8 +60,15 @@
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="/resources/demos/style.css">
     <style>
-        .sameWidthBtn{
+        .sameWidthBtn {
             width: 170px;
+            margin: 0;
+        }
+
+        /*override bootstrap*/
+        .page-title-box {
+            background: #ffffff00; /*tranparent*/
+            box-shadow: none;
         }
 
         .ui-autocomplete {
@@ -654,7 +661,7 @@
                                             $("#Modal").modal('show');
 
                                         } else { // dont offer return drive
-                                            document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>';
+                                            document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
                                             document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות שלי<i class="ti-back-right m-r-5"></i></button>';
 
                                             $("#Modal").modal('show');
