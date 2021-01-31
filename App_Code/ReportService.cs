@@ -9,27 +9,7 @@ using System.Web;
 
 /* Notes:
  * 
- select MainDriver, Volunteer.DisplayName, Volunteer.CityCityName, Volunteer.CellPhone, Volunteer.JoinDate ,
-  sum(case when MONTH([pickuptime]) = '1' then 1 else 0 end) Jan_2020,
-  sum(case when MONTH([pickuptime]) = '2' then 1 else 0 end) Feb_2020,
-  sum(case when MONTH([pickuptime]) = '3' then 1 else 0 end) Mar_2020,
-  sum(case when MONTH([pickuptime]) = '4' then 1 else 0 end) Apr_2020,
-  sum(case when MONTH([pickuptime]) = '5' then 1 else 0 end) May_2020,
-  sum(case when MONTH([pickuptime]) = '6' then 1 else 0 end) Jun_2020,
-  sum(case when MONTH([pickuptime]) = '7' then 1 else 0 end) Jul_2020,
-  sum(case when MONTH([pickuptime]) = '8' then 1 else 0 end) Aug_2020,
-  sum(case when MONTH([pickuptime]) = '9' then 1 else 0 end) Sep_2020,
-  sum(case when MONTH([pickuptime]) = '10' then 1 else 0 end) Oct_2020,
-  sum(case when MONTH([pickuptime]) = '11' then 1 else 0 end) Nov_2020,
-  sum(case when MONTH([pickuptime]) = '12' then 1 else 0 end) Dec_2020
-FROM RPView  rp
-INNER JOIN Volunteer on Volunteer.Id = rp.MainDriver 
-WHERE pickuptime >= '2020-1-01' 
-AND pickuptime < CURRENT_TIMESTAMP
-Group BY MainDriver, Volunteer.DisplayName, Volunteer.CityCityName, Volunteer.CellPhone, Volunteer.JoinDate
-;
-
-
+ 
   
  */
 public class ReportService
@@ -89,6 +69,8 @@ public class ReportService
         public string Address { get; set; }
         public string CityCityName { get; set; }
         public string JoinDate { get; set; }
+        public string CellPhone { get; set; }
+
     }
 
     public class VolunteersPerMonthInfo
@@ -98,6 +80,34 @@ public class ReportService
         public string Count { get; set; }
 
     }
+
+    public class SliceVolunteersPerMonthInfo
+    {
+        public string DisplayName { get; set; }
+        public string City { get; set; }
+        public string CellPhone { get; set; }
+        public string JoinDate { get; set; }
+        public string Jan { get; set; }
+        public string Feb { get; set; }
+        public string Mar { get; set; }
+        public string Apr { get; set; }
+        public string May { get; set; }
+        public string Jun { get; set; }
+        public string Jul { get; set; }
+        public string Aug { get; set; }
+        public string Sep { get; set; }
+        public string Oct { get; set; }
+        public string Nov { get; set; }
+        public string Dec { get; set; }
+
+    }
+
+    public class SliceVolunteersCountInMonthInfo
+    {
+        public string Volunteer { get; set; }
+        public string Count { get; set; }
+    }
+
 
     public class INSERT_TO_NI_SQL_Objects
     {
@@ -164,6 +174,106 @@ AND RidePat.pickuptime >= '2020-1-01'
         return dt;
     }
 
+    internal List<SliceVolunteersPerMonthInfo> GetReportSliceVolunteerPerMonth(string start_date, string end_date)
+    {
+        DbService db = new DbService();
+
+        string query =
+             @"select MainDriver, Volunteer.DisplayName as DisplayName, 
+                Volunteer.CityCityName as CityName, Volunteer.CellPhone as CellPhone, 
+                 convert(varchar, Volunteer.JoinDate, 103)  as JoinDate,
+              sum(case when MONTH([pickuptime]) = '1' then 1 else 0 end) Jan,
+              sum(case when MONTH([pickuptime]) = '2' then 1 else 0 end) Feb,
+              sum(case when MONTH([pickuptime]) = '3' then 1 else 0 end) Mar,
+              sum(case when MONTH([pickuptime]) = '4' then 1 else 0 end) Apr,
+              sum(case when MONTH([pickuptime]) = '5' then 1 else 0 end) May,
+              sum(case when MONTH([pickuptime]) = '6' then 1 else 0 end) Jun,
+              sum(case when MONTH([pickuptime]) = '7' then 1 else 0 end) Jul,
+              sum(case when MONTH([pickuptime]) = '8' then 1 else 0 end) Aug,
+              sum(case when MONTH([pickuptime]) = '9' then 1 else 0 end) Sep,
+              sum(case when MONTH([pickuptime]) = '10' then 1 else 0 end) Oct,
+              sum(case when MONTH([pickuptime]) = '11' then 1 else 0 end) Nov,
+              sum(case when MONTH([pickuptime]) = '12' then 1 else 0 end) Dec
+            FROM RPView  rp
+            INNER JOIN Volunteer on Volunteer.Id = rp.MainDriver 
+            WHERE pickuptime >= @start_date 
+            AND pickuptime <= @end_date
+            Group BY MainDriver, Volunteer.DisplayName, Volunteer.CityCityName, Volunteer.CellPhone, Volunteer.JoinDate
+            ";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+
+        List<SliceVolunteersPerMonthInfo> result = new List<SliceVolunteersPerMonthInfo>();
+
+        if (ds != null && ds.Tables.Count > 0 )
+        {
+            DataTable dt = ds.Tables[0];
+            foreach (DataRow dr in dt.Rows)
+            {
+                SliceVolunteersPerMonthInfo obj = new SliceVolunteersPerMonthInfo();
+                obj.DisplayName = dr["DisplayName"].ToString();
+                obj.City = dr["CityName"].ToString();
+                obj.CellPhone = dr["CellPhone"].ToString();
+                obj.JoinDate = dr["JoinDate"].ToString();
+                obj.Jan = dr["Jan"].ToString();
+                obj.Feb = dr["Feb"].ToString();
+                obj.Mar = dr["Mar"].ToString();
+                obj.Apr = dr["Apr"].ToString();
+                obj.May = dr["May"].ToString();
+                obj.Jun = dr["Jun"].ToString();
+                obj.Jul = dr["Jul"].ToString();
+                obj.Aug = dr["Aug"].ToString();
+                obj.Sep = dr["Sep"].ToString();
+                obj.Oct = dr["Oct"].ToString();
+                obj.Nov = dr["Nov"].ToString();
+                obj.Dec = dr["Dec"].ToString();
+
+                result.Add(obj);
+            }
+        }
+
+        return result;
+    }
+
+    internal List<ReportService.SliceVolunteersCountInMonthInfo> GetReportSliceVolunteersCountInMonth(string start_date, string end_date)
+    {
+        DbService db = new DbService();
+
+        string query =
+@"SELECT Volunteer.DisplayName , count(*) as COUNT_C  
+FROM RPView 
+INNER JOIN Volunteer ON RPView.MainDriver=Volunteer.Id
+WHERE pickuptime < @end_date
+AND pickuptime >= @start_date
+and MainDriver is not null
+GROUP BY Volunteer.DisplayName 
+";
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        List<SliceVolunteersCountInMonthInfo> result = new List<SliceVolunteersCountInMonthInfo>();
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            SliceVolunteersCountInMonthInfo obj = new SliceVolunteersCountInMonthInfo();
+            obj.Volunteer = dr["DisplayName"].ToString();
+            obj.Count = dr["COUNT_C"].ToString();
+            result.Add(obj);
+        }
+
+        return result;
+    }
+
     private DataTable getRides()
     {
         DbService db = new DbService();
@@ -177,7 +287,7 @@ AND RidePat.pickuptime >= '2020-1-01'
         return dt;
     }
 
-    internal string CommitReportedVolunteerListToNI_DB(string cell_phone, string start_date, string config)
+    internal string CommitReportedVolunteerListToNI_DB(string cell_phone, string start_date, string only_with_rides)
     {
         // This service is not to be used by everybody, check if user is entitled for it
         List<string> permissions = this.GetCurrentUserEntitlements(cell_phone);
@@ -189,7 +299,7 @@ AND RidePat.pickuptime >= '2020-1-01'
 
         DbService db = new DbService();
 
-        INSERT_TO_NI_SQL_Objects objs = GetQueryTextForINSERT_NIVolunteerList(start_date, config);
+        INSERT_TO_NI_SQL_Objects objs = GetQueryTextForINSERT_NIVolunteerList(start_date, only_with_rides);
 
         db.ExecuteQuery(objs.query, CommandType.Text, objs.sqlParameters);
 
@@ -281,76 +391,100 @@ AND RidePat.pickuptime >= '2020-1-01'
 
     internal string pad_with_zeros(string id)
     {
-        int pad = id.Length - 9;
-        if (pad > 0)
+        int pad = 9 - id.Length;
+        if (pad > 0 && pad != 9)
         {
             return new string('0', pad) + id;
         }
         return id;
     }
 
-    // The interface to execute statements on DbService differes than the one to Query
-    // It should sometimes return also an array of parameters, depending on config
-    internal INSERT_TO_NI_SQL_Objects GetQueryTextForINSERT_NIVolunteerList(string start_date, string config)
+
+    // Reusable code, for the logic to display (orupdate) the NI report volunteers
+    // Used both form the report Table, and also in the INSERT to the DeliveredNIReport
+    internal string getQueryBodyFor_NIVolunteerList(string start_date, string only_with_rides)
     {
-        string insert_header = @"INSERT into DeliveredNIReport  (ReportDate,DriverId)
-                                SELECT CAST(GETDATE() AS Date), Id ";
-        string query_body;
-        INSERT_TO_NI_SQL_Objects objs = new INSERT_TO_NI_SQL_Objects();
-        if (config.Equals("start_date"))
+        string result;
+        if (start_date.Equals("NONE"))
         {
-            query_body = @"from Volunteer
+            result = @"from Volunteer v
+                INNER JOIN RPView rp ON rp.MainDriver=v.Id
+                where IsActive='true' 
+                and not v.Id in (select distinct DriverId from DeliveredNIReport )";
+
+            if (only_with_rides.Equals("True"))
+            {
+                result += " and rp.pickuptime >= '2000-01-01'";  // From begining of time
+            }
+
+        }
+        else
+        {
+            result = @"from Volunteer v
+                INNER JOIN RPView rp ON rp.MainDriver=v.Id
                 where IsActive='true' 
                 and (JoinDate >= @start_date )
-                and not Id in (select distinct DriverId from DeliveredNIReport )
-            ";
+                and not v.Id in (select distinct DriverId from DeliveredNIReport )";
+
+            if (only_with_rides.Equals("True"))
+            {
+               result += " and rp.pickuptime >= @start_date";
+            }
+        }
+
+        return result;
+
+    }
+
+        // The interface to execute statements on DbService differes than the one to Query
+        // It should sometimes return also an array of parameters
+        internal INSERT_TO_NI_SQL_Objects GetQueryTextForINSERT_NIVolunteerList(string start_date, string only_with_rides)
+    {
+        string insert_header = @"INSERT into DeliveredNIReport   (DriverId, ReportDate) 
+                                SELECT  DISTINCT v.Id, CAST(GETDATE() AS Date) ";
+
+        string query_body = getQueryBodyFor_NIVolunteerList(start_date, only_with_rides);
+
+        INSERT_TO_NI_SQL_Objects objs = new INSERT_TO_NI_SQL_Objects();
+        objs.query = insert_header + query_body;
+
+        if (start_date.Equals("NONE"))
+        {
+            objs.sqlParameters = new SqlParameter[0];   // Make downstream DbService Execute happy
+        }
+        else
+        {
             objs.sqlParameters = new SqlParameter[1];
             objs.sqlParameters[0] = new SqlParameter("@start_date", SqlDbType.Date);
             objs.sqlParameters[0].Value = start_date;
         }
-        else
-        {
-            query_body = @"from Volunteer
-                where IsActive='true' 
-                and not Id in (select distinct DriverId from DeliveredNIReport )";
-            objs.sqlParameters = new SqlParameter[0];   // Make downstream DbService Execute happy
-        }
 
-        objs.query = insert_header + query_body;
         return objs;
     }
 
 
-        internal SqlCommand BuildSqlCommandForNIVolunteerList(string start_date, string config)
+        internal SqlCommand BuildSqlCommandForNIVolunteerList(string start_date, string only_with_rides)
     {
         SqlCommand cmd;
 
-        /* ATTENTION - If you change here, change also in GetQueryTextForINSERT_NIVolunteerList */
+        /* ATTENTION - If you change here, review  also GetQueryTextForINSERT_NIVolunteerList */
 
-        string header = "select FirstNameH, LastNameH ,VolunteerIdentity , Email, Address, CityCityName, JoinDate ";
+        string header = "select DISTINCT v.ID, FirstNameH, LastNameH , VolunteerIdentity , Email, Address, CityCityName, JoinDate, v.CellPhone ";
 
-        if (config.Equals("start_date"))
+        string query_body = getQueryBodyFor_NIVolunteerList(start_date, only_with_rides);
+
+        cmd = new SqlCommand(header + query_body);
+        cmd.CommandType = CommandType.Text;
+
+        if (!start_date.Equals("NONE"))
         {
-            string query_body = @"from Volunteer
-                where IsActive='true' 
-                and (JoinDate >= @start_date )
-                and not Id in (select distinct DriverId from DeliveredNIReport )
-            ";
-            cmd = new SqlCommand(header + query_body);
             cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
         }
-        else
-        {
-            string query_body = @"from Volunteer
-                where IsActive='true' 
-                and not Id in (select distinct DriverId from DeliveredNIReport )";
-            cmd = new SqlCommand(header + query_body);
-        }
 
-        cmd.CommandType = CommandType.Text;
         return cmd;
     }
-    internal List<VolunteerInfo> GetReportVolunteerList(string cell_phone, string start_date, string config)
+
+    internal List<VolunteerInfo> GetReportVolunteerList(string cell_phone, string start_date, string only_with_rides)
     {
         List<VolunteerInfo> result = new List<VolunteerInfo>();
 
@@ -363,7 +497,7 @@ AND RidePat.pickuptime >= '2020-1-01'
 
 
         DbService db = new DbService();
-        SqlCommand cmd = BuildSqlCommandForNIVolunteerList(start_date, config);
+        SqlCommand cmd = BuildSqlCommandForNIVolunteerList(start_date, only_with_rides);
         DataSet ds = db.GetDataSetBySqlCommand(cmd);
         DataTable dt = ds.Tables[0];
 
@@ -375,6 +509,7 @@ AND RidePat.pickuptime >= '2020-1-01'
             string id = dr["VolunteerIdentity"].ToString();
             obj.VolunteerIdentity = pad_with_zeros(id);
             obj.Email = dr["Email"].ToString();
+            obj.CellPhone = dr["CellPhone"].ToString();
             obj.Address = dr["Address"].ToString();
             obj.CityCityName = dr["CityCityName"].ToString();
             if ( dr.IsNull("JoinDate") )
@@ -587,7 +722,7 @@ INNER JOIN Volunteer ON BUFF.MainDriver=Volunteer.Id";
     }
 
 
-    //@@ TODO:  Maybe ths is not needed?
+    //@@ TODO:  See notes on this method name in reports.js
     public List<RidePat> GetReportRidesWeeklyPerRegion(string start_date, string end_date)
     {
         DbService db = new DbService();

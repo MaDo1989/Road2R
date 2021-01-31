@@ -93,14 +93,14 @@ public class ReportsWebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetReportVolunteerList(string start_date, string config)
+    public string GetReportVolunteerList(string start_date, string only_with_rides)
     {
         try
         {
             string cell_phone = (string)HttpContext.Current.Session["userSession"];
             HttpResponse response = GzipMe();
             ReportService report = new ReportService();
-            List<ReportService.VolunteerInfo> r = report.GetReportVolunteerList(cell_phone, start_date, config);
+            List<ReportService.VolunteerInfo> r = report.GetReportVolunteerList(cell_phone, start_date, only_with_rides);
             j.MaxJsonLength = Int32.MaxValue;
             return j.Serialize(r);
         }
@@ -134,7 +134,49 @@ public class ReportsWebService : System.Web.Services.WebService
 
     }
 
-   
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public List<ReportService.SliceVolunteersPerMonthInfo> GetReportSliceVolunteerPerMonth(string start_date, string end_date)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            ReportService report = new ReportService();
+            List<ReportService.SliceVolunteersPerMonthInfo> r = report.GetReportSliceVolunteerPerMonth(start_date, end_date);
+            return r;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in SliceVolunteersPerMonthInfo", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
+
+    
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public List<ReportService.SliceVolunteersCountInMonthInfo> GetReportSliceVolunteersCountInMonth(string start_date, string end_date)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            ReportService report = new ReportService();
+            List<ReportService.SliceVolunteersCountInMonthInfo> r = report.GetReportSliceVolunteersCountInMonth(start_date, end_date);
+            return r;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReportSliceVolunteersCountInMonth", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -161,7 +203,7 @@ public class ReportsWebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string CommitReportedVolunteerListToNI_DB(string start_date, string config)
+    public string CommitReportedVolunteerListToNI_DB(string start_date, string only_with_rides)
     {
         try
         {
@@ -169,7 +211,7 @@ public class ReportsWebService : System.Web.Services.WebService
             HttpResponse response = GzipMe();
 
             ReportService report = new ReportService();
-            report.CommitReportedVolunteerListToNI_DB(cell_phone, start_date, config);
+            report.CommitReportedVolunteerListToNI_DB(cell_phone, start_date, only_with_rides);
             return "OK";
         }
         catch (Exception ex)
