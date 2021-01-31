@@ -424,20 +424,35 @@
                         {
                             targets: 4, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //4 is driver column
                                 if (cellData.indexOf('אין!') !== -1) {
-                                    cell.style.color = "white";
-                                    cell.style.fontWeight = "bold";
 
-                                    //when the time is noon so background will be red
-                                    let now = new Date();
-                                    let nowHour = parseInt(now.toLocaleString('he-IL', { hour: '2-digit', timeZone: 'Asia/Jerusalem' }));
-
-
-                                    if (nowHour >= 12) {
+                                    if (rowData[0] === "אחה''צ") {
+                                        cell.style.color = "white";
+                                        cell.style.fontWeight = "bold";
                                         cell.style.backgroundColor = "red";
-                                    } else {
-                                        cell.style.backgroundColor = "orange";
+                                        return;
                                     }
 
+                                    let now = new Date();
+                                    let ridePatTime_td = $.trim(rowData[0]).split(':');
+
+                                    let ridePatTimeObj = {
+                                        hh: parseInt(ridePatTime_td[0]),
+                                        mm: parseInt(ridePatTime_td[1])
+                                    }
+                                    let ridePatTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), ridePatTimeObj.hh, ridePatTimeObj.mm);
+
+                                    let miliSeconds_gap = ridePatTime - now;
+                                    let hours_gap = miliSeconds_gap / (1000 * 60 * 60); //1000 ms in 1 sec, 60 sec in 1m, 60 min in 1h
+
+                                    if (hours_gap >= 0) {
+                                        cell.style.color = "white";
+                                        cell.style.fontWeight = "bold";
+                                        if (hours_gap <= 12) {
+                                            cell.style.backgroundColor = "red";
+                                        } else if (hours_gap <= 24) {
+                                            cell.style.backgroundColor = "orange";
+                                        }
+                                    }
                                 }
                             }
                         },
@@ -476,9 +491,37 @@
                         {
                             targets: 5, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //5 is driver column
                                 if (cellData.indexOf('אין!') !== -1) {
-                                    cell.style.backgroundColor = "orange";
-                                    cell.style.color = "white";
-                                    cell.style.fontWeight = "bold";
+
+                                    if (rowData[0] === "אחה''צ") {
+                                        cell.style.color = "white";
+                                        cell.style.fontWeight = "bold";
+                                        cell.style.backgroundColor = "red";
+                                        return;
+                                    }
+
+                                    let now = new Date();
+                                    let ridePatTime_td = $.trim(rowData[1]).split(':');
+
+                                    let ridePatTimeObj = {
+                                        hh: parseInt(ridePatTime_td[0]),
+                                        mm: parseInt(ridePatTime_td[1])
+                                    }
+                                    let ridePatTime = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, ridePatTimeObj.hh, ridePatTimeObj.mm);
+
+                                    let miliSeconds_gap = ridePatTime - now;
+                                    let hours_gap = miliSeconds_gap / (1000 * 60 * 60); //1000 ms in 1 sec, 60 sec in 1m, 60 min in 1h
+
+                                    if (hours_gap >= 0) {
+                                        cell.style.color = "white";
+                                        cell.style.fontWeight = "bold";
+                                        if (hours_gap <= 12) {
+                                            cell.style.backgroundColor = "red";
+                                        } else if (hours_gap <= 24) {
+                                            cell.style.backgroundColor = "orange";
+                                        }
+                                    }
+
+
                                 }
                             }
                         },
