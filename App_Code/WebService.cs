@@ -347,6 +347,9 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
+
+
+
     [WebMethod(EnableSession = true)]
     public string getPatients1()
     {
@@ -362,6 +365,22 @@ public class WebService : System.Web.Services.WebService
             throw new Exception("שגיאה בשליפת נתוני חולים");
         }
 
+    }
+
+    [WebMethod(EnableSession = true)]
+    public string GetPatients_slim(bool isActive)
+    {
+        try
+        {
+            Patient p = new Patient();
+            List<Patient> patients = p.GetPatients_slim(isActive);
+            return j.Serialize(patients);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetPatients_slim", ex);
+            throw ex;
+        }
     }
 
     [WebMethod(Description = "get patients with the same origin and destination")]
