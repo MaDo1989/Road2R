@@ -117,9 +117,9 @@
                                         <th>עדכון שבועי</th>
                                         <th class="right">שם באנגלית</th>
                                         <!--<th class="left">Source</th>
-                                        <th class="left">Rounds</th>
-                                        <th class="left">AnsweredPrevQues</th>
-                                        <th class="left">GalitRemarks</th>-->
+                                    <th class="left">Rounds</th>
+                                    <th class="left">AnsweredPrevQues</th>
+                                    <th class="left">GalitRemarks</th>-->
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -136,9 +136,9 @@
 
             </div>
         </div>
-        <footer class="footer text-right" style="right:0px">
-            2020 - 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה
+        <footer id="rights" data-toggle="tooltip" data-placement="top" title="© All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء" class="footer text-right">
         </footer>
+
     </div>
     <!-- End FOOTER -->
     <script>
@@ -148,6 +148,11 @@
     <script>
 
         $(document).ready(function () {
+
+
+            let { COPYWRITE } = GENERAL;
+            $('#rights').html(COPYWRITE());
+
             getVolunteerDataTable();
         });
 

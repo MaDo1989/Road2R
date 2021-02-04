@@ -69,6 +69,11 @@
 
         $(document).ready(function () {
 
+
+            let { COPYWRITE } = GENERAL;
+            $('#rights').html(COPYWRITE());
+
+
             if (localStorage.activeVol == "undefined" || localStorage.activeVol === undefined)
                 localStorage.activeVol = true;
 
@@ -1049,19 +1054,19 @@
                             <div class="card-box table-responsive">
 
                                 <!--<div class="row">
-                                    <div class="col-sm-8">
-                                        <h4 class="m-t-0 header-title"><b>טבלת מתנדבים</b></h4>
-                                        <p class="text-muted font-13 m-b-30">
-                                            מבט כללי על המתנדבים שבוצעו, ניתן לצפות בפרטים נוספים בלחיצה על כפתור ההרחבה.
-                                        </p>
-                                    </div>
-                                    <div class="col-sm-4 text-right">
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button> צפייה
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button> עריכה
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button> מחיקה
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo'></i></button> שחזור
-                                    </div>
-                                </div>-->
+                            <div class="col-sm-8">
+                                <h4 class="m-t-0 header-title"><b>טבלת מתנדבים</b></h4>
+                                <p class="text-muted font-13 m-b-30">
+                                    מבט כללי על המתנדבים שבוצעו, ניתן לצפות בפרטים נוספים בלחיצה על כפתור ההרחבה.
+                                </p>
+                            </div>
+                            <div class="col-sm-4 text-right">
+                                <button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button> צפייה
+                                <button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button> עריכה
+                                <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button> מחיקה
+                                <button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo'></i></button> שחזור
+                            </div>
+                        </div>-->
                                 <div class="row">
                                     <div class="col-sm-3 checkbox checkbox-primary text-left">
                                         <input id="activeCustomers" type="checkbox" onchange="ActiveMode()" checked>
@@ -1116,9 +1121,9 @@
             </div>
             <!-- end content -->
             <!-- FOOTER -->
-            <footer class="footer text-right">
-                2020 - 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה
+            <footer id="rights" data-toggle="tooltip" data-placement="top" title="© All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء" class="footer text-right">
             </footer>
+
             <!-- End FOOTER -->
 
         </div>
