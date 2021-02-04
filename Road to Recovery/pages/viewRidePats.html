@@ -93,6 +93,8 @@
         $(document).ready(function () {
 
             includeHTML();
+            let { COPYWRITE } = GENERAL;
+            $('#rights').html(COPYWRITE());
 
             $('[data-toggle="tooltip"]').tooltip();
 
@@ -1200,9 +1202,7 @@
                 </div>
                 <!-- end content -->
                 <!-- FOOTER -->
-                <footer class="footer text-right">
-                    2020 - 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה
-
+                <footer id="rights" data-toggle="tooltip" data-placement="top" title="© All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء" class="footer text-right">
                 </footer>
                 <!-- End FOOTER -->
 

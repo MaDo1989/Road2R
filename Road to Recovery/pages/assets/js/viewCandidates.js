@@ -3,6 +3,7 @@ let { convertDBDate2FrontEndDate, getHebrew_WeekDay } = GENERAL.USEFULL_FUNCTION
 let { getRidePatNum4_viewCandidate } = GENERAL.RIDEPAT;
 let { ajaxCall } = GENERAL.FETCH_DATA;
 let thisRidePat;
+let { COPYWRITE } = GENERAL;
 
 const wiringDataTables = () => {
     //manage button clicks on tables
@@ -17,6 +18,7 @@ const wiringDataTables = () => {
 
 $(document).ready(() => {
     fetchData4ThisRidepat();
+    $('#rights').html(COPYWRITE());
 
     if (!JSON.parse(localStorage.getItem("isProductionDatabase"))) {
         $("#databaseType").text("Test database ")

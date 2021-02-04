@@ -162,6 +162,8 @@
         $(document).ready(function () {
 
             wiringDataTables();
+            let { COPYWRITE } = GENERAL;
+           $('#rights').html(COPYWRITE());
 
             if (localStorage.refreshTime == "undefined" || localStorage.refreshTime === undefined) { // Set the deafult refresh rate for 5 minutes
                 localStorage.refreshTime = '300000';
@@ -1587,8 +1589,8 @@
 
             <!-- end content -->
             <!-- FOOTER -->
-            <footer data-toggle="tooltip" data-placement="top" title="© 2018 - 2019. All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء" class="footer text-right">
-                2020 - 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה
+            <footer id="rights" data-toggle="tooltip" data-placement="top" title="© All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء" class="footer text-right">
+               
             </footer>
             <!-- End FOOTER -->
 
