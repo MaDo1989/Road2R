@@ -1689,8 +1689,8 @@
                 console.log(JSON.parse(data.d));
             }
 
-            const { ajaxCall } = GENERAL.FETCH_DATA;
-            ajaxCall('GetPatients_slim', JSON.stringify({ isActive: true }), getPatients_slim_SCB, getPatients_slim_ECB);
+            const { ajaxCall_WithGzipMe } = GENERAL.FETCH_DATA;
+            ajaxCall_WithGzipMe('GetPatients_slim', JSON.stringify({ isActive: true }), getPatients_slim_SCB, getPatients_slim_ECB);
         }
 
         function loadPage() {

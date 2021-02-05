@@ -375,7 +375,7 @@ public class WebService : System.Web.Services.WebService
             HttpResponse response = GzipMe();
             Patient p = new Patient();
             List<Patient> patients = p.GetPatients_slim(isActive);
-            j.MaxJsonLength = Int32.MaxValue;
+           // j.MaxJsonLength = Int32.MaxValue;
             return j.Serialize(patients);
         }
         catch (Exception ex)

@@ -120,17 +120,23 @@ var GENERAL = {
                 success: successCB,
                 error: errorCB
             });
+        },
+        ajaxCall_WithGzipMe: function (funcNameInWebService, data, successCB, errorCB) {
+            $.ajax({
+                dataType: "json",
+                url: `WebService.asmx/${funcNameInWebService}`,
+                contentType: "application/json; charset=utf-8",
+                type: "POST",                                  /*WE ALWAYS USE POST*/
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-Encoding", "gzip");
+                },
+                data: data,
+                success: successCB,
+                error: errorCB
+            });
         }
     },
 
-    /*
-                  ADD CALL WITH THIS IN THAT CALL:
-
-                  beforeSend: function (xhr) {
-                    xhr.setRequestHeader("Content-Encoding", "gzip");
-                },
-
-     */
     USEFULL_FUNCTIONS: {
         convertDBDate2FrontEndDate: (fullTimeStempStr) => { // fullTimeStempStr = this form → "/Date(1608581640000)/"
             let startTrim = fullTimeStempStr.indexOf('(') + 1;
