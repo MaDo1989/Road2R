@@ -372,8 +372,10 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
+            HttpResponse response = GzipMe();
             Patient p = new Patient();
             List<Patient> patients = p.GetPatients_slim(isActive);
+            j.MaxJsonLength = Int32.MaxValue;
             return j.Serialize(patients);
         }
         catch (Exception ex)
@@ -503,7 +505,7 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
-    [WebMethod(EnableSession = true)]    
+    [WebMethod(EnableSession = true)]
     public string GetVolunteerById(int id)
     {
         try
@@ -908,7 +910,7 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    
+
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -1452,7 +1454,7 @@ public class WebService : System.Web.Services.WebService
         try
         {
             HttpResponse response = GzipMe();
-           
+
             Location d = new Location();
             List<Location> destinationsList = d.getDestinationsListForView(active);
             //j.MaxJsonLength = int.MaxValue;
@@ -1635,7 +1637,7 @@ public class WebService : System.Web.Services.WebService
         return j.Serialize(coors);
     }
 
-    
+
     [WebMethod(EnableSession = true)]
     public string getCoordinatorsList_version_02()
     {

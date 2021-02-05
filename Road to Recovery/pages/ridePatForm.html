@@ -1678,7 +1678,23 @@
             $("#Destination option[value ='" + a + "']").prop('selected', true);
         }
 
+        const getPatients_slim = () => {
+
+            const getPatients_slim_ECB = (err) => {
+                alert(err);
+                console.log(err);
+            }
+
+            const getPatients_slim_SCB = (data) => {
+                console.log(JSON.parse(data.d));
+            }
+
+            const { ajaxCall } = GENERAL.FETCH_DATA;
+            ajaxCall('GetPatients_slim', JSON.stringify({ isActive: true }), getPatients_slim_SCB, getPatients_slim_ECB);
+        }
+
         function loadPage() {
+            getPatients_slim();
             var userType = GENERAL.USER.getUserType();
             if (userType != "מנהל") {
                 $("#coorDiv").hide();
@@ -2277,6 +2293,7 @@
             $('#wait').show();
 
         }
+
         function createReturnRide() {
             if (secondModal) {
                 isThisAReturnDrive = true;
@@ -2298,6 +2315,7 @@
 
             $('#Modal').modal('hide');
         }
+
     </script>
 </head>
 <body class="fixed-left">
