@@ -352,6 +352,10 @@
             if (JSON.parse(GENERAL.PATIENTS.getPatientsList()).length != 0) {
                 arr_patient = JSON.parse(GENERAL.PATIENTS.getPatientsList());
                 if (arr_customer.func == "new") {
+                    $('#patientFirstName').prop('disabled', false);
+                    $('#patientLastName').prop('disabled', false);
+                    $('#patientEnglishName').prop('disabled', false);
+
                     document.getElementById("newEscort").disabled = true;
                     //generateBarrier();
                     //generateHospital();
