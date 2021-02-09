@@ -190,10 +190,12 @@
         var hospitals = [];
         var isThisAReturnDrive = false;
         var rideNumberForNo;
-        var secondModal = false;
+       // var secondModal = false;
         var CoordinatorForReturn;
 
         $(document).ready(function () {
+            let { COPYWRITE } = GENERAL;
+            $('#rights').html(COPYWRITE());
             //  GetCoordinatorsList();
             $('#saveCustomer').removeClass("saveHighlight");
             $('#deleteDriver').hide();
@@ -606,24 +608,30 @@
                                     data: JSON.stringify({ RidePatBack }),
                                     success: function (data) {
 
-                                        isDriver = ($('#driver').val() == "");
+                                        let driverInput_hasValue = ($('#driver').val() !== "");
 
                                         returnDriveExist = JSON.parse(data.d);
                                         console.log(returnDriveExist)
                                         var DestIsHospital = hospitals.includes(request.RidePat.Destination.Name);
 
-                                        if (DestIsHospital && !returnDriveExist && isDriver) {
-                                            $("#Modal").modal();
-
-                                        } else {
-                                            swal({
-                                                title: "הנסיעה שוחזרה בהצלחה / تمت استعادة الرحلة بنجاح",
-                                                type: "success",
-                                                timer: 1000,
-                                                showConfirmButton: false
-                                            });
+                                        if (driverInput_hasValue) {
+                                            currentDriverId = -1; 
                                             addDriver(rideNumber);
                                         }
+
+                                        if (DestIsHospital && !returnDriveExist) {//offer a return ride
+                                            document.getElementById('ModalTitle').innerHTML = 'הנסיעה שוחזרה בהצלחה';
+                                            document.getElementById('modalButtons').innerHTML += '<button onclick="createReturnRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn">יצירת החזרה &nbsp;<i class="ti-car m-r-5"></i></button>';
+                                            $("#Modal").modal('show');
+
+                                        } else { // dont offer return drive
+                                            document.getElementById('ModalTitle').innerHTML = 'הנסיעה שוחזרה בהצלחה';
+                                            document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
+                                            document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות שלי<i class="ti-back-right m-r-5"></i></button>';
+
+                                            $("#Modal").modal('show');
+                                        }
+                                     
                                     },
                                     error: function (err) { alert("Error in CheckRidePat: " + err.responseText); }
                                 });
@@ -650,22 +658,27 @@
                                     data: JSON.stringify({ RidePatBack }),
                                     success: function (data) {
 
-                                        isDriver = ($('#driver').val() == "");
+                                        let driverInput_hasValue = ($('#driver').val() !== "");
                                         returnDriveExist = JSON.parse(data.d);
                                         console.log(returnDriveExist)
                                         var DestIsHospital = hospitals.includes(request.RidePat.Destination.Name);
+                                        if (driverInput_hasValue) {
+                                            currentDriverId = -1; 
+                                            addDriver(rideNumber);
+                                        }
 
-                                        if (DestIsHospital && !returnDriveExist && isDriver) {//offer a return ride
+                                        if (DestIsHospital && !returnDriveExist) {//offer a return ride
+                                            document.getElementById('ModalTitle').innerHTML = 'הנסיעה נשמרה';
                                             document.getElementById('modalButtons').innerHTML += '<button onclick="createReturnRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn">יצירת החזרה &nbsp;<i class="ti-car m-r-5"></i></button>';
-
+                                            
                                             $("#Modal").modal('show');
 
                                         } else { // dont offer return drive
+                                            document.getElementById('ModalTitle').innerHTML = 'הנסיעה נשמרה';
                                             document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
                                             document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות שלי<i class="ti-back-right m-r-5"></i></button>';
 
                                             $("#Modal").modal('show');
-                                            addDriver(rideNumber);
                                         }
                                     },
                                     error: function (err) { alert("Error in CheckRidePat: " + err.responseText); }
@@ -757,11 +770,11 @@
             localStorage.setItem("ridePatId", ridePatId);
 
 
-            if (arr_customer.func == "new") {
+            //if (arr_customer.func == "new") {
 
-                arr_details = { RidePatNum: ridePatId, func: "edit" }; //ridePat.name=RidePatNum
-                GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
-            }
+            //    arr_details = { RidePatNum: ridePatId, func: "edit" }; //ridePat.name=RidePatNum
+            //    GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
+            //}
 
 
 
@@ -1973,30 +1986,31 @@
                         RidePatBack = {
                             Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Remark: Remark, Escorts: Escorts, Date: date, OnlyEscort: OnlyEscort
                         }
-                        console.log(RidePatBack)
-                        $.ajax({
-                            dataType: "json",
-                            url: "WebService.asmx/CheckRidePat",
-                            contentType: "application/json; charset=utf-8",
-                            type: "POST",
-                            async: false,
-                            data: JSON.stringify({ RidePatBack }),
-                            success: function (data) {
-                                returnDriveExist = JSON.parse(data.d);
-                                console.log(returnDriveExist)
-                                var DestIsHospital = hospitals.includes(ridePat.Destination.Name);
-                                var ReturnRidePatFlag = (localStorage.getItem("ReturnRidePatFlag") == 'true');
-                                //maybe currentDriverId != -1
-                                //alert(ReturnRidePatFlag);
-                                if (DestIsHospital && !returnDriveExist && ReturnRidePatFlag) {
-                                    secondModal = true;
-                                    $("#Modal").modal();
+                        //console.log(RidePatBack)
+                        //$.ajax({
+                        //    dataType: "json",
+                        //    url: "WebService.asmx/CheckRidePat",
+                        //    contentType: "application/json; charset=utf-8",
+                        //    type: "POST",
+                        //    async: false,
+                        //    data: JSON.stringify({ RidePatBack }),
+                        //    success: function (data) {
+                        //        returnDriveExist = JSON.parse(data.d);
+                        //        console.log(returnDriveExist)
+                        //        var DestIsHospital = hospitals.includes(ridePat.Destination.Name);
+                        //        var ReturnRidePatFlag = (localStorage.getItem("ReturnRidePatFlag") == 'true');
+                        //        //maybe currentDriverId != -1
+                        //        //alert(ReturnRidePatFlag);
+                        //        if (DestIsHospital && !returnDriveExist && ReturnRidePatFlag) {
+                        //            secondModal = true;
+                        //            $("#Modal").modal();
 
-                                }
-                            },
-                            error: function (err) { alert("Error in CheckRidePat: " + err.responseText); }
-                        });
+                        //        }
+                        //    },
+                        //    error: function (err) { alert("Error in CheckRidePat: " + err.responseText); }
+                        //});
 
+                        //CANCAEL THE QUESTION OF CREAT A RETURN RIDE WHEN GETS IN THE EDIT
                     }
                     else {
                         data.d = data.d.toString();
@@ -2195,10 +2209,10 @@
             });
 
             $('#deleteDriver').show();
-            if (firstDriverBeforeSwap) {
-                setTimeout('uploadData(ridePatId)', 1001);
-                firstDriverBeforeSwap = false;
-            }
+            //if (firstDriverBeforeSwap) {
+            //    setTimeout('uploadData(ridePatId)', 1001);
+            //    firstDriverBeforeSwap = false;
+            //}
 
         }
 
@@ -2295,10 +2309,10 @@
         }
 
         function createReturnRide() {
-            if (secondModal) {
-                isThisAReturnDrive = true;
-                localStorage.setItem("ReturnRidePatFlag", true);
-            }
+
+            isThisAReturnDrive = true;
+            localStorage.setItem("ReturnRidePatFlag", true);
+            
             returnRide();
             $("#afterNoon").attr('checked', 'checked');
             checkAfternoon();
@@ -2307,11 +2321,10 @@
             localStorage.removeItem("dateForReturnRepeat");
             $("#dateRide").val(dateForReturnRepeat)
 
-
+            $('#driver').val(""); // clearing the value of this input for avoiding mistakes
             $('#saveCustomer').addClass("saveHighlight");
 
             CoordinatorForReturn = $("#coordinator").val();
-
 
             $('#Modal').modal('hide');
         }
@@ -2548,17 +2561,17 @@
                                         </div>
                                         <!--<div class="row m-l-10 m-r-10">
 
-                                            <div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label class="col-sm-2 control-label">מספר הסעה</label>
-                                                    <div class="col-sm-6">
-                                                        <input id="ridePatNum" name="ridePatNum" type="text" class="form-control">
-                                                    </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label">מספר הסעה</label>
+                                                <div class="col-sm-6">
+                                                    <input id="ridePatNum" name="ridePatNum" type="text" class="form-control">
                                                 </div>
                                             </div>
-                                            <div class="col-sm-6">
-                                            </div>
-                                        </div>-->
+                                        </div>
+                                        <div class="col-sm-6">
+                                        </div>
+                                    </div>-->
                                         <!--duplicate ride section-->
                                         <div class="row m-l-10 m-r-10" id="hideOnEdit">
                                             <div class="col-sm-6">
@@ -2633,10 +2646,10 @@
                                                 <input type="button" onclick="deleteDriverFromRide()" id="deleteDriver" class="btn btn-danger w-md waves-light m-b-5 m-r-15" value="הסרת נהג" />
 
                                                 <!--<div class="form-group" id="escortDiv">
-                                                    <label data-toggle="tooltip" title="Patient escorts" class="col-sm-2 control-label">מלווים</label>
-                                                    <div class="col-sm-6" id="selectEscort">
-                                                    </div>
-                                                </div>-->
+                                                <label data-toggle="tooltip" title="Patient escorts" class="col-sm-2 control-label">מלווים</label>
+                                                <div class="col-sm-6" id="selectEscort">
+                                                </div>
+                                            </div>-->
                                             </div>
 
                                         </div>
@@ -2670,39 +2683,38 @@
             </div>
             <!-- Modal -->
             <!--<div class="modal fade text-center" id="IgulModal" tabindex="-1" role="dialog" aria-labelledby="IgulModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h2 class="modal-title" id="exampleModalLabel">תודה רבה</h2>
-                            <h3>הפרטים נשמרו</h3>
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title" id="exampleModalLabel">תודה רבה</h2>
+                        <h3>הפרטים נשמרו</h3>
 
-                        </div>
-                        <div class="modal-body">
-                            <div class="row m-l-10 m-r-10">
-                                <div class="col-sm-12 text-center">
-
-                                    <h4>
-                                        האם תהיה מעוניין ליצור נסיעת חזרה?
-                                    </h4>
-                                </div>
-                            </div>
-
-                        </div>
-                        <div class="modal-footer">
+                    </div>
+                    <div class="modal-body">
+                        <div class="row m-l-10 m-r-10">
                             <div class="col-sm-12 text-center">
-                                <button type="button" class="btn btn-primary" onclick="goToIgul()">כן</button>
-                                <button type="button" class="btn btn-secondary" onclick="reload()">לא</button>
+
+                                <h4>
+                                    האם תהיה מעוניין ליצור נסיעת חזרה?
+                                </h4>
                             </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <div class="col-sm-12 text-center">
+                            <button type="button" class="btn btn-primary" onclick="goToIgul()">כן</button>
+                            <button type="button" class="btn btn-secondary" onclick="reload()">לא</button>
                         </div>
                     </div>
                 </div>
-            </div>-->
+            </div>
+        </div>-->
             <!-- end container -->
         </div>
         <!-- end content -->
         <!-- FOOTER -->
-        <footer class="footer text-right">
-            2020 - 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה
+        <footer id="rights" data-toggle="tooltip" data-placement="top" title="© All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء" class="footer text-right">
         </footer>
         <!-- End FOOTER -->
     </div>
