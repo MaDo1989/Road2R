@@ -1268,9 +1268,7 @@
                     var gender = $("#gender").val();
 
                     //birth date data
-                    if ($("#birthDate").val() != "")
-                        var Bdate = new Date($("#birthDate").val());
-                    else Bdate = new Date();
+                    let Bdate = $("#birthDate").val() !== '' ? new Date($("#birthDate").val()) : '';
 
                     //var birthDate = $("#birthDate").val();
                     //var Day = parseInt(birthDate.substring(0, 2));
