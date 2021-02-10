@@ -121,12 +121,13 @@ var GENERAL = {
                 error: errorCB
             });
         },
-        ajaxCall_WithGzipMe: function (funcNameInWebService, data, successCB, errorCB) {
+        ajaxCall_WithGzipMe: function (funcNameInWebService, data, successCB, errorCB, async=true) {
             $.ajax({
                 dataType: "json",
                 url: `WebService.asmx/${funcNameInWebService}`,
                 contentType: "application/json; charset=utf-8",
                 type: "POST",                                  /*WE ALWAYS USE POST*/
+                async: async,
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader("Content-Encoding", "gzip");
                 },
@@ -135,6 +136,7 @@ var GENERAL = {
                 error: errorCB
             });
         }
+
     },
 
     USEFULL_FUNCTIONS: {
