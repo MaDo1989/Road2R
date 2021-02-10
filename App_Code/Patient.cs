@@ -499,8 +499,8 @@ public class Patient
                 patient = new Patient();
                 patient.Id = Convert.ToInt32(sdr["Id"]);
                 patient.PatientIdentity = String.IsNullOrEmpty(sdr["PatientIdentity"].ToString()) ? 0 : Convert.ToInt32(sdr["PatientIdentity"]);
-                patient.DisplayName = String.IsNullOrEmpty(sdr["DisplayName"].ToString())  ? "":  Convert.ToString(sdr["DisplayName"]);
-                patient.EnglishName = String.IsNullOrEmpty(sdr["EnglishName"].ToString())  ? "":  Convert.ToString(sdr["EnglishName"]);
+                patient.DisplayName = String.IsNullOrEmpty(sdr["DisplayName"].ToString()) ? "" : Convert.ToString(sdr["DisplayName"]);
+                patient.EnglishName = String.IsNullOrEmpty(sdr["EnglishName"].ToString()) ? "" : Convert.ToString(sdr["EnglishName"]);
 
                 patients.Add(patient);
             }
@@ -1088,7 +1088,12 @@ public class Patient
         cmdParams[6] = cmd.Parameters.AddWithValue("@homePhone", HomePhone);
         cmdParams[7] = cmd.Parameters.AddWithValue("@city", City);
         cmdParams[8] = cmd.Parameters.AddWithValue("@IsActive", IsActive);
-        cmdParams[9] = cmd.Parameters.AddWithValue("@birthDate", BirthDate);
+        
+        if (BirthDate == "")
+            cmdParams[9] = cmd.Parameters.AddWithValue("@birthDate", DBNull.Value);
+        else
+            cmdParams[9] = cmd.Parameters.AddWithValue("@birthDate", BirthDate);
+       
         cmdParams[10] = cmd.Parameters.AddWithValue("@history", History);
         cmdParams[11] = cmd.Parameters.AddWithValue("@department", Department);
         cmdParams[12] = cmd.Parameters.AddWithValue("@barrier", Barrier.Name);
@@ -1107,8 +1112,8 @@ public class Patient
             ChangeLastUpdateBy(Id);
             cmdParams[16].ToString().Trim();
             query = "UPDATE Patient SET FirstNameH=@firstNameH,FirstNameA=@firstNameA,LastNameH=@lastNameH,";
-            query += "CellPhone=@cellPhone,CellPhone2=@cellPhone2,CityCityName=@city,IsActive=@IsActive,BirthDate=@birthDate,";
-            query += "HomePhone=@homePhone,History=@history,Department=@department,Barrier=@barrier,Hospital=@hospital,Gender=@gender,Remarks=@remarks,DisplayName=@displayName,EnglishName=@englishName,PatientIdentity=@patientIdentity,lastModified=DATEADD(hour, 2, SYSDATETIME()) Where Id=" + Id;
+            query += "CellPhone=@cellPhone,CellPhone2=@cellPhone2,CityCityName=@city,IsActive=@IsActive,BirthDate=@birthDate,";                     //↓,DisplayName=@displayName
+            query += "HomePhone=@homePhone,History=@history,Department=@department,Barrier=@barrier,Hospital=@hospital,Gender=@gender,Remarks=@remarks,EnglishName=@englishName,PatientIdentity=@patientIdentity,lastModified=DATEADD(hour, 2, SYSDATETIME()) Where Id=" + Id;
             db = new DbService();
             res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
             if (res > 0)
