@@ -100,6 +100,11 @@
         .report_tree_UL {
             padding-right: 1.5em;
         }
+
+        /* PDF button should not be too near CSV button*/
+        a.btn.btn-default.buttons-csv.buttons-html5 {
+            margin-right: 0.5em;
+        }
     </style>
 
 
@@ -126,6 +131,9 @@
         var weekdays = [];
 
         $(document).ready(function () {
+
+            let {COPYWRITE} = GENERAL;
+            $('#rights').html(COPYWRITE());
 
             init_reports_page();
 
@@ -562,8 +570,7 @@
                 </div>
             </div>
         </div>
-        <footer class="footer text-right" style="right:0px">
-            2021 - 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה
+        <footer id="rights" data-toggle="tooltip" data-placement="top" title="©️ All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء" class="footer text-right">
         </footer>
     </div>
 

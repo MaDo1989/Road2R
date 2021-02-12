@@ -301,6 +301,36 @@ var K_fields_map = {
     ]
  }
 
+
+var K_DataTable_PDF_EXPORT = {
+    extend: 'pdfHtml5',
+    text: 'יצוא הדו"ח ל-PDF',
+    orientation: 'landscape',
+    pageSize: 'LEGAL',
+    customize: function (doc) {
+        pdfMake.fonts = {
+            hebrewFont: {
+                normal: 'Alef-Regular.ttf',
+                bold: 'Alef-Bold.ttf',
+                italics: 'Alef-Regular.ttf',
+                bolditalics: 'Alef-Bold.ttf'
+            }
+        };
+
+        doc.defaultStyle = {
+            font: 'hebrewFont'
+        };
+    }
+};
+
+// Also, see styling in html file -  buttons-csv.buttons-html5 
+var K_DataTable_CSV_EXPORT = {
+    extend: 'csv',
+    text: 'יצוא הדו"ח ל-CSV',
+};
+
+
+
 function populate_parameters(report_type) {
  //   $("#params_ph").text("Populating for " + report_type);
     $("#params_ph").empty();
@@ -778,6 +808,10 @@ function refresh_amuta_vls_week_Table(start_date, end_date) {
                 bLengthChange: false,
                 data: arr_rides,
                 destroy: true,
+                "language": {
+                    "search": "חיפוש:"
+                },
+
                 columnDefs: [
                     { "orderData": [0, 1], "targets": 0 }],
                 columns: [
@@ -787,31 +821,9 @@ function refresh_amuta_vls_week_Table(start_date, end_date) {
                 ],
                 dom: 'Bfrtip',
                 buttons: [
-                    {
-                        extend: 'pdfHtml5',
-                        orientation: 'landscape',
-                        pageSize: 'LEGAL',
-                        customize: function (doc) {
-                            pdfMake.fonts = {
-                                hebrewFont: {
-                                    normal: 'Alef-Regular.ttf',
-                                    bold: 'Alef-Bold.ttf',
-                                    italics: 'Alef-Regular.ttf',
-                                    bolditalics: 'Alef-Bold.ttf'
-                                }
-                            };
-
-                            doc.defaultStyle = {
-                                font: 'hebrewFont'
-                            };
-                            console.log(doc);
-                        } 
-                    }
-                ],
-
-                xbuttons: [
-                    'csv', 'excel', 'pdf'
+                    K_DataTable_PDF_EXPORT
                 ]
+
             });
         },
         error: function (err) {
@@ -856,6 +868,9 @@ function refresh_amuta_vls_km_Table(start_date, end_date) {
                 bLengthChange: false,
                 data: records,
                 destroy: true,
+                "language": {
+                    "search": "חיפוש:"
+                },
                 columnDefs: [
                     { "orderData": [0, 1], "targets": 0 }],
                 columns: [
@@ -876,7 +891,8 @@ function refresh_amuta_vls_km_Table(start_date, end_date) {
                 ],
                 dom: 'Bfrtip',
                 buttons: [
-                   'csv', 'excel', 'pdf'
+                    K_DataTable_PDF_EXPORT,
+                    K_DataTable_CSV_EXPORT
                 ]
             });
         },
@@ -918,6 +934,9 @@ function refresh_amuta_vls_per_month_Table(start_date) {
                 bLengthChange: false,
                 data: arr_rides,
                 destroy: true,
+                "language": {
+                    "search": "חיפוש:"
+                },
                 columnDefs: [
                     { "orderData": [0, 1], "targets": 0 }],
                 columns: [
@@ -930,7 +949,7 @@ function refresh_amuta_vls_per_month_Table(start_date) {
  
 
                 buttons: [
-                    'csv', 'excel', 
+                    K_DataTable_CSV_EXPORT
                 ]
             });
         },
@@ -974,6 +993,9 @@ function refresh_pil_vls_per_month_Table(start_date, end_date) {
                 bLengthChange: false,
                 data: arr_rides,
                 destroy: true,
+                "language": {
+                    "search": "חיפוש:"
+                },
                 columnDefs: [
                     { "orderData": [0, 1], "targets": 0 }],
                 columns: [
@@ -999,7 +1021,7 @@ function refresh_pil_vls_per_month_Table(start_date, end_date) {
 
 
                 buttons: [
-                    'csv', 'excel',
+                    K_DataTable_CSV_EXPORT
                 ]
             });
         },
@@ -1041,6 +1063,9 @@ function refresh_pil_vl_ride_month_Table(start_date, end_date) {
                 bLengthChange: false,
                 data: records,
                 destroy: true,
+                "language": {
+                    "search": "חיפוש:"
+                },
                 columnDefs: [
                     { "orderData": [0, 1], "targets": 0 }],
                 columns: [
@@ -1050,7 +1075,7 @@ function refresh_pil_vl_ride_month_Table(start_date, end_date) {
                 dom: 'Bfrtip',
 
                 buttons: [
-                    'csv', 'excel',
+                    K_DataTable_CSV_EXPORT
                 ]
             });
         },
@@ -1088,6 +1113,9 @@ function refresh_amuta_vls_list_Table(query_object) {
                 bLengthChange: false,
                 data: arr_rides,
                 destroy: true,
+                "language": {
+                    "search": "חיפוש:"
+                },
                 columnDefs: [
                     { "orderData": [0, 1], "targets": 0 }],
                 columns: [
@@ -1105,7 +1133,7 @@ function refresh_amuta_vls_list_Table(query_object) {
 
 
                 buttons: [
-                    'csv', 'excel',
+                    K_DataTable_CSV_EXPORT
                 ]
             });
         },
@@ -1154,6 +1182,9 @@ function refresh_amuta_vls_per_pat_Table(patient) {
                 bLengthChange: false,
                 data: arr_rides,
                 destroy: true,
+                "language": {
+                    "search": "חיפוש:"
+                },
                 columnDefs: [
                     { "orderData": [0, 1], "targets": 0 }],
                 columns: [
@@ -1173,7 +1204,8 @@ function refresh_amuta_vls_per_pat_Table(patient) {
                 ],
                 dom: 'Bfrtip',
                 buttons: [
-                     'csv', 'excel', 'pdf'
+                    K_DataTable_PDF_EXPORT,
+                    K_DataTable_CSV_EXPORT
                 ]
             });
         },
@@ -1269,6 +1301,9 @@ function refreshTable(volunteerId, start_date, end_date) {
                 bLengthChange: false,
                 data: ridesToShow,
                 destroy: true,
+                "language": {
+                    "search": "חיפוש:"
+                },
                 columnDefs: [
                     { "orderData": [0, 3], "targets": 0 }],
                 columns: [
@@ -1281,7 +1316,8 @@ function refreshTable(volunteerId, start_date, end_date) {
                 ],
                 dom: 'Bfrtip',
                 buttons: [
-                     'csv', 'excel', 'pdf'
+                    K_DataTable_PDF_EXPORT,
+                    K_DataTable_CSV_EXPORT
                 ]
             });
         },
