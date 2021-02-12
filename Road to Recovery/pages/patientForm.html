@@ -352,6 +352,10 @@
             if (JSON.parse(GENERAL.PATIENTS.getPatientsList()).length != 0) {
                 arr_patient = JSON.parse(GENERAL.PATIENTS.getPatientsList());
                 if (arr_customer.func == "new") {
+                    $('#patientFirstName').prop('disabled', false);
+                    $('#patientLastName').prop('disabled', false);
+                    $('#patientEnglishName').prop('disabled', false);
+
                     document.getElementById("newEscort").disabled = true;
                     //generateBarrier();
                     //generateHospital();
@@ -897,7 +901,7 @@
                                                 <div class="form-group">
                                                     <label data-toggle="tooltip" title="اسم شخصي First Name" class="col-sm-2 control-label">שם פרטי&nbsp;</label>
                                                     <div class="col-sm-6">
-                                                        <input id="patientFirstName" name="patientFirstName" type="text" class="form-control">
+                                                        <input id="patientFirstName" name="patientFirstName" type="text" class="form-control" disabled>
                                                     </div>
                                                 </div>
                                             </div>
@@ -905,7 +909,7 @@
                                                 <div class="form-group">
                                                     <label data-toggle="tooltip" title="اسم العائلة  Last Name" class="col-sm-2 control-label">שם משפחה&nbsp;</label>
                                                     <div class="col-sm-6">
-                                                        <input id="patientLastName" name="patientLastName" type="text" class="form-control">
+                                                        <input id="patientLastName" name="patientLastName" type="text" class="form-control" disabled>
                                                     </div>
                                                 </div>
                                             </div>
@@ -915,7 +919,7 @@
                                                 <div class="form-group">
                                                     <label data-toggle="tooltip" title="Patient name in english" class="col-sm-2 control-label">שם באנגלית&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
-                                                        <input id="patientEnglishName" name="patientEnglishName" type="text" class="form-control">
+                                                        <input id="patientEnglishName" name="patientEnglishName" type="text" class="form-control"  disabled>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1241,7 +1245,6 @@
 
                 submitHandler: function (form, event) {
                     event.preventDefault();
-                    debugger;
 
                     var valid = validatePatientInputs();
                     if (!valid) return false;
@@ -1249,10 +1252,10 @@
                     var name = $("#patientFirstName").val().trim().replace(/\s\s+/g, ' ');
                     var lastName = $("#patientLastName").val().trim().replace(/\s\s+/g, ' ');
                     var englishName = $("#patientEnglishName").val().trim().replace(/\s\s+/g, ' ');
-                    if (isAssistant) {
-                        name = englishName;
-                        lastName = " ";
-                    }
+                    //if (isAssistant) {
+                    //    name = englishName;
+                    //    lastName = " ";
+                    //}
                     var phone = $("#phone1").val().trim().replace(/\s\s+/g, ' ');
                     if (phone != "") {
                         phone = phone.replace(/-/g, '');

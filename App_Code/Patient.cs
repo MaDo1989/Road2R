@@ -483,6 +483,39 @@ public class Patient
         History = _history;
     }
 
+    public List<Patient> GetPatients_slim(bool isActive)
+    {
+        List<Patient> patients = new List<Patient>();
+        Patient patient;
+        string query = "exec spPatient_GetPatients_slim @IsActive=" + isActive;
+
+        try
+        {
+            dbs = new DbService();
+            SqlDataReader sdr = dbs.GetDataReader(query);
+
+            while (sdr.Read())
+            {
+                patient = new Patient();
+                patient.Id = Convert.ToInt32(sdr["Id"]);
+                patient.PatientIdentity = String.IsNullOrEmpty(sdr["PatientIdentity"].ToString()) ? 0 : Convert.ToInt32(sdr["PatientIdentity"]);
+                patient.DisplayName = String.IsNullOrEmpty(sdr["DisplayName"].ToString())  ? "":  Convert.ToString(sdr["DisplayName"]);
+                patient.EnglishName = String.IsNullOrEmpty(sdr["EnglishName"].ToString())  ? "":  Convert.ToString(sdr["EnglishName"]);
+
+                patients.Add(patient);
+            }
+            return patients;
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+        finally
+        {
+            dbs.CloseConnection();
+        }
+    }
+
     //By Sufa
     //public List<Patient> getPatientsList(bool active)
     //{

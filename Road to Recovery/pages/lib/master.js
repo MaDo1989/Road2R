@@ -122,6 +122,7 @@ var GENERAL = {
             });
         }
     },
+
     USEFULL_FUNCTIONS: {
         convertDBDate2FrontEndDate: (fullTimeStempStr) => { // fullTimeStempStr = this form → "/Date(1608581640000)/"
             let startTrim = fullTimeStempStr.indexOf('(') + 1;
@@ -142,5 +143,9 @@ var GENERAL = {
             return days[day];
 
         }
+    },
+
+    COPYWRITE: () => {
+        return "2021 - 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה";
     }
 };

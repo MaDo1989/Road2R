@@ -61,6 +61,10 @@
         let { ajaxCall } = GENERAL.FETCH_DATA;
 
         $(document).ready(function () {
+
+            let { COPYWRITE } = GENERAL;
+            $('#rights').html(COPYWRITE());
+
             if (window.location.hostname.toString() == 'localhost' || window.location.pathname.toLowerCase().indexOf('test') != -1) {
                 $("#na").css("background-color", "#ffde89");
             }
@@ -488,16 +492,16 @@
                             <!--check boxs for filtering-->
                             <!--  <input id="thisUser" type="checkbox" checked="checked" onchange="refreshTable(document.getElementById('hourSelect').value)">-->
                             <!--<label for="thisUser">
-                                הודעות שלי בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
-                            </label>-->
+                        הודעות שלי בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
+                    </label>-->
                             <!--<input id="canceldRides" type="checkbox" onchange="refreshTable(document.getElementById('hourSelect').value)">
-                            <label for="canceldRides">
-                                הסעות שבוטלו  &nbsp;&nbsp;|&nbsp;&nbsp;
-                            </label>
-                            <input id="changedStatus" type="checkbox" onchange="refreshTable(document.getElementById('hourSelect').value)">
-                            <label for="changedStatus">
-                                שינוי סטטוס  &nbsp;&nbsp;|&nbsp;&nbsp;
-                            </label>-->
+                    <label for="canceldRides">
+                        הסעות שבוטלו  &nbsp;&nbsp;|&nbsp;&nbsp;
+                    </label>
+                    <input id="changedStatus" type="checkbox" onchange="refreshTable(document.getElementById('hourSelect').value)">
+                    <label for="changedStatus">
+                        שינוי סטטוס  &nbsp;&nbsp;|&nbsp;&nbsp;
+                    </label>-->
 
 
                             <div class="card-box table-responsive" id="log">
@@ -545,9 +549,9 @@
             </div>
             <!-- end content -->
             <!-- FOOTER -->
-            <footer class="footer text-right">
-                2020 - 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה
+            <footer id="rights" data-toggle="tooltip" data-placement="top" title="© All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء" class="footer text-right">
             </footer>
+
             <!-- End FOOTER -->
 
         </div>
