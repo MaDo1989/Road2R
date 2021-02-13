@@ -183,7 +183,14 @@ function process_permissions() {
 function init_components() {
     // Datatables date-time plugin
     $.fn.dataTable.moment('DD/MM/YYYY');
+
+    $.validator.addMethod("smallerThan",
+        function (value, element, param) {
+            var $otherElement = $(param);
+            return parseInt(value, 10) < parseInt($otherElement.val(), 10);
+        });
 }
+
 // Handle a click event on one of the reports in the Reports-Tree
 function on_report_click(event) {
 
@@ -209,6 +216,7 @@ var K_strategy = {
     "rp_amuta_vls_per_month": rp_amuta_vls_per_month__refresh_preview,
     "rp_pil_vls_per_month": rp_pil_vls_per_month__refresh_preview,
     "rp_pil_vl_ride_month": rp_pil_vl_ride_month__refresh_preview,
+    "rp_pil_vl_ride_recent_period": rp_pil_vl_ride_recent_period__refresh_preview,
 }
 
 
@@ -298,7 +306,17 @@ var K_fields_map = {
             type: "MONTH",
             post_clone: rp_pil_vl_ride_month__post_clone
         }
+    ],
+    "rp_pil_vl_ride_recent_period": [
+        {
+            id: "rp_pil_vl_ride_recent_period__fields",
+            template: 'div[name="template_RECENT_PERIOD"]',
+            type: "RECENT_PERIOD",
+            post_clone: rp_pil_vl_ride_recent_period__post_clone
+        }
     ]
+
+    
  }
 
 
@@ -742,6 +760,49 @@ function rp_pil_vl_ride_month__refresh_preview() {
 }   
 
 
+function rp_pil_vl_ride_recent_period__refresh_preview() {
+
+    let v = $("#params_ph").validate({
+        // Specify validation rules
+        rules: {
+            input_period_begin: {
+                required: true,
+                digits: true,
+                min: 1
+            },
+            input_period_end: {
+                required: true,
+                digits: true,
+                min: 1,
+                smallerThan: "#input_period_begin"
+            }
+        },
+        // Specify validation error messages
+        messages: {
+            input_period_begin: "הכנס מספר חיובי",
+            input_period_end: {
+                required: "הכנס מספר חיובי",
+                smallerThan: "הכנס מספר קטן מהמספר שלמעלה",
+            }
+        }
+    });
+
+    if (v.form()) {
+        var begin_str = $("#input_period_begin").val();
+        var end_str = $("#input_period_end").val();
+
+        $("#generate_report_period").attr("disabled", false);
+
+        //        refresh_pil_vl_ride_recent_period_Table(begin_str, end_str);
+    }
+    else {
+        $("#generate_report_period").attr("disabled", true);
+    }
+}   
+
+
+
+
 function rp_pil_vls_per_month__post_clone(id)
 {
     $("#select_year_ytd").change(rp_pil_vls_per_month__refresh_preview);
@@ -753,6 +814,14 @@ function rp_pil_vl_ride_month__post_clone(id) {
     populate_month_field();
     rp_pil_vl_ride_month__refresh_preview();
 }
+
+
+function rp_pil_vl_ride_recent_period__post_clone(id) {
+    $("#input_period_begin").keyup(rp_pil_vl_ride_recent_period__refresh_preview);
+    $("#input_period_end").keyup(rp_pil_vl_ride_recent_period__refresh_preview);
+    rp_pil_vl_ride_recent_period__refresh_preview();
+}
+
 
 
 function rp_pil_vls_per_month__refresh_preview() {
@@ -1089,6 +1158,62 @@ function refresh_pil_vl_ride_month_Table(start_date, end_date) {
 
 
 
+function refresh_pil_vl_ride_recent_period_Table(begin_str, end_str) {
+    hide_all_tables();
+
+
+    $('#wait').show();
+    var query_object = {
+        begin: begin_str,
+        end: end_str
+    };
+
+
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportSliceVolunteersInPeriod",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            $('#wait').hide();
+            var records = data.d;
+
+            $('#div_table_pil_vl_ride_recent_period').show();
+            tbl = $('#table_pil_vl_ride_recent_period').DataTable({
+                pageLength: 100,
+                bLengthChange: false,
+                data: records,
+                destroy: true,
+                "language": {
+                    "search": "חיפוש:"
+                },
+                columnDefs: [
+                    { "orderData": [0, 1], "targets": 0 }],
+                columns: [
+                    { data: "Volunteer" },
+                    { data: "CellPhone" },
+                ],
+                dom: 'Bfrtip',
+
+                buttons: [
+                    K_DataTable_CSV_EXPORT
+                ]
+            });
+        },
+        error: function (err) {
+            $('#wait').hide();
+        }
+
+    });
+
+}
+
+
 
 function refresh_amuta_vls_list_Table(query_object) {
     hide_all_tables();
@@ -1372,6 +1497,7 @@ function hide_all_tables() {
     $('#div_table_amuta_vls_per_month').hide();
     $("#div_table_pil_vls_per_month").hide();
     $("#div_table_pil_vl_ride_month").hide();
+    $("#div_table_pil_vl_ride_recent_period").hide();
  }
 
 
