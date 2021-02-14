@@ -940,6 +940,7 @@ public class Patient
                 p.Gender = sdr["Gender"].ToString();
                 p.Remarks = sdr["Remarks"].ToString();
                 p.EnglishName = sdr["EnglishName"].ToString();
+                p.IsAnonymous = String.IsNullOrEmpty(sdr["IsAnonymous"].ToString()) ? "" : sdr["IsAnonymous"].ToString();
                 if (sdr["PatientIdentity"].ToString() == "")
                 {
                     p.PatientIdentity = 0;
@@ -947,6 +948,7 @@ public class Patient
                 else p.PatientIdentity = int.Parse(sdr["PatientIdentity"].ToString());
 
                 p.Equipment = p.getEquipmentForPatient(p.displayName);
+                p.EscortedList = getescortedsList(p.DisplayName, "ridePatForm");
             }
             return p;
         }
@@ -960,7 +962,7 @@ public class Patient
         }
     }
 
-
+   
     //-------------------------------------------------------
     //-- Benny optimization
     //----------------------------------------
