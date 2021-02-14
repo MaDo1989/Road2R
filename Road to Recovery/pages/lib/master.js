@@ -121,7 +121,7 @@ var GENERAL = {
                 error: errorCB
             });
         },
-        ajaxCall_WithGzipMe: function (funcNameInWebService, data, successCB, errorCB, async=true) {
+        ajaxCall_WithGzipMe: function (funcNameInWebService, data, successCB, errorCB, async = true) {
             $.ajax({
                 dataType: "json",
                 url: `WebService.asmx/${funcNameInWebService}`,
@@ -158,7 +158,31 @@ var GENERAL = {
 
             return days[day];
 
-        }
+        },
+        buildStringforEquipment: (hebrewArr) => {
+            if (hebrewArr.length === 0) return "(None) אין";
+            let str = "";
+            for (var i = 0; i < hebrewArr.length; i++) {
+                switch (hebrewArr[i]) {
+
+                    case "כסא גלגלים":
+                        str += `${hebrewArr[i]} (Wheelchair), `;
+                        break;
+                    case "כסא תינוק":
+                        str += `${hebrewArr[i]} (Baby seat), `;
+                        break;
+                    case "קביים":
+                        str += `${hebrewArr[i]} (Crutches), `;
+                        break;
+                    case "בוסטר":
+                        str += `${hebrewArr[i]} (Buster), `;
+                        break;
+                }
+            }
+            str = str.substring(0, str.lastIndexOf(", "));
+            return str;
+        },
+
     },
 
     COPYWRITE: () => {
