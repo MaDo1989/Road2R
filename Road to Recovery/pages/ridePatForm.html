@@ -12,7 +12,7 @@
 
     <title>הסעת חולה</title>
 
-    <link href="../plugins/switchery/swiFtchery.min.css" rel="stylesheet" />
+    <!--<link href="../plugins/switchery/swiFtchery.min.css" rel="stylesheet" />-->
     <link href="assets/css/bootstrap-rtl.min.css" rel="stylesheet" type="text/css">
     <link href="assets/css/core.css" rel="stylesheet" type="text/css">
     <link href="assets/css/icons.css" rel="stylesheet" type="text/css">
@@ -58,7 +58,7 @@
     <script src="../plugins/timepicker/bootstrap-timepicker.min.js"></script>-->
     <!--Patient Autocomplete-->
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="/resources/demos/style.css">
+    <!-- <link rel="stylesheet" href="/resources/demos/style.css">-->
     <style>
         .sameWidthBtn {
             width: 170px;
@@ -145,7 +145,6 @@
     <!--<script src="lib/datepicker-he.js"></script>-->
     <script src="lib/includeHTML.js"></script>
     <script>
-        //1.בהסעה חדשה רק שדה שם חולה הוא write, אחרי שמזינים אותו הכל נפתח.
         checkCookie();
         arr_addressRows = [];
         $.jgrid.defaults.responsive = true;
@@ -190,8 +189,10 @@
         var hospitals = [];
         var isThisAReturnDrive = false;
         var rideNumberForNo;
-       // var secondModal = false;
+        // var secondModal = false;
         var CoordinatorForReturn;
+        let patients_JSONArray = [];
+        let { buildStringforEquipment } = GENERAL.USEFULL_FUNCTIONS;
 
         $(document).ready(function () {
             let { COPYWRITE } = GENERAL;
@@ -238,8 +239,12 @@
             //datePicker();
             loadPage();
             $("#pat").blur(function () {
-                fillData();
-                getEquipmentForAnonymousPatient()
+                // fillData();
+                //getEquipmentForAnonymousPatient()
+
+                let patientObj = patients_JSONArray.find(p => p.DisplayName === $('#pat').val());
+                patientObj ? getPatientById(patientObj.Id) : "";
+
             });
 
             $("#pat").keyup(function () {
@@ -260,8 +265,12 @@
             });
 
             $("#patEnglishName").blur(function () {
-                fillData();
-                getEquipmentForAnonymousPatient()
+                //fillData();
+                //getEquipmentForAnonymousPatient()
+
+                let patientObj = patients_JSONArray.find(p => p.EnglishName === $('#patEnglishName').val());
+                patientObj ? getPatientById(patientObj.Id) : "";
+
             });
 
             $("#patEnglishName").keyup(function () {
@@ -270,7 +279,9 @@
                 $("#PatientIdentity").val("");
             });
             $("#PatientIdentity").blur(function () {
-                fillData();
+                //  fillData();
+                let patientObj = patients_JSONArray.find(p => p.PatientIdentity === parseInt($('#PatientIdentity').val()));
+                patientObj ? getPatientById(patientObj.Id) : "";
             });
 
             $("#PatientIdentity").keyup(function () {
@@ -385,28 +396,14 @@
                         OnlyEscort = true;
                     }
 
-
                     //set Escorts
-                    var selected = [];
+                    let Escorts = [];
+                    let Escort = {};
                     $('#selectEscort input:checked').each(function () {
-                        //selected.push($(this).attr('name'));
-                        selected.push($(this).attr('id'));
+                        Escort = {};
+                        Escort.Id = parseInt($(this).attr('id'));
+                        Escorts.push(Escort);
                     });
-
-
-                    var Escorts = [];
-                    for (i in arr_escort) {
-                        for (j in selected) {
-                            //if (arr_escort[i].DisplayName.replace("'", "") == selected[j]) {
-                            if ("escortCB" + arr_escort[i].Id == selected[j]) {
-                                var Escorted = new Object();
-                                Escorted = arr_escort[i];
-                                Escorts.push(Escorted);
-                            }
-                        }
-                    }
-
-
 
                     //in case of different equipment than declared for anonymous ridepat.
                     var str = "";
@@ -615,7 +612,7 @@
                                         var DestIsHospital = hospitals.includes(request.RidePat.Destination.Name);
 
                                         if (driverInput_hasValue) {
-                                            currentDriverId = -1; 
+                                            currentDriverId = -1;
                                             addDriver(rideNumber);
                                         }
 
@@ -631,7 +628,7 @@
 
                                             $("#Modal").modal('show');
                                         }
-                                     
+
                                     },
                                     error: function (err) { alert("Error in CheckRidePat: " + err.responseText); }
                                 });
@@ -663,14 +660,14 @@
                                         console.log(returnDriveExist)
                                         var DestIsHospital = hospitals.includes(request.RidePat.Destination.Name);
                                         if (driverInput_hasValue) {
-                                            currentDriverId = -1; 
+                                            currentDriverId = -1;
                                             addDriver(rideNumber);
                                         }
 
                                         if (DestIsHospital && !returnDriveExist) {//offer a return ride
                                             document.getElementById('ModalTitle').innerHTML = 'הנסיעה נשמרה';
                                             document.getElementById('modalButtons').innerHTML += '<button onclick="createReturnRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn">יצירת החזרה &nbsp;<i class="ti-car m-r-5"></i></button>';
-                                            
+
                                             $("#Modal").modal('show');
 
                                         } else { // dont offer return drive
@@ -737,12 +734,59 @@
                     for (i in arr_hospitals) {
                         hospitals.push(arr_hospitals[i].Name)
                     }
-                    console.log(hospitals)
+                    // console.log(hospitals)
                 },
                 error: function (err) { alert("Error in getHospitalView: " + err.responseText); }
             });
 
         });
+
+        const getPatientById = (id) => {
+
+            const getPatientById_SCB = (data) => {
+                $('#wait').hide();
+                fillPage_withPatientData(JSON.parse(data.d));
+            }
+
+            const getPatientById_ECB = (err) => {
+                $('#wait').hide();
+                alert(err);
+            }
+
+            const { ajaxCall } = GENERAL.FETCH_DATA;
+            $('#wait').show();
+            ajaxCall('GetPatientById', JSON.stringify({ id }), getPatientById_SCB, getPatientById_ECB);
+
+        }
+
+        const fillPage_withPatientData = (patient) => {
+            localStorage.PatID = patient.Id;
+            $('#pat').val(patient.DisplayName);
+            $('#patEnglishName').val(patient.EnglishName);
+            $('#patArabic').val(patient.FirstNameA + " " + patient.LastNameA);
+            if (patient.EscortedList.length > 0) {
+                EscortedList = patient.EscortedList;
+                let str = '';
+
+                for (var i = 0; i < EscortedList.length; i++) {
+                    str += `<input id='escortCB${EscortedList[i].Id}' type=checkbox name='${EscortedList[i].EnglishName}'>&nbsp`;
+                    str += `<label data-toggle='tooltip' title='${EscortedList[i].EnglishName}' for='escortCB${EscortedList[i].Id}'>${EscortedList[i].DisplayName}</label>&nbsp&nbsp</br>`;
+                }
+                $("#selectEscort").html(str);
+            }
+
+            $('#remark').val(patient.Remarks);
+            $('#PatientIdentity').val(patient.PatientIdentity);
+            $('#Origin').val(patient.Barrier.Name);
+            $('#Origin').prop('disabled', false);
+            $('#Destination').val(patient.Hospital.Name);
+            $('#Destination').prop('disabled', false);
+            $('#Equipment').text(buildStringforEquipment(patient.Equipment));
+
+            $('#minute').prop('disabled', false);
+            $('#hour').prop('disabled', false);
+            $('#dateRide').prop('disabled', false);
+        }
 
         function returnRide() {
             ridePatNum = " ";
@@ -891,6 +935,45 @@
             return false;
         }
 
+        const getPatients_slim = () => {
+
+            const getPatients_slim_ECB = (err) => {
+                alert(err);
+            }
+
+            const getPatients_slim_SCB = (data) => {
+                patients_JSONArray = JSON.parse(data.d);
+
+                let patients_Names = [];//DisplayName
+                let patients_EnglishNames = [];//EnglishName
+                let patients_identityNum = [];//PatientIdentity
+
+                // if isAssistant - NO ANONYMOUSE
+                for (var i = 0; i < patients_JSONArray.length; i++) {
+
+                    patients_Names.push(patients_JSONArray[i].DisplayName.trim());
+                    patients_EnglishNames.push(patients_JSONArray[i].EnglishName.trim());
+                    patients_identityNum.push(patients_JSONArray[i].PatientIdentity.toString());
+                }
+
+                $("#pat").autocomplete({
+                    source: patients_Names
+                });
+                $("#patEnglishName").autocomplete({
+                    source: patients_EnglishNames
+                });
+                $("#PatientIdentity").autocomplete({
+                    source: patients_identityNum
+                });
+
+
+            }
+
+            const { ajaxCall_WithGzipMe } = GENERAL.FETCH_DATA;
+            ajaxCall_WithGzipMe('GetPatients_slim', JSON.stringify({ isActive: true }), getPatients_slim_SCB, getPatients_slim_ECB, false);
+        }
+        //OLD AND SLOW WAY TO GET PATIENTS FOR AUTO COMPLETE ↓
+        /*
         function generatePat() {
 
             var $select = $("#pat");
@@ -940,22 +1023,16 @@
                         arr_pat = arr_for_assistant;
                     }
 
-                    $("#pat").autocomplete({
-                        source: patients
-                    });
+
                     $("#driver").autocomplete({
                         source: drivers
                     });
-                    $("#patEnglishName").autocomplete({
-                        source: arr_englishNames
-                    });
+
 
                     $("#patArabic").autocomplete({
                         source: arr_arabNames
                     });
-                    $("#PatientIdentity").autocomplete({
-                        source: patientsIdentity
-                    });
+
 
                 },
                 error: function (err) {
@@ -965,6 +1042,8 @@
                 }
             });
         }
+        */
+        //OLD AND SLOW WAY TO GET PATIENTS FOR AUTO COMPLETE ↑
 
         function generatePatAnonymous(origin, destination) {
             var $select = $("#pat");
@@ -1691,23 +1770,7 @@
             $("#Destination option[value ='" + a + "']").prop('selected', true);
         }
 
-        const getPatients_slim = () => {
-
-            const getPatients_slim_ECB = (err) => {
-                alert(err);
-                console.log(err);
-            }
-
-            const getPatients_slim_SCB = (data) => {
-                console.log(JSON.parse(data.d));
-            }
-
-            const { ajaxCall_WithGzipMe } = GENERAL.FETCH_DATA;
-            ajaxCall_WithGzipMe('GetPatients_slim', JSON.stringify({ isActive: true }), getPatients_slim_SCB, getPatients_slim_ECB);
-        }
-
         function loadPage() {
-            getPatients_slim();
             var userType = GENERAL.USER.getUserType();
             if (userType != "מנהל") {
                 $("#coorDiv").hide();
@@ -1768,8 +1831,12 @@
                     $("#dirBTN").attr('disabled', 'disabled');
                     $("#patArabic").attr('disabled', 'disabled');
                     //$("#saveCustomer").attr('disabled', 'disabled');
+
                     generateStatus();
-                    generatePat();
+
+                    //generatePat();
+                    getPatients_slim();
+
                     getCoor();
                     generateLocation();
                     generateHour();
@@ -1789,7 +1856,8 @@
 
         //function to fill form for edit
         function uploadData(ridePatNum) {
-            generatePat();
+            //  generatePat();
+            getPatients_slim();
             generateLocation();
             generateHour();
             generateMinute();
@@ -1808,7 +1876,8 @@
 
 
                     ridePat = JSON.parse(data.d);
-                    console.log(ridePat)
+                    arr_escort = ridePat.Escorts;
+
 
 
                     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(ridePat));
@@ -1908,22 +1977,26 @@
                     }
 
                     $("#pat").val(ridePat.Pat.DisplayName);
-                    $("#pat").blur();
+
+                    fillPage_withPatientData(ridePat.Pat)
                     if (typeof arr_escort !== "undefined") {
 
-                        for (i in arr_escort) {
-                            if (ridePat.Pat.IsAnonymous == "True" && (ridePat.Status != 'ממתינה לשיבוץ')) {
-                                var Escorted = new Object();
-                                Escorted = arr_escort[i];
-                                checkEscorts.push(Escorted);
-                            }
-                            for (j in ridePat.Escorts) {
-                                //if (arr_escort[i].DisplayName == ridePat.Escorts[j].DisplayName) {
-                                //CHECK THIS XXXXXXX
-                                if (arr_escort[i].Id == ridePat.Escorts[j].Id) {
-                                    $("#escortCB" + arr_escort[i].Id).prop('checked', true);
-                                }
-                            }
+                        for (i in arr_escort) {//escortCB$
+                            $(`#escortCB${arr_escort[i].Id}`).prop('checked', true);
+
+
+                            //if (ridePat.Pat.IsAnonymous == "True" && (ridePat.Status != 'ממתינה לשיבוץ')) {
+                            //    var Escorted = new Object();
+                            //    Escorted = arr_escort[i];
+                            //    checkEscorts.push(Escorted);
+                            //}
+                            //for (j in ridePat.Escorts) {
+                            //    //if (arr_escort[i].DisplayName == ridePat.Escorts[j].DisplayName) {
+                            //    //CHECK THIS XXXXXXX
+                            //    if (arr_escort[i].Id == ridePat.Escorts[j].Id) {
+                            //        $("#escortCB" + arr_escort[i].Id).prop('checked', true);
+                            //    }
+                            //}
                         }
                     } else ($("#selectEscort").html("<label data-toggle='tooltip' title='No escorts'>אין מלווים</label>"));
 
@@ -1961,7 +2034,6 @@
 
 
                     rideData = arr_customer.RidePatNum;
-                    console.log("num: " + rideData);
                     if (rideData !== 1) {
                         var rideNumber = rideData;
 
@@ -2312,7 +2384,7 @@
 
             isThisAReturnDrive = true;
             localStorage.setItem("ReturnRidePatFlag", true);
-            
+
             returnRide();
             $("#afterNoon").attr('checked', 'checked');
             checkAfternoon();
@@ -2561,17 +2633,17 @@
                                         </div>
                                         <!--<div class="row m-l-10 m-r-10">
 
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label class="col-sm-2 control-label">מספר הסעה</label>
-                                                <div class="col-sm-6">
-                                                    <input id="ridePatNum" name="ridePatNum" type="text" class="form-control">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">מספר הסעה</label>
+                                                    <div class="col-sm-6">
+                                                        <input id="ridePatNum" name="ridePatNum" type="text" class="form-control">
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                        </div>
-                                    </div>-->
+                                            <div class="col-sm-6">
+                                            </div>
+                                        </div>-->
                                         <!--duplicate ride section-->
                                         <div class="row m-l-10 m-r-10" id="hideOnEdit">
                                             <div class="col-sm-6">
@@ -2646,10 +2718,10 @@
                                                 <input type="button" onclick="deleteDriverFromRide()" id="deleteDriver" class="btn btn-danger w-md waves-light m-b-5 m-r-15" value="הסרת נהג" />
 
                                                 <!--<div class="form-group" id="escortDiv">
-                                                <label data-toggle="tooltip" title="Patient escorts" class="col-sm-2 control-label">מלווים</label>
-                                                <div class="col-sm-6" id="selectEscort">
-                                                </div>
-                                            </div>-->
+                                                    <label data-toggle="tooltip" title="Patient escorts" class="col-sm-2 control-label">מלווים</label>
+                                                    <div class="col-sm-6" id="selectEscort">
+                                                    </div>
+                                                </div>-->
                                             </div>
 
                                         </div>
@@ -2683,33 +2755,33 @@
             </div>
             <!-- Modal -->
             <!--<div class="modal fade text-center" id="IgulModal" tabindex="-1" role="dialog" aria-labelledby="IgulModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2 class="modal-title" id="exampleModalLabel">תודה רבה</h2>
-                        <h3>הפרטים נשמרו</h3>
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title" id="exampleModalLabel">תודה רבה</h2>
+                            <h3>הפרטים נשמרו</h3>
 
-                    </div>
-                    <div class="modal-body">
-                        <div class="row m-l-10 m-r-10">
-                            <div class="col-sm-12 text-center">
-
-                                <h4>
-                                    האם תהיה מעוניין ליצור נסיעת חזרה?
-                                </h4>
-                            </div>
                         </div>
+                        <div class="modal-body">
+                            <div class="row m-l-10 m-r-10">
+                                <div class="col-sm-12 text-center">
 
-                    </div>
-                    <div class="modal-footer">
-                        <div class="col-sm-12 text-center">
-                            <button type="button" class="btn btn-primary" onclick="goToIgul()">כן</button>
-                            <button type="button" class="btn btn-secondary" onclick="reload()">לא</button>
+                                    <h4>
+                                        האם תהיה מעוניין ליצור נסיעת חזרה?
+                                    </h4>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <div class="col-sm-12 text-center">
+                                <button type="button" class="btn btn-primary" onclick="goToIgul()">כן</button>
+                                <button type="button" class="btn btn-secondary" onclick="reload()">לא</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>-->
+            </div>-->
             <!-- end container -->
         </div>
         <!-- end content -->
