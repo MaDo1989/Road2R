@@ -253,7 +253,6 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
-    //changed the return value from int to void for logentry
     [WebMethod(EnableSession = true)]
     public int setRideStatus(int rideId, string status)
     {
@@ -1248,10 +1247,6 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            if (displayName.IndexOf("'") != -1)
-            {
-                displayName = displayName.Replace("'", "''");
-            }
             Volunteer v = new Volunteer();
             v.DisplayName = displayName;
             v.deactivateCustomer(active);
@@ -1306,6 +1301,9 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
+
+
+
 
     [WebMethod(EnableSession = true)]
     public void deactivateLocation(string displayName, string active)
@@ -1386,6 +1384,23 @@ public class WebService : System.Web.Services.WebService
         {
             Log.Error("Error in getVolunteers", ex);
             throw new Exception("שגיאה בשליפת מתנדבים");
+        }
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    public string GetDrivers(bool isActive, bool isDriving)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+            List<Volunteer> drivers = new Volunteer().GetDrivers(isActive, isDriving);
+            return j.Serialize(drivers);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in getDrivers", ex);
+            throw new Exception(" שגיאה בשליפת נהגים " + ex.Message);
         }
 
     }
