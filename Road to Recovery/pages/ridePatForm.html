@@ -193,6 +193,10 @@
         var CoordinatorForReturn;
         let patients_JSONArray = [];
         let { buildStringforEquipment } = GENERAL.USEFULL_FUNCTIONS;
+        let patients_Names = []
+        let rideNumber = 0;
+        let x_wasClicked = false;
+
 
         $(document).ready(function () {
             let { COPYWRITE } = GENERAL;
@@ -253,11 +257,11 @@
                 $("#PatientIdentity").val("");
             });
 
-            $("#patArabic").blur(function () {
-                fillData();
-                getEquipmentForAnonymousPatient()
-            });
-
+            //$("#patArabic").blur(function () {
+            //    fillData();
+            //    getEquipmentForAnonymousPatient()
+            //});
+            ``
             $("#patArabic").keyup(function () {
                 $("#pat").val("");
                 $("#patEnglishName").val("");
@@ -290,11 +294,11 @@
                 $("#patArabic").val("");
             });
 
-            if (JSON.parse(localStorage.getItem("PatientNameForRide")) !== null) {
-                $("#pat").val(JSON.parse(localStorage.getItem("PatientNameForRide")));
-                fillData();
-                localStorage.setItem("PatientNameForRide", null);
-            }
+            //if (JSON.parse(localStorage.getItem("PatientNameForRide")) !== null) {
+            //    $("#pat").val(JSON.parse(localStorage.getItem("PatientNameForRide")));
+            //    fillData();
+            //    localStorage.setItem("PatientNameForRide", null);
+            //}
 
             // DO NOT REMOVE : GLOBAL FUNCTIONS!
             var errorClass = 'invalid';
@@ -330,6 +334,7 @@
                     },
                 },
                 submitHandler: function (form, event) {
+                    $('#wait').show();
                     event.preventDefault();
                     var valid = validateInputs();
                     if (!valid) return false;
@@ -546,10 +551,21 @@
 
                     }
                     else {
+                        if (x_wasClicked) {
+                            x_wasClicked = false;
+                            RidePat = {
+                                RidePatNum: rideNumber, Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Date: date, Remark: Remark,
+                                Escorts: Escorts, OnlyEscort: OnlyEscort
+                            }
 
-                        RidePat = {
-                            RidePatNum: RidePatNum, Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Date: date, Remark: Remark,
-                            Escorts: Escorts, OnlyEscort: OnlyEscort
+                        } else {
+                            RidePat = {
+                                RidePatNum: RidePatNum, Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Date: date, Remark: Remark,
+                                Escorts: Escorts, OnlyEscort: OnlyEscort
+                            }
+                            if (RidePat.RidePatNum === "") {
+                                RidePat.RidePatNum = 0;
+                            }
                         }
                     }
                     if (isThisAReturnDrive) {
@@ -557,8 +573,6 @@
                     } else {
                         var request = { RidePat: RidePat, func: func, isAnonymous: isAnonymous, numberOfRides: numberOfRides, repeatRideEvery: repeatRide }
                     }
-
-
                     var dataString = JSON.stringify(request);
                     localStorage.setItem("PatientNameForRide", null);
                     $.ajax({
@@ -566,19 +580,17 @@
                         url: "WebService.asmx/setRidePat",
                         contentType: "application/json; charset=utf-8",
                         type: "POST",
-                        async: false,
                         data: dataString,
                         success: function (data) {
                             //SaveAddresses(0, numberOfRecords, customerID);
-                            console.log("num: " + data.d);
-
+                            //    console.log("num: " + data.d);
                             if (data.d === 1) {
                                 //there is such a drive and status is not נמחקה
 
                                 data.d = data.d.toString();
                                 var temp = data.d.replace(/(?!^)(\d{2})(?=(?:\d{2})*$)/g, '/$1');
                                 //var dateToShow = data.d.replace(;
-
+                                $('#wait').hide();
                                 swal(
                                     "خطأ\nשגיאה",
                                     "קיימת כבר הסעה בתאריך " + date + " עם אותו החולה ואותן נקודות האיסוף\nيوجد سفرية بالتاريخ (التاريخ) مع نفس المريض ونفس نقطة الالتقاء",
@@ -604,7 +616,7 @@
                                     async: false,
                                     data: JSON.stringify({ RidePatBack }),
                                     success: function (data) {
-
+                                        $('#wait').hide();
                                         let driverInput_hasValue = ($('#driver').val() !== "");
 
                                         returnDriveExist = JSON.parse(data.d);
@@ -618,6 +630,9 @@
 
                                         if (DestIsHospital && !returnDriveExist) {//offer a return ride
                                             document.getElementById('ModalTitle').innerHTML = 'הנסיעה שוחזרה בהצלחה';
+
+                                            document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
+                                            document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות שלי<i class="ti-back-right m-r-5"></i></button>';
                                             document.getElementById('modalButtons').innerHTML += '<button onclick="createReturnRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn">יצירת החזרה &nbsp;<i class="ti-car m-r-5"></i></button>';
                                             $("#Modal").modal('show');
 
@@ -630,11 +645,11 @@
                                         }
 
                                     },
-                                    error: function (err) { alert("Error in CheckRidePat: " + err.responseText); }
+                                    error: function (err) { $('#wait').hide(); alert("Error in CheckRidePat: " + err.responseText); }
                                 });
                             }
                             else {
-                                var rideNumber = data.d;
+                                rideNumber = data.d;
                                 rideNumberForNo = rideNumber;
                                 //$('#Modal').modal('show');
                                 var returnDriveExist = false;
@@ -654,7 +669,7 @@
                                     async: false,
                                     data: JSON.stringify({ RidePatBack }),
                                     success: function (data) {
-
+                                        $('#wait').hide();
                                         let driverInput_hasValue = ($('#driver').val() !== "");
                                         returnDriveExist = JSON.parse(data.d);
                                         console.log(returnDriveExist)
@@ -666,6 +681,9 @@
 
                                         if (DestIsHospital && !returnDriveExist) {//offer a return ride
                                             document.getElementById('ModalTitle').innerHTML = 'הנסיעה נשמרה';
+
+                                            document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
+                                            document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות שלי<i class="ti-back-right m-r-5"></i></button>';
                                             document.getElementById('modalButtons').innerHTML += '<button onclick="createReturnRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn">יצירת החזרה &nbsp;<i class="ti-car m-r-5"></i></button>';
 
                                             $("#Modal").modal('show');
@@ -678,7 +696,7 @@
                                             $("#Modal").modal('show');
                                         }
                                     },
-                                    error: function (err) { alert("Error in CheckRidePat: " + err.responseText); }
+                                    error: function (err) { $('#wait').hide();alert("Error in CheckRidePat: " + err.responseText); }
                                 });
 
 
@@ -686,6 +704,7 @@
 
                         },
                         error: function (err) {
+                            $('#wait').hide();
                             console.log(err);
                             swal(
                                 "خطأ\nשגיאה",
@@ -734,7 +753,6 @@
                     for (i in arr_hospitals) {
                         hospitals.push(arr_hospitals[i].Name)
                     }
-                    // console.log(hospitals)
                 },
                 error: function (err) { alert("Error in getHospitalView: " + err.responseText); }
             });
@@ -776,6 +794,7 @@
             }
 
             $('#remark').val(patient.Remarks);
+            $('#remark').prop('disabled', false);
             $('#PatientIdentity').val(patient.PatientIdentity);
             $('#Origin').val(patient.Barrier.Name);
             $('#Origin').prop('disabled', false);
@@ -944,13 +963,15 @@
             const getPatients_slim_SCB = (data) => {
                 patients_JSONArray = JSON.parse(data.d);
 
-                let patients_Names = [];//DisplayName
+                patients_Names = [];//DisplayName
                 let patients_EnglishNames = [];//EnglishName
                 let patients_identityNum = [];//PatientIdentity
 
-                // if isAssistant - NO ANONYMOUSE
                 for (var i = 0; i < patients_JSONArray.length; i++) {
 
+                    if (isAssistant && patients_JSONArray[i].IsAnonymous === true) { //CHECK AND TEST
+                        continue;
+                    }
                     patients_Names.push(patients_JSONArray[i].DisplayName.trim());
                     patients_EnglishNames.push(patients_JSONArray[i].EnglishName.trim());
                     patients_identityNum.push(patients_JSONArray[i].PatientIdentity.toString());
@@ -972,7 +993,8 @@
             const { ajaxCall_WithGzipMe } = GENERAL.FETCH_DATA;
             ajaxCall_WithGzipMe('GetPatients_slim', JSON.stringify({ isActive: true }), getPatients_slim_SCB, getPatients_slim_ECB, false);
         }
-        //OLD AND SLOW WAY TO GET PATIENTS FOR AUTO COMPLETE ↓
+
+        //OLD AND SLOW WAY TO GET PATIENTS FOR AUTO COMPLETE ↓ disabled by Yogev
         /*
         function generatePat() {
 
@@ -1043,7 +1065,7 @@
             });
         }
         */
-        //OLD AND SLOW WAY TO GET PATIENTS FOR AUTO COMPLETE ↑
+        //OLD AND SLOW WAY TO GET PATIENTS FOR AUTO COMPLETE ↑ disabled by Yogev
 
         function generatePatAnonymous(origin, destination) {
             var $select = $("#pat");
@@ -1313,150 +1335,77 @@
 
         function validateInputs() {
 
-            var patientExists = false;
-            var patientAExists = false;
-            var Origin = true;
-            var Dest = true;
-            var driverExist = true;
-            var pat = document.forms["customerForm"]["pat"].value;
-            var pat2 = $("#pat").val().trim().replace(/\s\s+/g, ' ');
+            let patientExists = false;
+            let origin = $("#Origin").val();
+            let destination = $("#Destination").val();
+            let driverExist = true;
 
-            for (i in patients) {
-                if (pat2 == patients[i] || pat == patients[i]) {
-                    patientExists = true;
-                    break;
-                }
-            }
+            let patientName = $("#pat").val().trim();
 
-            var patA = $("#patArabic").val().trim().replace(/\s\s+/g, ' ');
-            for (i in arr_arabNames) {
-                if (patA == arr_arabNames[i]) {
-                    patientAExists = true;
+            for (var i = 0; i < patients_Names.length; i++) {
+                patientExists = patientName === patients_Names[i].trim();
+                if (patientExists) {
                     break;
                 }
             }
 
             if (!patientExists) {
-                swal(
+                return swal(
                     "خطأ\nשגיאה",
                     "يجب اختيار مريض من القائمة\nיש לבחור חולה מתוך הרשימה",
                     "warning"
                 );
             }
 
-            if (!patientAExists) {
-                swal(
-                    "خطأ\nשגיאה",
-                    "يجب عليك اختيار مريض من القائمة",
-                    "warning"
-                );
-            }
-
-            var Origin = $("#Origin").val();
-            if (Origin == "בחר מוצא") {
-                Origin = false
-                swal(
+            if (origin === "בחר מוצא" || origin === '') {
+                return swal(
                     "خطأ\nשגיאה",
                     "يجب اختيار نقطة انطلاق من القائمة\nיש לבחור מוצא מתוך הרשימה",
                     "warning"
                 );
             }
 
-            var Destination = $("#Destination").val();
-            if (Destination == "בחר יעד") {
-                Dest = false;
-                swal(
+            if (destination === "בחר יעד" || destination === '') {
+                return swal(
                     "خطأ\nשגיאה",
-                    "يجب اختيار نقطة انطلاق من القائمة\nיש לבחור מוצא מתוך הרשימה",
+                    "يجب اختيار نقطة انطلاق من القائمة\nיש לבחור יעד מתוך הרשימה",
                     "warning"
                 );
             }
 
-            //var date = $("#dateRide").val();
             var date = document.getElementById("dateRide").value;
-            //var reg = new RegExp("[0-9]{2}\/[0-9]{2}\/[0-9]{4}");
-            //var dateMatch = reg.test(date);
-            //if (!dateMatch) alert("התאריך שהוזן אינו חוקי");
             var Day = parseInt(date.substring(8));
             var Month = parseInt(date.substring(5, 7)) - 1;
             var Year = parseInt(date.substring(0, 4));
             date = new Date(Year, Month, Day, $("#hour").val(), $("#minute").val());
             futureDate = checkFutureDate(date);
             if (!futureDate) {
-                var r = confirm(" זמן ההסעה עבר, האם להמשיך?");
-                if (r == true) {
-                    futureDate = true;
-                }
-
-                //swal({
-                //    title: "זמן ההסעה עבר",
-                //    text: "האם תרצה להמשיך?",
-                //    type: "warning",
-                //    showCancelButton: true,
-                //    confirmButtonClass: "btn-warning",
-                //    confirmButtonText: "המשך",
-                //    cancelButtonText: "ביטול",
-                //    closeOnConfirm: true,
-                //    closeOnCancel: true,
-
-                //},
-                //function (isConfirm) {
-                //    if (isConfirm) {
-                //        futureDate = true;
-                //    }
-                //});
-
-                //swal("خطأ\nשגיאה",
-                //    "زمن السفرية قد مضى، الرجاء التصحيح\nזמן ההסעה עבר, נא לתקן",
-                //    "warning"
-                //);
+                return confirm(" זמן ההסעה עבר, האם להמשיך?"); //yes will return true and vice verse
             }
 
             var timeMatch = true;
             var aN = $("#afterNoon").is(':checked');
             if (!aN) {
                 if ($("#hour").val() == "שעות" || $("#minute").val() == "דקות") {
-                    swal(
+                    return swal(
                         "خطأ\nשגיאה",
                         "השעה שנבחרה אינה חוקית\nالساعة التي تم اختيارها غير ملائمة",
                         "warning"
                     );
-                    timeMatch = false;
                 }
             }
-
-
-
-            if ($("#onlyEscort").is(':checked')) {
-                var atLeastOneIsChecked = 0;
-                $('#selectEscort input:checked').each(function () {
-                    atLeastOneIsChecked++;
-                });
-                if (atLeastOneIsChecked == 0) {
-                    swal(
-                        "خطأ\nשגיאה",
-                        "يجب اختيار مرافق واحد على الاقل\nיש לבחור לפחות מלווה אחד",
-                        "warning"
-                    );
-                }
-            }
-
 
             if (drivers.indexOf($('#driver').val()) == -1 && ($('#driver').val() != "")) {
-                swal(
+                return swal(
                     "خطأ\nשגיאה",
                     "יש לבחור נהג מתוך הרשימה",
                     "warning"
                 );
-
-                driverExist = false;
             }
-
-            if (!patientExists || !Origin || !Dest || !timeMatch || atLeastOneIsChecked == 0 || !futureDate || !driverExist) { //|| !dateMatch
-                return false;
-            } else return true;
+            return true;
         }
 
+        /*
         function fillData() {
             //.trim().replace(/\s\s+/g, ' ')
             if (isCenterPoint) {
@@ -1646,6 +1595,7 @@
             }
 
         }
+        */
 
         function checkFutureDate(date) {
             //if ($("#afterNoon").is(':checked')) { //22:14 is the default time that means afternoon אחה''צ
@@ -1836,7 +1786,6 @@
 
                     //generatePat();
                     getPatients_slim();
-
                     getCoor();
                     generateLocation();
                     generateHour();
@@ -2139,23 +2088,25 @@
 
             $.ajax({
                 dataType: "json",
-                url: "WebService.asmx/getVolunteers",
+                url: "WebService.asmx/GetDrivers",
                 contentType: "application/json; charset=utf-8",
-                //beforeSend: function (xhr) {
-                //    xhr.setRequestHeader("Content-Encoding", "gzip");
-                //},
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-Encoding", "gzip");
+                },
                 type: "POST",
                 async: false,
-                data: JSON.stringify({ active: true }),
+                data: JSON.stringify({ isActive: true, isDriving: true }),
                 success: function (data) {
                     var arr_drivers = JSON.parse(data.d);
                     arr_drivers.sort();
                     for (i in arr_drivers) {
-                        //$('<option>', { value: arr_drivers[i].Id, text: arr_drivers[i].DisplayName }).appendTo($drivers);
 
                         drivers.push(arr_drivers[i].DisplayName)
                         driversID.push(arr_drivers[i].Id)
                     }
+                    $('#driver').autocomplete({
+                        source: drivers
+                    });
                 },
                 error: function (err) { alert("Error in generateDrivers"); }
             });
@@ -2387,6 +2338,7 @@
 
             returnRide();
             $("#afterNoon").attr('checked', 'checked');
+            $("#afterNoon").prop('disabled', false);
             checkAfternoon();
 
             dateForReturnRepeat = localStorage.getItem("dateForReturnRepeat");
@@ -2399,6 +2351,11 @@
             CoordinatorForReturn = $("#coordinator").val();
 
             $('#Modal').modal('hide');
+        }
+
+        const editThisRide = () => {
+            x_wasClicked = true;
+            arr_customer.func = 'edit';
         }
 
     </script>
@@ -2534,7 +2491,6 @@
                                                 </div>
                                             </div>
                                         </div>
-
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group" id="escortDiv">
@@ -2795,7 +2751,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="editThisRide()">
                         <span aria-hidden="true">&times;</span>
                     </button>
                     <h1 class="modal-title centerHeader" id="ModalTitle">הנסיעה נשמרה</h1>
