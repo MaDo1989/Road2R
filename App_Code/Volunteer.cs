@@ -1647,6 +1647,36 @@ public class Volunteer
 
         return v;
     }
+    
+    public List<Volunteer> GetDrivers(bool isActive, bool isDriving)
+    {
+        string query = "exec spVolunteer_GetDrivers @isActive=" + isActive + ", @isDriving=" + isDriving;
+        List<Volunteer> drivers = new List<Volunteer>();
+        Volunteer v;
+
+        try
+        {
+            dbs = new DbService();
+            SqlDataReader sdr = dbs.GetDataReader(query);
+            while (sdr.Read())
+            {
+                v = new Volunteer();
+                v.Id = Convert.ToInt32(sdr["Id"].ToString());
+                v.DisplayName = Convert.ToString(sdr["DisplayName"]);
+                drivers.Add(v);
+            }
+            return drivers;
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+        finally
+        {
+            dbs.CloseConnection();
+        }
+    }
+
     public List<string> getPrefArea(int id)
     {
         List<string> areas = new List<string>();
@@ -1915,7 +1945,24 @@ public class Volunteer
     {
         DbService db = new DbService();
         ChangeLastUpdateBy(0, DisplayName);
-        db.ExecuteQuery("UPDATE Volunteer SET IsActive='" + active + "', lastModified=DATEADD(hour, 2, SYSDATETIME()) WHERE displayName=N'" + DisplayName + "'");
+       
+        SqlCommand cmd = new SqlCommand();
+        cmd.CommandType = CommandType.Text;
+        SqlParameter[] cmdParams = new SqlParameter[2];
+
+        cmdParams[0] = cmd.Parameters.AddWithValue("@isActive", active);
+        cmdParams[1] = cmd.Parameters.AddWithValue("@displayName", DisplayName);
+
+        string query = "UPDATE Volunteer SET IsActive=@isActive, lastModified=DATEADD(hour, 2, SYSDATETIME()) WHERE displayName=@displayName";
+        try
+        {
+            dbs = new DbService();
+            dbs.ExecuteQuery(query, cmd.CommandType, cmdParams);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
 
     }
 
@@ -2478,17 +2525,22 @@ public class Volunteer
         if (volunteerId == 0 && displayname.Length > 0)
         {
             Volunteer v = getVolunteerByDisplayName(displayname);
-            if (v.DisplayName == displayname) loggedInName = v.DisplayName;
+            if (v.DisplayName == displayname && loggedInName == null) loggedInName = v.DisplayName;
             volunteerId = v.Id;
         }
 
-        string query = query = "exec spVolunteer_ChangeLastUpdateBy @lastUpdateBy=N'" + loggedInName + "', @id=" + volunteerId;
         SqlCommand cmd = new SqlCommand();
+        cmd.CommandType = CommandType.Text;
+        SqlParameter[] cmdParams = new SqlParameter[2];
 
+        cmdParams[0] = cmd.Parameters.AddWithValue("@loggedInName", loggedInName);
+        cmdParams[1] = cmd.Parameters.AddWithValue("@volunteerId", volunteerId);
+
+        string query = "exec spVolunteer_ChangeLastUpdateBy @lastUpdateBy=@loggedInName, @id=@volunteerId";
         try
         {
             dbs = new DbService();
-            dbs.ExecuteQuery(query);
+            dbs.ExecuteQuery(query, cmd.CommandType, cmdParams);
         }
         catch (Exception ex)
         {
