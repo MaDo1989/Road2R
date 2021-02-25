@@ -1431,7 +1431,7 @@
             //        name = false;
             //    }
             //}
-            if (englishName == "") {
+            if (!englishName) {
                 swal(
                     "שגיאה\nخطأ",
                     "Enter patient english name",
@@ -1447,7 +1447,7 @@
                 }
                 //}
             }
-            if (city == "") {
+            if (!city) {
                 CityExists = true;
             }
             if (!CityExists) {
@@ -1466,7 +1466,7 @@
                 );
             }
             var barrier = $("#barrier").val();
-            if (barrier == "") {
+            if (!barrier) {
                 barrier = false
                 swal(
                     "שגיאה",
@@ -1476,7 +1476,7 @@
             }
 
             var hospital = $("#hospital").val();
-            if (hospital == "") {
+            if (!hospital) {
                 hospital = false
                 swal(
                     "שגיאה",
