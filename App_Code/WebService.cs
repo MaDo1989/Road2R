@@ -253,7 +253,6 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
-    //changed the return value from int to void for logentry
     [WebMethod(EnableSession = true)]
     public int setRideStatus(int rideId, string status)
     {
@@ -372,8 +371,10 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
+            HttpResponse response = GzipMe();
             Patient p = new Patient();
             List<Patient> patients = p.GetPatients_slim(isActive);
+            j.MaxJsonLength = Int32.MaxValue; 
             return j.Serialize(patients);
         }
         catch (Exception ex)
@@ -503,7 +504,7 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
-    [WebMethod(EnableSession = true)]    
+    [WebMethod(EnableSession = true)]
     public string GetVolunteerById(int id)
     {
         try
@@ -908,7 +909,7 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-    
+
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -1246,10 +1247,6 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            if (displayName.IndexOf("'") != -1)
-            {
-                displayName = displayName.Replace("'", "''");
-            }
             Volunteer v = new Volunteer();
             v.DisplayName = displayName;
             v.deactivateCustomer(active);
@@ -1304,6 +1301,9 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
+
+
+
 
     [WebMethod(EnableSession = true)]
     public void deactivateLocation(string displayName, string active)
@@ -1389,6 +1389,23 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
+    public string GetDrivers(bool isActive, bool isDriving)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+            List<Volunteer> drivers = new Volunteer().GetDrivers(isActive, isDriving);
+            return j.Serialize(drivers);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in getDrivers", ex);
+            throw new Exception(" שגיאה בשליפת נהגים " + ex.Message);
+        }
+
+    }
+
+    [WebMethod(EnableSession = true)]
     public string getVolunteer(string displayName)
     {
         try
@@ -1452,7 +1469,7 @@ public class WebService : System.Web.Services.WebService
         try
         {
             HttpResponse response = GzipMe();
-           
+
             Location d = new Location();
             List<Location> destinationsList = d.getDestinationsListForView(active);
             //j.MaxJsonLength = int.MaxValue;
@@ -1635,7 +1652,7 @@ public class WebService : System.Web.Services.WebService
         return j.Serialize(coors);
     }
 
-    
+
     [WebMethod(EnableSession = true)]
     public string getCoordinatorsList_version_02()
     {

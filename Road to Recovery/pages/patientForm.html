@@ -1268,9 +1268,7 @@
                     var gender = $("#gender").val();
 
                     //birth date data
-                    if ($("#birthDate").val() != "")
-                        var Bdate = new Date($("#birthDate").val());
-                    else Bdate = new Date();
+                    let Bdate = $("#birthDate").val() !== '' ? new Date($("#birthDate").val()) : '';
 
                     //var birthDate = $("#birthDate").val();
                     //var Day = parseInt(birthDate.substring(0, 2));
@@ -1433,7 +1431,7 @@
             //        name = false;
             //    }
             //}
-            if (englishName == "") {
+            if (!englishName) {
                 swal(
                     "שגיאה\nخطأ",
                     "Enter patient english name",
@@ -1449,7 +1447,7 @@
                 }
                 //}
             }
-            if (city == "") {
+            if (!city) {
                 CityExists = true;
             }
             if (!CityExists) {
@@ -1468,7 +1466,7 @@
                 );
             }
             var barrier = $("#barrier").val();
-            if (barrier == "") {
+            if (!barrier) {
                 barrier = false
                 swal(
                     "שגיאה",
@@ -1478,7 +1476,7 @@
             }
 
             var hospital = $("#hospital").val();
-            if (hospital == "") {
+            if (!hospital) {
                 hospital = false
                 swal(
                     "שגיאה",
