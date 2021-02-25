@@ -347,9 +347,13 @@
                         numberOfRides = parseInt($("#numberOfRides").val());
                         repeatRide = $("#repeatRide").val();
                     }
-                    if (numberOfRides > 1) {
+                    if (numberOfRides > 1 && arr_customer.func === "new") {
                         var validRides = PrintRides(repeatRide, numberOfRides);
-                        if (!validRides) return false;
+
+                        if (!validRides) {
+                            $('#wait').hide();
+                            return false;
+                        }
                     }
 
                     localStorage.setItem("numberOfRides", numberOfRides);
@@ -696,7 +700,7 @@
                                             $("#Modal").modal('show');
                                         }
                                     },
-                                    error: function (err) { $('#wait').hide();alert("Error in CheckRidePat: " + err.responseText); }
+                                    error: function (err) { $('#wait').hide(); alert("Error in CheckRidePat: " + err.responseText); }
                                 });
 
 
@@ -1743,13 +1747,14 @@
                         $('#repeatRide').val(duplicateRidePat.repeatRide);
                         $('#numberOfRides').val(duplicateRidePat.numberOfRides);
                         $("#duplicateRidePat").prop("checked", true);
-                        $('#hideDuplicate').show();
+                        // $('#hideDuplicate').show();
                         console.log(duplicateRidePat)
 
                         localStorage.removeItem("duplicateRidePat");
                     }
 
                     uploadData(arr_customer.RidePatNum);
+                    $('#hideDuplicate').hide();
                     $("#hideOnEdit").addClass('duplicateDisplay');
 
                     if (arr_customer.func == "show") {
