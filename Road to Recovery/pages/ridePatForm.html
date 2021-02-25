@@ -337,7 +337,10 @@
                     $('#wait').show();
                     event.preventDefault();
                     var valid = validateInputs();
-                    if (!valid) return false;
+                    if (!valid) {
+                        $('#wait').hide();
+                        return false;
+                    }
                     var numberOfRides = 1;
                     var repeatRide = "";
                     if (anonymousName == "True") {
