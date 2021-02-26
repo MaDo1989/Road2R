@@ -51,6 +51,26 @@ public class WebService : System.Web.Services.WebService
     //    var a = 0;
     //}
 
+
+
+
+
+    [WebMethod(EnableSession = true)]
+    public double CpuPrefTesting(int rounds)
+    {
+
+        Random r = new Random();
+        double sum = 0;
+        for (int i = 0; i < rounds; i++)
+        {
+            double num = r.Next(1, 2);
+            sum += Math.Sin(num);
+        }
+
+        return sum;
+    }
+
+
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string isPrimaryStillCanceled(int driverID, int rideID)
@@ -374,7 +394,7 @@ public class WebService : System.Web.Services.WebService
             HttpResponse response = GzipMe();
             Patient p = new Patient();
             List<Patient> patients = p.GetPatients_slim(isActive);
-            j.MaxJsonLength = Int32.MaxValue; 
+            j.MaxJsonLength = Int32.MaxValue;
             return j.Serialize(patients);
         }
         catch (Exception ex)
