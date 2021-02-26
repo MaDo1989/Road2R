@@ -620,7 +620,7 @@
                                     url: "WebService.asmx/CheckRidePat",
                                     contentType: "application/json; charset=utf-8",
                                     type: "POST",
-                                    async: false,
+                                  //  async: false,
                                     data: JSON.stringify({ RidePatBack }),
                                     success: function (data) {
                                         $('#wait').hide();
@@ -673,7 +673,7 @@
                                     url: "WebService.asmx/CheckRidePat",
                                     contentType: "application/json; charset=utf-8",
                                     type: "POST",
-                                    async: false,
+                                   // async: false,
                                     data: JSON.stringify({ RidePatBack }),
                                     success: function (data) {
                                         $('#wait').hide();
@@ -753,7 +753,7 @@
                 url: "WebService.asmx/getHospitalView",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                async: false,
+              //  async: false,
                 data: JSON.stringify({ active: true }),
                 success: function (data) {
                     arr_hospitals = JSON.parse(data.d);
@@ -894,7 +894,7 @@
                 url: "WebService.asmx/pushAssistant",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                async: false,
+                //async: false,
                 data: JSON.stringify({ ridepat: ridepat, cellphone: user, msg: msg }),
                 error: pushAssistantErrorCB,
 
@@ -998,7 +998,7 @@
             }
 
             const { ajaxCall_WithGzipMe } = GENERAL.FETCH_DATA;
-            ajaxCall_WithGzipMe('GetPatients_slim', JSON.stringify({ isActive: true }), getPatients_slim_SCB, getPatients_slim_ECB, false);
+            ajaxCall_WithGzipMe('GetPatients_slim', JSON.stringify({ isActive: true }), getPatients_slim_SCB, getPatients_slim_ECB);//, false
         }
 
         //OLD AND SLOW WAY TO GET PATIENTS FOR AUTO COMPLETE ↓ disabled by Yogev
@@ -1084,7 +1084,7 @@
                     xhr.setRequestHeader("Content-Encoding", "gzip");
                 },
                 type: "POST",
-                async: false,
+                //async: false,
                 data: JSON.stringify({ active: true, origin: origin, dest: destination }),
                 success: function (data) {
                     arr_pat = JSON.parse(data.d);
@@ -1126,7 +1126,7 @@
                 url: "WebService.asmx/getAnonymousPatientsListForArea",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                async: false,
+                //async: false,
                 data: JSON.stringify({ active: true, origin: origin, dest: destination, area: area }),
                 success: function (data) {
                     arr_pat = JSON.parse(data.d);
@@ -1167,7 +1167,7 @@
                 url: "WebService.asmx/getSpaceInCar",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                async: false,
+               // async: false,
                 data: JSON.stringify({ ridePatNum: ridePatNumber, driverId: driverId }),
                 success: function (data) {
                     spaceInCar = JSON.parse(data.d);
@@ -1218,7 +1218,7 @@
                 url: "WebService.asmx/getPatientEscorted",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                async: false,
+              //  async: false,
                 data: JSON.stringify({ displayName: displayName, caller: "ridePatForm" }),
                 success: generateEscSuccessCB,
                 error: generateEscErrorCB
@@ -1306,7 +1306,7 @@
                     xhr.setRequestHeader("Content-Encoding", "gzip");
                 },
                 type: "POST",
-                async: false,
+             //   async: false,
                 data: JSON.stringify({ active: true }),
                 success: function (data) {
                     var arr_locations = JSON.parse(data.d);
@@ -2102,7 +2102,7 @@
                     xhr.setRequestHeader("Content-Encoding", "gzip");
                 },
                 type: "POST",
-                async: false,
+               // async: false,
                 data: JSON.stringify({ isActive: true, isDriving: true }),
                 success: function (data) {
                     var arr_drivers = JSON.parse(data.d);
