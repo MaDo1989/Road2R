@@ -1646,7 +1646,7 @@ public class Volunteer
 
         return v;
     }
-    
+
     public List<Volunteer> GetDrivers(bool isActive, bool isDriving)
     {
         string query = "exec spVolunteer_GetDrivers @isActive=" + isActive + ", @isDriving=" + isDriving;
@@ -1944,7 +1944,7 @@ public class Volunteer
     {
         DbService db = new DbService();
         ChangeLastUpdateBy(0, DisplayName);
-       
+
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
         SqlParameter[] cmdParams = new SqlParameter[2];
@@ -2520,6 +2520,19 @@ public class Volunteer
     private void ChangeLastUpdateBy(int volunteerId, string displayname = "")
     {
         string loggedInName = (string)HttpContext.Current.Session["loggedInName"];
+        if (String.IsNullOrEmpty(loggedInName))
+        {
+            if (volunteerId != 0)
+            {
+                Volunteer loggedInUser = getVolunteerByID(volunteerId);
+                loggedInName = loggedInUser.DisplayName;
+            }
+            else
+            {
+                loggedInName = "משתמש לא מזוהה";
+            }
+
+        }
 
         if (volunteerId == 0 && displayname.Length > 0)
         {
