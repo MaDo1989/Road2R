@@ -845,7 +845,6 @@ public class Volunteer
         //dont update reg id and device type if user is rakaz on a mission
         if (regId != "i_am_spy")
         {
-            ChangeLastUpdateBy(v.Id);
             //update reg id
             db = new DbService();
             var updateRegid = "update Volunteer set pnRegId=@REGID where Id=@ID";

@@ -1029,7 +1029,7 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
-            Log.Error("Error in CheckUser", ex);
+            Log.Error("Error in CheckVolunteerByMobile", ex);
             throw new Exception("שגיאה בבדיקת נתוני משתמש");
         }
 
@@ -1049,7 +1049,7 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
-            Log.Error("Error in CheckUser", ex);
+            Log.Error("Error in CheckVolunteerExtendedByMobile", ex);
             throw new Exception("שגיאה בבדיקת נתוני משתמש");
         }
 
@@ -1913,7 +1913,7 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
-            Log.Error("Error in WelcomePage method", ex);
+            Log.Error("Error in WelcomePage2 method", ex);
             throw new Exception("שגיאה בבדיקת נתוני משתמש");
         }
 
