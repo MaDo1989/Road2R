@@ -1114,8 +1114,8 @@ public class Patient
             ChangeLastUpdateBy(Id);
             cmdParams[16].ToString().Trim();
             query = "UPDATE Patient SET FirstNameH=@firstNameH,FirstNameA=@firstNameA,LastNameH=@lastNameH,";
-            query += "CellPhone=@cellPhone,CellPhone2=@cellPhone2,CityCityName=@city,IsActive=@IsActive,BirthDate=@birthDate,";                     //↓,DisplayName=@displayName
-            query += "HomePhone=@homePhone,History=@history,Department=@department,Barrier=@barrier,Hospital=@hospital,Gender=@gender,Remarks=@remarks,EnglishName=@englishName,PatientIdentity=@patientIdentity,lastModified=DATEADD(hour, 2, SYSDATETIME()) Where Id=" + Id;
+            query += "CellPhone=@cellPhone,CellPhone2=@cellPhone2,CityCityName=@city,IsActive=@IsActive,BirthDate=@birthDate,";                     
+            query += "HomePhone=@homePhone,History=@history,Department=@department,Barrier=@barrier,Hospital=@hospital,Gender=@gender,Remarks=@remarks, DisplayName=@displayName,EnglishName=@englishName,PatientIdentity=@patientIdentity,lastModified=DATEADD(hour, 2, SYSDATETIME()) Where Id=" + Id;
             db = new DbService();
             res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
             if (res > 0)
