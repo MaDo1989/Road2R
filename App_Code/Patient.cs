@@ -962,7 +962,7 @@ public class Patient
         }
     }
 
-   
+
     //-------------------------------------------------------
     //-- Benny optimization
     //----------------------------------------
@@ -1090,19 +1090,37 @@ public class Patient
         cmdParams[6] = cmd.Parameters.AddWithValue("@homePhone", HomePhone);
         cmdParams[7] = cmd.Parameters.AddWithValue("@city", City);
         cmdParams[8] = cmd.Parameters.AddWithValue("@IsActive", IsActive);
-        
+
         if (BirthDate == "")
             cmdParams[9] = cmd.Parameters.AddWithValue("@birthDate", DBNull.Value);
         else
             cmdParams[9] = cmd.Parameters.AddWithValue("@birthDate", BirthDate);
-       
+
         cmdParams[10] = cmd.Parameters.AddWithValue("@history", History);
         cmdParams[11] = cmd.Parameters.AddWithValue("@department", Department);
         cmdParams[12] = cmd.Parameters.AddWithValue("@barrier", Barrier.Name);
         cmdParams[13] = cmd.Parameters.AddWithValue("@hospital", Hospital.Name);
         cmdParams[14] = cmd.Parameters.AddWithValue("@gender", Gender);
         cmdParams[15] = cmd.Parameters.AddWithValue("@remarks", Remarks);
+
+
+        FirstNameH = FirstNameH.Trim();
+        LastNameH = LastNameH.Trim();
+
+        //handle situation when user insert full name twice. once to firstname and seconde to lastname
+        if (FirstNameH == LastNameH)
+        {
+            if (firstNameA.Contains(" ") && lastNameH.Contains(" "))
+            {
+                FirstNameH = firstNameH.Substring(0, firstNameH.IndexOf(" "));
+                LastNameH = LastNameH.Substring(LastNameH.IndexOf(" ") + 1, LastNameH.Length - FirstNameH.Length - 1);
+            }
+        }
+
         string displayName = FirstNameH + " " + LastNameH;
+
+
+
         cmdParams[16] = cmd.Parameters.AddWithValue("@displayName", displayName.Trim());
         cmdParams[17] = cmd.Parameters.AddWithValue("@englishName", EnglishName);
         cmdParams[18] = cmd.Parameters.AddWithValue("@patientIdentity", PatientIdentity);
@@ -1110,14 +1128,28 @@ public class Patient
         string query = "";
         if (func == "edit")
         {
-            //DisplayName=@displayName,
             ChangeLastUpdateBy(Id);
             cmdParams[16].ToString().Trim();
             query = "UPDATE Patient SET FirstNameH=@firstNameH,FirstNameA=@firstNameA,LastNameH=@lastNameH,";
-            query += "CellPhone=@cellPhone,CellPhone2=@cellPhone2,CityCityName=@city,IsActive=@IsActive,BirthDate=@birthDate,";                     
+            query += "CellPhone=@cellPhone,CellPhone2=@cellPhone2,CityCityName=@city,IsActive=@IsActive,BirthDate=@birthDate,";
             query += "HomePhone=@homePhone,History=@history,Department=@department,Barrier=@barrier,Hospital=@hospital,Gender=@gender,Remarks=@remarks, DisplayName=@displayName,EnglishName=@englishName,PatientIdentity=@patientIdentity,lastModified=DATEADD(hour, 2, SYSDATETIME()) Where Id=" + Id;
             db = new DbService();
-            res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+
+            try
+            {
+                res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 2627)
+                {
+                    // Violation in unique constraint
+                    displayName += "_" + CellPhone;
+                    cmdParams[16] = cmd.Parameters.AddWithValue("@displayName", displayName.Trim());
+                    res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+                }
+            }
+
             if (res > 0)
             {
                 query = "delete from Equipment_Patient where PatientId=" + Id;
