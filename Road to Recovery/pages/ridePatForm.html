@@ -413,7 +413,8 @@
                     let Escort = {};
                     $('#selectEscort input:checked').each(function () {
                         Escort = {};
-                        Escort.Id = parseInt($(this).attr('id'));
+                        let tempStr = $(this).attr('id'); //// for example: escortCB17
+                        Escort.Id = parseInt(tempStr.substring(tempStr.indexOf('B') + 1, tempStr.length));
                         Escorts.push(Escort);
                     });
 
