@@ -501,7 +501,8 @@ public class Patient
                 patient.PatientIdentity = String.IsNullOrEmpty(sdr["PatientIdentity"].ToString()) ? 0 : Convert.ToInt32(sdr["PatientIdentity"]);
                 patient.DisplayName = String.IsNullOrEmpty(sdr["DisplayName"].ToString()) ? "" : Convert.ToString(sdr["DisplayName"]);
                 patient.EnglishName = String.IsNullOrEmpty(sdr["EnglishName"].ToString()) ? "" : Convert.ToString(sdr["EnglishName"]);
-
+                patient.IsAnonymous = String.IsNullOrEmpty(sdr["IsAnonymous"].ToString()) ? "False" : Convert.ToString(sdr["IsAnonymous"]);
+              
                 patients.Add(patient);
             }
             return patients;
