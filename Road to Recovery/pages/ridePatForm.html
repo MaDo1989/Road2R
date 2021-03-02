@@ -808,6 +808,7 @@
             $('#Origin').prop('disabled', false);
             $('#Destination').val(patient.Hospital.Name);
             $('#Destination').prop('disabled', false);
+            $("#dirBTN").prop('disabled', false);
             $('#Equipment').text(buildStringforEquipment(patient.Equipment));
 
             $('#minute').prop('disabled', false);
@@ -977,7 +978,7 @@
 
                 for (var i = 0; i < patients_JSONArray.length; i++) {
 
-                    if (isAssistant && patients_JSONArray[i].IsAnonymous === true) { //CHECK AND TEST
+                    if (isAssistant && patients_JSONArray[i].IsAnonymous === 'True') { 
                         continue;
                     }
                     patients_Names.push(patients_JSONArray[i].DisplayName.trim());
