@@ -986,6 +986,9 @@
                     patients_identityNum.push(patients_JSONArray[i].PatientIdentity.toString());
                 }
 
+                patients_Names.sort();
+                patients_EnglishNames.sort();
+
                 $("#pat").autocomplete({
                     source: patients_Names
                 });
@@ -1073,8 +1076,6 @@
                 }
             });
         }
-        */
-        //OLD AND SLOW WAY TO GET PATIENTS FOR AUTO COMPLETE ↑ disabled by Yogev
 
         function generatePatAnonymous(origin, destination) {
             var $select = $("#pat");
@@ -1119,7 +1120,6 @@
                 error: function (err) { alert("Error in getPatientsForAnonymous"); }
             });
         }
-
         function getAnonymousPatientsListForArea(origin, destination, area) {
             var $select = $("#pat");
             $('#wait').show();
@@ -1161,6 +1161,10 @@
                 error: function (err) { alert("Error in getPatientsForAnonymous"); }
             });
         }
+
+
+        */
+        //OLD AND SLOW WAY TO GET PATIENTS FOR AUTO COMPLETE ↑ disabled by Yogev
 
         function genarteAvailbaleSeats() {
             var ridePatNumber = parseInt($("#ridePatNum").val());
@@ -1906,7 +1910,7 @@
                         var origin = ridePat.Origin.Name;
                         var destination = ridePat.Destination.Name;
                         isCenterPoint = true;
-                        getAnonymousPatientsListForArea(origin, destination, area);
+                        //getAnonymousPatientsListForArea(origin, destination, area);
                     }
                     //else if (ridePat.Pat.IsAnonymous == "True") {
 
