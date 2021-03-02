@@ -261,7 +261,7 @@
             //    fillData();
             //    getEquipmentForAnonymousPatient()
             //});
-            ``
+
             $("#patArabic").keyup(function () {
                 $("#pat").val("");
                 $("#patEnglishName").val("");
@@ -284,8 +284,13 @@
             });
             $("#PatientIdentity").blur(function () {
                 //  fillData();
-                let patientObj = patients_JSONArray.find(p => p.PatientIdentity === parseInt($('#PatientIdentity').val()));
-                patientObj ? getPatientById(patientObj.Id) : "";
+                if ($('#pat').val() === '') { //due to the fact some patient still have 0 as their identity when 
+                    //we blur from there it brings the first one who has 0 as its identity 
+
+                    let patientObj = patients_JSONArray.find(p => p.PatientIdentity === parseInt($('#PatientIdentity').val()));
+                    patientObj ? getPatientById(patientObj.Id) : "";
+                }
+
             });
 
             $("#PatientIdentity").keyup(function () {
@@ -621,7 +626,7 @@
                                     url: "WebService.asmx/CheckRidePat",
                                     contentType: "application/json; charset=utf-8",
                                     type: "POST",
-                                  //  async: false,
+                                    //  async: false,
                                     data: JSON.stringify({ RidePatBack }),
                                     success: function (data) {
                                         $('#wait').hide();
@@ -674,7 +679,7 @@
                                     url: "WebService.asmx/CheckRidePat",
                                     contentType: "application/json; charset=utf-8",
                                     type: "POST",
-                                   // async: false,
+                                    // async: false,
                                     data: JSON.stringify({ RidePatBack }),
                                     success: function (data) {
                                         $('#wait').hide();
@@ -754,7 +759,7 @@
                 url: "WebService.asmx/getHospitalView",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-              //  async: false,
+                //  async: false,
                 data: JSON.stringify({ active: true }),
                 success: function (data) {
                     arr_hospitals = JSON.parse(data.d);
@@ -978,7 +983,7 @@
 
                 for (var i = 0; i < patients_JSONArray.length; i++) {
 
-                    if (isAssistant && patients_JSONArray[i].IsAnonymous === 'True') { 
+                    if (isAssistant && patients_JSONArray[i].IsAnonymous === 'True') {
                         continue;
                     }
                     patients_Names.push(patients_JSONArray[i].DisplayName.trim());
@@ -1006,7 +1011,9 @@
             ajaxCall_WithGzipMe('GetPatients_slim', JSON.stringify({ isActive: true }), getPatients_slim_SCB, getPatients_slim_ECB, false);
         }
 
-        //OLD AND SLOW WAY TO GET PATIENTS FOR AUTO COMPLETE ↓ disabled by Yogev
+        //#region  OLD AND SLOW WAY TO GET PATIENTS FOR AUTO COMPLETE AND UNNECESARY OLD FUNCTIONALITY ↓ disabled by Yogev
+
+
         /*
         function generatePat() {
 
@@ -1164,7 +1171,8 @@
 
 
         */
-        //OLD AND SLOW WAY TO GET PATIENTS FOR AUTO COMPLETE ↑ disabled by Yogev
+
+        //#endregion OLD AND SLOW WAY TO GET PATIENTS FOR AUTO COMPLETE AND UNNECESARY OLD FUNCTIONALITY ↑ disabled by Yogev
 
         function genarteAvailbaleSeats() {
             var ridePatNumber = parseInt($("#ridePatNum").val());
@@ -1173,7 +1181,7 @@
                 url: "WebService.asmx/getSpaceInCar",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-               // async: false,
+                // async: false,
                 data: JSON.stringify({ ridePatNum: ridePatNumber, driverId: driverId }),
                 success: function (data) {
                     spaceInCar = JSON.parse(data.d);
@@ -1224,7 +1232,7 @@
                 url: "WebService.asmx/getPatientEscorted",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-              //  async: false,
+                //  async: false,
                 data: JSON.stringify({ displayName: displayName, caller: "ridePatForm" }),
                 success: generateEscSuccessCB,
                 error: generateEscErrorCB
@@ -1312,7 +1320,7 @@
                     xhr.setRequestHeader("Content-Encoding", "gzip");
                 },
                 type: "POST",
-             //   async: false,
+                //   async: false,
                 data: JSON.stringify({ active: true }),
                 success: function (data) {
                     var arr_locations = JSON.parse(data.d);
@@ -2108,7 +2116,7 @@
                     xhr.setRequestHeader("Content-Encoding", "gzip");
                 },
                 type: "POST",
-               // async: false,
+                // async: false,
                 data: JSON.stringify({ isActive: true, isDriving: true }),
                 success: function (data) {
                     var arr_drivers = JSON.parse(data.d);
