@@ -245,8 +245,7 @@
             $("#pat").blur(function () {
                 // fillData();
                 //getEquipmentForAnonymousPatient()
-
-                let patientObj = patients_JSONArray.find(p => p.DisplayName === $('#pat').val());
+                let patientObj = patients_JSONArray.find(p => p.DisplayName.trim() === $('#pat').val().trim());
                 patientObj ? getPatientById(patientObj.Id) : "";
 
             });
@@ -272,7 +271,7 @@
                 //fillData();
                 //getEquipmentForAnonymousPatient()
 
-                let patientObj = patients_JSONArray.find(p => p.EnglishName === $('#patEnglishName').val());
+                let patientObj = patients_JSONArray.find(p => p.EnglishNam.trim() === $('#patEnglishName').val().trim());
                 patientObj ? getPatientById(patientObj.Id) : "";
 
             });
@@ -284,8 +283,8 @@
             });
             $("#PatientIdentity").blur(function () {
                 //  fillData();
-                if ($('#pat').val() === '') { //due to the fact some patient still have 0 as their identity when 
-                    //we blur from there it brings the first one who has 0 as its identity 
+                if ($('#pat').val() === '') { //due to the fact some patient still have 0 as their identity when
+                    //we blur from there it brings the first one who has 0 as its identity
 
                     let patientObj = patients_JSONArray.find(p => p.PatientIdentity === parseInt($('#PatientIdentity').val()));
                     patientObj ? getPatientById(patientObj.Id) : "";
