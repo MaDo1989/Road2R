@@ -271,7 +271,7 @@
                 //fillData();
                 //getEquipmentForAnonymousPatient()
 
-                let patientObj = patients_JSONArray.find(p => p.EnglishNam.trim() === $('#patEnglishName').val().trim());
+                let patientObj = patients_JSONArray.find(p => p.EnglishName.trim() === $('#patEnglishName').val().trim());
                 patientObj ? getPatientById(patientObj.Id) : "";
 
             });
