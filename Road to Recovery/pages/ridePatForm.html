@@ -347,9 +347,13 @@
                     }
                     var numberOfRides = 1;
                     var repeatRide = "";
-                    if (anonymousName == "True") {
-                        isAnonymous = true;
-                    }
+
+
+                    //if (anonymousName == "True") {
+                    //    isAnonymous = true;
+                    //}
+
+
                     if ($("#duplicateRidePat").is(':checked')) {
                         numberOfRides = parseInt($("#numberOfRides").val());
                         repeatRide = $("#repeatRide").val();
@@ -790,6 +794,7 @@
         }
 
         const fillPage_withPatientData = (patient) => {
+            isAnonymous = patient.IsAnonymous === 'True';
             localStorage.PatID = patient.Id;
             $('#pat').val(patient.DisplayName);
             $('#patEnglishName').val(patient.EnglishName);

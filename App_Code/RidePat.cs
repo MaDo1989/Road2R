@@ -415,16 +415,16 @@ public class RidePat
             DateTime newDate = new DateTime();
             for (int i = 0; i < numberOfRides; i++)
             {
+                
                 RidePat ridePatView = CheckRidePat_V2(ridePat, isAnonymous);
-
-                /* YOGEV - REMOVED IT:
+                /* YOGEV - REPLACED IT: ↑↓ 
                 if (CheckRidePat(ridePat, isAnonymous))
                 {
                     return 1;
                 }
                 */
 
-                if (ridePatView.RidePatNum != 0 && ridePatView.Status != "נמחקה")
+                if (ridePatView.RidePatNum != 0 && ridePatView.Status != "נמחקה" && !isAnonymous)
                 {
                     return 1; // there is an issue - don't create new drive 
                 }
