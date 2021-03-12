@@ -901,7 +901,8 @@
                                                 <div class="form-group">
                                                     <label data-toggle="tooltip" title="اسم شخصي First Name" class="col-sm-2 control-label">שם פרטי&nbsp;</label>
                                                     <div class="col-sm-6">
-                                                        <input id="patientFirstName" name="patientFirstName" type="text" class="form-control" disabled>
+                                                        <input id="patientFirstName" name="patientFirstName" type="text" class="form-control">
+                                                        <!--disabled  -->
                                                     </div>
                                                 </div>
                                             </div>
@@ -909,7 +910,8 @@
                                                 <div class="form-group">
                                                     <label data-toggle="tooltip" title="اسم العائلة  Last Name" class="col-sm-2 control-label">שם משפחה&nbsp;</label>
                                                     <div class="col-sm-6">
-                                                        <input id="patientLastName" name="patientLastName" type="text" class="form-control" disabled>
+                                                        <input id="patientLastName" name="patientLastName" type="text" class="form-control">
+                                                        <!-- disabled -->
                                                     </div>
                                                 </div>
                                             </div>
@@ -919,7 +921,8 @@
                                                 <div class="form-group">
                                                     <label data-toggle="tooltip" title="Patient name in english" class="col-sm-2 control-label">שם באנגלית&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
-                                                        <input id="patientEnglishName" name="patientEnglishName" type="text" class="form-control"  disabled>
+                                                        <input id="patientEnglishName" name="patientEnglishName" type="text" class="form-control">
+                                                        <!-- disabled -->
                                                     </div>
                                                 </div>
                                             </div>
@@ -1268,9 +1271,7 @@
                     var gender = $("#gender").val();
 
                     //birth date data
-                    if ($("#birthDate").val() != "")
-                        var Bdate = new Date($("#birthDate").val());
-                    else Bdate = new Date();
+                    let Bdate = $("#birthDate").val() !== '' ? new Date($("#birthDate").val()) : '';
 
                     //var birthDate = $("#birthDate").val();
                     //var Day = parseInt(birthDate.substring(0, 2));
@@ -1433,7 +1434,7 @@
             //        name = false;
             //    }
             //}
-            if (englishName == "") {
+            if (!englishName) {
                 swal(
                     "שגיאה\nخطأ",
                     "Enter patient english name",
@@ -1449,7 +1450,7 @@
                 }
                 //}
             }
-            if (city == "") {
+            if (!city) {
                 CityExists = true;
             }
             if (!CityExists) {
@@ -1468,7 +1469,7 @@
                 );
             }
             var barrier = $("#barrier").val();
-            if (barrier == "") {
+            if (!barrier) {
                 barrier = false
                 swal(
                     "שגיאה",
@@ -1478,7 +1479,7 @@
             }
 
             var hospital = $("#hospital").val();
-            if (hospital == "") {
+            if (!hospital) {
                 hospital = false
                 swal(
                     "שגיאה",

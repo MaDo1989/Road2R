@@ -415,16 +415,16 @@ public class RidePat
             DateTime newDate = new DateTime();
             for (int i = 0; i < numberOfRides; i++)
             {
+                
                 RidePat ridePatView = CheckRidePat_V2(ridePat, isAnonymous);
-
-                /* YOGEV - REMOVED IT:
+                /* YOGEV - REPLACED IT: ↑↓ 
                 if (CheckRidePat(ridePat, isAnonymous))
                 {
                     return 1;
                 }
                 */
 
-                if (ridePatView.RidePatNum != 0 && ridePatView.Status != "נמחקה")
+                if (ridePatView.RidePatNum != 0 && ridePatView.Status != "נמחקה" && !isAnonymous)
                 {
                     return 1; // there is an issue - don't create new drive 
                 }
@@ -811,8 +811,7 @@ public class RidePat
         }
         else rp.RideNum = -1;
         rp.OnlyEscort = Convert.ToBoolean(dr["OnlyEscort"].ToString());
-        rp.pat.DisplayName = dr["DisplayName"].ToString();
-        rp.pat.IsAnonymous = dr["IsAnonymous"].ToString();
+        rp.Pat = rp.Pat.GetPatientById(Convert.ToInt32(dr["Id"]));
         rp.Drivers = new List<Volunteer>();
         if (dr["MainDriver"].ToString() != "")
         {

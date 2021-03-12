@@ -169,7 +169,23 @@ public class myPushNot
         //Console.WriteLine("GCM Notification Sent!");
     };
 
+        return;
+
+                                                                            /*
+                                                                     =======================================================
+                                                                     ||       --- !!!  IMPORTANT NOTE !!! ---             ||
+                                                                     ||                                                   ||
+                                                                     ||         AS FOR 26.02.2021 Yogev&Benny Canceled    ||
+                                                                     ||          all PUSH NOTIFICATIONS FOLLOWED BY       ||
+                                                                     ||                  AMIR'S REQUEST                   ||
+                                                                     ||                                                   ||
+                                                                     ||       --- !!!  IMPORTANT NOTE !!! ---             ||
+                                                                     =======================================================
+                                                                     */
+
         // Start the broker
+
+        /*
         gcmBroker.Start();
 
 
@@ -199,6 +215,7 @@ public class myPushNot
         // This isn't done after every message, but after you're
         // done with the broker
         gcmBroker.Stop();
+        */
     }
 
 }
