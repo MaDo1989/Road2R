@@ -1,6 +1,7 @@
 ﻿// Purpose: JS code for the reports UI
 
 
+
 // 24-Nov:  Avishai
 //1.  . מספר המתנדבים השונים שהסיעו בכל חודש בשנתיים האחרונות. 
 
@@ -788,12 +789,7 @@ function rp_pil_vl_ride_recent_period__refresh_preview() {
     });
 
     if (v.form()) {
-        var begin_str = $("#input_period_begin").val();
-        var end_str = $("#input_period_end").val();
-
         $("#generate_report_period").attr("disabled", false);
-
-        //        refresh_pil_vl_ride_recent_period_Table(begin_str, end_str);
     }
     else {
         $("#generate_report_period").attr("disabled", true);
@@ -801,6 +797,13 @@ function rp_pil_vl_ride_recent_period__refresh_preview() {
 }   
 
 
+function rp_pil_vl_ride_recent_period__generate()
+{
+    var start_str = $("#input_period_begin").val();
+    var end_str = $("#input_period_end").val();
+    refresh_pil_vl_ride_recent_period_Table(start_str, end_str);
+
+}
 
 
 function rp_pil_vls_per_month__post_clone(id)
@@ -819,6 +822,7 @@ function rp_pil_vl_ride_month__post_clone(id) {
 function rp_pil_vl_ride_recent_period__post_clone(id) {
     $("#input_period_begin").keyup(rp_pil_vl_ride_recent_period__refresh_preview);
     $("#input_period_end").keyup(rp_pil_vl_ride_recent_period__refresh_preview);
+    $("#generate_report_period").click(rp_pil_vl_ride_recent_period__generate);
     rp_pil_vl_ride_recent_period__refresh_preview();
 }
 
@@ -1158,14 +1162,14 @@ function refresh_pil_vl_ride_month_Table(start_date, end_date) {
 
 
 
-function refresh_pil_vl_ride_recent_period_Table(begin_str, end_str) {
+function refresh_pil_vl_ride_recent_period_Table(start_number, end_number) {
     hide_all_tables();
 
 
     $('#wait').show();
     var query_object = {
-        begin: begin_str,
-        end: end_str
+        start_number: start_number,
+        end_number: end_number
     };
 
 
@@ -1196,7 +1200,8 @@ function refresh_pil_vl_ride_recent_period_Table(begin_str, end_str) {
                     { "orderData": [0, 1], "targets": 0 }],
                 columns: [
                     { data: "Volunteer" },
-                    { data: "CellPhone" },
+                    { data: "CityCityName" },
+                    { data: "CellPhone" }
                 ],
                 dom: 'Bfrtip',
 

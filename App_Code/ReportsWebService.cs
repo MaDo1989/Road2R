@@ -247,6 +247,29 @@ public class ReportsWebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public List<ReportService.VolunteersInPeriod> GetReportSliceVolunteersInPeriod(string start_number, string end_number)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+            int delta_start =  0 - Int32.Parse(start_number);
+            int delta_end = 0 - Int32.Parse(end_number);
+            
+            ReportService report = new ReportService();
+            List<ReportService.VolunteersInPeriod> r = report.GetReportSliceVolunteersInPeriod(delta_start, delta_end);
+            return r;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReportSliceVolunteersInPeriod", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string GetPatientsDisplayNames()
     {
         try
