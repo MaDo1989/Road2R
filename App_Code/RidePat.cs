@@ -444,7 +444,10 @@ public class RidePat
                 string CoordinatorID = u.getIdByUserName(Coordinator.DisplayName);
                 cmdParams[8] = cmd.Parameters.AddWithValue("@coordinatorID", CoordinatorID);
 
-
+                #region THE OLD WAY WE DELT WITH TIMEZONE CHANGE YOGEV COMMENT IT OUT
+                //THE SOLUTION IS TO CONVERT THE CLIENT SIDE DATE TO UTC(0)
+                //PLUS IT CAME TO A POINT IT DOESNT WORK ANY MORE
+                /*
                 if (newDate != new DateTime() && checkDaylightSaving)
                 {
                     bool DateDaylightSaving = Date.IsDaylightSavingTime();
@@ -469,7 +472,9 @@ public class RidePat
                     }
                 }
 
-
+                */
+                #endregion
+               
                 string query = "insert into RidePat (Patient,Origin,Destination,PickupTime,Coordinator,Remark,OnlyEscort,Area,CoordinatorId,lastModified) values (@pat,@origin,@destination,@date,@coordinator,@remark,@onlyEscort,@Area,@coordinatorID,DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
                 RidePatNum = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
 
