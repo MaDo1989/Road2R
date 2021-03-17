@@ -411,7 +411,7 @@ public class RidePat
 
         if (func == "new") //Insert new RidePat to DB
         {
-            bool checkDaylightSaving = true;
+            //bool checkDaylightSaving = true;
             DateTime newDate = new DateTime();
             for (int i = 0; i < numberOfRides; i++)
             {
