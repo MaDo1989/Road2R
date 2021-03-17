@@ -415,7 +415,7 @@ public class RidePat
             DateTime newDate = new DateTime();
             for (int i = 0; i < numberOfRides; i++)
             {
-                
+
                 RidePat ridePatView = CheckRidePat_V2(ridePat, isAnonymous);
                 /* YOGEV - REPLACED IT: ↑↓ 
                 if (CheckRidePat(ridePat, isAnonymous))
@@ -474,7 +474,7 @@ public class RidePat
 
                 */
                 #endregion
-               
+
                 string query = "insert into RidePat (Patient,Origin,Destination,PickupTime,Coordinator,Remark,OnlyEscort,Area,CoordinatorId,lastModified) values (@pat,@origin,@destination,@date,@coordinator,@remark,@onlyEscort,@Area,@coordinatorID,DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
                 RidePatNum = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
 
@@ -530,7 +530,7 @@ public class RidePat
         else if (func == "edit") //Edit existing RidePat in DB
         {
             RidePatNum = ridePat.RidePatNum;
-            
+
             //SET THE COORDINATOR NAME IN RIDEPAT TABLE TO THE LAST ONE WHO TOUCHED THIS RIDEPAT 
             ChangeCoordinatoor(RidePatNum);
 
@@ -569,6 +569,7 @@ public class RidePat
                 cmd2.CommandType = CommandType.Text;
                 SqlParameter[] cmdParams2 = new SqlParameter[3];
 
+
                 foreach (Escorted e in Escorts)
                 {
                     cmdParams2[0] = cmd2.Parameters.AddWithValue("@pat", Pat.Id);
@@ -576,16 +577,18 @@ public class RidePat
                     cmdParams2[2] = cmd2.Parameters.AddWithValue("@Escort", e.Id);
                     query2 = "insert into [PatientEscort_PatientInRide (RidePat)] ([PatientEscortPatientId],[PatientEscortEscortId],[PatientInRide (RidePat)RidePatNum]) values (@pat,@Escort,@ridePatNum);";
                     DbService db2 = new DbService();
-                    try
-                    {
-                        // db2.ExecuteQuery(query2);
-                        res += db2.ExecuteQuery(query2, cmd2.CommandType, cmdParams2);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw ex;
 
-                    }
+
+                        try
+                        {
+                            // db2.ExecuteQuery(query2);
+                            res += db2.ExecuteQuery(query2, cmd2.CommandType, cmdParams2);
+                        }
+                        catch (Exception ex)
+                        {
+                       //     throw ex;
+
+                        }
                 }
 
             }
@@ -2092,10 +2095,10 @@ public class RidePat
     /// </summary>
     private void ChangeCoordinatoor(int ridePatNum)
     {
-        string loggedInName = (string)HttpContext.Current.Session["loggedInName"]; 
+        string loggedInName = (string)HttpContext.Current.Session["loggedInName"];
 
 
-        string query = "exec spRidePat_ChangeCoordinatorName @coordinatorName=N'"+ loggedInName + "', @RidePatNum=" + ridePatNum;
+        string query = "exec spRidePat_ChangeCoordinatorName @coordinatorName=N'" + loggedInName + "', @RidePatNum=" + ridePatNum;
         SqlCommand cmd = new SqlCommand();
 
         try
