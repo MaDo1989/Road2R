@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
@@ -577,6 +577,14 @@ public class RidePat
                     cmdParams2[2] = cmd2.Parameters.AddWithValue("@Escort", e.Id);
                     query2 = "insert into [PatientEscort_PatientInRide (RidePat)] ([PatientEscortPatientId],[PatientEscortEscortId],[PatientInRide (RidePat)RidePatNum]) values (@pat,@Escort,@ridePatNum);";
                     DbService db2 = new DbService();
+                    try
+                    {
+                        // db2.ExecuteQuery(query2);
+                        res += db2.ExecuteQuery(query2, cmd2.CommandType, cmdParams2);
+                    }
+                    catch (Exception ex)
+                    {
+                      //  throw ex;
 
 
                         try
