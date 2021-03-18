@@ -1315,30 +1315,42 @@
             }
         }
 
-        function generateLocation() {
-            var $select = $("#Origin");
-            var $select1 = $("#Destination");
-            $.ajax({
-                dataType: "json",
-                url: "WebService.asmx/getDestinationView",
-                contentType: "application/json; charset=utf-8",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("Content-Encoding", "gzip");
-                },
-                type: "POST",
-                //   async: false,
-                data: JSON.stringify({ active: true }),
-                success: function (data) {
-                    var arr_locations = JSON.parse(data.d);
-                    arr_locations.sort();
-                    for (i in arr_locations) {
+        async function generateLocation() {
 
-                        $('<option>', { value: arr_locations[i].Name, text: arr_locations[i].EnglishName }).appendTo($select);
-                        $('<option>', { value: arr_locations[i].Name, text: arr_locations[i].EnglishName }).appendTo($select1);
+            return new Promise((resolve, reject) => {
+                $('#wait').show();
 
+                var $select = $("#Origin");
+                var $select1 = $("#Destination");
+                $.ajax({
+                    dataType: "json",
+                    url: "WebService.asmx/getDestinationView",
+                    contentType: "application/json; charset=utf-8",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("Content-Encoding", "gzip");
+                    },
+                    type: "POST",
+                    //   async: false,
+                    data: JSON.stringify({ active: true }),
+                    success: function (data) {
+
+                        var arr_locations = JSON.parse(data.d);
+                        arr_locations.sort();
+                        for (i in arr_locations) {
+
+                            $('<option>', { value: arr_locations[i].Name, text: arr_locations[i].EnglishName }).appendTo($select);
+                            $('<option>', { value: arr_locations[i].Name, text: arr_locations[i].EnglishName }).appendTo($select1);
+                        }
+
+                        $('#wait').hide();
+                        return resolve(1);
+                    },
+                    error: function (err) {
+                        $('#wait').hide();
+                        alert("Error in generateLocation");
+                        return reject(0);
                     }
-                },
-                error: function (err) { alert("Error in generateLocation"); }
+                });
             });
         }
 
@@ -1832,254 +1844,260 @@
         }
 
         //function to fill form for edit
-        function uploadData(ridePatNum) {
+        async function uploadData(ridePatNum) {
             //  generatePat();
             getPatients_slim();
-            generateLocation();
-            generateHour();
-            generateMinute();
-            generateStatus();
+            generateLocation()
+                .then((result) => {
 
-            $('#wait').show();
-            $.ajax({
-                dataType: "json",
-                url: "WebService.asmx/getRidePat",
-                contentType: "application/json; charset=utf-8",
-                type: "POST",
-                data: JSON.stringify({ ridePatNum: ridePatNum }),
-                success: function (data) {
+                    generateHour();
+                    generateMinute();
+                    generateStatus();
 
-
-
-
-                    ridePat = JSON.parse(data.d);
-                    arr_escort = ridePat.Escorts;
+                    $('#wait').show();
+                    $.ajax({
+                        dataType: "json",
+                        url: "WebService.asmx/getRidePat",
+                        contentType: "application/json; charset=utf-8",
+                        type: "POST",
+                        data: JSON.stringify({ ridePatNum: ridePatNum }),
+                        success: function (data) {
 
 
 
-                    GENERAL.RIDEPAT.setRidePatList(JSON.stringify(ridePat));
 
-                    var temp = ridePat.Date.substring(ridePat.Date.indexOf("(") + 1, ridePat.Date.indexOf(")"))
-                    var date = new Date(parseInt(temp));
-                    day = date.getDay();
-                    var dayArr = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
-                    var dayName = dayArr[day];
-                    var day = date.getDate();
-                    var month = date.getMonth() + 1;
-                    var year = date.getFullYear();
-                    var hours = date.getHours();
-                    var minutes = date.getMinutes();
-                    if (hours < 10) hours = "0" + hours;
-                    if (minutes < 10) minutes = minutes + "0";
-                    if (day < 10) day = "0" + day;
-                    if (month < 10) month = "0" + month;
-                    date = year + "-" + month + "-" + day;
-
-                    //rdate = ryear + "-" + rmonth + "-" + rday;
-                    document.getElementById("dateRide").value = date;
-
-                    if (hours + ":" + minutes == "22:14") {
-                        $("#afterNoon").attr('checked', 'checked');
-                        checkAfternoon();
-
-                    } else {
-                        $("#hour option[value='" + hours + "']").prop('selected', true);
-                        $("#minute option[value='" + minutes + "']").prop('selected', true);
-                    }
-                    if (ridePat.Status != 'ממתינה לשיבוץ') {
-                        rideStatusForFields = 1;
-                    }
-
-                    //editing anonymous ridepat only if a driver assigned to the ride.
-                    if ((ridePat.Pat.IsAnonymous == "True") && (ridePat.Status != 'ממתינה לשיבוץ')) {
-
-                        //$("#afterNoon").attr('disabled', 'disabled');
-                        $("#Origin").attr('disabled', 'disabled');
-                        $("#Destination").attr('disabled', 'disabled');
-                        //$("#hour").attr('disabled', 'disabled');
-                        //$("#minute").attr('disabled', 'disabled');
-                        $("#dateRide").attr('disabled', 'disabled');
-                        $("#dirBTN").attr('disabled', 'disabled');
-                    }
-                    if (ridePat.Pat.IsAnonymous == "True") {
-                        var area = "";
-                        //if(ridePat.Pat.DisplayName.indexOf('מרכז') !== -1){
-                        //    area="מרכז";
-                        //}
-                        //if(ridePat.Pat.DisplayName.indexOf('דרום') !== -1){
-                        //    area="דרום";
-                        //}
-                        //if(ridePat.Pat.DisplayName.indexOf('ירושלים') !== -1){
-                        //    area="ירושלים";
-                        //}
-                        //if(ridePat.Pat.DisplayName.indexOf('צפון') !== -1){
-                        //    area="צפון";
-                        //}
-                        //if (ridePat.Pat.DisplayName.indexOf('ארז') !== -1) {
-                        //    area = "ארז";
-                        //}
-                        //if (ridePat.Pat.DisplayName.indexOf('תרקומיא') !== -1) {
-                        //    area = "תרקומיא";
-                        //}
-                        var origin = ridePat.Origin.Name;
-                        var destination = ridePat.Destination.Name;
-                        isCenterPoint = true;
-                        //getAnonymousPatientsListForArea(origin, destination, area);
-                    }
-                    //else if (ridePat.Pat.IsAnonymous == "True") {
-
-                    //    var origin = ridePat.Origin.Name;
-                    //    var destination = ridePat.Destination.Name;
-                    //    generatePatAnonymous(origin, destination);
-                    //}
-
-                    if (ridePat.OnlyEscort) $("#onlyEscort").prop('checked', true);
-                    $("#ridePatNum").val(ridePat.RidePatNum);
+                            ridePat = JSON.parse(data.d);
+                            arr_escort = ridePat.Escorts;
 
 
-                    RideId = ridePat.RideNum;
-                    ridePatId = ridePat.RidePatNum;
-                    if (ridePat.Drivers.length > 0) {
-                        //$('#Driver').val(ridePat.Drivers[0].Id)
 
-                        var driverIDindex = driversID.indexOf(ridePat.Drivers[0].Id);
+                            GENERAL.RIDEPAT.setRidePatList(JSON.stringify(ridePat));
 
+                            var temp = ridePat.Date.substring(ridePat.Date.indexOf("(") + 1, ridePat.Date.indexOf(")"))
+                            var date = new Date(parseInt(temp));
+                            day = date.getDay();
+                            var dayArr = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+                            var dayName = dayArr[day];
+                            var day = date.getDate();
+                            var month = date.getMonth() + 1;
+                            var year = date.getFullYear();
+                            var hours = date.getHours();
+                            var minutes = date.getMinutes();
+                            if (hours < 10) hours = "0" + hours;
+                            if (minutes < 10) minutes = minutes + "0";
+                            if (day < 10) day = "0" + day;
+                            if (month < 10) month = "0" + month;
+                            date = year + "-" + month + "-" + day;
 
-                        $('#driver').val(drivers[driverIDindex])
-                        currentDriverId = ridePat.Drivers[0].Id;
-                        $('#deleteDriver').show();
-                    } else {
-                        currentDriverId = -1; // There is no driver assigned to the ride
+                            //rdate = ryear + "-" + rmonth + "-" + rday;
+                            document.getElementById("dateRide").value = date;
 
-                    }
+                            if (hours + ":" + minutes == "22:14") {
+                                $("#afterNoon").attr('checked', 'checked');
+                                checkAfternoon();
 
-                    $("#pat").val(ridePat.Pat.DisplayName);
+                            } else {
+                                $("#hour option[value='" + hours + "']").prop('selected', true);
+                                $("#minute option[value='" + minutes + "']").prop('selected', true);
+                            }
+                            if (ridePat.Status != 'ממתינה לשיבוץ') {
+                                rideStatusForFields = 1;
+                            }
 
-                    fillPage_withPatientData(ridePat.Pat)
-                    if (typeof arr_escort !== "undefined") {
+                            //editing anonymous ridepat only if a driver assigned to the ride.
+                            if ((ridePat.Pat.IsAnonymous == "True") && (ridePat.Status != 'ממתינה לשיבוץ')) {
 
-                        for (i in arr_escort) {//escortCB$
-                            $(`#escortCB${arr_escort[i].Id}`).prop('checked', true);
+                                //$("#afterNoon").attr('disabled', 'disabled');
+                                $("#Origin").attr('disabled', 'disabled');
+                                $("#Destination").attr('disabled', 'disabled');
+                                //$("#hour").attr('disabled', 'disabled');
+                                //$("#minute").attr('disabled', 'disabled');
+                                $("#dateRide").attr('disabled', 'disabled');
+                                $("#dirBTN").attr('disabled', 'disabled');
+                            }
+                            if (ridePat.Pat.IsAnonymous == "True") {
+                                var area = "";
+                                //if(ridePat.Pat.DisplayName.indexOf('מרכז') !== -1){
+                                //    area="מרכז";
+                                //}
+                                //if(ridePat.Pat.DisplayName.indexOf('דרום') !== -1){
+                                //    area="דרום";
+                                //}
+                                //if(ridePat.Pat.DisplayName.indexOf('ירושלים') !== -1){
+                                //    area="ירושלים";
+                                //}
+                                //if(ridePat.Pat.DisplayName.indexOf('צפון') !== -1){
+                                //    area="צפון";
+                                //}
+                                //if (ridePat.Pat.DisplayName.indexOf('ארז') !== -1) {
+                                //    area = "ארז";
+                                //}
+                                //if (ridePat.Pat.DisplayName.indexOf('תרקומיא') !== -1) {
+                                //    area = "תרקומיא";
+                                //}
+                                var origin = ridePat.Origin.Name;
+                                var destination = ridePat.Destination.Name;
+                                isCenterPoint = true;
+                                //getAnonymousPatientsListForArea(origin, destination, area);
+                            }
+                            //else if (ridePat.Pat.IsAnonymous == "True") {
 
-
-                            //if (ridePat.Pat.IsAnonymous == "True" && (ridePat.Status != 'ממתינה לשיבוץ')) {
-                            //    var Escorted = new Object();
-                            //    Escorted = arr_escort[i];
-                            //    checkEscorts.push(Escorted);
+                            //    var origin = ridePat.Origin.Name;
+                            //    var destination = ridePat.Destination.Name;
+                            //    generatePatAnonymous(origin, destination);
                             //}
-                            //for (j in ridePat.Escorts) {
-                            //    //if (arr_escort[i].DisplayName == ridePat.Escorts[j].DisplayName) {
-                            //    //CHECK THIS XXXXXXX
-                            //    if (arr_escort[i].Id == ridePat.Escorts[j].Id) {
-                            //        $("#escortCB" + arr_escort[i].Id).prop('checked', true);
-                            //    }
-                            //}
+
+                            if (ridePat.OnlyEscort) $("#onlyEscort").prop('checked', true);
+                            $("#ridePatNum").val(ridePat.RidePatNum);
+
+
+                            RideId = ridePat.RideNum;
+                            ridePatId = ridePat.RidePatNum;
+                            if (ridePat.Drivers.length > 0) {
+                                //$('#Driver').val(ridePat.Drivers[0].Id)
+
+                                var driverIDindex = driversID.indexOf(ridePat.Drivers[0].Id);
+
+
+                                $('#driver').val(drivers[driverIDindex])
+                                currentDriverId = ridePat.Drivers[0].Id;
+                                $('#deleteDriver').show();
+                            } else {
+                                currentDriverId = -1; // There is no driver assigned to the ride
+
+                            }
+
+                            $("#pat").val(ridePat.Pat.DisplayName);
+
+                            fillPage_withPatientData(ridePat.Pat)
+                            if (typeof arr_escort !== "undefined") {
+
+                                for (i in arr_escort) {//escortCB$
+                                    $(`#escortCB${arr_escort[i].Id}`).prop('checked', true);
+
+
+                                    //if (ridePat.Pat.IsAnonymous == "True" && (ridePat.Status != 'ממתינה לשיבוץ')) {
+                                    //    var Escorted = new Object();
+                                    //    Escorted = arr_escort[i];
+                                    //    checkEscorts.push(Escorted);
+                                    //}
+                                    //for (j in ridePat.Escorts) {
+                                    //    //if (arr_escort[i].DisplayName == ridePat.Escorts[j].DisplayName) {
+                                    //    //CHECK THIS XXXXXXX
+                                    //    if (arr_escort[i].Id == ridePat.Escorts[j].Id) {
+                                    //        $("#escortCB" + arr_escort[i].Id).prop('checked', true);
+                                    //    }
+                                    //}
+                                }
+                            } else ($("#selectEscort").html("<label data-toggle='tooltip' title='No escorts'>אין מלווים</label>"));
+
+                            //ridePat.Origin.EnglishName = ridePat.Origin.EnglishName.replace("'", "\\'");
+                            //$("#selectOrigin option[value='" + ridePat.Origin.EnglishName + "']").prop('selected', true);
+                            //ridePat.Destination.EnglishName = ridePat.Destination.EnglishName.replace("'", "\\'");
+                            //$("#selectDestination option[value='" + ridePat.Destination.EnglishName + "']").prop('selected', true);
+                            ridePat.Origin.Name = ridePat.Origin.Name.replace("'", "\\'");
+                            $("#selectOrigin option[value='" + ridePat.Origin.Name + "']").prop('selected', true);
+                            ridePat.Destination.Name = ridePat.Destination.Name.replace("'", "\\'");
+                            $("#selectDestination option[value='" + ridePat.Destination.Name + "']").prop('selected', true);
+
+                            if (ridePat.Pat.IsAnonymous == "True") {
+                                currentOrigin = ridePat.Origin.Name;
+                                currentDestination = ridePat.Destination.Name;
+                            }
+
+
+                            //$("#dateRide").val(date);
+
+
+                            $("#coordinator").val(ridePat.Coordinator.DisplayName);
+
+                            $("#remark").val(ridePat.Remark);
+
+                            $("#statusRidePat option[value='" + ridePat.Status + "']").prop('selected', true);
+                            //anonymousName = ridePat.Pat.DisplayName;
+                            isWaiting = ridePat.Status;
+                            if (ridePat.Drivers.length > 0) {
+                                driverId = ridePat.Drivers[0].Id;
+                            }
+                            $('#wait').hide();
+                            $('#driversDiv').show();
+                            $("#lastModified").val(ridePat.LastModified);
+
+
+                            rideData = arr_customer.RidePatNum;
+                            if (rideData !== 1) {
+                                var rideNumber = rideData;
+
+                                var returnDriveExist = false;
+                                if ($('#driver').val() != "") {
+                                    localStorage.setItem("ReturnRidePatFlag", true);
+                                }
+                                //tmpOrigin = $('#Origin').val();
+                                Pat = { DisplayName: ridePat.Pat.DisplayName, Id: localStorage.PatID };
+                                Origin = { Name: ridePat.Destination.Name };
+                                Destination = { Name: ridePat.Origin.Name };
+                                Coordinator = { DisplayName: ridePat.Coordinator.DisplayName }
+                                Remark = ridePat.Remark;
+                                Escorts = ridePat.Escorts;
+                                var temp = ridePat.Date.substring(ridePat.Date.indexOf("(") + 1, ridePat.Date.indexOf(")"))
+                                var date = new Date(parseInt(temp));
+                                let now = new Date();
+                                if (date.getTime() < now.getTime()) { // getTime converts the timestemp back to int for more accurate evaluate
+                                    return;
+                                }
+                                OnlyEscort = ridePat.OnlyEscort;
+                                RidePatBack = {
+                                    Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Remark: Remark, Escorts: Escorts, Date: date, OnlyEscort: OnlyEscort
+                                }
+                                //console.log(RidePatBack)
+                                //$.ajax({
+                                //    dataType: "json",
+                                //    url: "WebService.asmx/CheckRidePat",
+                                //    contentType: "application/json; charset=utf-8",
+                                //    type: "POST",
+                                //    async: false,
+                                //    data: JSON.stringify({ RidePatBack }),
+                                //    success: function (data) {
+                                //        returnDriveExist = JSON.parse(data.d);
+                                //        console.log(returnDriveExist)
+                                //        var DestIsHospital = hospitals.includes(ridePat.Destination.Name);
+                                //        var ReturnRidePatFlag = (localStorage.getItem("ReturnRidePatFlag") == 'true');
+                                //        //maybe currentDriverId != -1
+                                //        //alert(ReturnRidePatFlag);
+                                //        if (DestIsHospital && !returnDriveExist && ReturnRidePatFlag) {
+                                //            secondModal = true;
+                                //            $("#Modal").modal();
+
+                                //        }
+                                //    },
+                                //    error: function (err) { alert("Error in CheckRidePat: " + err.responseText); }
+                                //});
+
+                                //CANCAEL THE QUESTION OF CREAT A RETURN RIDE WHEN GETS IN THE EDIT
+                            }
+                            else {
+                                data.d = data.d.toString();
+                                var temp = data.d.replace(/(?!^)(\d{2})(?=(?:\d{2})*$)/g, '/$1');
+                                //var dateToShow = data.d.replace(;
+
+                                swal(
+                                    "خطأ\nשגיאה",
+                                    "קיימת כבר הסעה בתאריך " + date + " עם אותו החולה ואותן נקודות האיסוף\nيوجد سفرية بالتاريخ (التاريخ) مع نفس المريض ونفس نقطة الالتقاء",
+                                    "warning"
+                                );
+
+                            }
+
+                        },
+                        error: function (err) {
+                            $('#wait').hide();
+                            alert("Error in uploadData: " + err.responseText);
                         }
-                    } else ($("#selectEscort").html("<label data-toggle='tooltip' title='No escorts'>אין מלווים</label>"));
-
-                    //ridePat.Origin.EnglishName = ridePat.Origin.EnglishName.replace("'", "\\'");
-                    //$("#selectOrigin option[value='" + ridePat.Origin.EnglishName + "']").prop('selected', true);
-                    //ridePat.Destination.EnglishName = ridePat.Destination.EnglishName.replace("'", "\\'");
-                    //$("#selectDestination option[value='" + ridePat.Destination.EnglishName + "']").prop('selected', true);
-                    ridePat.Origin.Name = ridePat.Origin.Name.replace("'", "\\'");
-                    $("#selectOrigin option[value='" + ridePat.Origin.Name + "']").prop('selected', true);
-                    ridePat.Destination.Name = ridePat.Destination.Name.replace("'", "\\'");
-                    $("#selectDestination option[value='" + ridePat.Destination.Name + "']").prop('selected', true);
-
-                    if (ridePat.Pat.IsAnonymous == "True") {
-                        currentOrigin = ridePat.Origin.Name;
-                        currentDestination = ridePat.Destination.Name;
-                    }
-
-
-                    //$("#dateRide").val(date);
-
-
-                    $("#coordinator").val(ridePat.Coordinator.DisplayName);
-
-                    $("#remark").val(ridePat.Remark);
-
-                    $("#statusRidePat option[value='" + ridePat.Status + "']").prop('selected', true);
-                    //anonymousName = ridePat.Pat.DisplayName;
-                    isWaiting = ridePat.Status;
-                    if (ridePat.Drivers.length > 0) {
-                        driverId = ridePat.Drivers[0].Id;
-                    }
-                    $('#wait').hide();
-                    $('#driversDiv').show();
-                    $("#lastModified").val(ridePat.LastModified);
-
-
-                    rideData = arr_customer.RidePatNum;
-                    if (rideData !== 1) {
-                        var rideNumber = rideData;
-
-                        var returnDriveExist = false;
-                        if ($('#driver').val() != "") {
-                            localStorage.setItem("ReturnRidePatFlag", true);
-                        }
-                        //tmpOrigin = $('#Origin').val();
-                        Pat = { DisplayName: ridePat.Pat.DisplayName, Id: localStorage.PatID };
-                        Origin = { Name: ridePat.Destination.Name };
-                        Destination = { Name: ridePat.Origin.Name };
-                        Coordinator = { DisplayName: ridePat.Coordinator.DisplayName }
-                        Remark = ridePat.Remark;
-                        Escorts = ridePat.Escorts;
-                        var temp = ridePat.Date.substring(ridePat.Date.indexOf("(") + 1, ridePat.Date.indexOf(")"))
-                        var date = new Date(parseInt(temp));
-                        let now = new Date();
-                        if (date.getTime() < now.getTime()) { // getTime converts the timestemp back to int for more accurate evaluate
-                            return;
-                        }
-                        OnlyEscort = ridePat.OnlyEscort;
-                        RidePatBack = {
-                            Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Remark: Remark, Escorts: Escorts, Date: date, OnlyEscort: OnlyEscort
-                        }
-                        //console.log(RidePatBack)
-                        //$.ajax({
-                        //    dataType: "json",
-                        //    url: "WebService.asmx/CheckRidePat",
-                        //    contentType: "application/json; charset=utf-8",
-                        //    type: "POST",
-                        //    async: false,
-                        //    data: JSON.stringify({ RidePatBack }),
-                        //    success: function (data) {
-                        //        returnDriveExist = JSON.parse(data.d);
-                        //        console.log(returnDriveExist)
-                        //        var DestIsHospital = hospitals.includes(ridePat.Destination.Name);
-                        //        var ReturnRidePatFlag = (localStorage.getItem("ReturnRidePatFlag") == 'true');
-                        //        //maybe currentDriverId != -1
-                        //        //alert(ReturnRidePatFlag);
-                        //        if (DestIsHospital && !returnDriveExist && ReturnRidePatFlag) {
-                        //            secondModal = true;
-                        //            $("#Modal").modal();
-
-                        //        }
-                        //    },
-                        //    error: function (err) { alert("Error in CheckRidePat: " + err.responseText); }
-                        //});
-
-                        //CANCAEL THE QUESTION OF CREAT A RETURN RIDE WHEN GETS IN THE EDIT
-                    }
-                    else {
-                        data.d = data.d.toString();
-                        var temp = data.d.replace(/(?!^)(\d{2})(?=(?:\d{2})*$)/g, '/$1');
-                        //var dateToShow = data.d.replace(;
-
-                        swal(
-                            "خطأ\nשגיאה",
-                            "קיימת כבר הסעה בתאריך " + date + " עם אותו החולה ואותן נקודות האיסוף\nيوجد سفرية بالتاريخ (التاريخ) مع نفس المريض ونفس نقطة الالتقاء",
-                            "warning"
-                        );
-
-                    }
-
-                },
-                error: function (err) {
-                    $('#wait').hide();
-                    alert("Error in uploadData: " + err.responseText);
-                }
-            });
+                    });
+                })
+                .catch((err) => {
+                    alert('בעיה במילוי רשימות יעד ומוצא: ' + err);
+                });
         }
 
         function return2manageRidePats() {//returnRidePat()
@@ -2456,7 +2474,7 @@
                                         <h4 class="m-t-0 header-title"><b data-toggle="tooltip" title="Ride   توصيل المريض">הסעת חולה</b></h4>
 
                                         <div class="text-right m-b-30 m-r-15">
-                                            <button type="button" onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5"><i data-toggle="tooltip" data-placement="bottom" title="عودة  Back" class="ti-back-right m-r-5"></i>&nbsp Back</button>
+                                            <button type="button" onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5"><i data-toggle="tooltip" data-placement="bottom" title="عودة  Back" class="ti-back-right m-r-5"></i>&nbsp חזרה</button>
                                             <div id="patientInfo"> <button type="button" onclick="getPatientInformation()" dir="ltr" class="btn btn-info waves-effect w-md m-b-5"><i data-toggle="tooltip" data-placement="bottom" title="Patient info" class="ti-info m-r-5"></i>&nbsp Patient information</button></div>
                                         </div>
                                         <p class="required"><span data-toggle="tooltip" title="Must field   حقل اجباري">* שדה חובה</span></p>
@@ -2718,7 +2736,7 @@
                         <div>
                             <!--<hr />-->
                             <div class="text-right m-t-30 row">
-                                <button data-toggle="tooltip" title="Save  حفظ" type="submit" id="saveCustomer" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-save m-r-5"></i>&nbsp Save</button>
+                                <button data-toggle="tooltip" title="Save  حفظ" type="submit" id="saveCustomer" class="btn btn-success waves-effect w-md waves-light m-b-5  m-r-15"><i class="ti-save m-r-5"></i>&nbsp שמירה</button>
                             </div>
                         </div>
                         <div class="row m-l-10 m-r-10">
