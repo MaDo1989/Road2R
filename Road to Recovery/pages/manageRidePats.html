@@ -163,7 +163,7 @@
 
             wiringDataTables();
             let { COPYWRITE } = GENERAL;
-           $('#rights').html(COPYWRITE());
+            $('#rights').html(COPYWRITE());
 
             if (localStorage.refreshTime == "undefined" || localStorage.refreshTime === undefined) { // Set the deafult refresh rate for 5 minutes
                 localStorage.refreshTime = '300000';
@@ -514,11 +514,13 @@
                                     let hours_gap = miliSeconds_gap / (1000 * 60 * 60); //1000 ms in 1 sec, 60 sec in 1m, 60 min in 1h
 
                                     if (hours_gap >= 0) {
-                                        cell.style.color = "white";
-                                        cell.style.fontWeight = "bold";
                                         if (hours_gap <= 12) {
+                                            cell.style.color = "white";
+                                            cell.style.fontWeight = "bold";
                                             cell.style.backgroundColor = "red";
                                         } else if (hours_gap <= 24) {
+                                            cell.style.color = "white";
+                                            cell.style.fontWeight = "bold";
                                             cell.style.backgroundColor = "orange";
                                         }
                                     }
@@ -1590,7 +1592,6 @@
             <!-- end content -->
             <!-- FOOTER -->
             <footer id="rights" data-toggle="tooltip" data-placement="top" title="© All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء" class="footer text-right">
-               
             </footer>
             <!-- End FOOTER -->
 
