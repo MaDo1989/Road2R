@@ -794,6 +794,7 @@
         }
 
         const fillPage_withPatientData = (patient) => {
+
             isAnonymous = patient.IsAnonymous === 'True';
             localStorage.PatID = patient.Id;
             $('#pat').val(patient.DisplayName);
@@ -808,6 +809,8 @@
                     str += `<label data-toggle='tooltip' title='${EscortedList[i].EnglishName}' for='escortCB${EscortedList[i].Id}'>${EscortedList[i].DisplayName}</label>&nbsp&nbsp</br>`;
                 }
                 $("#selectEscort").html(str);
+            } else {
+                $("#selectEscort").html('');
             }
 
             $('#remark').val(patient.Remarks);

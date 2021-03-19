@@ -583,8 +583,7 @@ public class RidePat
                     }
                     catch (Exception ex)
                     {
-                      //  throw ex;
-
+                        throw ex;
                     }
                 }
 
