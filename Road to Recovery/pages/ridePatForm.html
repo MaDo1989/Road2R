@@ -399,7 +399,7 @@
                         Minute = 14;
                         hourForPush = "אחה\"צ"
                     }
-                    var date = new Date(Year, Month, Day, Hour, Minute);
+                    var date = new Date(Year, Month, Day, Hour, Minute).toUTCString();
                     var func = arr_customer.func;
                     //if (!flagFirstOne) {
                     //    func = "edit";
