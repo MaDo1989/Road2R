@@ -247,12 +247,12 @@
                             <h1> עץ הדו"חות</h1>
                             <ul id="myUL" class="report_tree_UL">
                                 <!--  <li>
-        <span>לרכז</span>
-        <ul>
-            <li>מתנדבים</li>
-            <li>הסעות שבוטלו</li>
-        </ul>
-    </li>   -->
+                                    <span>לרכז</span>
+                                    <ul>
+                                        <li>מתנדבים</li>
+                                        <li>הסעות שבוטלו</li>
+                                    </ul>
+                                </li>   -->
                                 <li>
                                     <span style="font-weight: bold;">לעמותה</span>
                                     <ul class="report_tree_UL">
@@ -391,6 +391,7 @@
                                             <th title="Volunteer" class="timeCustomWidth">מתנדב</th>
                                             <th title="CityCityName" class="timeCustomWidth">ישוב מגורים</th>
                                             <th title="CellPhone" class="timeCustomWidth">טלפון</th>
+                                            <th title="Buttons" class="timeCustomWidth">היסטוריית נסיעות</th>
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
@@ -589,41 +590,41 @@
                                 </div>
                             </div>
                         </div>
-                            <div class="row report_template" name="template_RECENT_PERIOD">
-                                <div class="card-box">
-                                    <div class="row">
-                                        <div class="col-sm-12">
-                                            <div class="form-group">
-                                                <label class="col-sm-2" style="padding: 0.5em 0px;">הסיע.ה ב</label>
-                                                <div class="col-sm-5">
-                                                    <input type="text" template_id="input_period_begin" name="input_period_begin" class="form-control" aria-required="true" aria-invalid="false" has-error required />
-                                                </div>
-                                                <label class="col-sm-5" style="padding: 0.5em 0px;">ימים האחרונים</label>
+                        <div class="row report_template" name="template_RECENT_PERIOD">
+                            <div class="card-box">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label class="col-sm-2" style="padding: 0.5em 0px;">הסיע.ה ב</label>
+                                            <div class="col-sm-5">
+                                                <input type="text" template_id="input_period_begin" name="input_period_begin" class="form-control" aria-required="true" aria-invalid="false" has-error required />
+                                            </div>
+                                            <label class="col-sm-5" style="padding: 0.5em 0px;">ימים האחרונים</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label class="col-sm-3" style="padding: 0.5em 0px;">אך לא הסיע.ה ב</label>
+                                            <div class="col-sm-5">
+                                                <input type="text" template_id="input_period_end" name="input_period_end" class="form-control" aria-required="true" aria-invalid="false" />
+                                            </div>
+                                            <label class="col-sm-4" style="padding: 0.5em 0px;">ימים האחרונים</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-sm-2"><input type="button" template_id="generate_report_period" value="בצע דיווח" disabled /> </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-sm-12">
-                                            <div class="form-group">
-                                                <label class="col-sm-3" style="padding: 0.5em 0px;">אך לא הסיע.ה ב</label>
-                                                <div class="col-sm-5">
-                                                    <input type="text" template_id="input_period_end" name="input_period_end" class="form-control" aria-required="true" aria-invalid="false" />
-                                                </div>
-                                                <label class="col-sm-4" style="padding: 0.5em 0px;">ימים האחרונים</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-12">
-                                            <div class="form-group">
-                                                <div class="row">
-                                                    <div class="col-sm-2"><input type="button" template_id="generate_report_period" value="בצע דיווח" disabled /> </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        </div>
-                                    </div>
+                                </div>
                             </div>
+                        </div>
                         <div class="row report_template report_hidden" name="HIDDEN_MONTH">
                             <input type="text" template_id="select_month" class="form-control" aria-required="true" aria-invalid="false">
                         </div>
@@ -635,12 +636,45 @@
         </footer>
     </div>
 
+
+    <div class="modal fade" id="documentedRidesModal" tabindex="-1" role="dialog" aria-labelledby="documentedRidesTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content modal-lg">
+                <div class="modal-header">
+                    <button id="overRideBS_modal_4changeClose_x" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h2 class="modal-title" id="documentedRidesTitle">היסטורית הסעות</h2>
+                </div>
+                <div class="modal-body">
+                    <table id="documentedRidesTable" class="table table-striped table-bordered">
+                        <thead>
+                            <tr dir="rtl">
+                                <th>תאריך</th>
+                                <th>שעה</th>
+                                <th>קו</th>
+                                <th>חולה</th>
+                                <th>הערות</th>
+                                <th id="invisible">z</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="text-right modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">סגירה</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        var resizefunc = [];
+                var resizefunc = [];
     </script>
 
     <script src="assets/js/bootstrap-rtl.min.js"></script>
-        <script src="assets/js/detect.js"></script>
+    <script src="assets/js/detect.js"></script>
     <script src="assets/js/fastclick.js"></script>
     <script src="assets/js/jquery.slimscroll.js"></script>
     <script src="assets/js/jquery.blockUI.js"></script>
@@ -679,11 +713,11 @@
     <script src="assets/js/jquery.core.js"></script>
     <script src="assets/js/jquery.app.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-        <script src="../plugins/moment/moment.js"></script>
+    <script src="../plugins/moment/moment.js"></script>
     <script src="../plugins/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
 
     <script type="text/javascript">
 
     </script>
-    </body>
+</body>
 </html>

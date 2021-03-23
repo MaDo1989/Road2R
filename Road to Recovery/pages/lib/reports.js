@@ -136,8 +136,11 @@ pages\ridePatForm.html  loadPage :     if (JSON.parse(GENERAL.RIDEPAT.getRidePat
  * 
  */
 
-// Current startegy for refreshing teh table, set per report type
+// Current startegy for refreshing the table, set per report type
 var S_refresh_preview = null;
+
+let S_HistoryTable = null;
+
 
 function init_reports_page() {
     includeHTML();
@@ -1187,6 +1190,12 @@ function refresh_pil_vl_ride_recent_period_Table(start_number, end_number) {
             $('#wait').hide();
             var records = data.d;
 
+            // Add buttons to the table
+            for (a_rec of records) {
+                let showDocumentedRidesBtn = '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5 showDocumentedRidesBtn" title="תיעוד הסעות" data-toggle="modal" data-target="#documentedRidesModal"><i class="fa fa-car" aria-hidden="true"></i></button>';
+                a_rec.Buttons = showDocumentedRidesBtn;
+            }
+
             $('#div_table_pil_vl_ride_recent_period').show();
             tbl = $('#table_pil_vl_ride_recent_period').DataTable({
                 pageLength: 100,
@@ -1201,7 +1210,8 @@ function refresh_pil_vl_ride_recent_period_Table(start_number, end_number) {
                 columns: [
                     { data: "Volunteer" },
                     { data: "CityCityName" },
-                    { data: "CellPhone" }
+                    { data: "CellPhone" },
+                    { data: "Buttons" }
                 ],
                 dom: 'Bfrtip',
 
@@ -1209,6 +1219,7 @@ function refresh_pil_vl_ride_recent_period_Table(start_number, end_number) {
                     K_DataTable_CSV_EXPORT
                 ]
             });
+            register_table_button_events();
         },
         error: function (err) {
             $('#wait').hide();
@@ -1217,6 +1228,158 @@ function refresh_pil_vl_ride_recent_period_Table(start_number, end_number) {
     });
 
 }
+
+
+// Copied from viewVolunteer.html:  buttonsEvents 
+function register_table_button_events() {
+
+    $(".showDocumentedRidesBtn").click ( function () {
+
+        $('#wait').show();
+
+        let rowData = tbl.row($(this).parents('tr')).data();
+        console.log(rowData);
+
+        $('#documentedRidesTitle').text("תיעוד הסעות " + rowData.Volunteer)
+        $.ajax({
+            dataType: "json",
+            url: "WebService.asmx/GetVolunteersDocumentedRides",
+            contentType: "application/json; charset=utf-8",
+            type: "POST",
+            data: JSON.stringify({ volunteerId: rowData.Id }),
+            success: function (data) {
+                data = JSON.parse(data.d)
+
+                if (S_HistoryTable != null) {
+                    S_HistoryTable.destroy();
+                }
+
+
+                S_HistoryTable = $('#documentedRidesTable').DataTable({
+                    order: [[5, "desc"]],
+                    pageLength: 10,
+                    data: data,
+                    columns: [
+                        {
+                            data: (data) => {
+                                // if (data.Date === undefined) return;
+                                return ConvertDBDate2UIDate(data.Date);
+                            }
+                        },
+                        {
+                            data: (data) => {
+                                if (data.Date === undefined) return;
+
+                                let fullTimeStempStr = data.Date;
+                                let startTrim = fullTimeStempStr.indexOf('(') + 1;
+                                let endTrim = fullTimeStempStr.indexOf(')');
+                                let fullTimeStempNumber = fullTimeStempStr.substring(startTrim, endTrim);
+                                let fullTimeStemp = new Date(parseInt(fullTimeStempNumber));
+
+                                if (fullTimeStemp.getMinutes() === 14) {
+                                    if (fullTimeStemp.getHours() === 19 || fullTimeStemp.getHours() === 20 || fullTimeStemp.getHours() === 21 || fullTimeStemp.getHours() === 22) {
+                                        return 'אחה"צ';
+                                    }
+                                }
+
+                                let hh = fullTimeStemp.getHours() < 10 ? "0" + fullTimeStemp.getHours() : fullTimeStemp.getHours();
+                                hh += ":";
+                                let mm = fullTimeStemp.getMinutes() < 10 ? "0" + fullTimeStemp.getMinutes() : fullTimeStemp.getMinutes();
+                                return hh + mm;
+                            }
+                        },
+                        {
+                            data: (data) => {
+                                if (data.Origin === undefined || data.Destination === undefined) return;
+
+                                let fullPath = data.Origin.Name + " ← " + data.Destination.Name;
+                                return fullPath;
+                            }
+                        },
+                        { data: "Pat.DisplayName" },
+                        { data: "Remark" },
+                        {
+                            data: (data) => {
+                                return ConvertDBDate2UIFullStempDate(data.Date);
+                            }
+                        },
+
+                    ],
+                    columnDefs: [
+                        { "targets": [0], type: 'de_date' },
+                        /*
+                         Amir wanted a seperated columns to date and time but still sort by the full time stemps (or the acctual ticks)
+                         so my (Yogev) soolution was to
+                         1. fetch the fulltime stemp from the back-end
+                         2. render and sort by this column
+                         3. not showing it to the user
+                          ↓*/
+                        { "targets": [5], visible: false },
+                        //↑
+                        {
+                            "targets": [0],
+                            render: function (data, type, full, meta) {
+                                let now = new Date();
+                                if (ConvertDBDate2UIFullStempDate(full.Date) > now) {
+                                    var rowIndex = meta.row + 1;
+                                    $('#documentedRidesTable tbody tr:nth-child(' + rowIndex + ')').addClass('futureRide');
+                                    return data;
+                                } else {
+                                    return data;
+                                }
+                            }
+                        },
+                        { "targets": 0, width: "10%" },
+                        { "targets": 1, width: "10%" },
+                        { "targets": 2, width: "20%" },
+                        { "targets": 3, width: "25%" },
+                        { "targets": 4, width: "35%" }
+
+                    ]
+                });
+                $('#wait').hide();
+
+            },
+            error: function (err) {
+                alert("Error in GetVolunteersRideHistory: " + err.responseText);
+                $('#wait').hide();
+            }
+        });
+
+
+    });
+
+}
+
+// Copied from viewVolunteer.html
+const ConvertDBDate2UIDate = (fullTimeStempStr) => {
+    if (fullTimeStempStr === undefined) return;
+    let startTrim = fullTimeStempStr.indexOf('(') + 1;
+    let endTrim = fullTimeStempStr.indexOf(')');
+    let fullTimeStempNumber = fullTimeStempStr.substring(startTrim, endTrim);
+    let fullTimeStemp = new Date(parseInt(fullTimeStempNumber));
+
+    //Note: in getMOnth function 0=January, 1=February etc...
+
+    let dd = fullTimeStemp.getDate();
+
+    let mm = fullTimeStemp.getMonth() + 1;
+
+    let yyyy = fullTimeStemp.getFullYear();
+
+    return `${dd}.${mm}.${yyyy}`;
+}
+
+// Copied from viewVolunteer.html
+const ConvertDBDate2UIFullStempDate = (dateAsStr) => {
+    if (dateAsStr === undefined) return;
+    let startTrim = dateAsStr.indexOf('(') + 1;
+    let endTrim = dateAsStr.indexOf(')');
+    let fullTimeStempNumber = dateAsStr.substring(startTrim, endTrim);
+    let fullTimeStemp = new Date(parseInt(fullTimeStempNumber));
+    return fullTimeStemp;
+}
+
 
 
 

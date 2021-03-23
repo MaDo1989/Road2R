@@ -118,6 +118,7 @@ public class ReportService
 
     public class VolunteersInPeriod
     {
+        public String Id { get; set; }
         public string Volunteer { get; set; }
         public string CityCityName { get; set; }
         public string CellPhone { get; set; }
@@ -666,6 +667,7 @@ and MainDriver is not NULL)
             foreach (DataRow dr in dt.Rows)
             {
                 VolunteersInPeriod obj = new VolunteersInPeriod();
+                obj.Id = dr["MainDriver"].ToString();
                 obj.Volunteer = dr["DisplayName"].ToString();
                 obj.CellPhone = dr["CellPhone"].ToString();
                 obj.CityCityName = dr["CityCityName"].ToString();
