@@ -221,6 +221,7 @@ var K_strategy = {
     "rp_pil_vls_per_month": rp_pil_vls_per_month__refresh_preview,
     "rp_pil_vl_ride_month": rp_pil_vl_ride_month__refresh_preview,
     "rp_pil_vl_ride_recent_period": rp_pil_vl_ride_recent_period__refresh_preview,
+    "rp_center_daily_by_month": rp_center_daily_by_month__refresh_preview,
 }
 
 
@@ -317,6 +318,14 @@ var K_fields_map = {
             template: 'div[name="template_RECENT_PERIOD"]',
             type: "RECENT_PERIOD",
             post_clone: rp_pil_vl_ride_recent_period__post_clone
+        }
+    ],
+    "rp_center_daily_by_month": [
+        {
+            id: "rp_center_daily_by_month__month",
+            template: 'div[name="template_MONTH"]',
+            type: "MONTH",
+            post_clone: field_month_post_clone
         }
     ]
 
@@ -1655,6 +1664,77 @@ function rp_amuta_vls_list__commit_to_ni_db() {
 
 }
 
+// Checks if all fields are filled. If so refresh the report
+function rp_center_daily_by_month__refresh_preview() {
+    var selected_date = Date.parse($("#select_month").val());
+    if (selected_date) {
+        var start_month_date = moment(selected_date);
+        var end_month_date = start_month_date.clone().add(1, 'months');
+
+        console.log(start_month_date, end_month_date);
+        rp_center_daily_by_month__refresh_Table(
+            start_month_date.format("YYYY-MM-DD"),
+            end_month_date.format("YYYY-MM-DD"));
+    }
+}   
+
+
+function rp_center_daily_by_month__refresh_Table(start_date, end_date) {
+    hide_all_tables();
+
+    $('#wait').show();
+    var query_object = {
+        start_date: start_date,
+        end_date: end_date
+    };
+
+
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/TBDTBDTBD",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            $('#wait').hide();
+            var records = data.d;
+
+            $('#div_table_center_daily_by_month').show();
+            tbl = $('#table_center_daily_by_month').DataTable({
+                pageLength: 100,
+                bLengthChange: false,
+                data: records,
+                destroy: true,
+                "language": {
+                    "search": "חיפוש:"
+                },
+                columnDefs: [
+                    { "orderData": [0, 1], "targets": 0 }],
+                columns: [
+                    { data: "Volunteer" },
+                    { data: "CityCityName" },
+                    { data: "CellPhone" },
+                    { data: "Buttons" }
+                ],
+                dom: 'Bfrtip',
+
+                buttons: [
+                    K_DataTable_CSV_EXPORT
+                ]
+            });
+        },
+        error: function (err) {
+            $('#wait').hide();
+        }
+
+    });
+
+}
+
 
 function hide_all_tables() {
     $('#div_weeklyRides').hide();
@@ -1666,6 +1746,7 @@ function hide_all_tables() {
     $("#div_table_pil_vls_per_month").hide();
     $("#div_table_pil_vl_ride_month").hide();
     $("#div_table_pil_vl_ride_recent_period").hide();
+    $("#div_table_center_daily_by_month").hide();
  }
 
 
