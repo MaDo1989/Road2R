@@ -1,6 +1,7 @@
 ﻿// Purpose: JS code for the reports UI
 
 
+
 // 24-Nov:  Avishai
 //1.  . מספר המתנדבים השונים שהסיעו בכל חודש בשנתיים האחרונות. 
 
@@ -135,8 +136,11 @@ pages\ridePatForm.html  loadPage :     if (JSON.parse(GENERAL.RIDEPAT.getRidePat
  * 
  */
 
-// Current startegy for refreshing teh table, set per report type
+// Current startegy for refreshing the table, set per report type
 var S_refresh_preview = null;
+
+let S_HistoryTable = null;
+
 
 function init_reports_page() {
     includeHTML();
@@ -183,7 +187,14 @@ function process_permissions() {
 function init_components() {
     // Datatables date-time plugin
     $.fn.dataTable.moment('DD/MM/YYYY');
+
+    $.validator.addMethod("smallerThan",
+        function (value, element, param) {
+            var $otherElement = $(param);
+            return parseInt(value, 10) < parseInt($otherElement.val(), 10);
+        });
 }
+
 // Handle a click event on one of the reports in the Reports-Tree
 function on_report_click(event) {
 
@@ -209,6 +220,7 @@ var K_strategy = {
     "rp_amuta_vls_per_month": rp_amuta_vls_per_month__refresh_preview,
     "rp_pil_vls_per_month": rp_pil_vls_per_month__refresh_preview,
     "rp_pil_vl_ride_month": rp_pil_vl_ride_month__refresh_preview,
+    "rp_pil_vl_ride_recent_period": rp_pil_vl_ride_recent_period__refresh_preview,
 }
 
 
@@ -298,8 +310,48 @@ var K_fields_map = {
             type: "MONTH",
             post_clone: rp_pil_vl_ride_month__post_clone
         }
+    ],
+    "rp_pil_vl_ride_recent_period": [
+        {
+            id: "rp_pil_vl_ride_recent_period__fields",
+            template: 'div[name="template_RECENT_PERIOD"]',
+            type: "RECENT_PERIOD",
+            post_clone: rp_pil_vl_ride_recent_period__post_clone
+        }
     ]
+
+    
  }
+
+
+var K_DataTable_PDF_EXPORT = {
+    extend: 'pdfHtml5',
+    text: 'יצוא הדו"ח ל-PDF',
+    orientation: 'landscape',
+    pageSize: 'LEGAL',
+    customize: function (doc) {
+        pdfMake.fonts = {
+            hebrewFont: {
+                normal: 'Alef-Regular.ttf',
+                bold: 'Alef-Bold.ttf',
+                italics: 'Alef-Regular.ttf',
+                bolditalics: 'Alef-Bold.ttf'
+            }
+        };
+
+        doc.defaultStyle = {
+            font: 'hebrewFont'
+        };
+    }
+};
+
+// Also, see styling in html file -  buttons-csv.buttons-html5 
+var K_DataTable_CSV_EXPORT = {
+    extend: 'csv',
+    text: 'יצוא הדו"ח ל-CSV',
+};
+
+
 
 function populate_parameters(report_type) {
  //   $("#params_ph").text("Populating for " + report_type);
@@ -712,6 +764,51 @@ function rp_pil_vl_ride_month__refresh_preview() {
 }   
 
 
+function rp_pil_vl_ride_recent_period__refresh_preview() {
+
+    let v = $("#params_ph").validate({
+        // Specify validation rules
+        rules: {
+            input_period_begin: {
+                required: true,
+                digits: true,
+                min: 1
+            },
+            input_period_end: {
+                required: true,
+                digits: true,
+                min: 1,
+                smallerThan: "#input_period_begin"
+            }
+        },
+        // Specify validation error messages
+        messages: {
+            input_period_begin: "הכנס מספר חיובי",
+            input_period_end: {
+                required: "הכנס מספר חיובי",
+                smallerThan: "הכנס מספר קטן מהמספר שלמעלה",
+            }
+        }
+    });
+
+    if (v.form()) {
+        $("#generate_report_period").attr("disabled", false);
+    }
+    else {
+        $("#generate_report_period").attr("disabled", true);
+    }
+}   
+
+
+function rp_pil_vl_ride_recent_period__generate()
+{
+    var start_str = $("#input_period_begin").val();
+    var end_str = $("#input_period_end").val();
+    refresh_pil_vl_ride_recent_period_Table(start_str, end_str);
+
+}
+
+
 function rp_pil_vls_per_month__post_clone(id)
 {
     $("#select_year_ytd").change(rp_pil_vls_per_month__refresh_preview);
@@ -723,6 +820,15 @@ function rp_pil_vl_ride_month__post_clone(id) {
     populate_month_field();
     rp_pil_vl_ride_month__refresh_preview();
 }
+
+
+function rp_pil_vl_ride_recent_period__post_clone(id) {
+    $("#input_period_begin").keyup(rp_pil_vl_ride_recent_period__refresh_preview);
+    $("#input_period_end").keyup(rp_pil_vl_ride_recent_period__refresh_preview);
+    $("#generate_report_period").click(rp_pil_vl_ride_recent_period__generate);
+    rp_pil_vl_ride_recent_period__refresh_preview();
+}
+
 
 
 function rp_pil_vls_per_month__refresh_preview() {
@@ -778,6 +884,10 @@ function refresh_amuta_vls_week_Table(start_date, end_date) {
                 bLengthChange: false,
                 data: arr_rides,
                 destroy: true,
+                "language": {
+                    "search": "חיפוש:"
+                },
+
                 columnDefs: [
                     { "orderData": [0, 1], "targets": 0 }],
                 columns: [
@@ -787,31 +897,9 @@ function refresh_amuta_vls_week_Table(start_date, end_date) {
                 ],
                 dom: 'Bfrtip',
                 buttons: [
-                    {
-                        extend: 'pdfHtml5',
-                        orientation: 'landscape',
-                        pageSize: 'LEGAL',
-                        customize: function (doc) {
-                            pdfMake.fonts = {
-                                hebrewFont: {
-                                    normal: 'Alef-Regular.ttf',
-                                    bold: 'Alef-Bold.ttf',
-                                    italics: 'Alef-Regular.ttf',
-                                    bolditalics: 'Alef-Bold.ttf'
-                                }
-                            };
-
-                            doc.defaultStyle = {
-                                font: 'hebrewFont'
-                            };
-                            console.log(doc);
-                        } 
-                    }
-                ],
-
-                xbuttons: [
-                    'csv', 'excel', 'pdf'
+                    K_DataTable_PDF_EXPORT
                 ]
+
             });
         },
         error: function (err) {
@@ -856,6 +944,9 @@ function refresh_amuta_vls_km_Table(start_date, end_date) {
                 bLengthChange: false,
                 data: records,
                 destroy: true,
+                "language": {
+                    "search": "חיפוש:"
+                },
                 columnDefs: [
                     { "orderData": [0, 1], "targets": 0 }],
                 columns: [
@@ -876,7 +967,8 @@ function refresh_amuta_vls_km_Table(start_date, end_date) {
                 ],
                 dom: 'Bfrtip',
                 buttons: [
-                   'csv', 'excel', 'pdf'
+                    K_DataTable_PDF_EXPORT,
+                    K_DataTable_CSV_EXPORT
                 ]
             });
         },
@@ -918,6 +1010,9 @@ function refresh_amuta_vls_per_month_Table(start_date) {
                 bLengthChange: false,
                 data: arr_rides,
                 destroy: true,
+                "language": {
+                    "search": "חיפוש:"
+                },
                 columnDefs: [
                     { "orderData": [0, 1], "targets": 0 }],
                 columns: [
@@ -930,7 +1025,7 @@ function refresh_amuta_vls_per_month_Table(start_date) {
  
 
                 buttons: [
-                    'csv', 'excel', 
+                    K_DataTable_CSV_EXPORT
                 ]
             });
         },
@@ -974,6 +1069,9 @@ function refresh_pil_vls_per_month_Table(start_date, end_date) {
                 bLengthChange: false,
                 data: arr_rides,
                 destroy: true,
+                "language": {
+                    "search": "חיפוש:"
+                },
                 columnDefs: [
                     { "orderData": [0, 1], "targets": 0 }],
                 columns: [
@@ -999,7 +1097,7 @@ function refresh_pil_vls_per_month_Table(start_date, end_date) {
 
 
                 buttons: [
-                    'csv', 'excel',
+                    K_DataTable_CSV_EXPORT
                 ]
             });
         },
@@ -1041,6 +1139,9 @@ function refresh_pil_vl_ride_month_Table(start_date, end_date) {
                 bLengthChange: false,
                 data: records,
                 destroy: true,
+                "language": {
+                    "search": "חיפוש:"
+                },
                 columnDefs: [
                     { "orderData": [0, 1], "targets": 0 }],
                 columns: [
@@ -1050,7 +1151,7 @@ function refresh_pil_vl_ride_month_Table(start_date, end_date) {
                 dom: 'Bfrtip',
 
                 buttons: [
-                    'csv', 'excel',
+                    K_DataTable_CSV_EXPORT
                 ]
             });
         },
@@ -1060,6 +1161,223 @@ function refresh_pil_vl_ride_month_Table(start_date, end_date) {
 
     });
 
+}
+
+
+
+function refresh_pil_vl_ride_recent_period_Table(start_number, end_number) {
+    hide_all_tables();
+
+
+    $('#wait').show();
+    var query_object = {
+        start_number: start_number,
+        end_number: end_number
+    };
+
+
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportSliceVolunteersInPeriod",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            $('#wait').hide();
+            var records = data.d;
+
+            // Add buttons to the table
+            for (a_rec of records) {
+                let showDocumentedRidesBtn = '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5 showDocumentedRidesBtn" title="תיעוד הסעות" data-toggle="modal" data-target="#documentedRidesModal"><i class="fa fa-car" aria-hidden="true"></i></button>';
+                a_rec.Buttons = showDocumentedRidesBtn;
+            }
+
+            $('#div_table_pil_vl_ride_recent_period').show();
+            tbl = $('#table_pil_vl_ride_recent_period').DataTable({
+                pageLength: 100,
+                bLengthChange: false,
+                data: records,
+                destroy: true,
+                "language": {
+                    "search": "חיפוש:"
+                },
+                columnDefs: [
+                    { "orderData": [0, 1], "targets": 0 }],
+                columns: [
+                    { data: "Volunteer" },
+                    { data: "CityCityName" },
+                    { data: "CellPhone" },
+                    { data: "Buttons" }
+                ],
+                dom: 'Bfrtip',
+
+                buttons: [
+                    K_DataTable_CSV_EXPORT
+                ]
+            });
+            register_table_button_events();
+        },
+        error: function (err) {
+            $('#wait').hide();
+        }
+
+    });
+
+}
+
+
+// Copied from viewVolunteer.html:  buttonsEvents 
+function register_table_button_events() {
+
+    $(".showDocumentedRidesBtn").click ( function () {
+
+        $('#wait').show();
+
+        let rowData = tbl.row($(this).parents('tr')).data();
+        console.log(rowData);
+
+        $('#documentedRidesTitle').text("תיעוד הסעות " + rowData.Volunteer)
+        $.ajax({
+            dataType: "json",
+            url: "WebService.asmx/GetVolunteersDocumentedRides",
+            contentType: "application/json; charset=utf-8",
+            type: "POST",
+            data: JSON.stringify({ volunteerId: rowData.Id }),
+            success: function (data) {
+                data = JSON.parse(data.d)
+
+                if (S_HistoryTable != null) {
+                    S_HistoryTable.destroy();
+                }
+
+
+                S_HistoryTable = $('#documentedRidesTable').DataTable({
+                    order: [[5, "desc"]],
+                    pageLength: 10,
+                    data: data,
+                    columns: [
+                        {
+                            data: (data) => {
+                                // if (data.Date === undefined) return;
+                                return ConvertDBDate2UIDate(data.Date);
+                            }
+                        },
+                        {
+                            data: (data) => {
+                                if (data.Date === undefined) return;
+
+                                let fullTimeStempStr = data.Date;
+                                let startTrim = fullTimeStempStr.indexOf('(') + 1;
+                                let endTrim = fullTimeStempStr.indexOf(')');
+                                let fullTimeStempNumber = fullTimeStempStr.substring(startTrim, endTrim);
+                                let fullTimeStemp = new Date(parseInt(fullTimeStempNumber));
+
+                                if (fullTimeStemp.getMinutes() === 14) {
+                                    if (fullTimeStemp.getHours() === 19 || fullTimeStemp.getHours() === 20 || fullTimeStemp.getHours() === 21 || fullTimeStemp.getHours() === 22) {
+                                        return 'אחה"צ';
+                                    }
+                                }
+
+                                let hh = fullTimeStemp.getHours() < 10 ? "0" + fullTimeStemp.getHours() : fullTimeStemp.getHours();
+                                hh += ":";
+                                let mm = fullTimeStemp.getMinutes() < 10 ? "0" + fullTimeStemp.getMinutes() : fullTimeStemp.getMinutes();
+                                return hh + mm;
+                            }
+                        },
+                        {
+                            data: (data) => {
+                                if (data.Origin === undefined || data.Destination === undefined) return;
+
+                                let fullPath = data.Origin.Name + " ← " + data.Destination.Name;
+                                return fullPath;
+                            }
+                        },
+                        { data: "Pat.DisplayName" },
+                        { data: "Remark" },
+                        {
+                            data: (data) => {
+                                return ConvertDBDate2UIFullStempDate(data.Date);
+                            }
+                        },
+
+                    ],
+                    columnDefs: [
+                        { "targets": [0], type: 'de_date' },
+                        /*
+                         Amir wanted a seperated columns to date and time but still sort by the full time stemps (or the acctual ticks)
+                         so my (Yogev) soolution was to
+                         1. fetch the fulltime stemp from the back-end
+                         2. render and sort by this column
+                         3. not showing it to the user
+                          ↓*/
+                        { "targets": [5], visible: false },
+                        //↑
+                        {
+                            "targets": [0],
+                            render: function (data, type, full, meta) {
+                                let now = new Date();
+                                if (ConvertDBDate2UIFullStempDate(full.Date) > now) {
+                                    var rowIndex = meta.row + 1;
+                                    $('#documentedRidesTable tbody tr:nth-child(' + rowIndex + ')').addClass('futureRide');
+                                    return data;
+                                } else {
+                                    return data;
+                                }
+                            }
+                        },
+                        { "targets": 0, width: "10%" },
+                        { "targets": 1, width: "10%" },
+                        { "targets": 2, width: "20%" },
+                        { "targets": 3, width: "25%" },
+                        { "targets": 4, width: "35%" }
+
+                    ]
+                });
+                $('#wait').hide();
+
+            },
+            error: function (err) {
+                alert("Error in GetVolunteersRideHistory: " + err.responseText);
+                $('#wait').hide();
+            }
+        });
+
+
+    });
+
+}
+
+// Copied from viewVolunteer.html
+const ConvertDBDate2UIDate = (fullTimeStempStr) => {
+    if (fullTimeStempStr === undefined) return;
+    let startTrim = fullTimeStempStr.indexOf('(') + 1;
+    let endTrim = fullTimeStempStr.indexOf(')');
+    let fullTimeStempNumber = fullTimeStempStr.substring(startTrim, endTrim);
+    let fullTimeStemp = new Date(parseInt(fullTimeStempNumber));
+
+    //Note: in getMOnth function 0=January, 1=February etc...
+
+    let dd = fullTimeStemp.getDate();
+
+    let mm = fullTimeStemp.getMonth() + 1;
+
+    let yyyy = fullTimeStemp.getFullYear();
+
+    return `${dd}.${mm}.${yyyy}`;
+}
+
+// Copied from viewVolunteer.html
+const ConvertDBDate2UIFullStempDate = (dateAsStr) => {
+    if (dateAsStr === undefined) return;
+    let startTrim = dateAsStr.indexOf('(') + 1;
+    let endTrim = dateAsStr.indexOf(')');
+    let fullTimeStempNumber = dateAsStr.substring(startTrim, endTrim);
+    let fullTimeStemp = new Date(parseInt(fullTimeStempNumber));
+    return fullTimeStemp;
 }
 
 
@@ -1088,6 +1406,9 @@ function refresh_amuta_vls_list_Table(query_object) {
                 bLengthChange: false,
                 data: arr_rides,
                 destroy: true,
+                "language": {
+                    "search": "חיפוש:"
+                },
                 columnDefs: [
                     { "orderData": [0, 1], "targets": 0 }],
                 columns: [
@@ -1105,7 +1426,7 @@ function refresh_amuta_vls_list_Table(query_object) {
 
 
                 buttons: [
-                    'csv', 'excel',
+                    K_DataTable_CSV_EXPORT
                 ]
             });
         },
@@ -1154,6 +1475,9 @@ function refresh_amuta_vls_per_pat_Table(patient) {
                 bLengthChange: false,
                 data: arr_rides,
                 destroy: true,
+                "language": {
+                    "search": "חיפוש:"
+                },
                 columnDefs: [
                     { "orderData": [0, 1], "targets": 0 }],
                 columns: [
@@ -1173,7 +1497,8 @@ function refresh_amuta_vls_per_pat_Table(patient) {
                 ],
                 dom: 'Bfrtip',
                 buttons: [
-                     'csv', 'excel', 'pdf'
+                    K_DataTable_PDF_EXPORT,
+                    K_DataTable_CSV_EXPORT
                 ]
             });
         },
@@ -1269,6 +1594,9 @@ function refreshTable(volunteerId, start_date, end_date) {
                 bLengthChange: false,
                 data: ridesToShow,
                 destroy: true,
+                "language": {
+                    "search": "חיפוש:"
+                },
                 columnDefs: [
                     { "orderData": [0, 3], "targets": 0 }],
                 columns: [
@@ -1281,7 +1609,8 @@ function refreshTable(volunteerId, start_date, end_date) {
                 ],
                 dom: 'Bfrtip',
                 buttons: [
-                     'csv', 'excel', 'pdf'
+                    K_DataTable_PDF_EXPORT,
+                    K_DataTable_CSV_EXPORT
                 ]
             });
         },
@@ -1336,6 +1665,7 @@ function hide_all_tables() {
     $('#div_table_amuta_vls_per_month').hide();
     $("#div_table_pil_vls_per_month").hide();
     $("#div_table_pil_vl_ride_month").hide();
+    $("#div_table_pil_vl_ride_recent_period").hide();
  }
 
 

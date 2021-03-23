@@ -116,6 +116,14 @@ public class ReportService
         public SqlParameter[] sqlParameters { get; set;  }
     }
 
+    public class VolunteersInPeriod
+    {
+        public String Id { get; set; }
+        public string Volunteer { get; set; }
+        public string CityCityName { get; set; }
+        public string CellPhone { get; set; }
+    }
+
 
     private DataTable getDriverByID(int driverID, DbService db)
     {
@@ -623,6 +631,50 @@ order BY DisplayName ASC
                 result.Add(dr["Permission"].ToString());
             }
         }
+        return result;
+    }
+
+
+
+    internal List<VolunteersInPeriod> GetReportSliceVolunteersInPeriod(int delta_start, int delta_end)
+    {
+        DbService db = new DbService();
+        List<VolunteersInPeriod> result = new List<VolunteersInPeriod>();
+
+        string query =
+@"select DISTINCT rp.MainDriver, Volunteer.DisplayName, Volunteer.CityCityName, Volunteer.CellPhone
+FROM RPView  rp
+INNER JOIN Volunteer on Volunteer.Id = rp.MainDriver 
+where pickuptime > dateadd(day, @delta_start, getdate()) 
+and pickuptime <= getdate()
+and not  MainDriver in ( select DISTINCT MainDriver from RPView 
+where pickuptime > dateadd(day, @delta_end, getdate())
+and pickuptime <= getdate() 
+and MainDriver is not NULL)
+";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@delta_start", SqlDbType.Int).Value = delta_start;
+        cmd.Parameters.Add("@delta_end", SqlDbType.Int).Value = delta_end;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+
+        if (ds != null && ds.Tables.Count > 0)
+        {
+            DataTable dt = ds.Tables[0];
+
+            foreach (DataRow dr in dt.Rows)
+            {
+                VolunteersInPeriod obj = new VolunteersInPeriod();
+                obj.Id = dr["MainDriver"].ToString();
+                obj.Volunteer = dr["DisplayName"].ToString();
+                obj.CellPhone = dr["CellPhone"].ToString();
+                obj.CityCityName = dr["CityCityName"].ToString();
+                result.Add(obj);
+            }
+        }
+
         return result;
     }
 
