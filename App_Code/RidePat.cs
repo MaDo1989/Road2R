@@ -1112,7 +1112,11 @@ public class RidePat
                     {
                         rp.pat.Equipment.Add(row.ItemArray[0].ToString());
                     }
-                    rp.pat.EscortedList = new List<Escorted>();
+
+                    //  rp.pat.EscortedList = new List<Escorted>();
+                    //↓↑ yogev switched that↓↑
+                    rp.Escorts = new List<Escorted>();
+                    
                     string escortSearchExpression = "RidePatNum = " + rp.ridePatNum;
                     DataRow[] escortRow = escortTable.Select(escortSearchExpression);
                     foreach (DataRow row in escortRow)
@@ -1120,7 +1124,10 @@ public class RidePat
                         Escorted e = new Escorted();
                         e.Id = int.Parse(row[0].ToString());
                         e.DisplayName = row[1].ToString();
-                        rp.pat.EscortedList.Add(e);
+                        
+                        rp.Escorts.Add(e);
+                        //↓↑ yogev switched that↓↑
+                        // rp.pat.EscortedList.Add(e);
                     }
 
                     Location origin = new Location();

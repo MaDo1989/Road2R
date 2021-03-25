@@ -1270,24 +1270,80 @@
 
         function buildTables(table) {
 
+            //#region STRING BUILDERS
+            let thisrp_escorts_span = '<span class="numOfEscorts">הסעה ללא מלווים</span>';
+                /*
+                document.createElement('span');
+            thisrp_escorts_span.innerHTML = 'הסעה ללא מלווים';
+            let thisrp_escorts = '<span class="numOfEscorts">הסעה ללא מלווים</span>';
+            */
+            let numOfEscorts = arr_rides[i].Escorts.length;
+            if (numOfEscorts > 0) {
+                thisrp_escorts_span = numOfEscorts === 1 ?
+                    '<span class="numOfEscorts">מלווה 1</span>' :
+                    `<span class="numOfEscorts">${arr_rides[i].Escorts.length} מלווים</span>`;
+            }
+
+            //#endregion STRING BUILDERS
+
+
+
             if (arr_rides[i].Pat.DisplayName.includes("אנונימי")) {
                 arr_rides[i].Pat.DisplayName = "חולה";
             }
             if (arr_rides[i].Status.indexOf("ממתינה לשיבוץ") !== -1 || (arr_rides[i].Status.indexOf("אין נסיעת הלוך") !== -1 && arr_rides[i].Status.indexOf("ויש נהג משובץ") === -1)) {
                 if (isAssistant) {
                     if (table.context[0].sTableId != "datatable-future" && table.context[0].sTableId != "datatable-tomorrow") {
-                        table.row.add([time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, "אין!<br/>None!", "Waiting for a driver", arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add(
+                            [
+                                time,
+                                arr_rides[i].Origin.EnglishName,
+                                arr_rides[i].Destination.EnglishName,
+                                arr_rides[i].Pat.EnglishName + thisrp_escorts_span,
+                                "אין!<br/>None!",
+                                "Waiting for a driver",
+                                arr_rides[i].LastModified.slice(0, -3),
+                                arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
+                                btnStr,
+                                arr_rides[i].Pat.IsAnonymous
+                            ]).draw(false);
                     }
                     else {
                         table.row.add([date2, time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, "אין!<br/>None!", "Waiting for a driver", arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
                     }
                 }
-                else {
+                else { //not assistant
+
                     if (table.context[0].sTableId != "datatable-future" && table.context[0].sTableId != "datatable-tomorrow") {
-                        table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!<br/>None!", arr_rides[i].Status, arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add(
+                            [
+                                time,
+                                arr_rides[i].Origin.Name,
+                                arr_rides[i].Destination.Name,
+                                arr_rides[i].Pat.DisplayName + thisrp_escorts_span,
+                                "אין!<br/>None!",
+                                arr_rides[i].Status,
+                                arr_rides[i].LastModified.slice(0, -3),
+                                arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
+                                btnStr,
+                                arr_rides[i].Pat.IsAnonymous
+                            ]).draw(false);
                     }
                     else {
-                        table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, "אין!<br/>None!", arr_rides[i].Status, arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add(
+                            [
+                                date2,
+                                time,
+                                arr_rides[i].Origin.Name,
+                                arr_rides[i].Destination.Name,
+                                arr_rides[i].Pat.DisplayName + thisrp_escorts_span,
+                                "אין!<br/>None!",
+                                arr_rides[i].Status,
+                                arr_rides[i].LastModified.slice(0, -3),
+                                arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
+                                btnStr,
+                                arr_rides[i].Pat.IsAnonymous
+                            ]).draw(false);
                     }
                 }
             }
@@ -1328,18 +1384,65 @@
                         s = 'Delay at the border';
                     }
                     if (table.context[0].sTableId != "datatable-future" && table.context[0].sTableId != "datatable-tomorrow") {
-                        table.row.add([time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, drivers, s, arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add(
+                            [
+                                time,
+                                arr_rides[i].Origin.EnglishName,
+                                arr_rides[i].Destination.EnglishName,
+                                arr_rides[i].Pat.EnglishName + thisrp_escorts_span,
+                                drivers, s, arr_rides[i].LastModified.slice(0, -3),
+                                arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
+                                btnStr,
+                                arr_rides[i].Pat.IsAnonymous
+                            ]).draw(false);
                     }
                     else {
-                        table.row.add([date2, time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, drivers, s, arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add(
+                            [
+                                date2,
+                                time,
+                                arr_rides[i].Origin.EnglishName,
+                                arr_rides[i].Destination.EnglishName,
+                                arr_rides[i].Pat.EnglishName + thisrp_escorts_span,
+                                drivers,
+                                s,
+                                arr_rides[i].LastModified.slice(0, -3),
+                                arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
+                                btnStr,
+                                arr_rides[i].Pat.IsAnonymous
+                            ]).draw(false);
                     }
                 }
                 else {
                     if (table.context[0].sTableId != "datatable-future" && table.context[0].sTableId != "datatable-tomorrow") {
-                        table.row.add([time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add(
+                            [
+                                time,
+                                arr_rides[i].Origin.Name,
+                                arr_rides[i].Destination.Name,
+                                arr_rides[i].Pat.DisplayName + thisrp_escorts_span,
+                                drivers,
+                                arr_rides[i].Status,
+                                arr_rides[i].LastModified.slice(0, -3),
+                                arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
+                                btnStr,
+                                arr_rides[i].Pat.IsAnonymous
+                            ]).draw(false);
                     }
                     else {
-                        table.row.add([date2, time, arr_rides[i].Origin.Name, arr_rides[i].Destination.Name, arr_rides[i].Pat.DisplayName, drivers, arr_rides[i].Status, arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add(
+                            [
+                                date2,
+                                time,
+                                arr_rides[i].Origin.Name,
+                                arr_rides[i].Destination.Name,
+                                arr_rides[i].Pat.DisplayName + thisrp_escorts_span,
+                                drivers, arr_rides[i].Status,
+                                arr_rides[i].LastModified.slice(0, -3),
+                                arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
+                                btnStr,
+                                arr_rides[i].Pat.IsAnonymous
+                            ]).draw(false);
                     }
                 }
 

@@ -13,7 +13,7 @@
 }
 
 #overRideBS_modal-dialog {
-            /*↓ this is work fine*/
+    /*↓ this is work fine*/
     width: fit-content;
     margin: 0 auto;
 }
@@ -31,7 +31,7 @@
 }
 
 
-.overRideBS_label{
+.overRideBS_label {
     font-weight: normal;
 }
 /* cool switch */
@@ -97,3 +97,8 @@ input:checked + .slider:before {
     }
 
 /* cool switch */
+
+.numOfEscorts {
+    display: block;
+    font-weight: bold;
+}
