@@ -1122,9 +1122,9 @@ public class RidePat
                     foreach (DataRow row in escortRow)
                     {
                         Escorted e = new Escorted();
-                        e.Id = int.Parse(row[0].ToString());
-                        e.DisplayName = row[1].ToString();
-                        
+                        e.Id = int.Parse(row["Id"].ToString());
+                        e.DisplayName = row["DisplayName"].ToString();
+                        e.CellPhone = row["CellPhone"].ToString();
                         rp.Escorts.Add(e);
                         //↓↑ yogev switched that↓↑
                         // rp.pat.EscortedList.Add(e);

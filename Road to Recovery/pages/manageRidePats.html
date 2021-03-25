@@ -74,6 +74,7 @@
         var returnDriverMsg;
 
         let arrayOF_areasObj = [];
+        const { validateMobileNum } = GENERAL.USEFULL_FUNCTIONS;
 
         function wiringDataTables() {
             //manage button clicks on tables
@@ -363,7 +364,6 @@
                     "stateDuration": 60 * 60,
                     "columnDefs": [
                         { targets: 0, type: 'de_datetime' },
-                        { targets: 7, className: 'text-left-strong' },
                         {
                             targets: 4, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //4 is driver column
                                 if (cellData.indexOf('אין!') !== -1) {
@@ -385,6 +385,7 @@
                                 }
                             }
                         },
+                        { targets: 7, className: 'text-left-strong' },
 
                     ],
 
@@ -1268,28 +1269,86 @@
 
         }
 
+        const showMe = (spanElement) => {
+
+            const displayName = spanElement.innerHTML;
+            const func = 'edit';
+            arr_details = { displayName, func };
+            GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
+            location.href = "patientForm.html";
+
+
+            /*
+                   var data = tbl.row($(this).parents('tr')).data();
+                GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
+                if (data.DisplayName.indexOf("אנונימי") != -1) {
+                    location.href = "anonymousPatientForm.html";
+                }
+                else location.href = "patientForm.html";
+             */
+        }
+
         function buildTables(table) {
 
-            //#region STRING BUILDERS
+
             let thisrp_escorts_span = '<span class="numOfEscorts">הסעה ללא מלווים</span>';
-                /*
-                document.createElement('span');
-            thisrp_escorts_span.innerHTML = 'הסעה ללא מלווים';
-            let thisrp_escorts = '<span class="numOfEscorts">הסעה ללא מלווים</span>';
-            */
             let numOfEscorts = arr_rides[i].Escorts.length;
+            let phone2render = '';
+            let equipments = '';
+
             if (numOfEscorts > 0) {
-                thisrp_escorts_span = numOfEscorts === 1 ?
-                    '<span class="numOfEscorts">מלווה 1</span>' :
-                    `<span class="numOfEscorts">${arr_rides[i].Escorts.length} מלווים</span>`;
+                if (numOfEscorts === 1) {
+
+                    thisrp_escorts_span = '<span class="numOfEscorts">מלווה 1</span>';
+
+                    if (validateMobileNum(arr_rides[i].Escorts[0].CellPhone)) {
+
+                        phone2render = `<span class="phone2render">${arr_rides[i].Escorts[0].DisplayName}:
+                                        ${arr_rides[i].Escorts[0].CellPhone}</span>`;
+                    } else if (validateMobileNum(arr_rides[i].Pat.CellPhone)) {
+
+                        phone2render = `<span class="phone2render">${arr_rides[i].Pat.CellPhone}</span>`;
+                    }
+                } else {
+                    thisrp_escorts_span = `<span class="numOfEscorts">${arr_rides[i].Escorts.length} מלווים</span>`;
+
+                    arr_rides[i].Escorts.map((es) => {
+                        phone2render +=
+                            validateMobileNum(es.CellPhone) ?
+                                `<span class="phone2render">${es.DisplayName}: ${es.CellPhone}</span>`
+                                :
+                                `<span class="phone2render">${es.DisplayName}: סלולארי לא תיקני</span>`;
+                    });
+                }
+
+            } else {
+                if (validateMobileNum(arr_rides[i].Pat.CellPhone)) {
+                    phone2render = `<span class="phone2render">${arr_rides[i].Pat.CellPhone}</span>`;
+                } else {
+                    phone2render = '<span class="numOfEscorts">אין נייד תיקני במערכת</span>';
+                }
+            }
+            if (arr_rides[i].Pat.Equipment.length > 0) {
+
+                equipments = `<div class="equipments">`;
+                arr_rides[i].Pat.Equipment.map((eq) => {
+                    equipments += eq + ', ';
+                });
+                equipments += `</div>`;
             }
 
-            //#endregion STRING BUILDERS
+            let patientAddons = thisrp_escorts_span + phone2render + equipments;
 
 
+            let patientName2render = '';
+            let patient_English_Name2render = '';
 
             if (arr_rides[i].Pat.DisplayName.includes("אנונימי")) {
-                arr_rides[i].Pat.DisplayName = "חולה";
+                //arr_rides[i].Pat.DisplayName = "חולה";
+                patientName2render = "<span>חולה</span>";
+            } else {
+                patientName2render = `<span onclick=showMe(this) class='clickable' id='${arr_rides[i].Pat.Id}'>${arr_rides[i].Pat.DisplayName}</span>`;
+                patient_English_Name2render = `<span onclick=showMe(this) class='clickable' id='${arr_rides[i].Pat.Id}'>${arr_rides[i].Pat.EnglishName}</span>`;
             }
             if (arr_rides[i].Status.indexOf("ממתינה לשיבוץ") !== -1 || (arr_rides[i].Status.indexOf("אין נסיעת הלוך") !== -1 && arr_rides[i].Status.indexOf("ויש נהג משובץ") === -1)) {
                 if (isAssistant) {
@@ -1299,7 +1358,7 @@
                                 time,
                                 arr_rides[i].Origin.EnglishName,
                                 arr_rides[i].Destination.EnglishName,
-                                arr_rides[i].Pat.EnglishName + thisrp_escorts_span,
+                                patient_English_Name2render + patientAddons,
                                 "אין!<br/>None!",
                                 "Waiting for a driver",
                                 arr_rides[i].LastModified.slice(0, -3),
@@ -1309,7 +1368,20 @@
                             ]).draw(false);
                     }
                     else {
-                        table.row.add([date2, time, arr_rides[i].Origin.EnglishName, arr_rides[i].Destination.EnglishName, arr_rides[i].Pat.EnglishName, "אין!<br/>None!", "Waiting for a driver", arr_rides[i].LastModified.slice(0, -3), arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName, btnStr, arr_rides[i].Pat.IsAnonymous]).draw(false);
+                        table.row.add(
+                            [
+                                date2,
+                                time,
+                                arr_rides[i].Origin.EnglishName,
+                                arr_rides[i].Destination.EnglishName,
+                                patient_English_Name2render + patientAddons,
+                                "אין!<br/>None!",
+                                "Waiting for a driver",
+                                arr_rides[i].LastModified.slice(0, -3),
+                                arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
+                                btnStr,
+                                arr_rides[i].Pat.IsAnonymous
+                            ]).draw(false);
                     }
                 }
                 else { //not assistant
@@ -1320,7 +1392,7 @@
                                 time,
                                 arr_rides[i].Origin.Name,
                                 arr_rides[i].Destination.Name,
-                                arr_rides[i].Pat.DisplayName + thisrp_escorts_span,
+                                patientName2render + patientAddons,
                                 "אין!<br/>None!",
                                 arr_rides[i].Status,
                                 arr_rides[i].LastModified.slice(0, -3),
@@ -1336,7 +1408,7 @@
                                 time,
                                 arr_rides[i].Origin.Name,
                                 arr_rides[i].Destination.Name,
-                                arr_rides[i].Pat.DisplayName + thisrp_escorts_span,
+                                patientName2render + patientAddons,
                                 "אין!<br/>None!",
                                 arr_rides[i].Status,
                                 arr_rides[i].LastModified.slice(0, -3),
@@ -1389,7 +1461,7 @@
                                 time,
                                 arr_rides[i].Origin.EnglishName,
                                 arr_rides[i].Destination.EnglishName,
-                                arr_rides[i].Pat.EnglishName + thisrp_escorts_span,
+                                patient_English_Name2render + patientAddons,
                                 drivers, s, arr_rides[i].LastModified.slice(0, -3),
                                 arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
                                 btnStr,
@@ -1403,7 +1475,7 @@
                                 time,
                                 arr_rides[i].Origin.EnglishName,
                                 arr_rides[i].Destination.EnglishName,
-                                arr_rides[i].Pat.EnglishName + thisrp_escorts_span,
+                                patient_English_Name2render + patientAddons,
                                 drivers,
                                 s,
                                 arr_rides[i].LastModified.slice(0, -3),
@@ -1420,7 +1492,7 @@
                                 time,
                                 arr_rides[i].Origin.Name,
                                 arr_rides[i].Destination.Name,
-                                arr_rides[i].Pat.DisplayName + thisrp_escorts_span,
+                                patientName2render + patientAddons,
                                 drivers,
                                 arr_rides[i].Status,
                                 arr_rides[i].LastModified.slice(0, -3),
@@ -1436,7 +1508,7 @@
                                 time,
                                 arr_rides[i].Origin.Name,
                                 arr_rides[i].Destination.Name,
-                                arr_rides[i].Pat.DisplayName + thisrp_escorts_span,
+                                patientName2render + patientAddons,
                                 drivers, arr_rides[i].Status,
                                 arr_rides[i].LastModified.slice(0, -3),
                                 arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
@@ -1613,7 +1685,7 @@
                                                             <th class="middle" title="Time  الساعة">שעה</th>
                                                             <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
                                                             <th class="middle" title="Destination  نقطة الوصول">יעד</th>
-                                                            <th class="middle" title="Patient  المريض">החולה</th>
+                                                            <th class="customWidth4column middle" title="Patient  المريض">החולה</th>
                                                             <th class="middle" title="Driver  السائق">המסיע</th>
                                                             <th class="middle" title="Status  حالة السفرية">סטטוס ההסעה</th>
                                                             <th class="customWidth middle" title="Last modified">עודכן לאחרונה</th>

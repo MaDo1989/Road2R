@@ -182,6 +182,32 @@ var GENERAL = {
             str = str.substring(0, str.lastIndexOf(", "));
             return str;
         },
+        /**
+            * Gets a string of israeli phone number with no "-".
+            * Returns a boolean weather the phone number has 10 valid digits
+        */
+        validateMobileNum: (mobileNum) => {
+
+            if (!mobileNum || isNaN(parseInt(mobileNum))) { return false; }
+
+            return mobileNum.length === 10;
+        },
+        /**
+            * Gets a string of israeli phone number with no "-".
+            * Returns a boolean weather the phone number valid or not, true is valid
+        */  
+        validateMobileNumFullVersion: (mobileNum) => {
+
+            if (!mobileNum || isNaN(parseInt(mobileNum))) { return false; }
+
+            if (mobileNum.length !== 10) { return false; }
+
+            const num2test_arr = Array.from(mobileNum);
+
+            if (num2test_arr[0] !== '0' || num2test_arr[1] !== '5') { return false; }
+
+            return true;
+        },
 
     },
 

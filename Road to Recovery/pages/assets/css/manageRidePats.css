@@ -98,7 +98,17 @@ input:checked + .slider:before {
 
 /* cool switch */
 
-.numOfEscorts {
+.numOfEscorts, .phone2render {
     display: block;
     font-weight: bold;
+}
+
+.customWidth4column{
+    width: 10vw;
+}
+
+.clickable:hover {
+    cursor: pointer;
+    color: mediumblue;
+    border-bottom: solid mediumblue 1px;
 }
