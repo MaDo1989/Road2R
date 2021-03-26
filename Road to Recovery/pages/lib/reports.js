@@ -1169,6 +1169,14 @@ function refresh_pil_vl_ride_recent_period_Table(start_number, end_number) {
     hide_all_tables();
 
 
+    let csv_export_button = {
+        exportOptions: {
+            columns: [0, 1,2 ] // do not export the Buttons column
+        }
+    };
+
+    Object.assign(csv_export_button, K_DataTable_CSV_EXPORT);  // Copy fields from reusable button
+
     $('#wait').show();
     var query_object = {
         start_number: start_number,
@@ -1214,9 +1222,8 @@ function refresh_pil_vl_ride_recent_period_Table(start_number, end_number) {
                     { data: "Buttons" }
                 ],
                 dom: 'Bfrtip',
-
-                buttons: [
-                    K_DataTable_CSV_EXPORT
+                buttons: [ 
+                    csv_export_button
                 ]
             });
             register_table_button_events();
