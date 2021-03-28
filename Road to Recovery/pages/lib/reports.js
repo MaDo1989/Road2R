@@ -1164,6 +1164,14 @@ function refresh_pil_vl_ride_month_Table(start_date, end_date) {
 }
 
 
+function get_buttons_pil_vl_ride_recent_period() {
+    let showDocumentedRidesAllBtn = '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5 showDocumentedRidesAllBtn" title="תיעוד הסעות" data-toggle="modal" data-target="#documentedRidesModal"><i class="fa fa-car" aria-hidden="true"></i></button>';
+    let showDocumentedRidesInPeriodBtn = '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5 showDocumentedRidesInPeriodBtn" title="תיעוד הסעות בתקופה" style = "margin-right: 0.5em" data-toggle="modal" data-target="#documentedRidesModal">';
+    showDocumentedRidesInPeriodBtn += '<div class="fa-stack" style="width:1em; height:1em;line-height:1em;"> <i class="fa fa-car"></i>';
+    showDocumentedRidesInPeriodBtn += '<i class="fa fa-filter" style="position:absolute;right:-1em;font-size: 0.7em;color:yellow"></i></div > ';
+    showDocumentedRidesInPeriodBtn += '</button > ';
+    return '<div>' + showDocumentedRidesAllBtn + showDocumentedRidesInPeriodBtn + '</div>';
+}
 
 function refresh_pil_vl_ride_recent_period_Table(start_number, end_number) {
     hide_all_tables();
@@ -1198,10 +1206,10 @@ function refresh_pil_vl_ride_recent_period_Table(start_number, end_number) {
             $('#wait').hide();
             var records = data.d;
 
+            let buttons_html = get_buttons_pil_vl_ride_recent_period();
             // Add buttons to the table
             for (a_rec of records) {
-                let showDocumentedRidesBtn = '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5 showDocumentedRidesBtn" title="תיעוד הסעות" data-toggle="modal" data-target="#documentedRidesModal"><i class="fa fa-car" aria-hidden="true"></i></button>';
-                a_rec.Buttons = showDocumentedRidesBtn;
+                a_rec.Buttons = buttons_html;
             }
 
             $('#div_table_pil_vl_ride_recent_period').show();
@@ -1236,129 +1244,163 @@ function refresh_pil_vl_ride_recent_period_Table(start_number, end_number) {
 
 }
 
+function filter_by_period(data, start_date, end_date) {
+    if (start_date == null || end_date == null) {
+        return data;
+    }
+
+    let result = data.filter(a_rec => { let this_date = moment(ConvertDBDate2UIFullStempDate(a_rec.Date)); return this_date.isBetween(start_date, end_date); } );
+    return result;
+}
+
+function show_rides_history(element, start_date, end_date) {
+
+    $('#wait').show();
+
+    let rowData = tbl.row(element.parents('tr')).data();
+    let title_str = "תיעוד הסעות " + rowData.Volunteer + " ";
+    if (start_date != null) {
+        title_str += "בתקופה  ";
+    }
+    $('#documentedRidesTitle').text(title_str);
+
+
+    $.ajax({
+        dataType: "json",
+        url: "WebService.asmx/GetVolunteersDocumentedRides",
+        contentType: "application/json; charset=utf-8",
+        type: "POST",
+        data: JSON.stringify({ volunteerId: rowData.Id }),
+        success: function (data) {
+            orig_data = JSON.parse(data.d)
+            data = filter_by_period(orig_data, start_date, end_date);
+
+
+            if (S_HistoryTable != null) {
+                S_HistoryTable.destroy();
+            }
+
+
+            S_HistoryTable = $('#documentedRidesTable').DataTable({
+                order: [[5, "desc"]],
+                pageLength: 10,
+                data: data,
+                columns: [
+                    {
+                        data: (data) => {
+                            // if (data.Date === undefined) return;
+                            return ConvertDBDate2UIDate(data.Date);
+                        }
+                    },
+                    {
+                        data: (data) => {
+                            if (data.Date === undefined) return;
+
+                            let fullTimeStempStr = data.Date;
+                            let startTrim = fullTimeStempStr.indexOf('(') + 1;
+                            let endTrim = fullTimeStempStr.indexOf(')');
+                            let fullTimeStempNumber = fullTimeStempStr.substring(startTrim, endTrim);
+                            let fullTimeStemp = new Date(parseInt(fullTimeStempNumber));
+
+                            if (fullTimeStemp.getMinutes() === 14) {
+                                if (fullTimeStemp.getHours() === 19 || fullTimeStemp.getHours() === 20 || fullTimeStemp.getHours() === 21 || fullTimeStemp.getHours() === 22) {
+                                    return 'אחה"צ';
+                                }
+                            }
+
+                            let hh = fullTimeStemp.getHours() < 10 ? "0" + fullTimeStemp.getHours() : fullTimeStemp.getHours();
+                            hh += ":";
+                            let mm = fullTimeStemp.getMinutes() < 10 ? "0" + fullTimeStemp.getMinutes() : fullTimeStemp.getMinutes();
+                            return hh + mm;
+                        }
+                    },
+                    {
+                        data: (data) => {
+                            if (data.Origin === undefined || data.Destination === undefined) return;
+
+                            let fullPath = data.Origin.Name + " ← " + data.Destination.Name;
+                            return fullPath;
+                        }
+                    },
+                    { data: "Pat.DisplayName" },
+                    { data: "Remark" },
+                    {
+                        data: (data) => {
+                            return ConvertDBDate2UIFullStempDate(data.Date);
+                        }
+                    },
+
+                ],
+                columnDefs: [
+                    { "targets": [0], type: 'de_date' },
+                    /*
+                     Amir wanted a seperated columns to date and time but still sort by the full time stemps (or the acctual ticks)
+                     so my (Yogev) soolution was to
+                     1. fetch the fulltime stemp from the back-end
+                     2. render and sort by this column
+                     3. not showing it to the user
+                      ↓*/
+                    { "targets": [5], visible: false },
+                    //↑
+                    {
+                        "targets": [0],
+                        render: function (data, type, full, meta) {
+                            let now = new Date();
+                            if (ConvertDBDate2UIFullStempDate(full.Date) > now) {
+                                var rowIndex = meta.row + 1;
+                                $('#documentedRidesTable tbody tr:nth-child(' + rowIndex + ')').addClass('futureRide');
+                                return data;
+                            } else {
+                                return data;
+                            }
+                        }
+                    },
+                    { "targets": 0, width: "10%" },
+                    { "targets": 1, width: "10%" },
+                    { "targets": 2, width: "20%" },
+                    { "targets": 3, width: "25%" },
+                    { "targets": 4, width: "35%" }
+
+                ]
+            });
+            $('#wait').hide();
+
+        },
+        error: function (err) {
+            alert("Error in GetVolunteersRideHistory: " + err.responseText);
+            $('#wait').hide();
+        }
+    });
+
+
+}
+
 
 // Copied from viewVolunteer.html:  buttonsEvents 
 function register_table_button_events() {
 
-    $(".showDocumentedRidesBtn").click ( function () {
-
-        $('#wait').show();
-
-        let rowData = tbl.row($(this).parents('tr')).data();
-        console.log(rowData);
-
-        $('#documentedRidesTitle').text("תיעוד הסעות " + rowData.Volunteer)
-        $.ajax({
-            dataType: "json",
-            url: "WebService.asmx/GetVolunteersDocumentedRides",
-            contentType: "application/json; charset=utf-8",
-            type: "POST",
-            data: JSON.stringify({ volunteerId: rowData.Id }),
-            success: function (data) {
-                data = JSON.parse(data.d)
-
-                if (S_HistoryTable != null) {
-                    S_HistoryTable.destroy();
-                }
-
-
-                S_HistoryTable = $('#documentedRidesTable').DataTable({
-                    order: [[5, "desc"]],
-                    pageLength: 10,
-                    data: data,
-                    columns: [
-                        {
-                            data: (data) => {
-                                // if (data.Date === undefined) return;
-                                return ConvertDBDate2UIDate(data.Date);
-                            }
-                        },
-                        {
-                            data: (data) => {
-                                if (data.Date === undefined) return;
-
-                                let fullTimeStempStr = data.Date;
-                                let startTrim = fullTimeStempStr.indexOf('(') + 1;
-                                let endTrim = fullTimeStempStr.indexOf(')');
-                                let fullTimeStempNumber = fullTimeStempStr.substring(startTrim, endTrim);
-                                let fullTimeStemp = new Date(parseInt(fullTimeStempNumber));
-
-                                if (fullTimeStemp.getMinutes() === 14) {
-                                    if (fullTimeStemp.getHours() === 19 || fullTimeStemp.getHours() === 20 || fullTimeStemp.getHours() === 21 || fullTimeStemp.getHours() === 22) {
-                                        return 'אחה"צ';
-                                    }
-                                }
-
-                                let hh = fullTimeStemp.getHours() < 10 ? "0" + fullTimeStemp.getHours() : fullTimeStemp.getHours();
-                                hh += ":";
-                                let mm = fullTimeStemp.getMinutes() < 10 ? "0" + fullTimeStemp.getMinutes() : fullTimeStemp.getMinutes();
-                                return hh + mm;
-                            }
-                        },
-                        {
-                            data: (data) => {
-                                if (data.Origin === undefined || data.Destination === undefined) return;
-
-                                let fullPath = data.Origin.Name + " ← " + data.Destination.Name;
-                                return fullPath;
-                            }
-                        },
-                        { data: "Pat.DisplayName" },
-                        { data: "Remark" },
-                        {
-                            data: (data) => {
-                                return ConvertDBDate2UIFullStempDate(data.Date);
-                            }
-                        },
-
-                    ],
-                    columnDefs: [
-                        { "targets": [0], type: 'de_date' },
-                        /*
-                         Amir wanted a seperated columns to date and time but still sort by the full time stemps (or the acctual ticks)
-                         so my (Yogev) soolution was to
-                         1. fetch the fulltime stemp from the back-end
-                         2. render and sort by this column
-                         3. not showing it to the user
-                          ↓*/
-                        { "targets": [5], visible: false },
-                        //↑
-                        {
-                            "targets": [0],
-                            render: function (data, type, full, meta) {
-                                let now = new Date();
-                                if (ConvertDBDate2UIFullStempDate(full.Date) > now) {
-                                    var rowIndex = meta.row + 1;
-                                    $('#documentedRidesTable tbody tr:nth-child(' + rowIndex + ')').addClass('futureRide');
-                                    return data;
-                                } else {
-                                    return data;
-                                }
-                            }
-                        },
-                        { "targets": 0, width: "10%" },
-                        { "targets": 1, width: "10%" },
-                        { "targets": 2, width: "20%" },
-                        { "targets": 3, width: "25%" },
-                        { "targets": 4, width: "35%" }
-
-                    ]
-                });
-                $('#wait').hide();
-
-            },
-            error: function (err) {
-                alert("Error in GetVolunteersRideHistory: " + err.responseText);
-                $('#wait').hide();
-            }
-        });
-
-
+    $(".showDocumentedRidesAllBtn").click(function () {
+        show_rides_history($(this), null, null);
     });
+
+
+    $(".showDocumentedRidesInPeriodBtn").click(function () {
+        var start_str = $("#input_period_begin").val();
+        var end_str = $("#input_period_end").val();
+        let start_date = moment().subtract(+start_str, 'd');
+        let end_date = moment().subtract(+end_str, 'd');
+
+        console.log(start_str, end_str, start_date, end_date);
+
+        show_rides_history($(this), start_date, end_date);
+    });
+
+
 
 }
 
 // Copied from viewVolunteer.html
+// The iput timestamp is  "/Date(1616560200000)/"
 const ConvertDBDate2UIDate = (fullTimeStempStr) => {
     if (fullTimeStempStr === undefined) return;
     let startTrim = fullTimeStempStr.indexOf('(') + 1;
