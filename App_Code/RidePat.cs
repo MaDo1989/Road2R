@@ -1040,6 +1040,7 @@ public class RidePat
                     RidePat rp = new RidePat();
                     rp.Coordinator = new Volunteer();
                     rp.Coordinator.DisplayName = dr["Coordinator"].ToString();
+                    rp.Remark = dr["Remark"].ToString();
                     rp.Drivers = new List<Volunteer>();
                     // if (numOfDrivers != 0)
                     //  {

@@ -111,4 +111,18 @@ input:checked + .slider:before {
     cursor: pointer;
     color: mediumblue;
     border-bottom: solid mediumblue 1px;
+    max-width: fit-content;
+                /*↑ works great in chrome*/
+}
+
+.driverName, .driverCellPhone {
+    display: block;
+}
+
+.equipments{
+    text-align: left;
+}
+
+.equipments-img{
+    height: 2vh;
 }

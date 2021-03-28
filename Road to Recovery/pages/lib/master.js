@@ -208,6 +208,23 @@ var GENERAL = {
 
             return true;
         },
+            /**
+              * Gets a string of israeli phone number with no "-".
+              * Returns a new string of the phone number with a string seperator
+            */
+        addSeperator2MobileNum: (mobileNum, Seperator) => {
+
+            let newStr = '';
+            newStr = mobileNum.substring(0, 3);
+
+            newStr += Seperator;
+
+            newStr += mobileNum.substring(3, mobileNum.length);
+
+            return newStr;
+
+        },
+
 
     },
 

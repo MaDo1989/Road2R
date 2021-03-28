@@ -1185,7 +1185,11 @@
             var errorElement = 'em';
             $('#PatientIdentity_ErrorMsg').hide();
 
-            let existingPatients = JSON.parse(GENERAL.PATIENTS.getPatients());
+            let existingPatients = [];
+            if (GENERAL.PATIENTS.getPatients() !== '') {
+                existingPatients = JSON.parse(GENERAL.PATIENTS.getPatients());
+            }
+               
 
             $('#PatientIdentity').blur(function () {
 
