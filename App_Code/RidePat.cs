@@ -583,8 +583,7 @@ public class RidePat
                     }
                     catch (Exception ex)
                     {
-                      //  throw ex;
-
+                        throw ex;
                     }
                 }
 
@@ -1041,6 +1040,7 @@ public class RidePat
                     RidePat rp = new RidePat();
                     rp.Coordinator = new Volunteer();
                     rp.Coordinator.DisplayName = dr["Coordinator"].ToString();
+                    rp.Remark = dr["Remark"].ToString();
                     rp.Drivers = new List<Volunteer>();
                     // if (numOfDrivers != 0)
                     //  {
@@ -1113,15 +1113,22 @@ public class RidePat
                     {
                         rp.pat.Equipment.Add(row.ItemArray[0].ToString());
                     }
-                    rp.pat.EscortedList = new List<Escorted>();
+
+                    //  rp.pat.EscortedList = new List<Escorted>();
+                    //↓↑ yogev switched that↓↑
+                    rp.Escorts = new List<Escorted>();
+                    
                     string escortSearchExpression = "RidePatNum = " + rp.ridePatNum;
                     DataRow[] escortRow = escortTable.Select(escortSearchExpression);
                     foreach (DataRow row in escortRow)
                     {
                         Escorted e = new Escorted();
-                        e.Id = int.Parse(row[0].ToString());
-                        e.DisplayName = row[1].ToString();
-                        rp.pat.EscortedList.Add(e);
+                        e.Id = int.Parse(row["Id"].ToString());
+                        e.DisplayName = row["DisplayName"].ToString();
+                        e.CellPhone = row["CellPhone"].ToString();
+                        rp.Escorts.Add(e);
+                        //↓↑ yogev switched that↓↑
+                        // rp.pat.EscortedList.Add(e);
                     }
 
                     Location origin = new Location();

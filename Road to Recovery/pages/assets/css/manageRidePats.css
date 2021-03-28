@@ -13,7 +13,7 @@
 }
 
 #overRideBS_modal-dialog {
-            /*↓ this is work fine*/
+    /*↓ this is work fine*/
     width: fit-content;
     margin: 0 auto;
 }
@@ -31,7 +31,7 @@
 }
 
 
-.overRideBS_label{
+.overRideBS_label {
     font-weight: normal;
 }
 /* cool switch */
@@ -97,3 +97,32 @@ input:checked + .slider:before {
     }
 
 /* cool switch */
+
+.numOfEscorts, .phone2render {
+    display: block;
+    font-weight: bold;
+}
+
+.customWidth4column{
+    width: 10vw;
+}
+
+.clickable:hover {
+    cursor: pointer;
+    color: mediumblue;
+    border-bottom: solid mediumblue 1px;
+    max-width: fit-content;
+                /*↑ works great in chrome*/
+}
+
+.driverName, .driverCellPhone {
+    display: block;
+}
+
+.equipments{
+    text-align: left;
+}
+
+.equipments-img{
+    height: 2vh;
+}

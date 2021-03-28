@@ -512,8 +512,8 @@
             });
         }
 
-        function returnpatients() {
-            location.href = "viewPatient.html"
+        function goBack() {
+            history.back();
         }
         function returnanonymouspatient() {
             location.href = "anonymousPatientForm.html"
@@ -889,7 +889,7 @@
                                             </div>
                                         </div>
                                         <div class="text-right m-b-30 m-r-15">
-                                            <button type="button" onclick="returnpatients()" class="btn btn-default waves-effect w-md m-b-5"><i data-toggle="tooltip" title="عودة Back" class="ti-back-right m-r-5"></i>&nbsp Back &nbsp</button>
+                                            <button type="button" onclick="goBack()" class="btn btn-default waves-effect w-md m-b-5"><i data-toggle="tooltip" title="عودة Back" class="ti-back-right m-r-5"></i>&nbsp Back &nbsp</button>
                                             <div id="backToRide"><button type="button" onclick="createRide()" class="btn btn-info waves-effect w-md m-b-5"><i data-toggle="tooltip" title="عودة Back to ride"></i>&nbsp Create Ride &nbsp</button></div>
 
                                         </div>
@@ -1185,7 +1185,11 @@
             var errorElement = 'em';
             $('#PatientIdentity_ErrorMsg').hide();
 
-            let existingPatients = JSON.parse(GENERAL.PATIENTS.getPatients());
+            let existingPatients = [];
+            if (GENERAL.PATIENTS.getPatients() !== '') {
+                existingPatients = JSON.parse(GENERAL.PATIENTS.getPatients());
+            }
+               
 
             $('#PatientIdentity').blur(function () {
 

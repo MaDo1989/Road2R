@@ -268,7 +268,7 @@ public class WebService : System.Web.Services.WebService
         catch (Exception ex)
         {
             Log.Error("Error in setRidePat", ex);
-            throw new Exception("שגיאה בפתיחה/עדכון/מחיקה של הסעה חדשה");
+            throw new Exception("שגיאה בפתיחה/עדכון/מחיקה של הסעה חדשה " + ex.Message);
 
         }
     }
