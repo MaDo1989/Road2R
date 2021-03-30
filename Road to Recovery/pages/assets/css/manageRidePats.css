@@ -126,3 +126,7 @@ input:checked + .slider:before {
 .equipments-img{
     height: 2vh;
 }
+
+.blueFont {
+    color: rgb(40,96,145);
+}
