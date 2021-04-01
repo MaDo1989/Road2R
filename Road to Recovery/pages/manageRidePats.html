@@ -1300,7 +1300,7 @@
                     if (validateMobileNum(arr_rides[i].Escorts[0].CellPhone)) {
 
                         let es = arr_rides[i].Escorts[0];
-                        phone2render = es.IsAnonymous ? 
+                        phone2render = es.IsAnonymous ?
                             `<span class="phone2render">מלווה: ${addSeperator2MobileNum(es.CellPhone, '-')}</span>` :
                             `<span class="phone2render">${es.DisplayName}: ${addSeperator2MobileNum(es.CellPhone, '-')}</span>`;
 
@@ -1311,24 +1311,23 @@
                 } else {
                     thisrp_escorts_span = `<span class="numOfEscorts">${arr_rides[i].Escorts.length} מלווים</span>`;
 
-                    for (let j = 0; j < arr_rides[i].Escorts.length; j++) {
-
-                        if (validateMobileNum(arr_rides[i].Escorts[j].CellPhone)) {
-                            let es  = arr_rides[i].Escorts[j];
+                    let notOneEscort_WithValidCellPhone = true;
+                    arr_rides[i].Escorts.map((es, index, arr) => {
+                        if (validateMobileNum(es.CellPhone)) {
+                            notOneEscort_WithValidCellPhone = false;
                             phone2render += es.IsAnonymous ?
                                 `<span class="phone2render">מלווה: ${addSeperator2MobileNum(es.CellPhone, '-')}</span>` :
                                 `<span class="phone2render">${es.DisplayName}: ${addSeperator2MobileNum(es.CellPhone, '-')}</span>`;
-                            break;
                         }
-                        if (j === arr_rides[i].Escorts.length - 1) {//last one + didn't execute the break;
+                        if (index === arr.length - 1 && notOneEscort_WithValidCellPhone) {
+                            //last one and no escort with valid cellphone
                             if (validateMobileNum(arr_rides[i].Pat.CellPhone)) {
                                 phone2render = `<span class="phone2render">${addSeperator2MobileNum(arr_rides[i].Pat.CellPhone, '-')}</span>`;
                             } else {
                                 phone2render = `<span class="numOfEscorts">אין מס' נייד תקין במערכת</span>`;
                             }
                         }
-
-                    }
+                    });
                 }
 
             } else {
@@ -1338,7 +1337,7 @@
                     phone2render = `<span class="numOfEscorts">אין מס' נייד תקין במערכת</span>`;
                 }
             }
-            
+
             if (arr_rides[i].Pat.Equipment.length > 0) {
 
                 equipments = `<div class="equipments">`;

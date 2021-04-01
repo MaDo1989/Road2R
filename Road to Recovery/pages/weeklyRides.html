@@ -297,11 +297,14 @@
                             patDisplayName = arr_rides[i].Pat.DisplayName;
                         }
 
-                        if (arr_rides[i].Pat.EscortedList.length == 1) {
+
+                        //(arr_rides[i].Pat.EscortedList.length == 1
+                        if (arr_rides[i].Escorts.length == 1) {
                             patDisplayName += " + מלווה";
                         }
-                        else if (arr_rides[i].Pat.EscortedList.length > 1) {
-                            patDisplayName += " + " + arr_rides[i].Pat.EscortedList.length + " מלווים";
+                        //arr_rides[i].Pat.EscortedList.length
+                        else if (arr_rides[i].Escorts.length > 1) {
+                            patDisplayName += " + " + arr_rides[i].Escorts.length + " מלווים";
                         }
 
                         equipment = buildEquipmentString(arr_rides[i].Pat.Equipment);
