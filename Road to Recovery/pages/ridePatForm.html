@@ -196,18 +196,21 @@
         let patients_Names = []
         let rideNumber = 0;
         let x_wasClicked = false;
+        let existingPatient;
+        const ROOL_BACK = 'RESTORE PAGE BACK TO ITS INITIAL STATE';
 
 
         $(document).ready(function () {
             let { COPYWRITE } = GENERAL;
             $('#rights').html(COPYWRITE());
+
             //  GetCoordinatorsList();
             $('#saveCustomer').removeClass("saveHighlight");
             $('#deleteDriver').hide();
             generateDrivers()
             //$('#driversDiv').hide();
 
-            $('#wait').hide();
+            $('#wait').show();
             var pat = $("#pat").val();
             if (pat === "") {
                 $("#patientInfo").hide();
@@ -242,6 +245,7 @@
             }
             //datePicker();
             loadPage();
+
             $("#pat").blur(function () {
                 // fillData();
                 //getEquipmentForAnonymousPatient()
@@ -298,6 +302,14 @@
                 $("#patArabic").val("");
             });
 
+            if (arr_customer.func === 'new' && document.referrer.includes('patientForm.html')) {
+                
+                let patientFrom_patientForm = JSON.parse(localStorage.getItem('PatientNameForRide'));
+
+                let patientObj = patients_JSONArray.find(p => p.DisplayName.trim() === patientFrom_patientForm.trim());
+                patientObj ? getPatientById(patientObj.Id) : "";
+
+            }
             //if (JSON.parse(localStorage.getItem("PatientNameForRide")) !== null) {
             //    $("#pat").val(JSON.parse(localStorage.getItem("PatientNameForRide")));
             //    fillData();
@@ -775,11 +787,38 @@
 
         });
 
+        const request2updateData = (existingPatient, targetPatient) => {
+
+            if (arr_customer.func == "new") {
+                return;//don't block update
+            }
+
+
+            if (existingPatient.IsAnonymous && targetPatient.IsAnonymous) {
+                return ROOL_BACK;
+            }
+            //restore page back to it intial state
+          //  fillPage_withPatientData(existingPatient);
+
+        }
+
         const getPatientById = (id) => {
 
             const getPatientById_SCB = (data) => {
                 $('#wait').hide();
-                fillPage_withPatientData(JSON.parse(data.d));
+
+                switch (request2updateData(existingPatient, JSON.parse(data.d))) {
+
+                    case ROOL_BACK:
+
+                        swal("לא ניתן לשנות הסעה אנונימית להסעה אנונימית אחרת", "", "error");
+                        fillPage_withPatientData(existingPatient);
+                        break;
+
+                    default://update the form with the target patient
+                        fillPage_withPatientData(JSON.parse(data.d))
+                        break;
+                }
             }
 
             const getPatientById_ECB = (err) => {
@@ -799,7 +838,19 @@
             localStorage.PatID = patient.Id;
             $('#pat').val(patient.DisplayName);
             $('#patEnglishName').val(patient.EnglishName);
-            $('#patArabic').val(patient.FirstNameA + " " + patient.LastNameA);
+            let arabicDisplayName = patient.FirstNameA & patient.FirstNameA !== null + " " + patient.LastNameA & patient.LastNameA !== null;
+
+            $('#patArabic').val(arabicDisplayName === 0 ? '' : arabicDisplayName);
+
+            let existingEscortes_checkBoxes = document.getElementById('selectEscort').getElementsByTagName('input')[0];
+
+            if (existingEscortes_checkBoxes !== undefined) {
+
+                existingEscortes_checkBoxes.map((es) => {
+                    $(`#escortCB${es.Id}`).prop('checked', es.checked);
+                });
+            }
+
             if (patient.EscortedList.length > 0) {
                 EscortedList = patient.EscortedList;
                 let str = '';
@@ -1835,6 +1886,7 @@
                     generateMinute();
                 }
             }
+
         }
 
         function showDuplicate() {
@@ -1971,7 +2023,7 @@
                             }
 
                             $("#pat").val(ridePat.Pat.DisplayName);
-
+                            existingPatient = ridePat.Pat;
                             fillPage_withPatientData(ridePat.Pat)
                             if (typeof arr_escort !== "undefined") {
 
@@ -2052,31 +2104,6 @@
                                 RidePatBack = {
                                     Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Remark: Remark, Escorts: Escorts, Date: date, OnlyEscort: OnlyEscort
                                 }
-                                //console.log(RidePatBack)
-                                //$.ajax({
-                                //    dataType: "json",
-                                //    url: "WebService.asmx/CheckRidePat",
-                                //    contentType: "application/json; charset=utf-8",
-                                //    type: "POST",
-                                //    async: false,
-                                //    data: JSON.stringify({ RidePatBack }),
-                                //    success: function (data) {
-                                //        returnDriveExist = JSON.parse(data.d);
-                                //        console.log(returnDriveExist)
-                                //        var DestIsHospital = hospitals.includes(ridePat.Destination.Name);
-                                //        var ReturnRidePatFlag = (localStorage.getItem("ReturnRidePatFlag") == 'true');
-                                //        //maybe currentDriverId != -1
-                                //        //alert(ReturnRidePatFlag);
-                                //        if (DestIsHospital && !returnDriveExist && ReturnRidePatFlag) {
-                                //            secondModal = true;
-                                //            $("#Modal").modal();
-
-                                //        }
-                                //    },
-                                //    error: function (err) { alert("Error in CheckRidePat: " + err.responseText); }
-                                //});
-
-                                //CANCAEL THE QUESTION OF CREAT A RETURN RIDE WHEN GETS IN THE EDIT
                             }
                             else {
                                 data.d = data.d.toString();
@@ -2090,6 +2117,7 @@
                                 );
 
                             }
+                            
 
                         },
                         error: function (err) {
@@ -2101,6 +2129,8 @@
                 .catch((err) => {
                     alert('בעיה במילוי רשימות יעד ומוצא: ' + err);
                 });
+
+
         }
 
         function return2manageRidePats() {//returnRidePat()
