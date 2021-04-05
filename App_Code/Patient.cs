@@ -938,6 +938,8 @@ public class Patient
                 p.Department = sdr["Department"].ToString();
                 p.Barrier = new Location(sdr["Barrier"].ToString());
                 p.Hospital = new Location(sdr["Hospital"].ToString());
+                p.Barrier = p.Barrier.getLocation(); //get the full discription of a location
+                p.Hospital = p.Hospital.getLocation(); //get the full discription of a location
                 p.Gender = sdr["Gender"].ToString();
                 p.Remarks = sdr["Remarks"].ToString();
                 p.EnglishName = sdr["EnglishName"].ToString();
