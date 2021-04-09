@@ -116,6 +116,27 @@
         a.btn.btn-default.buttons-csv.buttons-html5 {
             margin-right: 0.5em;
         }
+
+        /* Changing alternating background in a specific data-table */
+        #documentedRidesTable > tbody > tr:nth-child(odd) > td,
+        #documentedRidesTable > tbody > tr:nth-child(odd) > th {
+            background-color: #ececec;
+        }
+
+        #documentedRidesTable > tbody > tr:nth-child(odd).futureRide > td,
+        #documentedRidesTable > tbody > tr:nth-child(odd).futureRide > th {
+            background-color: #f7e4a8;
+        }
+
+        #documentedRidesTable > tbody > tr:nth-child(even).futureRide > td,
+        #documentedRidesTable > tbody > tr:nth-child(even).futureRide > th {
+            background-color: #f7edcd;
+        }
+
+        #documentedRidesTable > tbody > tr.earliestFuture > td,
+        #documentedRidesTable > tbody > tr.earliestFuture > tr {
+            border-bottom: 4px solid #9B4040;
+        }
     </style>
 
 
@@ -598,6 +619,7 @@
                                             <label class="col-sm-3" style="padding: 0.5em 0px;">הסיע.ה ב</label>
                                             <div class="col-sm-5">
                                                 <input type="text" template_id="input_period_begin" name="input_period_begin" class="form-control" aria-required="true" aria-invalid="false" has-error required />
+                                                <label style="padding-bottom: 0.5em;font-size: 0.9em;">הכנס מספר גדול מ - 0</label>
                                             </div>
                                             <label class="col-sm-4" style="padding: 0.5em 0px;">ימים האחרונים</label>
                                         </div>
@@ -609,6 +631,7 @@
                                             <label class="col-sm-3" style="padding: 0.5em 0px;">אך לא הסיע.ה ב</label>
                                             <div class="col-sm-5">
                                                 <input type="text" template_id="input_period_end" name="input_period_end" class="form-control" aria-required="true" aria-invalid="false" />
+                                                <label style="padding-bottom: 0.5em; font-size: 0.9em;">   הכנס מספר גדול מ - 0 וקטן מהמספר למעלה </label>
                                             </div>
                                             <label class="col-sm-4" style="padding: 0.5em 0px;">ימים האחרונים</label>
                                         </div>
