@@ -1276,6 +1276,7 @@ function show_rides_history(element, start_date, end_date) {
             }
 
             let now = new Date();
+            let earliyestFuture = { date: new Date(2100, 11, 31), row: null };
 
             S_HistoryTable = $('#documentedRidesTable').DataTable({
                 order: [[5, "desc"]],
@@ -1344,8 +1345,24 @@ function show_rides_history(element, start_date, end_date) {
                     { "targets": 4, width: "35%" },
                 ],
                 createdRow: function (row, data, index) {
-                    if (ConvertDBDate2UIFullStempDate(data.Date) > now) {
-                        $(row).addClass('futureRide');   //add class to row
+                    let the_date = ConvertDBDate2UIFullStempDate(data.Date);
+
+                    if (the_date > now) {
+                        $(row).addClass('futureRide'); 
+
+                        // We want to apply special border to the last future ride - i.e the earliest
+                        // earliyestFuture are used to record teh earliest date we observe, and it's row
+                        if (the_date < earliyestFuture.date) {
+                            earliyestFuture.date = the_date;
+                            earliyestFuture.row = $(row);
+                        }
+                    }
+                    else {
+                        // We are done with all future rides, tag the earliest and forget it
+                        if (earliyestFuture.row) {
+                            earliyestFuture.row.addClass('earliestFuture');
+                            earliyestFuture.row = null;
+                        }
                     }
                 }
 
