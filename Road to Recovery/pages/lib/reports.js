@@ -775,6 +775,8 @@ function filterInt(value) {
 
 function rp_pil_vl_ride_recent_period__refresh_preview() {
 
+    $("#div_table_pil_vl_ride_recent_period").hide();
+
     let is_valid = false;
 
     let begin_str = $("#input_period_begin").val();
@@ -1099,7 +1101,6 @@ function refresh_pil_vls_per_month_Table(start_date, end_date) {
         },
         error: function (err) {
             $('#wait').hide();
-            // @@ alert("Error in GetRidePatView: " + err.responseText);
         }
 
 
@@ -1109,7 +1110,6 @@ function refresh_pil_vls_per_month_Table(start_date, end_date) {
 
 function refresh_pil_vl_ride_month_Table(start_date, end_date) {
     hide_all_tables();
-    console.log(start_date + " ; " + end_date);
     $('#wait').show();
     var query_object = {
         start_date: start_date,
