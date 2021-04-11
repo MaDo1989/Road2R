@@ -197,7 +197,11 @@
         let rideNumber = 0;
         let x_wasClicked = false;
         let existingPatient;
-        const ROOL_BACK = 'RESTORE PAGE BACK TO ITS INITIAL STATE';
+        let allowChangeOf_originAndDestination = true;
+        let alert2user = '';
+        const DIFFER_RIDE_AXIS_MSG = 'ציר ההסעה של הסעה זו שונה ממה שהוגדר כברירת מחדל לחולה. ניתן לעדכן שדות אלו בהסעה.';
+        const DIFFER_AREAS_MSG = 'לא ניתן לשנות מהסעה באזור מסוים להסעה באזור אחר';
+
 
 
         $(document).ready(function () {
@@ -246,11 +250,12 @@
             //datePicker();
             loadPage();
 
-            $("#pat").blur(function () {
-                // fillData();
-                //getEquipmentForAnonymousPatient()
+            $("#pat").blur(async function () {
                 let patientObj = patients_JSONArray.find(p => p.DisplayName.trim() === $('#pat').val().trim());
-                patientObj ? getPatientById(patientObj.Id) : "";
+                if (patientObj) {
+                    let targetPatient = await getPatientById(patientObj.Id);
+                    request2updateData(targetPatient);
+                }
 
             });
 
@@ -260,24 +265,21 @@
                 $("#PatientIdentity").val("");
             });
 
-            //$("#patArabic").blur(function () {
-            //    fillData();
-            //    getEquipmentForAnonymousPatient()
-            //});
-
             $("#patArabic").keyup(function () {
                 $("#pat").val("");
                 $("#patEnglishName").val("");
                 $("#PatientIdentity").val("");
             });
 
-            $("#patEnglishName").blur(function () {
+            $("#patEnglishName").blur(async function () {
                 //fillData();
                 //getEquipmentForAnonymousPatient()
 
                 let patientObj = patients_JSONArray.find(p => p.EnglishName.trim() === $('#patEnglishName').val().trim());
-                patientObj ? getPatientById(patientObj.Id) : "";
-
+                if (patientObj) {
+                    let targetPatient = await getPatientById(patientObj.Id);
+                    request2updateData(targetPatient);
+                }
             });
 
             $("#patEnglishName").keyup(function () {
@@ -285,13 +287,16 @@
                 $("#patArabic").val("");
                 $("#PatientIdentity").val("");
             });
-            $("#PatientIdentity").blur(function () {
+            $("#PatientIdentity").blur(async function () {
                 //  fillData();
                 if ($('#pat').val() === '') { //due to the fact some patient still have 0 as their identity when
                     //we blur from there it brings the first one who has 0 as its identity
 
                     let patientObj = patients_JSONArray.find(p => p.PatientIdentity === parseInt($('#PatientIdentity').val()));
-                    patientObj ? getPatientById(patientObj.Id) : "";
+                    if (patientObj) {
+                        let targetPatient = await getPatientById(patientObj.Id);
+                        request2updateData(targetPatient);
+                    }
                 }
 
             });
@@ -303,11 +308,11 @@
             });
 
             if (arr_customer.func === 'new' && document.referrer.includes('patientForm.html')) {
-                
+
                 let patientFrom_patientForm = JSON.parse(localStorage.getItem('PatientNameForRide'));
 
                 let patientObj = patients_JSONArray.find(p => p.DisplayName.trim() === patientFrom_patientForm.trim());
-                patientObj ? getPatientById(patientObj.Id) : "";
+                patientObj ? request2updateData(getPatientById(patientObj.Id)) : "";
 
             }
             //if (JSON.parse(localStorage.getItem("PatientNameForRide")) !== null) {
@@ -787,51 +792,98 @@
 
         });
 
-        const request2updateData = (existingPatient, targetPatient) => {
-
-            if (arr_customer.func == "new") {
-                return;//don't block update
-            }
-
-
-            if (existingPatient.IsAnonymous && targetPatient.IsAnonymous) {
-                return ROOL_BACK;
-            }
-            //restore page back to it intial state
-          //  fillPage_withPatientData(existingPatient);
-
+        const isSameArea = (existingPatient, targetPatient) => {
+            return !(
+                existingPatient.Barrier.Area !== targetPatient.Barrier.Area
+                ||
+                existingPatient.Hospital.Area !== targetPatient.Hospital.Area
+            );
         }
 
-        const getPatientById = (id) => {
+        const request2updateData = (targetPatient) => {
 
-            const getPatientById_SCB = (data) => {
-                $('#wait').hide();
+            if (arr_customer.func == "new") {
+                return fillPage_withPatientData(targetPatient);
+            }
 
-                switch (request2updateData(existingPatient, JSON.parse(data.d))) {
+            // if func != 'new' then existingPatient should be defined by uploadData
+            if (!existingPatient) {
+               /*
+                an issue we didn't solve yet!
 
-                    case ROOL_BACK:
+                this is happens when create new ridepat.
+                and click on X on the appear popup text message
+                    
+                NOTE THAT in this case theridepat havent saved yet ! so no rp number
 
-                        swal("לא ניתן לשנות הסעה אנונימית להסעה אנונימית אחרת", "", "error");
-                        fillPage_withPatientData(existingPatient);
-                        break;
 
-                    default://update the form with the target patient
-                        fillPage_withPatientData(JSON.parse(data.d))
-                        break;
+                the right flow should start with uploadData(ridepatnum) so all our new logic 
+                of editing ridepat will take place
+
+                in this scenario existingPatient is undefined
+
+
+                    3 suggestion to fix it:
+
+                    1. in this case allow all changes since its not a ridepat yet ---->  return fillPage_withPatientData(targetPatient);
+                    2. do not allow the X on the popup                            ----> therefor cant edit ridepat we just create
+                    3. work on this issue                                         ----> might take some time to see how to acomplish
+
+                */
+            }
+
+            if (existingPatient.IsAnonymous) {
+
+                if (targetPatient.IsAnonymous) {
+                    swal('לא ניתן לשנות הסעה אנונימית להסעה אנונימית אחרת', '', 'error');
+                    return fillPage_withPatientData(existingPatient);
+                } else {
+
+                    if (existingPatient.Barrier.Type !== 'כללית'
+                        && existingPatient.Hospital.Type !== 'כללית') {//a well defined patient
+
+                        let bothBarrier_and_HospitalDiffer =
+                            existingPatient.Barrier !== targetPatient.Barrier
+                            &&
+                            existingPatient.Hospital !== targetPatient.Hospital;
+
+                        if (bothBarrier_and_HospitalDiffer
+                            ||
+                            existingPatient.Barrier !== targetPatient.Barrier
+                            ||
+                            existingPatient.Hospital !== targetPatient.Hospital
+                        ) {
+                            alert2user = DIFFER_RIDE_AXIS_MSG;
+                            allowChangeOf_originAndDestination = false;
+                            return fillPage_withPatientData(targetPatient);
+                        }
+
+                    } else {//a NOT well defined patient
+
+                        if (isSameArea(existingPatient, targetPatient)) {
+                            return fillPage_withPatientData(targetPatient);
+                        } else {
+                            swal(DIFFER_AREAS_MSG, '', 'error');
+                            return fillPage_withPatientData(existingPatient);
+                        }
+                    }
+                }
+
+            } else {
+                if (targetPatient.IsAnonymous) {
+                    swal('לא ניתן לשנות מהסעה לחולה מסויים להסעה אנונימית', '', 'error');
+                    return fillPage_withPatientData(existingPatient);
+                } else {
+                    if (isSameArea(existingPatient, targetPatient)) {
+                        return fillPage_withPatientData(targetPatient);
+                    } else {
+                        swal(DIFFER_AREAS_MSG, '', 'error');
+                        return fillPage_withPatientData(existingPatient);
+                    }
                 }
             }
 
-            const getPatientById_ECB = (err) => {
-                $('#wait').hide();
-                alert(err);
-            }
-
-            const { ajaxCall } = GENERAL.FETCH_DATA;
-            $('#wait').show();
-            ajaxCall('GetPatientById', JSON.stringify({ id }), getPatientById_SCB, getPatientById_ECB);
-
         }
-
         const fillPage_withPatientData = (patient) => {
 
             isAnonymous = patient.IsAnonymous === 'True';
@@ -841,15 +893,6 @@
             let arabicDisplayName = patient.FirstNameA & patient.FirstNameA !== null + " " + patient.LastNameA & patient.LastNameA !== null;
 
             $('#patArabic').val(arabicDisplayName === 0 ? '' : arabicDisplayName);
-
-            let existingEscortes_checkBoxes = document.getElementById('selectEscort').getElementsByTagName('input')[0];
-
-            if (existingEscortes_checkBoxes !== undefined) {
-
-                existingEscortes_checkBoxes.map((es) => {
-                    $(`#escortCB${es.Id}`).prop('checked', es.checked);
-                });
-            }
 
             if (patient.EscortedList.length > 0) {
                 EscortedList = patient.EscortedList;
@@ -867,10 +910,18 @@
             $('#remark').val(patient.Remarks);
             $('#remark').prop('disabled', false);
             $('#PatientIdentity').val(patient.PatientIdentity);
-            $('#Origin').val(patient.Barrier.Name);
+
+            if (allowChangeOf_originAndDestination) {
+                $('#Origin').val(patient.Barrier.Name);
+                $('#Destination').val(patient.Hospital.Name);
+            } else {
+                swal('', alert2user, 'warning');
+            }
+
             $('#Origin').prop('disabled', false);
-            $('#Destination').val(patient.Hospital.Name);
             $('#Destination').prop('disabled', false);
+
+
             $("#dirBTN").prop('disabled', false);
             $('#Equipment').text(buildStringforEquipment(patient.Equipment));
 
@@ -880,6 +931,29 @@
             $('#afterNoon').prop('disabled', false);
 
         }
+
+        const getPatientById = (id) => {
+
+            return new Promise((resolve, reject) => {
+
+                const getPatientById_SCB = (data) => {
+                    $('#wait').hide();
+                    return resolve(JSON.parse(data.d));
+                }
+
+                const getPatientById_ECB = (err) => {
+                    $('#wait').hide();
+                    alert(err);
+                    return reject(err);
+                }
+
+                const { ajaxCall } = GENERAL.FETCH_DATA;
+                $('#wait').show();
+                ajaxCall('GetPatientById', JSON.stringify({ id }), getPatientById_SCB, getPatientById_ECB);
+
+            });
+        }
+
 
         function returnRide() {
             ridePatNum = " ";
@@ -2117,7 +2191,7 @@
                                 );
 
                             }
-                            
+
 
                         },
                         error: function (err) {
