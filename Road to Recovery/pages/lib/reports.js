@@ -1745,7 +1745,7 @@ function rp_center_daily_by_month__refresh_Table(start_date, end_date) {
 
     $.ajax({
         dataType: "json",
-        url: "ReportsWebService.asmx/TBDTBDTBD",
+        url: "ReportsWebService.asmx/GetReportCenterDailybyMonth",
         contentType: "application/json; charset=utf-8",
         beforeSend: function (xhr) {
             xhr.setRequestHeader("Content-Encoding", "gzip");
@@ -1768,10 +1768,9 @@ function rp_center_daily_by_month__refresh_Table(start_date, end_date) {
                 columnDefs: [
                     { "orderData": [0, 1], "targets": 0 }],
                 columns: [
-                    { data: "Volunteer" },
-                    { data: "CityCityName" },
-                    { data: "CellPhone" },
-                    { data: "Buttons" }
+                    { data: "Date" },
+                    { data: "VolunteerCount" },
+                    { data: "PatientCount" }
                 ],
                 dom: 'Bfrtip',
 

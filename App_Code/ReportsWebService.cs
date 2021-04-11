@@ -307,5 +307,28 @@ public class ReportsWebService : System.Web.Services.WebService
         }
     }
 
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public List<ReportService.CenterDailybyMonthInfo> GetReportCenterDailybyMonth(string start_date, string end_date)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            ReportService report = new ReportService();
+            List<ReportService.CenterDailybyMonthInfo> r = report.GetReportCenterDailybyMonth(start_date, end_date);
+            return r;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReportCenterDailybyMonth", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
+    
+
 }
 

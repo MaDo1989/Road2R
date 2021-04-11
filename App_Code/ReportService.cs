@@ -124,6 +124,13 @@ public class ReportService
         public string CellPhone { get; set; }
     }
 
+    public class CenterDailybyMonthInfo
+    {
+        public string Date { get; set; }
+        public string PatientCount { get; set; }
+        public string VolunteerCount { get; set; }
+    }
+
 
     private DataTable getDriverByID(int driverID, DbService db)
     {
@@ -294,6 +301,7 @@ GROUP BY Volunteer.DisplayName
         DataTable dt = ds.Tables[0];
         return dt;
     }
+
 
     internal string CommitReportedVolunteerListToNI_DB(string cell_phone, string start_date, string only_with_rides)
     {
@@ -772,6 +780,42 @@ INNER JOIN Volunteer ON BUFF.MainDriver=Volunteer.Id";
         }
 
     }
+
+    internal List<CenterDailybyMonthInfo> GetReportCenterDailybyMonth(string start_date, string end_date)
+    {
+        DbService db = new DbService();
+
+        string query =
+@"select  count(DISTINCT rp.MainDriver) AS Drivers, count(DISTINCT rp.Id) As Patients, CONVERT(date, pickuptime) as DayInMonth
+FROM RPView  rp
+where pickuptime >= @start_date 
+and pickuptime <= @end_date
+and rp.MainDriver is not null
+group by CONVERT(date, pickuptime) ";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        List<CenterDailybyMonthInfo> result = new List<CenterDailybyMonthInfo>();
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            CenterDailybyMonthInfo obj = new CenterDailybyMonthInfo();
+            obj.Date = dr["DayInMonth"].ToString();
+            obj.VolunteerCount = dr["Drivers"].ToString();
+            obj.PatientCount = dr["Patients"].ToString();
+            result.Add(obj);
+        }
+
+        return result;
+    }
+
+
 
 
     //@@ TODO:  See notes on this method name in reports.js
