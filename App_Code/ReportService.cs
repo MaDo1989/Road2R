@@ -645,10 +645,10 @@ order BY DisplayName ASC
 @"select DISTINCT rp.MainDriver, Volunteer.DisplayName, Volunteer.CityCityName, Volunteer.CellPhone
 FROM RPView  rp
 INNER JOIN Volunteer on Volunteer.Id = rp.MainDriver 
-where pickuptime > dateadd(day, @delta_start, getdate()) 
-and pickuptime <= getdate()
+where CONVERT(date, pickuptime) > CONVERT(date, dateadd(day, @delta_start, getdate()))
+and pickuptime <= getdate() 
 and not  MainDriver in ( select DISTINCT MainDriver from RPView 
-where pickuptime > dateadd(day, @delta_end, getdate())
+where CONVERT(date, pickuptime) > CONVERT(date, dateadd(day, @delta_end, getdate()))
 and pickuptime <= getdate() 
 and MainDriver is not NULL)
 ";

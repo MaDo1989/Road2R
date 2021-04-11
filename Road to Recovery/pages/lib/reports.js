@@ -773,34 +773,32 @@ function rp_pil_vl_ride_month__refresh_preview() {
 }   
 
 
+// MDN  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/parseInt
+function filterInt(value) {
+    if (/^[-+]?\d+$/.test(value)) {
+        return Number(value)
+    } else {
+        return NaN
+    }
+}
+
 function rp_pil_vl_ride_recent_period__refresh_preview() {
 
-    let v = $("#params_ph").validate({
-        // Specify validation rules
-        rules: {
-            input_period_begin: {
-                required: true,
-                digits: true,
-                min: 1
-            },
-            input_period_end: {
-                required: true,
-                digits: true,
-                min: 1,
-                smallerThan: "#input_period_begin"
-            }
-        },
-        // Specify validation error messages
-        messages: {
-            input_period_begin: "הכנס מספר חיובי",
-            input_period_end: {
-                required: "הכנס מספר חיובי",
-                smallerThan: "הכנס מספר קטן מהמספר שלמעלה",
-            }
-        }
-    });
+    $("#div_table_pil_vl_ride_recent_period").hide();
 
-    if (v.form()) {
+    let is_valid = false;
+
+    let begin_str = $("#input_period_begin").val();
+    let begin_num = filterInt(begin_str);
+    if (begin_num > 0) {
+        let end_str = $("#input_period_end").val();
+        let end_num = filterInt(end_str);
+        if (end_num > 0 && end_num < begin_num) {
+            is_valid = true;
+        }
+    }
+
+    if (is_valid) {
         $("#generate_report_period").attr("disabled", false);
     }
     else {
@@ -1112,7 +1110,6 @@ function refresh_pil_vls_per_month_Table(start_date, end_date) {
         },
         error: function (err) {
             $('#wait').hide();
-            // @@ alert("Error in GetRidePatView: " + err.responseText);
         }
 
 
@@ -1122,7 +1119,6 @@ function refresh_pil_vls_per_month_Table(start_date, end_date) {
 
 function refresh_pil_vl_ride_month_Table(start_date, end_date) {
     hide_all_tables();
-    console.log(start_date + " ; " + end_date);
     $('#wait').show();
     var query_object = {
         start_date: start_date,
@@ -1184,7 +1180,6 @@ function get_buttons_pil_vl_ride_recent_period() {
 
 function refresh_pil_vl_ride_recent_period_Table(start_number, end_number) {
     hide_all_tables();
-
 
     let csv_export_button = {
         exportOptions: {
@@ -1289,6 +1284,8 @@ function show_rides_history(element, start_date, end_date) {
                 S_HistoryTable.destroy();
             }
 
+            let now = new Date();
+            let earliyestFuture = { date: new Date(2100, 11, 31), row: null };
 
             S_HistoryTable = $('#documentedRidesTable').DataTable({
                 order: [[5, "desc"]],
@@ -1350,27 +1347,34 @@ function show_rides_history(element, start_date, end_date) {
                      3. not showing it to the user
                       ↓*/
                     { "targets": [5], visible: false },
-                    //↑
-                    {
-                        "targets": [0],
-                        render: function (data, type, full, meta) {
-                            let now = new Date();
-                            if (ConvertDBDate2UIFullStempDate(full.Date) > now) {
-                                var rowIndex = meta.row + 1;
-                                $('#documentedRidesTable tbody tr:nth-child(' + rowIndex + ')').addClass('futureRide');
-                                return data;
-                            } else {
-                                return data;
-                            }
-                        }
-                    },
                     { "targets": 0, width: "10%" },
                     { "targets": 1, width: "10%" },
                     { "targets": 2, width: "20%" },
                     { "targets": 3, width: "25%" },
-                    { "targets": 4, width: "35%" }
+                    { "targets": 4, width: "35%" },
+                ],
+                createdRow: function (row, data, index) {
+                    let the_date = ConvertDBDate2UIFullStempDate(data.Date);
 
-                ]
+                    if (the_date > now) {
+                        $(row).addClass('futureRide'); 
+
+                        // We want to apply special border to the last future ride - i.e the earliest
+                        // earliyestFuture are used to record teh earliest date we observe, and it's row
+                        if (the_date < earliyestFuture.date) {
+                            earliyestFuture.date = the_date;
+                            earliyestFuture.row = $(row);
+                        }
+                    }
+                    else {
+                        // We are done with all future rides, tag the earliest and forget it
+                        if (earliyestFuture.row) {
+                            earliyestFuture.row.addClass('earliestFuture');
+                            earliyestFuture.row = null;
+                        }
+                    }
+                }
+
             });
             $('#wait').hide();
 
@@ -1799,3 +1803,41 @@ function hide_all_tables() {
  }
 
 
+
+/* Good code not used for now:
+ 
+ Validation in Bootstrap:
+
+     let v =  $("#params_ph").validate({
+        // Specify validation rules
+        rules: {
+            input_period_begin: {
+                required: true,
+                digits: true,
+                min: 1
+            },
+            input_period_end: {
+                required: true,
+                digits: true,
+                min: 1,
+                smallerThan: "#input_period_begin"
+            }
+        },
+        // Specify validation error messages
+        messages: {
+            input_period_begin: "",
+            input_period_end: {
+                required: "הכנס מספר חיובי",
+                smallerThan: "הכנס מספר קטן מהמספר שלמעלה",
+            }
+        }
+    });
+
+    if (v.form()) {
+        $("#generate_report_period").attr("disabled", false);
+    }
+    else {
+        $("#generate_report_period").attr("disabled", true);
+    }
+
+*/
