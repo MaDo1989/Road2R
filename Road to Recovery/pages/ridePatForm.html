@@ -197,8 +197,13 @@
         let rideNumber = 0;
         let x_wasClicked = false;
         let existingPatient;
+        let existingOrigion;
+        let existingDestination;
         let allowChangeOf_originAndDestination = true;
         let alert2user = '';
+        let arr_locations = [];
+
+
         const DIFFER_RIDE_AXIS_MSG = 'ציר ההסעה של הסעה זו שונה ממה שהוגדר כברירת מחדל לחולה. ניתן לעדכן שדות אלו בהסעה.';
         const DIFFER_AREAS_MSG = 'לא ניתן לשנות מהסעה באזור מסוים להסעה באזור אחר';
 
@@ -287,6 +292,7 @@
                 $("#patArabic").val("");
                 $("#PatientIdentity").val("");
             });
+
             $("#PatientIdentity").blur(async function () {
                 //  fillData();
                 if ($('#pat').val() === '') { //due to the fact some patient still have 0 as their identity when
@@ -306,6 +312,50 @@
                 $("#patEnglishName").val("");
                 $("#patArabic").val("");
             });
+
+
+            $('#Origin').on('change', function () {
+
+                if (arr_customer.func === 'new') {
+                    return;
+                }
+
+                let targetLocationObj = arr_locations.find(l => l.Name === $('#Origin').val());
+
+                if (!existingOrigion) {
+                    return $('#Origin').val(targetLocationObj.Name);
+                }
+                if (existingOrigion.Type === 'כללית' && targetLocationObj.Type !== 'כללית') {
+                    if (existingOrigion.Area !== targetLocationObj.Area) {
+                        $('#Origin').val(existingOrigion.Name);
+                        swal(DIFFER_AREAS_MSG, '', 'error');
+                    } else {
+                        $('#Origin').val(targetLocationObj.Name);
+                    }
+                }
+            });
+
+            $('#Destination').on('change', function () {
+
+                if (arr_customer.func === 'new') {
+                    return;
+                }
+
+                let targetLocationObj = arr_locations.find(l => l.Name === $('#Destination').val());
+
+                if (!existingDestination) {
+                    return $('#Destination').val(targetLocationObj.Name);
+                }
+                if (existingDestination.Type === 'כללית' && targetLocationObj.Type !== 'כללית') {
+                    if (existingDestination.Area !== targetLocationObj.Area) {
+                        $('#Destination').val(existingDestination.Name);
+                        swal(DIFFER_AREAS_MSG, '', 'error');
+                    } else {
+                        $('#Destination').val(targetLocationObj.Name);
+                    }
+                }
+            });
+
 
             if (arr_customer.func === 'new' && document.referrer.includes('patientForm.html')) {
 
@@ -705,7 +755,7 @@
                                         $('#wait').hide();
                                         let driverInput_hasValue = ($('#driver').val() !== "");
                                         returnDriveExist = JSON.parse(data.d);
-                                        console.log(returnDriveExist)
+                                        //console.log(returnDriveExist)
                                         var DestIsHospital = hospitals.includes(request.RidePat.Destination.Name);
                                         if (driverInput_hasValue) {
                                             currentDriverId = -1;
@@ -806,30 +856,8 @@
                 return fillPage_withPatientData(targetPatient);
             }
 
-            // if func != 'new' then existingPatient should be defined by uploadData
             if (!existingPatient) {
-               /*
-                an issue we didn't solve yet!
-
-                this is happens when create new ridepat.
-                and click on X on the appear popup text message
-                    
-                NOTE THAT in this case theridepat havent saved yet ! so no rp number
-
-
-                the right flow should start with uploadData(ridepatnum) so all our new logic 
-                of editing ridepat will take place
-
-                in this scenario existingPatient is undefined
-
-
-                    3 suggestion to fix it:
-
-                    1. in this case allow all changes since its not a ridepat yet ---->  return fillPage_withPatientData(targetPatient);
-                    2. do not allow the X on the popup                            ----> therefor cant edit ridepat we just create
-                    3. work on this issue                                         ----> might take some time to see how to acomplish
-
-                */
+                return fillPage_withPatientData(targetPatient);
             }
 
             if (existingPatient.IsAnonymous) {
@@ -918,8 +946,15 @@
                 swal('', alert2user, 'warning');
             }
 
-            $('#Origin').prop('disabled', false);
-            $('#Destination').prop('disabled', false);
+            if (patient.IsAnonymous &&
+                (patient.Barrier.Type === 'כללית' || patient.Hospital.Type === 'כללית')
+            ) {
+                $('#Origin').prop('disabled', true);
+                $('#Destination').prop('disabled', true);
+            } else {
+                $('#Origin').prop('disabled', false);
+                $('#Destination').prop('disabled', false);
+            }
 
 
             $("#dirBTN").prop('disabled', false);
@@ -1462,7 +1497,7 @@
                     data: JSON.stringify({ active: true }),
                     success: function (data) {
 
-                        var arr_locations = JSON.parse(data.d);
+                        arr_locations = JSON.parse(data.d);
                         arr_locations.sort();
                         for (i in arr_locations) {
 
@@ -1898,6 +1933,14 @@
             }
             if (JSON.parse(GENERAL.RIDEPAT.getRidePatList()).length != 0) {
                 arr_customer = JSON.parse(GENERAL.RIDEPAT.getRidePatList());
+                if (
+                    performance.navigation.type == performance.navigation.TYPE_RELOAD
+                    &&
+                    typeof arr_customer.func === 'undefined'
+                ) {
+                    alert('נא לשים לב, הדף נטען מחדש ולכן הפעולה הבאה תהיה יצירת הסעה חדשה');
+                    arr_customer.func = 'new';
+                }
                 $("#ridePatNum").attr('disabled', 'disabled');
                 $("#coordinator").attr('disabled', 'disabled');
                 $("#statusRidePat").attr('disabled', 'disabled');
@@ -2098,10 +2141,13 @@
 
                             $("#pat").val(ridePat.Pat.DisplayName);
                             existingPatient = ridePat.Pat;
+                            existingOrigion = ridePat.Origin;
+                            existingDestination = ridePat.Destination;
+
                             fillPage_withPatientData(ridePat.Pat)
                             if (typeof arr_escort !== "undefined") {
 
-                                for (i in arr_escort) {//escortCB$
+                                for (i in arr_escort) {
                                     $(`#escortCB${arr_escort[i].Id}`).prop('checked', true);
 
 

@@ -836,16 +836,20 @@ public class RidePat
         }
         //rp.pat.EscortedList = new List<Escorted>();
         rp.Escorts = new List<Escorted>();
+
         Location origin = new Location();
         origin.Name = dr["Origin"].ToString();
+        origin = origin.getLocation();
         if (locations[origin.Name] == null)
         {
             origin.EnglishName = "";
         }
         else origin.EnglishName = locations[origin.Name].ToString();
         rp.Origin = origin;
+
         Location dest = new Location();
         dest.Name = dr["Destination"].ToString();
+        dest = dest.getLocation();
         if (locations[dest.Name] == null)
         {
             dest.EnglishName = "";
