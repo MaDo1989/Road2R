@@ -191,6 +191,8 @@
         var rideNumberForNo;
         // var secondModal = false;
         var CoordinatorForReturn;
+
+        let arr_escort_inthisRidePat = [];
         let patients_JSONArray = [];
         let { buildStringforEquipment } = GENERAL.USEFULL_FUNCTIONS;
         let patients_Names = []
@@ -853,11 +855,11 @@
         const request2updateData = (targetPatient) => {
 
             if (arr_customer.func == "new") {
-                return fillPage_withPatientData(targetPatient);
+                return fillPage_withPatientData(targetPatient, true);
             }
 
             if (!existingPatient) {
-                return fillPage_withPatientData(targetPatient);
+                return fillPage_withPatientData(targetPatient, true);
             }
 
             if (existingPatient.IsAnonymous) {
@@ -883,13 +885,13 @@
                         ) {
                             alert2user = DIFFER_RIDE_AXIS_MSG;
                             allowChangeOf_originAndDestination = false;
-                            return fillPage_withPatientData(targetPatient);
+                            return fillPage_withPatientData(targetPatient, true);
                         }
 
                     } else {//a NOT well defined patient
 
                         if (isSameArea(existingPatient, targetPatient)) {
-                            return fillPage_withPatientData(targetPatient);
+                            return fillPage_withPatientData(targetPatient, true);
                         } else {
                             swal(DIFFER_AREAS_MSG, '', 'error');
                             return fillPage_withPatientData(existingPatient);
@@ -912,7 +914,8 @@
             }
 
         }
-        const fillPage_withPatientData = (patient) => {
+
+        const fillPage_withPatientData = (patient, markThe1stEscort=false) => {
 
             isAnonymous = patient.IsAnonymous === 'True';
             localStorage.PatID = patient.Id;
@@ -925,12 +928,13 @@
             if (patient.EscortedList.length > 0) {
                 EscortedList = patient.EscortedList;
                 let str = '';
-
+                //
                 for (var i = 0; i < EscortedList.length; i++) {
-                    str += `<input id='escortCB${EscortedList[i].Id}' type=checkbox name='${EscortedList[i].EnglishName}'>&nbsp`;
+                    str += `<input id='escortCB${EscortedList[i].Id}' type=checkbox name='${EscortedList[i].EnglishName}' ${i === 0 && markThe1stEscort ? 'checked' : ''} >&nbsp`;
                     str += `<label data-toggle='tooltip' title='${EscortedList[i].EnglishName}' for='escortCB${EscortedList[i].Id}'>${EscortedList[i].DisplayName}</label>&nbsp&nbsp</br>`;
                 }
                 $("#selectEscort").html(str);
+
             } else {
                 $("#selectEscort").html('');
             }
@@ -988,7 +992,6 @@
 
             });
         }
-
 
         function returnRide() {
             ridePatNum = " ";
@@ -1387,66 +1390,66 @@
         function getCoorErrorCB(e) {
             alert("Error in getCoor: " + e.responseText);
         }
+        /*
+                function generateEsc() {
 
-        function generateEsc() {
+                    //first checking if the patient is anonymous.
+                    var displayName = $("#pat").val();
+                    displayName = displayName.replace(/\s\s+/g, ' ');
+                    var i = patients.indexOf($("#pat").val().trim().replace(/\s\s+/g, ' '));
+                    localStorage.PatID = arr_pat[i].Id;
 
-            //first checking if the patient is anonymous.
-            var displayName = $("#pat").val();
-            displayName = displayName.replace(/\s\s+/g, ' ');
-            var i = patients.indexOf($("#pat").val().trim().replace(/\s\s+/g, ' '));
-            localStorage.PatID = arr_pat[i].Id;
-
-            $.ajax({
-                dataType: "json",
-                url: "WebService.asmx/getPatientEscorted",
-                contentType: "application/json; charset=utf-8",
-                type: "POST",
-                //  async: false,
-                data: JSON.stringify({ displayName: displayName, caller: "ridePatForm" }),
-                success: generateEscSuccessCB,
-                error: generateEscErrorCB
-            });
-        }
-
-        function generateEscSuccessCB(data) {
-            arr_escort = JSON.parse(data.d);
-
-            var str = "";
-
-            var displayName = $("#pat").val().trim().replace(/\s\s+/g, ' ');
-
-            var j = patients.indexOf($("#pat").val().trim().replace(/\s\s+/g, ' '));
-            localStorage.PatID = arr_pat[j].Id;
-
-            for (i in arr_escort) {
-                var escort1 = arr_escort[i].DisplayName;
-                var escort = arr_escort[i].DisplayName.replace("'", "");
-                var id = arr_escort[i].Id;
-                if (arr_pat[j].IsAnonymous == "True" && arr_customer.func == "new") {
-                    str += "<input checked id='escortCB" + id + "' type=checkbox name='" + escort + "'>&nbsp";
-                    str += "<label data-toggle='tooltip' title='" + arr_escort[i].EnglishName + "' for='escortCB" + id + "'>" + escort1 + "</label>&nbsp&nbsp</br>";
+                    $.ajax({
+                        dataType: "json",
+                        url: "WebService.asmx/getPatientEscorted",
+                        contentType: "application/json; charset=utf-8",
+                        type: "POST",
+                        //  async: false,
+                        data: JSON.stringify({ displayName: displayName, caller: "ridePatForm" }),
+                        success: generateEscSuccessCB,
+                        error: generateEscErrorCB
+                    });
                 }
-                else {
-                    str += "<input id='escortCB" + id + "' type=checkbox name='" + escort + "'>&nbsp";
-                    str += "<label data-toggle='tooltip' title='" + arr_escort[i].EnglishName + "' for='escortCB" + id + "'>" + escort1 + "</label>&nbsp&nbsp</br>";
+
+                function generateEscSuccessCB(data) {
+                    arr_escort = JSON.parse(data.d);
+
+                    var str = "";
+
+                    var displayName = $("#pat").val().trim().replace(/\s\s+/g, ' ');
+
+                    var j = patients.indexOf($("#pat").val().trim().replace(/\s\s+/g, ' '));
+                    localStorage.PatID = arr_pat[j].Id;
+
+                    for (i in arr_escort) {
+                        var escort1 = arr_escort[i].DisplayName;
+                        var escort = arr_escort[i].DisplayName.replace("'", "");
+                        var id = arr_escort[i].Id;
+                        if (arr_pat[j].IsAnonymous == "True" && arr_customer.func == "new") {
+                            str += "<input checked id='escortCB" + id + "' type=checkbox name='" + escort + "'>&nbsp";
+                            str += "<label data-toggle='tooltip' title='" + arr_escort[i].EnglishName + "' for='escortCB" + id + "'>" + escort1 + "</label>&nbsp&nbsp</br>";
+                        }
+                        else {
+                            str += "<input id='escortCB" + id + "' type=checkbox name='" + escort + "'>&nbsp";
+                            str += "<label data-toggle='tooltip' title='" + arr_escort[i].EnglishName + "' for='escortCB" + id + "'>" + escort1 + "</label>&nbsp&nbsp</br>";
+                        }
+                    }
+                    if (arr_escort.length == 0) str = "<label data-toggle='tooltip' title='no escorts'>אין מלווים</label>";
+                    $("#selectEscort").html(str);
+
+                    if (arr_customer.func == "show") {
+                        var select = $("#selectEscort input");
+                        for (var i = 0; i < select.length; i++) {
+                            $("#selectEscort input").eq(i).prop('disabled', true);
+                        }
+                    }
+
                 }
-            }
-            if (arr_escort.length == 0) str = "<label data-toggle='tooltip' title='no escorts'>אין מלווים</label>";
-            $("#selectEscort").html(str);
 
-            if (arr_customer.func == "show") {
-                var select = $("#selectEscort input");
-                for (var i = 0; i < select.length; i++) {
-                    $("#selectEscort input").eq(i).prop('disabled', true);
+                function generateEscErrorCB() {
+                    alert("Error in generateEsc");
                 }
-            }
-
-        }
-
-        function generateEscErrorCB() {
-            alert("Error in generateEsc");
-        }
-
+        */
         function generateStatus() {
 
             $.ajax({
@@ -2039,7 +2042,7 @@
 
 
                             ridePat = JSON.parse(data.d);
-                            arr_escort = ridePat.Escorts;
+                            arr_escort_inthisRidePat = ridePat.Escorts;
 
 
 
@@ -2145,10 +2148,10 @@
                             existingDestination = ridePat.Destination;
 
                             fillPage_withPatientData(ridePat.Pat)
-                            if (typeof arr_escort !== "undefined") {
+                            if (typeof arr_escort_inthisRidePat !== "undefined") {
 
-                                for (i in arr_escort) {
-                                    $(`#escortCB${arr_escort[i].Id}`).prop('checked', true);
+                                for (i in arr_escort_inthisRidePat) {
+                                    $(`#escortCB${arr_escort_inthisRidePat[i].Id}`).prop('checked', true);
 
 
                                     //if (ridePat.Pat.IsAnonymous == "True" && (ridePat.Status != 'ממתינה לשיבוץ')) {
