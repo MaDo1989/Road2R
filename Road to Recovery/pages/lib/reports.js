@@ -325,7 +325,7 @@ var K_fields_map = {
             id: "rp_center_daily_by_month__month",
             template: 'div[name="template_MONTH"]',
             type: "MONTH",
-            post_clone: field_month_post_clone
+            post_clone: rp_center_daily_by_month___post_clone
         }
     ]
 
@@ -486,7 +486,7 @@ function get_last_month_date() {
     return prev_month;
 }
 
-function populate_month_field() {
+function populate_month_field(is_last_month) {
     
     var dt = $('#select_month').datepicker({
         format: "MM yyyy",
@@ -494,13 +494,23 @@ function populate_month_field() {
         onClose: function () { console.log("populate_month_field()::onClose; Does not work, maybe due to duplicate IDS??"); },
         autoclose: true
     });
-    // compute previous month
-    dt.datepicker('setDate', get_last_month_date());
+    if (is_last_month) {
+        // compute previous month
+        dt.datepicker('setDate', get_last_month_date());
+    }
+    else {
+        // current month
+        dt.datepicker('setDate', new Date());
+    }
     dt.on("changeDate", refreshPreview);
 }
 
 function field_month_post_clone(id) {
-    populate_month_field();
+    populate_month_field(true);
+}
+
+function field_month_current_post_clone(id) {
+    populate_month_field(false);
 }
 
 function empty_func(id) {
@@ -824,7 +834,7 @@ function rp_pil_vls_per_month__post_clone(id)
 
 
 function rp_pil_vl_ride_month__post_clone(id) {
-    populate_month_field();
+    populate_month_field(true);
     rp_pil_vl_ride_month__refresh_preview();
 }
 
@@ -837,6 +847,10 @@ function rp_pil_vl_ride_recent_period__post_clone(id) {
 }
 
 
+function rp_center_daily_by_month___post_clone(id) {
+    populate_month_field(false);
+    rp_center_daily_by_month__refresh_preview();
+}
 
 function rp_pil_vls_per_month__refresh_preview() {
     var start_date, end_date;
@@ -1724,7 +1738,6 @@ function rp_center_daily_by_month__refresh_preview() {
         var start_month_date = moment(selected_date);
         var end_month_date = start_month_date.clone().add(1, 'months');
 
-        console.log(start_month_date, end_month_date);
         rp_center_daily_by_month__refresh_Table(
             start_month_date.format("YYYY-MM-DD"),
             end_month_date.format("YYYY-MM-DD"));
@@ -1755,6 +1768,7 @@ function rp_center_daily_by_month__refresh_Table(start_date, end_date) {
         success: function (data) {
             $('#wait').hide();
             var records = data.d;
+            records = rp_center_daily_by_month__fix_records(records, start_date);
 
             $('#div_table_center_daily_by_month').show();
             tbl = $('#table_center_daily_by_month').DataTable({
@@ -1766,9 +1780,18 @@ function rp_center_daily_by_month__refresh_Table(start_date, end_date) {
                     "search": "חיפוש:"
                 },
                 columnDefs: [
-                    { "orderData": [0, 1], "targets": 0 }],
+                    { "orderData": [0], "type": "num", "targets": 0 }],
                 columns: [
-                    { data: "Date" },
+                    {
+                        data: "Date",
+                        render: function (data, type, row) {
+                            if (type == "sort") {
+                                return data.Index;
+                            }
+                            return data.Str;
+                        }
+
+                    },
                     { data: "VolunteerCount" },
                     { data: "PatientCount" }
                 ],
@@ -1787,6 +1810,38 @@ function rp_center_daily_by_month__refresh_Table(start_date, end_date) {
 
 }
 
+function rp_center_daily_by_month__fix_records(records, start_date_str) {
+    // Change date format, inject empty rows, add total row
+
+    daysArr = { 0: "יום א", 1: "יום ב", 2: "יום ג", 3: "יום ד", 4: "יום ה", 5: "יום ו", 6: "יום שבת", };
+
+    // First, we create an array with every entry being 0 count
+    let curr_date = moment(start_date_str, "YYYY-MM-DD");
+    let days_in_month = curr_date.daysInMonth()
+    let result = new Array();
+    for (i = 0; i < days_in_month; i++) {
+        let new_date_str = `${daysArr[curr_date.day()]} - ${i + 1}`;
+        result.push({ Date: { Str: new_date_str, Index: i}, VolunteerCount: 0, PatientCount: 0 });
+        curr_date = curr_date.add(1, 'days');
+    }
+
+    let total_vols = 0, total_pats = 0;
+
+    for (a_rec of records) {
+        let d = moment(a_rec.Date.split(" ")[0], "DD/MM/YYYY");
+        let day_in_month = d.date();
+        let new_date_str = `${daysArr[d.day()]} - ${day_in_month}`;
+        a_rec.Date = { Str: new_date_str, Index: day_in_month - 1 };
+
+        result[day_in_month - 1] = a_rec; //override actual value in placeholder
+        total_vols = total_vols + +a_rec.VolunteerCount;
+        total_pats = total_pats + +a_rec.PatientCount;
+    }
+
+    result.push({ Date: { Str: 'סה"כ', Index: 1001 }, VolunteerCount: total_vols, PatientCount: total_pats });
+
+    return result;
+}
 
 function hide_all_tables() {
     $('#div_weeklyRides').hide();
