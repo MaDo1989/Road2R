@@ -207,7 +207,7 @@
 
 
         const DIFFER_RIDE_AXIS_MSG = 'ציר ההסעה של הסעה זו שונה ממה שהוגדר כברירת מחדל לחולה. ניתן לעדכן שדות אלו בהסעה.';
-        const DIFFER_AREAS_MSG = 'לא ניתן לשנות מהסעה באזור מסוים להסעה באזור אחר';
+        const DIFFER_AREAS_MSG = 'מכיוון שקו ההסעה של החולה לא נמצא באזור של ההסעה האנונימית הזו, לא ניתן להשתמש בהסעה. יש לפתוח הסעה חדשה עבור החולה הספציפי.';
 
 
 
@@ -873,15 +873,15 @@
                         && existingPatient.Hospital.Type !== 'כללית') {//a well defined patient
 
                         let bothBarrier_and_HospitalDiffer =
-                            existingPatient.Barrier !== targetPatient.Barrier
+                            existingPatient.Barrier.Name !== targetPatient.Barrier.Name
                             &&
-                            existingPatient.Hospital !== targetPatient.Hospital;
+                            existingPatient.Hospital.Name !== targetPatient.Hospital.Name;
 
                         if (bothBarrier_and_HospitalDiffer
                             ||
-                            existingPatient.Barrier !== targetPatient.Barrier
+                            existingPatient.Barrier.Name !== targetPatient.Barrier.Name
                             ||
-                            existingPatient.Hospital !== targetPatient.Hospital
+                            existingPatient.Hospital.Name !== targetPatient.Hospital.Name
                         ) {
                             alert2user = DIFFER_RIDE_AXIS_MSG;
                             allowChangeOf_originAndDestination = false;
@@ -953,8 +953,18 @@
             if (patient.IsAnonymous &&
                 (patient.Barrier.Type === 'כללית' || patient.Hospital.Type === 'כללית')
             ) {
+
+                /*
+       title=""
+
+
+       data-original-title="Select Origin   اختر نقطة الانطلاق"
+
+                 */
                 $('#Origin').prop('disabled', true);
+                $("#Origin").wrap(`<span style='background: yellow;' data-toggle="tooltip" title="השדה לא ניתן לשינוי כשהנסיעה היא של חולה אנונימי בציר כללי" class="d-inline-block" tabindex="0"></span>`);
                 $('#Destination').prop('disabled', true);
+                $("#Destination").wrap(`<span data-toggle="tooltip" title="השדה לא ניתן לשינוי כשהנסיעה היא של חולה אנונימי בציר כללי" class="d-inline-block" tabindex="0"></span>`);
             } else {
                 $('#Origin').prop('disabled', false);
                 $('#Destination').prop('disabled', false);
