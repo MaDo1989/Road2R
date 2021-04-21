@@ -854,7 +854,6 @@ public class WebService : System.Web.Services.WebService
             //    Response.Headers.Remove("Content-Encoding");
             //    Response.AppendHeader("Content-Encoding", "gzip");
             //}
-
             RidePat rp = new RidePat();
             List<RidePat> r = rp.GetRidePatView(volunteerId, maxDays);
             j.MaxJsonLength = Int32.MaxValue;
@@ -862,13 +861,13 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
+            CatchErrors catchErrors = new CatchErrors("WebService: Exception in GetRidePatView", ex + " " + ex.Message + " " + ex.InnerException + " " + ex.Source, ex.StackTrace);
             Log.Error("Error in GetRidePatView", ex);
-            CatchErrors catchErrors = new CatchErrors("Error in GetRidePatView", ex.Message, ex.StackTrace);
             throw new Exception("שגיאה בשליפת נתוני הסעות");
         }
 
     }
-    
+
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string GetRidePat(int ridePatNum)

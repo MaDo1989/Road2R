@@ -31,7 +31,7 @@ public class CatchErrors
 
         cmdParams[0] = cmd.Parameters.AddWithValue("@WhereCatched", WhereCatched);
         cmdParams[1] = cmd.Parameters.AddWithValue("@ExceptionStackTrace", ExceptionStackTrace);
-        cmdParams[2] = cmd.Parameters.AddWithValue("@ExceptionMessage", WhereCatched);
+        cmdParams[2] = cmd.Parameters.AddWithValue("@ExceptionMessage", ExceptionMessage);
 
         query = "insert into CatchErros(WhereCatched, ExceptionStackTrace, ExceptionMessage) values (@WhereCatched, @ExceptionStackTrace, @ExceptionMessage)";
         dbs = new DbService();

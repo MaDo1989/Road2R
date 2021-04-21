@@ -1029,7 +1029,6 @@ public class RidePat
         List<RidePat> rpl = new List<RidePat>();
 
         int counter = 0;
-
         try
         {
             foreach (DataRow dr in ds.Tables[0].Rows)
@@ -1118,12 +1117,12 @@ public class RidePat
                         rp.pat.Equipment.Add(row.ItemArray[0].ToString());
                     }
 
-                    //  rp.pat.EscortedList = new List<Escorted>();
+                     rp.pat.EscortedList = new List<Escorted>(); //this is have no logic sence! BUT due to fucked up mobile app  it has to stay
                     //↓↑ yogev switched that↓↑
                     rp.Escorts = new List<Escorted>();
-
                     string escortSearchExpression = "RidePatNum = " + rp.ridePatNum;
                     DataRow[] escortRow = escortTable.Select(escortSearchExpression);
+                  
                     foreach (DataRow row in escortRow)
                     {
                         Escorted e = new Escorted();
@@ -1132,8 +1131,8 @@ public class RidePat
                         e.CellPhone = row["CellPhone"].ToString();
                         e.IsAnonymous = String.IsNullOrEmpty(row["IsAnonymous"].ToString()) ? false : true;
                         rp.Escorts.Add(e);
+                        rp.pat.EscortedList.Add(e); //this is have no logic sence! BUT due to fucked up mobile app it has to stay
                         //↓↑ yogev switched that↓↑
-                        // rp.pat.EscortedList.Add(e);
                     }
 
                     Location origin = new Location();
@@ -1179,7 +1178,6 @@ public class RidePat
 
 
                     }
-
                     rpl.Add(rp);
                 }
                 catch (Exception ex)
@@ -1190,7 +1188,6 @@ public class RidePat
 
 
             }
-
             return rpl;
         }
         catch (Exception e)
