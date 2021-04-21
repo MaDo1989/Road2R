@@ -186,9 +186,9 @@
 
 
 
-            $(document).on("change", 'select[name ="datatable-future_length"]', function () {
-                localStorage.futurePageLength = $('select[name ="datatable-future_length"]').val();
-            })
+            //$(document).on("change", 'select[name ="datatable-future_length"]', function () {
+            //    localStorage.futurePageLength = $('select[name ="datatable-future_length"]').val();
+            //})
             // var isAssistant
 
             if (!JSON.parse(localStorage.getItem("isProductionDatabase"))) {
@@ -239,8 +239,8 @@
 
             jQuery.extend(jQuery.fn.dataTableExt.oSort, {
 
-                "de_datetime-asc": function (a, b) {
-                    /*a and b are a couple of dates to compare
+                "de_time-asc": function (a, b) {
+                    /*a and b are a couple of times hh:mm to compare
                     return value will be:
                     0 if a=b
                     1 if a > b
@@ -264,7 +264,7 @@
                     a = a_dateTime.getTime();
                     b = b_dateTime.getTime();
 
-                    if (isNaN(a)) {
+                    if (isNaN(a)) { //this is for אחה"צ
                         a = Infinity;
                     }
                     if (isNaN(b)) {
@@ -274,8 +274,8 @@
                     return a === b ? 0 : a > b ? 1 : -1;
                 },
 
-                "de_datetime-desc": function (a, b) {
-                    /*a and b are a couple of dates to compare
+                "de_time-desc": function (a, b) {
+                    /*a and b are a couple of times hh:mm to  compare
                       return value will be:
                       0 if a=b
                      -1 if a > b
@@ -298,12 +298,75 @@
                     a = a_dateTime.getTime();
                     b = b_dateTime.getTime();
 
-                    if (isNaN(a)) {
+                    if (isNaN(a)) {//this is for אחה"צ
                         a = Infinity;
                     }
                     if (isNaN(b)) {
                         b = Infinity;
                     }
+
+                    return a === b ? 0 : a > b ? -1 : 1;
+                },
+
+                "de_date-asc": (a, b) => {
+
+                    /*a and b are a couple of dates to compare
+                   return value will be:
+                   0 if a=b
+                   1 if a > b
+                  -1 if a < b
+                   */
+
+                    let ddmmyyyArr_a = $.trim(a).split('/');
+                    let ddmmyyyArr_b = $.trim(b).split('/');
+
+                    let dd_a = parseInt(ddmmyyyArr_a[0]);
+                    let mm_a = parseInt(ddmmyyyArr_a[1]);
+                    let yyyy_a = parseInt(ddmmyyyArr_a[2]);
+
+                    let dd_b = parseInt(ddmmyyyArr_b[0]);
+                    let mm_b = parseInt(ddmmyyyArr_b[1]);
+                    let yyyy_b = parseInt(ddmmyyyArr_b[2]);
+
+                    //let now = new Date();
+
+                    let a_date = new Date(yyyy_a, mm_a + 1, dd_a);
+                    let b_date = new Date(yyyy_b, mm_b + 1, dd_b);
+
+                    a = a_date.getTime();
+                    b = b_date.getTime();
+
+                    return a === b ? 0 : a > b ? 1 : -1;
+
+                },
+
+                "de_date-desc": (a, b) => {
+
+                    /*a and b are a couple of dates to compare
+                   return value will be:
+                   0 if a=b
+                   1 if a > b
+                  -1 if a < b
+                   */
+
+                    let ddmmyyyArr_a = $.trim(a).split('/');
+                    let ddmmyyyArr_b = $.trim(b).split('/');
+
+                    let dd_a = parseInt(ddmmyyyArr_a[0]);
+                    let mm_a = parseInt(ddmmyyyArr_a[1]);
+                    let yyyy_a = parseInt(ddmmyyyArr_a[2]);
+
+                    let dd_b = parseInt(ddmmyyyArr_b[0]);
+                    let mm_b = parseInt(ddmmyyyArr_b[1]);
+                    let yyyy_b = parseInt(ddmmyyyArr_b[2]);
+
+                    //let now = new Date();
+
+                    let a_date = new Date(yyyy_a, mm_a + 1, dd_a);
+                    let b_date = new Date(yyyy_b, mm_b + 1, dd_b);
+
+                    a = a_date.getTime();
+                    b = b_date.getTime();
 
                     return a === b ? 0 : a > b ? -1 : 1;
                 },
@@ -350,10 +413,10 @@
             });
 
             //Create a DataTable from the Table
-            var recordsNum = 50;
-            if (JSON.parse(localStorage.getItem("futurePageLength")) !== null) {
-                recordsNum = JSON.parse(localStorage.getItem("futurePageLength"));
-            }
+            //var recordsNum = 50;
+            //if (JSON.parse(localStorage.getItem("futurePageLength")) !== null) {
+            //    recordsNum = JSON.parse(localStorage.getItem("futurePageLength"));
+            //}
 
 
             /*
@@ -364,8 +427,9 @@
 
             tMorning = $('#datatable-morning').DataTable({
                 "stateDuration": 60 * 60,
+                "pageLength": 100,
                 "columnDefs": [
-                    { targets: 0, type: 'de_datetime' },
+                    { targets: 0, type: 'de_time' },
                     {
                         targets: 4, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //4 is driver column
                             if (cellData.indexOf('אין!') !== -1) {
@@ -412,9 +476,10 @@
             );
 
             tAfternoon = $('#datatable-afternoon').DataTable({
+                "pageLength": 100,
                 "stateDuration": 60 * 60,
                 "columnDefs": [
-                    { targets: 0, type: 'de_datetime' },
+                    { targets: 0, type: 'de_time' },
                     { targets: [0], createdCell: (td) => { $(td).attr('id', 'rideTiming') } },
                     {
                         targets: [1], createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //1 is origin column
@@ -485,9 +550,10 @@
             );
 
             tTomorrow = $('#datatable-tomorrow').DataTable({
+                "pageLength": 100,
                 "stateDuration": 60 * 60, //saves duration state for 1 hour
                 "columnDefs": [
-                    { targets: 1, type: 'de_datetime' },
+                    { targets: 1, type: 'de_time' },
                     {
                         targets: 5, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //5 is driver column
                             if (cellData.indexOf('אין!') !== -1) {
@@ -541,7 +607,7 @@
                     },
                     { targets: 8, className: 'text-left-strong' },
                 ],
-                "iDisplayLength": recordsNum,
+
                 //#region old way of sorting
                 //    "aoColumns": [
                 //        {
@@ -566,12 +632,13 @@
 
             tFuture = $('#datatable-future').DataTable(
                 {
+                    "pageLength": 100,
                     "stateDuration": 60 * 60, //saves duration state for 1 hour
                     "columnDefs": [
                         { targets: 8, className: 'text-left-strong' },
-                        { targets: 1, type: 'de_datetime' },
+                        { targets: 0, type: 'de_date' },
+                        { targets: 1, type: 'de_time' },
                     ],
-                    "iDisplayLength": recordsNum,
                     //#region old way of sorting
 
                     //"aoColumns": [{
@@ -1295,13 +1362,13 @@
             if (numOfEscorts > 0) {
                 if (numOfEscorts === 1) {
 
-                    thisrp_escorts_span = '<span class="numOfEscorts">מלווה 1</span>';
+                    thisrp_escorts_span = '<span class="numOfEscorts">2 נוסעים</span>';
 
                     if (validateMobileNum(arr_rides[i].Escorts[0].CellPhone)) {
 
                         let es = arr_rides[i].Escorts[0];
                         phone2render = es.IsAnonymous ?
-                            `<span class="phone2render">מלווה: ${addSeperator2MobileNum(es.CellPhone, '-')}</span>` :
+                            `<span class="phone2render">מלווה 1: ${addSeperator2MobileNum(es.CellPhone, '-')}</span>` :
                             `<span class="phone2render">${es.DisplayName}: ${addSeperator2MobileNum(es.CellPhone, '-')}</span>`;
 
                     } else if (validateMobileNum(arr_rides[i].Pat.CellPhone)) {
@@ -1309,14 +1376,14 @@
                         phone2render = `<span class="phone2render">${addSeperator2MobileNum(arr_rides[i].Pat.CellPhone, '-')}</span>`;
                     }
                 } else {
-                    thisrp_escorts_span = `<span class="numOfEscorts">${arr_rides[i].Escorts.length} מלווים</span>`;
+                    thisrp_escorts_span = `<span class="numOfEscorts">${arr_rides[i].Escorts.length + 1} נוסעים</span>`;
 
                     let notOneEscort_WithValidCellPhone = true;
                     arr_rides[i].Escorts.map((es, index, arr) => {
                         if (validateMobileNum(es.CellPhone)) {
                             notOneEscort_WithValidCellPhone = false;
                             phone2render += es.IsAnonymous ?
-                                `<span class="phone2render">מלווה: ${addSeperator2MobileNum(es.CellPhone, '-')}</span>` :
+                                `<span class="phone2render">מלווה ${index + 1}: ${addSeperator2MobileNum(es.CellPhone, '-')}</span>` :
                                 `<span class="phone2render">${es.DisplayName}: ${addSeperator2MobileNum(es.CellPhone, '-')}</span>`;
                         }
                         if (index === arr.length - 1 && notOneEscort_WithValidCellPhone) {
@@ -1331,10 +1398,11 @@
                 }
 
             } else {
+                thisrp_escorts_span = '<span class="numOfEscorts">נוסע יחיד</span>';
                 if (validateMobileNum(arr_rides[i].Pat.CellPhone)) {
                     phone2render = `<span class="phone2render">${addSeperator2MobileNum(arr_rides[i].Pat.CellPhone, '-')}</span>`;
                 } else {
-                    phone2render = `<span class="numOfEscorts">אין מס' נייד תקין במערכת</span>`;
+                    phone2render = `<span class="phone2render">אין מס' נייד תקין במערכת</span>`;
                 }
             }
 
@@ -1355,9 +1423,9 @@
 
             if (arr_rides[i].Pat.DisplayName.includes("אנונימי")) {
                 //arr_rides[i].Pat.DisplayName = "חולה";
-                patientName2render = "<span>חולה</span>";
+                patientName2render = "<span class='boldFont'>חולה</span>";
             } else {
-                patientName2render = `<span onclick='showMe(this, "patient")' class='blueFont clickable' id='${arr_rides[i].Pat.Id}'>${arr_rides[i].Pat.DisplayName}</span>`;
+                patientName2render = `<span onclick='showMe(this, "patient")' class='blueFont clickable boldFont' id='${arr_rides[i].Pat.Id}'>${arr_rides[i].Pat.DisplayName}</span>`;
                 patient_English_Name2render = `<span onclick='showMe(this, "patient")' class='clickable' id='${arr_rides[i].Pat.Id}'>${arr_rides[i].Pat.EnglishName}</span>`;
             }
             if (arr_rides[i].Status.indexOf("ממתינה לשיבוץ") !== -1 || (arr_rides[i].Status.indexOf("אין נסיעת הלוך") !== -1 && arr_rides[i].Status.indexOf("ויש נהג משובץ") === -1)) {
@@ -1436,7 +1504,7 @@
 
                 //we use to have an option for 2nd driver but no more
 
-                let driver = `<span class="driverName clickable blueFont" onclick='showMe(this, "volunterr")'>${arr_rides[i].Drivers[0].DisplayName}</span>`;
+                let driver = `<span class="driverName clickable blueFont boldFont" onclick='showMe(this, "volunterr")'>${arr_rides[i].Drivers[0].DisplayName}</span>`;
                 driver += `<span class="driverCellPhone">${addSeperator2MobileNum(arr_rides[i].Drivers[0].CellPhone, '-')}</span>`;
 
                 //#region old code for driver

@@ -100,7 +100,6 @@ input:checked + .slider:before {
 
 .numOfEscorts, .phone2render {
     display: block;
-    font-weight: bold;
 }
 
 .customWidth4column{
@@ -129,4 +128,8 @@ input:checked + .slider:before {
 
 .blueFont {
     color: rgb(40,96,145);
+}
+
+.boldFont {
+    font-weight: bold;
 }

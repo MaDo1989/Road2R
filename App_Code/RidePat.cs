@@ -415,7 +415,7 @@ public class RidePat
             DateTime newDate = new DateTime();
             for (int i = 0; i < numberOfRides; i++)
             {
-                
+
                 RidePat ridePatView = CheckRidePat_V2(ridePat, isAnonymous);
                 /* YOGEV - REPLACED IT: ↑↓ 
                 if (CheckRidePat(ridePat, isAnonymous))
@@ -474,7 +474,7 @@ public class RidePat
 
                 */
                 #endregion
-               
+
                 string query = "insert into RidePat (Patient,Origin,Destination,PickupTime,Coordinator,Remark,OnlyEscort,Area,CoordinatorId,lastModified) values (@pat,@origin,@destination,@date,@coordinator,@remark,@onlyEscort,@Area,@coordinatorID,DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
                 RidePatNum = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
 
@@ -530,7 +530,7 @@ public class RidePat
         else if (func == "edit") //Edit existing RidePat in DB
         {
             RidePatNum = ridePat.RidePatNum;
-            
+
             //SET THE COORDINATOR NAME IN RIDEPAT TABLE TO THE LAST ONE WHO TOUCHED THIS RIDEPAT 
             ChangeCoordinatoor(RidePatNum);
 
@@ -1121,7 +1121,7 @@ public class RidePat
                     //  rp.pat.EscortedList = new List<Escorted>();
                     //↓↑ yogev switched that↓↑
                     rp.Escorts = new List<Escorted>();
-                    
+
                     string escortSearchExpression = "RidePatNum = " + rp.ridePatNum;
                     DataRow[] escortRow = escortTable.Select(escortSearchExpression);
                     foreach (DataRow row in escortRow)
@@ -1130,6 +1130,7 @@ public class RidePat
                         e.Id = int.Parse(row["Id"].ToString());
                         e.DisplayName = row["DisplayName"].ToString();
                         e.CellPhone = row["CellPhone"].ToString();
+                        e.IsAnonymous = String.IsNullOrEmpty(row["IsAnonymous"].ToString()) ? false : true;
                         rp.Escorts.Add(e);
                         //↓↑ yogev switched that↓↑
                         // rp.pat.EscortedList.Add(e);
@@ -2103,10 +2104,10 @@ public class RidePat
     /// </summary>
     private void ChangeCoordinatoor(int ridePatNum)
     {
-        string loggedInName = (string)HttpContext.Current.Session["loggedInName"]; 
+        string loggedInName = (string)HttpContext.Current.Session["loggedInName"];
 
 
-        string query = "exec spRidePat_ChangeCoordinatorName @coordinatorName=N'"+ loggedInName + "', @RidePatNum=" + ridePatNum;
+        string query = "exec spRidePat_ChangeCoordinatorName @coordinatorName=N'" + loggedInName + "', @RidePatNum=" + ridePatNum;
         SqlCommand cmd = new SqlCommand();
 
         try
