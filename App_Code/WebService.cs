@@ -863,11 +863,12 @@ public class WebService : System.Web.Services.WebService
         catch (Exception ex)
         {
             Log.Error("Error in GetRidePatView", ex);
+            CatchErrors catchErrors = new CatchErrors("Error in GetRidePatView", ex.Message, ex.StackTrace);
             throw new Exception("שגיאה בשליפת נתוני הסעות");
         }
 
     }
-
+    
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string GetRidePat(int ridePatNum)
