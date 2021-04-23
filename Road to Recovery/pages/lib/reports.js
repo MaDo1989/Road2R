@@ -222,6 +222,7 @@ var K_strategy = {
     "rp_pil_vl_ride_month": rp_pil_vl_ride_month__refresh_preview,
     "rp_pil_vl_ride_recent_period": rp_pil_vl_ride_recent_period__refresh_preview,
     "rp_center_daily_by_month": rp_center_daily_by_month__refresh_preview,
+    "rp_center_monthly_by_year": rp_center_monthly_by_year__refresh_preview,
 }
 
 
@@ -326,6 +327,14 @@ var K_fields_map = {
             template: 'div[name="template_MONTH"]',
             type: "MONTH",
             post_clone: rp_center_daily_by_month___post_clone
+        }
+    ],
+    "rp_center_monthly_by_year": [
+        {
+            id: "rp_center_monthly_by_year__year",
+            type: "YEAR",
+            template: 'div[name="template_YEAR"]',
+            post_clone: rp_center_monthly_by_year__post_clone
         }
     ]
 
@@ -850,6 +859,10 @@ function rp_pil_vl_ride_recent_period__post_clone(id) {
 function rp_center_daily_by_month___post_clone(id) {
     populate_month_field(false);
     rp_center_daily_by_month__refresh_preview();
+}
+
+function rp_center_monthly_by_year__post_clone(id) {
+    rp_center_monthly_by_year__refresh_preview();
 }
 
 function rp_pil_vls_per_month__refresh_preview() {
@@ -1745,6 +1758,7 @@ function rp_center_daily_by_month__refresh_preview() {
 }   
 
 
+
 function rp_center_daily_by_month__refresh_Table(start_date, end_date) {
     hide_all_tables();
 
@@ -1843,6 +1857,88 @@ function rp_center_daily_by_month__fix_records(records, start_date_str) {
     return result;
 }
 
+function rp_center_monthly_by_year__refresh_preview() {
+    rp_center_monthly_by_year__refresh_table(1,2);
+
+}
+
+function rp_center_monthly_by_year__refresh_table(start_date, end_date) {
+    hide_all_tables();
+
+    $('#wait').show();
+    var query_object = {
+        start_date: start_date,
+        end_date: end_date
+    };
+
+
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportCenteryMonthlyByYear",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            $('#wait').hide();
+            var records = data.d;
+
+            records = rp_center_monthly_by_year__fix_records(records);
+
+            $('#div_table_rp_center_monthly_by_year').show();
+            tbl = $('#table_rp_center_monthly_by_year').DataTable({
+                pageLength: 100,
+                bLengthChange: false,
+                data: records,
+                destroy: true,
+                "language": {
+                    "search": "חיפוש:"
+                },
+                columnDefs: [
+                    { "orderData": [0], "type": "num", "targets": 0 }],
+                columns: [
+                    {
+                        data: "People"
+                    },
+                    { data: "1" },
+                    { data: "2" },
+                    { data: "3" },
+                    { data: "4" },
+                    { data: "5" },
+                    { data: "6" },
+                    { data: "7" },
+                    { data: "8" },
+                    { data: "9" },
+                    { data: "10" },
+                    { data: "11" },
+                    { data: "12" },
+                    { data: "Total" },
+                ],
+                dom: 'Bfrtip',
+
+                buttons: [
+                    K_DataTable_CSV_EXPORT
+                ]
+            });
+        },
+        error: function (err) {
+            $('#wait').hide();
+        }
+
+    });
+
+
+}
+
+function rp_center_monthly_by_year__fix_records(records) {
+    // TODO - trnspose teh array
+    console.log(records);
+}
+
+
 function hide_all_tables() {
     $('#div_weeklyRides').hide();
     $('#div_table_amuta_vls_week').hide();
@@ -1854,6 +1950,7 @@ function hide_all_tables() {
     $("#div_table_pil_vl_ride_month").hide();
     $("#div_table_pil_vl_ride_recent_period").hide();
     $("#div_table_center_daily_by_month").hide();
+    $("#div_table_rp_center_monthly_by_year").hide();
  }
 
 
