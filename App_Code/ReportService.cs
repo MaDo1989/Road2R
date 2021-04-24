@@ -831,22 +831,22 @@ group by CONVERT(date, pickuptime) ";
         string query =
 @"select count(DISTINCT Id )as COUNT_G, 'PATIENT' as TYPE_G, MONTH(PickupTime) as MONTH_G
 FROM RPView r 
-where PickupTime >= '2020-01-01'
-and PickupTime <= '2020-12-31'
+where PickupTime >= @start_date
+and PickupTime <= @end_date
 and RideNum  is not null
 GROUP BY  MONTH(PickupTime) 
 UNION
 SELECT count(DISTINCT MainDriver )as COUNT_G, 'DRIVER' as TYPE_G, MONTH(date) as MONTH_G
 FROM Ride 
-where date >= '2020-01-01'
-and date <= '2020-12-31'
+where date >= @start_date
+and date <= @end_date
 GROUP BY  MONTH(Date) 
 ORDER  BY MONTH_G, TYPE_G ASC";
 
         SqlCommand cmd = new SqlCommand(query);
         cmd.CommandType = CommandType.Text;
-//@@        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
-//@@        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
 
         DataSet ds = db.GetDataSetBySqlCommand(cmd);
         DataTable dt = ds.Tables[0];

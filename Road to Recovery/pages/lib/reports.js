@@ -700,28 +700,35 @@ function rp_vl_ride_month__refresh_preview() {
 }   
 
 
+function convert_year_to_start_end_dates(year_selector) {
+    var end_date;
+    var selected_year = new Date($(year_selector).val());
+    var start_date = moment(selected_year);
+
+    // this year end today, not on 31-Dec 
+    var today = new Date();
+    if (today.getFullYear() == selected_year.getFullYear()) {
+        // this year end today, not on 31-Dec 
+        end_date = moment(today);
+    }
+    else {
+        selected_year.setMonth(11);
+        selected_year.setDate(31);
+        end_date = moment(selected_year);
+    }
+    console.log(start_date, end_date);
+    return { start_date: start_date, end_date: end_date };
+}
+
 function rp_vl_ride_year__refresh_preview() {
     var volunteerId = $("#select_driver").attr("itemID");
     if (volunteerId) {
-        var end_date;
-        var selected_year = new Date( $("#select_year").val());
-        var start_date = moment(selected_year);
-        
-        // this year end today, not on 31-Dec 
-        var today = new Date();
-        if (today.getFullYear() == selected_year.getFullYear()) {
-            // this year end today, not on 31-Dec 
-            end_date = moment(today);
-        }
-        else {
-            selected_year.setMonth(11);
-            selected_year.setDate(31);
-            end_date = moment(selected_year);
-        }
 
+        obj = convert_year_to_start_end_dates("#select_year");
+        
         refreshTable(volunteerId,
-                start_date.format("YYYY-MM-DD"),
-                end_date.format("YYYY-MM-DD"));
+                obj.start_date.format("YYYY-MM-DD"),
+                obj.end_date.format("YYYY-MM-DD"));
     }
 }   
 
@@ -862,6 +869,10 @@ function rp_center_daily_by_month___post_clone(id) {
 }
 
 function rp_center_monthly_by_year__post_clone(id) {
+    var today = new Date();
+    $('#select_year').val(today.getFullYear());
+    $("#select_year").change(rp_center_monthly_by_year__refresh_preview);
+
     rp_center_monthly_by_year__refresh_preview();
 }
 
@@ -1858,8 +1869,12 @@ function rp_center_daily_by_month__fix_records(records, start_date_str) {
 }
 
 function rp_center_monthly_by_year__refresh_preview() {
-    rp_center_monthly_by_year__refresh_table(1,2);
 
+    obj = convert_year_to_start_end_dates("#select_year");
+
+    rp_center_monthly_by_year__refresh_table(
+        obj.start_date.format("YYYY-MM-DD"),
+        obj.end_date.format("YYYY-MM-DD"));
 }
 
 function rp_center_monthly_by_year__refresh_table(start_date, end_date) {
@@ -1903,18 +1918,18 @@ function rp_center_monthly_by_year__refresh_table(start_date, end_date) {
                     {
                         data: "People"
                     },
-                    { data: "1" },
-                    { data: "2" },
-                    { data: "3" },
-                    { data: "4" },
-                    { data: "5" },
-                    { data: "6" },
-                    { data: "7" },
-                    { data: "8" },
-                    { data: "9" },
-                    { data: "10" },
-                    { data: "11" },
-                    { data: "12" },
+                    { data: "1", "defaultContent": ""  },
+                    { data: "2", "defaultContent": ""  },
+                    { data: "3", "defaultContent": ""  },
+                    { data: "4", "defaultContent": ""  },
+                    { data: "5", "defaultContent": "" },
+                    { data: "6", "defaultContent": "" },
+                    { data: "7", "defaultContent": ""  },
+                    { data: "8", "defaultContent": ""  },
+                    { data: "9", "defaultContent": ""  },
+                    { data: "10", "defaultContent": ""  },
+                    { data: "11", "defaultContent": ""  },
+                    { data: "12", "defaultContent": ""  },
                     { data: "Total" },
                 ],
                 dom: 'Bfrtip',
@@ -1934,8 +1949,18 @@ function rp_center_monthly_by_year__refresh_table(start_date, end_date) {
 }
 
 function rp_center_monthly_by_year__fix_records(records) {
-    // TODO - trnspose teh array
-    console.log(records);
+    let drivers = { "People": "מתנדבים", Total: 0 };
+    let patients = { "People": "חולים", Total: 0 };
+    
+    for (a_rec of records) {
+        let obj = patients;
+        if (a_rec.Type == "DRIVER") {
+            obj = drivers;
+        }
+        obj[a_rec.Month] = a_rec.Count;
+        obj.Total += +a_rec.Count;
+    }
+    return new Array(patients, drivers);
 }
 
 
