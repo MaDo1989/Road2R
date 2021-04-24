@@ -35,35 +35,9 @@ need to read notes on what RPView is, and see where I copied it from....
 // --------------------------------------
 
 // Downhill Park:
-// 1. Export to PDF now prints in hebrew (as I created the font file), but it displayed reversed.
-// Need to look at pdfmake doc about RTL, or in data-table.
-// Also, shoudl check which font is used now in the HTML, maybe that font is better ?
 
 
-/* Instructions for printing PDF Hebrew 
- *  https://github.com/bpampuch/pdfmake/issues/1496
- *  
-  c.customize && c.customize(a);
-            a = d.pdfMake.createPdf(a);
-
-
-Downloaded font from:
-   https://fonts.google.com/specimen/Alef?subset=hebrew&preview.text=&preview.text_type=custom&sidebar.open=true&selection.family=Alef:wght@700
-
-
-https://pdfmake.github.io/docs/fonts/custom-fonts-client-side/vfs/
-
-
-Created vfs.js : 
-
-   git clone https://github.com/bpampuch/pdfmake.git .
-   cd examples/fonts/
-   explorer.exe  .
-   cd ..
-   node build-vfs.js
-
-and do a mnaul change to it, at teh end to regiser as .vfs
-            
+           
              * */
 
 /* Perf analsysis
@@ -341,10 +315,44 @@ var K_fields_map = {
     
  }
 
+/* Handling hebrew in PDF: 
+    Instructions for printing PDF Hebrew
+  https://github.com/bpampuch/pdfmake/issues/1496
+ 
+  c.customize && c.customize(a);
+  a = d.pdfMake.createPdf(a);
+
+Downloaded font from:
+   https://fonts.google.com/specimen/Alef?subset=hebrew&preview.text=&preview.text_type=custom&sidebar.open=true&selection.family=Alef:wght@700
+
+
+https://pdfmake.github.io/docs/fonts/custom-fonts-client-side/vfs/
+
+
+Created vfs.js :
+
+   git clone https://github.com/bpampuch/pdfmake.git .
+   cd examples/fonts/
+   explorer.exe  .
+   cd ..
+   node build-vfs.js
+
+and do a manual change to it, at the end to regiser as .vfs
+*/
+
 
 var K_DataTable_PDF_EXPORT = {
     extend: 'pdfHtml5',
     text: 'יצוא הדו"ח ל-PDF',
+    exportOptions: {
+        orthogonal: "exportpdf",
+        format: {
+            header: function (text, index, node) {
+                // https://datatables.net/forums/discussion/48856/is-there-a-way-to-target-table-header-using-export-options-while-exporting
+                return reverse_for_hebrew(text);
+            }
+        }
+    },
     orientation: 'landscape',
     pageSize: 'LEGAL',
     customize: function (doc) {
@@ -369,6 +377,26 @@ var K_DataTable_CSV_EXPORT = {
     text: 'יצוא הדו"ח ל-CSV',
 };
 
+
+function reverse_for_hebrew(input_str) {
+    // https://github.com/bpampuch/pdfmake/issues/184#issuecomment-677909980
+
+    let hebrew_char = input_str.search(/[\u0590-\u05FF]/);
+    if (hebrew_char >= 0) {
+        let rtl_string = input_str.split("").reverse().join("");
+        return rtl_string;
+    }
+    return input_str;
+}
+
+
+// https://datatables.net/forums/discussion/48267/can-a-column-be-defined-to-render-different-for-view-vs-printing#Comment_127032
+function render_cell_in_pdf_rtl(data, type, row) {
+    if (type === "exportpdf") {
+        return reverse_for_hebrew(data);
+    }
+    return data;
+}
 
 
 function populate_parameters(report_type) {
@@ -936,8 +964,14 @@ function refresh_amuta_vls_week_Table(start_date, end_date) {
                 columnDefs: [
                     { "orderData": [0, 1], "targets": 0 }],
                 columns: [
-                    { data: "Region" },
-                    { data: "Volunteer" }
+                    {
+                        data: "Region",
+                        render: render_cell_in_pdf_rtl
+                    },
+                    {
+                        data: "Volunteer",
+                        render: render_cell_in_pdf_rtl
+                    }
 
                 ],
                 dom: 'Bfrtip',
@@ -1004,10 +1038,22 @@ function refresh_amuta_vls_km_Table(start_date, end_date) {
                             return data;
                         }
                     },
-                    { data: "Volunteer" },
-                    { data: "Patient" },
-                    { data: "Origin" },
-                    { data: "Destination" }
+                    {
+                        data: "Volunteer",
+                        render: render_cell_in_pdf_rtl
+                    },
+                    {
+                        data: "Patient",
+                        render: render_cell_in_pdf_rtl
+                    },
+                    {
+                        data: "Origin",
+                        render: render_cell_in_pdf_rtl
+                    },
+                    {
+                        data: "Destination",
+                        render: render_cell_in_pdf_rtl
+                    }
 
                 ],
                 dom: 'Bfrtip',
@@ -1590,9 +1636,18 @@ function refresh_amuta_vls_per_pat_Table(patient) {
                             return data;
                         }
                     },
-                    { data: "Volunteer" },
-                    { data: "Origin" },
-                    { data: "Destination" }
+                    {
+                        data: "Volunteer",
+                        render: render_cell_in_pdf_rtl
+                    },
+                    {
+                        data: "Origin",
+                        render: render_cell_in_pdf_rtl
+                    },
+                    {
+                        data: "Destination",
+                        render: render_cell_in_pdf_rtl
+                    }
 
                 ],
                 dom: 'Bfrtip',
@@ -1702,9 +1757,18 @@ function refreshTable(volunteerId, start_date, end_date) {
                 columns: [
                     { data: "Date" },
                     { data: "Time" },
-                    { data: "OriginName" },
-                    { data: "DestinationName" },
-                    { data: "PatDisplayName" },
+                    {
+                        data: "OriginName",
+                        render: render_cell_in_pdf_rtl
+                    },
+                    {
+                        data: "DestinationName",
+                        render: render_cell_in_pdf_rtl
+                    },
+                    {
+                        data: "PatDisplayName",
+                        render: render_cell_in_pdf_rtl
+                    },
 
                 ],
                 dom: 'Bfrtip',
