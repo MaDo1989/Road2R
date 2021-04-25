@@ -1,4 +1,4 @@
-﻿.centerHeader {
+.centerHeader {
     text-align: center;
 }
 
@@ -98,11 +98,12 @@ input:checked + .slider:before {
 
 /* cool switch */
 
-.numOfEscorts, .phone2render {
+.numOfPassengers, .patientPhone2render {
     display: block;
 }
 
-.customWidth4column{
+
+.customWidth4column {
     width: 10vw;
 }
 

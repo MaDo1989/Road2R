@@ -1354,56 +1354,36 @@
         function buildTables(table) {
 
 
-            let thisrp_escorts_span = '<span class="numOfEscorts">הסעה ללא מלווים</span>';
+            let numOfPassengers = '<span class="numOfPassengers">נוסע יחיד</span>';
             let numOfEscorts = arr_rides[i].Escorts.length;
-            let phone2render = '';
+            let escortsPhone2render = '';
             let equipments = '';
+            let patientPhone2render = '';
 
+            if (validateMobileNum(arr_rides[i].Pat.CellPhone)) {
+
+                patientPhone2render = `<span class="patientPhone2render">${addSeperator2MobileNum(arr_rides[i].Pat.CellPhone, '-')}</span>`;
+            }
             if (numOfEscorts > 0) {
-                if (numOfEscorts === 1) {
+                numOfPassengers = `<span class="numOfPassengers">${numOfEscorts + 1} נוסעים</span>`;
 
-                    thisrp_escorts_span = '<span class="numOfEscorts">2 נוסעים</span>';
+                let numOfValidsPhones4Escorts = arr_rides[i].Escorts.filter(es => validateMobileNum(es.CellPhone)).length;
 
-                    if (validateMobileNum(arr_rides[i].Escorts[0].CellPhone)) {
+                if (numOfValidsPhones4Escorts > 0) escortsPhone2render = 'מלווים: ';
 
-                        let es = arr_rides[i].Escorts[0];
-                        phone2render = es.IsAnonymous ?
-                            `<span class="phone2render">מלווה 1: ${addSeperator2MobileNum(es.CellPhone, '-')}</span>` :
-                            `<span class="phone2render">${es.DisplayName}: ${addSeperator2MobileNum(es.CellPhone, '-')}</span>`;
+                arr_rides[i].Escorts.map((es, i) => {
+                    if (validateMobileNum(es.CellPhone)) {
 
-                    } else if (validateMobileNum(arr_rides[i].Pat.CellPhone)) {
 
-                        phone2render = `<span class="phone2render">${addSeperator2MobileNum(arr_rides[i].Pat.CellPhone, '-')}</span>`;
+                        escortsPhone2render += `<span class="escortsPhone2render">${addSeperator2MobileNum(es.CellPhone, '-')}, `;
+
+                        if (i === numOfEscorts - 1) {
+                            escortsPhone2render = escortsPhone2render.substring(0, escortsPhone2render.length - 2);
+                            escortsPhone2render += '</span>';
+                        }
                     }
-                } else {
-                    thisrp_escorts_span = `<span class="numOfEscorts">${arr_rides[i].Escorts.length + 1} נוסעים</span>`;
+                });
 
-                    let notOneEscort_WithValidCellPhone = true;
-                    arr_rides[i].Escorts.map((es, index, arr) => {
-                        if (validateMobileNum(es.CellPhone)) {
-                            notOneEscort_WithValidCellPhone = false;
-                            phone2render += es.IsAnonymous ?
-                                `<span class="phone2render">מלווה ${index + 1}: ${addSeperator2MobileNum(es.CellPhone, '-')}</span>` :
-                                `<span class="phone2render">${es.DisplayName}: ${addSeperator2MobileNum(es.CellPhone, '-')}</span>`;
-                        }
-                        if (index === arr.length - 1 && notOneEscort_WithValidCellPhone) {
-                            //last one and no escort with valid cellphone
-                            if (validateMobileNum(arr_rides[i].Pat.CellPhone)) {
-                                phone2render = `<span class="phone2render">${addSeperator2MobileNum(arr_rides[i].Pat.CellPhone, '-')}</span>`;
-                            } else {
-                                phone2render = `<span class="numOfEscorts">אין מס' נייד תקין במערכת</span>`;
-                            }
-                        }
-                    });
-                }
-
-            } else {
-                thisrp_escorts_span = '<span class="numOfEscorts">נוסע יחיד</span>';
-                if (validateMobileNum(arr_rides[i].Pat.CellPhone)) {
-                    phone2render = `<span class="phone2render">${addSeperator2MobileNum(arr_rides[i].Pat.CellPhone, '-')}</span>`;
-                } else {
-                    phone2render = `<span class="phone2render">אין מס' נייד תקין במערכת</span>`;
-                }
             }
 
             if (arr_rides[i].Pat.Equipment.length > 0) {
@@ -1415,7 +1395,7 @@
                 equipments += `</div>`;
             }
 
-            let patientAddons = thisrp_escorts_span + phone2render + equipments;
+            let patientAddons = numOfPassengers + patientPhone2render + escortsPhone2render + equipments;
 
 
             let patientName2render = '';
@@ -1814,7 +1794,7 @@
                                                             <th class="middle" title="Time  الساعة">שעה</th>
                                                             <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
                                                             <th class="middle" title="Destination  نقطة الوصول">יעד</th>
-                                                            <th class="middle" title="Patient  المريض">החולה</th>
+                                                            <th class="customWidth4column middle" title="Patient  المريض">החולה</th>
                                                             <th class="middle" title="Driver  السائق">המסיע</th>
                                                             <th class="middle" title="Status  حالة السفرية">סטטוס ההסעה</th>
                                                             <th class="customWidth middle" title="Last modified">עודכן לאחרונה</th>
@@ -1842,7 +1822,7 @@
                                                             <th class="middle" title="Time  الساعة">שעה</th>
                                                             <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
                                                             <th class="middle" title="Destination  نقطة الوصول">יעד</th>
-                                                            <th class="middle" title="Patient  المريض">החולה</th>
+                                                            <th class="customWidth4column middle" title="Patient  المريض">החולה</th>
                                                             <th class="middle" title="Driver  السائق">המסיע</th>
                                                             <th class="middle" title="Status  حالة السفرية">סטטוס ההסעה</th>
                                                             <th class="customWidth middle" title="Last modified">עודכן לאחרונה</th>
