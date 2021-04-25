@@ -32,7 +32,7 @@ public class RidePat
     string status;
     string area;
     string shift;
-    string lastModified;
+    DateTime? lastModified;
     DbService dbs;
 
     public bool OnlyEscort { get; set; }
@@ -205,7 +205,7 @@ public class RidePat
 
     public string Area { get; set; }
 
-    public string LastModified
+    public DateTime? LastModified
     {
         get
         {
@@ -475,7 +475,7 @@ public class RidePat
                 */
                 #endregion
 
-                string query = "insert into RidePat (Patient,Origin,Destination,PickupTime,Coordinator,Remark,OnlyEscort,Area,CoordinatorId,lastModified) values (@pat,@origin,@destination,@date,@coordinator,@remark,@onlyEscort,@Area,@coordinatorID,DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
+                string query = "insert into RidePat (Patient,Origin,Destination,PickupTime,Coordinator,Remark,OnlyEscort,Area,CoordinatorId,lastModified) values (@pat,@origin,@destination,@date,@coordinator,@remark,@onlyEscort,@Area,@coordinatorID,SYSDATETIME());SELECT SCOPE_IDENTITY();";
                 RidePatNum = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
 
                 if (Escorts.Count > 0 && RidePatNum != 0)
@@ -552,7 +552,7 @@ public class RidePat
 
             cmdParams[8] = cmd.Parameters.AddWithValue("@coordinatorID", -1); //THIS IS JUST SO YOU DONT GET EXCEPTION
 
-            var query = "update RidePat set Patient=@pat,Origin=@origin,Destination=@destination,PickupTime=@date,Remark=@remark,OnlyEscort=@onlyEscort,Area=@Area,lastModified=DATEADD(hour, 2, SYSDATETIME()) where RidePatNum=@ridePatNum";
+            var query = "update RidePat set Patient=@pat,Origin=@origin,Destination=@destination,PickupTime=@date,Remark=@remark,OnlyEscort=@onlyEscort,Area=@Area,lastModified=SYSDATETIME() where RidePatNum=@ridePatNum";
             int res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
 
             if (res > 0)
@@ -863,7 +863,7 @@ public class RidePat
         rp.Coordinator = new Volunteer();
         rp.Coordinator.DisplayName = dr["Coordinator"].ToString();
         rp.Remark = dr["Remark"].ToString();
-        rp.LastModified = dr["lastModified"].ToString();
+        rp.LastModified = Convert.ToDateTime(dr["lastModified"].ToString());
 
         string query2 = "select DisplayName,Id from RidePatEscortView where RidePatNum=" + ridePatNum;
         DbService db2 = new DbService();
@@ -1117,12 +1117,12 @@ public class RidePat
                         rp.pat.Equipment.Add(row.ItemArray[0].ToString());
                     }
 
-                     rp.pat.EscortedList = new List<Escorted>(); //this is have no logic sence! BUT due to fucked up mobile app  it has to stay
+                    rp.pat.EscortedList = new List<Escorted>(); //this is have no logic sence! BUT due to fucked up mobile app  it has to stay
                     //↓↑ yogev switched that↓↑
                     rp.Escorts = new List<Escorted>();
                     string escortSearchExpression = "RidePatNum = " + rp.ridePatNum;
                     DataRow[] escortRow = escortTable.Select(escortSearchExpression);
-                  
+
                     foreach (DataRow row in escortRow)
                     {
                         Escorted e = new Escorted();
@@ -1155,7 +1155,7 @@ public class RidePat
                     rp.Shift = dr["Shift"].ToString();
                     rp.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
                     rp.Status = dr["Status"].ToString();
-                    rp.LastModified = dr["lastModified"].ToString();
+                    rp.LastModified = Convert.ToDateTime(dr["lastModified"].ToString());
                     if (rp.RideNum > 0 && rp.Status != "אין נסיעת הלוך ויש נהג משובץ") // if RidePat is assigned to a Ride - Take the Ride's status
                     {
                         string searchExpression = "RideRideNum = " + rp.RideNum;
@@ -1329,7 +1329,7 @@ public class RidePat
                 rp.Shift = sdr["Shift"].ToString();
                 rp.Date = Convert.ToDateTime(sdr["PickupTime"].ToString());
                 rp.Status = sdr["Status"].ToString();
-                rp.LastModified = sdr["lastModified"].ToString();
+                rp.LastModified = Convert.ToDateTime(sdr["lastModified"].ToString());
                 if (rp.RideNum > 0 && rp.Status != "אין נסיעת הלוך ויש נהג משובץ") // if RidePat is assigned to a Ride - Take the Ride's status
                 {
                     string searchExpression = "RideRideNum = " + rp.RideNum;
@@ -1890,7 +1890,10 @@ public class RidePat
             rp.Coordinator = new Volunteer();
             rp.Coordinator.DisplayName = dr["Coordinator"].ToString();
             rp.Remark = dr["Remark"].ToString();
-            rp.LastModified = dr["lastModified"].ToString();
+
+            rp.LastModified = 
+                String.IsNullOrEmpty(dr["lastModified"].ToString()) ? null :
+                (DateTime?) Convert.ToDateTime(dr["lastModified"].ToString());
 
             string query2 = "select DisplayName,Id from RidePatEscortView where RidePatNum=" + rp.ridePatNum;
             DbService db2 = new DbService();
