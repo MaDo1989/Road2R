@@ -1357,7 +1357,7 @@
             let numOfPassengers = '<span class="numOfPassengers">נוסע יחיד</span>';
             let numOfEscorts = arr_rides[i].Escorts.length;
             let escortsPhone2render = '';
-            let equipments = '';
+            let equipmentsAndnumOfPassengers = '';
             let patientPhone2render = '';
             let lastModified = convertDBDate2FrontEndDate(arr_rides[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
 
@@ -1389,14 +1389,17 @@
 
             if (arr_rides[i].Pat.Equipment.length > 0) {
 
-                equipments = `<div class="equipments">`;
+                equipmentsAndnumOfPassengers = `<div class="equipmentsAndnumOfPassengers">`;
+                equipmentsAndnumOfPassengers += numOfPassengers;
+                equipmentsAndnumOfPassengers += `<div>`;
                 arr_rides[i].Pat.Equipment.map((eq) => {
-                    equipments += `<img class="equipments-img" src="../../Media/${eq}.png" />`;
+                    equipmentsAndnumOfPassengers += `<img class="equipments-img" src="../../Media/${eq}.png" />`;
                 });
-                equipments += `</div>`;
+                equipmentsAndnumOfPassengers += `</div>`;
+                equipmentsAndnumOfPassengers += `</div>`;
             }
 
-            let patientAddons = numOfPassengers + patientPhone2render + escortsPhone2render + equipments;
+            let patientAddons = equipmentsAndnumOfPassengers + patientPhone2render + escortsPhone2render;
 
 
             let patientName2render = '';

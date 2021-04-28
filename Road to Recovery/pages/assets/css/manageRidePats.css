@@ -98,10 +98,14 @@ input:checked + .slider:before {
 
 /* cool switch */
 
-.numOfPassengers, .patientPhone2render {
+.patientPhone2render {
     display: block;
 }
 
+.equipmentsAndnumOfPassengers {
+    display: flex;
+    justify-content: space-between;
+}
 
 .customWidth4column {
     width: 10vw;
@@ -117,10 +121,6 @@ input:checked + .slider:before {
 
 .driverName, .driverCellPhone {
     display: block;
-}
-
-.equipments{
-    text-align: left;
 }
 
 .equipments-img{
