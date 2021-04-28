@@ -900,7 +900,6 @@
         }
 
         function confirmDelete(ridePat, table) {
-            console.log(ridePat.name)
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/getRidePat",
@@ -1109,13 +1108,14 @@
             //var repeatRide = "";
             let ridePatNums2MarkDeleted = [];
             ridePatNums2MarkDeleted.push(ridePat.RidePatNum);
+            let nowInUTC = new Date().toUTCString();
 
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/ChangeArrayOF_RidePatStatuses",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                data: JSON.stringify({ newStatus: 'נמחקה', ridePatNums: ridePatNums2MarkDeleted }),
+                data: JSON.stringify({ newStatus: 'נמחקה', ridePatNums: ridePatNums2MarkDeleted, clientUTCTimeStemp: nowInUTC }),
                 success: function () {
                     swal({
                         title: "لقد تم حذف السفرية\nההסעה נמחקה",
@@ -1359,6 +1359,7 @@
             let escortsPhone2render = '';
             let equipments = '';
             let patientPhone2render = '';
+            let lastModified = convertDBDate2FrontEndDate(arr_rides[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
 
             if (validateMobileNum(arr_rides[i].Pat.CellPhone)) {
 
@@ -1419,7 +1420,7 @@
                                 patient_English_Name2render + patientAddons,
                                 "אין!<br/>None!",
                                 "Waiting for a driver",
-                                convertDBDate2FrontEndDate(arr_rides[i].LastModified),
+                                lastModified,
                                 arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
                                 arr_rides[i].Remark,
                                 btnStr,
@@ -1436,7 +1437,7 @@
                                 patient_English_Name2render + patientAddons,
                                 "אין!<br/>None!",
                                 "Waiting for a driver",
-                                convertDBDate2FrontEndDate(arr_rides[i].LastModified),
+                                lastModified,
                                 arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
                                 arr_rides[i].Remark,
                                 btnStr,
@@ -1455,7 +1456,7 @@
                                 patientName2render + patientAddons,
                                 "אין!<br/>None!",
                                 arr_rides[i].Status,
-                                convertDBDate2FrontEndDate(arr_rides[i].LastModified),
+                                lastModified,
                                 arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
                                 arr_rides[i].Remark,
                                 btnStr,
@@ -1472,7 +1473,7 @@
                                 patientName2render + patientAddons,
                                 "אין!<br/>None!",
                                 arr_rides[i].Status,
-                                convertDBDate2FrontEndDate(arr_rides[i].LastModified),
+                                lastModified,
                                 arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
                                 arr_rides[i].Remark,
                                 btnStr,
@@ -1537,7 +1538,7 @@
                                 patient_English_Name2render + patientAddons,
                                 driver,
                                 s,
-                                convertDBDate2FrontEndDate(arr_rides[i].LastModified),
+                                lastModified,
                                 arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
                                 arr_rides[i].Remark,
                                 btnStr,
@@ -1554,7 +1555,7 @@
                                 patient_English_Name2render + patientAddons,
                                 driver,
                                 s,
-                                convertDBDate2FrontEndDate(arr_rides[i].LastModified),
+                                lastModified,
                                 arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
                                 arr_rides[i].Remark,
                                 btnStr,
@@ -1572,7 +1573,7 @@
                                 patientName2render + patientAddons,
                                 driver,
                                 arr_rides[i].Status,
-                                convertDBDate2FrontEndDate(arr_rides[i].LastModified),
+                                lastModified,
                                 arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
                                 arr_rides[i].Remark,
                                 btnStr,
@@ -1589,7 +1590,7 @@
                                 patientName2render + patientAddons,
                                 driver,
                                 arr_rides[i].Status,
-                                convertDBDate2FrontEndDate(arr_rides[i].LastModified),
+                                lastModified,
                                 arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
                                 arr_rides[i].Remark,
                                 btnStr,
