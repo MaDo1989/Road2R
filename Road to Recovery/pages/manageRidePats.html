@@ -1370,13 +1370,13 @@
 
                 let numOfValidsPhones4Escorts = arr_rides[i].Escorts.filter(es => validateMobileNum(es.CellPhone)).length;
 
-                if (numOfValidsPhones4Escorts > 0) escortsPhone2render = 'מלווים: ';
+                if (numOfValidsPhones4Escorts > 0) escortsPhone2render = '<span class="escortsPhone2render block">מלווים: ';
 
                 arr_rides[i].Escorts.map((es, i) => {
                     if (validateMobileNum(es.CellPhone)) {
 
 
-                        escortsPhone2render += `<span class="escortsPhone2render">${addSeperator2MobileNum(es.CellPhone, '-')}, `;
+                        escortsPhone2render += `${addSeperator2MobileNum(es.CellPhone, '-')}, `;
 
                         if (i === numOfEscorts - 1) {
                             escortsPhone2render = escortsPhone2render.substring(0, escortsPhone2render.length - 2);
