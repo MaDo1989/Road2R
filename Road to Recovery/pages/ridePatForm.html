@@ -194,7 +194,7 @@
 
         let arr_escort_inthisRidePat = [];
         let patients_JSONArray = [];
-        let { buildStringforEquipment } = GENERAL.USEFULL_FUNCTIONS;
+        let { buildStringforEquipment, convertDBDate2FrontEndDate } = GENERAL.USEFULL_FUNCTIONS; 
         let patients_Names = []
         let rideNumber = 0;
         let x_wasClicked = false;
@@ -469,6 +469,7 @@
                         hourForPush = "אחה\"צ"
                     }
                     var date = new Date(Year, Month, Day, Hour, Minute).toUTCString();
+                    let nowInUTC = new Date().toUTCString();
                     var func = arr_customer.func;
                     //if (!flagFirstOne) {
                     //    func = "edit";
@@ -576,7 +577,7 @@
 
                     if (func == "new") {
                         RidePat = {
-                            Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Remark: Remark, Escorts: Escorts, Date: date, OnlyEscort: OnlyEscort
+                            Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Remark: Remark, Escorts: Escorts, Date: date, OnlyEscort: OnlyEscort, LastModified: nowInUTC
                         }
                         var userName = GENERAL.USER.getAsistantDisplayName();
                         pushMsg = "העוזר " + userName + " הקים נסיעה חדשה עם החולה " + $("#pat").val() + " בתאריך " + dateForPush + " בשעה " + hourForPush + " מ" + $("#Origin").val() + " ל" + $("#Destination").val();
@@ -640,13 +641,13 @@
                             x_wasClicked = false;
                             RidePat = {
                                 RidePatNum: rideNumber, Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Date: date, Remark: Remark,
-                                Escorts: Escorts, OnlyEscort: OnlyEscort
+                                Escorts: Escorts, OnlyEscort: OnlyEscort, LastModified: nowInUTC
                             }
 
                         } else {
                             RidePat = {
                                 RidePatNum: RidePatNum, Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Date: date, Remark: Remark,
-                                Escorts: Escorts, OnlyEscort: OnlyEscort
+                                Escorts: Escorts, OnlyEscort: OnlyEscort, LastModified: nowInUTC
                             }
                             if (RidePat.RidePatNum === "") {
                                 RidePat.RidePatNum = 0;
@@ -2209,8 +2210,7 @@
                             }
                             $('#wait').hide();
                             $('#driversDiv').show();
-                            $("#lastModified").val(ridePat.LastModified);
-
+                            $("#lastModified").val(convertDBDate2FrontEndDate(ridePat.LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" }));
 
                             rideData = arr_customer.RidePatNum;
                             if (rideData !== 1) {
