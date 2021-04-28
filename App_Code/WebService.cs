@@ -821,11 +821,11 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     // [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public void ChangeArrayOF_RidePatStatuses(string newStatus, List<int> ridePatNums)
+    public void ChangeArrayOF_RidePatStatuses(string newStatus, List<int> ridePatNums, DateTime clientUTCTimeStemp)
     {
         try
         {
-            new RidePat().ChangeArrayOF_RidePatStatuses(newStatus, ridePatNums);
+            new RidePat().ChangeArrayOF_RidePatStatuses(newStatus, ridePatNums, clientUTCTimeStemp);
         }
         catch (Exception ex)
         {

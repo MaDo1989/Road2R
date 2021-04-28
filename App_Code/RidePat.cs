@@ -374,7 +374,7 @@ public class RidePat
         DbService db = new DbService();
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
-        SqlParameter[] cmdParams = new SqlParameter[9];
+        SqlParameter[] cmdParams = new SqlParameter[10];
         bool sendMessage = true;
         try
         {
@@ -403,6 +403,8 @@ public class RidePat
             cmdParams[4] = cmd.Parameters.AddWithValue("@remark", Remark);
             cmdParams[5] = cmd.Parameters.AddWithValue("@onlyEscort", OnlyEscort);
             cmdParams[7] = cmd.Parameters.AddWithValue("@Area", Area);
+            cmdParams[9] = cmd.Parameters.AddWithValue("@lastModified", ridePat.LastModified);
+
         }
         catch (Exception ex)
         {
@@ -475,7 +477,7 @@ public class RidePat
                 */
                 #endregion
 
-                string query = "insert into RidePat (Patient,Origin,Destination,PickupTime,Coordinator,Remark,OnlyEscort,Area,CoordinatorId,lastModified) values (@pat,@origin,@destination,@date,@coordinator,@remark,@onlyEscort,@Area,@coordinatorID,SYSDATETIME());SELECT SCOPE_IDENTITY();";
+                string query = "insert into RidePat (Patient,Origin,Destination,PickupTime,Coordinator,Remark,OnlyEscort,Area,CoordinatorId,lastModified) values (@pat,@origin,@destination,@date,@coordinator,@remark,@onlyEscort,@Area,@coordinatorID,@lastModified);SELECT SCOPE_IDENTITY();";
                 RidePatNum = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
 
                 if (Escorts.Count > 0 && RidePatNum != 0)
@@ -552,7 +554,7 @@ public class RidePat
 
             cmdParams[8] = cmd.Parameters.AddWithValue("@coordinatorID", -1); //THIS IS JUST SO YOU DONT GET EXCEPTION
 
-            var query = "update RidePat set Patient=@pat,Origin=@origin,Destination=@destination,PickupTime=@date,Remark=@remark,OnlyEscort=@onlyEscort,Area=@Area,lastModified=SYSDATETIME() where RidePatNum=@ridePatNum";
+            var query = "update RidePat set Patient=@pat,Origin=@origin,Destination=@destination,PickupTime=@date,Remark=@remark,OnlyEscort=@onlyEscort,Area=@Area,lastModified=@lastModified where RidePatNum=@ridePatNum";
             int res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
 
             if (res > 0)
@@ -1932,54 +1934,95 @@ public class RidePat
         return db.ExecuteQuery(query, cmd.CommandType, cmdParams);
     }
 
-    public void ChangeArrayOF_RidePatStatuses(string new_status, List<int> ridePatNums)
+    public void ChangeArrayOF_RidePatStatuses(string new_status, List<int> ridePatNums, DateTime clientUTCTimeStemp)
     {
-        DbService dbs = new DbService();
-        Message msg = new Message();
-        Volunteer driver2inform = new Volunteer();
+        /*
+         * 27/04/2021 Yogev ! *
+         this design is not best practise at all but due to lack of time it stais this way for now
+         we should seek a way to send array of ids from here and create procedure will get all of them
+         and apply all the changes to them in it (where id in (...)
+        */
 
-        LogEntry log;
-        string query = "";
+        DbService dbs;
+        SqlParameter[] cmdparams = new SqlParameter[3];
+        SqlCommand cmd = new SqlCommand();
+        cmdparams[0] = cmd.Parameters.AddWithValue("@new_Status", new_status);
+        cmdparams[1] = cmd.Parameters.AddWithValue("@clientUTCTimeStemp", clientUTCTimeStemp);
 
-        string logMsg = "נסיעה מספר ";
+        string query = "exec SpRidePat_UpdateStatus @newStatus=@new_Status, @ridePatNum=@ridePatNum, @lastmodified=@clientUTCTimeStemp";
         try
         {
+            dbs = new DbService();
             for (int i = 0; i < ridePatNums.Count; i++)
             {
-                logMsg += ridePatNums[i] + " ";
-                query = "exec SpRidePat_UpdateStatus @newStatus=N'" + new_status + "',@ridePatNum=" + ridePatNums[i];
-                SqlDataReader sdr = dbs.GetDataReader(query);
-
-                if (sdr.Read())         //if the query returns a value → then there is a driver to inform
-                {
-                    //Update driver:
-                    driver2inform.Id = Convert.ToInt32(sdr["MainDriver"]);
-                    driver2inform.DisplayName = Convert.ToString(sdr["DisplayName"]);
-                    driver2inform.RegId = Convert.ToString(sdr["pnRegId"]);
-
-                    msg.cancelRide(ridePatNums[i], driver2inform);               // inform driver
-                    msg.coordinatorCanceledRide(ridePatNums[i], driver2inform); //inform coordinator  -  this method fetch the coordinator to inform to by the ridePatNums and the driver2inform id
-
-                    logMsg += "עם הנהג " + driver2inform.DisplayName + "שינתה סטטוס ל " + new_status;
-                    log = new LogEntry(DateTime.Now, "שינוי סטטוס", logMsg, 2, ridePatNums[i], false);
-
-                }
-                else
-                {
-                    logMsg += "ללא נהג שינתה סטטוס ל" + new_status;
-                    log = new LogEntry(DateTime.Now, "שינוי סטטוס", logMsg, 2, ridePatNums[i], false);
-                }
-                dbs.CloseConnection();
+                cmdparams[2] = cmd.Parameters.AddWithValue("@ridePatNum", ridePatNums[i]);
+                dbs.ExecuteQuery(query,CommandType.Text, cmdparams);
             }
         }
         catch (Exception e)
         {
             throw e;
         }
-        finally
+
+        #region old way of run the query and inform driver and coordinator
+        /*
+DbService dbs = new DbService();
+Message msg = new Message();
+Volunteer driver2inform = new Volunteer();
+
+LogEntry log;
+string query = "";
+
+string logMsg = "נסיעה מספר ";
+try
+{
+    for (int i = 0; i < ridePatNums.Count; i++)
+    {
+        logMsg += ridePatNums[i] + " ";
+        query = "exec SpRidePat_UpdateStatus @newStatus=N'" + new_status + "',@ridePatNum=" + ridePatNums[i];
+
+        //at the time twe worked with push notifications we worked with datareader here
+
+        //if the query returns a value → then there is a driver to inform using  push notifications
+
+        //this is no longer the case but SpRidePat_UpdateStatus still returns driver2inform {Id, DisplayName, RegId}
+
+
+        SqlDataReader sdr = dbs.GetDataReader(query);
+        if (sdr.Read())         
         {
-            dbs.CloseConnection();
+            //Update driver:
+            driver2inform.Id = Convert.ToInt32(sdr["MainDriver"]);
+            driver2inform.DisplayName = Convert.ToString(sdr["DisplayName"]);
+            driver2inform.RegId = Convert.ToString(sdr["pnRegId"]);
+
+            msg.cancelRide(ridePatNums[i], driver2inform);               // inform driver
+            msg.coordinatorCanceledRide(ridePatNums[i], driver2inform); //inform coordinator  -  this method fetch the coordinator to inform to by the ridePatNums and the driver2inform id
+
+            logMsg += "עם הנהג " + driver2inform.DisplayName + "שינתה סטטוס ל " + new_status;
+            log = new LogEntry(DateTime.Now, "שינוי סטטוס", logMsg, 2, ridePatNums[i], false);
+
         }
+        else
+        {
+            logMsg += "ללא נהג שינתה סטטוס ל" + new_status;
+            log = new LogEntry(DateTime.Now, "שינוי סטטוס", logMsg, 2, ridePatNums[i], false);
+        }
+
+        dbs.CloseConnection();
+
+    }
+}
+catch (Exception e)
+{
+    throw e;
+}
+finally
+{
+    dbs.CloseConnection();
+}
+         */
+        #endregion
     }
 
     public int AssignMultiRideToRidePat(int ridePatId, int userId, string driverType, int numberOfRides, string repeatRide)
