@@ -141,6 +141,9 @@ var GENERAL = {
 
     USEFULL_FUNCTIONS: {
         convertDBDate2FrontEndDate: (fullTimeStempStr) => { // fullTimeStempStr = this form → "/Date(1608581640000)/"
+
+            if (typeof fullTimeStempStr === 'undefined' || !fullTimeStempStr) return "";
+                
             let startTrim = fullTimeStempStr.indexOf('(') + 1;
             let endTrim = fullTimeStempStr.indexOf(')');
             let fullTimeStempNumber = fullTimeStempStr.substring(startTrim, endTrim);

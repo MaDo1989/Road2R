@@ -436,7 +436,7 @@ public class RidePat
                     changeRidePatStatus("ממתינה לשיבוץ", ridePatView.ridePatNum.ToString());
                     ridePat.ridePatNum = ridePatView.ridePatNum;
                     //recursive call - ! YOGEV
-                    
+
                     setRidePat(ridePat, "edit", isAnonymous, numberOfRides, repeatRideEvery); //when recover a ridepat we should consider all the new parameters
                     //multipling in -1 = case ==>  נסיעה שוחזרה
                     return -1 * ridePatView.ridePatNum;
@@ -868,7 +868,9 @@ public class RidePat
         rp.Coordinator = new Volunteer();
         rp.Coordinator.DisplayName = dr["Coordinator"].ToString();
         rp.Remark = dr["Remark"].ToString();
-        rp.LastModified = Convert.ToDateTime(dr["lastModified"].ToString());
+        rp.LastModified =
+                            String.IsNullOrEmpty(dr["lastModified"].ToString()) ? null :
+                            (DateTime?)Convert.ToDateTime(dr["lastModified"].ToString());
 
         string query2 = "select DisplayName,Id from RidePatEscortView where RidePatNum=" + ridePatNum;
         DbService db2 = new DbService();
@@ -1160,7 +1162,11 @@ public class RidePat
                     rp.Shift = dr["Shift"].ToString();
                     rp.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
                     rp.Status = dr["Status"].ToString();
-                    rp.LastModified = Convert.ToDateTime(dr["lastModified"].ToString());
+
+                    rp.LastModified =
+                                       String.IsNullOrEmpty(dr["lastModified"].ToString()) ? null :
+                                       (DateTime?)Convert.ToDateTime(dr["lastModified"].ToString());
+
                     if (rp.RideNum > 0 && rp.Status != "אין נסיעת הלוך ויש נהג משובץ") // if RidePat is assigned to a Ride - Take the Ride's status
                     {
                         string searchExpression = "RideRideNum = " + rp.RideNum;
@@ -1334,7 +1340,10 @@ public class RidePat
                 rp.Shift = sdr["Shift"].ToString();
                 rp.Date = Convert.ToDateTime(sdr["PickupTime"].ToString());
                 rp.Status = sdr["Status"].ToString();
-                rp.LastModified = Convert.ToDateTime(sdr["lastModified"].ToString());
+                rp.LastModified =
+                                  String.IsNullOrEmpty(sdr["lastModified"].ToString()) ? null :
+                                 (DateTime?)Convert.ToDateTime(sdr["lastModified"].ToString());
+
                 if (rp.RideNum > 0 && rp.Status != "אין נסיעת הלוך ויש נהג משובץ") // if RidePat is assigned to a Ride - Take the Ride's status
                 {
                     string searchExpression = "RideRideNum = " + rp.RideNum;
@@ -1896,9 +1905,9 @@ public class RidePat
             rp.Coordinator.DisplayName = dr["Coordinator"].ToString();
             rp.Remark = dr["Remark"].ToString();
 
-            rp.LastModified = 
-                String.IsNullOrEmpty(dr["lastModified"].ToString()) ? null :
-                (DateTime?) Convert.ToDateTime(dr["lastModified"].ToString());
+            rp.LastModified =
+                            String.IsNullOrEmpty(dr["lastModified"].ToString()) ? null :
+                            (DateTime?)Convert.ToDateTime(dr["lastModified"].ToString());
 
             string query2 = "select DisplayName,Id from RidePatEscortView where RidePatNum=" + rp.ridePatNum;
             DbService db2 = new DbService();
@@ -1959,7 +1968,7 @@ public class RidePat
             for (int i = 0; i < ridePatNums.Count; i++)
             {
                 cmdparams[2] = cmd.Parameters.AddWithValue("@ridePatNum", ridePatNums[i]);
-                dbs.ExecuteQuery(query,CommandType.Text, cmdparams);
+                dbs.ExecuteQuery(query, CommandType.Text, cmdparams);
             }
         }
         catch (Exception e)
