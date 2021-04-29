@@ -714,7 +714,7 @@
                                             addDriver(rideNumber);
                                         }
 
-                                        if (DestIsHospital && !returnDriveExist) {//offer a return ride
+                                        if (DestIsHospital && !returnDriveExist || DestIsHospital && isAnonymous) {//offer a return ride
                                             document.getElementById('ModalTitle').innerHTML = 'הנסיעה שוחזרה בהצלחה';
 
                                             document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
@@ -765,7 +765,7 @@
                                             addDriver(rideNumber);
                                         }
 
-                                        if (DestIsHospital && !returnDriveExist) {//offer a return ride
+                                        if (DestIsHospital && !returnDriveExist || DestIsHospital && isAnonymous) {//offer a return ride
                                             document.getElementById('ModalTitle').innerHTML = 'הנסיעה נשמרה';
 
                                             document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
