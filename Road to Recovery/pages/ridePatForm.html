@@ -194,7 +194,7 @@
 
         let arr_escort_inthisRidePat = [];
         let patients_JSONArray = [];
-        let { buildStringforEquipment, convertDBDate2FrontEndDate } = GENERAL.USEFULL_FUNCTIONS; 
+        let { buildStringforEquipment, convertDBDate2FrontEndDate } = GENERAL.USEFULL_FUNCTIONS;
         let patients_Names = []
         let rideNumber = 0;
         let x_wasClicked = false;
@@ -673,13 +673,14 @@
                             if (data.d === 1) {
                                 //there is such a drive and status is not נמחקה
 
-                                data.d = data.d.toString();
-                                var temp = data.d.replace(/(?!^)(\d{2})(?=(?:\d{2})*$)/g, '/$1');
+                                //data.d = data.d.toString();
+                                //var temp = data.d.replace(/(?!^)(\d{2})(?=(?:\d{2})*$)/g, '/$1');
                                 //var dateToShow = data.d.replace(;
                                 $('#wait').hide();
+                                let date2present = new Date(request.RidePat.Date).toLocaleDateString('he-IL');
                                 swal(
                                     "خطأ\nשגיאה",
-                                    "קיימת כבר הסעה בתאריך " + date + " עם אותו החולה ואותן נקודות האיסוף\nيوجد سفرية بالتاريخ (التاريخ) مع نفس المريض ونفس نقطة الالتقاء",
+                                    "קיימת כבר הסעה בתאריך " + date2present + " עם אותו החולה ואותן נקודות האיסוף\nيوجد سفرية بالتاريخ (التاريخ) مع نفس المريض ونفس نقطة الالتقاء",
                                     "warning"
                                 );
 
@@ -916,7 +917,7 @@
 
         }
 
-        const fillPage_withPatientData = (patient, markThe1stEscort=false) => {
+        const fillPage_withPatientData = (patient, markThe1stEscort = false) => {
 
             isAnonymous = patient.IsAnonymous === 'True';
             localStorage.PatID = patient.Id;
@@ -2238,6 +2239,7 @@
                                     Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Remark: Remark, Escorts: Escorts, Date: date, OnlyEscort: OnlyEscort
                                 }
                             }
+                            /*
                             else {
                                 data.d = data.d.toString();
                                 var temp = data.d.replace(/(?!^)(\d{2})(?=(?:\d{2})*$)/g, '/$1');
@@ -2250,7 +2252,7 @@
                                 );
 
                             }
-
+                            */
 
                         },
                         error: function (err) {

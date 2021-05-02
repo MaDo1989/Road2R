@@ -427,11 +427,20 @@
                     var deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' name='" + timeFilteredArr[i].RidePatNum + "' title='מחיקה'><i class='fa fa-remove' ></i></button>";
                     //btnStr += " " + showBtn;
 
-                    if (timeFilteredArr[i].Status == 'ממתינה לשיבוץ' && timeFilteredArr[i].Coordinator.DisplayName == currentCoor || ((timeFilteredArr[i].Pat.IsAnonymous == "True") && timeFilteredArr[i].Coordinator.DisplayName == currentCoor)) btnStr += " " + editBtn;
-                    else btnStr += " " + showBtn;
-                    if (timeFilteredArr[i].Coordinator.DisplayName == currentCoor) {
-                        btnStr += " " + deleteBtn;
-                    }
+
+                    /*
+                        02/05/2021 - Yogev
+                        new conceptual approach towards delete and edit ridepat - now everyone can do anything
+                    */
+
+                    //if (timeFilteredArr[i].Status == 'ממתינה לשיבוץ' && timeFilteredArr[i].Coordinator.DisplayName == currentCoor
+                    //|| ((timeFilteredArr[i].Pat.IsAnonymous == "True") && timeFilteredArr[i].Coordinator.DisplayName == currentCoor)) btnStr += " " + editBtn;
+                    //else btnStr += " " + showBtn;
+                    //if (timeFilteredArr[i].Coordinator.DisplayName == currentCoor) {
+                    //    btnStr += " " + deleteBtn;
+                    //}
+
+                    btnStr = editBtn += " " + deleteBtn;
                 } else {
                     let recoverBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='recover' name='" + timeFilteredArr[i].RidePatNum + "' title='שחזור'><i class='ti-share-alt'></i></button>";
                     btnStr = recoverBtn;

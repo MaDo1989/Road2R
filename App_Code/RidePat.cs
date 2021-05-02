@@ -435,9 +435,11 @@ public class RidePat
                     // recover the ridepat from נמחקה to ממתינה לשיבוץ
                     changeRidePatStatus("ממתינה לשיבוץ", ridePatView.ridePatNum.ToString());
                     ridePat.ridePatNum = ridePatView.ridePatNum;
-                    //recursive call - ! YOGEV
 
+                    //recursive call ↓ -  YOGEV
                     setRidePat(ridePat, "edit", isAnonymous, numberOfRides, repeatRideEvery); //when recover a ridepat we should consider all the new parameters
+                    //recursive call ↑ -  YOGEV
+
                     //multipling in -1 = case ==>  נסיעה שוחזרה
                     return -1 * ridePatView.ridePatNum;
                 }
