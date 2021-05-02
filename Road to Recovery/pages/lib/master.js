@@ -140,14 +140,26 @@ var GENERAL = {
     },
 
     USEFULL_FUNCTIONS: {
-        convertDBDate2FrontEndDate: (fullTimeStempStr) => { // fullTimeStempStr = this form → "/Date(1608581640000)/"
-
-            if (typeof fullTimeStempStr === 'undefined' || !fullTimeStempStr) return "";
-                
+        /**
+           * Gets a string of /Date(1608581640000).
+           * Returns an int → 1608581640000
+         */
+        convert2DBDateToInt: (fullTimeStempStr) => {
             let startTrim = fullTimeStempStr.indexOf('(') + 1;
             let endTrim = fullTimeStempStr.indexOf(')');
             let fullTimeStempNumber = fullTimeStempStr.substring(startTrim, endTrim);
-            return new Date(parseInt(fullTimeStempNumber));
+            return parseInt(fullTimeStempNumber);
+
+        },
+        /**
+          * Gets a string of /Date(1608581640000).
+          * Returns a Date obj → new Date(1608581640000)
+         */
+        convertDBDate2FrontEndDate: (fullTimeStempStr) => { // fullTimeStempStr = this form → "/Date(1608581640000)/"
+
+            if (typeof fullTimeStempStr === 'undefined' || !fullTimeStempStr) return "";
+
+            return new Date(GENERAL.USEFULL_FUNCTIONS.convert2DBDateToInt(fullTimeStempStr));
         },
         getHebrew_WeekDay: (day) => {
             let days = [];
@@ -198,7 +210,7 @@ var GENERAL = {
         /**
             * Gets a string of israeli phone number with no "-".
             * Returns a boolean weather the phone number valid or not, true is valid
-        */  
+        */
         validateMobileNumFullVersion: (mobileNum) => {
 
             if (!mobileNum || isNaN(parseInt(mobileNum))) { return false; }
@@ -211,10 +223,10 @@ var GENERAL = {
 
             return true;
         },
-            /**
-              * Gets a string of israeli phone number with no "-".
-              * Returns a new string of the phone number with a string seperator
-            */
+        /**
+          * Gets a string of israeli phone number with no "-".
+          * Returns a new string of the phone number with a string seperator
+        */
         addSeperator2MobileNum: (mobileNum, Seperator) => {
 
             let newStr = '';
