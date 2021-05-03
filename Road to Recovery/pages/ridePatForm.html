@@ -425,7 +425,7 @@
                     event.preventDefault();
                     var valid = validateInputs();
                     if (!valid) {
-                        //  $('#wait').hide();
+                         $('#wait').hide();
                         return false;
                     }
                     var numberOfRides = 1;
@@ -445,7 +445,7 @@
                         var validRides = PrintRides(repeatRide, numberOfRides);
 
                         if (!validRides) {
-                            //  $('#wait').hide();
+                              $('#wait').hide();
                             return false;
                         }
                     }
@@ -690,7 +690,7 @@
                                 //data.d = data.d.toString();
                                 //var temp = data.d.replace(/(?!^)(\d{2})(?=(?:\d{2})*$)/g, '/$1');
                                 //var dateToShow = data.d.replace(;
-                                // $('#wait').hide();
+                                $('#wait').hide();
                                 let date2present = new Date(request.RidePat.Date).toLocaleDateString('he-IL');
                                 swal(
                                     "خطأ\nשגיאה",
@@ -717,7 +717,7 @@
                                     //  async: false,
                                     data: JSON.stringify({ RidePatBack }),
                                     success: function (data) {
-                                        //  $('#wait').hide();
+                                          $('#wait').hide();
                                         let driverInput_hasValue = ($('#driver').val() !== "");
 
                                         returnDriveExist = JSON.parse(data.d);
@@ -747,7 +747,7 @@
 
                                     },
                                     error: function (err) {
-                                        //  $('#wait').hide();
+                                         $('#wait').hide();
                                         alert("Error in CheckRidePat: " + err.responseText);
                                     }
                                 });
@@ -773,7 +773,7 @@
                                     // async: false,
                                     data: JSON.stringify({ RidePatBack }),
                                     success: function (data) {
-                                        // $('#wait').hide();
+                                        $('#wait').hide();
                                         let driverInput_hasValue = ($('#driver').val() !== "");
                                         returnDriveExist = JSON.parse(data.d);
                                         //console.log(returnDriveExist)
@@ -801,7 +801,7 @@
                                         }
                                     },
                                     error: function (err) {
-                                        // $('#wait').hide();
+                                         $('#wait').hide();
                                         alert("Error in CheckRidePat: " + err.responseText);
                                     }
                                 });
@@ -811,7 +811,7 @@
 
                         },
                         error: function (err) {
-                            //  $('#wait').hide();
+                              $('#wait').hide();
                             console.log(err);
                             swal(
                                 "خطأ\nשגיאה",
@@ -1010,18 +1010,15 @@
             getPatientByIdPromise = new Promise((resolve, reject) => {
 
                 const getPatientById_SCB = (data) => {
-                    //$('#wait').hide();
                     return resolve(JSON.parse(data.d));
                 }
 
                 const getPatientById_ECB = (err) => {
-                    //  $('#wait').hide();
                     alert(err);
                     return reject(err);
                 }
 
                 const { ajaxCall } = GENERAL.FETCH_DATA;
-                //  $('#wait').show();
 
                 ajaxCall('GetPatientById', JSON.stringify({ id }), getPatientById_SCB, getPatientById_ECB);
 
@@ -1545,11 +1542,9 @@
                             $('<option>', { value: arr_locations[i].Name, text: arr_locations[i].EnglishName }).appendTo($select1);
                         }
 
-                        // $('#wait').hide();
                         return resolve(1);
                     },
                     error: function (err) {
-                        // $('#wait').hide();
                         alert("Error in generateLocation");
                         return reject(0);
                     }
@@ -2241,7 +2236,7 @@
                             if (ridePat.Drivers.length > 0) {
                                 driverId = ridePat.Drivers[0].Id;
                             }
-                            //   $('#wait').hide();
+                               $('#wait').hide();
                             $('#driversDiv').show();
                             $("#lastModified").val(convertDBDate2FrontEndDate(ridePat.LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" }));
 
@@ -2288,7 +2283,7 @@
                             request2TurnOffLoader([generateLocationPromise, getPatientByIdPromise]);
                         },
                         error: function (err) {
-                            // $('#wait').hide();
+                             $('#wait').hide();
                             alert("Error in uploadData: " + err.responseText);
                         }
                     });
@@ -2469,7 +2464,7 @@
 
             RideId = data.d;
             console.log(RideId);
-            // $('#wait').hide();
+             $('#wait').hide();
             swal({
                 title: "הנהג עודכן בהצלחה",
                 type: "success",
@@ -2486,8 +2481,8 @@
         }
 
         function signDriverErrorCB() {
-            // $('#wait').hide();
-            //alert("Error signing driver");
+             $('#wait').hide();
+            alert("Error signing driver");
 
         }
 
@@ -2516,7 +2511,7 @@
 
                 $('#driver').val("")
 
-                // $('#wait').hide();
+                 $('#wait').hide();
                 swal({
                     title: "הנהג נמחק מההסעה בהצלחה",
                     type: "success",
@@ -2532,7 +2527,7 @@
         }
 
         function deleteRideErrorCB() {
-            // $('#wait').hide();
+             $('#wait').hide();
             alert("Error deleting driver");
 
         }
