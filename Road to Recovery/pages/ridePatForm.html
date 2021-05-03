@@ -204,7 +204,8 @@
         let allowChangeOf_originAndDestination = true;
         let alert2user = '';
         let arr_locations = [];
-
+        let generateLocationPromise;
+        let getPatientByIdPromise;
 
         const DIFFER_RIDE_AXIS_MSG = 'ציר ההסעה של הסעה זו שונה ממה שהוגדר כברירת מחדל לחולה. ניתן לעדכן שדות אלו בהסעה.';
         const DIFFER_AREAS_MSG = 'מכיוון שקו ההסעה של החולה לא נמצא באזור של ההסעה האנונימית הזו, לא ניתן להשתמש בהסעה. יש לפתוח הסעה חדשה עבור החולה הספציפי.';
@@ -214,6 +215,7 @@
         $(document).ready(function () {
             let { COPYWRITE } = GENERAL;
             $('#rights').html(COPYWRITE());
+            $('#wait').show();
 
             //  GetCoordinatorsList();
             $('#saveCustomer').removeClass("saveHighlight");
@@ -221,7 +223,6 @@
             generateDrivers()
             //$('#driversDiv').hide();
 
-            $('#wait').show();
             var pat = $("#pat").val();
             if (pat === "") {
                 $("#patientInfo").hide();
@@ -254,14 +255,15 @@
                 var userName = GENERAL.USER.getUserDisplayName();
                 $("#userName").html(userName);
             }
-            //datePicker();
             loadPage();
 
             $("#pat").blur(async function () {
+                $('#wait').show();
                 let patientObj = patients_JSONArray.find(p => p.DisplayName.trim() === $('#pat').val().trim());
                 if (patientObj) {
                     let targetPatient = await getPatientById(patientObj.Id);
                     request2updateData(targetPatient);
+                    request2TurnOffLoader([getPatientByIdPromise]);
                 }
 
             });
@@ -279,13 +281,12 @@
             });
 
             $("#patEnglishName").blur(async function () {
-                //fillData();
-                //getEquipmentForAnonymousPatient()
-
+                $('#wait').show();
                 let patientObj = patients_JSONArray.find(p => p.EnglishName.trim() === $('#patEnglishName').val().trim());
                 if (patientObj) {
                     let targetPatient = await getPatientById(patientObj.Id);
                     request2updateData(targetPatient);
+                    request2TurnOffLoader([getPatientByIdPromise]);
                 }
             });
 
@@ -296,14 +297,16 @@
             });
 
             $("#PatientIdentity").blur(async function () {
-                //  fillData();
-                if ($('#pat').val() === '') { //due to the fact some patient still have 0 as their identity when
+                if ($('#pat').val() === '') {
+                    //due to the fact some patient still have 0 as their identity when
                     //we blur from there it brings the first one who has 0 as its identity
+                    $('#wait').show();
 
                     let patientObj = patients_JSONArray.find(p => p.PatientIdentity === parseInt($('#PatientIdentity').val()));
                     if (patientObj) {
                         let targetPatient = await getPatientById(patientObj.Id);
                         request2updateData(targetPatient);
+                        request2TurnOffLoader([getPatientByIdPromise]);
                     }
                 }
 
@@ -364,7 +367,18 @@
                 let patientFrom_patientForm = JSON.parse(localStorage.getItem('PatientNameForRide'));
 
                 let patientObj = patients_JSONArray.find(p => p.DisplayName.trim() === patientFrom_patientForm.trim());
-                patientObj ? request2updateData(getPatientById(patientObj.Id)) : "";
+
+                if (patientObj) {
+
+
+                    (async () => {
+                        let targetPatient = await getPatientById(patientObj.Id);
+                        request2updateData(targetPatient);
+                        request2TurnOffLoader([generateLocationPromise, getPatientByIdPromise]);
+                    })();
+
+                }
+
 
             }
             //if (JSON.parse(localStorage.getItem("PatientNameForRide")) !== null) {
@@ -411,7 +425,7 @@
                     event.preventDefault();
                     var valid = validateInputs();
                     if (!valid) {
-                        $('#wait').hide();
+                        //  $('#wait').hide();
                         return false;
                     }
                     var numberOfRides = 1;
@@ -431,7 +445,7 @@
                         var validRides = PrintRides(repeatRide, numberOfRides);
 
                         if (!validRides) {
-                            $('#wait').hide();
+                            //  $('#wait').hide();
                             return false;
                         }
                     }
@@ -676,7 +690,7 @@
                                 //data.d = data.d.toString();
                                 //var temp = data.d.replace(/(?!^)(\d{2})(?=(?:\d{2})*$)/g, '/$1');
                                 //var dateToShow = data.d.replace(;
-                                $('#wait').hide();
+                                // $('#wait').hide();
                                 let date2present = new Date(request.RidePat.Date).toLocaleDateString('he-IL');
                                 swal(
                                     "خطأ\nשגיאה",
@@ -703,7 +717,7 @@
                                     //  async: false,
                                     data: JSON.stringify({ RidePatBack }),
                                     success: function (data) {
-                                        $('#wait').hide();
+                                        //  $('#wait').hide();
                                         let driverInput_hasValue = ($('#driver').val() !== "");
 
                                         returnDriveExist = JSON.parse(data.d);
@@ -732,7 +746,10 @@
                                         }
 
                                     },
-                                    error: function (err) { $('#wait').hide(); alert("Error in CheckRidePat: " + err.responseText); }
+                                    error: function (err) {
+                                        //  $('#wait').hide();
+                                        alert("Error in CheckRidePat: " + err.responseText);
+                                    }
                                 });
                             }
                             else {
@@ -756,7 +773,7 @@
                                     // async: false,
                                     data: JSON.stringify({ RidePatBack }),
                                     success: function (data) {
-                                        $('#wait').hide();
+                                        // $('#wait').hide();
                                         let driverInput_hasValue = ($('#driver').val() !== "");
                                         returnDriveExist = JSON.parse(data.d);
                                         //console.log(returnDriveExist)
@@ -783,7 +800,10 @@
                                             $("#Modal").modal('show');
                                         }
                                     },
-                                    error: function (err) { $('#wait').hide(); alert("Error in CheckRidePat: " + err.responseText); }
+                                    error: function (err) {
+                                        // $('#wait').hide();
+                                        alert("Error in CheckRidePat: " + err.responseText);
+                                    }
                                 });
 
 
@@ -791,7 +811,7 @@
 
                         },
                         error: function (err) {
-                            $('#wait').hide();
+                            //  $('#wait').hide();
                             console.log(err);
                             swal(
                                 "خطأ\nשגיאה",
@@ -843,6 +863,7 @@
                 },
                 error: function (err) { alert("Error in getHospitalView: " + err.responseText); }
             });
+
 
         });
 
@@ -985,24 +1006,28 @@
 
         const getPatientById = (id) => {
 
-            return new Promise((resolve, reject) => {
+
+            getPatientByIdPromise = new Promise((resolve, reject) => {
 
                 const getPatientById_SCB = (data) => {
-                    $('#wait').hide();
+                    //$('#wait').hide();
                     return resolve(JSON.parse(data.d));
                 }
 
                 const getPatientById_ECB = (err) => {
-                    $('#wait').hide();
+                    //  $('#wait').hide();
                     alert(err);
                     return reject(err);
                 }
 
                 const { ajaxCall } = GENERAL.FETCH_DATA;
-                $('#wait').show();
+                //  $('#wait').show();
+
                 ajaxCall('GetPatientById', JSON.stringify({ id }), getPatientById_SCB, getPatientById_ECB);
 
             });
+
+            return getPatientByIdPromise;
         }
 
         function returnRide() {
@@ -1495,8 +1520,8 @@
 
         async function generateLocation() {
 
-            return new Promise((resolve, reject) => {
-                $('#wait').show();
+            generateLocationPromise = new Promise((resolve, reject) => {
+                // $('#wait').show();
 
                 var $select = $("#Origin");
                 var $select1 = $("#Destination");
@@ -1520,16 +1545,17 @@
                             $('<option>', { value: arr_locations[i].Name, text: arr_locations[i].EnglishName }).appendTo($select1);
                         }
 
-                        $('#wait').hide();
+                        // $('#wait').hide();
                         return resolve(1);
                     },
                     error: function (err) {
-                        $('#wait').hide();
+                        // $('#wait').hide();
                         alert("Error in generateLocation");
                         return reject(0);
                     }
                 });
             });
+            return generateLocationPromise;
         }
 
         function generateHour() {
@@ -2007,15 +2033,21 @@
                     $("#dirBTN").attr('disabled', 'disabled');
                     $("#patArabic").attr('disabled', 'disabled');
                     //$("#saveCustomer").attr('disabled', 'disabled');
-
-                    generateStatus();
-
-                    //generatePat();
                     getPatients_slim();
-                    getCoor();
-                    generateLocation();
-                    generateHour();
-                    generateMinute();
+                    generateLocation()
+                        .then((result) => {
+                            generateHour();
+                            generateMinute();
+                            generateStatus();
+                            getCoor();
+                            request2TurnOffLoader([generateLocationPromise, getPatientByIdPromise]);
+                        })
+                        .catch((err) => {
+                            request2TurnOffLoader(generateLocationPromise, getPatientByIdPromise);
+                            alert(`בעיה במילוי רשימות יעד ומוצא ${err}`);
+                        });
+
+
                 }
             }
 
@@ -2209,7 +2241,7 @@
                             if (ridePat.Drivers.length > 0) {
                                 driverId = ridePat.Drivers[0].Id;
                             }
-                            $('#wait').hide();
+                            //   $('#wait').hide();
                             $('#driversDiv').show();
                             $("#lastModified").val(convertDBDate2FrontEndDate(ridePat.LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" }));
 
@@ -2253,10 +2285,10 @@
 
                             }
                             */
-
+                            request2TurnOffLoader([generateLocationPromise, getPatientByIdPromise]);
                         },
                         error: function (err) {
-                            $('#wait').hide();
+                            // $('#wait').hide();
                             alert("Error in uploadData: " + err.responseText);
                         }
                     });
@@ -2437,7 +2469,7 @@
 
             RideId = data.d;
             console.log(RideId);
-            $('#wait').hide();
+            // $('#wait').hide();
             swal({
                 title: "הנהג עודכן בהצלחה",
                 type: "success",
@@ -2454,7 +2486,7 @@
         }
 
         function signDriverErrorCB() {
-            $('#wait').hide();
+            // $('#wait').hide();
             //alert("Error signing driver");
 
         }
@@ -2484,7 +2516,7 @@
 
                 $('#driver').val("")
 
-                $('#wait').hide();
+                // $('#wait').hide();
                 swal({
                     title: "הנהג נמחק מההסעה בהצלחה",
                     type: "success",
@@ -2500,7 +2532,7 @@
         }
 
         function deleteRideErrorCB() {
-            $('#wait').hide();
+            // $('#wait').hide();
             alert("Error deleting driver");
 
         }
@@ -2571,6 +2603,21 @@
             x_wasClicked = true;
             arr_customer.func = 'edit';
         }
+
+        const request2TurnOffLoader = (promises2wait4) => {
+            promises2wait4.map((p) => {
+                if (typeof p === 'undefined') {
+                    return;
+                }
+            })
+            Promise.all(promises2wait4).then(function () {
+                $('#wait').hide();
+            }, function (err) {
+                $('#wait').hide();
+            });
+        }
+
+
 
     </script>
 </head>
