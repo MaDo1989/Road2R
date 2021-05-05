@@ -483,9 +483,10 @@
                         document.getElementById("birthDate").value = date;
                         //$("#birthDate").val(patient.BirthDate.substring(0, 10));
                         $('#escortsToShow').show();
-                        $('html, body').animate({
-                            scrollTop: $("#escortsToShow").offset().top
-                        }, 2100);
+
+                        //$('html, body').animate({
+                        //    scrollTop: $("#escortsToShow").offset().top
+                        //}, 2100);
                         document.getElementById("newEscort").disabled = false;
 
                         if (typeof arr_equipment !== "undefined") {
