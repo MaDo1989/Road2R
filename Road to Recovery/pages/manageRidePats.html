@@ -949,7 +949,7 @@
                 if (userResponse) {
                     deleteRidePat(original_deleteCandidate, 'delete');
                 }
-               
+
             });
 
 
@@ -1266,7 +1266,7 @@
 
             var RidePat = new Object();
             RidePat.RidePatNum = returnRidePat.RidePatNum;
-         //   var tempDate = dateReturn; --wtf ?! YOGEV disable it
+            //   var tempDate = dateReturn; --wtf ?! YOGEV disable it
             var tempDate = "01/01/1970"; // Fictional date for deletion
             var tempDateReveresed = tempDate.split('/').reverse().join('/')
             var date3 = new Date(tempDateReveresed);
@@ -1312,7 +1312,7 @@
             //    //async: false,
             //    data: JSON.stringify({ newStatus: newStatus, ridePatNum: ReturnRidePatNum }),
             //    success: function (data) {
-                  
+
             //        setTimeout(function () { refreshTable() }, 1001);
             //    },
             //    error: function (err) {
@@ -1470,6 +1470,7 @@
             let equipmentsAndnumOfPassengers = '';
             let patientPhone2render = '';
             let lastModified = convertDBDate2FrontEndDate(arr_rides[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+            let numOfRealEscorts = 0; //not anonymous
 
             if (validateMobileNum(arr_rides[i].Pat.CellPhone)) {
 
@@ -1480,20 +1481,23 @@
 
                 let numOfValidsPhones4Escorts = arr_rides[i].Escorts.filter(es => validateMobileNum(es.CellPhone)).length;
 
-                if (numOfValidsPhones4Escorts > 0) escortsPhone2render = '<span class="escortsPhone2render block">מלווים: ';
+                escortsPhone2render = '<span class="escortsPhone2render block">מלווים: ';
 
                 arr_rides[i].Escorts.map((es, i) => {
                     if (validateMobileNum(es.CellPhone)) {
+                        if (!es.IsAnonymous) {
+                            numOfRealEscorts++;
+                            escortsPhone2render += `${addSeperator2MobileNum(es.CellPhone, '-')}, `;
 
-
-                        escortsPhone2render += `${addSeperator2MobileNum(es.CellPhone, '-')}, `;
-
-                        if (i === numOfEscorts - 1) {
-                            escortsPhone2render = escortsPhone2render.substring(0, escortsPhone2render.length - 2);
-                            escortsPhone2render += '</span>';
+                            if (i === numOfEscorts - 1) {
+                                escortsPhone2render = escortsPhone2render.substring(0, escortsPhone2render.length - 2);
+                                escortsPhone2render += '</span>';
+                            }
                         }
                     }
                 });
+
+                if (numOfRealEscorts === 0) escortsPhone2render = '';
 
             }
 
