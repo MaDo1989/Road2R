@@ -397,9 +397,17 @@
                 }
 
 
+
+
+                let checkBoxStr = '<input class="checkBoxes" type="checkbox" onchange=RowChecked(this) />';
+                /*
+                 BACK IN TIME ONLY THE CREATOR OF A RIDEPAT COULD EDIT || DELETE NOW EVERY ONE CAN. YOGEV 05/05/2021
+                 
                 let checkBoxStr = timeFilteredArr[i].Coordinator.DisplayName === currentCoor ?
                     '<input class="checkBoxes" type="checkbox" onchange=RowChecked(this) />' :
                     '<input type="checkbox" disabled />';
+                */
+
 
                 if (removeCandidates) {
                     /*
@@ -569,8 +577,8 @@
         const MarkAsRemoved_FewRidePats = () => {
 
             let txt2post = `האם אתם בטוחים?
-                                                                                האם למחוק את כל ${ridePatNums2MarkDeleted.length} ההסעות שנבחרו ברשימה המוצגת לפניך?
-                                                                                `;
+                                                                                        האם למחוק את כל ${ridePatNums2MarkDeleted.length} ההסעות שנבחרו ברשימה המוצגת לפניך?
+                                                                                        `;
             swal({
                 title: "האם אתם בטוחים?",
                 text: txt2post,
@@ -621,8 +629,8 @@
         const Recover_FewRidePats = () => {
 
             let txt2post = `האם אתם בטוחים?
-                                                                                האם למחוק את כל ${ridePatNums2MarkRecovered.length} ההסעות שנבחרו ברשימה המוצגת לפניך?
-                                                                                `;
+                                                                                        האם למחוק את כל ${ridePatNums2MarkRecovered.length} ההסעות שנבחרו ברשימה המוצגת לפניך?
+                                                                                        `;
             swal({
                 title: "האם אתם בטוחים?",
                 text: txt2post,
@@ -783,8 +791,8 @@
                 let date = tr.getElementsByTagName('td').Date.innerHTML;
 
                 let txt2post = `האם אתם בטוחים לשחזר את הנסיעה של : ${patientName}
-                                                                                                                                    מ - ${origin} ל - ${destenation}
-                                                                                                                                    בתאריך -  ${date}`;
+                                                                                                                                            מ - ${origin} ל - ${destenation}
+                                                                                                                                            בתאריך -  ${date}`;
 
 
                 swal({
@@ -841,8 +849,8 @@
                 let date = tr.getElementsByTagName('td').Date.innerHTML;
 
                 let txt2post = `האם אתם בטוחים למחוק את הנסיעה של : ${patientName}
-                                                                                                                                                        מ - ${origin} ל - ${destenation}
-                                                                                                                                                        בתאריך -  ${date}`;
+                                                                                                                                                                מ - ${origin} ל - ${destenation}
+                                                                                                                                                                בתאריך -  ${date}`;
                 let deleteMe = [];
                 deleteMe.push(ridePatNum);
 
