@@ -233,16 +233,7 @@
 
             //  document.getElementById("Numbers").checked = localStorage.numbers === 'true';
 
-            var today = new Date();
-            var time;
-
-            time = parseInt(today.getHours());
-
-            if ((12 <= time)) {
-                $('#collapse2').addClass("in");
-            }
-            else $('#collapse1').addClass("in");
-
+            deceideWhichTable2Show();
 
             jQuery.extend(jQuery.fn.dataTableExt.oSort, {
 
@@ -685,21 +676,23 @@
                 refreshInterval = setInterval("refreshTable()", refreshTime);
             }
 
-            $.ajax({
-                dataType: "json",
-                url: "WebService.asmx/getHospitalView",
-                contentType: "application/json; charset=utf-8",
-                type: "POST",
-                async: false,
-                data: JSON.stringify({ active: true }),
-                success: function (data) {
-                    arr_hospitals = JSON.parse(data.d);
-                    for (i in arr_hospitals) {
-                        hospitals.push(arr_hospitals[i].Name)
-                    }
-                },
-                error: function (err) { alert("Error in getHospitalView: " + err.responseText); }
-            });
+
+            // NOT NEEDED CALL TO SERVER?!?!?!?!?!!?
+            //$.ajax({
+            //    dataType: "json",
+            //    url: "WebService.asmx/getHospitalView",
+            //    contentType: "application/json; charset=utf-8",
+            //    type: "POST",
+            //    async: false,
+            //    data: JSON.stringify({ active: true }),
+            //    success: function (data) {
+            //        arr_hospitals = JSON.parse(data.d);
+            //        for (i in arr_hospitals) {
+            //            hospitals.push(arr_hospitals[i].Name)
+            //        }
+            //    },
+            //    error: function (err) { alert("Error in getHospitalView: " + err.responseText); }
+            //});
 
 
 
@@ -717,6 +710,66 @@
 
 
         });
+
+        const assignTable2lastOne = (tableName) => {
+
+            localStorage.setItem('lastTableWas', tableName);
+
+
+        }
+
+        const deceideWhichTable2Show = () => {
+            /*
+             #collapse1 = datatable-morning
+             #collapse2 = datatable-afternoon
+             #collapse3 = datatable-tomorrow
+             #collapse4 = datatable-future
+             */
+
+            
+
+            let table2open = localStorage.getItem('lastTableWas') ? localStorage.getItem('lastTableWas') : '';
+
+            switch (table2open) {
+
+                case 'datatable-morning':
+                    $('#collapse1').addClass("in");
+                    break;
+
+                case 'datatable-afternoon':
+                    $('#collapse2').addClass("in");
+                    break;
+
+                case 'datatable-tomorrow':
+                    $('#collapse3').addClass("in");
+                    break;
+
+                case 'datatable-future':
+                    $('#collapse4').addClass("in");
+                    break;
+
+                default:
+                    setTable2Show_Bytime();
+                    break;
+
+            }
+
+        }
+
+        const setTable2Show_Bytime = () => {
+
+            let now = new Date();
+
+            if (parseInt(now.getHours()) <= 12) {//show the morning table
+
+                $('#collapse1').addClass("in");
+            } else {//show the afternoon table
+
+                $('#collapse2').addClass("in");
+            }
+
+
+        }
 
         function getCoors() {
             $.ajax({
@@ -1846,7 +1899,7 @@
                                 </div>
 
                                 <div id="accordion" class="panel-group">
-                                    <div class="panel panel-primary">
+                                    <div onclick="assignTable2lastOne('datatable-morning')" class="panel panel-primary">
                                         <div class="panel-heading" id="col1">
                                             <h4 data-toggle="tooltip" data-placement="top" title="Morning Rides  سفريات الصباح" class="panel-title"> <a href="#collapse1" data-parent="#accordion" data-toggle="collapse" class="dropdown active open">נסיעות לבוקר</a></h4>
                                         </div>
@@ -1872,7 +1925,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="panel panel-primary">
+
+                                    <div onclick="assignTable2lastOne('datatable-afternoon')" class="panel panel-primary">
                                         <div class="panel-heading" id="col2">
                                             <h4 data-toggle="tooltip" data-placement="top" title="Afternoon Rides  سفريات المساء" class="panel-title"> <a href="#collapse2" data-parent="#accordion" data-toggle="collapse">נסיעות לאחה"צ</a></h4>
                                         </div>
@@ -1899,11 +1953,11 @@
                                         </div>
                                     </div>
 
-                                    <div class="panel panel-primary">
+                                    <div onclick="assignTable2lastOne('datatable-tomorrow')" class="panel panel-primary">
                                         <div class="panel-heading" id="col4">
-                                            <h4 data-toggle="tooltip" data-placement="bottom" title="Tomorrow Rides" class="panel-title"> <a href="#collapse4" data-parent="#accordion" data-toggle="collapse">נסיעות למחר</a></h4>
+                                            <h4 data-toggle="tooltip" data-placement="bottom" title="Tomorrow Rides" class="panel-title"> <a href="#collapse3" data-parent="#accordion" data-toggle="collapse">נסיעות למחר</a></h4>
                                         </div>
-                                        <div class="panel-collapse collapse" id="collapse4">
+                                        <div class="panel-collapse collapse" id="collapse3">
                                             <div class="panel-body">
                                                 <table id="datatable-tomorrow" class="table table-striped table-bordered hover">
                                                     <thead>
@@ -1927,11 +1981,11 @@
                                         </div>
                                     </div>
 
-                                    <div class="panel panel-primary">
+                                    <div onclick="assignTable2lastOne('datatable-future')" class="panel panel-primary">
                                         <div class="panel-heading" id="col3">
-                                            <h4 data-toggle="tooltip" data-placement="bottom" title="Future Rides  سفريات مستقبلية" class="panel-title"> <a href="#collapse3" data-parent="#accordion" data-toggle="collapse">נסיעות עתידיות</a></h4>
+                                            <h4 data-toggle="tooltip" data-placement="bottom" title="Future Rides  سفريات مستقبلية" class="panel-title"> <a href="#collapse4" data-parent="#accordion" data-toggle="collapse">נסיעות עתידיות</a></h4>
                                         </div>
-                                        <div class="panel-collapse collapse" id="collapse3">
+                                        <div class="panel-collapse collapse" id="collapse4">
                                             <div class="panel-body">
                                                 <table id="datatable-future" class="table table-striped table-bordered hover">
                                                     <thead>
