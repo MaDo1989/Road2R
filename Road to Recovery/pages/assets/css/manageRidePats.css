@@ -1,3 +1,11 @@
+#wait {
+    position: fixed;
+    top: 50%;
+    left: 45%;
+    z-index: 20000;
+}
+
+
 .centerHeader {
     text-align: center;
 }
@@ -137,4 +145,16 @@ input:checked + .slider:before {
 
 .block{
     display: block;
+}
+
+.redBackGround{
+    background: red;
+}
+
+.whiteFont{
+    color: white;
+}
+
+.ltr{
+    direction: ltr;
 }
