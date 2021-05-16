@@ -906,7 +906,7 @@ public class RidePat
         //SqlParameter[] cmdparams= new SqlParameter[1];
         cmd.CommandType = CommandType.Text;
         //cmdparams[0] = cmd.Parameters.AddWithValue("id", id);
-        string query = "select Id,DisplayName,CellPhone from Volunteer";
+        string query = "select Id, DisplayName, CellPhone, EnglishFN, EnglishLN from Volunteer";
         DataSet ds = db.GetDataSetByQuery(query);
         DataTable dt = ds.Tables[0];
         return dt;
@@ -1068,6 +1068,15 @@ public class RidePat
                         DataRow[] driverRow = driverTable.Select(searchExpression);
                         primary.DisplayName = driverRow[0]["DisplayName"].ToString();
                         primary.CellPhone = driverRow[0]["CellPhone"].ToString();
+                        primary.EnglishFN =
+                            String.IsNullOrEmpty(Convert.ToString(driverRow[0]["EnglishFN"])) ?
+                            "" :
+                            Convert.ToString(driverRow[0]["EnglishFN"]);
+                        primary.EnglishLN =
+                            String.IsNullOrEmpty(Convert.ToString(driverRow[0]["EnglishLN"])) ?
+                            "" :
+                            Convert.ToString(driverRow[0]["EnglishLN"]);
+
                         rp.Drivers.Add(primary);
                     }
 
