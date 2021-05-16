@@ -853,16 +853,27 @@
 
         const showMe = (spanElement, objName) => {
 
-            const displayName = spanElement.innerHTML;
             const func = 'edit';
-            const arr_details = { displayName, func };
+            let displayName;
+            let arr_details;
 
             switch (objName) {
                 case 'patient':
+                    const ridePatWith_ThisPat = arr_rides.find(r => r.Pat.Id === parseInt(spanElement.id));
+                    displayName = ridePatWith_ThisPat.Pat.DisplayName;
+                    arr_details = { displayName, func };
                     GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
                     open(`${objName}form.html`, '_blank');
                     break;
                 case 'volunteer':
+                    const ridePatWith_ThisDriver = arr_rides.find((r) => {
+
+                        if (r.Drivers.length > 0) {
+                            return r.Drivers[0].Id === parseInt(spanElement.id);
+                        }
+                    });
+                    displayName = ridePatWith_ThisDriver.Drivers[0].DisplayName;
+                    arr_details = { displayName, func };
                     GENERAL.VOLUNTEERS.setVolunteersList(JSON.stringify(arr_details));
                     open(`${objName}form.html`, '_blank');
                     break;
@@ -1015,7 +1026,7 @@
                                     DisplayName
                             }
 
-                            driverSpan = `<span class="driverName clickable blueFont boldFont" onclick='showMe(this, "volunteer")'>${driverSpanContent}</span>`;
+                            driverSpan = `<span class="driverName clickable blueFont boldFont" onclick='showMe(this, "volunteer")' id='${arr_rides[i].Drivers[0].Id}'>${driverSpanContent}</span>`;
                             driverSpan += `<span class="driverCellPhone">${addSeperator2MobileNum(arr_rides[i].Drivers[0].CellPhone, '-')}</span>`;
                         } else {
 
@@ -1403,248 +1414,6 @@
                     alert("Error in GetRidePatView: " + err.responseText);
                 }
             });
-        }
-
-        function buildTables(table) {
-
-            let numOfPassengers = '<span class="numOfPassengers">נוסע יחיד</span>';
-            let numOfEscorts = arr_rides[i].Escorts.length;
-            let escortsPhone2render = '';
-            let equipmentsAndnumOfPassengers = '';
-            let patientPhone2render = '';
-            let lastModified = convertDBDate2FrontEndDate(arr_rides[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
-            let numOfRealEscorts = 0; //not anonymous
-
-            if (validateMobileNum(arr_rides[i].Pat.CellPhone)) {
-
-                patientPhone2render = `<span class="patientPhone2render">${addSeperator2MobileNum(arr_rides[i].Pat.CellPhone, '-')}</span>`;
-            }
-            if (numOfEscorts > 0) {
-                numOfPassengers = `<span class="numOfPassengers">${numOfEscorts + 1} נוסעים</span>`;
-
-                let numOfValidsPhones4Escorts = arr_rides[i].Escorts.filter(es => validateMobileNum(es.CellPhone)).length;
-                let validatePhoneCounter = 0
-                let anonymousCounter = 0
-
-
-                escortsPhone2render = '<span class="escortsPhone2render block">מלווים: ';
-
-                arr_rides[i].Escorts.map((es, i) => {
-                    if (validateMobileNum(es.CellPhone)) {
-                        if (!es.IsAnonymous) {
-                            numOfRealEscorts++;
-                            escortsPhone2render += `${addSeperator2MobileNum(es.CellPhone, '-')}, `;
-
-                            if (i === numOfEscorts - 1) {
-                                escortsPhone2render = escortsPhone2render.substring(0, escortsPhone2render.length - 2);
-                                escortsPhone2render += '</span>';
-                            }
-                        }
-                    }
-                });
-
-                if (numOfRealEscorts === 0) escortsPhone2render = '';
-
-            }
-
-            if (arr_rides[i].Pat.Equipment.length > 0) {
-
-                equipmentsAndnumOfPassengers = `<div class="equipmentsAndnumOfPassengers">`;
-                equipmentsAndnumOfPassengers += numOfPassengers;
-                equipmentsAndnumOfPassengers += `<div>`;
-                arr_rides[i].Pat.Equipment.map((eq) => {
-                    equipmentsAndnumOfPassengers += `<img class="equipments-img" src="../../Media/${eq}.png" />`;
-                });
-                equipmentsAndnumOfPassengers += `</div>`;
-                equipmentsAndnumOfPassengers += `</div>`;
-            }
-
-            let patientAddons = equipmentsAndnumOfPassengers + patientPhone2render + escortsPhone2render;
-
-
-            let patientName2render = '';
-            let patient_English_Name2render = '';
-
-            if (arr_rides[i].Pat.DisplayName.includes("אנונימי")) {
-                //arr_rides[i].Pat.DisplayName = "חולה";
-                patientName2render = "<span class='boldFont'>חולה</span>";
-            } else {
-                patientName2render = `<span onclick='showMe(this, "patient")' class='blueFont clickable boldFont' id='${arr_rides[i].Pat.Id}'>${arr_rides[i].Pat.DisplayName}</span>`;
-                patient_English_Name2render = `<span onclick='showMe(this, "patient")' class='blueFont clickable boldFont' id='${arr_rides[i].Pat.Id}'>${arr_rides[i].Pat.EnglishName}</span>`;
-            }
-            if (arr_rides[i].Status.indexOf("ממתינה לשיבוץ") !== -1 || (arr_rides[i].Status.indexOf("אין נסיעת הלוך") !== -1 && arr_rides[i].Status.indexOf("ויש נהג משובץ") === -1)) {
-                if (isAssistant) {
-                    if (table.context[0].sTableId != "datatable-future" && table.context[0].sTableId != "datatable-tomorrow") {
-                        table.row.add(
-                            [
-                                time,
-                                arr_rides[i].Origin.EnglishName,
-                                arr_rides[i].Destination.EnglishName,
-                                patient_English_Name2render + patientAddons,
-                                "אין!<br/>None!",
-                                "Waiting for a driver",
-                                lastModified,
-                                arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
-                                arr_rides[i].Remark,
-                                btnStr,
-                                arr_rides[i].Pat.IsAnonymous
-                            ]).draw(false);
-                    }
-                    else {
-                        table.row.add(
-                            [
-                                date2,
-                                time,
-                                arr_rides[i].Origin.EnglishName,
-                                arr_rides[i].Destination.EnglishName,
-                                patient_English_Name2render + patientAddons,
-                                "אין!<br/>None!",
-                                "Waiting for a driver",
-                                lastModified,
-                                arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
-                                arr_rides[i].Remark,
-                                btnStr,
-                                arr_rides[i].Pat.IsAnonymous
-                            ]).draw(false);
-                    }
-                }
-                else { //not assistant
-
-                    if (table.context[0].sTableId != "datatable-future" && table.context[0].sTableId != "datatable-tomorrow") {
-                        table.row.add(
-                            [
-                                time,
-                                arr_rides[i].Origin.Name,
-                                arr_rides[i].Destination.Name,
-                                patientName2render + patientAddons,
-                                "אין!<br/>None!",
-                                arr_rides[i].Status,
-                                lastModified,
-                                arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
-                                arr_rides[i].Remark,
-                                btnStr,
-                                arr_rides[i].Pat.IsAnonymous
-                            ]).draw(false);
-                    }
-                    else {
-                        table.row.add(
-                            [
-                                date2,
-                                time,
-                                arr_rides[i].Origin.Name,
-                                arr_rides[i].Destination.Name,
-                                patientName2render + patientAddons,
-                                "אין!<br/>None!",
-                                arr_rides[i].Status,
-                                lastModified,
-                                arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
-                                arr_rides[i].Remark,
-                                btnStr,
-                                arr_rides[i].Pat.IsAnonymous
-                            ]).draw(false);
-                    }
-                }
-            } else { //ride has at least one drive assigned to it
-
-                //we use to have an option for 2nd driver but no more
-
-                let driver = `<span class="driverName clickable blueFont boldFont" onclick='showMe(this, "volunteer")'>${arr_rides[i].Drivers[0].DisplayName}</span>`;
-                driver += `<span class="driverCellPhone">${addSeperator2MobileNum(arr_rides[i].Drivers[0].CellPhone, '-')}</span>`;
-
-
-                if (isAssistant) {
-                    var s = '';
-                    if (arr_rides[i].Status == "שובץ נהג") {
-                        s = 'Driver registered';
-                    }
-                    if (arr_rides[i].Status == "יצאתי לדרך") {
-                        s = 'On my way';
-                    }
-                    if (arr_rides[i].Status == "הגעתי לנקודת האיסוף") {
-                        s = 'At the meeting pt.';
-                    }
-                    if (arr_rides[i].Status == "הגענו ליעד") {
-                        s = 'Reached destination';
-                    }
-                    if (arr_rides[i].Status == "אני אאחר") {
-                        s = "I'll be late";
-                    }
-                    if (arr_rides[i].Status == "עיכוב במחסום") {
-                        s = 'Delay at the border';
-                    }
-                    if (table.context[0].sTableId != "datatable-future" && table.context[0].sTableId != "datatable-tomorrow") {
-                        table.row.add(
-                            [
-                                time,
-                                arr_rides[i].Origin.EnglishName,
-                                arr_rides[i].Destination.EnglishName,
-                                patient_English_Name2render + patientAddons,
-                                driver,
-                                s,
-                                lastModified,
-                                arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
-                                arr_rides[i].Remark,
-                                btnStr,
-                                arr_rides[i].Pat.IsAnonymous
-                            ]).draw(false);
-                    }
-                    else {
-                        table.row.add(
-                            [
-                                date2,
-                                time,
-                                arr_rides[i].Origin.EnglishName,
-                                arr_rides[i].Destination.EnglishName,
-                                patient_English_Name2render + patientAddons,
-                                driver,
-                                s,
-                                lastModified,
-                                arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
-                                arr_rides[i].Remark,
-                                btnStr,
-                                arr_rides[i].Pat.IsAnonymous
-                            ]).draw(false);
-                    }
-                }
-                else {
-                    if (table.context[0].sTableId != "datatable-future" && table.context[0].sTableId != "datatable-tomorrow") {
-                        table.row.add(
-                            [
-                                time,
-                                arr_rides[i].Origin.Name,
-                                arr_rides[i].Destination.Name,
-                                patientName2render + patientAddons,
-                                driver,
-                                arr_rides[i].Status,
-                                lastModified,
-                                arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
-                                arr_rides[i].Remark,
-                                btnStr,
-                                arr_rides[i].Pat.IsAnonymous
-                            ]).draw(false);
-                    }
-                    else {
-                        table.row.add(
-                            [
-                                date2,
-                                time,
-                                arr_rides[i].Origin.Name,
-                                arr_rides[i].Destination.Name,
-                                patientName2render + patientAddons,
-                                driver,
-                                arr_rides[i].Status,
-                                lastModified,
-                                arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
-                                arr_rides[i].Remark,
-                                btnStr,
-                                arr_rides[i].Pat.IsAnonymous
-                            ]).draw(false);
-                    }
-                }
-
-
-            }
-
         }
 
     </script>
