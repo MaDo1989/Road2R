@@ -209,7 +209,7 @@
 
         const DIFFER_RIDE_AXIS_MSG = 'ציר ההסעה של הסעה זו שונה ממה שהוגדר כברירת מחדל לחולה. ניתן לעדכן שדות אלו בהסעה.';
         const DIFFER_AREAS_MSG = 'מכיוון שקו ההסעה של החולה לא נמצא באזור של ההסעה האנונימית הזו, לא ניתן להשתמש בהסעה. יש לפתוח הסעה חדשה עבור החולה הספציפי.';
-
+        const NOT_EXIST = 'ערך זה אינו קיים בבסיס הנתונים';
 
 
         $(document).ready(function () {
@@ -264,6 +264,9 @@
                     let targetPatient = await getPatientById(patientObj.Id);
                     request2updateData(targetPatient);
                     request2TurnOffLoader([getPatientByIdPromise]);
+                } else {
+                    $('#wait').hide();
+                    swal(NOT_EXIST, '', 'error');
                 }
 
             });
@@ -287,6 +290,9 @@
                     let targetPatient = await getPatientById(patientObj.Id);
                     request2updateData(targetPatient);
                     request2TurnOffLoader([getPatientByIdPromise]);
+                } else {
+                    $('#wait').hide();
+                    swal(NOT_EXIST, '', 'error');
                 }
             });
 
@@ -307,6 +313,9 @@
                         let targetPatient = await getPatientById(patientObj.Id);
                         request2updateData(targetPatient);
                         request2TurnOffLoader([getPatientByIdPromise]);
+                    } else {
+                        $('#wait').hide();
+                        swal(NOT_EXIST, '', 'error');
                     }
                 }
 
