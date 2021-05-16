@@ -1143,14 +1143,20 @@
                                             break;
 
                                         case 5://status column
-                                            if (cellData.indexOf("הגענו ליעד") !== -1) {
+                                            if (
+                                                cellData.indexOf("הגענו ליעד") !== -1 ||
+                                                cellData.indexOf("Reached destination") !== -1
+                                            ) {
                                                 cell.style.backgroundColor = "green";
                                                 cell.style.color = "white";
                                             }
-                                            else if (cellData.indexOf('ממתינה לשיבוץ') === -1 && rowData["isAnonymous"]) {
+                                            else if (cellData.includes('שובץ נהג') || cellData.includes('Driver registered')) {
 
-                                                //in other words, if there is a driver on a ride with anonymous patient
-                                                cell.parentElement.style.background = '#FFEF8F';
+                                                if (rowData["isAnonymous"]) {
+                                                    //in other words, if there is a driver on a ride with anonymous patient
+                                                    cell.parentElement.style.background = '#FFEF8F';
+
+                                                }
                                             }
                                             break;
 
@@ -1216,7 +1222,7 @@
                                         case 4: //driver
                                             if (cellData.indexOf('אין!') !== -1) {
 
-                                                if (rowData[0] === "אחה''צ") {
+                                                if (rowData['time'] === 'אחה"צ') {
                                                     cell.style.color = "white";
                                                     cell.style.fontWeight = "bold";
                                                     cell.style.backgroundColor = "red";
@@ -1224,7 +1230,7 @@
                                                 }
 
                                                 let now = new Date();
-                                                let ridePatTime_td = $.trim(rowData[0]).split(':');
+                                                let ridePatTime_td = $.trim(rowData['time']).split(':');
 
                                                 let ridePatTimeObj = {
                                                     hh: parseInt(ridePatTime_td[0]),
@@ -1248,13 +1254,17 @@
                                             break;
 
                                         case 5://status
-                                            if (cellData.indexOf("הגענו ליעד") !== -1) {
+                                            if (cellData.indexOf("הגענו ליעד") !== -1 ||
+                                                cellData.indexOf("Reached destination") !== -1) {
+
                                                 cell.style.backgroundColor = "green";
                                                 cell.style.color = "white";
-                                            } else if (cellData.indexOf('ממתינה לשיבוץ') === -1 && rowData[9].indexOf('True') !== -1) { //rowData[9] = isAnonymous column which is hidden to the user
-                                                //in other words, if there is a driver on a ride with anonymous patient
-                                                //paint the background in a yellowish color
-                                                cell.parentElement.style.background = '#FFEF8F';
+                                            } else if (cellData.includes('שובץ נהג') || cellData.includes('Driver registered')) {
+
+                                                if (rowData["isAnonymous"]) {
+                                                    //in other words, if there is a driver on a ride with anonymous patient
+                                                    cell.parentElement.style.background = '#FFEF8F';
+                                                }
                                             }
                                             break;
                                     }
@@ -1295,7 +1305,7 @@
                                 targets: 5, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //5 is driver column
                                     if (cellData.indexOf('אין!') !== -1) {
 
-                                        if (rowData[0] === "אחה''צ") {
+                                        if (rowData['time'] === 'אחה"צ') {
                                             cell.style.color = "white";
                                             cell.style.fontWeight = "bold";
                                             cell.style.backgroundColor = "red";
@@ -1303,7 +1313,7 @@
                                         }
 
                                         let now = new Date();
-                                        let ridePatTime_td = $.trim(rowData[1]).split(':');
+                                        let ridePatTime_td = $.trim(rowData['time']).split(':');
 
                                         let ridePatTimeObj = {
                                             hh: parseInt(ridePatTime_td[0]),
@@ -1332,13 +1342,17 @@
                             },
                             {
                                 targets: 6, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //6 is status column
-                                    if (cellData.indexOf("הגענו ליעד") !== -1) {
+                                    if (cellData.indexOf("הגענו ליעד") !== -1 ||
+                                        cellData.indexOf("Reached destination") !== -1) {
+
                                         cell.style.backgroundColor = "green";
                                         cell.style.color = "white";
-                                    } else if (cellData.indexOf('ממתינה לשיבוץ') === -1 && rowData['isAnonymous']) {
-                                        //in other words, if there is a driver on a ride with anonymous patient
-                                        //paint the background in a yellowish color
-                                        cell.parentElement.style.background = '#FFEF8F';
+                                    } else if (cellData.includes('שובץ נהג') || cellData.includes('Driver registered')) {
+
+                                        if (rowData["isAnonymous"]) {
+                                            //in other words, if there is a driver on a ride with anonymous patient
+                                            cell.parentElement.style.background = '#FFEF8F';
+                                        }
                                     }
                                 }
                             },
