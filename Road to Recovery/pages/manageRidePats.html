@@ -74,7 +74,10 @@
         var returnDriverMsg;
 
         let arrayOF_areasObj = [];
-
+        let morningRidePats = [];
+        let afterNoonRidePats = [];
+        let tomorrowRidePats = [];
+        let futureRidePats = [];
         const {
 
             validateMobileNum,
@@ -216,7 +219,6 @@
             if (isAssistant) {
                 $("#menuType").attr("w3-include-html", "HelperMenu.html");
                 var coorAssistant = GENERAL.USER.getCoorAssistant();
-                console.log(coorAssistant);
                 assistantName = GENERAL.USER.getAsistantDisplayName();
             }
             else $("#menuType").attr("w3-include-html", "menu.html");
@@ -315,8 +317,8 @@
                   -1 if a < b
                    */
 
-                    let ddmmyyyArr_a = $.trim(a).split('/');
-                    let ddmmyyyArr_b = $.trim(b).split('/');
+                    let ddmmyyyArr_a = $.trim(a).split('.');
+                    let ddmmyyyArr_b = $.trim(b).split('.');
 
                     let dd_a = parseInt(ddmmyyyArr_a[0]);
                     let mm_a = parseInt(ddmmyyyArr_a[1]);
@@ -347,8 +349,8 @@
                   -1 if a < b
                    */
 
-                    let ddmmyyyArr_a = $.trim(a).split('/');
-                    let ddmmyyyArr_b = $.trim(b).split('/');
+                    let ddmmyyyArr_a = $.trim(a).split('.');
+                    let ddmmyyyArr_b = $.trim(b).split('.');
 
                     let dd_a = parseInt(ddmmyyyArr_a[0]);
                     let mm_a = parseInt(ddmmyyyArr_a[1]);
@@ -369,304 +371,15 @@
                     return a === b ? 0 : a > b ? -1 : 1;
                 },
 
-                //#region old way of sorting
-                /*
-                "customdatesort-pre": function (a) {
-                    var r, x;
-                    if (a === null || a === "") {
-                        r = false;
-                    } else {
-                        x = a.split("/");
-                        r = +new Date(+x[2], +x[1] - 1, +x[0]);
-                    }
-                    //console.log("[PRECALC] " + a + " becomes " + r);
-                    return r;
-                },
-
-                "customdatesort-asc": function (a, b) {
-                    if (a === false && b === false) {
-                        return 0;
-                    } else if (a === false) {
-                        return 1;
-                    } else if (b === false) {
-                        return -1;
-                    } else {
-                        return a - b;
-                    }
-                },
-
-                "customdatesort-desc": function (a, b) {
-                    if (a === false && b === false) {
-                        return 0;
-                    } else if (a === false) {
-                        return 1;
-                    } else if (b === false) {
-                        return -1;
-                    } else {
-                        return b - a;
-                    }
-                }
-                */
-                //#endregion
             });
 
-            //Create a DataTable from the Table
-            //var recordsNum = 50;
-            //if (JSON.parse(localStorage.getItem("futurePageLength")) !== null) {
-            //    recordsNum = JSON.parse(localStorage.getItem("futurePageLength"));
-            //}
 
 
-            /*
-                         ============================
-                         || ↓DATATABLES PROPERTIES↓||
-                         ============================
-            */
 
-            tMorning = $('#datatable-morning').DataTable({
-                "stateDuration": 60 * 60,
-                "pageLength": 100,
-                "columnDefs": [
-                    { targets: 0, type: 'de_time' },
-                    {
-                        targets: 4, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //4 is driver column
-                            if (cellData.indexOf('אין!') !== -1) {
-                                cell.style.backgroundColor = "red";
-                                cell.style.color = "white";
-                                cell.style.fontWeight = "bold";
-                            }
-                        }
-                    },
-                    {
-                        targets: 5, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //5 is status column
-                            if (cellData.indexOf("הגענו ליעד") !== -1) {
-                                cell.style.backgroundColor = "green";
-                                cell.style.color = "white";
-                            } else if (cellData.indexOf('ממתינה לשיבוץ') === -1 && rowData[9].indexOf('True') !== -1) { //rowData[9] = isAnonymous column which is hidden to the user
-                                //in other words, if there is a driver on a ride with anonymous patient
-                                //paint the background in a yellowish color
-                                cell.parentElement.style.background = '#FFEF8F';
-                            }
-                        }
-                    },
-                    { targets: 7, className: 'text-left-strong' },
-                    // {targets: 10, visible: false }, -- could be this is not needed??
-
-                ],
-
-
-            },
-
-                // -- could be this is not needed?? ↓
-                //{
-                //    "paging": false
-                //},
-                //{
-                //    "visible": false,
-                //    "targets": [2]
-                //},
-                //{
-                //    "className": "dt-body-left",
-                //    "targets": [3]
-                //}
-                // -- could be this is not needed?? ↑
-
-            );
-
-            tAfternoon = $('#datatable-afternoon').DataTable({
-                "pageLength": 100,
-                "stateDuration": 60 * 60,
-                "columnDefs": [
-                    { targets: 0, type: 'de_time' },
-                    { targets: [0], createdCell: (td) => { $(td).attr('id', 'rideTiming') } },
-                    {
-                        targets: [1], createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //1 is origin column
-                            $(cell).attr('id', 'OriginName')
-                            if (cellData.indexOf('מרכז') !== -1
-                                || cellData.indexOf('center') !== -1
-                                || rowData[2].indexOf('מרכז') !== -1
-                                || rowData[2].indexOf('center') !== -1 //rowData[2] = destination
-                            ) {
-                                cell.parentElement.style.background = '#FFEF8F';
-                            }
-                        }
-                    },
-                    { targets: [2], createdCell: (td) => { $(td).attr('id', 'DestinationName') } },
-                    {
-                        targets: 4, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //4 is driver column
-                            if (cellData.indexOf('אין!') !== -1) {
-
-                                if (rowData[0] === "אחה''צ") {
-                                    cell.style.color = "white";
-                                    cell.style.fontWeight = "bold";
-                                    cell.style.backgroundColor = "red";
-                                    return;
-                                }
-
-                                let now = new Date();
-                                let ridePatTime_td = $.trim(rowData[0]).split(':');
-
-                                let ridePatTimeObj = {
-                                    hh: parseInt(ridePatTime_td[0]),
-                                    mm: parseInt(ridePatTime_td[1])
-                                }
-                                let ridePatTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), ridePatTimeObj.hh, ridePatTimeObj.mm);
-
-                                let miliSeconds_gap = ridePatTime - now;
-                                let hours_gap = miliSeconds_gap / (1000 * 60 * 60); //1000 ms in 1 sec, 60 sec in 1m, 60 min in 1h
-
-                                if (hours_gap >= 0) {
-                                    cell.style.color = "white";
-                                    cell.style.fontWeight = "bold";
-                                    if (hours_gap <= 12) {
-                                        cell.style.backgroundColor = "red";
-                                    } else if (hours_gap <= 24) {
-                                        cell.style.backgroundColor = "orange";
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    {
-                        targets: 5, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //5 is status column
-                            if (cellData.indexOf("הגענו ליעד") !== -1) {
-                                cell.style.backgroundColor = "green";
-                                cell.style.color = "white";
-                            } else if (cellData.indexOf('ממתינה לשיבוץ') === -1 && rowData[9].indexOf('True') !== -1) { //rowData[9] = isAnonymous column which is hidden to the user
-                                //in other words, if there is a driver on a ride with anonymous patient
-                                //paint the background in a yellowish color
-                                cell.parentElement.style.background = '#FFEF8F';
-                            }
-                        }
-                    },
-                    { targets: 7, className: 'text-left-strong' },
-
-
-                ]
-            },
-
-            );
-
-            tTomorrow = $('#datatable-tomorrow').DataTable({
-                "pageLength": 100,
-                "stateDuration": 60 * 60, //saves duration state for 1 hour
-                "columnDefs": [
-                    { targets: 1, type: 'de_time' },
-                    {
-                        targets: 5, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //5 is driver column
-                            if (cellData.indexOf('אין!') !== -1) {
-
-                                if (rowData[0] === "אחה''צ") {
-                                    cell.style.color = "white";
-                                    cell.style.fontWeight = "bold";
-                                    cell.style.backgroundColor = "red";
-                                    return;
-                                }
-
-                                let now = new Date();
-                                let ridePatTime_td = $.trim(rowData[1]).split(':');
-
-                                let ridePatTimeObj = {
-                                    hh: parseInt(ridePatTime_td[0]),
-                                    mm: parseInt(ridePatTime_td[1])
-                                }
-                                let ridePatTime = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, ridePatTimeObj.hh, ridePatTimeObj.mm);
-
-                                let miliSeconds_gap = ridePatTime - now;
-                                let hours_gap = miliSeconds_gap / (1000 * 60 * 60); //1000 ms in 1 sec, 60 sec in 1m, 60 min in 1h
-
-                                if (hours_gap >= 0) {
-                                    if (hours_gap <= 12) {
-                                        cell.style.color = "white";
-                                        cell.style.fontWeight = "bold";
-                                        cell.style.backgroundColor = "red";
-                                    } else if (hours_gap <= 24) {
-                                        cell.style.color = "white";
-                                        cell.style.fontWeight = "bold";
-                                        cell.style.backgroundColor = "orange";
-                                    }
-                                }
-
-
-                            }
-                        }
-                    },
-                    {
-                        targets: 6, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //6 is status column
-                            if (cellData.indexOf("הגענו ליעד") !== -1) {
-                                cell.style.backgroundColor = "green";
-                                cell.style.color = "white";
-                            } else if (cellData.indexOf('ממתינה לשיבוץ') === -1 && rowData[9].indexOf('True') !== -1) { //rowData[9] = isAnonymous column which is hidden to the user
-                                //in other words, if there is a driver on a ride with anonymous patient
-                                //paint the background in a yellowish color
-                                cell.parentElement.style.background = '#FFEF8F';
-                            }
-                        }
-                    },
-                    { targets: 8, className: 'text-left-strong' },
-                ],
-
-                //#region old way of sorting
-                //    "aoColumns": [
-                //        {
-                //            "sType": "customdatesort"
-                //        },
-                //        null,
-                //        null,
-                //        null,
-                //        null,
-                //        null,
-                //        null,
-                //        null,
-                //        null,
-                //        null,
-                //        null,
-                //    ]
-                //#endregion old way of sorting
-
-            },
-
-            );
-
-            tFuture = $('#datatable-future').DataTable(
-                {
-                    "pageLength": 100,
-                    "stateDuration": 60 * 60, //saves duration state for 1 hour
-                    "columnDefs": [
-                        { targets: 8, className: 'text-left-strong' },
-                        { targets: 0, type: 'de_date' },
-                        { targets: 1, type: 'de_time' },
-                    ],
-                    //#region old way of sorting
-
-                    //"aoColumns": [{
-                    //    "sType": "customdatesort"
-                    //},
-                    //    null,
-                    //    null,
-                    //    null,
-                    //    null,
-                    //    null,
-                    //    null,
-                    //    null,
-                    //    null,
-                    //    null,
-                    //]
-                    //#endregion old way of sorting
-
-                },
-            );
-
-            /*
-                         ============================
-                         || ↑DATATABLES PROPERTIES↑||
-                         ============================
-            */
-
-            tMorning.state.clear();
-            tAfternoon.state.clear();
-            tFuture.state.clear();
-            tTomorrow.state.clear();
+            //tMorning.state.clear();
+            //tAfternoon.state.clear();
+            //tFuture.state.clear();
+            //tTomorrow.state.clear();
 
             getCoors();
             refreshTable();
@@ -675,26 +388,6 @@
 
                 refreshInterval = setInterval("refreshTable()", refreshTime);
             }
-
-
-            // NOT NEEDED CALL TO SERVER?!?!?!?!?!!?
-            //$.ajax({
-            //    dataType: "json",
-            //    url: "WebService.asmx/getHospitalView",
-            //    contentType: "application/json; charset=utf-8",
-            //    type: "POST",
-            //    async: false,
-            //    data: JSON.stringify({ active: true }),
-            //    success: function (data) {
-            //        arr_hospitals = JSON.parse(data.d);
-            //        for (i in arr_hospitals) {
-            //            hospitals.push(arr_hospitals[i].Name)
-            //        }
-            //    },
-            //    error: function (err) { alert("Error in getHospitalView: " + err.responseText); }
-            //});
-
-
 
             let allSortsSwitch = JSON.parse(localStorage.getItem('allSortsSwitch'));
 
@@ -714,8 +407,6 @@
         const assignTable2lastOne = (tableName) => {
 
             localStorage.setItem('lastTableWas', tableName);
-
-
         }
 
         const deceideWhichTable2Show = () => {
@@ -725,8 +416,6 @@
              #collapse3 = datatable-tomorrow
              #collapse4 = datatable-future
              */
-
-            
 
             let table2open = localStorage.getItem('lastTableWas') ? localStorage.getItem('lastTableWas') : '';
 
@@ -817,148 +506,6 @@
         }
 
 
-        function refreshTable() {
-            let areasToShow_arr = JSON.parse(localStorage.getItem('areasToShow_arr'));
-            let allSortsSwitch = JSON.parse(localStorage.getItem('allSortsSwitch'));
-
-            checkCookie();
-
-            tMorning.clear().draw();
-            tAfternoon.clear().draw();
-            tFuture.clear().draw();
-            tTomorrow.clear().draw();
-
-
-            if (areasToShow_arr !== null && areasToShow_arr.length === 0 && allSortsSwitch) {
-                return;
-            }
-
-            var volunteerId = -1 // VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
-
-            $.ajax({
-                dataType: "json",
-                url: "WebService.asmx/GetRidePatView",
-                contentType: "application/json; charset=utf-8",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("Content-Encoding", "gzip");
-                },
-                type: "POST",
-                data: JSON.stringify({ volunteerId: volunteerId, maxDays: 30 }),
-                success: function (data) {
-
-                    arr_rides = JSON.parse(data.d);
-
-
-                    GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
-
-                    for (i in arr_rides) {
-
-                        if (allSortsSwitch && areasToShow_arr !== null) {
-                            if (areasToShow_arr.length !== 0) {
-                                if (!areasToShow_arr.includes(arr_rides[i].Area)) {
-                                    continue;
-                                }
-                            }
-                        }
-
-                        //Change date format
-                        var temp = arr_rides[i].Date.substring(arr_rides[i].Date.indexOf("(") + 1);
-                        temp = temp.substring(0, temp.indexOf(")"));
-                        var date = new Date(parseInt(temp));
-
-                        if (arr_rides[i].Drivers.length != 0) {
-                            driverName = arr_rides[i].Drivers[0].DisplayName;
-                        }
-                        destinationName = arr_rides[i].Destination.Name;
-                        originName = arr_rides[i].Origin.Name;
-                        patientName = arr_rides[i].Pat.DisplayName;
-                        Origin_Dest = arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName;
-
-                        if (date.getMinutes() < 10) {
-                            minutes = "0" + date.getMinutes();
-                        } else minutes = date.getMinutes();
-
-
-                        // date2 = date.toLocaleDateString();
-                        var day3 = date.getDate();
-                        if (day3 < 10) day3 = "0" + day3;
-                        date2 = day3 + "/" + (date.getMonth() + 1) + "/" + date.getUTCFullYear();
-
-
-                        hours = date.getHours();
-                        time = hours + ":" + minutes;
-                        if (hours == "22" && minutes == "14") time = "אחה''צ"; //22:14 means afternoon
-
-                        btnStr = "";
-                        showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' name='" + arr_rides[i].RidePatNum + "' title='צפייה'><i class='fa fa-wpforms'></i></button>";
-                        editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' name='" + arr_rides[i].RidePatNum + "' title='עריכה'><i class='ti-pencil'></i></button>";
-                        deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' name='" + arr_rides[i].RidePatNum + "' title='מחיקה'><i class='fa fa-remove'></i></button>";
-                        backupBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='backup' name='" + arr_rides[i].RidePatNum + "' title='שליחת הודעה לגיבוי'><i class='fa fa-send'></i></button>";
-
-
-                        //btnStr += showBtn;
-
-
-                        //if ((arr_rides[i].Status == 'ממתינה לשיבוץ') || (arr_rides[i].Pat.IsAnonymous == "True")) btnStr += " " + editBtn; //allow editing a ridepat if no drivers are assigned to it and if its not anonymous
-                        //else btnStr += " " + showBtn;
-                        //if ((arr_rides[i].Status === 'שובץ נהג' || arr_rides[i].Status === 'שובץ נהג וגיבוי' || arr_rides[i].Status === 'שובץ גיבוי') && isAssistant) {
-                        //    btnStr += "";
-                        //}
-                        //else btnStr += " " + deleteBtn;
-
-                        btnStr += editBtn + " ";
-                        /*
-                        let candidatesBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='candidatesBtn' name='" + arr_rides[i].RidePatNum + "' title='הצג מועמדים לנסיעה'><i class='fa fa-car'></i></button>";
-                        if (arr_rides[i].Drivers.length === 0) {
-                            btnStr += candidatesBtn + " ";
-                        }
-                        */
-                        btnStr += deleteBtn;
-
-                        //localStorage.setItem('IsAnonymous', JSON.stringify(arr_rides[i].Pat.IsAnonymous));
-
-                        if (arr_rides[i].Status == 'שובץ גיבוי') btnStr += " " + backupBtn; //Enable option to text the secondary driver asking to assign him to primary
-
-                        //XXX Checks which table and add the row to the correct one
-
-                        //tables rows building
-
-
-                        if (date.toLocaleDateString() == new Date().toLocaleDateString()) //today's rides
-                        {
-                            if (date.getHours() < splitHour) //morning rides
-                            {
-                                buildTables(tMorning);
-                            }
-                            else //afternoon rides
-                            {
-                                buildTables(tAfternoon);
-                            }
-                        }
-                        else if (date.toLocaleDateString() == tomorrowDate.toLocaleDateString()) { //tomorrow rides
-                            buildTables(tTomorrow);
-                        } else //futrue rides
-                        {
-
-                            buildTables(tFuture);
-
-                        }
-                        //console.log(arr_rides[i])
-                    }
-
-                    //tMorning.columns([0]).order('asc').draw();
-                    //tAfternoon.columns([0]).order('asc').draw();
-                    //tFuture.columns([0]).order('asc').draw();
-
-                    $(".dataTables_empty").html("אין הסעות لا توجد سفريات No drives");
-
-
-
-                },
-                error: function (err) { alert("Error in GetRidePatView: " + err.responseText); }
-            });
-        }
-
         function confirmDelete(deleteBtn, table) {
 
             let ridePatNum = parseInt(deleteBtn.name);
@@ -1005,175 +552,6 @@
 
             });
 
-
-            /*
-
-                    if (returnRidePat) {
-
-                    }
-                    else {
-                        setTimeout(function () { refreshTable() }, 1001);
-                    }
-             */
-
-            //#region old way of confirmDelete(ridePat, table)
-            /*
-            $.ajax({
-                dataType: "json",
-                url: "WebService.asmx/getRidePat",
-                contentType: "application/json; charset=utf-8",
-                type: "POST",
-                data: JSON.stringify({ ridePatNum: ridePat.name }),
-                success: function (data) {
-                    ridePat = JSON.parse(data.d);
-                    Pat = { DisplayName: ridePat.Pat.DisplayName, Id: localStorage.PatID };
-                    Origin = { Name: ridePat.Origin.Name };
-                    Destination = { Name: ridePat.Destination.Name };
-                    Coordinator = { DisplayName: ridePat.Coordinator.DisplayName }
-                    Remark = ridePat.Remark;
-                    Escorts = ridePat.Escorts;
-                    var temp = ridePat.Date.substring(ridePat.Date.indexOf("(") + 1, ridePat.Date.indexOf(")"))
-                    var date = new Date(parseInt(temp));
-                    OnlyEscort = ridePat.OnlyEscort;
-                    RidePat = {
-                        Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Remark: Remark, Escorts: Escorts, Date: date, OnlyEscort: OnlyEscort
-                    }
-
-                    $.ajax({
-                        dataType: "json",
-                        url: "WebService.asmx/getReturnRidePat",
-                        contentType: "application/json; charset=utf-8",
-                        type: "POST",
-                        async: false,
-                        data: JSON.stringify({ RidePat }),
-                        success: function (data) {
-
-                            returnRidePat = JSON.parse(data.d);
-                            console.log(returnRidePat)
-
-                            if (returnRidePat) {
-                                var patName = "חולה";
-                                if (!returnRidePat.Pat.DisplayName.includes("אנונימי")) {
-                                    patName = returnRidePat.Pat.DisplayName;
-                                }
-                                //Change date format
-                                var temp = returnRidePat.Date.substring(returnRidePat.Date.indexOf("(") + 1);
-                                temp = temp.substring(0, temp.indexOf(")"));
-                                var date = new Date(parseInt(temp));
-                                if (date.getMinutes() < 10) {
-                                    minutes = "0" + date.getMinutes();
-                                } else minutes = date.getMinutes();
-                                hours = date.getHours();
-                                time = "בשעה " + hours + ":" + minutes;
-                                if (hours == "22" && minutes == "14") time = "אחר הצהריים"; //22:14 means afternoon
-                                dateReturn = time;
-                                returnRidePatMsg = "האם למחוק גם את ההחזרה של " + patName + " מ" + returnRidePat.Origin.Name + " ל" + returnRidePat.Destination.Name + " " + time;
-                                $('#DriverReturnRidePatMsg').html("");
-                                if (returnRidePat.Drivers.length != 0) {
-                                    returnDriverMsg = returnRidePat.Drivers[0].DisplayName + " נרשם להחזרה הזו!";
-                                    console.log(returnDriverMsg);
-                                    $('#DriverReturnRidePatMsg').html("<h5 style='color:red; font-weight: bold;'>שימו לב!</h5><h5>" + returnRidePat.Drivers[0].DisplayName + " נרשם להחזרה הזו!</h5>");
-                                }
-                            }
-                        },
-                        error: function (err) { alert("Error in CheckRidePat: " + err.responseText); }
-                    });
-                },
-                error: function (err) {
-                    $('#wait').hide();
-                    alert("Error in uploadData: " + err.responseText);
-                }
-            });
-
-            arr_details = { RidePatNum: ridePat.name, func: "show" };// ridePat.name=RidePatNum
-            var data = table.row($(ridePat).parents('tr')).data();
-            var msg = "";
-            //in case the assistant delet's the ride.
-            var pushMsg = "";
-            var patientNameMessage = "";
-            var destinationNameMessage = "";
-            var originNameMessage = "";
-            var userName = GENERAL.USER.getUserDisplayName();
-            if (data.length == 10) {
-                patientNameMessage = data[3];
-                originNameMessage = data[2];
-                destinationNameMessage = data[1];
-                var hour = " בשעה ";
-                if (data[0] == "אחה''צ") {
-                    msg = "מחיקת ההסעה של " + data[3] + " מ: " + data[1] + " ל: " + data[2] + ", היום אחר הצהריים";
-                    pushMsg = "נמחקה ההסעה של " + data[3] + " מ: " + data[1] + " ל: " + data[2] + ", היום אחר הצהריים  ע\"י העוזר/ת " + userName;
-                } else {
-                    msg = "מחיקת ההסעה של " + data[3] + " מ: " + data[1] + " ל: " + data[2] + ", היום בשעה " + data[0] + "\n";
-                    //msg += "حذف سفرية " + data[3] + " من: " + data[2] + " الى: " + data[1] + ", في " + data[0];
-                    pushMsg = "נמחקה ההסעה של " + data[3] + " מ: " + data[1] + " ל: " + data[2] + ", היום בשעה " + data[0] + " ע\"י העוזר/ת " + userName;
-                }
-
-            }
-            else {
-                patientNameMessage = data[3];
-                originNameMessage = data[1];
-                destinationNameMessage = data[2];
-                var hour = " בשעה ";
-                if (data[1] == "אחה''צ") {
-                    msg = "מחיקת ההסעה של " + data[4] + " מ: " + data[2] + " ל: " + data[3] + ", בתאריך " + data[0] + " בשעות אחר הצהריים";
-                    pushMsg = "נמחקה ההסעה של " + data[4] + " מ: " + data[2] + " ל: " + data[3] + ", בתאריך " + data[0] + " בשעות אחר הצהריים ע\"י העוזר/ת " + userName;
-                } else {
-                    msg = "מחיקת ההסעה של " + data[4] + " מ: " + data[2] + " ל: " + data[3] + ", בתאריך " + data[0] + hour + data[1];
-                    //msg += "حذف سفرية " + data[3] + " من: " + data[2] + " الى: " + data[1] + ", في " + data[0] + hour + data[1];
-                    pushMsg = "נמחקה ההסעה של " + data[4] + " מ: " + data[2] + " ל: " + data[3] + ", בתאריך " + data[0] + hour + data[1] + " ע\"י העוזר/ת " + userName;
-                }
-
-
-            }
-
-            swal({
-                title: "هل انت متأكد?\nהאם אתם בטוחים?",
-                type: "warning",
-                text: msg,
-                showCancelButton: true,
-                cancelButtonText: "الغاء\nבטל",
-                confirmButtonClass: 'btn-warning',
-                confirmButtonText: "حذف\nמחיקה",
-                closeOnConfirm: true
-            }, function () {
-
-                var RidePat = new Object();
-                RidePat.RidePatNum = arr_details.RidePatNum;
-
-                var tempDate = data[0];
-                if (tempDate == "אחה''צ") {
-                    tempDate = "01/01/1970"; // Fictional date for deletion
-                }
-                var tempDateReveresed = tempDate.split('/').reverse().join('/')
-                var date = new Date(tempDateReveresed);
-                RidePat.Date = date;
-                if (isNaN(date.getTime())) {
-                    var date = new Date();
-                    var tempHour = tempDate.split(':');
-                    date.setHours(tempHour[0])
-                    RidePat.Date = date;
-                }
-
-                var Pat = new Object();
-                Pat.DisplayName = patientNameMessage;
-                RidePat.Pat = Pat;
-                var Destination = new Object();
-                Destination.Name = destinationNameMessage;
-                RidePat.Destination = Destination;
-                var Origin = new Object();
-                Origin.Name = originNameMessage;
-                RidePat.Origin = Origin;
-                deleteRidePat(RidePat, 'delete');
-                if (isAssistant) {
-                    //send messege to coordinator from assistant.
-                    //int ridepat,string cellphone, string msg
-                    var user = GENERAL.USER.getUserName();
-                    sendMessegeFromAssistant(arr_details.RidePatNum, user, pushMsg);
-                }
-            });
-
-            */
-            //#endregion
 
         }
 
@@ -1353,28 +731,6 @@
             //newStatus = "אין נסיעת הלוך"
 
 
-            //UNNECESSARY CALL TO BACKEND YOGEV DISABLED IT ON 02/05/2021
-            //newStatus = "ממתינה לשיבוץ"
-
-            //ReturnRidePatNum = returnRidePat.RidePatNum
-            //$.ajax({
-            //    dataType: "json",
-            //    url: "WebService.asmx/changeRidePatStatus",
-            //    contentType: "application/json; charset=utf-8",
-            //    type: "POST",
-            //    //async: false,
-            //    data: JSON.stringify({ newStatus: newStatus, ridePatNum: ReturnRidePatNum }),
-            //    success: function (data) {
-
-            //        setTimeout(function () { refreshTable() }, 1001);
-            //    },
-            //    error: function (err) {
-
-            //        alert("Error in changeRidePatStatus: " + err.responseText);
-            //    }
-            //});
-
-            //setTimeout(function () { refreshTable() }, 1001);
         }
 
         const showFiltersModal = () => {
@@ -1504,18 +860,538 @@
             switch (objName) {
                 case 'patient':
                     GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
-                    location.href = "patientForm.html";
+                    open(`${objName}form.html`, '_blank');
                     break;
-                case 'volunterr':
+                case 'volunteer':
                     GENERAL.VOLUNTEERS.setVolunteersList(JSON.stringify(arr_details));
-                    location.href = "volunteerForm.html";
+                    open(`${objName}form.html`, '_blank');
                     break;
             }
 
         }
 
-        function buildTables(table) {
+        function refreshTable() {
+            $('#wait').show();
+            let areasToShow_arr = JSON.parse(localStorage.getItem('areasToShow_arr'));
+            let allSortsSwitch = JSON.parse(localStorage.getItem('allSortsSwitch'));
 
+            checkCookie();
+
+            if (areasToShow_arr !== null && areasToShow_arr.length === 0 && allSortsSwitch) {
+                return;
+            }
+
+            var volunteerId = -1 // VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
+
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/GetRidePatView",
+                contentType: "application/json; charset=utf-8",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-Encoding", "gzip");
+                },
+                type: "POST",
+                data: JSON.stringify({ volunteerId: volunteerId, maxDays: 30 }),
+                success: function (data) {
+                    $('#wait').hide();
+                    arr_rides = JSON.parse(data.d);
+
+                    GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
+
+                    let thisRidePatDate;
+                    let thisRidePat = {};
+
+                    let editBtn;
+                    let deleteBtn;
+                    let btnStr = '';
+
+                    //patient column variables:
+                    let numOfPassengers = '<span class="numOfPassengers">נוסע יחיד</span>';
+                    let numOfPassengers_English = '<span class="numOfPassengers">single passenger</span>';
+                    let numOfEscorts;
+                    let escortsPhone2render = '';
+                    let equipmentsAndnumOfPassengers = '';
+                    let patientPhone2render = '';
+                    let lastModified = convertDBDate2FrontEndDate(arr_rides[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                    let numOfRealEscorts = 0; //not anonymous
+
+                    //driver column variables:
+                    let driverColumnContent = '';
+
+                    //status
+                    let englishStatus = '';
+
+                    for (let i = 0; i < arr_rides.length; i++) {
+
+
+                        thisRidePatDate = convertDBDate2FrontEndDate(arr_rides[i].Date);
+                        numOfEscorts = arr_rides[i].Escorts.length;
+
+                        //#region adjust patient column
+                        if (validateMobileNum(arr_rides[i].Pat.CellPhone)) {
+
+                            patientPhone2render = `<span class="patientPhone2render">${addSeperator2MobileNum(arr_rides[i].Pat.CellPhone, '-')}</span>`;
+                        }
+
+                        if (numOfEscorts > 0) {
+
+                            numOfPassengers = `<span class="numOfPassengers">${numOfEscorts + 1} נוסעים</span>`;
+                            numOfPassengers_English = `<span class="numOfPassengers">${numOfEscorts + 1} passengers</span>`;
+                            let numOfValidsPhones4Escorts = arr_rides[i].Escorts.filter(es => validateMobileNum(es.CellPhone)).length;
+
+                            escortsPhone2render = '<span class="escortsPhone2render block">מלווים: ';
+                            numOfRealEscorts = 0;
+
+                            arr_rides[i].Escorts.map((es, i) => {
+                                if (validateMobileNum(es.CellPhone)) {
+                                    if (!es.IsAnonymous) {
+                                        numOfRealEscorts++;
+                                        escortsPhone2render += `${addSeperator2MobileNum(es.CellPhone, '-')}, `;
+
+                                        if (i === numOfEscorts - 1) {
+                                            escortsPhone2render = escortsPhone2render.substring(0, escortsPhone2render.length - 2);
+                                            escortsPhone2render += '</span>';
+                                        }
+                                    }
+                                }
+                            });
+
+                            if (numOfRealEscorts === 0) escortsPhone2render = '';
+
+                        } else {
+                            numOfPassengers = `<span class="numOfPassengers">נוסע יחיד</span>`;
+                            numOfPassengers_English = `<span class="numOfPassengers">single pasnger</span>`;
+
+                        }
+
+                        if (arr_rides[i].Pat.Equipment.length > 0) {
+
+                            equipmentsAndnumOfPassengers = `<div class="equipmentsAndnumOfPassengers">`;
+                            equipmentsAndnumOfPassengers += isAssistant ? numOfPassengers_English : numOfPassengers;
+                            equipmentsAndnumOfPassengers += `<div>`;
+                            arr_rides[i].Pat.Equipment.map((eq) => {
+                                equipmentsAndnumOfPassengers += `<img class="equipments-img" src="../../Media/${eq}.png" />`;
+                            });
+                            equipmentsAndnumOfPassengers += `</div>`;
+                            equipmentsAndnumOfPassengers += `</div>`;
+                        } else {
+                            equipmentsAndnumOfPassengers = `<div class="equipmentsAndnumOfPassengers block">`;
+                            equipmentsAndnumOfPassengers += isAssistant ? numOfPassengers_English : numOfPassengers;
+                            equipmentsAndnumOfPassengers += `</div>`;
+                        }
+
+                        let patientAddons = equipmentsAndnumOfPassengers + patientPhone2render + escortsPhone2render;
+
+
+                        let patientName2render = '';
+                        let patient_English_Name2render = '';
+
+                        if (arr_rides[i].Pat.DisplayName.includes("אנונימי")) {
+
+                            patientName2render = "<span class='boldFont'>חולה</span>";
+                            patient_English_Name2render = "<span class='boldFont'>patient</span>";
+                        } else {
+
+                            patientName2render = `<span onclick='showMe(this, "patient")' class='blueFont clickable boldFont' id='${arr_rides[i].Pat.Id}'>${arr_rides[i].Pat.DisplayName}</span>`;
+                            patient_English_Name2render = `<span onclick='showMe(this, "patient")' class='blueFont clickable boldFont' id='${arr_rides[i].Pat.Id}'>${arr_rides[i].Pat.EnglishName}</span>`;
+                        }
+                        //#endregion
+
+                        //#region adjust driver column
+
+                        let driverSpan = '';
+                        let driverSpanContent = '';
+
+                        if (arr_rides[i].Drivers.length > 0) {
+                            const { DisplayName, EnglishFN, EnglishLN } = arr_rides[i].Drivers[0];
+                            if (!isAssistant) {//hebrew
+
+                                driverSpanContent = DisplayName;
+                            } else {//english
+
+                                driverSpanContent = EnglishFN.length + EnglishLN.length > 0 ?
+                                    `${EnglishFN} ${EnglishLN}`
+                                    :
+                                    DisplayName
+                            }
+
+                            driverSpan = `<span class="driverName clickable blueFont boldFont" onclick='showMe(this, "volunteer")'>${driverSpanContent}</span>`;
+                            driverSpan += `<span class="driverCellPhone">${addSeperator2MobileNum(arr_rides[i].Drivers[0].CellPhone, '-')}</span>`;
+                        } else {
+
+                            driverSpan = 'אין!<br/>None!';
+                        }
+
+
+
+
+                        if (isAssistant) {
+                            switch (arr_rides[i].Status) {
+
+                                case 'שובץ נהג':
+                                    englishStatus = 'Driver registered';
+                                    break;
+
+                                case 'יצאתי לדרך':
+                                    englishStatus = 'On my way';
+                                    break;
+
+                                case 'הגעתי לנקודת האיסוף':
+                                    englishStatus = 'At the pickup point';
+                                    break;
+
+                                case '"הגענו ליעד':
+                                    englishStatus = 'Reached destination';
+                                    break;
+
+                                case 'אני אאחר':
+                                    englishStatus = "I'll be late";
+                                    break;
+
+                                case 'עיכוב במחסום':
+                                    englishStatus = 'Delay at the border';
+                                    break;
+                                default:
+                                    englishStatus = 'Waiting for a driver';
+                                    break;
+                            }
+
+                        }
+                        //#endregion
+
+                        //#region buttons
+                        editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' name='" + arr_rides[i].RidePatNum + "' title='עריכה'><i class='ti-pencil'></i></button>";
+                        deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' name='" + arr_rides[i].RidePatNum + "' title='מחיקה'><i class='fa fa-remove'></i></button>";
+                        btnStr = `${editBtn} ${deleteBtn}`;
+                        //#endregion buttons
+
+                        thisRidePat = {
+                            time: thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' }),
+                            origin: isAssistant ? arr_rides[i].Origin.EnglishName : arr_rides[i].Origin.Name,
+                            destination: isAssistant ? arr_rides[i].Destination.EnglishName : arr_rides[i].Destination.Name,
+                            patient: isAssistant ? patient_English_Name2render + patientAddons : patientName2render + patientAddons,
+                            driver: driverSpan,
+                            status: isAssistant ? englishStatus : arr_rides[i].Status,
+                            lastModified: convertDBDate2FrontEndDate(arr_rides[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" }),
+                            englishOriginAndDestination: arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
+                            remark: arr_rides[i].Remark,
+                            isAnonymous: arr_rides[i].Pat.IsAnonymous === 'True',
+                            buttons: btnStr,
+                        }
+
+                        if (thisRidePatDate.toLocaleDateString() === new Date().toLocaleDateString()) {//today
+                            if (thisRidePatDate.getHours() < 12) {//morning
+
+                                morningRidePats.push(thisRidePat);
+                            } else {//afternoon
+
+                                afterNoonRidePats.push(thisRidePat);
+                            }
+
+                        } else if (thisRidePatDate.toLocaleDateString() === tomorrowDate.toLocaleDateString()) {//tomorrow
+
+                            thisRidePat.date = thisRidePatDate.toLocaleString('he-IL', { dateStyle: 'short' });
+                            tomorrowRidePats.push(thisRidePat);
+                        } else if (thisRidePatDate > tomorrowDate) {//future
+
+                            thisRidePat.date = thisRidePatDate.toLocaleString('he-IL', { dateStyle: 'short' });
+                            futureRidePats.push(thisRidePat);
+                        }
+
+
+
+
+                    }
+                    //           ============================
+                    //           || ↓DATATABLES PROPERTIES↓||
+                    //           ============================
+
+
+                    tMorning = $('#datatable-morning').DataTable({
+                        data: morningRidePats,
+                        pageLength: 100,
+                        columns: [
+                            //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
+                            { data: "time" },                                //0
+                            { data: "origin" },                              //1
+                            { data: "destination" },                         //2
+                            { data: "patient" },                             //3
+                            { data: "driver" },                              //4
+                            { data: "status" },                              //5
+                            { data: "lastModified" },                        //6
+                            { data: "englishOriginAndDestination" },         //7
+                            { data: "remark" },                              //8
+                            { data: "isAnonymous" },                         //9
+                            { data: "buttons" },                             //10
+                        ],
+                        columnDefs: [
+
+                            { targets: 0, type: 'de_time' },
+                            {
+                                targets: [1, 2, 3, 4, 5], createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {
+                                    if (isAssistant) {
+                                        cell.className += 'ltr';
+                                    }
+
+                                    switch (colIndex) {
+                                        case 4: //driver column
+                                            if (cellData.indexOf('אין!') !== -1) {
+                                                cell.style.backgroundColor = "red";
+                                                cell.style.color = "white";
+                                                cell.style.fontWeight = "bold";
+                                            }
+                                            break;
+
+                                        case 5://status column
+                                            if (cellData.indexOf("הגענו ליעד") !== -1) {
+                                                cell.style.backgroundColor = "green";
+                                                cell.style.color = "white";
+                                            }
+                                            else if (cellData.indexOf('ממתינה לשיבוץ') === -1 && rowData["isAnonymous"]) {
+
+                                                //in other words, if there is a driver on a ride with anonymous patient
+                                                cell.parentElement.style.background = '#FFEF8F';
+                                            }
+                                            break;
+
+                                    }
+
+                                }
+                            },
+
+                            { targets: 7, className: 'text-left-strong' },
+                            { "targets": [9], visible: false },
+
+
+                        ],
+
+
+                    });
+
+
+
+                    tAfternoon = $('#datatable-afternoon').DataTable({
+                        "pageLength": 100,
+                        data: afterNoonRidePats,
+                        columns: [
+                            //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
+                            { data: "time" },                                //0
+                            { data: "origin" },                              //1
+                            { data: "destination" },                         //2
+                            { data: "patient" },                             //3
+                            { data: "driver" },                              //4
+                            { data: "status" },                              //5
+                            { data: "lastModified" },                        //6
+                            { data: "englishOriginAndDestination" },         //7
+                            { data: "remark" },                              //8
+                            { data: "isAnonymous" },                         //9
+                            { data: "buttons" },                             //10
+                        ],
+                        "columnDefs": [
+                            { targets: 0, type: 'de_time' },
+                            { targets: [0], createdCell: (td) => { $(td).attr('id', 'rideTiming') } },
+                            {
+                                targets: [1, 2, 3, 4, 5], createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {
+                                    if (isAssistant) {
+                                        cell.className += 'ltr';
+                                    }
+
+                                    switch (colIndex) {
+
+                                        case 1: //origin
+                                            $(cell).attr('id', 'OriginName');
+                                            if (cellData.indexOf('מרכז') !== -1
+                                                || cellData.indexOf('center') !== -1
+                                                || rowData['destination'].indexOf('מרכז') !== -1
+                                                || rowData['destination'].indexOf('center') !== -1
+                                            ) {
+                                                cell.parentElement.style.background = '#FFEF8F';
+                                            }
+                                            break;
+
+                                        case 2://destination
+                                            createdCell: (td) => { $(td).attr('id', 'DestinationName') }
+                                            break;
+
+                                        case 4: //driver
+                                            if (cellData.indexOf('אין!') !== -1) {
+
+                                                if (rowData[0] === "אחה''צ") {
+                                                    cell.style.color = "white";
+                                                    cell.style.fontWeight = "bold";
+                                                    cell.style.backgroundColor = "red";
+                                                    return;
+                                                }
+
+                                                let now = new Date();
+                                                let ridePatTime_td = $.trim(rowData[0]).split(':');
+
+                                                let ridePatTimeObj = {
+                                                    hh: parseInt(ridePatTime_td[0]),
+                                                    mm: parseInt(ridePatTime_td[1])
+                                                }
+                                                let ridePatTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), ridePatTimeObj.hh, ridePatTimeObj.mm);
+
+                                                let miliSeconds_gap = ridePatTime - now;
+                                                let hours_gap = miliSeconds_gap / (1000 * 60 * 60); //1000 ms in 1 sec, 60 sec in 1m, 60 min in 1h
+
+                                                if (hours_gap >= 0) {
+                                                    cell.style.color = "white";
+                                                    cell.style.fontWeight = "bold";
+                                                    if (hours_gap <= 12) {
+                                                        cell.style.backgroundColor = "red";
+                                                    } else if (hours_gap <= 24) {
+                                                        cell.style.backgroundColor = "orange";
+                                                    }
+                                                }
+                                            }
+                                            break;
+
+                                        case 5://status
+                                            if (cellData.indexOf("הגענו ליעד") !== -1) {
+                                                cell.style.backgroundColor = "green";
+                                                cell.style.color = "white";
+                                            } else if (cellData.indexOf('ממתינה לשיבוץ') === -1 && rowData[9].indexOf('True') !== -1) { //rowData[9] = isAnonymous column which is hidden to the user
+                                                //in other words, if there is a driver on a ride with anonymous patient
+                                                //paint the background in a yellowish color
+                                                cell.parentElement.style.background = '#FFEF8F';
+                                            }
+                                            break;
+                                    }
+
+                                }
+                            },
+
+                            { targets: 7, className: 'text-left-strong' },
+                            { targets: [9], visible: false },
+
+                        ]
+
+                    },
+
+                    );
+
+                    tTomorrow = $('#datatable-tomorrow').DataTable({
+                        data: tomorrowRidePats,
+                        "pageLength": 100,
+                        columns: [
+                            //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
+                            { data: "date" },                                //0
+                            { data: "time" },                                //1
+                            { data: "origin" },                              //2
+                            { data: "destination" },                         //3
+                            { data: "patient" },                             //4
+                            { data: "driver" },                              //5
+                            { data: "status" },                              //6
+                            { data: "lastModified" },                        //7
+                            { data: "englishOriginAndDestination" },         //8
+                            { data: "remark" },                              //9
+                            { data: "isAnonymous" },                         //10
+                            { data: "buttons" },                             //11
+                        ],
+                        "columnDefs": [
+                            { targets: 1, type: 'de_time' },
+                            {
+                                targets: 5, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //5 is driver column
+                                    if (cellData.indexOf('אין!') !== -1) {
+
+                                        if (rowData[0] === "אחה''צ") {
+                                            cell.style.color = "white";
+                                            cell.style.fontWeight = "bold";
+                                            cell.style.backgroundColor = "red";
+                                            return;
+                                        }
+
+                                        let now = new Date();
+                                        let ridePatTime_td = $.trim(rowData[1]).split(':');
+
+                                        let ridePatTimeObj = {
+                                            hh: parseInt(ridePatTime_td[0]),
+                                            mm: parseInt(ridePatTime_td[1])
+                                        }
+                                        let ridePatTime = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, ridePatTimeObj.hh, ridePatTimeObj.mm);
+
+                                        let miliSeconds_gap = ridePatTime - now;
+                                        let hours_gap = miliSeconds_gap / (1000 * 60 * 60); //1000 ms in 1 sec, 60 sec in 1m, 60 min in 1h
+
+                                        if (hours_gap >= 0) {
+                                            if (hours_gap <= 12) {
+                                                cell.style.color = "white";
+                                                cell.style.fontWeight = "bold";
+                                                cell.style.backgroundColor = "red";
+                                            } else if (hours_gap <= 24) {
+                                                cell.style.color = "white";
+                                                cell.style.fontWeight = "bold";
+                                                cell.style.backgroundColor = "orange";
+                                            }
+                                        }
+
+
+                                    }
+                                }
+                            },
+                            {
+                                targets: 6, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //6 is status column
+                                    if (cellData.indexOf("הגענו ליעד") !== -1) {
+                                        cell.style.backgroundColor = "green";
+                                        cell.style.color = "white";
+                                    } else if (cellData.indexOf('ממתינה לשיבוץ') === -1 && rowData['isAnonymous']) {
+                                        //in other words, if there is a driver on a ride with anonymous patient
+                                        //paint the background in a yellowish color
+                                        cell.parentElement.style.background = '#FFEF8F';
+                                    }
+                                }
+                            },
+                            { targets: 8, className: 'text-left-strong' },
+                        ],
+                    });
+
+                    tFuture = $('#datatable-future').DataTable(
+                        {
+                            data: futureRidePats,
+                            columns: [
+                                //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
+                                { data: "date" },                                //0
+                                { data: "time" },                                //1
+                                { data: "origin" },                              //2
+                                { data: "destination" },                         //3
+                                { data: "patient" },                             //4
+                                { data: "driver" },                              //5
+                                { data: "status" },                              //6
+                                { data: "lastModified" },                        //7
+                                { data: "englishOriginAndDestination" },         //8
+                                { data: "remark" },                              //9
+                                { data: "isAnonymous" },                         //10
+                                { data: "buttons" },                             //11
+                            ],
+                            "pageLength": 100,
+                            "columnDefs": [
+                                { targets: 0, type: 'de_date' },
+                                { targets: 1, type: 'de_time' },
+                                { targets: 8, className: 'text-left-strong' },
+                            ],
+
+
+                        },
+                    );
+
+                    //                    /*
+                    //                                 ============================
+                    //                                 || ↑DATATABLES PROPERTIES↑||
+                    //                                 ============================
+                    //                    */
+
+                    $(".dataTables_empty").html("אין הסעות لا توجد سفريات No drives");
+
+                },
+                error: function (err) {
+                    $('#wait').hide();
+                    alert("Error in GetRidePatView: " + err.responseText);
+                }
+            });
+        }
+
+        function buildTables(table) {
 
             let numOfPassengers = '<span class="numOfPassengers">נוסע יחיד</span>';
             let numOfEscorts = arr_rides[i].Escorts.length;
@@ -1533,6 +1409,9 @@
                 numOfPassengers = `<span class="numOfPassengers">${numOfEscorts + 1} נוסעים</span>`;
 
                 let numOfValidsPhones4Escorts = arr_rides[i].Escorts.filter(es => validateMobileNum(es.CellPhone)).length;
+                let validatePhoneCounter = 0
+                let anonymousCounter = 0
+
 
                 escortsPhone2render = '<span class="escortsPhone2render block">מלווים: ';
 
@@ -1577,7 +1456,7 @@
                 patientName2render = "<span class='boldFont'>חולה</span>";
             } else {
                 patientName2render = `<span onclick='showMe(this, "patient")' class='blueFont clickable boldFont' id='${arr_rides[i].Pat.Id}'>${arr_rides[i].Pat.DisplayName}</span>`;
-                patient_English_Name2render = `<span onclick='showMe(this, "patient")' class='clickable' id='${arr_rides[i].Pat.Id}'>${arr_rides[i].Pat.EnglishName}</span>`;
+                patient_English_Name2render = `<span onclick='showMe(this, "patient")' class='blueFont clickable boldFont' id='${arr_rides[i].Pat.Id}'>${arr_rides[i].Pat.EnglishName}</span>`;
             }
             if (arr_rides[i].Status.indexOf("ממתינה לשיבוץ") !== -1 || (arr_rides[i].Status.indexOf("אין נסיעת הלוך") !== -1 && arr_rides[i].Status.indexOf("ויש נהג משובץ") === -1)) {
                 if (isAssistant) {
@@ -1655,29 +1534,9 @@
 
                 //we use to have an option for 2nd driver but no more
 
-                let driver = `<span class="driverName clickable blueFont boldFont" onclick='showMe(this, "volunterr")'>${arr_rides[i].Drivers[0].DisplayName}</span>`;
+                let driver = `<span class="driverName clickable blueFont boldFont" onclick='showMe(this, "volunteer")'>${arr_rides[i].Drivers[0].DisplayName}</span>`;
                 driver += `<span class="driverCellPhone">${addSeperator2MobileNum(arr_rides[i].Drivers[0].CellPhone, '-')}</span>`;
 
-                //#region old code for driver
-                /*
-                for (j in arr_rides[i].Drivers) {
-                    var primaryCellPhone = arr_rides[i].Drivers[j].CellPhone.replace(/^([\w]{3})/, "$1-");
-                    var secondaryCellPhone = arr_rides[i].Drivers[j].CellPhone.replace(/^([\w]{3})/, "$1-");
-                    if (arr_rides[i].Drivers[j].DriverType == "Primary")
-                    var primary = arr_rides[i].Drivers[j].DisplayName + "<br/>" + primaryCellPhone;
-                    else secondary = arr_rides[i].Drivers[j].DisplayName + "<br/>" + secondaryCellPhone;
-                }
-
-                if (arr_rides[i].Drivers.length == 1) {
-                    if (primary != undefined) //Only a primary driver is assigned
-                        var drivers = "ראשי: " + primary;
-                    else //only a secondary driver is assigned
-                        drivers = "גיבוי בלבד: " + secondary;
-                }
-                else if (arr_rides[i].Drivers.length == 2) //Two drivers are assigned
-                    var drivers = "ראשי: " + primary + ",<br> " + "גיבוי: " + secondary;
-                    */
-                //#endregion old code for driver
 
                 if (isAssistant) {
                     var s = '';
@@ -1771,12 +1630,7 @@
 
 
             }
-            //if (table.context[0].sTableId == "datatable-future") {
-            //    if (localStorage.futurePageLength != null && localStorage.futurePageLength != "") {
-            //        $('select[name="datatable-future_length"]').val(parseInt(localStorage.futurePageLength));
 
-            //    }
-            //}
         }
 
     </script>
@@ -1826,7 +1680,9 @@
         <!-- Top Bar End -->
         <!-- ========== Right Sidebar Start ========== -->
         <div id="menuType"></div>
-
+        <div id="wait">
+            <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
+        </div>
         <!--<div w3-include-html="HelperMenu.html"></div>-->
         <!-- Right Sidebar End -->
         <!-- ============================================================== -->
@@ -1917,6 +1773,7 @@
                                                             <th class="customWidth middle" title="Last modified">עודכן לאחרונה</th>
                                                             <th class="customWidth middle" title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
                                                             <th class="customWidth  middle" title="Remarks  ملاحظات">הערות</th>
+                                                            <th title="isAnonymous"></th> <!-- hidden to the user -->
                                                             <th class="SmallcustomWidth  middle" title="Actions  اعمال">פעולות</th>
                                                         </tr>
                                                     </thead>
@@ -1944,6 +1801,7 @@
                                                             <th class="customWidth middle" title="Last modified">עודכן לאחרונה</th>
                                                             <th class="customWidth middle" title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
                                                             <th class="customWidth  middle" title="Remarks  ملاحظات">הערות</th>
+                                                            <th title="isAnonymous"></th> <!-- hidden to the user -->
                                                             <th class="SmallcustomWidth middle" title="Actions  اعمال">פעולות</th>
                                                         </tr>
                                                     </thead>
@@ -1972,6 +1830,7 @@
                                                             <th class="customWidth middle" title="Last modified">עודכן לאחרונה</th>
                                                             <th class="customWidth middle" title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
                                                             <th class="customWidth  middle" title="Remarks  ملاحظات">הערות</th>
+                                                            <th title="isAnonymous"></th> <!-- hidden to the user -->
                                                             <th class="SmallcustomWidth middle" title="Actions  اعمال">פעולות</th>
                                                         </tr>
                                                     </thead>
@@ -2000,6 +1859,7 @@
                                                             <th class="customWidth middle" title="Last modified">עודכן לאחרונה</th>
                                                             <th class="customWidth middle" title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Origin - Destination</th>
                                                             <th class="customWidth  middle" title="Remarks  ملاحظات">הערות</th>
+                                                            <th title="isAnonymous"></th> <!-- hidden to the user -->
                                                             <th class="SmallcustomWidth middle" title="Actions  اعمال">פעולות</th>
                                                         </tr>
                                                     </thead>
