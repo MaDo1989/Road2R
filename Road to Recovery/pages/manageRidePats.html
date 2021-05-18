@@ -86,88 +86,93 @@
 
         } = GENERAL.USEFULL_FUNCTIONS;
 
+        let tMorning, tAfternoon, tFuture, tTomorrow;
+
         function wiringDataTables() {
             //manage button clicks on tables
 
-            $('#datatable-morning tbody').on('click', '#candidatesBtn', function () {
-                candidatesButton(this);
-            });
+            //$('#datatable-morning tbody').on('click', '#candidatesBtn', function () {
+            //    candidatesButton(this);
+            //});
 
-            $('#datatable-morning tbody').on('click', '#edit', function () {
-                editButton(this);
-            });
+            //$('#datatable-afternoon tbody').on('click', '#candidatesBtn', function () {
+            //    candidatesButton(this);
+            //});
 
-            $('#datatable-morning tbody').on('click', '#show', function () {
-                showButton(this);
-            });
+            //$('#datatable-future tbody').on('click', '#candidatesBtn', function () {
+            //    candidatesButton(this);
+            //});
 
-            $('#datatable-morning tbody').on('click', '#remove', function () {
+            //$('#datatable-tomorrow tbody').on('click', '#candidatesBtn', function () {
+            //    candidatesButton(this);
+            //});
+
+            //$('#datatable-morning tbody').on('click', '#show', function () {
+            //    showButton(this);
+            //});
+
+            //$('#datatable-afternoon tbody').on('click', '#show', function () {
+            //    showButton(this);
+            //});
+
+            //$('#datatable-future tbody').on('click', '#show', function () {
+            //    showButton(this);
+            //});
+
+            //$('#datatable-tomorrow tbody').on('click', '#show', function () {
+            //    showButton(this);
+            //}); 
+
+            $('#datatable-morning tbody').on('click', '.remove', function () {
                 confirmDelete(this, tMorning);
             });
 
-            $('#datatable-morning tbody').on('click', '#backup', function () {
-                backupToPrimaryButton(this);
-            });
-
-            $('#datatable-afternoon tbody').on('click', '#edit', function () {
-                editButton(this);
-            });
-
-            $('#datatable-afternoon tbody').on('click', '#candidatesBtn', function () {
-                candidatesButton(this);
-            });
-
-            $('#datatable-afternoon tbody').on('click', '#show', function () {
-                showButton(this);
-            });
-
-            $('#datatable-afternoon tbody').on('click', '#remove', function () {
+            $('#datatable-afternoon tbody').on('click', '.remove', function () {
                 confirmDelete(this, tAfternoon);
             });
 
-            $('#datatable-afternoon tbody').on('click', '#backup', function () {
-                backupToPrimaryButton(this);
-            });
-
-            $('#datatable-future tbody').on('click', '#candidatesBtn', function () {
-                candidatesButton(this);
-            });
-
-            $('#datatable-future tbody').on('click', '#edit', function () {
-                editButton(this);
-            });
-
-            $('#datatable-future tbody').on('click', '#show', function () {
-                showButton(this);
-            });
-
-            $('#datatable-future tbody').on('click', '#remove', function () {
+            $('#datatable-future tbody').on('click', '.remove', function () {
                 confirmDelete(this, tFuture);
             });
 
-            $('#datatable-future tbody').on('click', '#backup', function () {
-                backupToPrimaryButton(this);
-            });
-
-            $('#datatable-tomorrow tbody').on('click', '#candidatesBtn', function () {
-                candidatesButton(this);
-            });
-
-            $('#datatable-tomorrow tbody').on('click', '#edit', function () {
-                editButton(this);
-            });
-
-            $('#datatable-tomorrow tbody').on('click', '#show', function () {
-                showButton(this);
-            });
-
-            $('#datatable-tomorrow tbody').on('click', '#remove', function () {
+            $('#datatable-tomorrow tbody').on('click', '.remove', function () {
                 confirmDelete(this, tTomorrow);
             });
 
-            $('#datatable-tomorrow tbody').on('click', '#backup', function () {
-                backupToPrimaryButton(this);
+            $('#datatable-morning tbody').on('click', '.edit', function () {
+                editButton(this);
             });
+
+            $('#datatable-afternoon tbody').on('click', '.edit', function () {
+                editButton(this);
+            });
+
+            $('#datatable-future tbody').on('click', '.edit', function () {
+                editButton(this);
+            });
+
+            $('#datatable-tomorrow tbody').on('click', '.edit', function () {
+                editButton(this);
+            });
+            //$('#datatable-morning tbody').on('click', '#backup', function () {
+            //    backupToPrimaryButton(this);
+            //});
+
+            //$('#datatable-afternoon tbody').on('click', '#backup', function () {
+            //    backupToPrimaryButton(this);
+            //});
+
+            //$('#datatable-future tbody').on('click', '#backup', function () {
+            //    backupToPrimaryButton(this);
+            //});
+
+            //$('#datatable-tomorrow tbody').on('click', '#backup', function () {
+            //    backupToPrimaryButton(this);
+            //});
+
+
+
+
         }
 
         $(document).ready(function () {
@@ -373,14 +378,6 @@
 
             });
 
-
-
-
-            //tMorning.state.clear();
-            //tAfternoon.state.clear();
-            //tFuture.state.clear();
-            //tTomorrow.state.clear();
-
             getCoors();
             refreshTable();
 
@@ -508,7 +505,7 @@
 
         function confirmDelete(deleteBtn, table) {
 
-            let ridePatNum = parseInt(deleteBtn.name);
+            let ridePatNum = parseInt(deleteBtn.id);
 
             //IMMUTABLE paradigme !
             const original_deleteCandidate = arr_rides.find((r) => r.RidePatNum === ridePatNum);
@@ -547,7 +544,7 @@
                 closeOnConfirm: true
             }, function (userResponse) {
                 if (userResponse) {
-                    deleteRidePat(original_deleteCandidate, 'delete');
+                    deleteRidePat(original_deleteCandidate, deleteBtn, table);
                 }
 
             });
@@ -555,17 +552,17 @@
 
         }
 
-        const candidatesButton = (btn) => {
-            let ridePatNum = btn.name;
-            GENERAL.RIDEPAT.setRidePatNum4_viewCandidate(ridePatNum);
-            location.href = "viewCandidates.html";
-        }
+        //const candidatesButton = (btn) => {
+        //    let ridePatNum = btn.id;
+        //    GENERAL.RIDEPAT.setRidePatNum4_viewCandidate(ridePatNum);
+        //    location.href = "viewCandidates.html";
+        //}
 
-        function showButton(ridePat) {
-            arr_details = { RidePatNum: ridePat.name, func: "show" };//ridePat.name=RidePatNum
-            GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
-            location.href = "ridePatForm.html";
-        }
+        //function showButton(ridePat) {
+        //    arr_details = { RidePatNum: ridePat.name, func: "show" };//ridePat.name=RidePatNum
+        //    GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
+        //    location.href = "ridePatForm.html";
+        //}
 
         function editButton(ridePat) {
             arr_details = { RidePatNum: ridePat.name, func: "edit" }; //ridePat.name=RidePatNum
@@ -573,36 +570,36 @@
             location.href = "ridePatForm.html";
         }
 
-        function backupToPrimaryButton(ridePat) {
-            //arr_details = { RidePatNum: ridePat.name, func: "show" };//ridePat.name=RidePatNum
-            var RidePat = new Object();
-            RidePat.RidePatNum = ridePat.name;
+        //function backupToPrimaryButton(ridePat) {
+        //    //arr_details = { RidePatNum: ridePat.name, func: "show" };//ridePat.name=RidePatNum
+        //    var RidePat = new Object();
+        //    RidePat.RidePatNum = ridePat.name;
 
-            $.ajax({
-                dataType: "json",
-                url: "WebService.asmx/backupToPrimaryNotification",
-                contentType: "application/json; charset=utf-8",
-                type: "POST",
-                data: JSON.stringify({ ridePatId: RidePat.RidePatNum }),
-                success: function (data) {
-                    if (data.d == 1) {
-                        swal({
-                            title: "لقد تم ارسال الرسالة\nההודעה נשלחה",
-                            timer: 1000,
-                            type: "success",
-                            showConfirmButton: false
-                        });
-                    }
+        //    $.ajax({
+        //        dataType: "json",
+        //        url: "WebService.asmx/backupToPrimaryNotification",
+        //        contentType: "application/json; charset=utf-8",
+        //        type: "POST",
+        //        data: JSON.stringify({ ridePatId: RidePat.RidePatNum }),
+        //        success: function (data) {
+        //            if (data.d == 1) {
+        //                swal({
+        //                    title: "لقد تم ارسال الرسالة\nההודעה נשלחה",
+        //                    timer: 1000,
+        //                    type: "success",
+        //                    showConfirmButton: false
+        //                });
+        //            }
 
 
-                },
-                error: function (err) {
-                    alert("Error in backupToPrimaryNotification:" + err.responseText);
-                }
-            });
-        }
+        //        },
+        //        error: function (err) {
+        //            alert("Error in backupToPrimaryNotification:" + err.responseText);
+        //        }
+        //    });
+        //}
 
-        function deleteRidePat(ridePat, func) {
+        function deleteRidePat(ridePat, deleteBtn, thistable) {
             checkCookie();
             $('#wait').show();
             // var numberOfRides = 1;
@@ -625,11 +622,10 @@
                         showConfirmButton: false
                     });
 
-                    setTimeout(refreshTable, 1001);
-
+                    thistable.row($(deleteBtn).parents('tr')).remove().draw();
 
                     let RidePat = {
-                        Date: convertDBDate2FrontEndDate(ridePat.Date),
+                        Date: typeof ridePat.Date === 'string' ? convertDBDate2FrontEndDate(ridePat.Date) : ridePat.Date,
                         Destination: ridePat.Destination,
                         Origin: ridePat.Origin,
                         Pat: ridePat.Pat
@@ -672,7 +668,6 @@
                                 $('#messagesModal').modal('toggle');
                             } else {
                                 $('#wait').hide();
-                                setTimeout(refreshTable, 1001);
                             }
                         },
                         error: function (err) {
@@ -717,10 +712,32 @@
             var Origin = new Object();
             Origin.Name = returnRidePat.Origin.Name;
             RidePat.Origin = Origin;
-            deleteRidePat(RidePat, 'delete');
+
+        
+
+            let deleteBtn = document.getElementById(`${RidePat.RidePatNum}`);
+            let thistTble;
+
+            switch ($(deleteBtn).parents('table')[0].id) {
+                case 'datatable-morning':
+                    thisTable = tMorning;
+                    break;
+                case 'datatable-afternoon':
+                    thisTable = tAfternoon;
+                    break;
+                case 'datatable-tomorrow':
+                    thisTable = tTomorrow
+                    break;
+                case 'datatable-future':
+                    thisTable = tFuture;
+                    break;
+
+            }
+
             returnRidePat = null;
             $('#messagesModal').modal('toggle');
             $('#DriverReturnRidePatMsg').html("");
+            deleteRidePat(RidePat, deleteBtn, thisTable);
         }
 
         function closeModal() {
@@ -883,6 +900,7 @@
 
         function refreshTable() {
             $('#wait').show();
+
             let areasToShow_arr = JSON.parse(localStorage.getItem('areasToShow_arr'));
             let allSortsSwitch = JSON.parse(localStorage.getItem('allSortsSwitch'));
 
@@ -1071,8 +1089,8 @@
                         //#endregion
 
                         //#region buttons
-                        editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' name='" + arr_rides[i].RidePatNum + "' title='עריכה'><i class='ti-pencil'></i></button>";
-                        deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' name='" + arr_rides[i].RidePatNum + "' title='מחיקה'><i class='fa fa-remove'></i></button>";
+                        editBtn = `<button type='button' class='edit btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='${arr_rides[i].RidePatNum}' name='${arr_rides[i].RidePatNum}' title='עריכה'><i class='ti-pencil'></i></button>`;
+                        deleteBtn = `<button type='button' class='remove btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5'id='${arr_rides[i].RidePatNum}' name='${arr_rides[i].RidePatNum}' title='מחיקה'><i class='fa fa-remove'></i></button>`;
                         btnStr = `${editBtn} ${deleteBtn}`;
                         //#endregion buttons
 
@@ -1113,14 +1131,17 @@
 
 
                     }
+
+
+
                     //           ============================
                     //           || ↓DATATABLES PROPERTIES↓||
                     //           ============================
 
-
                     tMorning = $('#datatable-morning').DataTable({
                         data: morningRidePats,
                         pageLength: 100,
+                        stateSave: true,
                         columns: [
                             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
                             { data: "time" },                                //0
@@ -1185,11 +1206,10 @@
 
                     });
 
-
-
                     tAfternoon = $('#datatable-afternoon').DataTable({
-                        "pageLength": 100,
+                        pageLength: 100,
                         data: afterNoonRidePats,
+                        stateSave: true,
                         columns: [
                             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
                             { data: "time" },                                //0
@@ -1204,7 +1224,7 @@
                             { data: "isAnonymous" },                         //9
                             { data: "buttons" },                             //10
                         ],
-                        "columnDefs": [
+                        columnDefs: [
                             { targets: 0, type: 'de_time' },
                             { targets: [0], createdCell: (td) => { $(td).attr('id', 'rideTiming') } },
                             {
@@ -1294,6 +1314,7 @@
 
                     tTomorrow = $('#datatable-tomorrow').DataTable({
                         data: tomorrowRidePats,
+                        stateSave: true,
                         "pageLength": 100,
                         columns: [
                             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
@@ -1376,6 +1397,7 @@
                     tFuture = $('#datatable-future').DataTable(
                         {
                             data: futureRidePats,
+                            stateSave: true,
                             columns: [
                                 //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
                                 { data: "date" },                                //0
@@ -1409,6 +1431,7 @@
                     //                                 || ↑DATATABLES PROPERTIES↑||
                     //                                 ============================
                     //                    */
+
 
                     $(".dataTables_empty").html("אין הסעות لا توجد سفريات No drives");
 
