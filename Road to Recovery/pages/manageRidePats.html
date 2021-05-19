@@ -642,7 +642,8 @@
 
                             returnRidePat = JSON.parse(data.d);
 
-                            if (returnRidePat.Status !== 'נמחקה') {// נמצאה החזרה
+                            
+                            if (returnRidePat && returnRidePat.Status !== 'נמחקה') {
                                 $('#wait').hide();
 
                                 let patientName = 'חולה';
@@ -717,8 +718,8 @@
 
             let deleteBtn = document.getElementById(`${RidePat.RidePatNum}`);
             let thistTble;
-
-            switch ($(deleteBtn).parents('table')[0].id) {
+            
+            switch ($(deleteBtn).parents("table:first")[0].id) {
                 case 'datatable-morning':
                     thisTable = tMorning;
                     break;
