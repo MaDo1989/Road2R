@@ -918,6 +918,10 @@
                             alert2user = DIFFER_RIDE_AXIS_MSG;
                             allowChangeOf_originAndDestination = false;
                             return fillPage_withPatientData(targetPatient, true);
+
+                        } else { //target patient and exist one has the same route
+                            return fillPage_withPatientData(targetPatient, true);
+
                         }
 
                     } else {//a NOT well defined patient
