@@ -121,7 +121,7 @@
 
             //$('#datatable-tomorrow tbody').on('click', '#show', function () {
             //    showButton(this);
-            //}); 
+            //});
 
             $('#datatable-morning tbody').on('click', '.remove', function () {
                 confirmDelete(this, tMorning);
@@ -642,7 +642,7 @@
 
                             returnRidePat = JSON.parse(data.d);
 
-                            
+
                             if (returnRidePat && returnRidePat.Status !== 'נמחקה') {
                                 $('#wait').hide();
 
@@ -714,11 +714,11 @@
             Origin.Name = returnRidePat.Origin.Name;
             RidePat.Origin = Origin;
 
-        
+
 
             let deleteBtn = document.getElementById(`${RidePat.RidePatNum}`);
             let thistTble;
-            
+
             switch ($(deleteBtn).parents("table:first")[0].id) {
                 case 'datatable-morning':
                     thisTable = tMorning;
@@ -848,23 +848,23 @@
 
             localStorage.setItem('arrayOF_areasObj', JSON.stringify(arrayOF_areasObj));
             localStorage.setItem('areasToShow_arr', JSON.stringify(areasToShow_arr));
-            refreshTable();
 
+            refreshTable();
         }
 
         const allSortsSwitch_changed = () => {
 
-            let consdierSorts_controllers = $('#allSortsSwitch').prop('checked');
-            localStorage.setItem('allSortsSwitch', JSON.stringify(consdierSorts_controllers));
+            let considerSorts_controllers = $('#allSortsSwitch').prop('checked');
+            localStorage.setItem('allSortsSwitch', JSON.stringify(considerSorts_controllers));
 
-            if (!consdierSorts_controllers) {
+            if (!considerSorts_controllers) {
+
                 $('#allSortsLabel').html('הפעל סינון');
                 $('#openSortsControllers').prop('disabled', true);
-                refreshTable();
             } else {
+
                 $('#allSortsLabel').html('כבה סינון');
                 $('#openSortsControllers').prop('disabled', false);
-                refreshTable();
             }
 
         }
@@ -953,6 +953,13 @@
 
                     for (let i = 0; i < arr_rides.length; i++) {
 
+                        if (allSortsSwitch && areasToShow_arr !== null) {
+                            if (areasToShow_arr.length !== 0) {
+                                if (!areasToShow_arr.includes(arr_rides[i].Area)) {
+                                    continue;
+                                }
+                            }
+                        }
 
                         thisRidePatDate = convertDBDate2FrontEndDate(arr_rides[i].Date);
                         numOfEscorts = arr_rides[i].Escorts.length;
@@ -1143,6 +1150,7 @@
                         data: morningRidePats,
                         pageLength: 100,
                         stateSave: true,
+                        destroy: true,
                         columns: [
                             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
                             { data: "time" },                                //0
@@ -1211,6 +1219,7 @@
                         pageLength: 100,
                         data: afterNoonRidePats,
                         stateSave: true,
+                        destroy: true,
                         columns: [
                             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
                             { data: "time" },                                //0
@@ -1316,6 +1325,7 @@
                     tTomorrow = $('#datatable-tomorrow').DataTable({
                         data: tomorrowRidePats,
                         stateSave: true,
+                        destroy: true,
                         "pageLength": 100,
                         columns: [
                             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
@@ -1399,6 +1409,7 @@
                         {
                             data: futureRidePats,
                             stateSave: true,
+                            destroy: true,
                             columns: [
                                 //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
                                 { data: "date" },                                //0
@@ -1443,6 +1454,7 @@
                 }
             });
         }
+
 
     </script>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
