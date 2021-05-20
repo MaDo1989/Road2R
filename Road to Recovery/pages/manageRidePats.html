@@ -861,10 +861,12 @@
 
                 $('#allSortsLabel').html('הפעל סינון');
                 $('#openSortsControllers').prop('disabled', true);
+                refreshTable();
             } else {
 
                 $('#allSortsLabel').html('כבה סינון');
                 $('#openSortsControllers').prop('disabled', false);
+                refreshTable();
             }
 
         }
@@ -902,12 +904,26 @@
         function refreshTable() {
             $('#wait').show();
 
+            morningRidePats = [];
+            afterNoonRidePats = [];
+            tomorrowRidePats = [];
+            futureRidePats = [];
+
             let areasToShow_arr = JSON.parse(localStorage.getItem('areasToShow_arr'));
             let allSortsSwitch = JSON.parse(localStorage.getItem('allSortsSwitch'));
 
             checkCookie();
 
-            if (areasToShow_arr !== null && areasToShow_arr.length === 0 && allSortsSwitch) {
+            if (areasToShow_arr !== null && areasToShow_arr.length === 0 && allSortsSwitch) { //dont show any
+                $('#wait').hide();
+
+                tMorning = $('#datatable-morning').DataTable({ data: [], destroy: true });
+
+                tAfternoon = $('#datatable-afternoon').DataTable({ data: [], destroy: true });
+
+                tTomorrow = $('#datatable-tomorrow').DataTable({ data: [], destroy: true });
+
+                tFuture = $('#datatable-future').DataTable({ data: [], destroy: true });
                 return;
             }
 
@@ -1438,11 +1454,9 @@
                         },
                     );
 
-                    //                    /*
-                    //                                 ============================
-                    //                                 || ↑DATATABLES PROPERTIES↑||
-                    //                                 ============================
-                    //                    */
+                    //            ============================
+                    //            || ↑DATATABLES PROPERTIES↑||
+                    //            ============================
 
 
                     $(".dataTables_empty").html("אין הסעות لا توجد سفريات No drives");
