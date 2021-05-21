@@ -665,7 +665,12 @@
                         showConfirmButton: false
                     });
 
-                    thistable.row($(deleteBtn).parents('tr')).remove().draw();
+
+                    if (thistable && deleteBtn) {
+                        thistable.row($(deleteBtn).parents('tr')).remove().draw();
+                    } else {
+                        location.reload();
+                    }
 
                     let RidePat = {
                         Date: typeof ridePat.Date === 'string' ? convertDBDate2FrontEndDate(ridePat.Date) : ridePat.Date,
@@ -757,24 +762,28 @@
             Origin.Name = returnRidePat.Origin.Name;
             RidePat.Origin = Origin;
 
+            let thisTable = null;
+            let deleteBtn = null;
+
+            if (document.getElementById(`${RidePat.RidePatNum}`) !== null) { //DUE TO SORTING THE ROW IS NOT RENDERED
 
 
-            let deleteBtn = document.getElementById(`${RidePat.RidePatNum}`);
-            let thistTble;
+                deleteBtn = document.getElementById(`${RidePat.RidePatNum}`);
 
-            switch ($(deleteBtn).parents("table:first")[0].id) {
-                case 'datatable-morning':
-                    thisTable = tMorning;
-                    break;
-                case 'datatable-afternoon':
-                    thisTable = tAfternoon;
-                    break;
-                case 'datatable-tomorrow':
-                    thisTable = tTomorrow
-                    break;
-                case 'datatable-future':
-                    thisTable = tFuture;
-                    break;
+                switch ($(deleteBtn).parents("table:first")[0].id) {
+                    case 'datatable-morning':
+                        thisTable = tMorning;
+                        break;
+                    case 'datatable-afternoon':
+                        thisTable = tAfternoon;
+                        break;
+                    case 'datatable-tomorrow':
+                        thisTable = tTomorrow
+                        break;
+                    case 'datatable-future':
+                        thisTable = tFuture;
+                        break;
+                }
 
             }
 
@@ -1081,7 +1090,7 @@
                                     DisplayName
                             }
 
-                      
+
                             driverSpan = `<a href="volunteerform.html" data-obj="volunteer" class="showMe driverName clickable blueFont boldFont" id='${arr_rides[i].Drivers[0].Id}'>${driverSpanContent}</a>`;
                             driverSpan += `<span class="driverCellPhone">${addSeperator2MobileNum(arr_rides[i].Drivers[0].CellPhone, '-')}</span>`;
                         } else {
