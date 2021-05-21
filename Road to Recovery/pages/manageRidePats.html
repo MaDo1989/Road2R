@@ -88,8 +88,124 @@
 
         let tMorning, tAfternoon, tFuture, tTomorrow;
 
+
+        const showMe = ({ objId, objName }) => {
+
+            const func = 'edit';
+            let displayName;
+            let arr_details;
+
+            switch (objName) {
+                case 'patient':
+                    const ridePatWith_ThisPat = arr_rides.find(r => r.Pat.Id === parseInt(objId));
+                    displayName = ridePatWith_ThisPat.Pat.DisplayName;
+                    arr_details = { displayName, func };
+                    GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
+                    break;
+                case 'volunteer':
+                    const ridePatWith_ThisDriver = arr_rides.find((r) => {
+
+                        if (r.Drivers.length > 0) {
+                            return r.Drivers[0].Id === parseInt(objId);
+                        }
+                    });
+                    displayName = ridePatWith_ThisDriver.Drivers[0].DisplayName;
+                    arr_details = { displayName, func };
+                    GENERAL.VOLUNTEERS.setVolunteersList(JSON.stringify(arr_details));
+                    break;
+            }
+
+        }
+
+
         function wiringDataTables() {
             //manage button clicks on tables
+
+
+            //#region remove ridepat
+            $('#datatable-morning tbody').on('click', '.remove', function () {
+                confirmDelete(this, tMorning);
+            });
+
+            $('#datatable-afternoon tbody').on('click', '.remove', function () {
+                confirmDelete(this, tAfternoon);
+            });
+
+            $('#datatable-tomorrow tbody').on('click', '.remove', function () {
+                confirmDelete(this, tTomorrow);
+            });
+
+            $('#datatable-future tbody').on('click', '.remove', function () {
+                confirmDelete(this, tFuture);
+            });
+            //#endregion
+
+            //#region edit ridepat
+            $('#datatable-morning tbody').on('click', '.edit', function () {
+                editButton(this);
+            });
+
+            $('#datatable-afternoon tbody').on('click', '.edit', function () {
+                editButton(this);
+            });
+
+
+            $('#datatable-tomorrow tbody').on('click', '.edit', function () {
+                editButton(this);
+            });
+
+            $('#datatable-future tbody').on('click', '.edit', function () {
+                editButton(this);
+            });
+            //#endregion
+
+
+
+
+            //#region show target form
+            /*
+             IMPORTANT NOTE
+             the event is mouseup in order to catch all scenarios.
+
+             */
+            $('#datatable-morning tbody').on('mouseup', '.showMe', function () {
+                let targetObj = {};
+                targetObj.objId = $(this).attr('id');
+                targetObj.objName = $(this).attr("data-obj");
+
+                showMe(targetObj);
+
+            });
+
+            $('#datatable-afternoon tbody').on('mouseup', '.showMe', function () {
+                let targetObj = {};
+                targetObj.objId = $(this).attr('id');
+                targetObj.objName = $(this).attr("data-obj");
+
+                showMe(targetObj);
+            });
+
+
+            $('#datatable-tomorrow tbody').on('mouseup', '.showMe', function () {
+                let targetObj = {};
+                targetObj.objId = $(this).attr('id');
+                targetObj.objName = $(this).attr("data-obj");
+
+                showMe(targetObj);
+            });
+
+            $('#datatable-future tbody').on('mouseup', '.showMe', function () {
+
+                let targetObj = {};
+                targetObj.objId = $(this).attr('id');
+                targetObj.objName = $(this).attr("data-obj");
+
+                showMe(targetObj);
+
+            });
+            //#endregion
+
+
 
             //$('#datatable-morning tbody').on('click', '#candidatesBtn', function () {
             //    candidatesButton(this);
@@ -106,70 +222,6 @@
             //$('#datatable-tomorrow tbody').on('click', '#candidatesBtn', function () {
             //    candidatesButton(this);
             //});
-
-            //$('#datatable-morning tbody').on('click', '#show', function () {
-            //    showButton(this);
-            //});
-
-            //$('#datatable-afternoon tbody').on('click', '#show', function () {
-            //    showButton(this);
-            //});
-
-            //$('#datatable-future tbody').on('click', '#show', function () {
-            //    showButton(this);
-            //});
-
-            //$('#datatable-tomorrow tbody').on('click', '#show', function () {
-            //    showButton(this);
-            //});
-
-            $('#datatable-morning tbody').on('click', '.remove', function () {
-                confirmDelete(this, tMorning);
-            });
-
-            $('#datatable-afternoon tbody').on('click', '.remove', function () {
-                confirmDelete(this, tAfternoon);
-            });
-
-            $('#datatable-future tbody').on('click', '.remove', function () {
-                confirmDelete(this, tFuture);
-            });
-
-            $('#datatable-tomorrow tbody').on('click', '.remove', function () {
-                confirmDelete(this, tTomorrow);
-            });
-
-            $('#datatable-morning tbody').on('click', '.edit', function () {
-                editButton(this);
-            });
-
-            $('#datatable-afternoon tbody').on('click', '.edit', function () {
-                editButton(this);
-            });
-
-            $('#datatable-future tbody').on('click', '.edit', function () {
-                editButton(this);
-            });
-
-            $('#datatable-tomorrow tbody').on('click', '.edit', function () {
-                editButton(this);
-            });
-            //$('#datatable-morning tbody').on('click', '#backup', function () {
-            //    backupToPrimaryButton(this);
-            //});
-
-            //$('#datatable-afternoon tbody').on('click', '#backup', function () {
-            //    backupToPrimaryButton(this);
-            //});
-
-            //$('#datatable-future tbody').on('click', '#backup', function () {
-            //    backupToPrimaryButton(this);
-            //});
-
-            //$('#datatable-tomorrow tbody').on('click', '#backup', function () {
-            //    backupToPrimaryButton(this);
-            //});
-
 
 
 
@@ -197,14 +249,6 @@
                 refreshInterval = setInterval("refreshTable()", refreshTime);
 
             });
-
-
-
-
-            //$(document).on("change", 'select[name ="datatable-future_length"]', function () {
-            //    localStorage.futurePageLength = $('select[name ="datatable-future_length"]').val();
-            //})
-            // var isAssistant
 
             if (!JSON.parse(localStorage.getItem("isProductionDatabase"))) {
                 $("#databaseType").text("Test database ")
@@ -236,9 +280,7 @@
                 var userName = GENERAL.USER.getUserDisplayName();
                 $("#userName").html(userName);
             }
-            splitHour = 12; //The hourthat seperates morning and afternoon ridepats
 
-            //  document.getElementById("Numbers").checked = localStorage.numbers === 'true';
 
             deceideWhichTable2Show();
 
@@ -397,6 +439,7 @@
                 $('#openSortsControllers').prop('disabled', true);
                 $('#allSortsLabel').html('הפעל סינון');
             }
+
 
 
         });
@@ -871,36 +914,6 @@
 
         }
 
-        const showMe = (spanElement, objName) => {
-
-            const func = 'edit';
-            let displayName;
-            let arr_details;
-
-            switch (objName) {
-                case 'patient':
-                    const ridePatWith_ThisPat = arr_rides.find(r => r.Pat.Id === parseInt(spanElement.id));
-                    displayName = ridePatWith_ThisPat.Pat.DisplayName;
-                    arr_details = { displayName, func };
-                    GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
-                    open(`${objName}form.html`, '_blank');
-                    break;
-                case 'volunteer':
-                    const ridePatWith_ThisDriver = arr_rides.find((r) => {
-
-                        if (r.Drivers.length > 0) {
-                            return r.Drivers[0].Id === parseInt(spanElement.id);
-                        }
-                    });
-                    displayName = ridePatWith_ThisDriver.Drivers[0].DisplayName;
-                    arr_details = { displayName, func };
-                    GENERAL.VOLUNTEERS.setVolunteersList(JSON.stringify(arr_details));
-                    open(`${objName}form.html`, '_blank');
-                    break;
-            }
-
-        }
-
         function refreshTable() {
             $('#wait').show();
 
@@ -1045,8 +1058,8 @@
                             patient_English_Name2render = "<span class='boldFont'>patient</span>";
                         } else {
 
-                            patientName2render = `<span onclick='showMe(this, "patient")' class='blueFont clickable boldFont' id='${arr_rides[i].Pat.Id}'>${arr_rides[i].Pat.DisplayName}</span>`;
-                            patient_English_Name2render = `<span onclick='showMe(this, "patient")' class='blueFont clickable boldFont' id='${arr_rides[i].Pat.Id}'>${arr_rides[i].Pat.EnglishName}</span>`;
+                            patientName2render = `<a href="patientform.html" data-obj="patient" class='showMe blueFont clickable boldFont' id='${arr_rides[i].Pat.Id}'>${arr_rides[i].Pat.DisplayName}</a>`;
+                            patient_English_Name2render = `<a href="patientform.html" data-obj="patient" class='showMe blueFont clickable boldFont' id='${arr_rides[i].Pat.Id}'>${arr_rides[i].Pat.EnglishName}</a>`;
                         }
                         //#endregion
 
@@ -1068,7 +1081,8 @@
                                     DisplayName
                             }
 
-                            driverSpan = `<span class="driverName clickable blueFont boldFont" onclick='showMe(this, "volunteer")' id='${arr_rides[i].Drivers[0].Id}'>${driverSpanContent}</span>`;
+                      
+                            driverSpan = `<a href="volunteerform.html" data-obj="volunteer" class="showMe driverName clickable blueFont boldFont" id='${arr_rides[i].Drivers[0].Id}'>${driverSpanContent}</a>`;
                             driverSpan += `<span class="driverCellPhone">${addSeperator2MobileNum(arr_rides[i].Drivers[0].CellPhone, '-')}</span>`;
                         } else {
 
