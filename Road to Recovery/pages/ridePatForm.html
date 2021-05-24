@@ -964,7 +964,6 @@
             if (patient.EscortedList.length > 0) {
                 EscortedList = patient.EscortedList;
                 let str = '';
-                //
                 for (var i = 0; i < EscortedList.length; i++) {
                     str += `<input id='escortCB${EscortedList[i].Id}' type=checkbox name='${EscortedList[i].EnglishName}' ${i === 0 && markThe1stEscort ? 'checked' : ''} >&nbsp`;
                     str += `<label data-toggle='tooltip' title='${EscortedList[i].EnglishName}' for='escortCB${EscortedList[i].Id}'>${EscortedList[i].DisplayName}</label>&nbsp&nbsp</br>`;
@@ -975,7 +974,7 @@
                 $("#selectEscort").html('');
             }
 
-            $('#remark').val(patient.Remarks);
+           // $('#remark').val(patient.Remarks); //Amir request not to show a patient remark by default to any new ridepat...
             $('#remark').prop('disabled', false);
             $('#PatientIdentity').val(patient.PatientIdentity);
 
@@ -990,13 +989,6 @@
                 (patient.Barrier.Type === 'כללית' || patient.Hospital.Type === 'כללית')
             ) {
 
-                /*
-       title=""
-
-
-       data-original-title="Select Origin   اختر نقطة الانطلاق"
-
-                 */
                 $('#Origin').prop('disabled', true);
                 $("#Origin").wrap(`<span style='background: yellow;' data-toggle="tooltip" title="השדה לא ניתן לשינוי כשהנסיעה היא של חולה אנונימי בציר כללי" class="d-inline-block" tabindex="0"></span>`);
                 $('#Destination').prop('disabled', true);

@@ -1300,17 +1300,21 @@
                                             break;
 
                                         case 4: //driver
+                                            //this code is identical to the one in datatable-tomorrow when can need to change to 1 function
+
                                             if (cellData.indexOf('אין!') !== -1) {
 
-                                                if (rowData['time'] === 'אחה"צ') {
-                                                    cell.style.color = "white";
-                                                    cell.style.fontWeight = "bold";
-                                                    cell.style.backgroundColor = "red";
-                                                    return;
-                                                }
 
                                                 let now = new Date();
-                                                let ridePatTime_td = $.trim(rowData['time']).split(':');
+                                                let ridePatTime_td;
+                                                if (rowData['time'] === 'אחה"צ') {
+
+                                                    ridePatTime_td = [12, 0];
+                                                } else {
+
+                                                    ridePatTime_td = $.trim(rowData['time']).split(':');
+                                                }
+
 
                                                 let ridePatTimeObj = {
                                                     hh: parseInt(ridePatTime_td[0]),
@@ -1387,15 +1391,17 @@
                                 targets: 5, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //5 is driver column
                                     if (cellData.indexOf('אין!') !== -1) {
 
-                                        if (rowData['time'] === 'אחה"צ') {
-                                            cell.style.color = "white";
-                                            cell.style.fontWeight = "bold";
-                                            cell.style.backgroundColor = "red";
-                                            return;
-                                        }
 
+                                        //this code is identical to the one in datatable-afternoon when can need to change to 1 function
                                         let now = new Date();
-                                        let ridePatTime_td = $.trim(rowData['time']).split(':');
+                                        let ridePatTime_td;
+                                        if (rowData['time'] === 'אחה"צ') {
+
+                                            ridePatTime_td = [12, 0];
+                                        } else {
+
+                                            ridePatTime_td = $.trim(rowData['time']).split(':');
+                                        }
 
                                         let ridePatTimeObj = {
                                             hh: parseInt(ridePatTime_td[0]),
