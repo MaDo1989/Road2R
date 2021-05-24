@@ -975,7 +975,7 @@
                 $("#selectEscort").html('');
             }
 
-            $('#remark').val(patient.Remarks);
+           // $('#remark').val(patient.Remarks); //Amir request not to show a patient remark by default to any new ridepat...
             $('#remark').prop('disabled', false);
             $('#PatientIdentity').val(patient.PatientIdentity);
 
@@ -990,13 +990,6 @@
                 (patient.Barrier.Type === 'כללית' || patient.Hospital.Type === 'כללית')
             ) {
 
-                /*
-       title=""
-
-
-       data-original-title="Select Origin   اختر نقطة الانطلاق"
-
-                 */
                 $('#Origin').prop('disabled', true);
                 $("#Origin").wrap(`<span style='background: yellow;' data-toggle="tooltip" title="השדה לא ניתן לשינוי כשהנסיעה היא של חולה אנונימי בציר כללי" class="d-inline-block" tabindex="0"></span>`);
                 $('#Destination').prop('disabled', true);
