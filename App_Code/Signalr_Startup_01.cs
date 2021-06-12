@@ -3,7 +3,7 @@ using Owin;
 using System;
 using System.Threading.Tasks;
 
-[assembly: OwinStartup(typeof(Signalr_Startup_01))]
+[assembly: OwinStartup("ProductionConfiguration", typeof(Signalr_Startup_01))]
 
 public class Signalr_Startup_01
 {
