@@ -116,7 +116,7 @@ input:checked + .slider:before {
 }
 
 .customWidth4column {
-    width: 10vw;
+    width: 5vw;
 }
 
 .clickable:hover {
@@ -124,14 +124,14 @@ input:checked + .slider:before {
     color: mediumblue;
     border-bottom: solid mediumblue 1px;
     max-width: fit-content;
-                /*↑ works great in chrome*/
+    /*↑ works great in chrome*/
 }
 
 .driverName, .driverCellPhone {
     display: block;
 }
 
-.equipments-img{
+.equipments-img {
     height: 2vh;
 }
 
@@ -143,18 +143,24 @@ input:checked + .slider:before {
     font-weight: bold;
 }
 
-.block{
+.block {
     display: block;
 }
 
-.redBackGround{
+.redBackGround {
     background: red;
 }
 
-.whiteFont{
+.whiteFont {
     color: white;
 }
 
-.ltr{
+.ltr {
     direction: ltr;
+}
+
+.btnsInSameLine {
+    display: flex;
+    justify-content: center;
+    width: 100px;
 }
