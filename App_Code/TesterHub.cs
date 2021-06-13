@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-public class ChatHub : Hub
+public class TesterHub : Hub
 {
-    public void Send(string name, string message)
+    public void BroadCastNotification(string notification)
     {
-        Clients.All.broadcastMessage(name, message);
+        Clients.All.spreadtheWord(notification);
     }
 }

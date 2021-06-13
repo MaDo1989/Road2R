@@ -11,6 +11,7 @@ using System.Web.UI;
 using System.Configuration;
 using System.Collections;
 using System.Activities.Statements;
+using Microsoft.AspNet.SignalR;
 
 /// <summary>
 /// Summary description for WebService
@@ -2114,6 +2115,43 @@ public class WebService : System.Web.Services.WebService
 
     }
     #endregion
+
+    #region SIGNALR
+
+    [WebMethod(EnableSession = true)]
+    public void TestServerSideSignalR()
+    {
+        try
+        {
+
+
+            // Get the context for the Pusher hub
+            IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<TesterHub>();
+
+            hubContext.Clients.All.spreadtheWord("test signal r on server");
+
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
+
+
+    #endregion
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 
