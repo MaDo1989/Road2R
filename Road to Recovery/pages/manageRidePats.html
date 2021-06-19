@@ -26,6 +26,12 @@
 
         $.connection.hub.start().done();
 
+            /*
+                NOT FINISHED! THERE IS A BUG TO FIX
+                WHEN THE CHANGE KICKS IN 
+                THE LINK TO THE VOLUNTEER PAGE (THE DRIVER)
+                IS BROKEN.
+             */
 
         notification.client.ridePatHasUpdated = function (updated_ridePat) {
 
@@ -68,25 +74,13 @@
             changeStyle.background = '#f9f9f9'
             changeStyle.color = '#797979';
 
-
         }
 
 
 
         /*
-                     steps to manipolate the DOM
 
-                         let x = tMorning.row('#40398').data()
-
-                x.driver = "I lone datatable API"
-
-                x.driver = 'I ♥ datatable API'
-                "I ♥ datatable API"
-                tMorning.row('#40672').data(x).draw();
-                _Api [Array(1), context: Array(1), selector: {…}, tables: ƒ, table: ƒ, draw: ƒ, …]
-                tMorning.row('#40398').data(x).draw();
-                _Api [Array(1), context: Array(1), selector: {…}, tables: ƒ, table: ƒ, draw: ƒ, …]
-
+case when deleting a driver ...?
 
 3. create amir's UI and update it both new text on the roller and color of lastMODIFIED
          */
