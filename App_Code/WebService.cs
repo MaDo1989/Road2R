@@ -2124,12 +2124,10 @@ public class WebService : System.Web.Services.WebService
         try
         {
 
-
-            // Get the context for the Pusher hub
+            // Get the context for the Tester hub since you can't use a hub class as instance
+            //(due to its many pipeline functions)
             IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<TesterHub>();
-
-            hubContext.Clients.All.spreadtheWord("test signal r on server");
-
+            hubContext.Clients.All.spreadtheWord("test signalr send from server → clients");
         }
         catch (Exception e)
         {
