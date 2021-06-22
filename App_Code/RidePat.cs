@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Web.Script.Serialization;
 
@@ -851,7 +852,7 @@ public class RidePat
             //    v2.DriverType = "Secondary";
             //    rp.Drivers.Add(v2);
             //}
-            
+
             rp.pat.EscortedList = new List<Escorted>();
             rp.Escorts = new List<Escorted>();
 
@@ -1607,11 +1608,17 @@ public class RidePat
         RidePatNum = rp.RidePatNum;
 
 
-        //if in this month → inform clients on manageridpats 
-        //+ What about realtime in viewridepats and weeklyrides?
-        IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<RidePatHub>();
-        hubContext.Clients.All.ridePatHasUpdated(rp);
+        
 
+        if ((Date - timeRightNow).Days <= 30)
+        {//case in this month → inform clients on manageridpats.html
+            Thread t = new Thread(()=> {
+                Activate_ridePatHasUpdated_onAdiffThread(rp);
+            });
+
+            t.Start();
+        }
+        
         if (Date > timeRightNow)
         {
             try
@@ -1630,6 +1637,12 @@ public class RidePat
 
         return RideId;
 
+    }
+
+    private void Activate_ridePatHasUpdated_onAdiffThread(RidePat rp)
+    {
+        IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<RidePatHub>();
+        hubContext.Clients.All.ridePatHasUpdated(rp);
     }
 
     public int LeaveRidePat(int ridePatId, int rideId, int driverId)
