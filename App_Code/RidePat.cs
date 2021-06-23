@@ -1612,11 +1612,8 @@ public class RidePat
 
         if ((Date - timeRightNow).Days <= 30)
         {//case in this month → inform clients on manageridpats.html
-            Thread t = new Thread(()=> {
-                Activate_ridePatHasUpdated_onAdiffThread(rp);
-            });
-
-            t.Start();
+            IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<RidePatHub>();
+            hubContext.Clients.All.ridePatHasUpdated(rp);
         }
         
         if (Date > timeRightNow)
@@ -1632,19 +1629,8 @@ public class RidePat
 
         }
 
-
-
-
-        return RideId;
-
+       return RideId;
     }
-
-    private void Activate_ridePatHasUpdated_onAdiffThread(RidePat rp)
-    {
-        IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<RidePatHub>();
-        hubContext.Clients.All.ridePatHasUpdated(rp);
-    }
-
     public int LeaveRidePat(int ridePatId, int rideId, int driverId)
     {
 

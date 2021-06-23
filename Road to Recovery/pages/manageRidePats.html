@@ -21,27 +21,25 @@
     <script src="../../signalr/hubs"></script>
     <script>
 
-        const { ajaxCall } = GENERAL.FETCH_DATA;
         const notification = $.connection.ridePatHub;
-
         $.connection.hub.start().done();
-
-        /*
-            NOT FINISHED! THERE IS A BUG TO FIX
-            WHEN THE CHANGE KICKS IN
-            THE LINK TO THE VOLUNTEER PAGE (THE DRIVER)
-            IS BROKEN.
-         */
 
         notification.client.ridePatHasUpdated = function (updated_ridePat) {
 
+            /*   *********************
+                 * !!! IMPORTANT !!! *
+                 ********↓↓↓**********/
 
-            //update the specific ride in arr_rides IMPORTANT
+            //update the specific ride in arr_rides:
             const index = arr_rides.findIndex(r => r.RidePatNum === updated_ridePat.RidePatNum)
             arr_rides[index] = updated_ridePat;
 
+            /*  *********↑↑↑*********
+                * !!! IMPORTANT !!! *
+                *********************/
+                
             let ridepat_tr = document.getElementById(updated_ridePat.RidePatNum);
-            let table2manipulate = ridepat_tr.closest('table').id // = for example: "datatable-morning"
+            let table2manipulate = ridepat_tr.closest('table').id
             let ridepat_tr_2manipulate;
 
             switch (table2manipulate) {
@@ -91,88 +89,18 @@ case when deleting a driver ...?
 
 
         /*
-        $(document).ready(() => {
-            alert(updatedRidePat.RidePatNum);
-        });
-
-            //code which manipulates the DOM
-            $('#sendTextBtn2').click(() => {
-                ajaxCall(
-                    'TestServerSideSignalR',
-                    '',
-                    TestServerSideSignalR_SCB,
-                    TestServerSideSignalR_ECB
-                );
-
-
-            });
-
-        const TestServerSideSignalR_SCB = (res) => {
-            console.log(tMorning);
-            console.log('works fine - ', res)
-        }
-        const TestServerSideSignalR_ECB = (err) => { console.log(err) }
-
-
-
-
-
-        details needed:
-
-            case of added driver
-                1. ridepatId
-                2. driver name and id
-
-
-
-
-
-
-       driverSpan = `<a href="volunteerform.html" data-obj="volunteer" class="showMe driverName clickable blueFont boldFont" id='${arr_rides[i].Drivers[0].Id}'>${driverSpanContent}</a>`;
-                            driverSpan += `<span class="driverCellPhone">${addSeperator2MobileNum(arr_rides[i].Drivers[0].CellPhone, '-')}</span>`;
-
-
 
             case of remove a driver
                 change content to:
                     driverSpan = 'אין!<br/>None!';
-
-
-
-
-
-
-
-
-
-            steps to manipolate the DOM
-         1. find table:
-            x = document.getElementById('40398')
-            x.closest('table').id // = for example: "datatable-morning"
-
-         2.
-
-         let x = tMorning.row('#40398').data()
-undefined
-x.driver = 'I lone datatable API'
-"I lone datatable API"
-x.driver = 'I ♥ datatable API'
-"I ♥ datatable API"
-tMorning.row('#40672').data(x).draw();
-_Api [Array(1), context: Array(1), selector: {…}, tables: ƒ, table: ƒ, draw: ƒ, …]
-tMorning.row('#40398').data(x).draw();
-_Api [Array(1), context: Array(1), selector: {…}, tables: ƒ, table: ƒ, draw: ƒ, …]
-
-
-3. create amir's UI and update it both new text on the roller and color of lastMODIFIED
          */
 
 
     </script>
 
     <!-- #endregion REAL-TIME BY SIGNALR - FOR ANY COMPLAINTS WHATSOEVER YOU CAN TALK 2 YOGEV -->
-    <!-- DataTables -->
 
+    <!-- DataTables -->
     <link href="../plugins/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
     <link href="../plugins/datatables/buttons.bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="../plugins/datatables/fixedHeader.bootstrap.min.css" rel="stylesheet" type="text/css" />
