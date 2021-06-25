@@ -1585,6 +1585,14 @@
 
             let patientName = $("#pat").val().trim();
 
+            if (isAssistant && patientName.includes('אנונימי')) {
+                return swal(
+                    "PAY ATTENTION",
+                    "Sorry, an assistant account cannot modify an anonymous patient's ride information",
+                    "warning"
+                );
+            }
+
             for (var i = 0; i < patients_Names.length; i++) {
                 patientExists = patientName === patients_Names[i].trim();
                 if (patientExists) {
