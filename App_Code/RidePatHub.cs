@@ -9,7 +9,7 @@ public class RidePatHub : Hub
 {
     public void BroadCast_driverAssigning(RidePat rp)
     {
-        Clients.All.ridePatHasUpdated(rp);
+        Clients.All.driverHasAssigned2RidePat(rp);
     }
 
 }

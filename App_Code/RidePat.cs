@@ -1607,15 +1607,12 @@ public class RidePat
         RidePat rp = GetRidePat(ridePatId);
         RidePatNum = rp.RidePatNum;
 
-
-        
-
         if ((Date - timeRightNow).Days <= 30)
         {//case in this month → inform clients on manageridpats.html
             IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<RidePatHub>();
-            hubContext.Clients.All.ridePatHasUpdated(rp);
+            hubContext.Clients.All.driverHasAssigned2RidePat(rp);
         }
-        
+
         if (Date > timeRightNow)
         {
             try
@@ -1629,7 +1626,7 @@ public class RidePat
 
         }
 
-       return RideId;
+        return RideId;
     }
     public int LeaveRidePat(int ridePatId, int rideId, int driverId)
     {
