@@ -38,7 +38,8 @@
                 *********************/
             let ridepat_tr = document.getElementById(updated_ridePat.RidePatNum);
             let table2manipulate = ridepat_tr.closest('table').id
-            let thisRidePatDate = new Date(updated_ridePat.Date);
+            let thisRidePatDate = new Date(new Date(updated_ridePat.Date) - new Date().getTimezoneOffset() * 60000);
+            let thisRidePatLastModified = new Date(new Date(updated_ridePat.LastModified) - new Date().getTimezoneOffset() * 60000);
             let row2manipulate;
 
             switch (table2manipulate) {
@@ -53,7 +54,7 @@
                     row2manipulate.patient = buildPatientHTML(updated_ridePat);
                     row2manipulate.driver = buildDriverHTML(updated_ridePat.Drivers[0]);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
-                    row2manipulate.lastModified = new Date(updated_ridePat.LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                    row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
                     row2manipulate.remark = updated_ridePat.Remark;
 
@@ -70,7 +71,7 @@
                     row2manipulate.patient = buildPatientHTML(updated_ridePat);
                     row2manipulate.driver = buildDriverHTML(updated_ridePat.Drivers[0]);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
-                    row2manipulate.lastModified = new Date(updated_ridePat.LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                    row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
                     row2manipulate.remark = updated_ridePat.Remark;
 
@@ -88,7 +89,7 @@
                     row2manipulate.patient = buildPatientHTML(updated_ridePat);
                     row2manipulate.driver = buildDriverHTML(updated_ridePat.Drivers[0]);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
-                    row2manipulate.lastModified = new Date(updated_ridePat.LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                    row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
                     row2manipulate.remark = updated_ridePat.Remark;
 
@@ -106,7 +107,7 @@
                     row2manipulate.patient = buildPatientHTML(updated_ridePat);
                     row2manipulate.driver = buildDriverHTML(updated_ridePat.Drivers[0]);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
-                    row2manipulate.lastModified = new Date(updated_ridePat.LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                    row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
                     row2manipulate.remark = updated_ridePat.Remark;
 
