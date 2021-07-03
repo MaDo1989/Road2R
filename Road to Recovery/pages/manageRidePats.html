@@ -22,6 +22,32 @@
     <script src="../../signalr/hubs"></script>
     <script>
 
+        //function to reuse
+        const update_arr_rides = (updated_ridePat) => {
+            const index = arr_rides.findIndex(r => r.RidePatNum === updated_ridePat.RidePatNum)
+            arr_rides[index] = updated_ridePat;
+        }
+
+        const getTableName2Manipulate = (ridePatNum) => {
+            let tableName2manipulate;
+            if (typeof tMorning.row(`#${ridePatNum}`).data() !== 'undefined') {
+                tableName2manipulate = 'datatable-morning';
+            } else if (typeof tAfternoon.row(`#${ridePatNum}`).data() !== 'undefined') {
+                tableName2manipulate = 'datatable-afternoon';
+            } else if (typeof tTomorrow.row(`#${ridePatNum}`).data() !== 'undefined') {
+                tableName2manipulate = 'datatable-tomorrow';
+            } else if (typeof tFuture.row(`#${ridePatNum}`).data() !== 'undefined') {
+                tableName2manipulate = 'datatable-future';
+            } else {
+                tableName2manipulate = 'table did not found...';
+            }
+            return tableName2manipulate;
+        }
+
+        const fixDate_WhichComeFromOpenConnection = (date2fix) => {
+            return new Date(new Date(date2fix) - new Date().getTimezoneOffset() * 60000);
+        }
+
         const notification = $.connection.ridePatHub;
         $.connection.hub.start().done();
         notification.client.driverHasAssigned2RidePat = function (updated_ridePat) {
@@ -29,20 +55,18 @@
             /*   *********************
                  * !!! IMPORTANT !!! *
                  ********↓↓↓**********/
-
             //update the specific ride in arr_rides:
-            const index = arr_rides.findIndex(r => r.RidePatNum === updated_ridePat.RidePatNum)
-            arr_rides[index] = updated_ridePat;
+            update_arr_rides(updated_ridePat);
             /*  *********↑↑↑*********
                 * !!! IMPORTANT !!! *
                 *********************/
-            let ridepat_tr = document.getElementById(updated_ridePat.RidePatNum);
-            let table2manipulate = ridepat_tr.closest('table').id
-            let thisRidePatDate = new Date(new Date(updated_ridePat.Date) - new Date().getTimezoneOffset() * 60000);
-            let thisRidePatLastModified = new Date(new Date(updated_ridePat.LastModified) - new Date().getTimezoneOffset() * 60000);
+
+            let tableName2manipulate = getTableName2Manipulate(updated_ridePat.RidePatNum);
+            let thisRidePatDate = fixDate_WhichComeFromOpenConnection(updated_ridePat.Date);
+            let thisRidePatLastModified = fixDate_WhichComeFromOpenConnection(updated_ridePat.LastModified);
             let row2manipulate;
 
-            switch (table2manipulate) {
+            switch (tableName2manipulate) {
 
                 case 'datatable-morning':
 
@@ -58,7 +82,7 @@
                     row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
                     row2manipulate.remark = updated_ridePat.Remark;
 
-                    tMorning.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw();
+                    tMorning.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
                     break;
 
                 case 'datatable-afternoon':
@@ -75,7 +99,7 @@
                     row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
                     row2manipulate.remark = updated_ridePat.Remark;
 
-                    tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw();
+                    tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
                     break;
 
                 case 'datatable-tomorrow':
@@ -93,7 +117,7 @@
                     row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
                     row2manipulate.remark = updated_ridePat.Remark;
 
-                    tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw();
+                    tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
                     break;
 
                 case 'datatable-future':
@@ -111,45 +135,120 @@
                     row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
                     row2manipulate.remark = updated_ridePat.Remark;
 
-                    tFuture.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw();
+                    tFuture.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
                     break;
 
+                default:
+                    console.log('system recognized a tempt of the server to post real-time data but failed to found the rellevant row to redraw');
+                    break;
             }
 
+            let ridepat_tr = document.getElementById(updated_ridePat.RidePatNum);
+            if (ridepat_tr) {//only rendered rows can be edited.
 
-            change_driver_td_Style = ridepat_tr.getElementsByClassName('driver_td')[0].style
-            change_driver_td_Style.color = '#797979';
+                let change_driver_td_Style = ridepat_tr.getElementsByClassName('driver_td')[0].style
+                change_driver_td_Style.color = '#797979';
 
+                if (updated_ridePat.Pat.IsAnonymous === 'True') {
+                    if (tableName2manipulate !== 'datatable-future') {
 
-
-            if (updated_ridePat.Pat.IsAnonymous === 'True') {
-
-                ridepat_tr.style.background = '#FFEF8F';
-                change_driver_td_Style.background = '#FFEF8F';
-            } else {
-                change_driver_td_Style.background = '#f9f9f9'  //only driver td
+                        ridepat_tr.style.background = '#FFEF8F';
+                        change_driver_td_Style.background = '#FFEF8F';
+                    }
+                } else {
+                    change_driver_td_Style.background = '#f9f9f9'  //only driver td
+                }
             }
 
         }
 
+        notification.client.driverHasRemovedFromRidePat = function (updated_ridePat) {
+            /*********************
+             * !!! IMPORTANT !!! *
+             ********↓↓↓**********/
+            //update the specific ride in arr_rides:
+            update_arr_rides(updated_ridePat);
+            /*********↑↑↑*********
+             * !!! IMPORTANT !!! *
+             *********************/
 
+            let tableName2manipulate = getTableName2Manipulate(updated_ridePat.RidePatNum);
+            let thisRidePatDate = fixDate_WhichComeFromOpenConnection(updated_ridePat.Date);
+            let thisRidePatLastModified = fixDate_WhichComeFromOpenConnection(updated_ridePat.LastModified);
+            let row2manipulate;
 
-        /*
+            switch (tableName2manipulate) {
 
-case when deleting a driver ...?
+                case 'datatable-morning':
 
-3. create amir's UI and update it both new text on the roller and color of lastMODIFIED
-         */
+                    row2manipulate = tMorning.row(`#${updated_ridePat.RidePatNum}`).data();
 
+                    row2manipulate.driver = 'אין!<br/>None!';;
+                    row2manipulate.status = buildStatusString(updated_ridePat.Status);
+                    row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
 
-        /*
+                    tMorning.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                    break;
 
-            case of remove a driver
-                change content to:
-                    driverSpan = 'אין!<br/>None!';
-         */
+                case 'datatable-afternoon':
 
+                    row2manipulate = tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data();
 
+                    row2manipulate.driver = 'אין!<br/>None!';;
+                    row2manipulate.status = buildStatusString(updated_ridePat.Status);
+                    row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+
+                    tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                    break;
+
+                case 'datatable-tomorrow':
+
+                    row2manipulate = tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data();
+
+                    row2manipulate.driver = 'אין!<br/>None!';;
+                    row2manipulate.status = buildStatusString(updated_ridePat.Status);
+                    row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+
+                    tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                    break;
+
+                case 'datatable-future':
+
+                    row2manipulate = tFuture.row(`#${updated_ridePat.RidePatNum}`).data();
+
+                    row2manipulate.driver = 'אין!<br/>None!';;
+                    row2manipulate.status = buildStatusString(updated_ridePat.Status);
+                    row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+
+                    tFuture.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                    break;
+
+                default:
+                    console.log('system recognized a tempt of the server to post real-time data but failed to found the rellevant row to redraw');
+                    break;
+            }
+
+            let ridepat_tr = document.getElementById(updated_ridePat.RidePatNum);
+            if (ridepat_tr) {//only rendered rows can be edited.
+
+                ridepat_tr.style.background = '#f9f9f9';//back to default 
+                let change_driver_td_Style = ridepat_tr.getElementsByClassName('driver_td')[0].style
+
+                const timeNeed2bAdded = tableName2manipulate === 'datatable-afternoon' || tableName2manipulate === 'datatable-tomorrow';
+                const hh = thisRidePatDate.getHours();
+                const mm = thisRidePatDate.getMinutes();
+                const { fontColor, fontWeight, backgroundColor } =
+                    timeNeed2bAdded ?
+                    styleManager.getSuitableStyle_4thisTime(tableName2manipulate, hh, mm)
+                    :
+                    styleManager.getSuitableStyle_4thisTime(tableName2manipulate);
+
+                change_driver_td_Style.color = fontColor;
+                change_driver_td_Style.fontWeight = fontWeight;
+                change_driver_td_Style.background = backgroundColor;
+
+            }
+        }
     </script>
 
     <!-- #endregion REAL-TIME BY SIGNALR - FOR ANY COMPLAINTS WHATSOEVER YOU CAN TALK 2 YOGEV -->
@@ -198,6 +297,12 @@ case when deleting a driver ...?
 
 
     <script>
+        /*
+         NOTICE THIS:
+         אחה"צ
+         calculation   wise: its value is 12:00 (like when we calaulate hours gap between the present and a given ridepat)
+         table sorting wise: its value is Infinity or negetive Infinity
+         */
         checkCookie();
         var destinationName = "";
         var originName = "";
@@ -1066,6 +1171,80 @@ case when deleting a driver ...?
 
         }
 
+        const styleManager = {
+            defaultStyle: {
+                fontColor: "#797979",
+                fontWeight: "",
+                backgroundColor: "",
+            },
+
+            getSuitableStyle_4thisTime: (tableName, hh = -1, mm = -1) => {
+                let calculatedStyle;
+
+                switch (tableName) {
+                    case "datatable-morning":
+                        calculatedStyle = {
+                            fontColor: "white",
+                            fontWeight: "bold",
+                            backgroundColor: "red",
+                        };
+                        break;
+                    case "datatable-afternoon":
+                        calculatedStyle = styleManager.calculateStyle_24HoursRange(hh, mm);
+                        break;
+                    case "datatable-tomorrow":
+                        calculatedStyle = styleManager.calculateStyle_24HoursRange(
+                            hh,
+                            mm,
+                            false
+                        );
+                        break;
+                    case "datatable-future":
+                        calculatedStyle = styleManager.defaultStyle;
+                        break;
+                }
+                return calculatedStyle;
+            },
+
+            calculateStyle_24HoursRange: (hh, mm, isToday = true) => {
+                let calculatedStyle = {};
+
+                let now = new Date();
+                let ridePatTimeObj = {
+                    hh: parseInt(hh),
+                    mm: parseInt(mm),
+                };
+                const addons = isToday ? 0 : 1;
+
+                let ridePatTime = new Date(
+                    now.getFullYear(),
+                    now.getMonth(),
+                    now.getDate() + addons,
+                    ridePatTimeObj.hh,
+                    ridePatTimeObj.mm
+                );
+
+                let miliSeconds_gap = ridePatTime - now;
+                let hours_gap = miliSeconds_gap / (1000 * 60 * 60); //1000 ms in 1 sec, 60 sec in 1m, 60 min in 1h
+
+                if (hours_gap >= 0 && hours_gap <= 24) {
+                    calculatedStyle.fontColor = "white";
+                    calculatedStyle.fontWeight = "bold";
+
+                    if (hours_gap <= 12) {
+                        calculatedStyle.backgroundColor = "red";
+                    } else {
+                        calculatedStyle.backgroundColor = "orange";
+                    }
+                } else {
+                    calculatedStyle = styleManager.defaultStyle;
+                }
+
+                return calculatedStyle;
+            },
+        };
+
+
         function refreshTable() {
             $('#wait').show();
 
@@ -1243,9 +1422,10 @@ case when deleting a driver ...?
                                         case 4: //driver column
                                             cell.className += ' driver_td';
                                             if (cellData.indexOf('אין!') !== -1) {
-                                                cell.style.backgroundColor = "red";
-                                                cell.style.color = "white";
-                                                cell.style.fontWeight = "bold";
+                                                const calculatedStyle = styleManager.getSuitableStyle_4thisTime("datatable-morning");
+                                                cell.style.backgroundColor = calculatedStyle.backgroundColor;
+                                                cell.style.color = calculatedStyle.fontColor;
+                                                cell.style.fontWeight = calculatedStyle.fontWeight;
                                             }
                                             break;
 
@@ -1332,7 +1512,6 @@ case when deleting a driver ...?
                                             cell.className += ' driver_td';
                                             if (cellData.indexOf('אין!') !== -1) {
 
-                                                let now = new Date();
                                                 let ridePatTime_td;
                                                 if (rowData['time'] === 'אחה"צ') {
 
@@ -1342,25 +1521,13 @@ case when deleting a driver ...?
                                                     ridePatTime_td = $.trim(rowData['time']).split(':');
                                                 }
 
+                                                const hh = parseInt(ridePatTime_td[0]);
+                                                const mm = parseInt(ridePatTime_td[1]);
 
-                                                let ridePatTimeObj = {
-                                                    hh: parseInt(ridePatTime_td[0]),
-                                                    mm: parseInt(ridePatTime_td[1])
-                                                }
-                                                let ridePatTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), ridePatTimeObj.hh, ridePatTimeObj.mm);
-
-                                                let miliSeconds_gap = ridePatTime - now;
-                                                let hours_gap = miliSeconds_gap / (1000 * 60 * 60); //1000 ms in 1 sec, 60 sec in 1m, 60 min in 1h
-
-                                                if (hours_gap >= 0) {
-                                                    cell.style.color = "white";
-                                                    cell.style.fontWeight = "bold";
-                                                    if (hours_gap <= 12) {
-                                                        cell.style.backgroundColor = "red";
-                                                    } else if (hours_gap <= 24) {
-                                                        cell.style.backgroundColor = "orange";
-                                                    }
-                                                }
+                                                const calculatedStyle = styleManager.getSuitableStyle_4thisTime("datatable-afternoon", hh, mm);
+                                                cell.style.backgroundColor = calculatedStyle.backgroundColor;
+                                                cell.style.color = calculatedStyle.fontColor;
+                                                cell.style.fontWeight = calculatedStyle.fontWeight;
                                             }
                                             break;
 
@@ -1421,8 +1588,6 @@ case when deleting a driver ...?
                                     cell.className += ' driver_td';
                                     if (cellData.indexOf('אין!') !== -1) {
 
-                                        //this code is identical to the one in datatable-afternoon when can need to change to 1 function
-                                        let now = new Date();
                                         let ridePatTime_td;
                                         if (rowData['time'] === 'אחה"צ') {
 
@@ -1432,27 +1597,13 @@ case when deleting a driver ...?
                                             ridePatTime_td = $.trim(rowData['time']).split(':');
                                         }
 
-                                        let ridePatTimeObj = {
-                                            hh: parseInt(ridePatTime_td[0]),
-                                            mm: parseInt(ridePatTime_td[1])
-                                        }
-                                        let ridePatTime = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, ridePatTimeObj.hh, ridePatTimeObj.mm);
+                                        const hh = parseInt(ridePatTime_td[0]);
+                                        const mm = parseInt(ridePatTime_td[1]);
 
-                                        let miliSeconds_gap = ridePatTime - now;
-                                        let hours_gap = miliSeconds_gap / (1000 * 60 * 60); //1000 ms in 1 sec, 60 sec in 1m, 60 min in 1h
-
-                                        if (hours_gap >= 0) {
-                                            if (hours_gap <= 12) {
-                                                cell.style.color = "white";
-                                                cell.style.fontWeight = "bold";
-                                                cell.style.backgroundColor = "red";
-                                            } else if (hours_gap <= 24) {
-                                                cell.style.color = "white";
-                                                cell.style.fontWeight = "bold";
-                                                cell.style.backgroundColor = "orange";
-                                            }
-                                        }
-
+                                        const calculatedStyle = styleManager.getSuitableStyle_4thisTime("datatable-tomorrow", hh, mm);
+                                        cell.style.backgroundColor = calculatedStyle.backgroundColor;
+                                        cell.style.color = calculatedStyle.fontColor;
+                                        cell.style.fontWeight = calculatedStyle.fontWeight;
 
                                     }
                                 }
