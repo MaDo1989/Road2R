@@ -1519,7 +1519,7 @@ public class RidePat
     }
 
     public int AssignRideToRidePat(int ridePatId, int userId, string driverType)
-    {
+    {//signalR implemnted int his method
         int RideId = -1;
 
         DateTime timeRightNow = DateTime.Now;
@@ -1607,11 +1607,7 @@ public class RidePat
         RidePat rp = GetRidePat(ridePatId);
         RidePatNum = rp.RidePatNum;
 
-        if ((Date - timeRightNow).Days <= 30)
-        {//case in this month → inform clients on manageridpats.html
-            IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<RidePatHub>();
-            hubContext.Clients.All.driverHasAssigned2RidePat(rp);
-        }
+        BroadCast2Clients_driverHasAssigned2RidePat(rp);
 
         if (Date > timeRightNow)
         {
@@ -1629,8 +1625,7 @@ public class RidePat
         return RideId;
     }
     public int LeaveRidePat(int ridePatId, int rideId, int driverId)
-    {
-
+    {//signalR implemnted int his method
         int res = -1;
         DateTime timeRightNow = DateTime.Now;
         string driver = "";
@@ -1659,16 +1654,17 @@ public class RidePat
 
 
 
+        //NOT SUPORTED FEATURE ! (PUSH MESSAGES) - YOGEV
+        ////return ridePatId;
+        //RidePat rp = GetRidePat(ridePatId);
+        //RidePatNum = rp.RidePatNum;
+        //Message m = new Message();
 
-        //return ridePatId;
-        RidePat rp = GetRidePat(ridePatId);
-        RidePatNum = rp.RidePatNum;
-        Message m = new Message();
+        //if (pickupTime > timeRightNow)
+        //{
+        //    m.driverRemovedFromRide(RidePatNum, rp.Drivers[0]);
+        //}
 
-        if (pickupTime > timeRightNow)
-        {
-            m.driverRemovedFromRide(RidePatNum, rp.Drivers[0]);
-        }
         if (driver == "secondaryDriver")
         {
             string query1 = "update Ride set secondaryDriver=null where RideNum=" + rideId;
@@ -1681,6 +1677,7 @@ public class RidePat
             string query2 = "update Ride set MainDriver=null where RideNum=" + rideId;
             DbService db = new DbService();
             res = db.ExecuteQuery(query2);
+
         }
         if (hours <= 24 && (pickupTime > timeRightNow))
         {
@@ -1688,16 +1685,10 @@ public class RidePat
             //it's less than 24 to the ride
             res = 911;
         }
-
-
-
-
-
-
-
+        RidePat rp = GetRidePat(ridePatId);
+        BroadCast2Clients_driverHasRemovedFromRidePat(rp);
 
         return res;
-
     }
 
     public int DeleteDriver(int ridePatId, int driverId)
@@ -2207,6 +2198,26 @@ finally
         }
 
     }
+
+
+    private void BroadCast2Clients_driverHasAssigned2RidePat(RidePat rp)
+    {
+        if ((rp.Date - DateTime.Now).Days <= 30)
+        {//case in this month → inform clients on manageRidPats.html
+            IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<RidePatHub>();
+            hubContext.Clients.All.driverHasAssigned2RidePat(rp);
+        }
+    }
+
+    private void BroadCast2Clients_driverHasRemovedFromRidePat(RidePat rp)
+    {
+        if ((rp.Date - DateTime.Now).Days <= 30)
+        {//case in this month → inform clients on manageRidPats.html
+            IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<RidePatHub>();
+            hubContext.Clients.All.driverHasRemovedFromRidePat(rp);
+        }
+    }
+
     //Irrelevant
     #region GetRidePatEscortView
     //public List<RidePat> GetRidePatEscortView()
