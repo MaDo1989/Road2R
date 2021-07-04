@@ -1628,7 +1628,6 @@ public class RidePat
     {//signalR implemnted int his method
         int res = -1;
         DateTime timeRightNow = DateTime.Now;
-        string driver = "";
         string query = "select * from RPView where RidePatNum=" + ridePatId;
         DbService db4 = new DbService();
         DataSet ds2 = db4.GetDataSetByQuery(query);
@@ -1643,42 +1642,10 @@ public class RidePat
         TimeSpan difference = pickupTime - DateTime.Now;
         hours = difference.Hours;
 
-        if (dr["MainDriver"].ToString() == driverId.ToString())
-        {
-            driver = "MainDriver";
-        }
-        else if (dr["secondaryDriver"].ToString() == driverId.ToString())
-        {
-            driver = "secondaryDriver";
-        }
+        string query2 = "update Ride set MainDriver=null where RideNum=" + rideId;
+        DbService db = new DbService();
+        res = db.ExecuteQuery(query2);
 
-
-
-        //NOT SUPORTED FEATURE ! (PUSH MESSAGES) - YOGEV
-        ////return ridePatId;
-        //RidePat rp = GetRidePat(ridePatId);
-        //RidePatNum = rp.RidePatNum;
-        //Message m = new Message();
-
-        //if (pickupTime > timeRightNow)
-        //{
-        //    m.driverRemovedFromRide(RidePatNum, rp.Drivers[0]);
-        //}
-
-        if (driver == "secondaryDriver")
-        {
-            string query1 = "update Ride set secondaryDriver=null where RideNum=" + rideId;
-            DbService db = new DbService();
-            res = db.ExecuteQuery(query1);
-        }
-        else
-        {
-            // string query = "update RidePat set RideId=null where RidePatNum=" + ridePatId; //+"; update Ride set "+driver+" =null where RideNum="+rideId;
-            string query2 = "update Ride set MainDriver=null where RideNum=" + rideId;
-            DbService db = new DbService();
-            res = db.ExecuteQuery(query2);
-
-        }
         if (hours <= 24 && (pickupTime > timeRightNow))
         {
 
