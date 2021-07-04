@@ -240,7 +240,20 @@ var GENERAL = {
 
         },
 
+    /**
+       * Gets two dates 
+       * Returns the hours gap between them.
+       * notes:
+       *  - The function return can be negative or positive depands on the parameter
+       *        for instance if you insert values to the function like this: getHoursDiff(early, late) → return will be negative and vice versa
+       * this logic comes from the need to know if a ridepat is in G hours or allready passed (and how many hours passes since)
+     */
+        getHoursGap: (x, y) => {
 
+            let miliSeconds_gap = x - y;
+            let hours_gap = miliSeconds_gap / (1000 * 60 * 60); //1000 ms in 1 sec, 60 sec in 1m, 60 min in 1h
+            return hours_gap;
+        },
     },
 
     COPYWRITE: () => {
