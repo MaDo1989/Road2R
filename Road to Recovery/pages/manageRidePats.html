@@ -146,7 +146,9 @@
             let ridepat_tr = document.getElementById(updated_ridePat.RidePatNum);
             if (ridepat_tr) {//only rendered rows can be edited.
 
-                let change_driver_td_Style = ridepat_tr.getElementsByClassName('driver_td')[0].style
+                let change_driver_td_Style = ridepat_tr.getElementsByClassName('driver_td')[0].style;
+                let change_lastModified_td_style = ridepat_tr.getElementsByClassName('last-modified_td')[0].style;
+                change_lastModified_td_style.background = styleManager.calculateStyle4_lastModified(thisRidePatLastModified);
                 change_driver_td_Style.color = '#797979';
 
                 if (updated_ridePat.Pat.IsAnonymous === 'True') {
@@ -231,7 +233,8 @@
             let ridepat_tr = document.getElementById(updated_ridePat.RidePatNum);
             if (ridepat_tr) {//only rendered rows can be edited.
 
-                ridepat_tr.style.background = '#f9f9f9';//back to default 
+                change_lastModified_td_style.background = styleManager.calculateStyle4_lastModified(thisRidePatLastModified);
+                ridepat_tr.style.background = '#f9f9f9';//back to default
                 let change_driver_td_Style = ridepat_tr.getElementsByClassName('driver_td')[0].style
 
                 const timeNeed2bAdded = tableName2manipulate === 'datatable-afternoon' || tableName2manipulate === 'datatable-tomorrow';
@@ -239,9 +242,9 @@
                 const mm = thisRidePatDate.getMinutes();
                 const { fontColor, fontWeight, backgroundColor } =
                     timeNeed2bAdded ?
-                    styleManager.getSuitableStyle_4thisTime(tableName2manipulate, hh, mm)
-                    :
-                    styleManager.getSuitableStyle_4thisTime(tableName2manipulate);
+                        styleManager.getSuitableStyle_4thisTime(tableName2manipulate, hh, mm)
+                        :
+                        styleManager.getSuitableStyle_4thisTime(tableName2manipulate);
 
                 change_driver_td_Style.color = fontColor;
                 change_driver_td_Style.fontWeight = fontWeight;
@@ -331,6 +334,8 @@
             validateMobileNum,
             addSeperator2MobileNum,
             convertDBDate2FrontEndDate,
+            getHoursGap,
+            convert2DBDateToInt
 
         } = GENERAL.USEFULL_FUNCTIONS;
 
@@ -1224,8 +1229,8 @@
                     ridePatTimeObj.mm
                 );
 
-                let miliSeconds_gap = ridePatTime - now;
-                let hours_gap = miliSeconds_gap / (1000 * 60 * 60); //1000 ms in 1 sec, 60 sec in 1m, 60 min in 1h
+
+                let hours_gap = getHoursGap(ridePatTime, now);
 
                 if (hours_gap >= 0 && hours_gap <= 24) {
                     calculatedStyle.fontColor = "white";
@@ -1241,6 +1246,16 @@
                 }
 
                 return calculatedStyle;
+            },
+
+            calculateStyle4_lastModified: (ridePatLastModified) => {
+                let now = new Date();
+                const hoursGap = getHoursGap(ridePatLastModified, now);
+                if (hoursGap >= -2 && hoursGap <= 0) {
+                    return "rgb(197,248,209)";
+                }
+                return "";
+
             },
         };
 
@@ -1413,7 +1428,7 @@
 
                             { targets: 0, type: 'de_time' },
                             {
-                                targets: [1, 2, 3, 4, 5], createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {
+                                targets: [1, 2, 3, 4, 5, 6], createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {
                                     if (isAssistant) {
                                         cell.className += ' ltr';
                                     }
@@ -1446,12 +1461,19 @@
                                                 }
                                             }
                                             break;
+                                        case 6://lastModified column
+
+                                            let thisridePatObj = arr_rides.find((r) => r.RidePatNum === rowData.ridePatNum);
+                                            const intValue = convert2DBDateToInt(thisridePatObj.LastModified);//the reasone why we get the origial obj is to support pc with english date
+                                            const thisRidePatLastModified = new Date(intValue)
+                                            cell.style.backgroundColor = styleManager.calculateStyle4_lastModified(thisRidePatLastModified);
+                                            break;
 
                                     }
 
                                 }
                             },
-
+                            { targets: 6, className: 'last-modified_td' },
                             { targets: 7, className: 'text-left-strong' },
                             { "targets": [9], visible: false },
 
@@ -1485,7 +1507,7 @@
                             { targets: 0, type: 'de_time' },
                             { targets: [0], createdCell: (td) => { $(td).attr('id', 'rideTiming') } },
                             {
-                                targets: [1, 2, 3, 4, 5], createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {
+                                targets: [1, 2, 3, 4, 5, 6], createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {
                                     if (isAssistant) {
                                         cell.className += ' ltr';
                                     }
@@ -1545,11 +1567,19 @@
                                                 }
                                             }
                                             break;
+                                        case 6://lastModified column
+
+                                            let thisridePatObj = arr_rides.find((r) => r.RidePatNum === rowData.ridePatNum);
+                                            const intValue = convert2DBDateToInt(thisridePatObj.LastModified);//the reasone why we get the origial obj is to support pc with english date
+                                            const thisRidePatLastModified = new Date(intValue)
+                                            cell.style.backgroundColor = styleManager.calculateStyle4_lastModified(thisRidePatLastModified);
+                                            break;
+
                                     }
 
                                 }
                             },
-
+                            { targets: 6, className: 'last-modified_td' },
                             { targets: 7, className: 'text-left-strong' },
                             { targets: [9], visible: false },
 
@@ -1624,6 +1654,16 @@
                                     }
                                 }
                             },
+                            {
+                                targets: 7, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {//lastModified column
+
+                                    let thisridePatObj = arr_rides.find((r) => r.RidePatNum === rowData.ridePatNum);
+                                    const intValue = convert2DBDateToInt(thisridePatObj.LastModified);//the reasone why we get the origial obj is to support pc with english date
+                                    const thisRidePatLastModified = new Date(intValue)
+                                    cell.style.backgroundColor = styleManager.calculateStyle4_lastModified(thisRidePatLastModified);
+                                }
+                            },
+                            { targets: 7, className: 'last-modified_td' },
                             { targets: 8, className: 'text-left-strong' },
                             { targets: [10], visible: false },
 
@@ -1655,6 +1695,16 @@
                             { targets: 0, type: 'de_date' },
                             { targets: 1, type: 'de_time' },
                             { targets: 5, className: 'driver_td' },
+                            {
+                                targets: 7, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {//lastModified column
+
+                                    let thisridePatObj = arr_rides.find((r) => r.RidePatNum === rowData.ridePatNum);
+                                    const intValue = convert2DBDateToInt(thisridePatObj.LastModified);//the reasone why we get the origial obj is to support pc with english date
+                                    const thisRidePatLastModified = new Date(intValue)
+                                    cell.style.backgroundColor = styleManager.calculateStyle4_lastModified(thisRidePatLastModified);
+                                }
+                            },
+                            { targets: 7, className: 'last-modified_td' },
                             { targets: 8, className: 'text-left-strong' },
                             { targets: [10], visible: false },
                         ],
