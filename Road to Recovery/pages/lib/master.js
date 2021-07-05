@@ -245,7 +245,7 @@ var GENERAL = {
        * Returns the hours gap between them.
        * notes:
        *  - The function return can be negative or positive depands on the parameter
-       *        for instance if you insert values to the function like this: getHoursDiff(early, late) → return will be negative and vice versa
+       *        for instance if you insert values to the function like this: getHoursGap(early, late) → return will be negative and vice versa
        * this logic comes from the need to know if a ridepat is in G hours or allready passed (and how many hours passes since)
      */
         getHoursGap: (x, y) => {
