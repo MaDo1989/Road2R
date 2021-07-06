@@ -233,11 +233,14 @@
             let ridepat_tr = document.getElementById(updated_ridePat.RidePatNum);
             if (ridepat_tr) {//only rendered rows can be edited.
 
-                change_lastModified_td_style.background = styleManager.calculateStyle4_lastModified(thisRidePatLastModified);
+
                 ridepat_tr.style.background = '#f9f9f9';//back to default
                 let change_driver_td_Style = ridepat_tr.getElementsByClassName('driver_td')[0].style
+                let change_lastModified_td_style = ridepat_tr.getElementsByClassName('last-modified_td')[0].style;
+                change_lastModified_td_style.background = styleManager.calculateStyle4_lastModified(thisRidePatLastModified);
 
-                const timeNeed2bAdded = tableName2manipulate === 'datatable-afternoon' || tableName2manipulate === 'datatable-tomorrow';
+
+                const timeNeed2bAdded = tableName2manipulate === 'datatable-afternoon' || tableName2manipulate === 'datatable-tomorrow'; //morning ia always red. future is always default
                 const hh = thisRidePatDate.getHours();
                 const mm = thisRidePatDate.getMinutes();
                 const { fontColor, fontWeight, backgroundColor } =
