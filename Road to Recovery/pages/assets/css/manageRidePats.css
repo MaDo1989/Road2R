@@ -169,3 +169,19 @@ input:checked + .slider:before {
     background: rgb(197,248,209);
 }
 
+
+.dropbtn {
+    background-color: #04AA6D;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+}
+
+    .dropbtn:hover {
+        background-color: #3e8e41;
+    }
+
+.hidden {
+    visibility: hidden;
+}

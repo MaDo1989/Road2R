@@ -310,8 +310,6 @@
     <script src="lib/sorting.js"></script>
     <script src="lib/includeHTML.js"></script>
 
-
-
     <script>
         /*
          NOTICE THIS:
@@ -353,7 +351,6 @@
         } = GENERAL.USEFULL_FUNCTIONS;
 
         let tMorning, tAfternoon, tFuture, tTomorrow;
-
 
         const showMe = ({ objId, objName }) => {
 
@@ -425,9 +422,6 @@
             });
             //#endregion
 
-
-
-
             //#region show target form
             /*
              IMPORTANT NOTE
@@ -471,6 +465,21 @@
             });
             //#endregion
 
+            let timer;
+
+            $('#datatable-morning tbody').on('mousedown', '.within2HoursSinceChange', function (e) {
+
+                timer = setTimeout(function () {
+                    console.log(e);
+                    $('.ContextMenu_dropdown').removeClass('hidden');
+
+                    $(".ContextMenu_dropdown").css({ position: "absolute", top: e.pageY, left: e.pageX });
+                }, 500);
+            }).on("mouseup mouseleave", function () {
+                clearTimeout(timer);
+            }).on("click", function () {//click on the td...
+                $('.ContextMenu_dropdown').addClass('hidden');
+            });
 
 
             //$('#datatable-morning tbody').on('click', '#candidatesBtn', function () {
@@ -2249,6 +2258,8 @@
             </div>
         </div>
     </div>
-
+    <div class="ContextMenu_dropdown hidden">
+        <button class="dropbtn">הסר סימון מתא זה</button>
+    </div>
 </body>
 </html>
