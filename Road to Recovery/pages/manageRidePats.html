@@ -147,8 +147,13 @@
             if (ridepat_tr) {//only rendered rows can be edited.
 
                 let change_driver_td_Style = ridepat_tr.getElementsByClassName('driver_td')[0].style;
-                let change_lastModified_td_style = ridepat_tr.getElementsByClassName('last-modified_td')[0].style;
-                change_lastModified_td_style.background = styleManager.calculateStyle4_lastModified(thisRidePatLastModified);
+
+                if (isWithin2HoursSinceChange(thisRidePatLastModified)) {
+
+                    let lastModified_td = ridepat_tr.getElementsByClassName('last-modified_td')[0];
+                    lastModified_td.classList.add('within2HoursSinceChange');
+                }
+
                 change_driver_td_Style.color = '#797979';
 
                 if (updated_ridePat.Pat.IsAnonymous === 'True') {
@@ -236,8 +241,13 @@
 
                 ridepat_tr.style.background = '#f9f9f9';//back to default
                 let change_driver_td_Style = ridepat_tr.getElementsByClassName('driver_td')[0].style
-                let change_lastModified_td_style = ridepat_tr.getElementsByClassName('last-modified_td')[0].style;
-                change_lastModified_td_style.background = styleManager.calculateStyle4_lastModified(thisRidePatLastModified);
+
+                if (isWithin2HoursSinceChange(thisRidePatLastModified)) {
+
+                    let lastModified_td = ridepat_tr.getElementsByClassName('last-modified_td')[0];
+                    lastModified_td.classList.add('within2HoursSinceChange');
+                }
+
 
 
                 const timeNeed2bAdded = tableName2manipulate === 'datatable-afternoon' || tableName2manipulate === 'datatable-tomorrow'; //morning ia always red. future is always default
@@ -1250,18 +1260,14 @@
 
                 return calculatedStyle;
             },
-
-            calculateStyle4_lastModified: (ridePatLastModified) => {
-                let now = new Date();
-                const hoursGap = getHoursGap(ridePatLastModified, now);
-                if (hoursGap >= -2 && hoursGap <= 0) {
-                    return "rgb(197,248,209)";
-                }
-                return "";
-
-            },
         };
 
+
+        const isWithin2HoursSinceChange = (ridePatLastModified) => {
+            let now = new Date();
+            const hoursGap = getHoursGap(ridePatLastModified, now);
+            return (hoursGap >= -2 && hoursGap <= 0);
+        }
 
         function refreshTable() {
             $('#wait').show();
@@ -1469,7 +1475,10 @@
                                             let thisridePatObj = arr_rides.find((r) => r.RidePatNum === rowData.ridePatNum);
                                             const intValue = convert2DBDateToInt(thisridePatObj.LastModified);//the reasone why we get the origial obj is to support pc with english date
                                             const thisRidePatLastModified = new Date(intValue)
-                                            cell.style.backgroundColor = styleManager.calculateStyle4_lastModified(thisRidePatLastModified);
+
+                                            if (isWithin2HoursSinceChange(thisRidePatLastModified)) {
+                                                cell.classList.add('within2HoursSinceChange');
+                                            }
                                             break;
 
                                     }
@@ -1575,7 +1584,9 @@
                                             let thisridePatObj = arr_rides.find((r) => r.RidePatNum === rowData.ridePatNum);
                                             const intValue = convert2DBDateToInt(thisridePatObj.LastModified);//the reasone why we get the origial obj is to support pc with english date
                                             const thisRidePatLastModified = new Date(intValue)
-                                            cell.style.backgroundColor = styleManager.calculateStyle4_lastModified(thisRidePatLastModified);
+                                            if (isWithin2HoursSinceChange(thisRidePatLastModified)) {
+                                                cell.classList.add('within2HoursSinceChange');
+                                            }
                                             break;
 
                                     }
@@ -1663,7 +1674,9 @@
                                     let thisridePatObj = arr_rides.find((r) => r.RidePatNum === rowData.ridePatNum);
                                     const intValue = convert2DBDateToInt(thisridePatObj.LastModified);//the reasone why we get the origial obj is to support pc with english date
                                     const thisRidePatLastModified = new Date(intValue)
-                                    cell.style.backgroundColor = styleManager.calculateStyle4_lastModified(thisRidePatLastModified);
+                                    if (isWithin2HoursSinceChange(thisRidePatLastModified)) {
+                                        cell.classList.add('within2HoursSinceChange');
+                                    }
                                 }
                             },
                             { targets: 7, className: 'last-modified_td' },
@@ -1704,7 +1717,9 @@
                                     let thisridePatObj = arr_rides.find((r) => r.RidePatNum === rowData.ridePatNum);
                                     const intValue = convert2DBDateToInt(thisridePatObj.LastModified);//the reasone why we get the origial obj is to support pc with english date
                                     const thisRidePatLastModified = new Date(intValue)
-                                    cell.style.backgroundColor = styleManager.calculateStyle4_lastModified(thisRidePatLastModified);
+                                    if (isWithin2HoursSinceChange(thisRidePatLastModified)) {
+                                        cell.classList.add('within2HoursSinceChange');
+                                    }
                                 }
                             },
                             { targets: 7, className: 'last-modified_td' },

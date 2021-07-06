@@ -164,3 +164,8 @@ input:checked + .slider:before {
     justify-content: center;
     width: 100px;
 }
+
+.within2HoursSinceChange {
+    background: rgb(197,248,209);
+}
+
