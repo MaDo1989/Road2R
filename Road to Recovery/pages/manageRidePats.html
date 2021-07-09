@@ -340,6 +340,8 @@
         let afterNoonRidePats = [];
         let tomorrowRidePats = [];
         let futureRidePats = [];
+        let candidate4IhaveSeen;
+        let timer;
         const {
 
             validateMobileNum,
@@ -384,7 +386,6 @@
         function wiringDataTables() {
             //manage button clicks on tables
 
-
             //#region remove ridepat
             $('#datatable-morning tbody').on('click', '.remove', function () {
                 confirmDelete(this, tMorning);
@@ -426,7 +427,6 @@
             /*
              IMPORTANT NOTE
              the event is mouseup in order to catch all scenarios.
-
              */
             $('#datatable-morning tbody').on('mouseup', '.showMe', function () {
                 let targetObj = {};
@@ -465,11 +465,53 @@
             });
             //#endregion
 
-            let timer;
-
+            //#region ContextMenu_dropdown
             $('#datatable-morning tbody').on('mousedown', '.within2HoursSinceChange', function (e) {
 
                 timer = setTimeout(function () {
+                    candidate4IhaveSeen = e.target.parentElement.id;
+                    $('.ContextMenu_dropdown').removeClass('hidden');
+
+                    $(".ContextMenu_dropdown").css({ position: "absolute", top: e.pageY, left: e.pageX });
+                }, 500);
+            }).on("mouseup mouseleave", function () {
+                clearTimeout(timer);
+            }).on("click", function () {//click on the td...
+                $('.ContextMenu_dropdown').addClass('hidden');
+            });
+
+            $('#datatable-afternoon tbody').on('mousedown', '.within2HoursSinceChange', function (e) {
+
+                timer = setTimeout(function () {
+                    candidate4IhaveSeen = e.target.parentElement.id;
+                    $('.ContextMenu_dropdown').removeClass('hidden');
+
+                    $(".ContextMenu_dropdown").css({ position: "absolute", top: e.pageY, left: e.pageX });
+                }, 500);
+            }).on("mouseup mouseleave", function () {
+                clearTimeout(timer);
+            }).on("click", function () {//click on the td...
+                $('.ContextMenu_dropdown').addClass('hidden');
+            });
+
+            $('#datatable-tomorrow tbody').on('mousedown', '.within2HoursSinceChange', function (e) {
+
+                timer = setTimeout(function () {
+                    candidate4IhaveSeen = e.target.parentElement.id;
+                    $('.ContextMenu_dropdown').removeClass('hidden');
+
+                    $(".ContextMenu_dropdown").css({ position: "absolute", top: e.pageY, left: e.pageX });
+                }, 500);
+            }).on("mouseup mouseleave", function () {
+                clearTimeout(timer);
+            }).on("click", function () {//click on the td...
+                $('.ContextMenu_dropdown').addClass('hidden');
+            });
+
+            $('#datatable-future tbody').on('mousedown', '.within2HoursSinceChange', function (e) {
+
+                timer = setTimeout(function () {
+                    candidate4IhaveSeen = e.target.parentElement.id;
                     console.log(e);
                     $('.ContextMenu_dropdown').removeClass('hidden');
 
@@ -481,7 +523,9 @@
                 $('.ContextMenu_dropdown').addClass('hidden');
             });
 
+            //#endregion
 
+            //#region candidatesButton
             //$('#datatable-morning tbody').on('click', '#candidatesBtn', function () {
             //    candidatesButton(this);
             //});
@@ -497,8 +541,7 @@
             //$('#datatable-tomorrow tbody').on('click', '#candidatesBtn', function () {
             //    candidatesButton(this);
             //});
-
-
+            //#endregion
 
         }
 
@@ -1415,8 +1458,10 @@
 
 
                     }
-
-
+                    let arrayOf_IHaveSeenAllready = localStorage.getItem('arrayOf_IHaveSeenAllready') ?
+                        JSON.parse(localStorage.getItem('arrayOf_IHaveSeenAllready'))
+                        :
+                        [];
 
                     //           ============================
                     //           || ↓DATATABLES PROPERTIES↓||
@@ -1481,11 +1526,13 @@
                                             break;
                                         case 6://lastModified column
 
-                                            let thisridePatObj = arr_rides.find((r) => r.RidePatNum === rowData.ridePatNum);
+                                            const thisRidePatId = rowData.ridePatNum;
+                                            const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatId);
                                             const intValue = convert2DBDateToInt(thisridePatObj.LastModified);//the reasone why we get the origial obj is to support pc with english date
                                             const thisRidePatLastModified = new Date(intValue)
+                                            const isSeenAllReady = arrayOf_IHaveSeenAllready.includes(thisRidePatId);
 
-                                            if (isWithin2HoursSinceChange(thisRidePatLastModified)) {
+                                            if (isWithin2HoursSinceChange(thisRidePatLastModified && !isSeenAllReady)) {
                                                 cell.classList.add('within2HoursSinceChange');
                                             }
                                             break;
@@ -1590,10 +1637,13 @@
                                             break;
                                         case 6://lastModified column
 
-                                            let thisridePatObj = arr_rides.find((r) => r.RidePatNum === rowData.ridePatNum);
+                                            const thisRidePatId = rowData.ridePatNum;
+                                            const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatId);
                                             const intValue = convert2DBDateToInt(thisridePatObj.LastModified);//the reasone why we get the origial obj is to support pc with english date
                                             const thisRidePatLastModified = new Date(intValue)
-                                            if (isWithin2HoursSinceChange(thisRidePatLastModified)) {
+                                            const isSeenAllReady = arrayOf_IHaveSeenAllready.includes(thisRidePatId);
+
+                                            if (isWithin2HoursSinceChange(thisRidePatLastModified && !isSeenAllReady)) {
                                                 cell.classList.add('within2HoursSinceChange');
                                             }
                                             break;
@@ -1680,10 +1730,13 @@
                             {
                                 targets: 7, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {//lastModified column
 
-                                    let thisridePatObj = arr_rides.find((r) => r.RidePatNum === rowData.ridePatNum);
+                                    const thisRidePatId = rowData.ridePatNum;
+                                    const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatId);
                                     const intValue = convert2DBDateToInt(thisridePatObj.LastModified);//the reasone why we get the origial obj is to support pc with english date
                                     const thisRidePatLastModified = new Date(intValue)
-                                    if (isWithin2HoursSinceChange(thisRidePatLastModified)) {
+                                    const isSeenAllReady = arrayOf_IHaveSeenAllready.includes(thisRidePatId);
+
+                                    if (isWithin2HoursSinceChange(thisRidePatLastModified && !isSeenAllReady)) {
                                         cell.classList.add('within2HoursSinceChange');
                                     }
                                 }
@@ -1723,10 +1776,13 @@
                             {
                                 targets: 7, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {//lastModified column
 
-                                    let thisridePatObj = arr_rides.find((r) => r.RidePatNum === rowData.ridePatNum);
+                                    const thisRidePatId = rowData.ridePatNum;
+                                    const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatId);
                                     const intValue = convert2DBDateToInt(thisridePatObj.LastModified);//the reasone why we get the origial obj is to support pc with english date
                                     const thisRidePatLastModified = new Date(intValue)
-                                    if (isWithin2HoursSinceChange(thisRidePatLastModified)) {
+                                    const isSeenAllReady = arrayOf_IHaveSeenAllready.includes(thisRidePatId);
+
+                                    if (isWithin2HoursSinceChange(thisRidePatLastModified && !isSeenAllReady)) {
                                         cell.classList.add('within2HoursSinceChange');
                                     }
                                 }
@@ -1903,7 +1959,26 @@
             return englishStatus;
         };
 
+        const add2IhaveSeenAllready = () => {
 
+            $('.ContextMenu_dropdown').addClass('hidden');//hide floating button
+            $($(`#${candidate4IhaveSeen}`).children('.last-modified_td')[0]).removeClass('within2HoursSinceChange');//remove marker
+
+            let arrayOf_IHaveSeenAllready = JSON.parse(localStorage.getItem('arrayOf_IHaveSeenAllready'));
+
+
+            if (arrayOf_IHaveSeenAllready) {
+
+                arrayOf_IHaveSeenAllready.push(parseInt(candidate4IhaveSeen));
+                localStorage.setItem('arrayOf_IHaveSeenAllready', JSON.stringify(arrayOf_IHaveSeenAllready));
+            } else {
+
+                let newArr = [];
+                newArr.push(parseInt(candidate4IhaveSeen))
+                localStorage.setItem('arrayOf_IHaveSeenAllready', JSON.stringify(newArr));
+            }
+
+        }
     </script>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -2259,7 +2334,7 @@
         </div>
     </div>
     <div class="ContextMenu_dropdown hidden">
-        <button class="dropbtn">הסר סימון מתא זה</button>
+        <button onclick="add2IhaveSeenAllready(this)" class="dropbtn">הסר סימון מתא זה</button>
     </div>
 </body>
 </html>
