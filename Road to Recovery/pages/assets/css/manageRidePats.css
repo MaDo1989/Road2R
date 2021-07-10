@@ -191,3 +191,12 @@ input:checked + .slider:before {
     margin-left: 20px;
     font-size: 1.15em;
 }
+
+/*override bootstrap*/
+.panel-group .panel-heading {
+    padding: 6px 26px;
+}
+
+.fa-remove:before, .fa-close:before, .fa-times:before {
+    color: red;
+}
