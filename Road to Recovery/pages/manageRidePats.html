@@ -1484,6 +1484,7 @@
 
                     tMorning = $('#datatable-morning').DataTable({
                         data: morningRidePats,
+                        autoWidth: false,
                         rowId: 'ridePatNum',
                         pageLength: 100,
                         stateSave: true,
@@ -1572,6 +1573,7 @@
                         pageLength: 100,
                         data: afterNoonRidePats,
                         stateSave: true,
+                        autoWidth: false,
                         destroy: true,
                         columns: [
                             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
@@ -1684,6 +1686,7 @@
                         data: tomorrowRidePats,
                         stateSave: true,
                         destroy: true,
+                        autoWidth: false,
                         "pageLength": 100,
                         columns: [
                             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
@@ -1771,6 +1774,7 @@
                         data: futureRidePats,
                         stateSave: true,
                         destroy: true,
+                        autoWidth: false,
                         columns: [
                             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
                             { data: "date" },                                //0
