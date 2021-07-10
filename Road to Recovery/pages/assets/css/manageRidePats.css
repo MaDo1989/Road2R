@@ -197,8 +197,14 @@ input:checked + .slider:before {
     padding: 6px 26px;
 }
 
+/*override bootstrap*/
 .fa-remove:before,
 .fa-close:before,
 .fa-times:before {
     color: red;
+}
+
+/*override bootstrap*/
+.ti-pencil:before {
+    color: #3bafda;
 }
