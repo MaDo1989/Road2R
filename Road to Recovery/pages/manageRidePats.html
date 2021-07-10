@@ -83,6 +83,7 @@
                     row2manipulate.remark = updated_ridePat.Remark;
 
                     tMorning.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                    increaseCounter('morning', updated_ridePat.RidePatNum);
                     break;
 
                 case 'datatable-afternoon':
@@ -100,6 +101,7 @@
                     row2manipulate.remark = updated_ridePat.Remark;
 
                     tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                    increaseCounter('afternoon', updated_ridePat.RidePatNum);
                     break;
 
                 case 'datatable-tomorrow':
@@ -118,6 +120,8 @@
                     row2manipulate.remark = updated_ridePat.Remark;
 
                     tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                    increaseCounter('tomorrow', updated_ridePat.RidePatNum);
+
                     break;
 
                 case 'datatable-future':
@@ -136,6 +140,8 @@
                     row2manipulate.remark = updated_ridePat.Remark;
 
                     tFuture.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                    increaseCounter('future', updated_ridePat.RidePatNum);
+
                     break;
 
                 default:
@@ -195,6 +201,8 @@
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
 
                     tMorning.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                    increaseCounter('morning', updated_ridePat.RidePatNum);
+
                     break;
 
                 case 'datatable-afternoon':
@@ -206,6 +214,8 @@
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
 
                     tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                    increaseCounter('afternoon', updated_ridePat.RidePatNum);
+
                     break;
 
                 case 'datatable-tomorrow':
@@ -217,6 +227,8 @@
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
 
                     tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                    increaseCounter('tomorrow', updated_ridePat.RidePatNum);
+
                     break;
 
                 case 'datatable-future':
@@ -228,6 +240,8 @@
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
 
                     tFuture.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                    increaseCounter('future', updated_ridePat.RidePatNum);
+
                     break;
 
                 default:
@@ -340,6 +354,7 @@
         let afterNoonRidePats = [];
         let tomorrowRidePats = [];
         let futureRidePats = [];
+        let allReadyCountedRidePats = [];
         let candidate4IhaveSeen;
         let timer;
         const {
@@ -1526,14 +1541,15 @@
                                             break;
                                         case 6://lastModified column
 
-                                            const thisRidePatId = rowData.ridePatNum;
-                                            const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatId);
+                                            const thisRidePatNum = rowData.ridePatNum;
+                                            const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatNum);
                                             const intValue = convert2DBDateToInt(thisridePatObj.LastModified);//the reasone why we get the origial obj is to support pc with english date
                                             const thisRidePatLastModified = new Date(intValue)
-                                            const isSeenAllReady = arrayOf_IHaveSeenAllready.includes(thisRidePatId);
+                                            const isSeenAllReady = arrayOf_IHaveSeenAllready.includes(thisRidePatNum);
 
-                                            if (isWithin2HoursSinceChange(thisRidePatLastModified && !isSeenAllReady)) {
+                                            if (isWithin2HoursSinceChange(thisRidePatLastModified) && !isSeenAllReady) {
                                                 cell.classList.add('within2HoursSinceChange');
+                                                increaseCounter('morning', thisRidePatNum);
                                             }
                                             break;
 
@@ -1637,14 +1653,15 @@
                                             break;
                                         case 6://lastModified column
 
-                                            const thisRidePatId = rowData.ridePatNum;
-                                            const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatId);
+                                            const thisRidePatNum = rowData.ridePatNum;
+                                            const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatNum);
                                             const intValue = convert2DBDateToInt(thisridePatObj.LastModified);//the reasone why we get the origial obj is to support pc with english date
                                             const thisRidePatLastModified = new Date(intValue)
-                                            const isSeenAllReady = arrayOf_IHaveSeenAllready.includes(thisRidePatId);
+                                            const isSeenAllReady = arrayOf_IHaveSeenAllready.includes(thisRidePatNum);
 
-                                            if (isWithin2HoursSinceChange(thisRidePatLastModified && !isSeenAllReady)) {
+                                            if (isWithin2HoursSinceChange(thisRidePatLastModified) && !isSeenAllReady) {
                                                 cell.classList.add('within2HoursSinceChange');
+                                                increaseCounter('afternoon', thisRidePatNum);
                                             }
                                             break;
 
@@ -1730,14 +1747,15 @@
                             {
                                 targets: 7, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {//lastModified column
 
-                                    const thisRidePatId = rowData.ridePatNum;
-                                    const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatId);
+                                    const thisRidePatNum = rowData.ridePatNum;
+                                    const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatNum);
                                     const intValue = convert2DBDateToInt(thisridePatObj.LastModified);//the reasone why we get the origial obj is to support pc with english date
                                     const thisRidePatLastModified = new Date(intValue)
-                                    const isSeenAllReady = arrayOf_IHaveSeenAllready.includes(thisRidePatId);
+                                    const isSeenAllReady = arrayOf_IHaveSeenAllready.includes(thisRidePatNum);
 
-                                    if (isWithin2HoursSinceChange(thisRidePatLastModified && !isSeenAllReady)) {
+                                    if (isWithin2HoursSinceChange(thisRidePatLastModified) && !isSeenAllReady) {
                                         cell.classList.add('within2HoursSinceChange');
+                                        increaseCounter('tomorrow', thisRidePatNum);
                                     }
                                 }
                             },
@@ -1776,14 +1794,15 @@
                             {
                                 targets: 7, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {//lastModified column
 
-                                    const thisRidePatId = rowData.ridePatNum;
-                                    const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatId);
+                                    const thisRidePatNum = rowData.ridePatNum;
+                                    const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatNum);
                                     const intValue = convert2DBDateToInt(thisridePatObj.LastModified);//the reasone why we get the origial obj is to support pc with english date
                                     const thisRidePatLastModified = new Date(intValue)
-                                    const isSeenAllReady = arrayOf_IHaveSeenAllready.includes(thisRidePatId);
+                                    const isSeenAllReady = arrayOf_IHaveSeenAllready.includes(thisRidePatNum);
 
-                                    if (isWithin2HoursSinceChange(thisRidePatLastModified && !isSeenAllReady)) {
+                                    if (isWithin2HoursSinceChange(thisRidePatLastModified) && !isSeenAllReady) {
                                         cell.classList.add('within2HoursSinceChange');
+                                        increaseCounter('future', thisRidePatNum);
                                     }
                                 }
                             },
@@ -1979,6 +1998,20 @@
             }
 
         }
+
+
+        const increaseCounter = (tableName, ridePatNum) => {
+
+            if (!allReadyCountedRidePats.includes(ridePatNum)) {
+
+                let counterValue_asTxt = $(`#datatable-${tableName}_lastModified_counter`).text();
+                let previosValue = parseInt(counterValue_asTxt);
+                previosValue++;
+                $(`#datatable-${tableName}_lastModified_counter`).html(previosValue)
+
+                allReadyCountedRidePats.push(ridePatNum);
+            }
+        }
     </script>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -2103,7 +2136,18 @@
                                 <div id="accordion" class="panel-group">
                                     <div onclick="assignTable2lastOne('datatable-morning')" class="panel panel-primary">
                                         <div class="panel-heading" id="col1">
-                                            <h4 data-toggle="tooltip" data-placement="top" title="Morning Rides  سفريات الصباح" class="panel-title"> <a href="#collapse1" data-parent="#accordion" data-toggle="collapse" class="dropdown active open">נסיעות לבוקר</a></h4>
+                                            <h4 data-toggle="tooltip" data-placement="top" title="Morning Rides  سفريات الصباح" class="panel-title">
+                                                <a href="#collapse1" data-parent="#accordion" data-toggle="collapse" class="dropdown active open">
+                                                    <span class="m-l-15">
+                                                        נסיעות לבוקר
+                                                        <span class="lastModified_counter">
+                                                            רשימות שעודכנו לאחרונה:
+                                                            <span id="datatable-morning_lastModified_counter">0</span>
+                                                        </span>
+                                                    </span>
+                                                </a>
+
+                                            </h4>
                                         </div>
                                         <div class="panel-collapse collapse" id="collapse1">
                                             <div class="panel-body">
@@ -2131,7 +2175,17 @@
 
                                     <div onclick="assignTable2lastOne('datatable-afternoon')" class="panel panel-primary">
                                         <div class="panel-heading" id="col2">
-                                            <h4 data-toggle="tooltip" data-placement="top" title="Afternoon Rides  سفريات المساء" class="panel-title"> <a href="#collapse2" data-parent="#accordion" data-toggle="collapse">נסיעות לאחה"צ</a></h4>
+                                            <h4 data-toggle="tooltip" data-placement="top" title="Afternoon Rides  سفريات المساء" class="panel-title">
+                                                <a href="#collapse2" data-parent="#accordion" data-toggle="collapse">
+                                                    <span class="m-l-15">
+                                                        נסיעות לאחה"צ
+                                                        <span class="lastModified_counter">
+                                                            רשימות שעודכנו לאחרונה:
+                                                            <span id="datatable-afternoon_lastModified_counter">0</span>
+                                                        </span>
+                                                    </span>
+                                                </a>
+                                            </h4>
                                         </div>
                                         <div class="panel-collapse collapse" id="collapse2">
                                             <div class="panel-body">
@@ -2159,7 +2213,17 @@
 
                                     <div onclick="assignTable2lastOne('datatable-tomorrow')" class="panel panel-primary">
                                         <div class="panel-heading" id="col4">
-                                            <h4 data-toggle="tooltip" data-placement="bottom" title="Tomorrow Rides" class="panel-title"> <a href="#collapse3" data-parent="#accordion" data-toggle="collapse">נסיעות למחר</a></h4>
+                                            <h4 data-toggle="tooltip" data-placement="bottom" title="Tomorrow Rides" class="panel-title">
+                                                <a href="#collapse3" data-parent="#accordion" data-toggle="collapse">
+                                                    <span class="m-l-15">
+                                                        נסיעות למחר
+                                                        <span class="lastModified_counter">
+                                                            רשימות שעודכנו לאחרונה:
+                                                            <span id="datatable-tomorrow_lastModified_counter">0</span>
+                                                        </span>
+                                                    </span>
+                                                </a>
+                                            </h4>
                                         </div>
                                         <div class="panel-collapse collapse" id="collapse3">
                                             <div class="panel-body">
@@ -2188,7 +2252,17 @@
 
                                     <div onclick="assignTable2lastOne('datatable-future')" class="panel panel-primary">
                                         <div class="panel-heading" id="col3">
-                                            <h4 data-toggle="tooltip" data-placement="bottom" title="Future Rides  سفريات مستقبلية" class="panel-title"> <a href="#collapse4" data-parent="#accordion" data-toggle="collapse">נסיעות עתידיות</a></h4>
+                                            <h4 data-toggle="tooltip" data-placement="bottom" title="Future Rides  سفريات مستقبلية" class="panel-title">
+                                                <a href="#collapse4" data-parent="#accordion" data-toggle="collapse">
+                                                    <span class="m-l-15">
+                                                        נסיעות עתידיות
+                                                    </span>
+                                                    <span class="lastModified_counter">
+                                                        רשימות שעודכנו לאחרונה:
+                                                        <span id="datatable-future_lastModified_counter">0</span>
+                                                    </span>
+                                                </a>
+                                            </h4>
                                         </div>
                                         <div class="panel-collapse collapse" id="collapse4">
                                             <div class="panel-body">

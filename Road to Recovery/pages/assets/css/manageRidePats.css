@@ -185,3 +185,9 @@ input:checked + .slider:before {
 .hidden {
     visibility: hidden;
 }
+
+.lastModified_counter{
+    float: left;
+    margin-left: 20px;
+    font-size: 1.15em;
+}
