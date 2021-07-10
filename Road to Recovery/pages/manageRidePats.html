@@ -1484,7 +1484,7 @@
 
                     tMorning = $('#datatable-morning').DataTable({
                         data: morningRidePats,
-                        autoWidth: false,
+                        //autoWidth: false,
                         rowId: 'ridePatNum',
                         pageLength: 100,
                         stateSave: true,
@@ -1504,7 +1504,9 @@
                             { data: "buttons" },                             //10
                         ],
                         columnDefs: [
-
+                            { width: '9%', "targets": [0, 1, 2, 4, 5, 6, 8, 10] },
+                            { width: '6%', "targets": [7] },
+                            { width: '22%', "targets": [3] },
                             { targets: 0, type: 'de_time' },
                             {
                                 targets: [1, 2, 3, 4, 5, 6], createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {
@@ -1564,7 +1566,7 @@
 
 
                         ],
-
+                        autoWidth: false,
 
                     });
 
@@ -1573,7 +1575,6 @@
                         pageLength: 100,
                         data: afterNoonRidePats,
                         stateSave: true,
-                        autoWidth: false,
                         destroy: true,
                         columns: [
                             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
@@ -1590,6 +1591,9 @@
                             { data: "buttons" },                             //10
                         ],
                         columnDefs: [
+                            { width: '9%', "targets": [0, 1, 2, 4, 5, 6, 8, 10] },
+                            { width: '6%', "targets": [7] },
+                            { width: '22%', "targets": [3] },
                             { targets: 0, type: 'de_time' },
                             { targets: [0], createdCell: (td) => { $(td).attr('id', 'rideTiming') } },
                             {
@@ -1675,18 +1679,16 @@
                             { targets: 7, className: 'text-left-strong' },
                             { targets: [9], visible: false },
 
-                        ]
+                        ],
+                        autoWidth: false,
 
-                    },
-
-                    );
+                    });
 
                     tTomorrow = $('#datatable-tomorrow').DataTable({
                         rowId: 'ridePatNum',
                         data: tomorrowRidePats,
                         stateSave: true,
                         destroy: true,
-                        autoWidth: false,
                         "pageLength": 100,
                         columns: [
                             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
@@ -1705,6 +1707,9 @@
                         ],
                         "columnDefs": [
                             { targets: 1, type: 'de_time' },
+                            { width: '9%', "targets": [0, 1, 2, 5, 6, 8, 9, 11] },
+                            { width: '22%', "targets": [4] },
+                            { width: '6%', "targets": [8] },
                             {
                                 targets: 5, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //5 is driver column
 
@@ -1767,6 +1772,8 @@
                             { targets: [10], visible: false },
 
                         ],
+                        autoWidth: false,
+
                     });
 
                     tFuture = $('#datatable-future').DataTable({
@@ -1774,7 +1781,6 @@
                         data: futureRidePats,
                         stateSave: true,
                         destroy: true,
-                        autoWidth: false,
                         columns: [
                             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
                             { data: "date" },                                //0
@@ -1790,10 +1796,13 @@
                             { data: "isAnonymous" },                         //10
                             { data: "buttons" },                             //11
                         ],
-                        "pageLength": 100,
-                        "columnDefs": [
+                        pageLength: 100,
+                        columnDefs: [
                             { targets: 0, type: 'de_date' },
                             { targets: 1, type: 'de_time' },
+                            { width: '9%', "targets": [0, 1, 2,5, 6, 8, 9, 11] },
+                            { width: '22%', "targets": [4] },
+                            { width: '6%', "targets": [8] },
                             { targets: 5, className: 'driver_td' },
                             {
                                 targets: 7, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {//lastModified column
@@ -1814,8 +1823,9 @@
                             { targets: 8, className: 'text-left-strong' },
                             { targets: [10], visible: false },
                         ],
-                    },
-                    );
+                        autoWidth: false,
+
+                    });
 
                     //            ============================
                     //            || ↑DATATABLES PROPERTIES↑||
