@@ -208,3 +208,33 @@ input:checked + .slider:before {
 .ti-pencil:before {
     color: #3bafda;
 }
+
+
+.driverAssign2AnonymousRide {
+             /* ↓ yellowish*/
+    background: #FFEF8F;
+}
+
+.reached2destination{
+    background: green;
+    color: white;
+    font-weight: bold;
+}
+
+.initialStyle {
+    color: #797979;
+}
+
+.withIn12HoursDrive, .withIn24HoursDrive {
+    color: white;
+    font-weight: bold;
+}
+
+.withIn12HoursDrive {
+    background: red;
+}
+
+.withIn24HoursDrive {
+    background: orange;
+}
+
