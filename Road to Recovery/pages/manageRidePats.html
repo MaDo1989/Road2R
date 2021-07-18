@@ -22,6 +22,17 @@
     <script src="../../signalr/hubs"></script>
     <script>
 
+        let tableName2manipulate;
+        let thisRidePatDate;
+        let thisRidePatLastModified;
+        let row2manipulate;
+        let tr_nodesAsArray = [];
+        let node2manipulate;
+        let nodechilds;
+        let lastModified_td;
+
+        const ADD_DRIVER = 'add driver', REMOVE_DRIVER = 'remove driver';
+
         //function to reuse
         const update_arr_rides = (updated_ridePat) => {
             const index = arr_rides.findIndex(r => r.RidePatNum === updated_ridePat.RidePatNum)
@@ -48,6 +59,44 @@
             return new Date(new Date(date2fix) - new Date().getTimezoneOffset() * 60000);
         }
 
+        const manipilateNodeStyle = (tr_node2manipulate, updated_ridePat, functionlity, isFutureTable = false, tableName = "") => {
+
+            nodechilds = Array.from($(tr_node2manipulate).children());
+            lastModified_td = nodechilds.find(x => x.className.includes('last-modified_td'));
+            driver_td = nodechilds.find(x => x.className.includes('driver_td'));
+            $(lastModified_td).addClass('within2HoursSinceChange');
+            $(driver_td).removeClass('withIn12HoursDrive withIn24HoursDrive');
+
+            switch (functionlity) {
+
+                case ADD_DRIVER:
+
+                    if (!isFutureTable && updated_ridePat.Pat.IsAnonymous === 'True') {
+                        $(tr_node2manipulate).addClass('driverAssign2AnonymousRide');
+                    }
+
+                    break;
+
+                case REMOVE_DRIVER:
+
+                    $(tr_node2manipulate).removeClass('driverAssign2AnonymousRide');
+
+                    let hh, mm;
+                    const rideDate = fixDate_WhichComeFromOpenConnection(updated_ridePat.Date);
+
+                    if (rideDate.getMinutes() === 14) {//afternoon
+                        hh = 12, mm = 0;
+                    } else {
+                        hh = rideDate.getHours(), mm = rideDate.getMinutes();
+                    }
+
+                    const suitableClass = classManager.getSuitableClassS_4thisTime(tableName, hh, mm);
+                    $(driver_td).addClass(suitableClass);
+                    break;
+
+            }
+        }
+
         const notification = $.connection.ridePatHub;
         $.connection.hub.start().done();
         notification.client.driverHasAssigned2RidePat = function (updated_ridePat) {
@@ -61,10 +110,10 @@
                 * !!! IMPORTANT !!! *
                 *********************/
 
-            let tableName2manipulate = getTableName2Manipulate(updated_ridePat.RidePatNum);
-            let thisRidePatDate = fixDate_WhichComeFromOpenConnection(updated_ridePat.Date);
-            let thisRidePatLastModified = fixDate_WhichComeFromOpenConnection(updated_ridePat.LastModified);
-            let row2manipulate;
+            tableName2manipulate = getTableName2Manipulate(updated_ridePat.RidePatNum);
+            thisRidePatDate = fixDate_WhichComeFromOpenConnection(updated_ridePat.Date);
+            thisRidePatLastModified = fixDate_WhichComeFromOpenConnection(updated_ridePat.LastModified);
+
 
             switch (tableName2manipulate) {
 
@@ -83,7 +132,9 @@
                     row2manipulate.remark = updated_ridePat.Remark;
 
                     tMorning.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                    increaseCounter('morning', updated_ridePat.RidePatNum);
+                    increaseCounter('datatable-morning', updated_ridePat.RidePatNum);
+
+                    tr_nodesAsArray = Array.from(tMorning.rows().nodes());
                     break;
 
                 case 'datatable-afternoon':
@@ -101,7 +152,9 @@
                     row2manipulate.remark = updated_ridePat.Remark;
 
                     tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                    increaseCounter('afternoon', updated_ridePat.RidePatNum);
+                    increaseCounter('datatable-afternoon', updated_ridePat.RidePatNum);
+
+                    tr_nodesAsArray = Array.from(tAfternoon.rows().nodes());
                     break;
 
                 case 'datatable-tomorrow':
@@ -120,8 +173,9 @@
                     row2manipulate.remark = updated_ridePat.Remark;
 
                     tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                    increaseCounter('tomorrow', updated_ridePat.RidePatNum);
+                    increaseCounter('datatable-tomorrow', updated_ridePat.RidePatNum);
 
+                    tr_nodesAsArray = Array.from(tTomorrow.rows().nodes());
                     break;
 
                 case 'datatable-future':
@@ -140,39 +194,24 @@
                     row2manipulate.remark = updated_ridePat.Remark;
 
                     tFuture.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                    increaseCounter('future', updated_ridePat.RidePatNum);
+                    increaseCounter('datatable-future', updated_ridePat.RidePatNum);
 
+                    tr_nodesAsArray = Array.from(tFuture.rows().nodes());
+                    tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
+                    manipilateNodeStyle(tr_node2manipulate, updated_ridePat, ADD_DRIVER, true);
+                    tr_nodesAsArray = null;
                     break;
 
                 default:
                     console.log('system recognized a tempt of the server to post real-time data but failed to found the rellevant row to redraw');
+                    tr_nodesAsArray = null;
                     break;
             }
+            if (tr_nodesAsArray) {
 
-            let ridepat_tr = document.getElementById(updated_ridePat.RidePatNum);
-            if (ridepat_tr) {//only rendered rows can be edited.
-
-                let change_driver_td_Style = ridepat_tr.getElementsByClassName('driver_td')[0].style;
-
-                if (isWithin2HoursSinceChange(thisRidePatLastModified)) {
-
-                    let lastModified_td = ridepat_tr.getElementsByClassName('last-modified_td')[0];
-                    lastModified_td.classList.add('within2HoursSinceChange');
-                }
-
-                change_driver_td_Style.color = '#797979';
-
-                if (updated_ridePat.Pat.IsAnonymous === 'True') {
-                    if (tableName2manipulate !== 'datatable-future') {
-
-                        ridepat_tr.style.background = '#FFEF8F';
-                        change_driver_td_Style.background = '#FFEF8F';
-                    }
-                } else {
-                    change_driver_td_Style.background = '#f9f9f9'  //only driver td
-                }
+                tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
+                manipilateNodeStyle(tr_node2manipulate, updated_ridePat, ADD_DRIVER);
             }
-
         }
 
         notification.client.driverHasRemovedFromRidePat = function (updated_ridePat) {
@@ -184,11 +223,9 @@
             /*********↑↑↑*********
              * !!! IMPORTANT !!! *
              *********************/
-
-            let tableName2manipulate = getTableName2Manipulate(updated_ridePat.RidePatNum);
-            let thisRidePatDate = fixDate_WhichComeFromOpenConnection(updated_ridePat.Date);
-            let thisRidePatLastModified = fixDate_WhichComeFromOpenConnection(updated_ridePat.LastModified);
-            let row2manipulate;
+            tableName2manipulate = getTableName2Manipulate(updated_ridePat.RidePatNum);
+            thisRidePatDate = fixDate_WhichComeFromOpenConnection(updated_ridePat.Date);
+            thisRidePatLastModified = fixDate_WhichComeFromOpenConnection(updated_ridePat.LastModified);
 
             switch (tableName2manipulate) {
 
@@ -201,8 +238,9 @@
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
 
                     tMorning.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                    increaseCounter('morning', updated_ridePat.RidePatNum);
+                    increaseCounter('datatable-morning', updated_ridePat.RidePatNum);
 
+                    tr_nodesAsArray = Array.from(tMorning.rows().nodes());
                     break;
 
                 case 'datatable-afternoon':
@@ -214,8 +252,9 @@
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
 
                     tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                    increaseCounter('afternoon', updated_ridePat.RidePatNum);
+                    increaseCounter('datatable-afternoon', updated_ridePat.RidePatNum);
 
+                    tr_nodesAsArray = Array.from(tAfternoon.rows().nodes());
                     break;
 
                 case 'datatable-tomorrow':
@@ -227,8 +266,9 @@
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
 
                     tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                    increaseCounter('tomorrow', updated_ridePat.RidePatNum);
+                    increaseCounter('datatable-tomorrow', updated_ridePat.RidePatNum);
 
+                    tr_nodesAsArray = Array.from(tTomorrow.rows().nodes());
                     break;
 
                 case 'datatable-future':
@@ -240,44 +280,28 @@
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
 
                     tFuture.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                    increaseCounter('future', updated_ridePat.RidePatNum);
+                    increaseCounter('datatable-future', updated_ridePat.RidePatNum);
 
+                    tr_nodesAsArray = Array.from(tFuture.rows().nodes());
+                    tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
+                    manipilateNodeStyle(tr_node2manipulate, updated_ridePat, REMOVE_DRIVER, true, tableName2manipulate);
+                    tr_nodesAsArray = null;
                     break;
 
                 default:
+
                     console.log('system recognized a tempt of the server to post real-time data but failed to found the rellevant row to redraw');
+                    tr_nodesAsArray = null;
                     break;
             }
+            if (tr_nodesAsArray) {
 
-            let ridepat_tr = document.getElementById(updated_ridePat.RidePatNum);
-            if (ridepat_tr) {//only rendered rows can be edited.
-
-
-                ridepat_tr.style.background = '#f9f9f9';//back to default
-                let change_driver_td_Style = ridepat_tr.getElementsByClassName('driver_td')[0].style
-
-                if (isWithin2HoursSinceChange(thisRidePatLastModified)) {
-
-                    let lastModified_td = ridepat_tr.getElementsByClassName('last-modified_td')[0];
-                    lastModified_td.classList.add('within2HoursSinceChange');
-                }
-
-
-
-                const timeNeed2bAdded = tableName2manipulate === 'datatable-afternoon' || tableName2manipulate === 'datatable-tomorrow'; //morning ia always red. future is always default
-                const hh = thisRidePatDate.getHours();
-                const mm = thisRidePatDate.getMinutes();
-                const { fontColor, fontWeight, backgroundColor } =
-                    timeNeed2bAdded ?
-                        styleManager.getSuitableStyle_4thisTime(tableName2manipulate, hh, mm)
-                        :
-                        styleManager.getSuitableStyle_4thisTime(tableName2manipulate);
-
-                change_driver_td_Style.color = fontColor;
-                change_driver_td_Style.fontWeight = fontWeight;
-                change_driver_td_Style.background = backgroundColor;
-
+                tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
+                manipilateNodeStyle(tr_node2manipulate, updated_ridePat, REMOVE_DRIVER, false, tableName2manipulate);
             }
+
+
+
         }
     </script>
 
@@ -359,7 +383,7 @@
         let timer;
         const {
 
-            validateMobileNum,
+            validateMobileNumFullVersion,
             addSeperator2MobileNum,
             convertDBDate2FrontEndDate,
             getHoursGap,
@@ -396,7 +420,6 @@
             }
 
         }
-
 
         function wiringDataTables() {
             //manage button clicks on tables
@@ -484,9 +507,9 @@
             $('#datatable-morning tbody').on('mousedown', '.within2HoursSinceChange', function (e) {
 
                 timer = setTimeout(function () {
+
                     candidate4IhaveSeen = e.target.parentElement.id;
                     $('.ContextMenu_dropdown').removeClass('hidden');
-
                     $(".ContextMenu_dropdown").css({ position: "absolute", top: e.pageY, left: e.pageX });
                 }, 500);
             }).on("mouseup mouseleave", function () {
@@ -498,9 +521,9 @@
             $('#datatable-afternoon tbody').on('mousedown', '.within2HoursSinceChange', function (e) {
 
                 timer = setTimeout(function () {
+
                     candidate4IhaveSeen = e.target.parentElement.id;
                     $('.ContextMenu_dropdown').removeClass('hidden');
-
                     $(".ContextMenu_dropdown").css({ position: "absolute", top: e.pageY, left: e.pageX });
                 }, 500);
             }).on("mouseup mouseleave", function () {
@@ -512,9 +535,9 @@
             $('#datatable-tomorrow tbody').on('mousedown', '.within2HoursSinceChange', function (e) {
 
                 timer = setTimeout(function () {
+
                     candidate4IhaveSeen = e.target.parentElement.id;
                     $('.ContextMenu_dropdown').removeClass('hidden');
-
                     $(".ContextMenu_dropdown").css({ position: "absolute", top: e.pageY, left: e.pageX });
                 }, 500);
             }).on("mouseup mouseleave", function () {
@@ -526,10 +549,10 @@
             $('#datatable-future tbody').on('mousedown', '.within2HoursSinceChange', function (e) {
 
                 timer = setTimeout(function () {
+
                     candidate4IhaveSeen = e.target.parentElement.id;
                     console.log(e);
                     $('.ContextMenu_dropdown').removeClass('hidden');
-
                     $(".ContextMenu_dropdown").css({ position: "absolute", top: e.pageY, left: e.pageX });
                 }, 500);
             }).on("mouseup mouseleave", function () {
@@ -878,7 +901,6 @@
             alert("Error in getCoors: " + e.responseText);
         }
 
-
         function confirmDelete(deleteBtn, table) {
 
             let ridePatNum = parseInt(deleteBtn.id);
@@ -934,46 +956,11 @@
         //    location.href = "viewCandidates.html";
         //}
 
-        //function showButton(ridePat) {
-        //    arr_details = { RidePatNum: ridePat.name, func: "show" };//ridePat.name=RidePatNum
-        //    GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
-        //    location.href = "ridePatForm.html";
-        //}
-
         function editButton(ridePat) {
             arr_details = { RidePatNum: ridePat.name, func: "edit" }; //ridePat.name=RidePatNum
             GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
             location.href = "ridePatForm.html";
         }
-
-        //function backupToPrimaryButton(ridePat) {
-        //    //arr_details = { RidePatNum: ridePat.name, func: "show" };//ridePat.name=RidePatNum
-        //    var RidePat = new Object();
-        //    RidePat.RidePatNum = ridePat.name;
-
-        //    $.ajax({
-        //        dataType: "json",
-        //        url: "WebService.asmx/backupToPrimaryNotification",
-        //        contentType: "application/json; charset=utf-8",
-        //        type: "POST",
-        //        data: JSON.stringify({ ridePatId: RidePat.RidePatNum }),
-        //        success: function (data) {
-        //            if (data.d == 1) {
-        //                swal({
-        //                    title: "لقد تم ارسال الرسالة\nההודעה נשלחה",
-        //                    timer: 1000,
-        //                    type: "success",
-        //                    showConfirmButton: false
-        //                });
-        //            }
-
-
-        //        },
-        //        error: function (err) {
-        //            alert("Error in backupToPrimaryNotification:" + err.responseText);
-        //        }
-        //    });
-        //}
 
         function deleteRidePat(ridePat, deleteBtn, thistable) {
             checkCookie();
@@ -1256,43 +1243,33 @@
 
         }
 
-        const styleManager = {
-            defaultStyle: {
-                fontColor: "#797979",
-                fontWeight: "",
-                backgroundColor: "",
-            },
+        const classManager = {
 
-            getSuitableStyle_4thisTime: (tableName, hh = -1, mm = -1) => {
-                let calculatedStyle;
+            getSuitableClassS_4thisTime: (tableName, hh = -1, mm = -1) => {
+                let suitableClass;
 
                 switch (tableName) {
                     case "datatable-morning":
-                        calculatedStyle = {
-                            fontColor: "white",
-                            fontWeight: "bold",
-                            backgroundColor: "red",
-                        };
+                        suitableClass = 'withIn12HoursDrive';
                         break;
                     case "datatable-afternoon":
-                        calculatedStyle = styleManager.calculateStyle_24HoursRange(hh, mm);
+                        suitableClass = classManager.calculateSuitableClass_24HoursRange(hh, mm);
                         break;
                     case "datatable-tomorrow":
-                        calculatedStyle = styleManager.calculateStyle_24HoursRange(
+                        suitableClass = classManager.calculateSuitableClass_24HoursRange(
                             hh,
                             mm,
                             false
                         );
                         break;
                     case "datatable-future":
-                        calculatedStyle = styleManager.defaultStyle;
+                        suitableClass = 'initialStyle';
                         break;
                 }
-                return calculatedStyle;
+                return suitableClass;
             },
 
-            calculateStyle_24HoursRange: (hh, mm, isToday = true) => {
-                let calculatedStyle = {};
+            calculateSuitableClass_24HoursRange: (hh, mm, isToday = true) => {
 
                 let now = new Date();
                 let ridePatTimeObj = {
@@ -1313,22 +1290,13 @@
                 let hours_gap = getHoursGap(ridePatTime, now);
 
                 if (hours_gap >= 0 && hours_gap <= 24) {
-                    calculatedStyle.fontColor = "white";
-                    calculatedStyle.fontWeight = "bold";
 
-                    if (hours_gap <= 12) {
-                        calculatedStyle.backgroundColor = "red";
-                    } else {
-                        calculatedStyle.backgroundColor = "orange";
-                    }
-                } else {
-                    calculatedStyle = styleManager.defaultStyle;
+                    return hours_gap <= 12 ? 'withIn12HoursDrive' : 'withIn24HoursDrive';
                 }
 
-                return calculatedStyle;
+                return 'initialStyle';
             },
         };
-
 
         const isWithin2HoursSinceChange = (ridePatLastModified) => {
             let now = new Date();
@@ -1516,12 +1484,11 @@
 
                                     switch (colIndex) {
                                         case 4: //driver column
-                                            cell.className += ' driver_td';
+
+                                            $(cell).addClass('driver_td');
                                             if (cellData.indexOf('אין!') !== -1) {
-                                                const calculatedStyle = styleManager.getSuitableStyle_4thisTime("datatable-morning");
-                                                cell.style.backgroundColor = calculatedStyle.backgroundColor;
-                                                cell.style.color = calculatedStyle.fontColor;
-                                                cell.style.fontWeight = calculatedStyle.fontWeight;
+                                                const suitableClass = classManager.getSuitableClassS_4thisTime("datatable-morning");
+                                                $(cell).addClass(suitableClass);
                                             }
                                             break;
 
@@ -1536,9 +1503,7 @@
                                             else if (cellData.includes('שובץ נהג') || cellData.includes('Driver registered')) {
 
                                                 if (rowData["isAnonymous"]) {
-
-                                                    //in other words, if there is a driver on a ride with anonymous patient
-                                                    cell.parentElement.style.background = '#FFEF8F';
+                                                    $(cell.parentElement).addClass('driverAssign2AnonymousRide');
                                                 }
                                             }
                                             break;
@@ -1552,7 +1517,7 @@
 
                                             if (isWithin2HoursSinceChange(thisRidePatLastModified) && !isSeenAllReady) {
                                                 cell.classList.add('within2HoursSinceChange');
-                                                increaseCounter('morning', thisRidePatNum);
+                                                increaseCounter('datatable-morning', thisRidePatNum);
                                             }
                                             break;
 
@@ -1611,7 +1576,7 @@
                                                 || rowData['destination'].indexOf('מרכז') !== -1
                                                 || rowData['destination'].indexOf('center') !== -1
                                             ) {
-                                                cell.parentElement.style.background = '#FFEF8F';
+                                                $(cell.parentElement).addClass('driverAssign2AnonymousRide');
                                             }
                                             break;
 
@@ -1621,7 +1586,7 @@
 
                                         case 4: //driver
                                             //this code is identical to the one in datatable-tomorrow when can need to change to 1 function
-                                            cell.className += ' driver_td';
+                                            $(cell).addClass('driver_td');
                                             if (cellData.indexOf('אין!') !== -1) {
 
                                                 let ridePatTime_td;
@@ -1636,10 +1601,9 @@
                                                 const hh = parseInt(ridePatTime_td[0]);
                                                 const mm = parseInt(ridePatTime_td[1]);
 
-                                                const calculatedStyle = styleManager.getSuitableStyle_4thisTime("datatable-afternoon", hh, mm);
-                                                cell.style.backgroundColor = calculatedStyle.backgroundColor;
-                                                cell.style.color = calculatedStyle.fontColor;
-                                                cell.style.fontWeight = calculatedStyle.fontWeight;
+                                                const suitableClass = classManager.getSuitableClassS_4thisTime("datatable-afternoon", hh, mm);
+                                                $(cell).addClass(suitableClass);
+
                                             }
                                             break;
 
@@ -1647,13 +1611,12 @@
                                             if (cellData.indexOf("הגענו ליעד") !== -1 ||
                                                 cellData.indexOf("Reached destination") !== -1) {
 
-                                                cell.style.backgroundColor = "green";
-                                                cell.style.color = "white";
+                                                $(cell).addClass('reached2destination');
                                             } else if (cellData.includes('שובץ נהג') || cellData.includes('Driver registered')) {
 
                                                 if (rowData["isAnonymous"]) {
-                                                    //in other words, if there is a driver on a ride with anonymous patient
-                                                    cell.parentElement.style.background = '#FFEF8F';
+
+                                                    $(cell.parentElement).addClass('driverAssign2AnonymousRide');
                                                 }
                                             }
                                             break;
@@ -1667,7 +1630,7 @@
 
                                             if (isWithin2HoursSinceChange(thisRidePatLastModified) && !isSeenAllReady) {
                                                 cell.classList.add('within2HoursSinceChange');
-                                                increaseCounter('afternoon', thisRidePatNum);
+                                                increaseCounter('datatable-afternoon', thisRidePatNum);
                                             }
                                             break;
 
@@ -1728,10 +1691,8 @@
                                         const hh = parseInt(ridePatTime_td[0]);
                                         const mm = parseInt(ridePatTime_td[1]);
 
-                                        const calculatedStyle = styleManager.getSuitableStyle_4thisTime("datatable-tomorrow", hh, mm);
-                                        cell.style.backgroundColor = calculatedStyle.backgroundColor;
-                                        cell.style.color = calculatedStyle.fontColor;
-                                        cell.style.fontWeight = calculatedStyle.fontWeight;
+                                        const suitableClass = classManager.getSuitableClassS_4thisTime("datatable-tomorrow", hh, mm);
+                                        $(cell).addClass(suitableClass);
 
                                     }
                                 }
@@ -1741,13 +1702,12 @@
                                     if (cellData.indexOf("הגענו ליעד") !== -1 ||
                                         cellData.indexOf("Reached destination") !== -1) {
 
-                                        cell.style.backgroundColor = "green";
-                                        cell.style.color = "white";
+                                        $(cell).addClass('reached2destination');
                                     } else if (cellData.includes('שובץ נהג') || cellData.includes('Driver registered')) {
 
                                         if (rowData["isAnonymous"]) {
-                                            //in other words, if there is a driver on a ride with anonymous patient
-                                            cell.parentElement.style.background = '#FFEF8F';
+
+                                            $(cell.parentElement).addClass('driverAssign2AnonymousRide');
                                         }
                                     }
                                 }
@@ -1763,7 +1723,7 @@
 
                                     if (isWithin2HoursSinceChange(thisRidePatLastModified) && !isSeenAllReady) {
                                         cell.classList.add('within2HoursSinceChange');
-                                        increaseCounter('tomorrow', thisRidePatNum);
+                                        increaseCounter('datatable-tomorrow', thisRidePatNum);
                                     }
                                 }
                             },
@@ -1800,7 +1760,7 @@
                         columnDefs: [
                             { targets: 0, type: 'de_date' },
                             { targets: 1, type: 'de_time' },
-                            { width: '9%', "targets": [0, 1, 2,5, 6, 8, 9, 11] },
+                            { width: '9%', "targets": [0, 1, 2, 5, 6, 8, 9, 11] },
                             { width: '22%', "targets": [4] },
                             { width: '6%', "targets": [8] },
                             { targets: 5, className: 'driver_td' },
@@ -1809,13 +1769,13 @@
 
                                     const thisRidePatNum = rowData.ridePatNum;
                                     const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatNum);
-                                    const intValue = convert2DBDateToInt(thisridePatObj.LastModified);//the reasone why we get the origial obj is to support pc with english date
+                                    const intValue = convert2DBDateToInt(thisridePatObj.LastModified);
                                     const thisRidePatLastModified = new Date(intValue)
                                     const isSeenAllReady = arrayOf_IHaveSeenAllready.includes(thisRidePatNum);
 
                                     if (isWithin2HoursSinceChange(thisRidePatLastModified) && !isSeenAllReady) {
                                         cell.classList.add('within2HoursSinceChange');
-                                        increaseCounter('future', thisRidePatNum);
+                                        increaseCounter('datatable-future', thisRidePatNum);
                                     }
                                 }
                             },
@@ -1842,7 +1802,6 @@
             });
         }
 
-
         const buildDriverHTML = (driver) => {
 
             let driverInnerContent = '';
@@ -1868,6 +1827,7 @@
         }
 
         const buildPatientHTML = (ridepat) => {
+
             let patientPhone2render = "";
             let numOfEscorts = ridepat.Escorts.length;
             let numOfPassengers = '<span class="numOfPassengers">נוסע יחיד</span>';
@@ -1876,7 +1836,7 @@
             let escortsPhone2render = "";
             let equipmentsAndnumOfPassengers = "";
 
-            if (validateMobileNum(ridepat.Pat.CellPhone)) {
+            if (validateMobileNumFullVersion(ridepat.Pat.CellPhone)) {
                 patientPhone2render = `<span class="patientPhone2render">${addSeperator2MobileNum(
                     ridepat.Pat.CellPhone,
                     "-"
@@ -1884,34 +1844,30 @@
             }
 
             if (numOfEscorts > 0) {
-                numOfPassengers = `<span class="numOfPassengers">${numOfEscorts + 1
+                numOfPassengers = `<span class="numOfPassengers">${numOfEscorts + 1//+1 is the patient his-self
                     } נוסעים</span>`;
                 numOfPassengers_English = `<span class="numOfPassengers">${numOfEscorts + 1
                     } passengers</span>`;
-                let numOfValidsPhones4Escorts = ridepat.Escorts.filter((es) =>
-                    validateMobileNum(es.CellPhone)
-                ).length;
 
                 escortsPhone2render = '<span class="escortsPhone2render block">מלווים: ';
                 numOfRealEscorts = 0;
 
                 ridepat.Escorts.map((es, i) => {
-                    if (validateMobileNum(es.CellPhone)) {
-                        if (!es.IsAnonymous) {
-                            numOfRealEscorts++;
-                            escortsPhone2render += `${addSeperator2MobileNum(
-                                es.CellPhone,
-                                "-"
-                            )}, `;
+                    if (validateMobileNumFullVersion(es.CellPhone)) {
+                        numOfRealEscorts++;
+                        escortsPhone2render += `${addSeperator2MobileNum(
+                            es.CellPhone,
+                            "-"
+                        )}, `;
 
-                            if (i === numOfEscorts - 1) {
-                                escortsPhone2render = escortsPhone2render.substring(
-                                    0,
-                                    escortsPhone2render.length - 2
-                                );
-                                escortsPhone2render += "</span>";
-                            }
+                        if (i === numOfEscorts - 1) {
+                            escortsPhone2render = escortsPhone2render.substring(
+                                0,
+                                escortsPhone2render.length - 2
+                            );
+                            escortsPhone2render += "</span>";
                         }
+
                     }
                 });
                 if (numOfRealEscorts === 0) escortsPhone2render = "";
@@ -1997,8 +1953,9 @@
             $('.ContextMenu_dropdown').addClass('hidden');//hide floating button
             $($(`#${candidate4IhaveSeen}`).children('.last-modified_td')[0]).removeClass('within2HoursSinceChange');//remove marker
 
-            let arrayOf_IHaveSeenAllready = JSON.parse(localStorage.getItem('arrayOf_IHaveSeenAllready'));
+            increaseCounter($($(`#${candidate4IhaveSeen}`)).closest('table')[0].id, candidate4IhaveSeen, true);
 
+            let arrayOf_IHaveSeenAllready = JSON.parse(localStorage.getItem('arrayOf_IHaveSeenAllready'));
 
             if (arrayOf_IHaveSeenAllready) {
 
@@ -2013,19 +1970,20 @@
 
         }
 
-
-        const increaseCounter = (tableName, ridePatNum) => {
+        const increaseCounter = (tableName, ridePatNum, isDecrease = false) => {
 
             if (!allReadyCountedRidePats.includes(ridePatNum)) {
 
-                let counterValue_asTxt = $(`#datatable-${tableName}_lastModified_counter`).text();
+                let counterValue_asTxt = $(`#${tableName}_lastModified_counter`).text();
                 let previosValue = parseInt(counterValue_asTxt);
-                previosValue++;
-                $(`#datatable-${tableName}_lastModified_counter`).html(previosValue)
+                isDecrease ? previosValue-- : previosValue++;
+                $(`#${tableName}_lastModified_counter`).html(previosValue)
 
                 allReadyCountedRidePats.push(ridePatNum);
             }
         }
+
+
     </script>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -2150,17 +2108,16 @@
                                 <div id="accordion" class="panel-group">
                                     <div onclick="assignTable2lastOne('datatable-morning')" class="panel panel-primary">
                                         <div class="panel-heading" id="col1">
-                                            <h4 data-toggle="tooltip" data-placement="top" title="Morning Rides  سفريات الصباح" class="panel-title">
+                                            <h4 data-toggle="tooltip" data-placement="top" title="Morning Rides  سفريات الصباح" class="row panel-title">
                                                 <a href="#collapse1" data-parent="#accordion" data-toggle="collapse" class="dropdown active open">
                                                     <span class="m-l-15">
                                                         נסיעות לבוקר
                                                         <span class="lastModified_counter">
-                                                            רשימות שעודכנו לאחרונה:
+                                                            רשומות שעודכנו לאחרונה:
                                                             <span id="datatable-morning_lastModified_counter">0</span>
                                                         </span>
                                                     </span>
                                                 </a>
-
                                             </h4>
                                         </div>
                                         <div class="panel-collapse collapse" id="collapse1">
@@ -2194,7 +2151,7 @@
                                                     <span class="m-l-15">
                                                         נסיעות לאחה"צ
                                                         <span class="lastModified_counter">
-                                                            רשימות שעודכנו לאחרונה:
+                                                            רשומות שעודכנו לאחרונה:
                                                             <span id="datatable-afternoon_lastModified_counter">0</span>
                                                         </span>
                                                     </span>
@@ -2232,7 +2189,7 @@
                                                     <span class="m-l-15">
                                                         נסיעות למחר
                                                         <span class="lastModified_counter">
-                                                            רשימות שעודכנו לאחרונה:
+                                                            רשומות שעודכנו לאחרונה:
                                                             <span id="datatable-tomorrow_lastModified_counter">0</span>
                                                         </span>
                                                     </span>
@@ -2272,7 +2229,7 @@
                                                         נסיעות עתידיות
                                                     </span>
                                                     <span class="lastModified_counter">
-                                                        רשימות שעודכנו לאחרונה:
+                                                        רשומות שעודכנו לאחרונה:
                                                         <span id="datatable-future_lastModified_counter">0</span>
                                                     </span>
                                                 </a>
@@ -2422,7 +2379,7 @@
         </div>
     </div>
     <div class="ContextMenu_dropdown hidden">
-        <button onclick="add2IhaveSeenAllready(this)" class="dropbtn">הסר סימון מתא זה</button>
+        <button onclick="add2IhaveSeenAllready()" class="dropbtn">הסר סימון מתא זה</button>
     </div>
 </body>
 </html>
