@@ -194,7 +194,10 @@
 
         let arr_escort_inthisRidePat = [];
         let patients_JSONArray = [];
-        let { buildStringforEquipment, convertDBDate2FrontEndDate } = GENERAL.USEFULL_FUNCTIONS;
+        let { buildStringforEquipment,
+            convertDBDate2FrontEndDate,
+            buildStringforDriverResponsibilityEquipment
+        } = GENERAL.USEFULL_FUNCTIONS;
         let patients_Names = []
         let rideNumber = 0;
         let x_wasClicked = false;
@@ -434,7 +437,7 @@
                     event.preventDefault();
                     var valid = validateInputs();
                     if (!valid) {
-                         $('#wait').hide();
+                        $('#wait').hide();
                         return false;
                     }
                     var numberOfRides = 1;
@@ -454,7 +457,7 @@
                         var validRides = PrintRides(repeatRide, numberOfRides);
 
                         if (!validRides) {
-                              $('#wait').hide();
+                            $('#wait').hide();
                             return false;
                         }
                     }
@@ -726,7 +729,7 @@
                                     //  async: false,
                                     data: JSON.stringify({ RidePatBack }),
                                     success: function (data) {
-                                          $('#wait').hide();
+                                        $('#wait').hide();
                                         let driverInput_hasValue = ($('#driver').val() !== "");
 
                                         returnDriveExist = JSON.parse(data.d);
@@ -756,7 +759,7 @@
 
                                     },
                                     error: function (err) {
-                                         $('#wait').hide();
+                                        $('#wait').hide();
                                         alert("Error in CheckRidePat: " + err.responseText);
                                     }
                                 });
@@ -810,7 +813,7 @@
                                         }
                                     },
                                     error: function (err) {
-                                         $('#wait').hide();
+                                        $('#wait').hide();
                                         alert("Error in CheckRidePat: " + err.responseText);
                                     }
                                 });
@@ -820,7 +823,7 @@
 
                         },
                         error: function (err) {
-                              $('#wait').hide();
+                            $('#wait').hide();
                             console.log(err);
                             swal(
                                 "خطأ\nשגיאה",
@@ -974,7 +977,7 @@
                 $("#selectEscort").html('');
             }
 
-            $('#remark').val(patient.Remarks); 
+            $('#remark').val(patient.Remarks);
             $('#remark').prop('disabled', false);
             $('#PatientIdentity').val(patient.PatientIdentity);
 
@@ -1001,6 +1004,7 @@
 
             $("#dirBTN").prop('disabled', false);
             $('#Equipment').text(buildStringforEquipment(patient.Equipment));
+            $('#driverResponsibilityEquipment').text(buildStringforDriverResponsibilityEquipment(patient.Equipment));
 
             $('#minute').prop('disabled', false);
             $('#hour').prop('disabled', false);
@@ -2094,7 +2098,7 @@
 
 
                             ridePat = JSON.parse(data.d);
-                            arr_escort_inthisRidePat = ridePat.Escorts;
+                            arr_escort_inthisRidePat = ridePat.Pat.EscortedList;
 
 
 
@@ -2249,7 +2253,7 @@
                             if (ridePat.Drivers.length > 0) {
                                 driverId = ridePat.Drivers[0].Id;
                             }
-                               $('#wait').hide();
+                            $('#wait').hide();
                             $('#driversDiv').show();
                             $("#lastModified").val(convertDBDate2FrontEndDate(ridePat.LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" }));
 
@@ -2267,7 +2271,8 @@
                                 Destination = { Name: ridePat.Origin.Name };
                                 Coordinator = { DisplayName: ridePat.Coordinator.DisplayName }
                                 Remark = ridePat.Remark;
-                                Escorts = ridePat.Escorts;
+                                Escorts = ridePat.Pat.EscortedList;
+                                                    //↑ even though it is not the most logical thing to do its the best way nowadays
                                 var temp = ridePat.Date.substring(ridePat.Date.indexOf("(") + 1, ridePat.Date.indexOf(")"))
                                 var date = new Date(parseInt(temp));
                                 let now = new Date();
@@ -2296,7 +2301,7 @@
                             request2TurnOffLoader([generateLocationPromise, getPatientByIdPromise]);
                         },
                         error: function (err) {
-                             $('#wait').hide();
+                            $('#wait').hide();
                             alert("Error in uploadData: " + err.responseText);
                         }
                     });
@@ -2477,7 +2482,7 @@
 
             RideId = data.d;
             console.log(RideId);
-             $('#wait').hide();
+            $('#wait').hide();
             swal({
                 title: "הנהג עודכן בהצלחה",
                 type: "success",
@@ -2494,7 +2499,7 @@
         }
 
         function signDriverErrorCB() {
-             $('#wait').hide();
+            $('#wait').hide();
             alert("Error signing driver");
 
         }
@@ -2524,7 +2529,7 @@
 
                 $('#driver').val("")
 
-                 $('#wait').hide();
+                $('#wait').hide();
                 swal({
                     title: "הנהג נמחק מההסעה בהצלחה",
                     type: "success",
@@ -2540,7 +2545,7 @@
         }
 
         function deleteRideErrorCB() {
-             $('#wait').hide();
+            $('#wait').hide();
             alert("Error deleting driver");
 
         }
@@ -2782,12 +2787,29 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label data-toggle="tooltip" title="Equipment   غرض مرافق" class="col-sm-2 control-label">ציוד נלווה</label>
+                                                    <label data-toggle="tooltip" title="Equipment   غرض مرافق" class="col-sm-2 control-label">
+                                                        ציוד נלווה
+                                                    </label>
                                                     <div class="col-sm-6" id="selectaddition">
                                                         <label id="Equipment" name="Equipment" class="control-label" />
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            <div class="col-sm-6">
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label data-toggle="tooltip" title="driverResponsibilityEquipment   غرض مرافق" class="col-sm-2 control-label">
+                                                        ציוד נלווה באחריות הנהג
+                                                    </label>
+                                                    <div class="col-sm-6">
+                                                        <label id="driverResponsibilityEquipment" class="control-label" />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
                                         </div>
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
