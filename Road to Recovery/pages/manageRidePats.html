@@ -675,6 +675,7 @@
                     }
 
                     return a === b ? 0 : a > b ? 1 : -1;
+
                 },
 
                 "de_time-desc": function (a, b) {
@@ -731,7 +732,6 @@
                     let mm_b = parseInt(ddmmyyyArr_b[1]);
                     let yyyy_b = parseInt(ddmmyyyArr_b[2]);
 
-                    //let now = new Date();
 
                     let a_date = new Date(yyyy_a, mm_a + 1, dd_a);
                     let b_date = new Date(yyyy_b, mm_b + 1, dd_b);
@@ -748,8 +748,8 @@
                     /*a and b are a couple of dates to compare
                    return value will be:
                    0 if a=b
-                   1 if a > b
-                  -1 if a < b
+                  -1 if a > b
+                   1 if a < b
                    */
 
                     let ddmmyyyArr_a = $.trim(a).split('.');
@@ -772,6 +772,94 @@
                     b = b_date.getTime();
 
                     return a === b ? 0 : a > b ? -1 : 1;
+                },
+
+                "last_modifiedSort-asc": (a, b) => {
+                    /*
+                     a and b are a couple of dates to compare
+                     return value will be:
+                     0 if a=b
+                     1 if a > b
+                     -1 if a < b
+                    */
+
+                    let dateAndTimeArrayof_a = $.trim(a).split(', ');
+                    let dateAndTimeArrayof_b = $.trim(b).split(', ');
+
+
+                    let ddmmyyyArr_a = dateAndTimeArrayof_a[0].split('.');
+                    let ddmmyyyArr_b = dateAndTimeArrayof_b[0].split('.');
+
+                    let dd_a = parseInt(ddmmyyyArr_a[0]);
+                    let mm_a = parseInt(ddmmyyyArr_a[1]);
+                    let yyyy_a = parseInt(ddmmyyyArr_a[2]);
+
+                    let dd_b = parseInt(ddmmyyyArr_b[0]);
+                    let mm_b = parseInt(ddmmyyyArr_b[1]);
+                    let yyyy_b = parseInt(ddmmyyyArr_b[2]);
+
+
+                    let time_a = dateAndTimeArrayof_a[1].split(':');
+                    let time_b = dateAndTimeArrayof_b[1].split(':');
+
+                    let hh_a = parseInt(time_a[0]);
+                    let minutes_a = parseInt(time_a[1]);
+
+                    let hh_b = parseInt(time_b[0]);
+                    let minutes_b = parseInt(time_b[1]);
+
+                    //new Date(year, monthIndex, day, hours, minutes)
+                    let a_dateAndTime = new Date(yyyy_a, mm_a - 1, dd_a, hh_a, minutes_a);
+                    let b_dateAndTime = new Date(yyyy_b, mm_b - 1, dd_b, hh_b, minutes_b);
+
+                    a = a_dateAndTime.getTime();
+                    b = b_dateAndTime.getTime();
+                    return a === b ? 0 : a > b ? 1 : -1;
+
+                },
+
+                "last_modifiedSort-desc": (a, b) => {
+                    /*
+                     a and b are a couple of dates to compare
+                     return value will be:
+                     0 if a=b
+                    -1 if a > b
+                     1 if a < b
+                    */
+
+                    let dateAndTimeArrayof_a = $.trim(a).split(', ');
+                    let dateAndTimeArrayof_b = $.trim(b).split(', ');
+
+
+                    let ddmmyyyArr_a = dateAndTimeArrayof_a[0].split('.');
+                    let ddmmyyyArr_b = dateAndTimeArrayof_b[0].split('.');
+
+                    let dd_a = parseInt(ddmmyyyArr_a[0]);
+                    let mm_a = parseInt(ddmmyyyArr_a[1]);
+                    let yyyy_a = parseInt(ddmmyyyArr_a[2]);
+
+                    let dd_b = parseInt(ddmmyyyArr_b[0]);
+                    let mm_b = parseInt(ddmmyyyArr_b[1]);
+                    let yyyy_b = parseInt(ddmmyyyArr_b[2]);
+
+
+                    let time_a = dateAndTimeArrayof_a[1].split(':');
+                    let time_b = dateAndTimeArrayof_b[1].split(':');
+
+                    let hh_a = parseInt(time_a[0]);
+                    let minutes_a = parseInt(time_a[1]);
+
+                    let hh_b = parseInt(time_b[0]);
+                    let minutes_b = parseInt(time_b[1]);
+
+                    //new Date(year, monthIndex, day, hours, minutes)
+                    let a_dateAndTime = new Date(yyyy_a, mm_a - 1, dd_a, hh_a, minutes_a);
+                    let b_dateAndTime = new Date(yyyy_b, mm_b - 1, dd_b, hh_b, minutes_b);
+
+                    a = a_dateAndTime.getTime();
+                    b = b_dateAndTime.getTime();
+                    return a === b ? 0 : a > b ? -1 : 1;
+
                 },
 
             });
@@ -1780,6 +1868,7 @@
                                 }
                             },
                             { targets: 7, className: 'last-modified_td' },
+                            { targets: 7, type: 'last_modifiedSort' },
                             { targets: 8, className: 'text-left-strong' },
                             { targets: [10], visible: false },
                         ],
@@ -1983,6 +2072,22 @@
             }
         }
 
+        const sortTable_LastModifiedFirst = (tableName) => {
+            switch (tableName) {
+                case 'datatable-morning':
+                    tMorning.order([6, 'desc']).draw();
+                    break;
+                case 'datatable-afternoon':
+                    tAfternoon.order([6, 'desc']).draw();
+                    break;
+                case 'datatable-tomorrow':
+                    tTomorrow.order([7, 'desc']).draw();
+                    break;
+                case 'datatable-future':
+                    tFuture.order([7, 'desc']).draw();
+                    break;
+            }
+        }
 
     </script>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -2108,12 +2213,14 @@
                                 <div id="accordion" class="panel-group">
                                     <div onclick="assignTable2lastOne('datatable-morning')" class="panel panel-primary">
                                         <div class="panel-heading" id="col1">
-                                            <h4 data-toggle="tooltip" data-placement="top" title="Morning Rides  سفريات الصباح" class="row panel-title">
+                                            <h4 data-toggle="tooltip" data-placement="top" title="Morning Rides  سفريات الصباح" class="panel-title">
                                                 <a href="#collapse1" data-parent="#accordion" data-toggle="collapse" class="dropdown active open">
                                                     <span class="m-l-15">
                                                         נסיעות לבוקר
                                                         <span class="lastModified_counter">
-                                                            רשומות שעודכנו לאחרונה:
+                                                            <span onclick="sortTable_LastModifiedFirst('datatable-morning')">
+                                                                רשומות שעודכנו לאחרונה:
+                                                            </span>
                                                             <span id="datatable-morning_lastModified_counter">0</span>
                                                         </span>
                                                     </span>
@@ -2151,7 +2258,9 @@
                                                     <span class="m-l-15">
                                                         נסיעות לאחה"צ
                                                         <span class="lastModified_counter">
-                                                            רשומות שעודכנו לאחרונה:
+                                                            <span onclick="sortTable_LastModifiedFirst('datatable-afternoon')">
+                                                                רשומות שעודכנו לאחרונה:
+                                                            </span>
                                                             <span id="datatable-afternoon_lastModified_counter">0</span>
                                                         </span>
                                                     </span>
@@ -2189,7 +2298,9 @@
                                                     <span class="m-l-15">
                                                         נסיעות למחר
                                                         <span class="lastModified_counter">
-                                                            רשומות שעודכנו לאחרונה:
+                                                            <span onclick="sortTable_LastModifiedFirst('datatable-tomorrow')">
+                                                                רשומות שעודכנו לאחרונה:
+                                                            </span>
                                                             <span id="datatable-tomorrow_lastModified_counter">0</span>
                                                         </span>
                                                     </span>
@@ -2229,7 +2340,9 @@
                                                         נסיעות עתידיות
                                                     </span>
                                                     <span class="lastModified_counter">
-                                                        רשומות שעודכנו לאחרונה:
+                                                        <span onclick="sortTable_LastModifiedFirst('datatable-future')">
+                                                            רשומות שעודכנו לאחרונה:
+                                                        </span>
                                                         <span id="datatable-future_lastModified_counter">0</span>
                                                     </span>
                                                 </a>
