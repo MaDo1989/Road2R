@@ -853,9 +853,6 @@ public class RidePat
             //    rp.Drivers.Add(v2);
             //}
 
-            rp.pat.EscortedList = new List<Escorted>();
-            rp.Escorts = new List<Escorted>();
-
             Location origin = new Location();
             origin.Name = dr["Origin"].ToString();
             origin = origin.getLocation();
@@ -889,14 +886,22 @@ public class RidePat
             string query2 = "select DisplayName,Id from RidePatEscortView where RidePatNum=" + ridePatNum;
             DbService db2 = new DbService();
             DataSet ds2 = db2.GetDataSetByQuery(query2);
+            rp.pat.EscortedList = new List<Escorted>();
+            rp.Escorts = new List<Escorted>();
+
             foreach (DataRow r in ds2.Tables[0].Rows)
             {
                 if (r["DisplayName"].ToString() != "")
                 {
                     Escorted e = new Escorted();
                     e.DisplayName = r["DisplayName"].ToString();
-                    //rp.pat.EscortedList.Add(e);
                     e.Id = (int)r["Id"];
+
+                    //UNFORTUNATELY we need both lists of escorts DO NOT REMOVE !!!
+                    //////////web app uses rp.pat.EscortedList
+                    //////////mobile app uses rp.Escorts 
+                    
+                    rp.pat.EscortedList.Add(e);
                     rp.Escorts.Add(e);
                 }
             }
@@ -1519,7 +1524,7 @@ public class RidePat
     }
 
     public int AssignRideToRidePat(int ridePatId, int userId, string driverType)
-    {//signalR implemnted int his method
+    {//signalR implemnted in this method
         int RideId = -1;
 
         DateTime timeRightNow = DateTime.Now;
@@ -1625,7 +1630,7 @@ public class RidePat
         return RideId;
     }
     public int LeaveRidePat(int ridePatId, int rideId, int driverId)
-    {//signalR implemnted int his method
+    {//signalR implemnted in this method
         int res = -1;
         DateTime timeRightNow = DateTime.Now;
         string query = "select * from RPView where RidePatNum=" + ridePatId;
