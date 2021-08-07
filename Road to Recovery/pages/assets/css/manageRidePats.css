@@ -164,3 +164,77 @@ input:checked + .slider:before {
     justify-content: center;
     width: 100px;
 }
+
+.within2HoursSinceChange {
+    background: rgb(197,248,209);
+}
+
+
+.dropbtn {
+    background-color: #04AA6D;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+}
+
+    .dropbtn:hover {
+        background-color: #3e8e41;
+    }
+
+.hidden {
+    visibility: hidden;
+}
+
+.lastModified_counter {
+    float: left;
+    margin-left: 20px;
+    font-size: 1.15em;
+}
+
+/*override bootstrap*/
+.panel-group .panel-heading {
+    padding: 6px 26px;
+}
+
+/*override bootstrap*/
+.fa-remove:before,
+.fa-close:before,
+.fa-times:before {
+    color: red;
+}
+
+/*override bootstrap*/
+.ti-pencil:before {
+    color: #3bafda;
+}
+
+
+.driverAssign2AnonymousRide {
+             /* ↓ yellowish*/
+    background: #FFEF8F;
+}
+
+.reached2destination{
+    background: green;
+    color: white;
+    font-weight: bold;
+}
+
+.initialStyle {
+    color: #797979;
+}
+
+.withIn12HoursDrive, .withIn24HoursDrive {
+    color: white;
+    font-weight: bold;
+}
+
+.withIn12HoursDrive {
+    background: red;
+}
+
+.withIn24HoursDrive {
+    background: orange;
+}
+

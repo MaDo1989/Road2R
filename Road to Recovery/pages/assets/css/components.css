@@ -373,9 +373,9 @@
   display: block;
 }
 .panel-group .panel .panel-heading a[data-toggle=collapse]:before {
-  content: '\f068';
+   content: '\f068'; 
   display: block;
-  float: left;
+  float: right;
   font-family: 'FontAwesome';
   font-size: 14px;
   text-align: left;
