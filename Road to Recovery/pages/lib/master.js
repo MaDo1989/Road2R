@@ -140,6 +140,7 @@ var GENERAL = {
     },
 
     USEFULL_FUNCTIONS: {
+
         /**
            * Gets a string of /Date(1608581640000).
            * Returns an int → 1608581640000
@@ -151,6 +152,7 @@ var GENERAL = {
             return parseInt(fullTimeStempNumber);
 
         },
+
         /**
           * Gets a string of /Date(1608581640000).
           * Returns a Date obj → new Date(1608581640000)
@@ -161,6 +163,7 @@ var GENERAL = {
 
             return new Date(GENERAL.USEFULL_FUNCTIONS.convert2DBDateToInt(fullTimeStempStr));
         },
+
         getHebrew_WeekDay: (day) => {
             let days = [];
             days[days.length] = "יום ראשון";
@@ -174,6 +177,7 @@ var GENERAL = {
             return days[day];
 
         },
+
         buildStringforEquipment: (hebrewArr) => {
             if (hebrewArr.length === 0) return "(None) אין";
             let str = "";
@@ -183,20 +187,33 @@ var GENERAL = {
                     case "כסא גלגלים":
                         str += `${hebrewArr[i]} (Wheelchair), `;
                         break;
-                    case "כסא תינוק":
-                        str += `${hebrewArr[i]} (Baby seat), `;
-                        break;
                     case "קביים":
                         str += `${hebrewArr[i]} (Crutches), `;
-                        break;
-                    case "בוסטר":
-                        str += `${hebrewArr[i]} (Buster), `;
                         break;
                 }
             }
             str = str.substring(0, str.lastIndexOf(", "));
             return str;
         },
+
+        buildStringforDriverResponsibilityEquipment: (hebrewArr) => {
+
+            let str = '';
+            for (var i = 0; i < hebrewArr.length; i++) {
+                switch (hebrewArr[i]) {
+                    case "כסא תינוק":
+                        str += `${hebrewArr[i]} (Baby seat), `;
+                        break;
+                    case "בוסטר":
+                        str += `${hebrewArr[i]} (Buster), `;
+                        break;
+                }
+            }
+            if (!hebrewArr.includes('כסא תינוק') && !hebrewArr.includes('בוסטר')) return "(None) אין";
+            str = str.substring(0, str.lastIndexOf(", "));
+            return str;
+        },
+
         /**
             * Gets a string of israeli phone number with no "-".
             * Returns a boolean weather the phone number has 10 valid digits
@@ -207,6 +224,7 @@ var GENERAL = {
 
             return mobileNum.length === 10;
         },
+
         /**
             * Gets a string of israeli phone number with no "-".
             * Returns a boolean weather the phone number valid or not, true is valid
@@ -223,6 +241,7 @@ var GENERAL = {
 
             return true;
         },
+
         /**
           * Gets a string of israeli phone number with no "-".
           * Returns a new string of the phone number with a string seperator
@@ -240,7 +259,20 @@ var GENERAL = {
 
         },
 
+        /**
+       * Gets two dates 
+       * Returns the hours gap between them.
+       * notes:
+       *  - The function return can be negative or positive depands on the parameter
+       *        for instance if you insert values to the function like this: getHoursGap(early, late) → return will be negative and vice versa
+       * this logic comes from the need to know if a ridepat is in G hours or allready passed (and how many hours passes since)
+     */
+        getHoursGap: (x, y) => {
 
+            let miliSeconds_gap = x - y;
+            let hours_gap = miliSeconds_gap / (1000 * 60 * 60); //1000 ms in 1 sec, 60 sec in 1m, 60 min in 1h
+            return hours_gap;
+        },
     },
 
     COPYWRITE: () => {

@@ -11,6 +11,7 @@ using System.Web.UI;
 using System.Configuration;
 using System.Collections;
 using System.Activities.Statements;
+using Microsoft.AspNet.SignalR;
 
 /// <summary>
 /// Summary description for WebService
@@ -2114,6 +2115,20 @@ public class WebService : System.Web.Services.WebService
 
     }
     #endregion
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 

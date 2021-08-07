@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Microsoft.AspNet.SignalR;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Web.Script.Serialization;
 
@@ -623,6 +625,8 @@ public class RidePat
                     m.changeInRide(RidePatNum, driver);
                 }
             }
+
+            //   InformAllConnectedClientsAboutChnagesInThisRidepat();
             return RidePatNum;
             //return res;
         }
@@ -803,93 +807,111 @@ public class RidePat
      */
     public RidePat GetRidePat(int ridePatNum)
     {
-        Location tmp = new Location();
-        Hashtable locations = tmp.getLocationsEnglishName();
-        string query = "select * from RPView where RidePatNum=" + ridePatNum;
-        DbService db = new DbService();
-        DataSet ds = db.GetDataSetByQuery(query);
-        RidePat rp = new RidePat();
-        rp.pat = new Patient();
-        DataRow dr = ds.Tables[0].Rows[0];
-
-        rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
-        if (dr["RideNum"].ToString() != null)
+        try
         {
-            if (dr["RideNum"].ToString() != "")
+
+
+            Location tmp = new Location();
+            Hashtable locations = tmp.getLocationsEnglishName();
+            string query = "select * from RPView where RidePatNum=" + ridePatNum;
+            DbService db = new DbService();
+            DataSet ds = db.GetDataSetByQuery(query);
+            RidePat rp = new RidePat();
+            rp.pat = new Patient();
+            DataRow dr = ds.Tables[0].Rows[0];
+
+            rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
+            if (dr["RideNum"].ToString() != null)
             {
-                rp.RideNum = int.Parse(dr["RideNum"].ToString());
+                if (dr["RideNum"].ToString() != "")
+                {
+                    rp.RideNum = int.Parse(dr["RideNum"].ToString());
+                }
             }
-        }
-        else rp.RideNum = -1;
-        rp.OnlyEscort = Convert.ToBoolean(dr["OnlyEscort"].ToString());
-        rp.Pat = rp.Pat.GetPatientById(Convert.ToInt32(dr["Id"]));
-        rp.Drivers = new List<Volunteer>();
-        if (dr["MainDriver"].ToString() != "")
-        {
-            Volunteer v1 = new Volunteer();
-            v1.Id = int.Parse(dr["MainDriver"].ToString());
-            v1.RegId = v1.GetVolunteerRegById(v1.Id);
-            v1.DriverType = "Primary";
-            rp.Drivers.Add(v1);
-
-        }
-        if (dr["secondaryDriver"].ToString() != "")
-        {
-            Volunteer v2 = new Volunteer();
-            v2.Id = int.Parse(dr["secondaryDriver"].ToString());
-            v2.RegId = v2.GetVolunteerRegById(v2.Id);
-            v2.DriverType = "Secondary";
-            rp.Drivers.Add(v2);
-        }
-        //rp.pat.EscortedList = new List<Escorted>();
-        rp.Escorts = new List<Escorted>();
-
-        Location origin = new Location();
-        origin.Name = dr["Origin"].ToString();
-        origin = origin.getLocation();
-        if (locations[origin.Name] == null)
-        {
-            origin.EnglishName = "";
-        }
-        else origin.EnglishName = locations[origin.Name].ToString();
-        rp.Origin = origin;
-
-        Location dest = new Location();
-        dest.Name = dr["Destination"].ToString();
-        dest = dest.getLocation();
-        if (locations[dest.Name] == null)
-        {
-            dest.EnglishName = "";
-        }
-        else dest.EnglishName = locations[dest.Name].ToString();
-        rp.Destination = dest;
-        rp.Area = dr["Area"].ToString();
-        rp.Shift = dr["Shift"].ToString();
-        rp.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
-        rp.Status = dr["Status"].ToString();
-        rp.Coordinator = new Volunteer();
-        rp.Coordinator.DisplayName = dr["Coordinator"].ToString();
-        rp.Remark = dr["Remark"].ToString();
-        rp.LastModified =
-                            String.IsNullOrEmpty(dr["lastModified"].ToString()) ? null :
-                            (DateTime?)Convert.ToDateTime(dr["lastModified"].ToString());
-
-        string query2 = "select DisplayName,Id from RidePatEscortView where RidePatNum=" + ridePatNum;
-        DbService db2 = new DbService();
-        DataSet ds2 = db2.GetDataSetByQuery(query2);
-        foreach (DataRow r in ds2.Tables[0].Rows)
-        {
-            if (r["DisplayName"].ToString() != "")
+            else rp.RideNum = -1;
+            rp.OnlyEscort = Convert.ToBoolean(dr["OnlyEscort"].ToString());
+            rp.Pat = rp.Pat.GetPatientById(Convert.ToInt32(dr["Id"]));
+            rp.Drivers = new List<Volunteer>();
+            if (dr["MainDriver"].ToString() != "")
             {
-                Escorted e = new Escorted();
-                e.DisplayName = r["DisplayName"].ToString();
-                //rp.pat.EscortedList.Add(e);
-                e.Id = (int)r["Id"];
-                rp.Escorts.Add(e);
-            }
-        }
+                Volunteer mainDriver = new Volunteer();
+                mainDriver.Id = int.Parse(dr["MainDriver"].ToString());
+                mainDriver = mainDriver.getVolunteerByID(mainDriver.Id);
+                mainDriver.RegId = mainDriver.GetVolunteerRegById(mainDriver.Id);
+                mainDriver.DriverType = "Primary";
 
-        return rp;
+                rp.Drivers.Add(mainDriver);
+            }
+
+            //NOT A SUPPORTED FEATCHER ANY MORE
+            //if (dr["secondaryDriver"].ToString() != "")
+            //{
+            //    Volunteer v2 = new Volunteer();
+            //    v2.Id = int.Parse(dr["secondaryDriver"].ToString());
+            //    v2.RegId = v2.GetVolunteerRegById(v2.Id);
+            //    v2.DriverType = "Secondary";
+            //    rp.Drivers.Add(v2);
+            //}
+
+            Location origin = new Location();
+            origin.Name = dr["Origin"].ToString();
+            origin = origin.getLocation();
+            if (locations[origin.Name] == null)
+            {
+                origin.EnglishName = "";
+            }
+            else origin.EnglishName = locations[origin.Name].ToString();
+            rp.Origin = origin;
+
+            Location dest = new Location();
+            dest.Name = dr["Destination"].ToString();
+            dest = dest.getLocation();
+            if (locations[dest.Name] == null)
+            {
+                dest.EnglishName = "";
+            }
+            else dest.EnglishName = locations[dest.Name].ToString();
+            rp.Destination = dest;
+            rp.Area = dr["Area"].ToString();
+            rp.Shift = dr["Shift"].ToString();
+            rp.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
+            rp.Status = dr["Status"].ToString();
+            rp.Coordinator = new Volunteer();
+            rp.Coordinator.DisplayName = dr["Coordinator"].ToString();
+            rp.Remark = dr["Remark"].ToString();
+            rp.LastModified =
+                                String.IsNullOrEmpty(dr["lastModified"].ToString()) ? null :
+                                (DateTime?)Convert.ToDateTime(dr["lastModified"].ToString());
+
+            string query2 = "select DisplayName,Id from RidePatEscortView where RidePatNum=" + ridePatNum;
+            DbService db2 = new DbService();
+            DataSet ds2 = db2.GetDataSetByQuery(query2);
+            rp.pat.EscortedList = new List<Escorted>();
+            rp.Escorts = new List<Escorted>();
+
+            foreach (DataRow r in ds2.Tables[0].Rows)
+            {
+                if (r["DisplayName"].ToString() != "")
+                {
+                    Escorted e = new Escorted();
+                    e.DisplayName = r["DisplayName"].ToString();
+                    e.Id = (int)r["Id"];
+
+                    //UNFORTUNATELY we need both lists of escorts DO NOT REMOVE !!!
+                    //////////web app uses rp.pat.EscortedList
+                    //////////mobile app uses rp.Escorts 
+                    
+                    rp.pat.EscortedList.Add(e);
+                    rp.Escorts.Add(e);
+                }
+            }
+
+            return rp;
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
 
     }
 
@@ -1502,7 +1524,7 @@ public class RidePat
     }
 
     public int AssignRideToRidePat(int ridePatId, int userId, string driverType)
-    {
+    {//signalR implemnted in this method
         int RideId = -1;
 
         DateTime timeRightNow = DateTime.Now;
@@ -1586,10 +1608,12 @@ public class RidePat
             }
         }
 
-        //HERE!
 
         RidePat rp = GetRidePat(ridePatId);
         RidePatNum = rp.RidePatNum;
+
+        BroadCast2Clients_driverHasAssigned2RidePat(rp);
+
         if (Date > timeRightNow)
         {
             try
@@ -1603,19 +1627,12 @@ public class RidePat
 
         }
 
-
-
-
         return RideId;
-
     }
-
     public int LeaveRidePat(int ridePatId, int rideId, int driverId)
-    {
-
+    {//signalR implemnted in this method
         int res = -1;
         DateTime timeRightNow = DateTime.Now;
-        string driver = "";
         string query = "select * from RPView where RidePatNum=" + ridePatId;
         DbService db4 = new DbService();
         DataSet ds2 = db4.GetDataSetByQuery(query);
@@ -1630,56 +1647,20 @@ public class RidePat
         TimeSpan difference = pickupTime - DateTime.Now;
         hours = difference.Hours;
 
-        if (dr["MainDriver"].ToString() == driverId.ToString())
-        {
-            driver = "MainDriver";
-        }
-        else if (dr["secondaryDriver"].ToString() == driverId.ToString())
-        {
-            driver = "secondaryDriver";
-        }
+        string query2 = "update Ride set MainDriver=null where RideNum=" + rideId;
+        DbService db = new DbService();
+        res = db.ExecuteQuery(query2);
 
-
-
-
-        //return ridePatId;
-        RidePat rp = GetRidePat(ridePatId);
-        RidePatNum = rp.RidePatNum;
-        Message m = new Message();
-
-        if (pickupTime > timeRightNow)
-        {
-            m.driverRemovedFromRide(RidePatNum, rp.Drivers[0]);
-        }
-        if (driver == "secondaryDriver")
-        {
-            string query1 = "update Ride set secondaryDriver=null where RideNum=" + rideId;
-            DbService db = new DbService();
-            res = db.ExecuteQuery(query1);
-        }
-        else
-        {
-            // string query = "update RidePat set RideId=null where RidePatNum=" + ridePatId; //+"; update Ride set "+driver+" =null where RideNum="+rideId;
-            string query2 = "update Ride set MainDriver=null where RideNum=" + rideId;
-            DbService db = new DbService();
-            res = db.ExecuteQuery(query2);
-        }
         if (hours <= 24 && (pickupTime > timeRightNow))
         {
 
             //it's less than 24 to the ride
             res = 911;
         }
-
-
-
-
-
-
-
+        RidePat rp = GetRidePat(ridePatId);
+        BroadCast2Clients_driverHasRemovedFromRidePat(rp);
 
         return res;
-
     }
 
     public int DeleteDriver(int ridePatId, int driverId)
@@ -1966,6 +1947,8 @@ public class RidePat
          and apply all the changes to them in it (where id in (...)
         */
 
+        //signalr goes in this method
+
         DbService dbs;
         SqlParameter[] cmdparams = new SqlParameter[3];
         SqlCommand cmd = new SqlCommand();
@@ -2187,6 +2170,26 @@ finally
         }
 
     }
+
+
+    private void BroadCast2Clients_driverHasAssigned2RidePat(RidePat rp)
+    {
+        if ((rp.Date - DateTime.Now).Days <= 30)
+        {//case in this month → inform clients on manageRidPats.html
+            IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<RidePatHub>();
+            hubContext.Clients.All.driverHasAssigned2RidePat(rp);
+        }
+    }
+
+    private void BroadCast2Clients_driverHasRemovedFromRidePat(RidePat rp)
+    {
+        if ((rp.Date - DateTime.Now).Days <= 30)
+        {//case in this month → inform clients on manageRidPats.html
+            IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<RidePatHub>();
+            hubContext.Clients.All.driverHasRemovedFromRidePat(rp);
+        }
+    }
+
     //Irrelevant
     #region GetRidePatEscortView
     //public List<RidePat> GetRidePatEscortView()
