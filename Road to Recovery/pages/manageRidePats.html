@@ -907,18 +907,22 @@
 
                 case 'datatable-morning':
                     $('#collapse1').addClass("in");
+                    $('#collapsed1_aTag').removeClass('collapsed');
                     break;
 
                 case 'datatable-afternoon':
                     $('#collapse2').addClass("in");
+                    $('#collapsed2_aTag').removeClass('collapsed');
                     break;
 
                 case 'datatable-tomorrow':
                     $('#collapse3').addClass("in");
+                    $('#collapsed3_aTag').removeClass('collapsed');
                     break;
 
                 case 'datatable-future':
                     $('#collapse4').addClass("in");
+                    $('#collapsed4_aTag').removeClass('collapsed');
                     break;
 
                 default:
@@ -1440,7 +1444,7 @@
                     let editBtn;
                     let deleteBtn;
                     let btnStr = '';
-               //     let lastModified = convertDBDate2FrontEndDate(arr_rides[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                    //     let lastModified = convertDBDate2FrontEndDate(arr_rides[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     let numOfRealEscorts = 0; //not anonymous
                     let driverColumnContent = '';
                     let englishStatus = '';
@@ -2214,14 +2218,14 @@
                                     <div onclick="assignTable2lastOne('datatable-morning')" class="panel panel-primary">
                                         <div class="panel-heading" id="col1">
                                             <h4 data-toggle="tooltip" data-placement="top" title="Morning Rides  سفريات الصباح" class="panel-title">
-                                                <a href="#collapse1" data-parent="#accordion" data-toggle="collapse" class="dropdown active open">
+                                                <a id="collapsed1_aTag" href="#collapse1" data-parent="#accordion" data-toggle="collapse" class="dropdown active open collapsed">
                                                     <span class="m-l-15">
                                                         נסיעות לבוקר
                                                         <span class="lastModified_counter">
-                                                            <span onclick="sortTable_LastModifiedFirst('datatable-morning')">
+                                                            <span class="lastModified_Records" onclick="sortTable_LastModifiedFirst('datatable-morning')">
                                                                 רשומות שעודכנו לאחרונה:
+                                                                <span id="datatable-morning_lastModified_counter">0</span>
                                                             </span>
-                                                            <span id="datatable-morning_lastModified_counter">0</span>
                                                         </span>
                                                     </span>
                                                 </a>
@@ -2254,16 +2258,16 @@
                                     <div onclick="assignTable2lastOne('datatable-afternoon')" class="panel panel-primary">
                                         <div class="panel-heading" id="col2">
                                             <h4 data-toggle="tooltip" data-placement="top" title="Afternoon Rides  سفريات المساء" class="panel-title">
-                                                <a href="#collapse2" data-parent="#accordion" data-toggle="collapse">
-                                                    <span class="m-l-15">
-                                                        נסיעות לאחה"צ
-                                                        <span class="lastModified_counter">
-                                                            <span onclick="sortTable_LastModifiedFirst('datatable-afternoon')">
-                                                                רשומות שעודכנו לאחרונה:
-                                                            </span>
+                                                <a id="collapsed2_aTag" href="#collapse2" data-parent="#accordion" data-toggle="collapse" class="dropdown active open collapsed" />
+                                                <span class="m-l-15">
+                                                    נסיעות לאחה"צ
+                                                    <span class="lastModified_counter">
+                                                        <span class="lastModified_Records" onclick="sortTable_LastModifiedFirst('datatable-afternoon')">
+                                                            רשומות שעודכנו לאחרונה:
                                                             <span id="datatable-afternoon_lastModified_counter">0</span>
                                                         </span>
                                                     </span>
+                                                </span>
                                                 </a>
                                             </h4>
                                         </div>
@@ -2294,14 +2298,14 @@
                                     <div onclick="assignTable2lastOne('datatable-tomorrow')" class="panel panel-primary">
                                         <div class="panel-heading" id="col4">
                                             <h4 data-toggle="tooltip" data-placement="bottom" title="Tomorrow Rides" class="panel-title">
-                                                <a href="#collapse3" data-parent="#accordion" data-toggle="collapse">
+                                                <a id="collapsed3_aTag" href="#collapse3" data-parent="#accordion" data-toggle="collapse" class="dropdown active open collapsed">
                                                     <span class="m-l-15">
                                                         נסיעות למחר
                                                         <span class="lastModified_counter">
-                                                            <span onclick="sortTable_LastModifiedFirst('datatable-tomorrow')">
+                                                            <span class="lastModified_Records" onclick="sortTable_LastModifiedFirst('datatable-tomorrow')">
                                                                 רשומות שעודכנו לאחרונה:
+                                                                <span id="datatable-tomorrow_lastModified_counter">0</span>
                                                             </span>
-                                                            <span id="datatable-tomorrow_lastModified_counter">0</span>
                                                         </span>
                                                     </span>
                                                 </a>
@@ -2335,15 +2339,15 @@
                                     <div onclick="assignTable2lastOne('datatable-future')" class="panel panel-primary">
                                         <div class="panel-heading" id="col3">
                                             <h4 data-toggle="tooltip" data-placement="bottom" title="Future Rides  سفريات مستقبلية" class="panel-title">
-                                                <a href="#collapse4" data-parent="#accordion" data-toggle="collapse">
+                                                <a id="collapsed4_aTag" href="#collapse4" data-parent="#accordion" data-toggle="collapse" class="dropdown active open collapsed">
                                                     <span class="m-l-15">
                                                         נסיעות עתידיות
                                                     </span>
                                                     <span class="lastModified_counter">
-                                                        <span onclick="sortTable_LastModifiedFirst('datatable-future')">
+                                                        <span class="lastModified_Records" onclick="sortTable_LastModifiedFirst('datatable-future')">
                                                             רשומות שעודכנו לאחרונה:
+                                                            <span id="datatable-future_lastModified_counter">0</span>
                                                         </span>
-                                                        <span id="datatable-future_lastModified_counter">0</span>
                                                     </span>
                                                 </a>
                                             </h4>
