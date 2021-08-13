@@ -192,6 +192,9 @@ input:checked + .slider:before {
     font-size: 1.15em;
 }
 
+.lastModified_Records{
+    text-decoration-line: underline;
+}
 /*override bootstrap*/
 .panel-group .panel-heading {
     padding: 6px 26px;
