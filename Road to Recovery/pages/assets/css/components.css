@@ -1,4 +1,4 @@
-﻿@import url(https://fonts.googleapis.com/css?family=Noto+Sans:400,700);
+@import url(https://fonts.googleapis.com/css?family=Noto+Sans:400,700);
 @import url(http://fonts.googleapis.com/css?family=Roboto:400,500,700);
 /* ===========
    Components List
@@ -18,9 +18,9 @@
    Buttons
  =============*/
 .btn {
-    border-radius: 2px;
-    background: rgb(232,232,232);
+    /* border-radius: 2px; */
     padding: 6px 14px;
+    background: rgb(200,200,200);
 }
 
 .btn-group-lg > .btn,
