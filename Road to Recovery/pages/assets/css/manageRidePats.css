@@ -171,16 +171,22 @@ input:checked + .slider:before {
 
 
 .dropbtn {
-    background-color: #04AA6D;
     color: white;
-    padding: 16px;
     font-size: 16px;
-    border: none;
+    background-color: rgb(180,180,180);
+    padding: 5px 10px !important;
+    border-radius: 35%;
 }
 
     .dropbtn:hover {
-        background-color: #3e8e41;
+        background: rgb(200,200,200);
     }
+
+.ContextMenu_dropdown{
+    color: white;
+    background: rgb(200,200,200);
+    padding: 5px 10px !important;
+}
 
 .hidden {
     visibility: hidden;
@@ -192,6 +198,9 @@ input:checked + .slider:before {
     font-size: 1.15em;
 }
 
+.lastModified_Records {
+    text-decoration-line: underline;
+}
 /*override bootstrap*/
 .panel-group .panel-heading {
     padding: 6px 26px;
@@ -211,11 +220,11 @@ input:checked + .slider:before {
 
 
 .driverAssign2AnonymousRide {
-             /* ↓ yellowish*/
+    /* ↓ yellowish*/
     background: #FFEF8F;
 }
 
-.reached2destination{
+.reached2destination {
     background: green;
     color: white;
     font-weight: bold;
@@ -237,4 +246,3 @@ input:checked + .slider:before {
 .withIn24HoursDrive {
     background: orange;
 }
-
