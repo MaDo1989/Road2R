@@ -1006,11 +1006,13 @@
             $('#Equipment').text(buildStringforEquipment(patient.Equipment));
             $('#driverResponsibilityEquipment').text(buildStringforDriverResponsibilityEquipment(patient.Equipment));
 
-            $('#minute').prop('disabled', false);
-            $('#hour').prop('disabled', false);
-            $('#dateRide').prop('disabled', false);
-            $('#afterNoon').prop('disabled', false);
-
+            if ($("#afterNoon").is(':checked')) {
+                $("#hour").val("");
+                $("#minute").val("");
+                $("#hour").attr('disabled', true);
+                $("#minute").attr('disabled', true);
+            }
+          
         }
 
         const getPatientById = (id) => {
@@ -2123,8 +2125,8 @@
                             //rdate = ryear + "-" + rmonth + "-" + rday;
                             document.getElementById("dateRide").value = date;
 
-                            if (hours + ":" + minutes == "22:14") {
-                                $("#afterNoon").attr('checked', 'checked');
+                            if (minutes == "14") {
+                                $("#afterNoon").attr('checked', true);
                                 checkAfternoon();
 
                             } else {
@@ -2322,8 +2324,8 @@
             if ($("#afterNoon").is(':checked')) {
                 $("#hour").val("");
                 $("#minute").val("");
-                $("#hour").attr('disabled', 'disabled');
-                $("#minute").attr('disabled', 'disabled');
+                $("#hour").attr('disabled', true);
+                $("#minute").attr('disabled', true);
             } else {
                 $("#hour").val("06");
                 $("#minute").val("00");
