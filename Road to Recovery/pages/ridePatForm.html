@@ -1005,14 +1005,19 @@
             $("#dirBTN").prop('disabled', false);
             $('#Equipment').text(buildStringforEquipment(patient.Equipment));
             $('#driverResponsibilityEquipment').text(buildStringforDriverResponsibilityEquipment(patient.Equipment));
+            $('#dateRide').prop('disabled', false);
 
             if ($("#afterNoon").is(':checked')) {
                 $("#hour").val("");
                 $("#minute").val("");
                 $("#hour").attr('disabled', true);
                 $("#minute").attr('disabled', true);
+            } else {
+                $('#minute').prop('disabled', false);
+                $('#hour').prop('disabled', false);
+                $('#afterNoon').prop('disabled', false);
             }
-          
+
         }
 
         const getPatientById = (id) => {
@@ -2274,7 +2279,7 @@
                                 Coordinator = { DisplayName: ridePat.Coordinator.DisplayName }
                                 Remark = ridePat.Remark;
                                 Escorts = ridePat.Pat.EscortedList;
-                                                    //↑ even though it is not the most logical thing to do its the best way nowadays
+                                //↑ even though it is not the most logical thing to do its the best way nowadays
                                 var temp = ridePat.Date.substring(ridePat.Date.indexOf("(") + 1, ridePat.Date.indexOf(")"))
                                 var date = new Date(parseInt(temp));
                                 let now = new Date();
