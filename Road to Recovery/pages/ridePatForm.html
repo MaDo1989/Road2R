@@ -374,7 +374,7 @@
             });
 
 
-            if (arr_customer.func === 'new' && document.referrer.includes('patientForm.html')) {
+            if (arr_customer.func === 'new' && document.referrer.toLocaleLowerCase().includes('patientform.html')) {
 
                 let patientFrom_patientForm = JSON.parse(localStorage.getItem('PatientNameForRide'));
 
