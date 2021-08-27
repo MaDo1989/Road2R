@@ -886,9 +886,9 @@ public class RidePat
             string query2 = "select DisplayName,Id from RidePatEscortView where RidePatNum=" + ridePatNum;
             DbService db2 = new DbService();
             DataSet ds2 = db2.GetDataSetByQuery(query2);
-            rp.pat.EscortedList = new List<Escorted>();
             rp.Escorts = new List<Escorted>();
 
+            //rp.pat.EscortedList = new List<Escorted>();
             foreach (DataRow r in ds2.Tables[0].Rows)
             {
                 if (r["DisplayName"].ToString() != "")
@@ -897,11 +897,14 @@ public class RidePat
                     e.DisplayName = r["DisplayName"].ToString();
                     e.Id = (int)r["Id"];
 
-                    //UNFORTUNATELY we need both lists of escorts DO NOT REMOVE !!!
-                    //////////web app uses rp.pat.EscortedList
-                    //////////mobile app uses rp.Escorts 
-                    
-                    rp.pat.EscortedList.Add(e);
+
+                    /// rp.pat.EscortedList are the escorts a patient has in general
+                    /// &
+                    /// rp.Escorts are escorts in this particular ridepat
+                    ///
+
+
+                    //rp.pat.EscortedList.Add(e);
                     rp.Escorts.Add(e);
                 }
             }
