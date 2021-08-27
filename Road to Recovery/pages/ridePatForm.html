@@ -192,7 +192,7 @@
         // var secondModal = false;
         var CoordinatorForReturn;
 
-        let arr_escort_inthisRidePat = [];
+        let escorts_inthisRidePat = [];
         let patients_JSONArray = [];
         let { buildStringforEquipment,
             convertDBDate2FrontEndDate,
@@ -2105,7 +2105,7 @@
 
 
                             ridePat = JSON.parse(data.d);
-                            arr_escort_inthisRidePat = ridePat.Pat.EscortedList;
+                            escorts_inthisRidePat = ridePat.Escorts;
 
 
 
@@ -2210,27 +2210,39 @@
                             existingOrigion = ridePat.Origin;
                             existingDestination = ridePat.Destination;
 
-                            fillPage_withPatientData(ridePat.Pat)
-                            if (typeof arr_escort_inthisRidePat !== "undefined") {
 
-                                for (i in arr_escort_inthisRidePat) {
-                                    $(`#escortCB${arr_escort_inthisRidePat[i].Id}`).prop('checked', true);
+                            //this ↓ function also among other things draw the patient's escorts checkboxes 
+                            fillPage_withPatientData(ridePat.Pat);
 
+                            //this code incharge to mark which escorts to checked in.
+                            if (typeof escorts_inthisRidePat !== "undefined") {
 
-                                    //if (ridePat.Pat.IsAnonymous == "True" && (ridePat.Status != 'ממתינה לשיבוץ')) {
-                                    //    var Escorted = new Object();
-                                    //    Escorted = arr_escort[i];
-                                    //    checkEscorts.push(Escorted);
-                                    //}
-                                    //for (j in ridePat.Escorts) {
-                                    //    //if (arr_escort[i].DisplayName == ridePat.Escorts[j].DisplayName) {
-                                    //    //CHECK THIS XXXXXXX
-                                    //    if (arr_escort[i].Id == ridePat.Escorts[j].Id) {
-                                    //        $("#escortCB" + arr_escort[i].Id).prop('checked', true);
-                                    //    }
-                                    //}
+                                for (var i = 0; i < escorts_inthisRidePat.length; i++) {
+
+                                    $(`#escortCB${escorts_inthisRidePat[i].Id}`).prop('checked', true);
                                 }
-                            } else ($("#selectEscort").html("<label data-toggle='tooltip' title='No escorts'>אין מלווים</label>"));
+                            }
+
+                            //if (typeof arr_escort_inthisRidePat !== "undefined") {
+
+                            //    for (i in arr_escort_inthisRidePat) {
+                            //        $(`#escortCB${arr_escort_inthisRidePat[i].Id}`).prop('checked', true);
+
+
+                            //        //if (ridePat.Pat.IsAnonymous == "True" && (ridePat.Status != 'ממתינה לשיבוץ')) {
+                            //        //    var Escorted = new Object();
+                            //        //    Escorted = arr_escort[i];
+                            //        //    checkEscorts.push(Escorted);
+                            //        //}
+                            //        //for (j in ridePat.Escorts) {
+                            //        //    //if (arr_escort[i].DisplayName == ridePat.Escorts[j].DisplayName) {
+                            //        //    //CHECK THIS XXXXXXX
+                            //        //    if (arr_escort[i].Id == ridePat.Escorts[j].Id) {
+                            //        //        $("#escortCB" + arr_escort[i].Id).prop('checked', true);
+                            //        //    }
+                            //        //}
+                            //    }
+                            //} else ($("#selectEscort").html("<label data-toggle='tooltip' title='No escorts'>אין מלווים</label>"));
 
                             //ridePat.Origin.EnglishName = ridePat.Origin.EnglishName.replace("'", "\\'");
                             //$("#selectOrigin option[value='" + ridePat.Origin.EnglishName + "']").prop('selected', true);
