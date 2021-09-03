@@ -990,7 +990,7 @@ public class RidePat
     }
 
 
-    //This method is used for שבץ אותי
+    //This method is used for שבץ אותי in mobile app & manageRidepats
     public List<RidePat> GetRidePatView(int volunteerId, int maxDays) //VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
     {
 
@@ -1160,8 +1160,7 @@ public class RidePat
                         rp.pat.Equipment.Add(row.ItemArray[0].ToString());
                     }
 
-                    rp.pat.EscortedList = new List<Escorted>(); //this is have no logic sence! BUT due to fucked up mobile app  it has to stay
-                    //↓↑ yogev switched that↓↑
+                    rp.pat.EscortedList = new List<Escorted>(); 
                     rp.Escorts = new List<Escorted>();
                     string escortSearchExpression = "RidePatNum = " + rp.ridePatNum;
                     DataRow[] escortRow = escortTable.Select(escortSearchExpression);
@@ -1174,8 +1173,8 @@ public class RidePat
                         e.CellPhone = row["CellPhone"].ToString();
                         e.IsAnonymous = String.IsNullOrEmpty(row["IsAnonymous"].ToString()) ? false : true;
                         rp.Escorts.Add(e);
-                        rp.pat.EscortedList.Add(e); //this is have no logic sence! BUT due to fucked up mobile app it has to stay
-                        //↓↑ yogev switched that↓↑
+                        rp.pat.EscortedList.Add(e); 
+                        
                     }
 
                     Location origin = new Location();
@@ -1198,7 +1197,11 @@ public class RidePat
                     rp.Shift = dr["Shift"].ToString();
                     rp.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
                     rp.Status = dr["Status"].ToString();
-
+                   
+                    bool result;
+                    Boolean.TryParse(dr["OnlyEscort"].ToString(), out result);
+                    rp.OnlyEscort = result;
+                    
                     rp.LastModified =
                                        String.IsNullOrEmpty(dr["lastModified"].ToString()) ? null :
                                        (DateTime?)Convert.ToDateTime(dr["lastModified"].ToString());
@@ -2156,8 +2159,8 @@ finally
     /// </summary>
     private void ChangeCoordinatoor(int ridePatNum)
     {
-        string loggedInName = (string)HttpContext.Current.Session["loggedInName"];
-
+        string loggedInName = String.IsNullOrEmpty((string)HttpContext.Current.Session["loggedInName"]) ? "sessionWasEmpty":
+            FixApostrophe((string)HttpContext.Current.Session["loggedInName"]);
 
         string query = "exec spRidePat_ChangeCoordinatorName @coordinatorName=N'" + loggedInName + "', @RidePatNum=" + ridePatNum;
         SqlCommand cmd = new SqlCommand();
@@ -2174,6 +2177,10 @@ finally
 
     }
 
+    private string FixApostrophe(string strWithChopchick)
+    {
+        return strWithChopchick.Replace("'","''");
+    }
 
     private void BroadCast2Clients_driverHasAssigned2RidePat(RidePat rp)
     {
