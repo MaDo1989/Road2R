@@ -182,7 +182,7 @@ public class Volunteer
             lastNameA = value;
         }
     }
-
+    public string OldCellPhone { get; set; }
     public string CellPhone
     {
         get
@@ -1826,11 +1826,9 @@ public class Volunteer
         {
             ChangeLastUpdateBy(0, v.DisplayName);
             string displayQuery = "";
-            string EnglishDisplayQuery = "";
-
             User u = new User();
             string newDisplayName = v.FirstNameH + " " + v.LastNameH;
-            string existingDisplayName = u.getUserNameByCellphone(v.CellPhone);
+            string existingDisplayName = u.getUserNameByCellphone(v.OldCellPhone);
 
             if (existingDisplayName != newDisplayName && u.CheckIfDisplayNameExists(newDisplayName))
             {
@@ -1844,7 +1842,7 @@ public class Volunteer
 
 
             string EnglishNewDisplayName = v.EnglishFN + " " + v.EnglishLN;
-            string existingEnglishDisplayName = u.getUserEnglishNameByCellphone(v.CellPhone);
+            string existingEnglishDisplayName = u.getUserEnglishNameByCellphone(v.OldCellPhone);
             if (EnglishNewDisplayName != existingEnglishDisplayName && u.CheckIfEnglishDisplayNameExists(EnglishNewDisplayName))
             {
 
