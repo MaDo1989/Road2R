@@ -226,6 +226,25 @@ public class WebService : System.Web.Services.WebService
             throw new Exception("שגיאה בשליפת נתוני מלווים");
         }
     }
+
+    //Benny Candidates
+    [WebMethod(EnableSession = true)]
+    public string getCandidates(int ridePatNum) {
+
+        try
+        {
+            candidatesLogic cl = new candidatesLogic();
+            return j.Serialize(cl.getCandidates(ridePatNum));
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in getCandidates", ex);
+            throw new Exception("שגיאה בקבלת מועמדים לנסיעות");
+
+        }
+    }
+    
+
     [WebMethod(EnableSession = true)]
     public string getVolunteerPrefs(int Id)
     {
