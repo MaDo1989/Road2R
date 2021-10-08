@@ -579,12 +579,12 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
-    public void setEscortedStatus(string displayName, string active)// change name to SetStatus
+    public void setEscortedStatus(int escortId, string active)// change name to SetStatus
     {
         try
         {
             Escorted c = new Escorted();
-            c.DisplayName = displayName;
+            c.Id = escortId;
             c.setEscortedStatus(active);
         }
         catch (Exception ex)
@@ -736,6 +736,21 @@ public class WebService : System.Web.Services.WebService
         {
             Log.Error("Error in getEscorted", ex);
             throw new Exception("שגיאה בשליפת מלווים");
+        }
+
+    }
+    [WebMethod(EnableSession = true)]
+    public string GetEscortById(int id)
+    {
+        try
+        {
+            Escorted escort = new Escorted().GetEscortById(id);
+            return j.Serialize(escort);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetEscortById", ex);
+            throw new Exception("שגיאה בשליפת מלווה לפי מזהה");
         }
 
     }
