@@ -87,13 +87,12 @@
         let timeFilteredArr = [];
         let ridePatNums2MarkDeleted = [];
         let ridePatNums2MarkRecovered = [];
-
-
+        let { convertDBDate2FrontEndDate } = GENERAL.USEFULL_FUNCTIONS;
 
         $(document).ready(function () {
 
             includeHTML();
-            let { COPYWRITE } = GENERAL;
+            let { COPYWRITE } = GENERAL;;
             $('#rights').html(COPYWRITE());
 
             $('[data-toggle="tooltip"]').tooltip();
@@ -316,7 +315,7 @@
         function refreshTable() {
             //this function doesnt changeing timeFilteredArr or fetching data from the back-end
             $('#wait').show();
-            setTimeout(() => { $('#wait').hide() },3000);
+            setTimeout(() => { $('#wait').hide() }, 3000);
 
 
             checkCookie();
@@ -398,9 +397,17 @@
                 }
 
 
+
+
+                let checkBoxStr = '<input class="checkBoxes" type="checkbox" onchange=RowChecked(this) />';
+                /*
+                 BACK IN TIME ONLY THE CREATOR OF A RIDEPAT COULD EDIT || DELETE NOW EVERY ONE CAN. YOGEV 05/05/2021
+                 
                 let checkBoxStr = timeFilteredArr[i].Coordinator.DisplayName === currentCoor ?
                     '<input class="checkBoxes" type="checkbox" onchange=RowChecked(this) />' :
                     '<input type="checkbox" disabled />';
+                */
+
 
                 if (removeCandidates) {
                     /*
@@ -428,11 +435,20 @@
                     var deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' name='" + timeFilteredArr[i].RidePatNum + "' title='מחיקה'><i class='fa fa-remove' ></i></button>";
                     //btnStr += " " + showBtn;
 
-                    if (timeFilteredArr[i].Status == 'ממתינה לשיבוץ' && timeFilteredArr[i].Coordinator.DisplayName == currentCoor || ((timeFilteredArr[i].Pat.IsAnonymous == "True") && timeFilteredArr[i].Coordinator.DisplayName == currentCoor)) btnStr += " " + editBtn;
-                    else btnStr += " " + showBtn;
-                    if (timeFilteredArr[i].Coordinator.DisplayName == currentCoor) {
-                        btnStr += " " + deleteBtn;
-                    }
+
+                    /*
+                        02/05/2021 - Yogev
+                        new conceptual approach towards delete and edit ridepat - now everyone can do anything
+                    */
+
+                    //if (timeFilteredArr[i].Status == 'ממתינה לשיבוץ' && timeFilteredArr[i].Coordinator.DisplayName == currentCoor
+                    //|| ((timeFilteredArr[i].Pat.IsAnonymous == "True") && timeFilteredArr[i].Coordinator.DisplayName == currentCoor)) btnStr += " " + editBtn;
+                    //else btnStr += " " + showBtn;
+                    //if (timeFilteredArr[i].Coordinator.DisplayName == currentCoor) {
+                    //    btnStr += " " + deleteBtn;
+                    //}
+
+                    btnStr = editBtn += " " + deleteBtn;
                 } else {
                     let recoverBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='recover' name='" + timeFilteredArr[i].RidePatNum + "' title='שחזור'><i class='ti-share-alt'></i></button>";
                     btnStr = recoverBtn;
@@ -456,7 +472,7 @@
                         Coordinator: timeFilteredArr[i].Coordinator.DisplayName,
                         Buttons: btnStr,
                         IsAnonymous: '',
-                        LastModified: timeFilteredArr[i].LastModified
+                        LastModified: convertDBDate2FrontEndDate(timeFilteredArr[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" })
                     }
                 }
                 else {
@@ -489,7 +505,7 @@
 
                         Buttons: buttons,
                         IsAnonymous: timeFilteredArr[i].Pat.IsAnonymous,
-                        LastModified: timeFilteredArr[i].LastModified
+                        LastModified: convertDBDate2FrontEndDate(timeFilteredArr[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" })
                     }
                 }
 
@@ -560,9 +576,7 @@
 
         const MarkAsRemoved_FewRidePats = () => {
 
-            let txt2post = `האם אתם בטוחים?
-                                                האם למחוק את כל ${ridePatNums2MarkDeleted.length} ההסעות שנבחרו ברשימה המוצגת לפניך?
-                                                `;
+            let txt2post = `האם אתם בטוחים? האם למחוק את כל ${ridePatNums2MarkDeleted.length} ההסעות שנבחרו ברשימה המוצגת לפניך?`;
             swal({
                 title: "האם אתם בטוחים?",
                 text: txt2post,
@@ -575,13 +589,15 @@
                 closeOnCancel: false
             }, function (isConfirm) {
                 if (isConfirm) {
+                    $('#wait').show();
                     $.ajax({
                         dataType: "json",
                         url: "WebService.asmx/ChangeArrayOF_RidePatStatuses",
                         contentType: "application/json; charset=utf-8",
                         type: "POST",
-                        data: JSON.stringify({ newStatus: 'נמחקה', ridePatNums: ridePatNums2MarkDeleted }),
+                        data: JSON.stringify({ newStatus: 'נמחקה', ridePatNums: ridePatNums2MarkDeleted, clientUTCTimeStemp: new Date().toUTCString() }),
                         success: function (data) {
+                            $('#wait').hide();
                             swal({
                                 title: "ההסעות סומנו כמחוקה 🗑️",
                                 timer: 1000,
@@ -596,7 +612,10 @@
                                 ImportDataByTimeFilters();
                             }, 1001);//literally means go fetch new data from server side with the same time frame
                         },
-                        error: function (err) { alert("Error in deleteRidePat:" + err.responseText); }
+                        error: function (err) {
+                            $('#wait').hide();
+                            alert("Error in deleteRidePat:" + err.responseText);
+                        }
                     });
 
                 } else {
@@ -607,9 +626,7 @@
 
         const Recover_FewRidePats = () => {
 
-            let txt2post = `האם אתם בטוחים?
-                                                האם למחוק את כל ${ridePatNums2MarkRecovered.length} ההסעות שנבחרו ברשימה המוצגת לפניך?
-                                                `;
+            let txt2post = `האם אתם בטוחים? האם למחוק את כל ${ridePatNums2MarkRecovered.length} ההסעות שנבחרו ברשימה המוצגת לפניך?`;
             swal({
                 title: "האם אתם בטוחים?",
                 text: txt2post,
@@ -622,13 +639,15 @@
                 closeOnCancel: false
             }, function (isConfirm) {
                 if (isConfirm) {
+                    $('#wait').show();
                     $.ajax({
                         dataType: "json",
                         url: "WebService.asmx/ChangeArrayOF_RidePatStatuses",
                         contentType: "application/json; charset=utf-8",
                         type: "POST",
-                        data: JSON.stringify({ newStatus: 'ממתינה לשיבוץ', ridePatNums: ridePatNums2MarkRecovered }),
+                        data: JSON.stringify({ newStatus: 'ממתינה לשיבוץ', ridePatNums: ridePatNums2MarkRecovered, clientUTCTimeStemp: new Date().toUTCString() }),
                         success: function (data) {
+                            $('#wait').hide();
                             swal({
                                 title: "ההסעות שוחזרו 🗑️",
                                 timer: 1000,
@@ -643,7 +662,10 @@
                                 ImportDataByTimeFilters();
                             }, 1001);//literally means go fetch new data from server side with the same time frame
                         },
-                        error: function (err) { alert("Error in Recover_FewRidePats:" + err.responseText); }
+                        error: function (err) {
+                            $('#wait').hide();
+                            alert("Error in Recover_FewRidePats:" + err.responseText);
+                        }
                     });
 
                 } else {
@@ -765,8 +787,8 @@
                 let date = tr.getElementsByTagName('td').Date.innerHTML;
 
                 let txt2post = `האם אתם בטוחים לשחזר את הנסיעה של : ${patientName}
-                                                                                                    מ - ${origin} ל - ${destenation}
-                                                                                                    בתאריך -  ${date}`;
+                                                                                                                                            מ - ${origin} ל - ${destenation}
+                                                                                                                                            בתאריך -  ${date}`;
 
 
                 swal({
@@ -823,8 +845,8 @@
                 let date = tr.getElementsByTagName('td').Date.innerHTML;
 
                 let txt2post = `האם אתם בטוחים למחוק את הנסיעה של : ${patientName}
-                                                                                                                        מ - ${origin} ל - ${destenation}
-                                                                                                                        בתאריך -  ${date}`;
+                                                                                                                                                                מ - ${origin} ל - ${destenation}
+                                                                                                                                                                בתאריך -  ${date}`;
                 let deleteMe = [];
                 deleteMe.push(ridePatNum);
 
@@ -840,13 +862,15 @@
                     closeOnCancel: false
                 }, function (isConfirm) {
                     if (isConfirm) {
+                        $('#wait').show();
                         $.ajax({
                             dataType: "json",
                             url: "WebService.asmx/ChangeArrayOF_RidePatStatuses",
                             contentType: "application/json; charset=utf-8",
                             type: "POST",
-                            data: JSON.stringify({ newStatus: 'נמחקה', ridePatNums: deleteMe }),
+                            data: JSON.stringify({ newStatus: 'נמחקה', ridePatNums: deleteMe, clientUTCTimeStemp: new Date().toUTCString() }),
                             success: function (data) {
+                                $('#wait').hide();
                                 refreshTable();
                                 swal({
                                     title: "ההסעה סומנה כמחוקה 🗑️",
@@ -857,7 +881,10 @@
                                 //right after
                                 setTimeout(function () { ImportDataByTimeFilters() }, 1001);//literally means go fetch new data from server side with the same time frame
                             },
-                            error: function (err) { alert("Error in deleteRidePat:" + err.responseText); }
+                            error: function (err) {
+                                $('#wait').hide();
+                                alert("Error in deleteRidePat:" + err.responseText);
+                            }
                         });
 
                     } else {

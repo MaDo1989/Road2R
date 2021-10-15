@@ -11,6 +11,7 @@ using System.Web.UI;
 using System.Configuration;
 using System.Collections;
 using System.Activities.Statements;
+using Microsoft.AspNet.SignalR;
 
 /// <summary>
 /// Summary description for WebService
@@ -268,7 +269,7 @@ public class WebService : System.Web.Services.WebService
         catch (Exception ex)
         {
             Log.Error("Error in setRidePat", ex);
-            throw new Exception("שגיאה בפתיחה/עדכון/מחיקה של הסעה חדשה");
+            throw new Exception("שגיאה בפתיחה/עדכון/מחיקה של הסעה חדשה " + ex.Message);
 
         }
     }
@@ -821,11 +822,11 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     // [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public void ChangeArrayOF_RidePatStatuses(string newStatus, List<int> ridePatNums)
+    public void ChangeArrayOF_RidePatStatuses(string newStatus, List<int> ridePatNums, DateTime clientUTCTimeStemp)
     {
         try
         {
-            new RidePat().ChangeArrayOF_RidePatStatuses(newStatus, ridePatNums);
+            new RidePat().ChangeArrayOF_RidePatStatuses(newStatus, ridePatNums, clientUTCTimeStemp);
         }
         catch (Exception ex)
         {
@@ -854,7 +855,6 @@ public class WebService : System.Web.Services.WebService
             //    Response.Headers.Remove("Content-Encoding");
             //    Response.AppendHeader("Content-Encoding", "gzip");
             //}
-
             RidePat rp = new RidePat();
             List<RidePat> r = rp.GetRidePatView(volunteerId, maxDays);
             j.MaxJsonLength = Int32.MaxValue;
@@ -862,6 +862,7 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
+            CatchErrors catchErrors = new CatchErrors("WebService: Exception in GetRidePatView", ex + " " + ex.Message + " " + ex.InnerException + " " + ex.Source, ex.StackTrace);
             Log.Error("Error in GetRidePatView", ex);
             throw new Exception("שגיאה בשליפת נתוני הסעות");
         }
@@ -2114,6 +2115,20 @@ public class WebService : System.Web.Services.WebService
 
     }
     #endregion
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 

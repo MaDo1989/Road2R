@@ -398,7 +398,7 @@ public class Escorted
         string query = "";
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
-        SqlParameter[] cmdParams = new SqlParameter[15];
+        SqlParameter[] cmdParams = new SqlParameter[16];
         cmdParams[0] = cmd.Parameters.AddWithValue("@FirstNameH", FirstNameH);
         cmdParams[1] = cmd.Parameters.AddWithValue("@FirstNameA", FirstNameA);
         cmdParams[2] = cmd.Parameters.AddWithValue("@LastNameH", LastNameH);
@@ -414,6 +414,7 @@ public class Escorted
         cmdParams[12] = cmd.Parameters.AddWithValue("@PatientId", Pat.Id);
         cmdParams[13] = cmd.Parameters.AddWithValue("@Relationship", 0);
         cmdParams[14] = cmd.Parameters.AddWithValue("@EnglishName",EnglishName);
+        cmdParams[15] = cmd.Parameters.AddWithValue("@IsAnonymous", IsAnonymous);
 
         db = new DbService();
         query = "select Id from ContactType where Name=@ContactType";
@@ -461,8 +462,9 @@ public class Escorted
         else if (func == "new")
         {
             query = "INSERT INTO Escorted (FirstNameH,LastNameH, CellPhone,CellPhone2,HomePhone,";
-            query += "City,IsActive,Gender,FirstNameA,LastNameA,EnglishName)";
-            query += " values (@FirstNameH,@LastNameH,@CellPhone,@CellPhone2,@HomePhone,@City,@IsActive,@Gender,@FirstNameA,@LastNameA,@EnglishName); select SCOPE_IDENTITY()";
+            query += "City,IsActive,Gender,FirstNameA,LastNameA,EnglishName, IsAnonymous)";
+            query += " values (@FirstNameH,@LastNameH,@CellPhone,@CellPhone2,@HomePhone,@City,@IsActive,@Gender,@FirstNameA,@LastNameA,@EnglishName,@IsAnonymous);" +
+                "select SCOPE_IDENTITY()";
             db = new DbService();
             Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
             cmdParams[11] = cmd.Parameters.AddWithValue("@Id", Id);

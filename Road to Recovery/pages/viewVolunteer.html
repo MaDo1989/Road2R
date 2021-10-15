@@ -92,60 +92,9 @@
             $("#closeModal").click(function () {
 
             });
-            //adds menu.html content into any "#menu" element
-            //$('#menu').load('menu.html');
-            //var userName = GENERAL.USER.getUserName();
-            //$("#userName").html(userName);
-
-            //Create a DataTable from the Table
-            t = $('#datatable-buttons').DataTable({
-                //bProcessing: true,
-                //bServerSide:true,
-                //ajax: function (data, callback, settings) {
-                //    $.ajax({
-                //        url: '/your/url',
-                //        type: 'POST',
-                //        data: data,
-                //        success: function (data) {
-                //            callback(data);
-                //            // Do whatever you want.
-                //        }
-                //    });
-                //},
-                "bDeferRender": true,
-                columnDefs: [
-                    {
-                        targets: 5,
-                        className: 'dt-body-left'
-                    }
-                ],
-                "autoWidth": true,
-
-
-            });
+          
 
             refreshTable();
-
-            //var pastePhone = document.getElementById('pastePhone');
-
-            //cleanPhoneNumber = function (e) {
-            //    e.preventDefault();
-            //    var pastedText = '';
-            //    if (window.clipboardData && window.clipboardData.getData) { // IE
-            //        pastedText = window.clipboardData.getData('Text');
-            //    } else if (e.clipboardData && e.clipboardData.getData) {
-            //        pastedText = e.clipboardData.getData('text/plain');
-            //    }
-            //    var patt = /(\d{1,3},\d{3}(,\d{3})*)(\.\d*)?|\d+\.?\d*/;
-            //    var res = patt.test(pastedText);
-            //    if (res) {
-            //        this.value = pastedText.replace(/\D/g, '');
-            //    } else {
-            //        this.value = pastedText;
-            //    }
-            //};
-
-
             jQuery.extend(jQuery.fn.dataTableExt.oSort, {
                 "de_date-asc": function (a, b) {
                     /*a and b are a couple of dates to compare
@@ -298,15 +247,13 @@
 
                     tbl = $('#datatable-buttons').DataTable({
                         data: allVolunteersFromDb,
+                        stateSave: true,
                         rowId: 'Id',
                         "autoWidth": false,
                         "destroy": true,
                         dom: 'Bfrtip',
                         buttons: [
-                            {
-                                extend: 'excel',
-                                title: 'מתנדבים'
-                            }
+                            'excel'
                         ],
                         columnDefs: [
                             {

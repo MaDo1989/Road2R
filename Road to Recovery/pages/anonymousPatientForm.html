@@ -151,47 +151,28 @@
         function generateEquipmentErrorCB(e) {
             alert("Error in generateEquipment: " + e.responseText);
         }
-        function generateHospital() {
-            var $select = $("#hospital");
+
+        function generateLocations() {
+
             $.ajax({
                 dataType: "json",
-                url: "WebService.asmx/getHospitalView",
+                url: "WebService.asmx/getDestinationView",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
                 async: false,
                 data: JSON.stringify({ active: true }),
                 success: function (data) {
-                    var arr_hospitals = JSON.parse(data.d);
+                    var arr_locations = JSON.parse(data.d);
+                    arr_locations.sort();
+                    $('<option>', { value: "", text: "בחר " }).appendTo($("#barrier"));
+                    $('<option>', { value: "", text: "בחר " }).appendTo($("#hospital"));
 
-                    $('<option>', { value: "", text: "בחר " }).appendTo($select);
-
-                    for (i in arr_hospitals) {
-                        $('<option>', { value: arr_hospitals[i].Name, text: arr_hospitals[i].Name }).appendTo($select);
+                    for (i in arr_locations) {
+                        $('<option>', { value: arr_locations[i].Name, text: arr_locations[i].EnglishName }).appendTo($("#barrier"));
+                        $('<option>', { value: arr_locations[i].Name, text: arr_locations[i].EnglishName }).appendTo($("#hospital"));
                     }
                 },
-                error: function (err) { alert("Error in getHospitalView: " + err.responseText); }
-            });
-        }
-
-        function generateBarrier() {
-            var $select = $("#barrier");
-            $.ajax({
-                dataType: "json",
-                url: "WebService.asmx/getBarrierView",
-                contentType: "application/json; charset=utf-8",
-                type: "POST",
-                async: false,
-                data: JSON.stringify({ active: true }),
-                success: function (data) {
-                    var arr_barriers = JSON.parse(data.d);
-
-                    $('<option>', { value: "", text: "בחר " }).appendTo($select);
-
-                    for (i in arr_barriers) {
-                        $('<option>', { value: arr_barriers[i].Name, text: arr_barriers[i].Name }).appendTo($select);
-                    }
-                },
-                error: function (err) { alert("Error in getBarrierView: " + err.responseText); }
+                error: function (err) { alert("Error in getDestinationView: " + err.responseText); }
             });
         }
 
@@ -201,8 +182,8 @@
             if (JSON.parse(GENERAL.PATIENTS.getPatientsList()).length != 0) {
                 arr_patient = JSON.parse(GENERAL.PATIENTS.getPatientsList());
                 if (arr_customer.func == "new") {
-                    generateBarrier();
-                    generateHospital();
+                    generateLocations();
+                  //  generateHospital();
                     generateEquipment();
                     //generateCities();
                 }
@@ -240,8 +221,8 @@
                     }
 
                     else {
-                        generateBarrier();
-                        generateHospital();
+                        generateLocations();
+                       // generateHospital();
                         generateEquipment();
                         generateCities();
                         $("#patientFirstName").attr('disabled', 'disabled');
@@ -265,8 +246,8 @@
                     var patient = JSON.parse(data.d);
                     GENERAL.PATIENTS.setPatientsList(JSON.stringify(patient));
                     generateEquipment();
-                    generateHospital();
-                    generateBarrier();
+                  //  generateHospital();
+                    generateLocations();
                     $("#PatientName").val(patient.DisplayName);
                     $("#patientFirstName").val(patient.FirstNameH);
                     $("#escort").val(patient.NumberOfEscort);

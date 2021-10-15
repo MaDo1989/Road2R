@@ -1,4 +1,12 @@
-﻿.centerHeader {
+#wait {
+    position: fixed;
+    top: 50%;
+    left: 45%;
+    z-index: 20000;
+}
+
+
+.centerHeader {
     text-align: center;
 }
 
@@ -13,7 +21,7 @@
 }
 
 #overRideBS_modal-dialog {
-            /*↓ this is work fine*/
+    /*↓ this is work fine*/
     width: fit-content;
     margin: 0 auto;
 }
@@ -31,7 +39,7 @@
 }
 
 
-.overRideBS_label{
+.overRideBS_label {
     font-weight: normal;
 }
 /* cool switch */
@@ -97,3 +105,144 @@ input:checked + .slider:before {
     }
 
 /* cool switch */
+
+.patientPhone2render {
+    display: block;
+}
+
+.equipmentsAndnumOfPassengers {
+    display: flex;
+    justify-content: space-between;
+}
+
+.customWidth4column {
+    width: 5vw;
+}
+
+.clickable:hover {
+    cursor: pointer;
+    color: mediumblue;
+    border-bottom: solid mediumblue 1px;
+    max-width: fit-content;
+    /*↑ works great in chrome*/
+}
+
+.driverName, .driverCellPhone {
+    display: block;
+}
+
+.equipments-img {
+    height: 2vh;
+}
+
+.blueFont {
+    color: rgb(40,96,145);
+}
+
+.boldFont {
+    font-weight: bold;
+}
+
+.block {
+    display: block;
+}
+
+.redBackGround {
+    background: red;
+}
+
+.whiteFont {
+    color: white;
+}
+
+.ltr {
+    direction: ltr;
+}
+
+.btnsInSameLine {
+    display: flex;
+    justify-content: center;
+    width: 100px;
+}
+
+.within2HoursSinceChange {
+    background: rgb(197,248,209);
+}
+
+
+.dropbtn {
+    color: white;
+    font-size: 16px;
+    background-color: rgb(180,180,180);
+    padding: 5px 10px !important;
+    border-radius: 35%;
+}
+
+    .dropbtn:hover {
+        background: rgb(200,200,200);
+    }
+
+.ContextMenu_dropdown{
+    color: white;
+    background: rgb(200,200,200);
+    padding: 5px 10px !important;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+.lastModified_counter {
+    float: left;
+    margin-left: 20px;
+    font-size: 1.15em;
+}
+
+.lastModified_Records {
+    text-decoration-line: underline;
+}
+/*override bootstrap*/
+.panel-group .panel-heading {
+    padding: 6px 26px;
+}
+
+/*override bootstrap*/
+.fa-remove:before,
+.fa-close:before,
+.fa-times:before {
+    color: red;
+}
+
+/*override bootstrap*/
+.ti-pencil:before {
+    color: #3bafda;
+}
+
+
+.driverAssign2AnonymousRide {
+    /* ↓ yellowish*/
+    background: #FFEF8F;
+}
+
+.reached2destination {
+    background: green;
+    color: white;
+    font-weight: bold;
+}
+
+.initialStyle {
+    color: #797979;
+}
+
+.withIn12HoursDrive, .withIn24HoursDrive {
+    color: white;
+    font-weight: bold;
+}
+
+.withIn12HoursDrive {
+    background: red;
+}
+
+.withIn24HoursDrive {
+    background: orange;
+}

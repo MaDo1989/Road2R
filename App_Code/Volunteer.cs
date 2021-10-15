@@ -1711,6 +1711,8 @@ public class Volunteer
         v.FirstNameH = dr["FirstNameH"].ToString();
         v.LastNameH = dr["LastNameH"].ToString();
         v.LastNameA = dr["LastNameA"].ToString();
+        v.EnglishFN = dr["EnglishFN"].ToString();
+        v.EnglishLN = dr["EnglishLN"].ToString();
         v.CellPhone = dr["CellPhone"].ToString();
         v.CellPhone2 = dr["CellPhone2"].ToString();
         v.HomePhone = dr["HomePhone"].ToString();
