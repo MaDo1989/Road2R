@@ -9,17 +9,27 @@ using System.Web;
 /// </summary>
 public class Candidate
 {
-    //here I stop and went to develop sort by regions
-
-    string DisplayName;
+    string displayName;
     short maxPathMatch;
     bool isSuperUser;
     bool dayMatch;
     short closestRide;
+    bool isNewbie;
+    SqlDataReader sdr;
+    DbService dbs;
 
+    public bool IsNewbie
+    {
+        get
+        {
+            return isNewbie;
+        }
 
-
-
+        set
+        {
+            isNewbie = value;
+        }
+    }
     public short MaxPathMatch
     {
         get
@@ -72,20 +82,18 @@ public class Candidate
         }
     }
 
-    public string DisplayName1
+    public string DisplayName
     {
         get
         {
-            return DisplayName;
+            return displayName;
         }
 
         set
         {
-            DisplayName = value;
+            displayName = value;
         }
     }
-
-
 
     public List<Candidate> GetCandidates(int ridePatNum) {
 
@@ -122,5 +130,36 @@ public class Candidate
 
     }
 
+    public List<Candidate> GetNewCandidates(int daysSinceJoin)
+    {
+        List<Candidate> newbies = new List<Candidate>();
+        Candidate candidate;
+        string query = "exec spVolunteer_GetActiveVolunteers_NotDriversYet @daysSinceJoin=" + daysSinceJoin;
+
+        try
+        {
+            dbs = new DbService();
+            sdr = dbs.GetDataReader(query);
+            while (sdr.Read())
+            {
+                candidate = new Candidate();
+                candidate.ClosestRide = -1;
+                candidate.maxPathMatch = -1;
+                candidate.IsNewbie = true;
+                candidate.DisplayName = sdr["DisplayName"].ToString();
+
+                newbies.Add(candidate);
+            }
+            return newbies;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+        finally
+        {
+            dbs.CloseConnection();
+        }
+    }
 
 }
