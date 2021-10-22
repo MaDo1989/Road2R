@@ -40,9 +40,11 @@
     <script src="lib/master.js"></script>
 
     <script src="lib/reports.js"></script>
+    <script src="lib/dashboard_high_level.js"></script>
 
     <script src="assets/js/jquery.min.js"></script>
     <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="../plugins/chart.js/chart.min.js"></script>
 
     <script src="dataTables.js"></script>
     <script src="moment.js"></script>
@@ -142,82 +144,83 @@
 
 
     <script>
-                checkCookie();
+        checkCookie();
 
-                var arr_rides;
-                var curr = new Date; // get current date
-                var first = curr.getDate() - curr.getDay(); // First day is the day of the month - the day of the week
-                var last = first + 6; // last day is the first day + 6
+        var arr_rides;
+        var curr = new Date; // get current date
+        var first = curr.getDate() - curr.getDay(); // First day is the day of the month - the day of the week
+        var last = first + 6; // last day is the first day + 6
 
-                var firstday = new Date(curr.setDate(first));
-                var lastday = new Date(curr.setDate(last));
+        var firstday = new Date(curr.setDate(first));
+        var lastday = new Date(curr.setDate(last));
 
-                if (lastday.getDate() < firstday.getDate()) {
-                    { var thisWeekFirst = lastday.getDate() + "." + (lastday.getMonth() + 2) + " - " + firstday.getDate() + "." + (firstday.getMonth() + 1) }
-                } else { var thisWeekFirst = lastday.getDate() + "." + (lastday.getMonth() + 1) + " - " + firstday.getDate() + "." + (firstday.getMonth() + 1) }
-                var locations;
-                var southLocations = []
-                var centerLocations = []
-                var northLocations = []
-                var allRides = [];
-                var weekdays = [];
+        if (lastday.getDate() < firstday.getDate()) {
+            { var thisWeekFirst = lastday.getDate() + "." + (lastday.getMonth() + 2) + " - " + firstday.getDate() + "." + (firstday.getMonth() + 1) }
+        } else { var thisWeekFirst = lastday.getDate() + "." + (lastday.getMonth() + 1) + " - " + firstday.getDate() + "." + (firstday.getMonth() + 1) }
+        var locations;
+        var southLocations = []
+        var centerLocations = []
+        var northLocations = []
+        var allRides = [];
+        var weekdays = [];
 
-                $(document).ready(function () {
+        $(document).ready(function () {
 
-                    let {COPYWRITE} = GENERAL;
-                    $('#rights').html(COPYWRITE());
+            let { COPYWRITE } = GENERAL;
+            $('#rights').html(COPYWRITE());
 
-                    init_reports_page();
+            init_reports_page();
 
-                    $("#rp_vl_ride_month").click(on_report_click);
-                    $("#rp_vl_ride_year").click(on_report_click);
-                    $("#rp_amuta_vls_week").click(on_report_click);
-                    $("#rp_amuta_vls_per_pat").click(on_report_click);
-                    $("#rp_amuta_vls_km").click(on_report_click);
-                    $("#rp_amuta_vls_list").click(on_report_click);
-                    $("#rp_amuta_vls_per_month").click(on_report_click);
-                    $("#rp_pil_vls_per_month").click(on_report_click);
-                    $("#rp_pil_vl_ride_month").click(on_report_click);
-                    $("#rp_pil_vl_ride_recent_period").click(on_report_click);
-                    $("#rp_center_daily_by_month").click(on_report_click);
-                    $("#rp_center_monthly_by_year").click(on_report_click);
- 
-
+            $("#rp_vl_ride_month").click(on_report_click);
+            $("#rp_vl_ride_year").click(on_report_click);
+            $("#rp_amuta_vls_week").click(on_report_click);
+            $("#rp_amuta_vls_per_pat").click(on_report_click);
+            $("#rp_amuta_vls_km").click(on_report_click);
+            $("#rp_amuta_vls_list").click(on_report_click);
+            $("#rp_amuta_vls_per_month").click(on_report_click);
+            $("#rp_pil_vls_per_month").click(on_report_click);
+            $("#rp_pil_vl_ride_month").click(on_report_click);
+            $("#rp_pil_vl_ride_recent_period").click(on_report_click);
+            $("#rp_center_daily_by_month").click(on_report_click);
+            $("#rp_center_monthly_by_year").click(on_report_click);
 
 
-                });
+            $("#dsb_hl").click(dashboard_hl_init);
+
+
+        });
 
 
 
-                function getDayString(num) {
-                    var day;    //Create a local variable to hold the string
-                    switch (num) {
-                        case 0:
-                            day = "יום א'";
-                            break;
-                        case 1:
-                            day = "יום ב'";
-                            break;
-                        case 2:
-                            day = "יום ג'";
-                            break;
-                        case 3:
-                            day = "יום ד'";
-                            break;
-                        case 4:
-                            day = "יום ה'";
-                            break;
-                        case 5:
-                            day = "יום ו'";
-                            break;
-                        case 6:
-                            day = "יום ש'";
-                            break;
-                        default:
-                            day = "Invalid day";
-                    }
-                    return day;
-                }
+        function getDayString(num) {
+            var day;    //Create a local variable to hold the string
+            switch (num) {
+                case 0:
+                    day = "יום א'";
+                    break;
+                case 1:
+                    day = "יום ב'";
+                    break;
+                case 2:
+                    day = "יום ג'";
+                    break;
+                case 3:
+                    day = "יום ד'";
+                    break;
+                case 4:
+                    day = "יום ה'";
+                    break;
+                case 5:
+                    day = "יום ו'";
+                    break;
+                case 6:
+                    day = "יום ש'";
+                    break;
+                default:
+                    day = "Invalid day";
+            }
+            return day;
+        }
 
 
     </script>
@@ -266,17 +269,17 @@
 
             <div class="content">
                 <div class="container">
-                    <div class="row">
+                    <div class="row"  id="reports_content_div" >
                         <div class="col-sm-2">
                             <h1> עץ הדו"חות</h1>
                             <ul id="myUL" class="report_tree_UL">
                                 <!--  <li>
-                                    <span>לרכז</span>
-                                    <ul>
-                                        <li>מתנדבים</li>
-                                        <li>הסעות שבוטלו</li>
-                                    </ul>
-                                </li>   -->
+        <span>לרכז</span>
+        <ul>
+            <li>מתנדבים</li>
+            <li>הסעות שבוטלו</li>
+        </ul>
+    </li>   -->
                                 <li>
                                     <span style="font-weight: bold;">לעמותה</span>
                                     <ul class="report_tree_UL">
@@ -301,6 +304,12 @@
                                         <li><a class="report_link_cls" id="rp_pil_vls_per_month">הסעות מתנדבים בפילוח חודשי </a></li>
                                         <li><a class="report_link_cls" id="rp_pil_vl_ride_month">מתנדבים מסיעים בחתך חודשי </a></li>
                                         <li><a class="report_link_cls" id="rp_pil_vl_ride_recent_period">הסעות בתקופה האחרונה </a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <span style="font-weight: bold;">בפיתוח</span>
+                                    <ul class="report_tree_UL">
+                                        <li><a class="report_link_cls" id="dsb_hl">Dashboard</a></li>
                                     </ul>
                                 </li>
                                 <li id="rp_special_list" style="display:none">
@@ -467,6 +476,12 @@
                             <br />
                         </div>
 
+                    </div>
+                </div>
+                <!--  DSBDSBDSB  This is the HTML UI for the High Level Dashboard  -->
+                <div class="row"  id="dsb_hl_content_div" style="display:none">
+                    <div>
+                        <h1> &nbsp;&nbsp; לוח מחוונים (שם זמני)</h1>
                     </div>
                 </div>
                 <div class="row" name="Container_for_wide_tables">
@@ -703,6 +718,7 @@
     </div>
 
 
+
     <div class="modal fade" id="documentedRidesModal" tabindex="-1" role="dialog" aria-labelledby="documentedRidesTitle" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content modal-lg">
@@ -736,7 +752,7 @@
     </div>
 
     <script>
-                var resizefunc = [];
+        var resizefunc = [];
     </script>
 
     <script src="assets/js/bootstrap-rtl.min.js"></script>
