@@ -139,6 +139,13 @@ public class ReportService
     }
 
 
+    public class MetricInfo
+    {
+        public string MetricName { get; set; }
+        public int Value1 { get; set; }
+        public int Value2 { get; set; }
+    }
+
 
     private DataTable getDriverByID(int driverID, DbService db)
     {
@@ -342,6 +349,17 @@ GROUP BY Volunteer.DisplayName
         DataSet ds = db.GetDataSetByQuery(query);
         DataTable dt = ds.Tables[0];
         return dt;
+    }
+
+    internal MetricInfo GetReportMetrics(string metric_name, string start_date1, string end_date1, string start_date2, string end_date2)
+    {
+        MetricInfo result = new MetricInfo();
+        result.MetricName = metric_name;
+
+        Random rng = new Random();
+        result.Value1 = rng.Next(0, 100);
+        result.Value2 = rng.Next(20, 180);
+        return result;
     }
 
     internal List<VolunteerPerRegion> GetReportVolunteerWeekly(string start_date, string end_date)

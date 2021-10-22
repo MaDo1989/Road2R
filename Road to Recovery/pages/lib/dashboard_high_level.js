@@ -4,18 +4,51 @@
 function dashboard_hl_init() {
     $("#reports_content_div").hide();
     $("#dsb_hl_content_div").show();
-    display_cards();
+    start_cards();
 }
 
-function display_cards() {
+function start_cards() {
     // display_demo_card();
 
-    for (const card of card_definitions) {
-        card.render(card);
+    for (const card_def of card_definitions) {
+        start_one_card(card_def);
     }
 }
 
-function render_card_rides(card_def) {
+// Initiate async ajax call. When call finishes, invoke card's on_data callback
+function start_one_card(card_def) {
+    var query_object = {
+        metric_name: card_def.name,
+        start_date1: "01-01-2020",
+        end_date1: "31-12-2020",
+        start_date2: "01-01-2020",
+        end_date2: "31-12-2020"
+    };
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportMetrics",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            // $('#wait').hide();
+            result = data.d;
+            card_def.render(card_def, result);
+        },
+        error: function (err) {
+            // $('#wait').hide();
+        }
+
+
+    });
+
+}
+
+function render_card_rides(card_def, metric_info) {
     var ctx = document.getElementById(card_def.canvas_name).getContext('2d');
     var slice_def = slice_definitions[card_def.slice];
 
@@ -25,7 +58,7 @@ function render_card_rides(card_def) {
             labels: slice_def.labels,
             datasets: [{
                 label: card_def.title,
-                data: [112, 143],
+                data: [metric_info.Value1, metric_info.Value2],
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)'
@@ -50,7 +83,7 @@ function render_card_rides(card_def) {
 }
 
 
-function render_card_patients(card_def) {
+function render_card_patients(card_def, metric_info) {
     var ctx = document.getElementById(card_def.canvas_name).getContext('2d');
     var slice_def = slice_definitions[card_def.slice];
 
@@ -58,7 +91,7 @@ function render_card_patients(card_def) {
         labels: slice_def.labels,
         datasets: [{
             label: card_def.title,
-            data: [52, 73],
+            data: [metric_info.Value1, metric_info.Value2],
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
                 'rgba(54, 162, 235, 0.2)'
@@ -85,7 +118,7 @@ function render_card_patients(card_def) {
     });
 }
 
-function render_card_engaged_volunteers(card_def) {
+function render_card_engaged_volunteers(card_def, metric_info) {
     var ctx = document.getElementById(card_def.canvas_name).getContext('2d');
     var slice_def = slice_definitions[card_def.slice];
 
@@ -93,7 +126,7 @@ function render_card_engaged_volunteers(card_def) {
         labels: slice_def.labels,
         datasets: [{
             label: card_def.title,
-            data: [39, 65],
+            data: [metric_info.Value1, metric_info.Value2],
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
                 'rgba(54, 162, 235, 0.2)'
@@ -122,7 +155,7 @@ function render_card_engaged_volunteers(card_def) {
 
 
 
-function render_card_new_volunteers(card_def) {
+function render_card_new_volunteers(card_def, metric_info) {
     var ctx = document.getElementById(card_def.canvas_name).getContext('2d');
     var slice_def = slice_definitions[card_def.slice];
 
@@ -130,7 +163,7 @@ function render_card_new_volunteers(card_def) {
         labels: slice_def.labels,
         datasets: [{
             label: card_def.title,
-            data: [4, 7],
+            data: [metric_info.Value1, metric_info.Value2],
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
                 'rgba(54, 162, 235, 0.2)'

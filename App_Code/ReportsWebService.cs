@@ -349,6 +349,27 @@ public class ReportsWebService : System.Web.Services.WebService
 
     }
 
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public ReportService.MetricInfo GetReportMetrics(string metric_name, string start_date1, string end_date1,
+                                                                        string start_date2, string end_date2)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            ReportService report = new ReportService();
+            ReportService.MetricInfo r = report.GetReportMetrics(metric_name, start_date1, end_date1, start_date2, end_date2);
+            return r;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReportMetrics", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
 
 }
 
