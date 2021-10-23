@@ -146,6 +146,13 @@ public class ReportService
         public int Value2 { get; set; }
     }
 
+    public class MetricDailyInfo
+    {
+        public string MetricName { get; set; }
+        public int Value1 { get; set; }
+        public int Value2 { get; set; }
+    }
+
 
     private DataTable getDriverByID(int driverID, DbService db)
     {
@@ -392,6 +399,16 @@ GROUP BY Volunteer.DisplayName
             obj.Region = dr["Area"].ToString();
             result.Add(obj);
         }
+
+        return result;
+    }
+
+    internal ReportService.MetricDailyInfo GetReportDailyMetrics(string metric_name)
+    {
+        MetricDailyInfo result = new MetricDailyInfo();
+        result.MetricName = metric_name;
+        result.Value1 = 10;
+        result.Value2 = 2;
 
         return result;
     }

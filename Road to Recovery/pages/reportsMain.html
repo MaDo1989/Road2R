@@ -187,6 +187,8 @@
 
             $("#dsb_hl").click(dashboard_hl_init);
 
+            dashboard_hl_init();
+
 
         });
 
@@ -486,7 +488,7 @@
                         </div>
 
                         <div class="col-sm-4">
-                            <h1> &nbsp;&nbsp; לוח מחוונים (שם זמני)</h1>
+                            <h1> &nbsp;&nbsp; מדדי העמותה</h1>
                         </div>
 
                         <div class="col-sm-7">
@@ -494,13 +496,17 @@
                         </div>
                     </div>
 
-                    <div class="row">   <!-- First row - two cards -->
-                        <div class="col-sm-1">
+                    <div class="row">
+                        <!-- First row - Daily - 3 cards -->
+                        <h2> &nbsp; &nbsp;היום</h2>
+                        <div class="col-sm-2">
                             &nbsp;
                         </div>
 
-                        <div class="col-sm-4">
-                            <canvas id="dsb_hl_card_rides" width="400" height="300"></canvas>
+                        <div class="col-sm-2" id="dsb_hl_daily_rides">
+                            <h3>הסעות</h3><p />
+                            <p id="dsb_hl_daily_rides_total">--</p>
+                            <p>ל - <span id="dsb_hl_daily_rides_attention"> -- </span> אין עדיין נהג</p>
                         </div>
 
 
@@ -508,13 +514,22 @@
                             &nbsp;
                         </div>
 
-                        <div class="col-sm-4">
-                            <canvas id="dsb_hl_card_patients" width="400" height="300"></canvas>
+                        <div class="col-sm-2" id="dsb_hl_daily_patients">
+                            <h3>חולים</h3><p />
+                            <p id="dsb_hl_daily_patients_total">--</p>
+                            <p>ל - <span id="dsb_hl_daily_patients_attention"> -- </span> אין עדיין הסעה</p>
                         </div>
 
-                        <div class="col-sm-1">
+                        <div class="col-sm-2">
                             &nbsp;
                         </div>
+
+                        <div class="col-sm-2" id="dsb_hl_daily_volunteers">
+                            <h3>מתנדבים מסיעים</h3><p />
+                            <p id="dsb_hl_daily_volunteers_total">--</p>
+                            <p> <span id="dsb_hl_daily_volunteers_attention"> -- </span> חדשים</p>
+                        </div>
+
                     </div>
                     <div class="row">
                         <!-- Second row; two more cards  -->

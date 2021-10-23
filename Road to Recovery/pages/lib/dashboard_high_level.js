@@ -4,30 +4,25 @@
 function dashboard_hl_init() {
     $("#reports_content_div").hide();
     $("#dsb_hl_content_div").show();
-    start_cards();
+   start_daily_cards();
 }
 
-function start_cards() {
-    // display_demo_card();
+function start_daily_cards() {
 
-    for (const card_def of card_definitions) {
-        start_one_card(card_def);
+    for (const card_def of daily_card_definitions) {
+        start_one_daily_card(card_def);
     }
 }
 
 // Initiate async ajax call. When call finishes, invoke card's on_data callback
-function start_one_card(card_def) {
+function start_one_daily_card(card_def) {
     var query_object = {
         metric_name: card_def.name,
-        start_date1: "01-01-2020",
-        end_date1: "31-12-2020",
-        start_date2: "01-01-2020",
-        end_date2: "31-12-2020"
     };
 
     $.ajax({
         dataType: "json",
-        url: "ReportsWebService.asmx/GetReportMetrics",
+        url: "ReportsWebService.asmx/GetReportDailyMetrics",
         contentType: "application/json; charset=utf-8",
         beforeSend: function (xhr) {
             xhr.setRequestHeader("Content-Encoding", "gzip");
@@ -37,7 +32,9 @@ function start_one_card(card_def) {
         success: function (data) {
             // $('#wait').hide();
             result = data.d;
-            card_def.render(card_def, result);
+            // Update card numeric value
+            $("#" + card_def.div_id + "_total").text(result.Value1);
+            $("#" + card_def.div_id + "_attention").text(result.Value2);
         },
         error: function (err) {
             // $('#wait').hide();
@@ -192,6 +189,27 @@ function render_card_new_volunteers(card_def, metric_info) {
 
 
 
+const daily_card_definitions = [
+
+    {
+        name: "daily_rides",
+        title: "הסעות",
+        div_id: "dsb_hl_daily_rides"
+    },
+    {
+        name: "daily_patients",
+        title: "חולים",
+        div_id: "dsb_hl_daily_patients"
+    },
+    {
+        name: "daily_volunteers",
+        title: "מתנדבים",
+        div_id: "dsb_hl_daily_volunteers"
+    }
+];
+
+
+    /*
 const card_definitions = [
     {
         name: "rides",
@@ -223,6 +241,7 @@ const card_definitions = [
         canvas_name: "dsb_hl_card_new_volunteers"
     },
 ];
+    */
 
  slice_definitions = {
     "SLICE_DEF_YTD": {
