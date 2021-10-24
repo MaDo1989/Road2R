@@ -1,10 +1,24 @@
 ﻿// Purpose: Dashboard UI for Amuta
 
+// next step - first note in GitHub Project Trello orad - Dashboard column.
+
+
+const CHART_COLORS = {
+    red: 'rgb(255, 99, 132)',
+    orange: 'rgb(255, 159, 64)',
+    yellow: 'rgb(255, 205, 86)',
+    green: 'rgb(75, 192, 192)',
+    blue: 'rgb(54, 162, 235)',
+    purple: 'rgb(153, 102, 255)',
+    grey: 'rgb(201, 203, 207)'
+};
+
 
 function dashboard_hl_init() {
     $("#reports_content_div").hide();
     $("#dsb_hl_content_div").show();
-   start_daily_cards();
+    start_daily_cards();
+    start_monthly_cards();
 }
 
 function start_daily_cards() {
@@ -283,6 +297,102 @@ function display_demo_card() {
                 ],
                 borderWidth: 1
             }]
+        },
+        options: {
+            responsive: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+}
+
+const month_card_definitions = [
+
+];
+
+
+function start_monthly_cards() {
+
+    for (const card_def of month_card_definitions) {
+        start_one_month_card(card_def);
+    }
+
+    start_month_graph();
+}
+
+function start_one_month_card() {
+    alert("start_one_month_card - TBD");
+}
+
+function start_month_graph() {
+
+    var query_object = {
+        start_date: '2020-01-01',
+        end_date: '2020-01-31'
+    };
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportMonthlyGraphMetrics",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            result = data.d;
+            render_month_graph(result);
+        },
+        error: function (err) {
+        }
+
+
+    });
+}
+
+function render_month_graph(data) {
+
+    let labels = data.map(function (obj) { return obj.Day; });
+    let rides = data.map(function (obj) { return obj.Rides; });
+    let volunteers = data.map(function (obj) { return obj.Volunteers; });
+    let patients = data.map(function (obj) { return obj.Patients; });
+
+    var ctx = document.getElementById('dsb_hl_monthly_graph').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'הסעות',
+                    data: rides,
+                    fill: false,
+                    borderColor: CHART_COLORS.green,
+                    backgroundColor: CHART_COLORS.green,
+                    borderWidth: 1
+                },
+                {
+                    label: 'חולים',
+                    data: patients,
+                    fill: false,
+                    borderColor: CHART_COLORS.purple,
+                    backgroundColor: CHART_COLORS.purple,
+                    borderWidth: 1
+                },
+                {
+                    label: 'מתנדבים',
+                    data: volunteers,
+                    fill: false,
+                    borderColor: CHART_COLORS.orange,
+                    backgroundColor: CHART_COLORS.orange,
+                    borderWidth: 1
+                }
+            ]
         },
         options: {
             responsive: false,

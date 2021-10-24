@@ -482,7 +482,8 @@
                 </div>
                 <!--  DSBDSBDSB  This is the HTML UI for the High Level Dashboard  -->
                 <div class="row" id="dsb_hl_content_div" style="display:none">
-                    <div class="row">  <!-- header row-->
+                    <div class="row">
+                        <!-- header row-->
                         <div class="col-sm-1">
                             &nbsp;
                         </div>
@@ -506,7 +507,7 @@
                         <div class="col-sm-2" id="dsb_hl_daily_rides">
                             <h3>הסעות</h3><p />
                             <p id="dsb_hl_daily_rides_total">--</p>
-                            <p>ל - <span id="dsb_hl_daily_rides_attention"> -- </span> אין עדיין נהג</p>
+                            <strong class="lead">ל - <span id="dsb_hl_daily_rides_attention"> -- </span> אין עדיין נהג</strong>
                         </div>
 
 
@@ -525,35 +526,48 @@
                         </div>
 
                         <div class="col-sm-2" id="dsb_hl_daily_volunteers">
-                            <h3>מתנדבים מסיעים</h3><p />
+                            <h3>מתנדבים</h3><p />
                             <p id="dsb_hl_daily_volunteers_total">--</p>
                             <p> <span id="dsb_hl_daily_volunteers_attention"> -- </span> חדשים</p>
                         </div>
 
                     </div>
                     <div class="row">
-                        <!-- Second row; two more cards  -->
-                        <div class="col-sm-1">
+                        <!-- Second row - Monthly - 1 Graph -->
+                        <h2> &nbsp; &nbsp;מבט חודשי</h2>
+                        <div class="col-sm-3">
                             &nbsp;
                         </div>
-
-                        <div class="col-sm-4">
-                            <canvas id="dsb_hl_card_engaged_volunteers" width="400" height="300"></canvas>
+                        <div class="col-sm-6">
+                            <canvas id="dsb_hl_monthly_graph" width="600" height="450"></canvas>
                         </div>
-
-
-                        <div class="col-sm-2">
-                            &nbsp;
-                        </div>
-
-                        <div class="col-sm-4">
-                            <canvas id="dsb_hl_card_new_volunteers" width="400" height="300"></canvas>
-                        </div>
-
-                        <div class="col-sm-1">
+                        <div class="col-sm-3">
                             &nbsp;
                         </div>
                     </div>
+                        <div class="row">
+                            <!-- Second row; two more cards  -->
+                            <div class="col-sm-1">
+                                &nbsp;
+                            </div>
+
+                            <div class="col-sm-4">
+                                <canvas id="dsb_hl_card_engaged_volunteers" width="400" height="300"></canvas>
+                            </div>
+
+
+                            <div class="col-sm-2">
+                                &nbsp;
+                            </div>
+
+                            <div class="col-sm-4">
+                                <canvas id="dsb_hl_card_new_volunteers" width="400" height="300"></canvas>
+                            </div>
+
+                            <div class="col-sm-1">
+                                &nbsp;
+                            </div>
+                        </div>
 
                     </div>
                     <div class="row" name="Container_for_wide_tables">
