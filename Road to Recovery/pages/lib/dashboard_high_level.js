@@ -22,21 +22,22 @@ function dashboard_hl_init() {
 }
 
 function start_daily_cards() {
-
-    for (const card_def of daily_card_definitions) {
-        start_one_daily_card(card_def);
-    }
+    start_current_day_row();
 }
 
 // Initiate async ajax call. When call finishes, invoke card's on_data callback
-function start_one_daily_card(card_def) {
+function start_current_day_row() {
+
+    // @@ 
+    let hack_day = new Date(2020, 09, 12); // 12-Oct-2020
     var query_object = {
-        metric_name: card_def.name,
-    };
+        start_date: moment(hack_day).format('YYYY-MM-DD'),
+        end_date: moment(hack_day).add(1, 'days').format('YYYY-MM-DD')
+    }
 
     $.ajax({
         dataType: "json",
-        url: "ReportsWebService.asmx/GetReportDailyMetrics",
+        url: "ReportsWebService.asmx/GetReportMonthlyDigestMetrics",
         contentType: "application/json; charset=utf-8",
         beforeSend: function (xhr) {
             xhr.setRequestHeader("Content-Encoding", "gzip");
@@ -44,14 +45,13 @@ function start_one_daily_card(card_def) {
         type: "POST",
         data: JSON.stringify(query_object),
         success: function (data) {
-            // $('#wait').hide();
             result = data.d;
             // Update card numeric value
-            $("#" + card_def.div_id + "_total").text(result.Value1);
-            $("#" + card_def.div_id + "_attention").text(result.Value2);
+            $("#dsb_hl_daily_rides_total").text(result.Rides);
+            $("#dsb_hl_daily_patients_total").text(result.Patients);
+            $("#dsb_hl_daily_volunteers_total").text(result.Volunteers);
         },
         error: function (err) {
-            // $('#wait').hide();
         }
 
 
@@ -310,7 +310,58 @@ function display_demo_card() {
 
 }
 
+
+function get_month_name_in_hebrew(month_designator) {
+    let dateObj = new Date();
+
+    //@@ Hack alert, using last year data as TEST DB is empty
+        dateObj.setFullYear(dateObj.getFullYear() - 1);
+
+    if (month_designator.localeCompare("prev") == 0) {
+        dateObj.setMonth(dateObj.getMonth() - 1);
+    }
+    if (month_designator.localeCompare("yoy") == 0) {
+        dateObj.setFullYear(dateObj.getFullYear() - 1);
+    }
+
+    return dateObj.toLocaleString("he", { year: 'numeric', month: "long" });
+}
+
+
+function get_month_range(month_designator) {
+    let dateObj = new Date();
+
+    //@@ Hack alert, using last year data as TEST DB is empty
+        dateObj.setFullYear(dateObj.getFullYear() - 1);
+
+    if (month_designator.localeCompare("prev") == 0) {
+        dateObj.setMonth(dateObj.getMonth() - 1);
+    }
+    if (month_designator.localeCompare("yoy") == 0) {
+        dateObj.setFullYear(dateObj.getFullYear() - 1);
+    }
+
+    dateObj.setDate(1);
+    let endDate = new Date(dateObj.getFullYear(),dateObj.getMonth() + 1, 0);
+
+    let result = {
+        start_date: moment(dateObj).format("YYYY-MM-DD"),
+        end_date: moment(endDate).format("YYYY-MM-DD")
+    }
+    return result;
+}
+
 const month_card_definitions = [
+
+    {
+        designator: "curr"
+    },
+    {
+        designator: "prev"
+    },
+    {
+        designator: "yoy"
+    }
 
 ];
 
@@ -321,19 +372,49 @@ function start_monthly_cards() {
         start_one_month_card(card_def);
     }
 
-    start_month_graph();
+   start_month_graph();
 }
 
-function start_one_month_card() {
-    alert("start_one_month_card - TBD");
+function start_one_month_card(card_def) {
+    let dsg = card_def.designator;
+    let label_id = "#dsb_hl_monthly_tbl_" + dsg + "_month_name";
+    let month_name = get_month_name_in_hebrew(dsg);
+    $(label_id).text(month_name);
+
+    // Invok Async call, to get info for this row.
+
+    var query_object = get_month_range(dsg);
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportMonthlyDigestMetrics",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            result = data.d;
+            render_month_card(dsg, result);
+        },
+        error: function (err) {
+        }
+    });
+}
+
+function render_month_card(dsg, result) {
+    let label_id = "#dsb_hl_monthly_tbl_" + dsg + "_pats";
+    $(label_id).text(result.Patients);
+    label_id = "#dsb_hl_monthly_tbl_" + dsg + "_rides";
+    $(label_id).text(result.Rides);
+    label_id = "#dsb_hl_monthly_tbl_" + dsg + "_vols";
+    $(label_id).text(result.Volunteers);
 }
 
 function start_month_graph() {
 
-    var query_object = {
-        start_date: '2020-01-01',
-        end_date: '2020-01-31'
-    };
+    var query_object = get_month_range("curr");
 
     $.ajax({
         dataType: "json",

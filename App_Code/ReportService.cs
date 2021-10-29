@@ -146,12 +146,6 @@ public class ReportService
         public int Value2 { get; set; }
     }
 
-    public class MetricDailyInfo
-    {
-        public string MetricName { get; set; }
-        public int Value1 { get; set; }
-        public int Value2 { get; set; }
-    }
 
     public class MetricMonthlyInfo
     {
@@ -410,6 +404,36 @@ GROUP BY Volunteer.DisplayName
         return result;
     }
 
+    internal MetricMonthlyInfo GetReportMonthlyDigestMetrics(string start_date, string end_date)
+    {
+        DbService db = new DbService();
+
+        string query =
+             @"SELECT count(DISTINCT DisplayName) as COUNT_PAT,  count(*) as COUNT_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
+               FROM RPView 
+               WHERE MainDriver is not null
+               AND RPView.pickuptime > @start_date
+               AND RPView.pickuptime < @end_date";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        MetricMonthlyInfo result = new MetricMonthlyInfo();
+
+        DataRow dr = dt.Rows[0];
+        result.Rides = dr["COUNT_RIDES"].ToString();
+        result.Patients = dr["COUNT_PAT"].ToString();
+        result.Volunteers = dr["COUNT_VOL"].ToString();
+
+        return result;
+
+    }
+
     internal List<ReportService.MetricMonthlyInfo> GetReportMonthlyGraphMetrics(string start_date, string end_date)
     {
         DbService db = new DbService();
@@ -447,16 +471,7 @@ GROUP BY Volunteer.DisplayName
 
     }
 
-    internal ReportService.MetricDailyInfo GetReportDailyMetrics(string metric_name)
-    {
-        MetricDailyInfo result = new MetricDailyInfo();
-        result.MetricName = metric_name;
-        result.Value1 = 10;
-        result.Value2 = 2;
-
-        return result;
-    }
-
+    
     internal List<VolunteersPerMonthInfo> GetReportVolunteerPerMonth(string start_date)
     {
         DbService db = new DbService();

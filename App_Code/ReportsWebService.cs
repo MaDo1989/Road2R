@@ -370,25 +370,7 @@ public class ReportsWebService : System.Web.Services.WebService
 
     }
 
-    [WebMethod(EnableSession = true)]
-    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public ReportService.MetricDailyInfo GetReportDailyMetrics(string metric_name)
-    {
-        try
-        {
-            HttpResponse response = GzipMe();
-
-            ReportService report = new ReportService();
-            ReportService.MetricDailyInfo r = report.GetReportDailyMetrics(metric_name);
-            return r;
-        }
-        catch (Exception ex)
-        {
-            Log.Error("Error in GetReportMetrics", ex);
-            throw new Exception("שגיאה בשליפת נתוני הסעות");
-        }
-
-    }
+    
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -405,6 +387,27 @@ public class ReportsWebService : System.Web.Services.WebService
         catch (Exception ex)
         {
             Log.Error("Error in GetReportMonthlyMetrics", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public ReportService.MetricMonthlyInfo GetReportMonthlyDigestMetrics(string start_date, string end_date)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            ReportService report = new ReportService();
+            ReportService.MetricMonthlyInfo r = report.GetReportMonthlyDigestMetrics(start_date, end_date);
+            return r;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReportMonthlyDigestMetrics", ex);
             throw new Exception("שגיאה בשליפת נתוני הסעות");
         }
 
