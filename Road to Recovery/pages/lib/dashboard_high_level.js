@@ -29,12 +29,19 @@ function start_daily_cards() {
 function start_current_day_row() {
 
     // @@ 
-    let hack_day = new Date(2020, 09, 12); // 12-Oct-2020
+    let hack_day = new Date(2021, 09, 12); // 12-Oct-2020
     var query_object = {
         start_date: moment(hack_day).format('YYYY-MM-DD'),
         end_date: moment(hack_day).add(1, 'days').format('YYYY-MM-DD')
     }
 
+    start_current_daily_totals(query_object);
+
+    start_current_daily_new_volunteers(query_object);
+
+}
+
+function start_current_daily_totals(query_object) {
     $.ajax({
         dataType: "json",
         url: "ReportsWebService.asmx/GetReportMonthlyDigestMetrics",
@@ -53,11 +60,30 @@ function start_current_day_row() {
         },
         error: function (err) {
         }
-
-
     });
-
 }
+
+
+
+function start_current_daily_new_volunteers(query_object) {
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportNewDriversInRange",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            result = data.d;
+            $("#dsb_hl_daily_volunteers_attention").text(result.Volunteers);
+        },
+        error: function (err) {
+        }
+    });
+}
+
 
 function render_card_rides(card_def, metric_info) {
     var ctx = document.getElementById(card_def.canvas_name).getContext('2d');
@@ -314,8 +340,8 @@ function display_demo_card() {
 function get_month_name_in_hebrew(month_designator) {
     let dateObj = new Date();
 
-    //@@ Hack alert, using last year data as TEST DB is empty
-        dateObj.setFullYear(dateObj.getFullYear() - 1);
+    // Hack alert, using last year data as TEST DB is empty
+    //        dateObj.setFullYear(dateObj.getFullYear() - 1);
 
     if (month_designator.localeCompare("prev") == 0) {
         dateObj.setMonth(dateObj.getMonth() - 1);
@@ -331,8 +357,8 @@ function get_month_name_in_hebrew(month_designator) {
 function get_month_range(month_designator) {
     let dateObj = new Date();
 
-    //@@ Hack alert, using last year data as TEST DB is empty
-        dateObj.setFullYear(dateObj.getFullYear() - 1);
+    // Hack alert, using last year data as TEST DB is empty
+    //      dateObj.setFullYear(dateObj.getFullYear() - 1);
 
     if (month_designator.localeCompare("prev") == 0) {
         dateObj.setMonth(dateObj.getMonth() - 1);
@@ -369,13 +395,18 @@ const month_card_definitions = [
 function start_monthly_cards() {
 
     for (const card_def of month_card_definitions) {
-        start_one_month_card(card_def);
+        start_one_month_row(card_def);
     }
 
    start_month_graph();
+
+   for (const card_def of month_card_definitions) {
+        start_one_month_new_volunteers(card_def);
+    }
+
 }
 
-function start_one_month_card(card_def) {
+function start_one_month_row(card_def) {
     let dsg = card_def.designator;
     let label_id = "#dsb_hl_monthly_tbl_" + dsg + "_month_name";
     let month_name = get_month_name_in_hebrew(dsg);
@@ -396,14 +427,14 @@ function start_one_month_card(card_def) {
         data: JSON.stringify(query_object),
         success: function (data) {
             result = data.d;
-            render_month_card(dsg, result);
+            render_month_row(dsg, result);
         },
         error: function (err) {
         }
     });
 }
 
-function render_month_card(dsg, result) {
+function render_month_row(dsg, result) {
     let label_id = "#dsb_hl_monthly_tbl_" + dsg + "_pats";
     $(label_id).text(result.Patients);
     label_id = "#dsb_hl_monthly_tbl_" + dsg + "_rides";
@@ -411,6 +442,32 @@ function render_month_card(dsg, result) {
     label_id = "#dsb_hl_monthly_tbl_" + dsg + "_vols";
     $(label_id).text(result.Volunteers);
 }
+
+
+function start_one_month_new_volunteers(card_def) {
+    let dsg = card_def.designator;
+    var query_object = get_month_range(dsg);
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportNewDriversInRange",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            result = data.d;
+            label_id = "#dsb_hl_monthly_tbl_" + dsg + "_new";
+            $(label_id).text(result.Volunteers);
+        },
+        error: function (err) {
+        }
+    });
+}
+
+
 
 function start_month_graph() {
 

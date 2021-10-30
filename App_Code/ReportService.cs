@@ -404,6 +404,38 @@ GROUP BY Volunteer.DisplayName
         return result;
     }
 
+    internal MetricMonthlyInfo GetReportNewDriversInRange(string start_date, string end_date)
+    {
+        DbService db = new DbService();
+
+        string query =
+             @"select  count (DISTINCT MainDriver)  AS COUNT_VOL
+            from RPView
+            where MainDriver is not null
+            and pickuptime > @start_date
+            and pickuptime < @end_date
+            AND not MainDriver in (
+	            select distinct MainDriver
+	            from RPView
+	            where MainDriver is not null
+	            and pickuptime < @start_date)";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        MetricMonthlyInfo result = new MetricMonthlyInfo();
+
+        DataRow dr = dt.Rows[0];
+        result.Volunteers = dr["COUNT_VOL"].ToString();
+
+        return result;
+    }
+
     internal MetricMonthlyInfo GetReportMonthlyDigestMetrics(string start_date, string end_date)
     {
         DbService db = new DbService();
@@ -431,7 +463,6 @@ GROUP BY Volunteer.DisplayName
         result.Volunteers = dr["COUNT_VOL"].ToString();
 
         return result;
-
     }
 
     internal List<ReportService.MetricMonthlyInfo> GetReportMonthlyGraphMetrics(string start_date, string end_date)

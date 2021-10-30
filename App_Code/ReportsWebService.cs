@@ -413,6 +413,26 @@ public class ReportsWebService : System.Web.Services.WebService
 
     }
 
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public ReportService.MetricMonthlyInfo GetReportNewDriversInRange(string start_date, string end_date)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            ReportService report = new ReportService();
+            ReportService.MetricMonthlyInfo r = report.GetReportNewDriversInRange(start_date, end_date);
+            return r;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReportMonthlyDigestMetrics", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
 
 }
 
