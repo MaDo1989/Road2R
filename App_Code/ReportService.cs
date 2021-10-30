@@ -436,6 +436,42 @@ GROUP BY Volunteer.DisplayName
         return result;
     }
 
+    internal List<MetricMonthlyInfo> GetReportYearlyGraphMetrics(string start_date, string end_date)
+    {
+        DbService db = new DbService();
+
+        string query =
+             @"SELECT  MONTH(pickuptime) as MONTH_C ,  count(DISTINCT DisplayName) as COUNT_PAT,  count(*) as COUNT_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
+               FROM RPView 
+               WHERE MainDriver is not null
+               AND RPView.pickuptime > @start_date
+               AND RPView.pickuptime < @end_date
+               GROUP BY MONTH(pickuptime)
+               ORDER BY MONTH_C ASC";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        List<MetricMonthlyInfo> result = new List<MetricMonthlyInfo>();
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            MetricMonthlyInfo obj = new MetricMonthlyInfo();
+            obj.Day = dr["MONTH_C"].ToString();
+            obj.Rides = dr["COUNT_RIDES"].ToString();
+            obj.Patients = dr["COUNT_PAT"].ToString();
+            obj.Volunteers = dr["COUNT_VOL"].ToString();
+            result.Add(obj);
+        }
+
+        return result;
+    }
+
     internal MetricMonthlyInfo GetReportMonthlyDigestMetrics(string start_date, string end_date)
     {
         DbService db = new DbService();

@@ -500,7 +500,7 @@
                     <div class="row">
                         <!-- First row - Daily - 3 cards -->
                         <h2> &nbsp; &nbsp;היום</h2>
-                        <div class="col-sm-2">
+                        <div class="col-sm-1">
                             &nbsp;
                         </div>
 
@@ -511,7 +511,7 @@
                         </div>
 
 
-                        <div class="col-sm-2">
+                        <div class="col-sm-1">
                             &nbsp;
                         </div>
 
@@ -521,7 +521,7 @@
                             <p>ל - <span id="dsb_hl_daily_patients_attention"> -- </span> אין עדיין הסעה</p>
                         </div>
 
-                        <div class="col-sm-2">
+                        <div class="col-sm-1">
                             &nbsp;
                         </div>
 
@@ -539,7 +539,7 @@
                             &nbsp;
                         </div>
                         <div class="col-sm-6">
-                            <canvas id="dsb_hl_monthly_graph" width="600" height="450"></canvas>
+                            <canvas id="dsb_hl_monthly_graph" width="550" height="300"></canvas>
                         </div>
                         <div class="col-sm-3">
                             &nbsp;
@@ -584,29 +584,47 @@
                             &nbsp;
                         </div>
                     </div>
+
                     <div class="row">
-                        <!-- Second row; two more cards  -->
-                        <div class="col-sm-1">
+                        <!-- Fourth row - Yearly - 1 Graph -->
+                        <h2> &nbsp; &nbsp;מבט שנתי</h2>
+                        <div class="col-sm-3">
                             &nbsp;
                         </div>
-
-                        <div class="col-sm-4">
-                            <canvas id="dsb_hl_card_engaged_volunteers" width="400" height="300"></canvas>
+                        <div class="col-sm-6">
+                            <canvas id="dsb_hl_yearly_graph" width="600" height="450"></canvas>
                         </div>
-
-
-                        <div class="col-sm-2">
-                            &nbsp;
-                        </div>
-
-                        <div class="col-sm-4">
-                            <canvas id="dsb_hl_card_new_volunteers" width="400" height="300"></canvas>
-                        </div>
-
-                        <div class="col-sm-1">
+                        <div class="col-sm-3">
                             &nbsp;
                         </div>
                     </div>
+                    <div class="row">
+                        <!-- Fifth row - yearly - Table -->
+                        <div class="col-sm-1">
+                            &nbsp;
+                        </div>
+                        <div class="col-sm-1">
+                            <div class="row">&nbsp;             </div>
+                            <div class="row" >    YTD       </div>
+                            <div class="row" >     המקבילה בשנה שעברה        </div>
+                        </div>
+                        <div class="col-sm-1">
+                            <div class="row">חולים          </div>
+                            <div class="row" id="dsb_hl_yearly_tbl_ytd_pats"> --            </div>
+                            <div class="row" id="dsb_hl_yearly_tbl_yoy_pats">--</div>
+                        </div>
+                        <div class="col-sm-1">
+                            <div class="row">הסעות          </div>
+                            <div class="row" id="dsb_hl_yearly_tbl_ytd_rides"> --            </div>
+                            <div class="row" id="dsb_hl_yearly_tbl_yoy_rides">--</div>
+                        </div>
+                        <div class="col-sm-1">
+                            <div class="row">מתנדבים          </div>
+                            <div class="row" id="dsb_hl_yearly_tbl_ytd_vols">  --           </div>
+                            <div class="row" id="dsb_hl_yearly_tbl_yoy_vols">--</div>
+                        </div>
+                    </div>
+
 
                 </div>
                     <div class="row" name="Container_for_wide_tables">

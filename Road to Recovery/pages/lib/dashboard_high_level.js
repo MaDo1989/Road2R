@@ -1,6 +1,6 @@
 ﻿// Purpose: Dashboard UI for Amuta
 
-// next step - first note in GitHub Project Trello orad - Dashboard column.
+// next step - first note in GitHub Project Trello board - Dashboard column.
 
 
 const CHART_COLORS = {
@@ -19,6 +19,7 @@ function dashboard_hl_init() {
     $("#dsb_hl_content_div").show();
     start_daily_cards();
     start_monthly_cards();
+    start_yearly_cards();
 }
 
 function start_daily_cards() {
@@ -340,9 +341,6 @@ function display_demo_card() {
 function get_month_name_in_hebrew(month_designator) {
     let dateObj = new Date();
 
-    // Hack alert, using last year data as TEST DB is empty
-    //        dateObj.setFullYear(dateObj.getFullYear() - 1);
-
     if (month_designator.localeCompare("prev") == 0) {
         dateObj.setMonth(dateObj.getMonth() - 1);
     }
@@ -356,9 +354,6 @@ function get_month_name_in_hebrew(month_designator) {
 
 function get_month_range(month_designator) {
     let dateObj = new Date();
-
-    // Hack alert, using last year data as TEST DB is empty
-    //      dateObj.setFullYear(dateObj.getFullYear() - 1);
 
     if (month_designator.localeCompare("prev") == 0) {
         dateObj.setMonth(dateObj.getMonth() - 1);
@@ -541,5 +536,146 @@ function render_month_graph(data) {
             }
         }
     });
+}
 
+
+function start_yearly_cards() {
+
+    start_one_year_row("ytd");
+    start_one_year_row("yoy");
+
+    start_year_graph();
+}
+
+function get_year_range(year_designator) {
+    let today = new Date();
+    let start = new Date(today.getFullYear(), 0, 1); // 01-Jan
+
+    if (year_designator.localeCompare("yoy") == 0) {
+        today.setFullYear(today.getFullYear() - 1);
+        start.setFullYear(start.getFullYear() - 1);
+    }
+
+    if (year_designator.localeCompare("12months") == 0) {
+        start = new Date();
+        start.setFullYear(start.getFullYear() - 1);
+    }
+
+    let result = {
+        start_date: moment(start).format("YYYY-MM-DD"),
+        end_date: moment(today).format("YYYY-MM-DD")
+    }
+    return result;
+}
+
+
+function start_one_year_row(dsg) {
+    var query_object = get_year_range(dsg);
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportMonthlyDigestMetrics",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            result = data.d;
+            render_year_row(dsg, result);
+        },
+        error: function (err) {
+        }
+    });
+}
+
+function render_year_row(dsg, result) {
+    let label_id = "#dsb_hl_yearly_tbl_" + dsg + "_pats";
+    $(label_id).text(result.Patients);
+    label_id = "#dsb_hl_yearly_tbl_" + dsg + "_rides";
+    $(label_id).text(result.Rides);
+    label_id = "#dsb_hl_yearly_tbl_" + dsg + "_vols";
+    $(label_id).text(result.Volunteers);
+}
+
+
+function start_year_graph() {
+    var query_object = get_year_range("12months");
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportYearlyGraphMetrics",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            result = data.d;
+            render_year_graph(result);
+        },
+        error: function (err) {
+        }
+    });
+}
+
+function render_year_graph(data) {
+    console.log(data);
+
+    // We get from DB the months in 1-12 order.
+    // We need to order as - last 12 months
+    let today = new Date();
+    let curr_month = today.getMonth() + 1;
+    let last_year = data.slice(curr_month);
+    data = last_year.concat(data.slice(0, curr_month));
+    console.log(data);
+
+    let labels = data.map(function (obj) { return obj.Day; });
+    let rides = data.map(function (obj) { return obj.Rides; });
+    let volunteers = data.map(function (obj) { return obj.Volunteers; });
+    let patients = data.map(function (obj) { return obj.Patients; });
+
+    var ctx = document.getElementById('dsb_hl_yearly_graph').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'הסעות',
+                    data: rides,
+                    fill: false,
+                    borderColor: CHART_COLORS.green,
+                    backgroundColor: CHART_COLORS.green,
+                    borderWidth: 1
+                },
+                {
+                    label: 'חולים',
+                    data: patients,
+                    fill: false,
+                    borderColor: CHART_COLORS.purple,
+                    backgroundColor: CHART_COLORS.purple,
+                    borderWidth: 1
+                },
+                {
+                    label: 'מתנדבים',
+                    data: volunteers,
+                    fill: false,
+                    borderColor: CHART_COLORS.orange,
+                    backgroundColor: CHART_COLORS.orange,
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
 }
