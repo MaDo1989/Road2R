@@ -359,17 +359,6 @@ GROUP BY Volunteer.DisplayName
         return dt;
     }
 
-    internal MetricInfo GetReportMetrics(string metric_name, string start_date1, string end_date1, string start_date2, string end_date2)
-    {
-        MetricInfo result = new MetricInfo();
-        result.MetricName = metric_name;
-
-        Random rng = new Random();
-        result.Value1 = rng.Next(0, 100);
-        result.Value2 = rng.Next(20, 180);
-        return result;
-    }
-
     internal List<VolunteerPerRegion> GetReportVolunteerWeekly(string start_date, string end_date)
     {
         DbService db = new DbService();
