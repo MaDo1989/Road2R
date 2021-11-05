@@ -17,9 +17,9 @@ const CHART_COLORS = {
 function dashboard_hl_init() {
     $("#reports_content_div").hide();
     $("#dsb_hl_content_div").show();
-    start_daily_cards();
+    // start_daily_cards();
     start_monthly_cards();
-    start_yearly_cards();
+    // start_yearly_cards();
 }
 
 function start_daily_cards() {
@@ -402,33 +402,44 @@ function get_month_range(month_designator) {
 }
 
 const month_card_definitions = [
-
     {
-        designator: "curr"
+        designator: "curr",
+        next: "prev"
     },
     {
-        designator: "prev"
+        designator: "prev",
+        borderDash: [8,8],
+        next: "yoy"
     },
     {
-        designator: "yoy"
+        designator: "yoy", 
+        borderDash: [10, 4],
+        next: null
     }
-
 ];
 
-
+function get_month_card(dsg) {
+    for (const card_def of month_card_definitions) {
+        if (card_def.designator.localeCompare(dsg) == 0) {
+            return card_def;
+        }
+    }
+    return null;
+}
 function start_monthly_cards() {
 
     for (const card_def of month_card_definitions) {
-        start_one_month_row(card_def);
+     //@@    start_one_month_row(card_def);
     }
 
-   start_month_graph();
+    start_month_graph(get_month_card("curr"));
 
    for (const card_def of month_card_definitions) {
-        start_one_month_new_volunteers(card_def);
+      //@@   start_one_month_new_volunteers(card_def);
     }
-
 }
+
+
 
 function start_one_month_row(card_def) {
     let dsg = card_def.designator;
@@ -492,10 +503,8 @@ function start_one_month_new_volunteers(card_def) {
 }
 
 
-
-function start_month_graph() {
-
-    var query_object = get_month_range("curr");
+function start_month_graph(card_def) {
+    var query_object = get_month_range(card_def.designator);
 
     $.ajax({
         dataType: "json",
@@ -507,8 +516,14 @@ function start_month_graph() {
         type: "POST",
         data: JSON.stringify(query_object),
         success: function (data) {
+            // Schedule fetch for next data-set if needed.
+            let next_card = get_month_card(card_def.next);
+            if (next_card) {
+                start_month_graph(next_card);   // Not really recursive - called from incoming-data callback
+            }
             result = data.d;
-            render_month_graph(result);
+            render_month_graph(card_def, result);
+
         },
         error: function (err) {
         }
@@ -517,22 +532,53 @@ function start_month_graph() {
     });
 }
 
-function render_month_graph(data) {
 
-    let labels = data.map(function (obj) { return obj.Day; });
-    let rides = data.map(function (obj) { return obj.Rides; });
-    let volunteers = data.map(function (obj) { return obj.Volunteers; });
-    let patients = data.map(function (obj) { return obj.Patients; });
+function render_month_graph(card_def, data)
+{
+    let prepared_data = {
+        labels: data.map(function (obj) { return obj.Day; }),
+        rides: data.map(function (obj) { return obj.Rides; }),
+        volunteers: data.map(function (obj) { return obj.Volunteers; }),
+        patients: data.map(function (obj) { return obj.Patients; })
+    };
+
+    var myChart = null;
+    // Find the chart, if exists
+    Chart.helpers.each(Chart.instances, function (instance) {
+        if (instance.chart.canvas.id.localeCompare("dsb_hl_monthly_graph") == 0) {
+            myChart = instance;
+        }
+    })
+
+    if (myChart) {
+        add_to_month_graph(myChart, prepared_data, card_def);
+    }
+    else {
+        create_month_graph(prepared_data);
+    }
+}
+
+const r2rHTMLLegend = {
+    id: 'r2rHTMLLegend',
+    afterUpdate(chart, args) {
+        console.log("r2rHTMLLegend::afterUpdate", chart, args);
+    }
+};
+
+function create_month_graph(prepared_data)
+{
+    // We use version 2.1.4 of chart.js
+    Chart.pluginService.register(r2rHTMLLegend);
 
     var ctx = document.getElementById('dsb_hl_monthly_graph').getContext('2d');
     var myChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: labels,
+            labels: prepared_data.labels,
             datasets: [
                 {
                     label: 'הסעות',
-                    data: rides,
+                    data: prepared_data.rides,
                     fill: false,
                     borderColor: CHART_COLORS.green,
                     backgroundColor: CHART_COLORS.green,
@@ -540,7 +586,7 @@ function render_month_graph(data) {
                 },
                 {
                     label: 'חולים',
-                    data: patients,
+                    data: prepared_data.patients,
                     fill: false,
                     borderColor: CHART_COLORS.purple,
                     backgroundColor: CHART_COLORS.purple,
@@ -548,7 +594,7 @@ function render_month_graph(data) {
                 },
                 {
                     label: 'מתנדבים',
-                    data: volunteers,
+                    data: prepared_data.volunteers,
                     fill: false,
                     borderColor: CHART_COLORS.orange,
                     backgroundColor: CHART_COLORS.orange,
@@ -565,6 +611,43 @@ function render_month_graph(data) {
             }
         }
     });
+}
+
+
+function add_to_month_graph(myChart, prepared_data, card_def) {
+    window.myd = myChart;
+    let updated = myChart.data.datasets.concat(
+        [
+            {
+                label: 'הסעות',
+                data: prepared_data.rides,
+                fill: false,
+                borderColor: CHART_COLORS.green,
+                backgroundColor: CHART_COLORS.green,
+                borderWidth: 1,
+                borderDash: card_def.borderDash
+            },
+            {
+                label: 'חולים',
+                data: prepared_data.patients,
+                fill: false,
+                borderColor: CHART_COLORS.purple,
+                backgroundColor: CHART_COLORS.purple,
+                borderWidth: 1,
+                borderDash: card_def.borderDash
+            },
+            {
+                label: 'מתנדבים',
+                data: prepared_data.volunteers,
+                fill: false,
+                borderColor: CHART_COLORS.orange,
+                backgroundColor: CHART_COLORS.orange,
+                borderWidth: 1,
+                borderDash: card_def.borderDash
+            }
+        ]);
+    myChart.data.datasets = updated;
+    myChart.update();
 }
 
 
