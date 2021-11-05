@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
@@ -469,6 +469,44 @@ GROUP BY Volunteer.DisplayName
             result.Add(obj);
         }
 
+        return result;
+    }
+
+    internal MetricInfo GetReportRangeNeedDriversMetrics(string start_date, string end_date)
+    {
+        DbService db = new DbService();
+
+        string query =
+             @"select ID from RPView
+                where MainDriver is NULL
+                and pickuptime > @start_date
+                and pickuptime < @end_date
+                and Status = N'ממתינה לשיבוץ' ";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+
+        int count = 0;
+        HashSet<string> uniqueIDs = new HashSet<string>();
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            uniqueIDs.Add(dr["ID"].ToString());
+            count++;
+        }
+
+        MetricInfo result = new MetricInfo
+        {
+            MetricName = "NeedDrivers",
+            Value1 = count,
+            Value2 = uniqueIDs.Count
+        };
         return result;
     }
 

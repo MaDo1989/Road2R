@@ -370,8 +370,6 @@ public class ReportsWebService : System.Web.Services.WebService
 
     }
 
-    
-
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public List<ReportService.MetricMonthlyInfo> GetReportMonthlyGraphMetrics(string start_date, string end_date)
@@ -443,6 +441,26 @@ public class ReportsWebService : System.Web.Services.WebService
 
             ReportService report = new ReportService();
             List<ReportService.MetricMonthlyInfo> r = report.GetReportYearlyGraphMetrics(start_date, end_date);
+            return r;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReportMonthlyMetrics", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public ReportService.MetricInfo GetReportRangeNeedDriversMetrics(string start_date, string end_date)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            ReportService report = new ReportService();
+            ReportService.MetricInfo r = report.GetReportRangeNeedDriversMetrics(start_date, end_date);
             return r;
         }
         catch (Exception ex)

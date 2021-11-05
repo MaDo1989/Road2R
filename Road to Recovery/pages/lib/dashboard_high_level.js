@@ -29,14 +29,22 @@ function start_daily_cards() {
 // Initiate async ajax call. When call finishes, invoke card's on_data callback
 function start_current_day_row() {
 
+
     // @@ 
-    let hack_day = new Date(2021, 09, 12); // 12-Oct-2020
+    // let today = new Date(2021, 09, 12); // 12-Oct-2020
+    // let today = new Date();
+    let today = new Date(2021, 10, 05); // 05-Nov-2020
+
+    $("#dsb_hl_daily_rides_todays_date").text(moment(today).format('DD.MM'));
+
     var query_object = {
-        start_date: moment(hack_day).format('YYYY-MM-DD'),
-        end_date: moment(hack_day).add(1, 'days').format('YYYY-MM-DD')
+        start_date: moment(today).format('YYYY-MM-DD'),
+        end_date: moment(today).add(1, 'days').format('YYYY-MM-DD')
     }
 
     start_current_daily_totals(query_object);
+
+    start_current_daily_need_drivers(query_object);
 
     start_current_daily_new_volunteers(query_object);
 
@@ -58,6 +66,27 @@ function start_current_daily_totals(query_object) {
             $("#dsb_hl_daily_rides_total").text(result.Rides);
             $("#dsb_hl_daily_patients_total").text(result.Patients);
             $("#dsb_hl_daily_volunteers_total").text(result.Volunteers);
+        },
+        error: function (err) {
+        }
+    });
+}
+
+function start_current_daily_need_drivers(query_object) {
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportRangeNeedDriversMetrics",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            result = data.d;
+            // Update card numeric value
+            $("#dsb_hl_daily_rides_attention").text(result.Value1);
+            $("#dsb_hl_daily_patients_attention").text(result.Value2);
         },
         error: function (err) {
         }
@@ -622,15 +651,12 @@ function start_year_graph() {
 }
 
 function render_year_graph(data) {
-    console.log(data);
-
     // We get from DB the months in 1-12 order.
     // We need to order as - last 12 months
     let today = new Date();
     let curr_month = today.getMonth() + 1;
     let last_year = data.slice(curr_month);
     data = last_year.concat(data.slice(0, curr_month));
-    console.log(data);
 
     let labels = data.map(function (obj) { return obj.Day; });
     let rides = data.map(function (obj) { return obj.Rides; });
