@@ -545,7 +545,7 @@ function render_month_graph(card_def, data)
     var myChart = null;
     // Find the chart, if exists
     Chart.helpers.each(Chart.instances, function (instance) {
-        if (instance.chart.canvas.id.localeCompare("dsb_hl_monthly_graph") == 0) {
+        if (instance.ctx.canvas.id.localeCompare("dsb_hl_monthly_graph") == 0) {
             myChart = instance;
         }
     })
@@ -568,7 +568,7 @@ const r2rHTMLLegend = {
 function create_month_graph(prepared_data)
 {
     // We use version 2.1.4 of chart.js
-    Chart.pluginService.register(r2rHTMLLegend);
+    //@@ Chart.pluginService.register(r2rHTMLLegend);
 
     var ctx = document.getElementById('dsb_hl_monthly_graph').getContext('2d');
     var myChart = new Chart(ctx, {
