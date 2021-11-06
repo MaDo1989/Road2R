@@ -17,9 +17,9 @@ const CHART_COLORS = {
 function dashboard_hl_init() {
     $("#reports_content_div").hide();
     $("#dsb_hl_content_div").show();
-    // start_daily_cards();
+    start_daily_cards();
     start_monthly_cards();
-    // start_yearly_cards();
+    start_yearly_cards();
 }
 
 function start_daily_cards() {
@@ -429,13 +429,13 @@ function get_month_card(dsg) {
 function start_monthly_cards() {
 
     for (const card_def of month_card_definitions) {
-     //@@    start_one_month_row(card_def);
+      start_one_month_row(card_def);
     }
 
     start_month_graph(get_month_card("curr"));
 
    for (const card_def of month_card_definitions) {
-      //@@   start_one_month_new_volunteers(card_def);
+      start_one_month_new_volunteers(card_def);
     }
 }
 
@@ -615,7 +615,6 @@ function create_month_graph(prepared_data)
 
 
 function add_to_month_graph(myChart, prepared_data, card_def) {
-    window.myd = myChart;
     let updated = myChart.data.datasets.concat(
         [
             {
@@ -656,15 +655,15 @@ function start_yearly_cards() {
     start_one_year_row("ytd");
     start_one_year_row("yoy");
 
-    start_year_graph();
+    start_year_graph("12months");
 }
 
 function get_year_range(year_designator) {
-    let today = new Date();
-    let start = new Date(today.getFullYear(), 0, 1); // 01-Jan
+    let end = new Date();
+    let start = new Date(end.getFullYear(), 0, 1); // 01-Jan
 
     if (year_designator.localeCompare("yoy") == 0) {
-        today.setFullYear(today.getFullYear() - 1);
+        end.setFullYear(end.getFullYear() - 1);
         start.setFullYear(start.getFullYear() - 1);
     }
 
@@ -673,9 +672,15 @@ function get_year_range(year_designator) {
         start.setFullYear(start.getFullYear() - 1);
     }
 
+    if (year_designator.localeCompare("prev12months") == 0) {
+        start = new Date();
+        start.setFullYear(start.getFullYear() - 2);
+        end.setFullYear(end.getFullYear() - 1);
+    }
+
     let result = {
         start_date: moment(start).format("YYYY-MM-DD"),
-        end_date: moment(today).format("YYYY-MM-DD")
+        end_date: moment(end).format("YYYY-MM-DD")
     }
     return result;
 }
@@ -712,8 +717,8 @@ function render_year_row(dsg, result) {
 }
 
 
-function start_year_graph() {
-    var query_object = get_year_range("12months");
+function start_year_graph(dsg) {
+    var query_object = get_year_range(dsg);
 
     $.ajax({
         dataType: "json",
@@ -725,15 +730,19 @@ function start_year_graph() {
         type: "POST",
         data: JSON.stringify(query_object),
         success: function (data) {
+            if (dsg.localeCompare("12months") == 0) {
+                start_year_graph("prev12months"); // Schedule fetch of prev year data
+            }
             result = data.d;
-            render_year_graph(result);
+            render_year_graph(dsg, result);
         },
         error: function (err) {
         }
     });
 }
 
-function render_year_graph(data) {
+
+function render_year_graph(dsg, data) {
     // We get from DB the months in 1-12 order.
     // We need to order as - last 12 months
     let today = new Date();
@@ -741,20 +750,42 @@ function render_year_graph(data) {
     let last_year = data.slice(curr_month);
     data = last_year.concat(data.slice(0, curr_month));
 
-    let labels = data.map(function (obj) { return obj.Day; });
-    let rides = data.map(function (obj) { return obj.Rides; });
-    let volunteers = data.map(function (obj) { return obj.Volunteers; });
-    let patients = data.map(function (obj) { return obj.Patients; });
 
+    let prepared_data = {
+        labels: data.map(function (obj) { return obj.Day; }),
+        rides: data.map(function (obj) { return obj.Rides; }),
+        volunteers: data.map(function (obj) { return obj.Volunteers; }),
+        patients: data.map(function (obj) { return obj.Patients; })
+   };
+
+    var myChart = null;
+    // Find the chart, if exists
+    Chart.helpers.each(Chart.instances, function (instance) {
+        if (instance.ctx.canvas.id.localeCompare("dsb_hl_yearly_graph") == 0) {
+            myChart = instance;
+        }
+    })
+
+    if (myChart) {
+        add_to_year_graph(myChart, prepared_data, dsg);
+    }
+    else {
+        create_year_graph(prepared_data);
+    }
+}
+
+
+function create_year_graph(data) {
+ 
     var ctx = document.getElementById('dsb_hl_yearly_graph').getContext('2d');
     var myChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: labels,
+            labels: data.labels,
             datasets: [
                 {
                     label: 'הסעות',
-                    data: rides,
+                    data: data.rides,
                     fill: false,
                     borderColor: CHART_COLORS.green,
                     backgroundColor: CHART_COLORS.green,
@@ -762,7 +793,7 @@ function render_year_graph(data) {
                 },
                 {
                     label: 'חולים',
-                    data: patients,
+                    data: data.patients,
                     fill: false,
                     borderColor: CHART_COLORS.purple,
                     backgroundColor: CHART_COLORS.purple,
@@ -770,7 +801,7 @@ function render_year_graph(data) {
                 },
                 {
                     label: 'מתנדבים',
-                    data: volunteers,
+                    data: data.volunteers,
                     fill: false,
                     borderColor: CHART_COLORS.orange,
                     backgroundColor: CHART_COLORS.orange,
@@ -787,4 +818,39 @@ function render_year_graph(data) {
             }
         }
     });
+}
+
+function add_to_year_graph(myChart, prepared_data, dsg) {
+    let updated = myChart.data.datasets.concat(
+        [
+            {
+                label: 'הסעות',
+                data: prepared_data.rides,
+                fill: false,
+                borderColor: CHART_COLORS.green,
+                backgroundColor: CHART_COLORS.green,
+                borderWidth: 1,
+                borderDash: [10, 10]
+            },
+            {
+                label: 'חולים',
+                data: prepared_data.patients,
+                fill: false,
+                borderColor: CHART_COLORS.purple,
+                backgroundColor: CHART_COLORS.purple,
+                borderWidth: 1,
+                borderDash: [10, 10]
+            },
+            {
+                label: 'מתנדבים',
+                data: prepared_data.volunteers,
+                fill: false,
+                borderColor: CHART_COLORS.orange,
+                backgroundColor: CHART_COLORS.orange,
+                borderWidth: 1,
+                borderDash: [10, 10]
+            }
+        ]);
+    myChart.data.datasets = updated;
+    myChart.update();
 }
