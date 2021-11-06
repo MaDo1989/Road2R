@@ -139,6 +139,12 @@
         #documentedRidesTable > tbody > tr.earliestFuture > tr {
             border-bottom: 4px solid #9B4040;
         }
+
+        .dsb_hl_legend_header {
+            height: 1em; 
+            width: 20px; 
+            display: inline-block; 
+        }
     </style>
 
 
@@ -497,7 +503,7 @@
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row" style="border-width: thin; border-style: solid">
                         <!-- First row - Daily - 3 cards -->
                         <h2> &nbsp; &nbsp;היום&nbsp;<span id="dsb_hl_daily_rides_todays_date">  </span></h2>
                         <div class="col-sm-1">
@@ -539,37 +545,46 @@
                             &nbsp;
                         </div>
                         <div class="col-sm-6">
-                            <canvas id="dsb_hl_monthly_graph" width="700" height="420"></canvas>
+                            <canvas id="dsb_hl_monthly_graph" width="700" height="420" style="padding-bottom: 20px"></canvas>
                         </div>
                         <div class="col-sm-3">
                             &nbsp;
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row" style="border-style: none none solid none; border-width: thin">
                         <!-- Third row - Monthly - Table -->
                         <div class="col-sm-1">
                             &nbsp;
                         </div>
                         <div class="col-sm-1">
                             <div class="row">&nbsp;             </div>
-                            <div class="row" id="dsb_hl_monthly_tbl_curr_month_name">           </div>
-                            <div class="row" id="dsb_hl_monthly_tbl_prev_month_name">             </div>
-                            <div class="row" id="dsb_hl_monthly_tbl_yoy_month_name">              </div>
+                            <div class="row">
+                                <input type="checkbox" id="dsb_hl_monthly_tbl_curr_show" r2data="0,1,2" style="margin-top: 0px;" checked>
+                                <span id="dsb_hl_monthly_tbl_curr_month_name"> </span>
+                            </div>
+                            <div class="row">
+                                <input type="checkbox" id="dsb_hl_monthly_tbl_prev_show" r2data="3,4,5"  style="margin-top: 0px;"  checked>
+                                <span id="dsb_hl_monthly_tbl_prev_month_name"></span>
+                            </div>
+                            <div class="row">
+                                <input type="checkbox" id="dsb_hl_monthly_tbl_yoy_show" r2data="6,7,8"  style="margin-top: 0px;"  checked>
+                                <span id="dsb_hl_monthly_tbl_yoy_month_name"></span>
+                            </div>
                         </div>
                         <div class="col-sm-1">
-                            <div class="row">חולים          </div>
+                            <div class="row">חולים      <div class="dsb_hl_legend_header" style="background-color: rgb(153, 102, 255)"></div> </div>
                             <div class="row" id="dsb_hl_monthly_tbl_curr_pats"> --            </div>
                             <div class="row" id="dsb_hl_monthly_tbl_prev_pats">--</div>
                             <div class="row" id="dsb_hl_monthly_tbl_yoy_pats"> --        </div>
                         </div>
                         <div class="col-sm-1">
-                            <div class="row">הסעות          </div>
+                            <div class="row">הסעות         <div class="dsb_hl_legend_header" style="background-color: rgb(75, 192, 192)"></div>   </div>
                             <div class="row" id="dsb_hl_monthly_tbl_curr_rides"> --            </div>
                             <div class="row" id="dsb_hl_monthly_tbl_prev_rides">--</div>
                             <div class="row" id="dsb_hl_monthly_tbl_yoy_rides"> --        </div>
                         </div>
                         <div class="col-sm-1">
-                            <div class="row">מתנדבים          </div>
+                            <div class="row">מתנדבים      <div class="dsb_hl_legend_header" style="background-color: rgb(255, 159, 64)"></div>      </div>
                             <div class="row" id="dsb_hl_monthly_tbl_curr_vols">  --           </div>
                             <div class="row" id="dsb_hl_monthly_tbl_prev_vols">--</div>
                             <div class="row" id="dsb_hl_monthly_tbl_yoy_vols"> --        </div>
@@ -592,7 +607,7 @@
                             &nbsp;
                         </div>
                         <div class="col-sm-6">
-                            <canvas id="dsb_hl_yearly_graph" width="600" height="450"></canvas>
+                            <canvas id="dsb_hl_yearly_graph" width="600" height="450" style="padding-bottom: 20px"></canvas>
                         </div>
                         <div class="col-sm-3">
                             &nbsp;
@@ -609,17 +624,17 @@
                             <div class="row" >     המקבילה בשנה שעברה        </div>
                         </div>
                         <div class="col-sm-1">
-                            <div class="row">חולים          </div>
+                            <div class="row">חולים        <div class="dsb_hl_legend_header" style="background-color: rgb(153, 102, 255)"></div>   </div>
                             <div class="row" id="dsb_hl_yearly_tbl_ytd_pats"> --            </div>
                             <div class="row" id="dsb_hl_yearly_tbl_yoy_pats">--</div>
                         </div>
                         <div class="col-sm-1">
-                            <div class="row">הסעות          </div>
+                            <div class="row">הסעות      <div class="dsb_hl_legend_header" style="background-color: rgb(75, 192, 192)"></div>     </div>
                             <div class="row" id="dsb_hl_yearly_tbl_ytd_rides"> --            </div>
                             <div class="row" id="dsb_hl_yearly_tbl_yoy_rides">--</div>
                         </div>
                         <div class="col-sm-1">
-                            <div class="row">מתנדבים          </div>
+                            <div class="row">מתנדבים     <div class="dsb_hl_legend_header" style="background-color: rgb(255, 159, 64)"></div>       </div>
                             <div class="row" id="dsb_hl_yearly_tbl_ytd_vols">  --           </div>
                             <div class="row" id="dsb_hl_yearly_tbl_yoy_vols">--</div>
                         </div>

@@ -499,16 +499,9 @@ GROUP BY Volunteer.DisplayName
         return result;
     }
 
-    internal MetricMonthlyInfo GetReportMonthlyDigestMetrics(string start_date, string end_date)
+    internal MetricMonthlyInfo GetReportRangeDigestMetrics(string start_date, string end_date, string query)
     {
         DbService db = new DbService();
-
-        string query =
-             @"SELECT count(DISTINCT DisplayName) as COUNT_PAT,  count(*) as COUNT_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
-               FROM RPView 
-               WHERE MainDriver is not null
-               AND RPView.pickuptime > @start_date
-               AND RPView.pickuptime < @end_date";
 
         SqlCommand cmd = new SqlCommand(query);
         cmd.CommandType = CommandType.Text;
@@ -526,6 +519,30 @@ GROUP BY Volunteer.DisplayName
         result.Volunteers = dr["COUNT_VOL"].ToString();
 
         return result;
+    }
+    
+    internal MetricMonthlyInfo GetReportMonthlyDigestMetrics(string start_date, string end_date)
+    {
+        string query =
+             @"SELECT count(DISTINCT DisplayName) as COUNT_PAT,  count(*) as COUNT_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
+               FROM RPView 
+               WHERE MainDriver is not null
+               AND RPView.pickuptime > @start_date
+               AND RPView.pickuptime < @end_date";
+
+        return GetReportRangeDigestMetrics(start_date, end_date, query);
+    }
+
+    internal MetricMonthlyInfo GetReportDailyDigestMetrics(string start_date, string end_date)
+    {
+        // Gets info also on rides without an allocted driver
+        string query =
+             @"SELECT count(DISTINCT DisplayName) as COUNT_PAT,  count(*) as COUNT_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
+               FROM RPView 
+               WHERE RPView.pickuptime > @start_date
+               AND RPView.pickuptime < @end_date";
+
+        return GetReportRangeDigestMetrics(start_date, end_date, query);
     }
 
     internal List<ReportService.MetricMonthlyInfo> GetReportMonthlyGraphMetrics(string start_date, string end_date)
