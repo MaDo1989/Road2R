@@ -307,5 +307,170 @@ public class ReportsWebService : System.Web.Services.WebService
         }
     }
 
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public List<ReportService.CenterDailybyMonthInfo> GetReportCenterDailybyMonth(string start_date, string end_date)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            ReportService report = new ReportService();
+            List<ReportService.CenterDailybyMonthInfo> r = report.GetReportCenterDailybyMonth(start_date, end_date);
+            return r;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReportCenterDailybyMonth", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public List<ReportService.CenterMonthlyByYearInfo> GetReportCenteryMonthlyByYear(string start_date, string end_date)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            ReportService report = new ReportService();
+            List<ReportService.CenterMonthlyByYearInfo> r = report.GetReportCenterMonthlyByYear(start_date, end_date);
+            return r;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReportCenteryMonthlyByYear", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
+    
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public List<ReportService.MetricMonthlyInfo> GetReportMonthlyGraphMetrics(string start_date, string end_date)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            ReportService report = new ReportService();
+            List<ReportService.MetricMonthlyInfo> r = report.GetReportMonthlyGraphMetrics(start_date, end_date);
+            return r;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReportMonthlyMetrics", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public ReportService.MetricMonthlyInfo GetReportDailyDigestMetrics(string start_date, string end_date)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            ReportService report = new ReportService();
+            ReportService.MetricMonthlyInfo r = report.GetReportDailyDigestMetrics(start_date, end_date);
+            return r;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReportMonthlyDigestMetrics", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public ReportService.MetricMonthlyInfo GetReportMonthlyDigestMetrics(string start_date, string end_date)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            ReportService report = new ReportService();
+            ReportService.MetricMonthlyInfo r = report.GetReportMonthlyDigestMetrics(start_date, end_date);
+            return r;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReportMonthlyDigestMetrics", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public ReportService.MetricMonthlyInfo GetReportNewDriversInRange(string start_date, string end_date)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            ReportService report = new ReportService();
+            ReportService.MetricMonthlyInfo r = report.GetReportNewDriversInRange(start_date, end_date);
+            return r;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReportMonthlyDigestMetrics", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public List<ReportService.MetricMonthlyInfo> GetReportYearlyGraphMetrics(string start_date, string end_date)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            ReportService report = new ReportService();
+            List<ReportService.MetricMonthlyInfo> r = report.GetReportYearlyGraphMetrics(start_date, end_date);
+            return r;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReportMonthlyMetrics", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public ReportService.MetricInfo GetReportRangeNeedDriversMetrics(string start_date, string end_date)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            ReportService report = new ReportService();
+            ReportService.MetricInfo r = report.GetReportRangeNeedDriversMetrics(start_date, end_date);
+            return r;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReportMonthlyMetrics", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
+
 }
 

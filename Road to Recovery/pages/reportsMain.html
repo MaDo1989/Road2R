@@ -40,9 +40,11 @@
     <script src="lib/master.js"></script>
 
     <script src="lib/reports.js"></script>
+    <script src="lib/dashboard_high_level.js"></script>
 
     <script src="assets/js/jquery.min.js"></script>
     <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="../plugins/chart.js/ver_3_6_0/chart_v360.min.js"></script>
 
     <script src="dataTables.js"></script>
     <script src="moment.js"></script>
@@ -137,84 +139,94 @@
         #documentedRidesTable > tbody > tr.earliestFuture > tr {
             border-bottom: 4px solid #9B4040;
         }
+
+        .dsb_hl_legend_header {
+            height: 1em; 
+            width: 20px; 
+            display: inline-block; 
+        }
     </style>
 
 
 
     <script>
-                checkCookie();
+        checkCookie();
 
-                var arr_rides;
-                var curr = new Date; // get current date
-                var first = curr.getDate() - curr.getDay(); // First day is the day of the month - the day of the week
-                var last = first + 6; // last day is the first day + 6
+        var arr_rides;
+        var curr = new Date; // get current date
+        var first = curr.getDate() - curr.getDay(); // First day is the day of the month - the day of the week
+        var last = first + 6; // last day is the first day + 6
 
-                var firstday = new Date(curr.setDate(first));
-                var lastday = new Date(curr.setDate(last));
+        var firstday = new Date(curr.setDate(first));
+        var lastday = new Date(curr.setDate(last));
 
-                if (lastday.getDate() < firstday.getDate()) {
-                    { var thisWeekFirst = lastday.getDate() + "." + (lastday.getMonth() + 2) + " - " + firstday.getDate() + "." + (firstday.getMonth() + 1) }
-                } else { var thisWeekFirst = lastday.getDate() + "." + (lastday.getMonth() + 1) + " - " + firstday.getDate() + "." + (firstday.getMonth() + 1) }
-                var locations;
-                var southLocations = []
-                var centerLocations = []
-                var northLocations = []
-                var allRides = [];
-                var weekdays = [];
+        if (lastday.getDate() < firstday.getDate()) {
+            { var thisWeekFirst = lastday.getDate() + "." + (lastday.getMonth() + 2) + " - " + firstday.getDate() + "." + (firstday.getMonth() + 1) }
+        } else { var thisWeekFirst = lastday.getDate() + "." + (lastday.getMonth() + 1) + " - " + firstday.getDate() + "." + (firstday.getMonth() + 1) }
+        var locations;
+        var southLocations = []
+        var centerLocations = []
+        var northLocations = []
+        var allRides = [];
+        var weekdays = [];
 
-                $(document).ready(function () {
+        $(document).ready(function () {
 
-                    let {COPYWRITE} = GENERAL;
-                    $('#rights').html(COPYWRITE());
+            let { COPYWRITE } = GENERAL;
+            $('#rights').html(COPYWRITE());
 
-                    init_reports_page();
+            init_reports_page();
 
-                    $("#rp_vl_ride_month").click(on_report_click);
-                    $("#rp_vl_ride_year").click(on_report_click);
-                    $("#rp_amuta_vls_week").click(on_report_click);
-                    $("#rp_amuta_vls_per_pat").click(on_report_click);
-                    $("#rp_amuta_vls_km").click(on_report_click);
-                    $("#rp_amuta_vls_list").click(on_report_click);
-                    $("#rp_amuta_vls_per_month").click(on_report_click);
-                    $("#rp_pil_vls_per_month").click(on_report_click);
-                    $("#rp_pil_vl_ride_month").click(on_report_click);
-                    $("#rp_pil_vl_ride_recent_period").click(on_report_click);
-
-
-
-                });
+            $("#rp_vl_ride_month").click(on_report_click);
+            $("#rp_vl_ride_year").click(on_report_click);
+            $("#rp_amuta_vls_week").click(on_report_click);
+            $("#rp_amuta_vls_per_pat").click(on_report_click);
+            $("#rp_amuta_vls_km").click(on_report_click);
+            $("#rp_amuta_vls_list").click(on_report_click);
+            $("#rp_amuta_vls_per_month").click(on_report_click);
+            $("#rp_pil_vls_per_month").click(on_report_click);
+            $("#rp_pil_vl_ride_month").click(on_report_click);
+            $("#rp_pil_vl_ride_recent_period").click(on_report_click);
+            $("#rp_center_daily_by_month").click(on_report_click);
+            $("#rp_center_monthly_by_year").click(on_report_click);
 
 
+            $("#dsb_hl").click(dashboard_hl_init);
 
-                function getDayString(num) {
-                    var day;    //Create a local variable to hold the string
-                    switch (num) {
-                        case 0:
-                            day = "יום א'";
-                            break;
-                        case 1:
-                            day = "יום ב'";
-                            break;
-                        case 2:
-                            day = "יום ג'";
-                            break;
-                        case 3:
-                            day = "יום ד'";
-                            break;
-                        case 4:
-                            day = "יום ה'";
-                            break;
-                        case 5:
-                            day = "יום ו'";
-                            break;
-                        case 6:
-                            day = "יום ש'";
-                            break;
-                        default:
-                            day = "Invalid day";
-                    }
-                    return day;
-                }
+            // dashboard_hl_init();
+        });
+
+
+
+        function getDayString(num) {
+            var day;    //Create a local variable to hold the string
+            switch (num) {
+                case 0:
+                    day = "יום א'";
+                    break;
+                case 1:
+                    day = "יום ב'";
+                    break;
+                case 2:
+                    day = "יום ג'";
+                    break;
+                case 3:
+                    day = "יום ד'";
+                    break;
+                case 4:
+                    day = "יום ה'";
+                    break;
+                case 5:
+                    day = "יום ו'";
+                    break;
+                case 6:
+                    day = "יום ש'";
+                    break;
+                default:
+                    day = "Invalid day";
+            }
+            return day;
+        }
 
 
     </script>
@@ -263,17 +275,17 @@
 
             <div class="content">
                 <div class="container">
-                    <div class="row">
+                    <div class="row"  id="reports_content_div" >
                         <div class="col-sm-2">
                             <h1> עץ הדו"חות</h1>
                             <ul id="myUL" class="report_tree_UL">
                                 <!--  <li>
-                                    <span>לרכז</span>
-                                    <ul>
-                                        <li>מתנדבים</li>
-                                        <li>הסעות שבוטלו</li>
-                                    </ul>
-                                </li>   -->
+        <span>לרכז</span>
+        <ul>
+            <li>מתנדבים</li>
+            <li>הסעות שבוטלו</li>
+        </ul>
+    </li>   -->
                                 <li>
                                     <span style="font-weight: bold;">לעמותה</span>
                                     <ul class="report_tree_UL">
@@ -281,6 +293,8 @@
                                         <li><a class="report_link_cls" id="rp_amuta_vls_per_pat">מתנדבים - פר חולה</a></li>
                                         <li><a class="report_link_cls" id="rp_amuta_vls_km">מתנדבים – שנתי</a></li>
                                         <li><a class="report_link_cls" id="rp_amuta_vls_per_month"> מספר המתנדבים המסיעים פר חודש</a></li>
+                                        <li><a class="report_link_cls" id="rp_center_daily_by_month"> מרכז תיאום - מבט יומי</a></li>
+                                        <li><a class="report_link_cls" id="rp_center_monthly_by_year"> מרכז תיאום - מבט חודשי</a></li>
                                     </ul>
                                 </li>
                                 <li>
@@ -296,6 +310,12 @@
                                         <li><a class="report_link_cls" id="rp_pil_vls_per_month">הסעות מתנדבים בפילוח חודשי </a></li>
                                         <li><a class="report_link_cls" id="rp_pil_vl_ride_month">מתנדבים מסיעים בחתך חודשי </a></li>
                                         <li><a class="report_link_cls" id="rp_pil_vl_ride_recent_period">הסעות בתקופה האחרונה </a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <span style="font-weight: bold;">בפיתוח</span>
+                                    <ul class="report_tree_UL">
+                                        <li><a class="report_link_cls" id="dsb_hl">Dashboard</a></li>
                                     </ul>
                                 </li>
                                 <li id="rp_special_list" style="display:none">
@@ -418,6 +438,44 @@
                                     <tbody></tbody>
                                 </table>
                             </div>
+                            <div id="div_table_center_daily_by_month" style="display:none" class="card-box table-responsive">
+                                <table id="table_center_daily_by_month" class="table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th title="Day" class="timeCustomWidth">יום</th>
+                                            <th title="Patients" class="timeCustomWidth">חולים</th>
+                                            <th title="Volunteers" class="timeCustomWidth">מתנדבים</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                            <div id="div_table_rp_center_monthly_by_year" style="display:none" class="card-box table-responsive">
+                                <table id="table_rp_center_monthly_by_year" class="table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th title="People" class="timeCustomWidth">  </th>
+                                            <th title="1" class="timeCustomWidth">1</th>
+                                            <th title="2" class="timeCustomWidth">2</th>
+                                            <th title="3" class="timeCustomWidth">3</th>
+                                            <th title="4" class="timeCustomWidth">4</th>
+                                            <th title="5" class="timeCustomWidth">5</th>
+                                            <th title="6" class="timeCustomWidth">6</th>
+                                            <th title="7" class="timeCustomWidth">7</th>
+                                            <th title="8" class="timeCustomWidth">8</th>
+                                            <th title="9" class="timeCustomWidth">9</th>
+                                            <th title="10" class="timeCustomWidth">10</th>
+                                            <th title="11" class="timeCustomWidth">11</th>
+                                            <th title="12" class="timeCustomWidth">12</th>
+                                            <th title="Total" class="timeCustomWidth">סה"כ שנתי</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+
                             <div id="wait" style="display:none;width:69px;height:89px;position:fixed;top:50%;left:50%;padding:2px;">
                                 <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
                             </div>
@@ -426,238 +484,395 @@
 
                     </div>
                 </div>
-                <div class="row" name="Container_for_wide_tables">
-                    <div class="col-sm-12">
-                        <div id="div_table_pil_vls_per_month" style="display:none" class="card-box table-responsive">
-                            <table id="table_pil_vls_per_month" class="table table-striped table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th title="DisplayName" class="timeCustomWidth"> שם המתנדב</th>
-                                        <th title="City" class="timeCustomWidth"> ישוב מגורים</th>
-                                        <th title="CellPhone" class="timeCustomWidth">טלפון</th>
-                                        <th title="JoinDate" class="timeCustomWidth"> תאריך הצטרפות</th>
-                                        <th title="Jan" class="timeCustomWidth">ינואר</th>
-                                        <th title="Feb" class="timeCustomWidth">פברואר</th>
-                                        <th title="Mar" class="timeCustomWidth">מרץ</th>
-                                        <th title="Apr" class="timeCustomWidth">אפריל</th>
-                                        <th title="May" class="timeCustomWidth">מאי</th>
-                                        <th title="Jun" class="timeCustomWidth">יוני</th>
-                                        <th title="Jul" class="timeCustomWidth">יולי</th>
-                                        <th title="Aug" class="timeCustomWidth">אוגוסט</th>
-                                        <th title="Sep" class="timeCustomWidth">ספטמבר</th>
-                                        <th title="Oct" class="timeCustomWidth">אוקטובר</th>
-                                        <th title="Nov" class="timeCustomWidth">נובמבר</th>
-                                        <th title="Dec" class="timeCustomWidth">דצמבר</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
+                <!--  DSBDSBDSB  This is the HTML UI for the High Level Dashboard  -->
+                <div class="row" id="dsb_hl_content_div" style="display:none">
+                    <div class="row">
+                        <!-- header row-->
+                        <div class="col-sm-1">
+                            &nbsp;
+                        </div>
+
+                        <div class="col-sm-4">
+                            <h1> &nbsp;&nbsp; מדדי העמותה</h1>
+                        </div>
+
+                        <div class="col-sm-7">
+                            &nbsp;
+                        </div>
+                    </div>
+
+                    <div class="row" style="border-width: thin; border-style: solid">
+                        <!-- First row - Daily - 3 cards -->
+                        <h2> &nbsp; &nbsp;היום&nbsp;<span id="dsb_hl_daily_rides_todays_date">  </span></h2>
+                        <div class="col-sm-1">
+                            &nbsp;
+                        </div>
+
+                        <div class="col-sm-2" id="dsb_hl_daily_rides">
+                            <h3>הסעות</h3><p />
+                            <p id="dsb_hl_daily_rides_total">--</p>
+                            <strong class="lead">ל - <span id="dsb_hl_daily_rides_attention"> -- </span> אין עדיין נהג</strong>
+                        </div>
+
+
+                        <div class="col-sm-1">
+                            &nbsp;
+                        </div>
+
+                        <div class="col-sm-2" id="dsb_hl_daily_patients">
+                            <h3>חולים</h3><p />
+                            <p id="dsb_hl_daily_patients_total">--</p>
+                            <p>ל - <span id="dsb_hl_daily_patients_attention"> -- </span> אין עדיין הסעה</p>
+                        </div>
+
+                        <div class="col-sm-1">
+                            &nbsp;
+                        </div>
+
+                        <div class="col-sm-2" id="dsb_hl_daily_volunteers">
+                            <h3>מתנדבים</h3><p />
+                            <p id="dsb_hl_daily_volunteers_total">--</p>
+                            <p> <span id="dsb_hl_daily_volunteers_attention"> -- </span> חדשים</p>
                         </div>
 
                     </div>
+                    <div class="row">
+                        <!-- Second row - Monthly - 1 Graph -->
+                        <h2> &nbsp; &nbsp;מבט חודשי</h2>
+                        <div class="col-sm-3">
+                            &nbsp;
+                        </div>
+                        <div class="col-sm-6">
+                            <canvas id="dsb_hl_monthly_graph" width="700" height="420" style="padding-bottom: 20px"></canvas>
+                        </div>
+                        <div class="col-sm-3">
+                            &nbsp;
+                        </div>
+                    </div>
+                    <div class="row" style="border-style: none none solid none; border-width: thin">
+                        <!-- Third row - Monthly - Table -->
+                        <div class="col-sm-1">
+                            &nbsp;
+                        </div>
+                        <div class="col-sm-1">
+                            <div class="row">&nbsp;             </div>
+                            <div class="row">
+                                <input type="checkbox" id="dsb_hl_monthly_tbl_curr_show" r2data="0,1,2" style="margin-top: 0px;" checked>
+                                <span id="dsb_hl_monthly_tbl_curr_month_name"> </span>
+                            </div>
+                            <div class="row">
+                                <input type="checkbox" id="dsb_hl_monthly_tbl_prev_show" r2data="3,4,5"  style="margin-top: 0px;"  checked>
+                                <span id="dsb_hl_monthly_tbl_prev_month_name"></span>
+                            </div>
+                            <div class="row">
+                                <input type="checkbox" id="dsb_hl_monthly_tbl_yoy_show" r2data="6,7,8"  style="margin-top: 0px;"  checked>
+                                <span id="dsb_hl_monthly_tbl_yoy_month_name"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-1">
+                            <div class="row">חולים      <div class="dsb_hl_legend_header" style="background-color: rgb(153, 102, 255)"></div> </div>
+                            <div class="row" id="dsb_hl_monthly_tbl_curr_pats"> --            </div>
+                            <div class="row" id="dsb_hl_monthly_tbl_prev_pats">--</div>
+                            <div class="row" id="dsb_hl_monthly_tbl_yoy_pats"> --        </div>
+                        </div>
+                        <div class="col-sm-1">
+                            <div class="row">הסעות         <div class="dsb_hl_legend_header" style="background-color: rgb(75, 192, 192)"></div>   </div>
+                            <div class="row" id="dsb_hl_monthly_tbl_curr_rides"> --            </div>
+                            <div class="row" id="dsb_hl_monthly_tbl_prev_rides">--</div>
+                            <div class="row" id="dsb_hl_monthly_tbl_yoy_rides"> --        </div>
+                        </div>
+                        <div class="col-sm-1">
+                            <div class="row">מתנדבים      <div class="dsb_hl_legend_header" style="background-color: rgb(255, 159, 64)"></div>      </div>
+                            <div class="row" id="dsb_hl_monthly_tbl_curr_vols">  --           </div>
+                            <div class="row" id="dsb_hl_monthly_tbl_prev_vols">--</div>
+                            <div class="row" id="dsb_hl_monthly_tbl_yoy_vols"> --        </div>
+                        </div>
+                        <div class="col-sm-1">
+                            <div class="row">מתנדבים חדשים          </div>
+                            <div class="row" id="dsb_hl_monthly_tbl_curr_new">--             </div>
+                            <div class="row" id="dsb_hl_monthly_tbl_prev_new">--</div>
+                            <div class="row" id="dsb_hl_monthly_tbl_yoy_new">--         </div>
+                        </div>
+                        <div class="col-sm-3">
+                            &nbsp;
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Fourth row - Yearly - 1 Graph -->
+                        <h2> &nbsp; &nbsp;מבט שנתי</h2>
+                        <div class="col-sm-3">
+                            &nbsp;
+                        </div>
+                        <div class="col-sm-6">
+                            <canvas id="dsb_hl_yearly_graph" width="600" height="450" style="padding-bottom: 20px"></canvas>
+                        </div>
+                        <div class="col-sm-3">
+                            &nbsp;
+                        </div>
+                    </div>
+                    <div class="row">
+                        <!-- Fifth row - yearly - Table -->
+                        <div class="col-sm-1">
+                            &nbsp;
+                        </div>
+                        <div class="col-sm-1">
+                            <div class="row">&nbsp;             </div>
+                            <div class="row" >    YTD       </div>
+                            <div class="row" >     המקבילה בשנה שעברה        </div>
+                        </div>
+                        <div class="col-sm-1">
+                            <div class="row">חולים        <div class="dsb_hl_legend_header" style="background-color: rgb(153, 102, 255)"></div>   </div>
+                            <div class="row" id="dsb_hl_yearly_tbl_ytd_pats"> --            </div>
+                            <div class="row" id="dsb_hl_yearly_tbl_yoy_pats">--</div>
+                        </div>
+                        <div class="col-sm-1">
+                            <div class="row">הסעות      <div class="dsb_hl_legend_header" style="background-color: rgb(75, 192, 192)"></div>     </div>
+                            <div class="row" id="dsb_hl_yearly_tbl_ytd_rides"> --            </div>
+                            <div class="row" id="dsb_hl_yearly_tbl_yoy_rides">--</div>
+                        </div>
+                        <div class="col-sm-1">
+                            <div class="row">מתנדבים     <div class="dsb_hl_legend_header" style="background-color: rgb(255, 159, 64)"></div>       </div>
+                            <div class="row" id="dsb_hl_yearly_tbl_ytd_vols">  --           </div>
+                            <div class="row" id="dsb_hl_yearly_tbl_yoy_vols">--</div>
+                        </div>
+                    </div>
+
+
                 </div>
-                <div class="row">
-
-                    <div class="col-sm-12">
-                        <div class="row report_template" name="template_VOLUNTEER">
-                            <div class="card-box">
-                                <div class="row">
-
-                                    <div class="col-sm-12">
-                                        <div class="form-group">
-                                            <label class="col-sm-2" style="padding: 0.5em 0px;">מתנדב</label>
-                                            <div class="col-sm-10" id="selectDriver">
-                                                <input placeholder="הזן שם" type="text" template_id="select_driver" class="form-control ui-autocomplete-input" autocomplete="off" aria-required="true" aria-invalid="false">
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-
-                                </div>
+                    <div class="row" name="Container_for_wide_tables">
+                        <div class="col-sm-12">
+                            <div id="div_table_pil_vls_per_month" style="display:none" class="card-box table-responsive">
+                                <table id="table_pil_vls_per_month" class="table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th title="DisplayName" class="timeCustomWidth"> שם המתנדב</th>
+                                            <th title="City" class="timeCustomWidth"> ישוב מגורים</th>
+                                            <th title="CellPhone" class="timeCustomWidth">טלפון</th>
+                                            <th title="JoinDate" class="timeCustomWidth"> תאריך הצטרפות</th>
+                                            <th title="Jan" class="timeCustomWidth">ינואר</th>
+                                            <th title="Feb" class="timeCustomWidth">פברואר</th>
+                                            <th title="Mar" class="timeCustomWidth">מרץ</th>
+                                            <th title="Apr" class="timeCustomWidth">אפריל</th>
+                                            <th title="May" class="timeCustomWidth">מאי</th>
+                                            <th title="Jun" class="timeCustomWidth">יוני</th>
+                                            <th title="Jul" class="timeCustomWidth">יולי</th>
+                                            <th title="Aug" class="timeCustomWidth">אוגוסט</th>
+                                            <th title="Sep" class="timeCustomWidth">ספטמבר</th>
+                                            <th title="Oct" class="timeCustomWidth">אוקטובר</th>
+                                            <th title="Nov" class="timeCustomWidth">נובמבר</th>
+                                            <th title="Dec" class="timeCustomWidth">דצמבר</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
                             </div>
+
                         </div>
-                        <div class="row report_template" name="template_MONTH">
-                            <div class="card-box">
-                                <div class="row">
+                    </div>
+                    <div class="row">
 
-                                    <div class="col-sm-12">
-                                        <div class="form-group">
-                                            <label class="col-sm-2" style="padding: 0.5em 0px;">חודש</label>
-                                            <div class="col-sm-10">
-                                                <input type="text" template_id="select_month" class="form-control" aria-required="true" aria-invalid="false">
+                        <div class="col-sm-12">
+                            <div class="row report_template" name="template_VOLUNTEER">
+                                <div class="card-box">
+                                    <div class="row">
+
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label class="col-sm-2" style="padding: 0.5em 0px;">מתנדב</label>
+                                                <div class="col-sm-10" id="selectDriver">
+                                                    <input placeholder="הזן שם" type="text" template_id="select_driver" class="form-control ui-autocomplete-input" autocomplete="off" aria-required="true" aria-invalid="false">
+                                                </div>
                                             </div>
+
                                         </div>
 
-                                    </div>
 
-
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row report_template" name="template_WEEK">
-                            <div class="card-box">
-                                <div class="row">
-
-                                    <div class="col-sm-12">
-                                        <div class="form-group">
-                                            <label class="col-sm-2" style="padding: 0.5em 0px;">שבוע</label>
-                                            <div class="col-sm-10">
-                                                <input type="date" template_id="select_week" placeholder="..." class="form-control">
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row report_template" name="template_VOLUNTEER_LIST_RADIO">
-                            <div class="card-box">
-                                <div class="row">
-                                    <div class="col-sm-1"><input type="radio" template_name="radio" template_id="radio_start_date" style="margin-top: 10px" checked /></div>
-                                    <div class="col-sm-11">
-                                        <div class="form-group">
-                                            <label class="col-sm-4" style="padding: 0.5em 0px;">הצטרפות אחרי </label>
-                                            <div class="col-sm-8">
-                                                <input type="date" template_id="select_date_later" placeholder="..." class="form-control">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-1"><input type="radio" template_name="radio" template_id="radio_all" style="margin-top: 10px" /></div>
-                                    <div class="col-sm-10">
-                                        <label style="padding: 0.5em 0px;">    כל המתנדבים (למעט אלו שסומנו לא להציג שוב) </label>
-                                    </div>
-                                </div>
-                                <div class="row" style="padding: 0.3em 0px;"></div>
-                                <div class="row">
-                                    <div class="col-sm-1"><input type="checkbox" template_id="ck_only_with_rides" value="" /> </div>
-                                    <div class="col-sm-11">
-                                        <label> הצג רק מתנדבים שהסיעו </label>
-                                    </div>
-                                </div>
-                                <div class="row" style="padding: 1.0em 0px;"></div>
-                                <div class="row">
-                                    <div class="col-sm-6"><input type="button" template_id="commit_to_ni_db" value="אל תדווח שוב על מתנדבים אלו" /> </div>
-                                    <div class="col-sm-6">
-                                        <label> הקשה פה תמחק את המתנדבים מכל דו"ח עתידי </label>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-                        <div class="row report_template" name="template_PATIENT">
-                            <div class="card-box">
-                                <div class="row">
-
-                                    <div class="col-sm-12">
-                                        <div class="form-group">
-                                            <label class="col-sm-2" style="padding: 0.5em 0px;">חולה</label>
-                                            <div class="col-sm-10">
-                                                <input type="text" template_id="select_patient" class="form-control" aria-required="true" aria-invalid="false">
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row report_template" name="template_YEAR">
-                            <div class="card-box">
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <div class="form-group">
-                                            <label class="col-sm-2" style="padding: 0.5em 0px;">שנה</label>
-                                            <div class="col-sm-10">
-                                                <select template_id="select_year" class="form-control">
-                                                    <option value="2021" selected>2021</option>
-                                                    <option value="2020">2020</option>
-                                                    <option value="2019">2019</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row report_template" name="template_PER_MONTH">
-                        </div>
-                        <div class="row report_template" name="template_YTD">
-                            <div class="card-box">
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <div class="form-group">
-                                            <label class="col-sm-2" style="padding: 0.5em 0px;">שנה</label>
-                                            <div class="col-sm-10">
-                                                <select template_id="select_year_ytd" class="form-control">
-                                                    <option value="last_12_months" selected>שנה אחורה מהיום</option>
-                                                    <option value="2021">2021 - YTD</option>
-                                                    <option value="2020">2020</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row report_template" name="template_RECENT_PERIOD">
-                            <div class="card-box">
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <div class="form-group">
-                                            <label class="col-sm-3" style="padding: 0.5em 0px;">הסיע.ה ב</label>
-                                            <div class="col-sm-5">
-                                                <input type="text" template_id="input_period_begin" name="input_period_begin" class="form-control" aria-required="true" aria-invalid="false" has-error required />
-                                                <label style="padding-bottom: 0.5em;font-size: 0.9em;">הכנס מספר גדול מ - 0</label>
-                                            </div>
-                                            <label class="col-sm-4" style="padding: 0.5em 0px;">ימים האחרונים</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <div class="form-group">
-                                            <label class="col-sm-3" style="padding: 0.5em 0px;">אך לא הסיע.ה ב</label>
-                                            <div class="col-sm-5">
-                                                <input type="text" template_id="input_period_end" name="input_period_end" class="form-control" aria-required="true" aria-invalid="false" />
-                                                <label style="padding-bottom: 0.5em; font-size: 0.9em;">   הכנס מספר גדול מ - 0 וקטן מהמספר למעלה </label>
-                                            </div>
-                                            <label class="col-sm-4" style="padding: 0.5em 0px;">ימים האחרונים</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <div class="form-group">
-                                            <div class="row">
-                                                <div class="col-sm-2"><input type="button" template_id="generate_report_period" value='הפקת דו"ח' disabled class="btn btn-default buttons-html5" /> </div>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row report_template report_hidden" name="HIDDEN_MONTH">
-                            <input type="text" template_id="select_month" class="form-control" aria-required="true" aria-invalid="false">
+                            <div class="row report_template" name="template_MONTH">
+                                <div class="card-box">
+                                    <div class="row">
+
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label class="col-sm-2" style="padding: 0.5em 0px;">חודש</label>
+                                                <div class="col-sm-10">
+                                                    <input type="text" template_id="select_month" class="form-control" aria-required="true" aria-invalid="false">
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row report_template" name="template_WEEK">
+                                <div class="card-box">
+                                    <div class="row">
+
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label class="col-sm-2" style="padding: 0.5em 0px;">שבוע</label>
+                                                <div class="col-sm-10">
+                                                    <input type="date" template_id="select_week" placeholder="..." class="form-control">
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row report_template" name="template_VOLUNTEER_LIST_RADIO">
+                                <div class="card-box">
+                                    <div class="row">
+                                        <div class="col-sm-1"><input type="radio" template_name="radio" template_id="radio_start_date" style="margin-top: 10px" checked /></div>
+                                        <div class="col-sm-11">
+                                            <div class="form-group">
+                                                <label class="col-sm-4" style="padding: 0.5em 0px;">הצטרפות אחרי </label>
+                                                <div class="col-sm-8">
+                                                    <input type="date" template_id="select_date_later" placeholder="..." class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-1"><input type="radio" template_name="radio" template_id="radio_all" style="margin-top: 10px" /></div>
+                                        <div class="col-sm-10">
+                                            <label style="padding: 0.5em 0px;">    כל המתנדבים (למעט אלו שסומנו לא להציג שוב) </label>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="padding: 0.3em 0px;"></div>
+                                    <div class="row">
+                                        <div class="col-sm-1"><input type="checkbox" template_id="ck_only_with_rides" value="" /> </div>
+                                        <div class="col-sm-11">
+                                            <label> הצג רק מתנדבים שהסיעו </label>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="padding: 1.0em 0px;"></div>
+                                    <div class="row">
+                                        <div class="col-sm-6"><input type="button" template_id="commit_to_ni_db" value="אל תדווח שוב על מתנדבים אלו" /> </div>
+                                        <div class="col-sm-6">
+                                            <label> הקשה פה תמחק את המתנדבים מכל דו"ח עתידי </label>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="row report_template" name="template_PATIENT">
+                                <div class="card-box">
+                                    <div class="row">
+
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label class="col-sm-2" style="padding: 0.5em 0px;">חולה</label>
+                                                <div class="col-sm-10">
+                                                    <input type="text" template_id="select_patient" class="form-control" aria-required="true" aria-invalid="false">
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row report_template" name="template_YEAR">
+                                <div class="card-box">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label class="col-sm-2" style="padding: 0.5em 0px;">שנה</label>
+                                                <div class="col-sm-10">
+                                                    <select template_id="select_year" class="form-control">
+                                                        <option value="2021" selected>2021</option>
+                                                        <option value="2020">2020</option>
+                                                        <option value="2019">2019</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row report_template" name="template_PER_MONTH">
+                            </div>
+                            <div class="row report_template" name="template_YTD">
+                                <div class="card-box">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label class="col-sm-2" style="padding: 0.5em 0px;">שנה</label>
+                                                <div class="col-sm-10">
+                                                    <select template_id="select_year_ytd" class="form-control">
+                                                        <option value="last_12_months" selected>שנה אחורה מהיום</option>
+                                                        <option value="2021">2021 - YTD</option>
+                                                        <option value="2020">2020</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row report_template" name="template_RECENT_PERIOD">
+                                <div class="card-box">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label class="col-sm-3" style="padding: 0.5em 0px;">הסיע.ה ב</label>
+                                                <div class="col-sm-5">
+                                                    <input type="text" template_id="input_period_begin" name="input_period_begin" class="form-control" aria-required="true" aria-invalid="false" has-error required />
+                                                    <label style="padding-bottom: 0.5em;font-size: 0.9em;">הכנס מספר גדול מ - 0</label>
+                                                </div>
+                                                <label class="col-sm-4" style="padding: 0.5em 0px;">ימים האחרונים</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label class="col-sm-3" style="padding: 0.5em 0px;">אך לא הסיע.ה ב</label>
+                                                <div class="col-sm-5">
+                                                    <input type="text" template_id="input_period_end" name="input_period_end" class="form-control" aria-required="true" aria-invalid="false" />
+                                                    <label style="padding-bottom: 0.5em; font-size: 0.9em;">   הכנס מספר גדול מ - 0 וקטן מהמספר למעלה </label>
+                                                </div>
+                                                <label class="col-sm-4" style="padding: 0.5em 0px;">ימים האחרונים</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-sm-2"><input type="button" template_id="generate_report_period" value='הפקת דו"ח' disabled class="btn btn-default buttons-html5" /> </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row report_template report_hidden" name="HIDDEN_MONTH">
+                                <input type="text" template_id="select_month" class="form-control" aria-required="true" aria-invalid="false">
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
         </div>
         <footer id="rights" data-toggle="tooltip" data-placement="top" title="©️ All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء" class="footer text-right">
         </footer>
     </div>
+
 
 
     <div class="modal fade" id="documentedRidesModal" tabindex="-1" role="dialog" aria-labelledby="documentedRidesTitle" aria-hidden="true">
@@ -693,7 +908,7 @@
     </div>
 
     <script>
-                var resizefunc = [];
+        var resizefunc = [];
     </script>
 
     <script src="assets/js/bootstrap-rtl.min.js"></script>
