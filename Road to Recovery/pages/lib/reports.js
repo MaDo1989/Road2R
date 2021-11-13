@@ -744,7 +744,6 @@ function convert_year_to_start_end_dates(year_selector) {
         selected_year.setDate(31);
         end_date = moment(selected_year);
     }
-    console.log(start_date, end_date);
     return { start_date: start_date, end_date: end_date };
 }
 
@@ -1134,7 +1133,6 @@ function refresh_amuta_vls_per_month_Table(start_date) {
 // 'start_date' :  a date formatted as YYYY-MM-DD
 function refresh_pil_vls_per_month_Table(start_date, end_date) {
     hide_all_tables();
-    console.log(start_date + " ; " + end_date);
     $('#wait').show();
     var query_object = {
         start_date: start_date,
@@ -1487,8 +1485,6 @@ function register_table_button_events() {
         let start_date = moment().subtract(+start_str, 'd');
         let end_date = moment().subtract(+end_str, 'd');
 
-        console.log(start_str, end_str, start_date, end_date);
-
         show_rides_history($(this), start_date, end_date);
     });
 
@@ -1589,6 +1585,15 @@ function refresh_amuta_vls_list_Table(query_object) {
 
 
 
+// Change Date field in every object, to have a string & index
+function update_date_field_for_sort(arr) {
+    for (let entry of arr) {
+        entry.Date = {
+            str: build_date_with_dow_string(entry.Date),
+            timestamp : new moment(entry.Date, "DD/MM/YYYY", true).valueOf()
+        }
+    }
+}
 
 function rp_amuta_vls_per_pat__refresh_preview() {
     var patient = $("#select_patient").attr("itemID");
@@ -1615,6 +1620,8 @@ function refresh_amuta_vls_per_pat_Table(patient) {
             $('#wait').hide();
             arr_rides = data.d;
 
+            update_date_field_for_sort(arr_rides);
+
             $('#div_table_amuta_vls_per_pat').show();
             tbl = $('#table_amuta_vls_per_pat').DataTable({
                 pageLength: 500,
@@ -1630,10 +1637,10 @@ function refresh_amuta_vls_per_pat_Table(patient) {
                     {
                         data: "Date",
                         render: function (data, type, row) {
-                            if (type == "display") {
-                                return build_date_with_dow_string(data);
+                            if (type == "sort") {
+                                return (data.timestamp);
                             }
-                            return data;
+                            return data.str;
                         }
                     },
                     {
@@ -1674,6 +1681,8 @@ function build_date_with_dow_string(in_date) {
     var result = HEBday + " " + date.format("DD/MM/YY");
     return result;
 }
+
+
 
 // 'start_date' :  a date formatted as YYYY-MM-DD
 // 'end_date'   :  a date formatted as YYYY-MM-DD
@@ -1724,7 +1733,7 @@ function refreshTable(volunteerId, start_date, end_date) {
 //@@                 }
 
                // date2 = HEBday + " " + day + "/" + month + "/" + date.getUTCFullYear() % 2000;
-                date2 = HEBday + " " + date.format("DD/MM/YY");
+                date2 = { str: HEBday + " " + date.format("DD/MM/YY"), timestamp: date.valueOf()};
                 time = date.format("HH:mm");
 
                 if (time == "22:14") { //22:14 is the default time to show afternoon אחה''צ
@@ -1755,7 +1764,15 @@ function refreshTable(volunteerId, start_date, end_date) {
                 columnDefs: [
                     { "orderData": [0, 3], "targets": 0 }],
                 columns: [
-                    { data: "Date" },
+                    {
+                        data: "Date",
+                        render: function (data, type, row) {
+                            if (type == "sort") {
+                                return (data.timestamp);
+                            }
+                            return data.str;
+                        }
+                    },
                     { data: "Time" },
                     {
                         data: "OriginName",

@@ -29,11 +29,10 @@ function start_daily_cards() {
 // Initiate async ajax call. When call finishes, invoke card's on_data callback
 function start_current_day_row() {
 
-
-    // @@ 
     // let today = new Date(2021, 09, 12); // 12-Oct-2020
-    // let today = new Date();
-    let today = new Date(2021, 10, 05); // 05-Nov-2020
+    // let today = new Date(2021, 10, 05); // 05-Nov-2020
+    
+    let today = new Date();
 
     $("#dsb_hl_daily_rides_todays_date").text(moment(today).format('DD.MM'));
 
