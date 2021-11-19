@@ -216,6 +216,8 @@ AND RidePat.pickuptime >= '2020-1-01'
     {
         DbService db = new DbService();
 
+        // Inner select groups by time, origin&dest, to avoid counting the same ride multiple times 
+
         string query =
              @"select MainDriver, Volunteer.DisplayName as DisplayName, 
                 Volunteer.CityCityName as CityName, Volunteer.CellPhone as CellPhone, 
@@ -232,10 +234,13 @@ AND RidePat.pickuptime >= '2020-1-01'
               sum(case when MONTH([pickuptime]) = '10' then 1 else 0 end) Oct,
               sum(case when MONTH([pickuptime]) = '11' then 1 else 0 end) Nov,
               sum(case when MONTH([pickuptime]) = '12' then 1 else 0 end) Dec
-            FROM RPView  rp
-            INNER JOIN Volunteer on Volunteer.Id = rp.MainDriver 
-            WHERE pickuptime >= @start_date 
-            AND pickuptime <= @end_date
+             FROM (select MainDriver, PickupTime  from RPView r 
+					where pickuptime >= @start_date 
+					AND pickuptime <= @end_date
+					AND MainDriver is not null
+					GROUP BY MainDriver, PickupTime, Origin, Destination 
+			   ) inner_select
+            INNER JOIN Volunteer on Volunteer.Id = inner_select.MainDriver 
             Group BY MainDriver, Volunteer.DisplayName, Volunteer.CityCityName, Volunteer.CellPhone, Volunteer.JoinDate
             ";
 
@@ -282,14 +287,19 @@ AND RidePat.pickuptime >= '2020-1-01'
     {
         DbService db = new DbService();
 
+        // Inner-Select - Grouping by pickup time, dest & Orig is part of better accuracy
+        // it avoids counting the same ride with multiple patients as 2 rides 
         string query =
-@"SELECT Volunteer.DisplayName , count(*) as COUNT_C  
-FROM RPView 
-INNER JOIN Volunteer ON RPView.MainDriver=Volunteer.Id
-WHERE pickuptime < @end_date
-AND pickuptime >= @start_date
-and MainDriver is not null
-GROUP BY Volunteer.DisplayName 
+@"select DisplayName, count(*) as COUNT_C   from 
+(  SELECT Volunteer.DisplayName, RPView.PickupTime, RPView.Origin, RPView.Destination, count(*) as INNER_C
+  FROM RPView 
+  INNER JOIN Volunteer ON RPView.MainDriver=Volunteer.Id
+  WHERE pickuptime < @end_date
+  AND pickuptime >= @start_date
+  and MainDriver is not null
+  GROUP BY Volunteer.DisplayName, RPView.PickupTime, RPView.Origin, RPView.Destination 
+  ) inner_select
+GROUP BY inner_select.DisplayName
 ";
         SqlCommand cmd = new SqlCommand(query);
         cmd.CommandType = CommandType.Text;
