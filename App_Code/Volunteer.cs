@@ -99,7 +99,7 @@ public class Volunteer
 
     //public DateTime BirthDate { get; set; }
 
-    public DateTime JoinDate { get; set; }
+    public DateTime? JoinDate { get; set; }
 
     //public bool KnowsArabic { get; set; }
 
@@ -1792,7 +1792,15 @@ public class Volunteer
         cmdParams[7] = cmd.Parameters.AddWithValue("@gender", v.Gender);
         //cmdParams[8] = cmd.Parameters.AddWithValue("@phone", v.HomePhone);
         cmdParams[8] = cmd.Parameters.AddWithValue("@IsActive", v.IsActive);
-        cmdParams[9] = cmd.Parameters.AddWithValue("@jDate", v.JoinDate);
+        
+        if (String.IsNullOrEmpty(v.JoinDate.ToString()))
+        {
+            cmdParams[9] = cmd.Parameters.AddWithValue("@jDate", DBNull.Value);
+        }
+        else
+        {
+            cmdParams[9] = cmd.Parameters.AddWithValue("@jDate", v.JoinDate);
+        }
         cmdParams[10] = cmd.Parameters.AddWithValue("@knowsArabic", v.KnowsArabic);
         cmdParams[11] = cmd.Parameters.AddWithValue("@lastNameA", v.LastNameA);
         cmdParams[12] = cmd.Parameters.AddWithValue("@lastNameH", v.LastNameH);
