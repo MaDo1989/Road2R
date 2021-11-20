@@ -178,10 +178,10 @@
 
 
 
-                        <div class="row m-l-10 m-r-10">
+                        <!--<div class="row m-l-10 m-r-10">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label">מעוניינ.ת בהדרכה?&nbsp;<!--<span class="required">*</span>--></label>
+                                    <label class="col-sm-4 control-label">מעוניינ.ת בהדרכה?&nbsp;--><!--<span class="required">*</span>--><!--</label>
                                     <div class="col-sm-6" id="needInstructions">
                                         <select id="instructions" name="instructions" class="form-control req">
                                             <option>בחר.י</option>
@@ -191,7 +191,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div>-->
 
                         <hr /><br />
                         <div class="row m-l-10 m-r-10">
@@ -330,7 +330,7 @@
                         type: "POST",
                         async: false,
                         //data: JSON.stringify({ volunteer: volunteer, coorEmail: coordinatorEmail, coorName: coordinatorName, coorPhone: coordinatorPhone, instructions: instructions }),
-                        data: JSON.stringify({ volunteer: volunteer, coordinators: coordinators, instructions: instructions }),
+                        data: JSON.stringify({ volunteer: volunteer, coordinators: coordinators, instructions: false }), //: instructions  
                         success: function (data) {
                             swal({
                                 title: "הפרטים נשמרו\nתודה רבה",
