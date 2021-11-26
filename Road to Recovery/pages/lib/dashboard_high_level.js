@@ -154,17 +154,24 @@ function get_month_name_in_hebrew(month_designator) {
 
 
 function get_month_range(month_designator) {
-    let dateObj = new Date();
+    let endDate, dateObj = new Date();
+    dateObj.setDate(1);
 
+    if (month_designator.localeCompare("curr") == 0) {
+        // Bound end date with current date
+        endDate = new Date();
+        endDate.setDate(endDate.getDate() + 1);
+    }
     if (month_designator.localeCompare("prev") == 0) {
         dateObj.setMonth(dateObj.getMonth() - 1);
+        // set end date to be first day of next month
+        endDate = new Date(dateObj.getFullYear(), dateObj.getMonth() + 1, 1);
     }
     if (month_designator.localeCompare("yoy") == 0) {
         dateObj.setFullYear(dateObj.getFullYear() - 1);
+        // set end date to be first day of next month
+        endDate = new Date(dateObj.getFullYear(), dateObj.getMonth() + 1, 1);
     }
-
-    dateObj.setDate(1);
-    let endDate = new Date(dateObj.getFullYear(),dateObj.getMonth() + 1, 0);
 
     let result = {
         start_date: moment(dateObj).format("YYYY-MM-DD"),
@@ -204,7 +211,7 @@ function start_monthly_cards() {
     start_one_month_row(card_def);
     }
 
-    start_month_graph(get_month_card("curr"));
+   start_month_graph(get_month_card("curr"));
 
    for (const card_def of month_card_definitions) {
       start_one_month_new_volunteers(card_def);
@@ -472,12 +479,21 @@ function get_year_range(year_designator) {
     if (year_designator.localeCompare("12months") == 0) {
         start = new Date();
         start.setFullYear(start.getFullYear() - 1);
+        // Avoid counting teh rides of the same month ayear ago, under this month
+        // e.g. if today is 17-Nov-2021, we do not want to count rides of range
+        // 01-Nov-2020 --> 17-Nov-2020 in November (due to GROUP BY MONTH(PickupTime))
+        start.setMonth(start.getMonth() + 1);
+        start.setDate(1);
     }
 
     if (year_designator.localeCompare("prev12months") == 0) {
         start = new Date();
         start.setFullYear(start.getFullYear() - 2);
+        start.setMonth(start.getMonth() + 1);
+        start.setDate(1);
         end.setFullYear(end.getFullYear() - 1);
+        end.setMonth(end.getMonth() + 1);
+        end.setDate(1);
     }
 
     let result = {
