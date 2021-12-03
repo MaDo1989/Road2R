@@ -1,5 +1,6 @@
 ﻿/*NEW CODE WHICH EXIST IN TEST AND YET EXIST IN PROD*/
 
+
 ALTER TABLE Escorted  ADD LastUpdateBy nvarchar(255)
 
 /**/
@@ -99,5 +100,32 @@ create procedure spVolunteer_GetActiveVolunteers_NotDriversYet
 			and   IsActive=1
 			and   Id not in (select distinct MainDriver from ride where MainDriver is not null)
 	END
+
+
+	/****** Object:  StoredProcedure [dbo].[spVolunteerTypeView_GetVolunteersList]    Script Date: 11/27/2021 6:27:34 PM ******/
+
+ALTER procedure [dbo].[spVolunteerTypeView_GetVolunteersList]
+@IsActive bit
+as
+begin
+	select *, (select count(*)
+				from ridepat rp inner join ride r
+				on rp.rideid=r.ridenum
+				where r.maindriver = vtv.Id
+				and pickuptime between DATEADD(Month, -2, GETDATE()) and  GETDATE()) as NumOfRides_last2Months
+				,
+				(
+			select origin + '-'+destination from
+				(
+				select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM RIDE
+				where maindriver = id
+				group by maindriver, origin, destination
+				order by numberOfTimesDrove desc
+				) t
+			) mostCommonPath
+	from VolunteerTypeView vtv
+	where IsActive = @IsActive
+	order by firstNameH
+end
 
 
