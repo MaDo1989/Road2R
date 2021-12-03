@@ -87,6 +87,8 @@
         arr_addressRows = [];
         $.jgrid.defaults.responsive = true;
         $.jgrid.defaults.styleUI = 'Bootstrap';
+        let OldCellPhone = '';
+
 
         function generateCities() {
 
@@ -256,6 +258,7 @@
                 success: function (data) {
                     var volunteer = JSON.parse(data.d);
                     console.log(volunteer)
+                    OldCellPhone = volunteer.CellPhone;
                     GENERAL.VOLUNTEERS.setVolunteersList(volunteer);
                     var location = "";
                     for (i in volunteer.PrefArea) {
@@ -365,7 +368,7 @@
             location.href = "viewVolunteer.html";
         }
 
-        function goBack(){
+        function goBack() {
             history.back();
         }
 
@@ -378,7 +381,7 @@
                 return [true, ""];
             }
         };
-
+                
     </script>
 </head>
 <body class="fixed-left">
@@ -556,7 +559,6 @@
                                                     <label class="col-sm-2 control-label">טלפון ראשי&nbsp;<span class="required">*</span></label>
                                                     <div class="col-sm-6">
                                                         <input id="phone1" dir="ltr" name="phone1" type="text" class="form-control" placeholder="0xxxxxxxxx או 0xxxxxxxx">
-
                                                     </div>
                                                 </div>
                                             </div>
@@ -975,6 +977,9 @@
                         city: city, address: address, email: email, joinDate: joinDate, gender: gender, KnowsArabic: knowsArabic,
                         typeVol: typeVol, IsActive: active, Remarks: remark, DisplayName: displayName, EnglishName: englishName, IsAssistant: isHelper, VolunteerIdentity: VolunteerIdentity, //birthdate: bdate,
                         EnglishFN: englishFN, EnglishLN: englishLN, BirthDate: birthDate, IsDriving: isDriving, Role: role
+                    }
+                    if (func === 'edit') {
+                        volunteer.OldCellPhone = OldCellPhone;
                     }
                     $.ajax({
                         dataType: "json",

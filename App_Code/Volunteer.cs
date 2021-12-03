@@ -93,13 +93,15 @@ public class Volunteer
         public string Name { get; set; }
     }
 
+    public string MostCommonPath { get; set; }
+
     public string RegId { get; set; }
 
     public string Remarks { get; set; }
 
     //public DateTime BirthDate { get; set; }
 
-    public DateTime JoinDate { get; set; }
+    public DateTime? JoinDate { get; set; }
 
     //public bool KnowsArabic { get; set; }
 
@@ -182,7 +184,7 @@ public class Volunteer
             lastNameA = value;
         }
     }
-
+    public string OldCellPhone { get; set; }
     public string CellPhone
     {
         get
@@ -1427,7 +1429,8 @@ public class Volunteer
             v.NoOfDocumentedCalls = Convert.ToInt32(dr["NoOfDocumentedCalls"]);
             v.NoOfDocumentedRides = Convert.ToInt32(dr["NoOfDocumentedRides"]);
             v.NumOfRides_last2Months = Convert.ToInt32(dr["NumOfRides_last2Months"]);
-
+            v.MostCommonPath = dr["mostCommonPath"].ToString();
+                   
             //v.Day1 = dr["preferDay1"].ToString();
             //v.Hour1 = dr["preferHour1"].ToString();
             //v.Day2 = dr["preferDay2"].ToString();
@@ -1792,7 +1795,15 @@ public class Volunteer
         cmdParams[7] = cmd.Parameters.AddWithValue("@gender", v.Gender);
         //cmdParams[8] = cmd.Parameters.AddWithValue("@phone", v.HomePhone);
         cmdParams[8] = cmd.Parameters.AddWithValue("@IsActive", v.IsActive);
-        cmdParams[9] = cmd.Parameters.AddWithValue("@jDate", v.JoinDate);
+        
+        if (String.IsNullOrEmpty(v.JoinDate.ToString()))
+        {
+            cmdParams[9] = cmd.Parameters.AddWithValue("@jDate", DBNull.Value);
+        }
+        else
+        {
+            cmdParams[9] = cmd.Parameters.AddWithValue("@jDate", v.JoinDate);
+        }
         cmdParams[10] = cmd.Parameters.AddWithValue("@knowsArabic", v.KnowsArabic);
         cmdParams[11] = cmd.Parameters.AddWithValue("@lastNameA", v.LastNameA);
         cmdParams[12] = cmd.Parameters.AddWithValue("@lastNameH", v.LastNameH);
@@ -1826,11 +1837,9 @@ public class Volunteer
         {
             ChangeLastUpdateBy(0, v.DisplayName);
             string displayQuery = "";
-            string EnglishDisplayQuery = "";
-
             User u = new User();
             string newDisplayName = v.FirstNameH + " " + v.LastNameH;
-            string existingDisplayName = u.getUserNameByCellphone(v.CellPhone);
+            string existingDisplayName = u.getUserNameByCellphone(v.OldCellPhone);
 
             if (existingDisplayName != newDisplayName && u.CheckIfDisplayNameExists(newDisplayName))
             {
@@ -1844,7 +1853,7 @@ public class Volunteer
 
 
             string EnglishNewDisplayName = v.EnglishFN + " " + v.EnglishLN;
-            string existingEnglishDisplayName = u.getUserEnglishNameByCellphone(v.CellPhone);
+            string existingEnglishDisplayName = u.getUserEnglishNameByCellphone(v.OldCellPhone);
             if (EnglishNewDisplayName != existingEnglishDisplayName && u.CheckIfEnglishDisplayNameExists(EnglishNewDisplayName))
             {
 

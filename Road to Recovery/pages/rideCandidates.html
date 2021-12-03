@@ -461,6 +461,36 @@
             });
             //#endregion
 
+            //#region candidate ridepat
+            $('#datatable-morning tbody').on('click', '.candidate', function () {
+                //editButton(this);
+                alert("in candidate");
+            });
+
+            $('#datatable-afternoon tbody').on('click', '.candidate', function () {
+                //editButton(this);
+                alert("in candidate");
+
+            });
+
+
+            $('#datatable-tomorrow tbody').on('click', '.candidate', function () {
+                //editButton(this);
+                alert("in candidate");
+
+            });
+
+            $('#datatable-future tbody').on('click', '.candidate', function () {
+                //editButton(this);
+                //alert("in candidate");
+                suggestCandidate(this);
+
+            });
+            //#endregion
+
+
+
+
             //#region show target form
             /*
              IMPORTANT NOTE
@@ -948,6 +978,39 @@
 
         }
 
+        function getCandidates(ridePatNum) {
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getCandidates",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({ ridePatNum: ridePatNum }),
+                type: "POST",
+                async: false,
+                //data: JSON.stringify({}),
+                success: getCandidatesSuccessCB,
+                error: getCandidatesErrorCB
+            });
+        }
+
+
+        function getCandidatesSuccessCB(data) {
+            //alert("in getCandidatesSuccessCB success");
+            candidates = JSON.parse(data.d);
+            console.log("*** Super Drivers Candidate List ***");
+            console.log(candidates.SuperDriversList);
+            console.log("*** Regular Drivers Candidate List ***");
+            console.log(candidates.RegularDriversList);
+            console.log("*** Newbies Drivers Candidate List ***");
+            console.log(candidates.NewBies);
+
+        }
+
+        function getCandidatesErrorCB(err) {
+            alert("Error in getCandidatesErrorCB");
+        }
+
+
+
         function getCoors() {
             $.ajax({
                 dataType: "json",
@@ -1052,6 +1115,15 @@
             arr_details = { RidePatNum: ridePat.name, func: "edit" }; //ridePat.name=RidePatNum
             GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
             location.href = "ridePatForm.html";
+        }
+
+        function suggestCandidate(ridePat) {
+            //arr_details = { RidePatNum: ridePat.name, func: "edit" }; //ridePat.name=RidePatNum
+            //GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
+            //location.href = "ridePatForm.html";
+            RidePatNum = parseInt(ridePat.name); // holds the ridepatnum
+            getCandidates(RidePatNum);
+            //alert(RidePatNum);
         }
 
         function deleteRidePat(ridePat, deleteBtn, thistable) {
@@ -1492,7 +1564,9 @@
                         //#region buttons
                         editBtn = `<button type='button' class='edit btn btn-icon waves-effect waves-light btn-secondary btn-sm m-r-5 m-b-5' id='${arr_rides[i].RidePatNum}' name='${arr_rides[i].RidePatNum}' title='עריכה'><i class='ti-pencil'></i></button>`;
                         deleteBtn = `<button type='button' class='remove btn btn-icon waves-effect waves-light btn-secondary btn-sm m-b-5'id='${arr_rides[i].RidePatNum}' name='${arr_rides[i].RidePatNum}' title='מחיקה'><i class='fa fa-remove'></i></button>`;
-                        btnStr = `<div class='btnsInSameLine'>${editBtn} ${deleteBtn}</div>`;
+                        candidateBtn = `<button type='button' class='candidate btn btn-icon waves-effect waves-light btn-secondary btn-sm m-b-5'id='${arr_rides[i].RidePatNum}' name='${arr_rides[i].RidePatNum}' title='הצעת מועמדים'><i class='fa fa-search-minus'></i></button>`;
+
+                        btnStr = `<div class='btnsInSameLine'>${editBtn} ${deleteBtn}${candidateBtn}</div>`;
                         //#endregion buttons
 
                         thisRidePat = {
@@ -1937,14 +2011,10 @@
             }
 
             if (numOfEscorts > 0) {
-
-                if (numOfEscorts > 1) {
-                    numOfPassengers = `<span class="numOfPassengers">${numOfEscorts + (ridepat.OnlyEscort ? 0 : 1)//+1 is the patient himself
-                        } נוסעים</span>`;
-                    numOfPassengers_English = `<span class="numOfPassengers">${numOfEscorts + (ridepat.OnlyEscort ? 0 : 1)
-                        } passengers</span>`;
-
-                }
+                numOfPassengers = `<span class="numOfPassengers">${numOfEscorts + 1//+1 is the patient his-self
+                    } נוסעים</span>`;
+                numOfPassengers_English = `<span class="numOfPassengers">${numOfEscorts + 1
+                    } passengers</span>`;
 
                 escortsPhone2render = '<span class="escortsPhone2render block">מלווים: ';
                 numOfRealEscorts = 0;
@@ -2501,7 +2571,7 @@
     </div>
     <div class="ContextMenu_dropdown hidden">
         להסיר סימון עודכן לאחרונה מתא זה?
-        <input onclick="add2IhaveSeenAllready()" class="dropbtn" type="button" value="כן" />
+            <input onclick="add2IhaveSeenAllready()" class="dropbtn" type="button" value="כן" />
     </div>
 </body>
 </html>

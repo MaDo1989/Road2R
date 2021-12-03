@@ -7,11 +7,9 @@ using System.Text;
 using System.Web;
 using System.Web.Script.Serialization;
 
-/// <summary>
-/// Summary description for Escorted
-/// </summary>
 public class Escorted
 {
+    #region Private Fields
     Patient pat;//חולה
     string englishName;//שם באנגלית
     string displayName; //מזהה ייחודי
@@ -28,14 +26,13 @@ public class Escorted
     string gender;
     int id;
     bool isAnonymous;
+    DbService dbs;
+    #endregion Private Fields
 
+    #region Public Properties
     public string City { get; set; }
-
-
     public bool IsActive { get; set; }
-
     public int Id { get; set; }
-
     public Patient Pat
     {
         get
@@ -48,7 +45,6 @@ public class Escorted
             pat = value;
         }
     }
-
     public string DisplayName
     {
         get
@@ -61,7 +57,6 @@ public class Escorted
             displayName = value;
         }
     }
-
     public string FirstNameH
     {
         get
@@ -74,7 +69,6 @@ public class Escorted
             firstNameH = value;
         }
     }
-
     public string FirstNameA
     {
         get
@@ -87,7 +81,6 @@ public class Escorted
             firstNameA = value;
         }
     }
-
     public string LastNameH
     {
         get
@@ -100,7 +93,6 @@ public class Escorted
             lastNameH = value;
         }
     }
-
     public string LastNameA
     {
         get
@@ -113,7 +105,6 @@ public class Escorted
             lastNameA = value;
         }
     }
-
     public string Addrees
     {
         get
@@ -126,7 +117,6 @@ public class Escorted
             addrees = value;
         }
     }
-
     public string CellPhone
     {
         get
@@ -139,7 +129,6 @@ public class Escorted
             cellPhone = value;
         }
     }
-
     public string CellPhone2
     {
         get
@@ -152,7 +141,6 @@ public class Escorted
             cellPhone2 = value;
         }
     }
-
     public string HomePhone
     {
         get
@@ -165,7 +153,6 @@ public class Escorted
             homePhone = value;
         }
     }
-
     public string Status
     {
         get
@@ -178,7 +165,6 @@ public class Escorted
             status = value;
         }
     }
-
     public string ContactType
     {
         get
@@ -191,7 +177,6 @@ public class Escorted
             contactType = value;
         }
     }
-
     public string Gender
     {
         get
@@ -204,7 +189,6 @@ public class Escorted
             gender = value;
         }
     }
-
     public bool IsAnonymous
     {
         get
@@ -217,7 +201,6 @@ public class Escorted
             isAnonymous = value;
         }
     }
-
     public string EnglishName
     {
         get
@@ -230,7 +213,6 @@ public class Escorted
             englishName = value;
         }
     }
-
     public int Id1
     {
         get
@@ -243,7 +225,9 @@ public class Escorted
             id = value;
         }
     }
+    #endregion Public Properties
 
+    #region Constructors
     public Escorted(Patient _pat, string _displayName, string _firstNameH, string _firstNameA, string _lastNameH, string _lastNameA,
      string _addrees, string _cellPhone, string _cellPhone2, string _homePhone, string _status, string _contactType, string _gender)
     {
@@ -261,7 +245,6 @@ public class Escorted
         ContactType = _contactType;
         Gender = _gender;
     }
-
     public Escorted(Patient _pat, string _firstNameH, string _firstNameA, string _lastNameH, string _lastNameA,
         string _addrees, string _cellPhone, string _cellPhone2, string _homePhone, string _status, string _contactType, string _gender)
     {
@@ -301,7 +284,6 @@ public class Escorted
         // TODO: Add constructor logic here
         //
     }
-
     public Escorted(string _displayname, string _firstNameH, string _lastNameH, string _cellPhone)
     {
         DisplayName = _displayname;
@@ -309,24 +291,13 @@ public class Escorted
         LastNameH = _lastNameH;
         CellPhone = _cellPhone;
     }
-
     public Escorted(string _displayname)
     {
         DisplayName = _displayname;
     }
+    #endregion Constructors
 
-    public void setEscortedStatus(string active)// change name to SetStatus
-    {
-        DbService db = new DbService();
-        SqlCommand cmd = new SqlCommand();
-        cmd.CommandType = CommandType.Text;
-        SqlParameter[] cmdParams = new SqlParameter[2];
-        cmdParams[0] = cmd.Parameters.AddWithValue("@displayName", DisplayName);
-        cmdParams[1] = cmd.Parameters.AddWithValue("@status", active);
-        string query = "UPDATE Escorted SET IsActive=@status WHERE displayName=@displayName";
-        db.ExecuteQuery(query, cmd.CommandType, cmdParams);
-    }
-
+    #region Get Methods
     public List<Escorted> getContactType()
     {
         List<Escorted> cl = new List<Escorted>();
@@ -342,7 +313,6 @@ public class Escorted
         }
         return cl;
     }
-
     public Escorted getEscorted(string patientName)
     {
         #region DB functions
@@ -356,7 +326,7 @@ public class Escorted
         cmd.CommandType = CommandType.Text;
         cmdParams = new SqlParameter[1];
         cmdParams[0] = cmd.Parameters.AddWithValue("@displayName", displayName);
-        DataSet ds = db.GetDataSetByQuery(query, true,cmd.CommandType, cmdParams);
+        DataSet ds = db.GetDataSetByQuery(query, true, cmd.CommandType, cmdParams);
 
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
@@ -385,15 +355,61 @@ public class Escorted
         cmdParams[0] = cmd.Parameters.AddWithValue("@patient", patientName);
         cmdParams[1] = cmd.Parameters.AddWithValue("@escort", e.DisplayName);
         query = "select Relationship from RelationshipView where Patient=@patient and Escort=@escort";
-        DataRow dr2 = db.GetDataSetByQuery(query, true,cmd.CommandType, cmdParams).Tables[0].Rows[0];
+        DataRow dr2 = db.GetDataSetByQuery(query, true, cmd.CommandType, cmdParams).Tables[0].Rows[0];
         e.ContactType = dr2["Relationship"].ToString();
         #endregion
 
         return e;
     }
 
+    public Escorted GetEscortById(int id)
+    {
+        string query = "exec spEscorted_GetEscortById @id=" + id;
+        try
+        {
+            dbs = new DbService();
+            SqlDataReader sdr = dbs.GetDataReader(query);
+            Escorted escort = new Escorted(); 
+            if (sdr.Read())
+            {
+                escort.Id = int.Parse(sdr["Id"].ToString());
+                escort.DisplayName = sdr["DisplayName"].ToString();
+                escort.FirstNameH = sdr["FirstNameH"].ToString();
+                escort.LastNameH = sdr["LastNameH"].ToString();
+                escort.CellPhone = sdr["CellPhone"].ToString();
+                escort.IsAnonymous =  String.IsNullOrEmpty(sdr["IsAnonymous"].ToString());
+                escort.IsActive =  String.IsNullOrEmpty(sdr["IsActive"].ToString());
+            }
+            return escort;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+        finally
+        {
+            dbs.CloseConnection();
+        }
+    }
+
+    #endregion Get Methods
+
+    #region SetMethods
+    public void setEscortedStatus(string active)
+    {
+        ChangeLastUpdateBy(Id);
+        DbService db = new DbService();
+        SqlCommand cmd = new SqlCommand();
+        cmd.CommandType = CommandType.Text;
+        SqlParameter[] cmdParams = new SqlParameter[2];
+        cmdParams[0] = cmd.Parameters.AddWithValue("@escortId", Id);
+        cmdParams[1] = cmd.Parameters.AddWithValue("@status", active);
+        string query = "exec spEscorted_ToggleIsActive @id=@escortId, @isActive=@status";
+        db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+    }
     public void setEscorted(string func)
     {
+        ChangeLastUpdateBy(Id);
         DbService db = new DbService();
         string query = "";
         SqlCommand cmd = new SqlCommand();
@@ -413,7 +429,7 @@ public class Escorted
         cmdParams[11] = cmd.Parameters.AddWithValue("@Id", Id);
         cmdParams[12] = cmd.Parameters.AddWithValue("@PatientId", Pat.Id);
         cmdParams[13] = cmd.Parameters.AddWithValue("@Relationship", 0);
-        cmdParams[14] = cmd.Parameters.AddWithValue("@EnglishName",EnglishName);
+        cmdParams[14] = cmd.Parameters.AddWithValue("@EnglishName", EnglishName);
         cmdParams[15] = cmd.Parameters.AddWithValue("@IsAnonymous", IsAnonymous);
 
         db = new DbService();
@@ -432,6 +448,10 @@ public class Escorted
 
         if (func == "edit")
         {
+
+            //->
+            //ID IS ALLREADY EXIST
+
             query = "update Escorted set FirstNameH=@FirstNameH,LastNameH=@LastNameH,FirstNameA=@FirstNameA,";
             query += "LastNameA=@LastNameA,CellPhone=@CellPhone,CellPhone2=@CellPhone2,HomePhone=@HomePhone,";
             query += "City=@City,IsActive=@IsActive,Gender=@Gender,EnglishName=@EnglishName where Id=@Id";
@@ -481,16 +501,15 @@ public class Escorted
             }
         }
     }
-
     //the function works only if the anonymous escort's id is: 22,23,25,26,28.
-    public void setAnonymousEscorted(string func,int patientId,int numberOfEscort)
+    public void setAnonymousEscorted(string func, int patientId, int numberOfEscort)
     {
         DbService db = new DbService();
         string query = "";
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
         SqlParameter[] cmdParams = new SqlParameter[3];
-        
+
         cmdParams[0] = cmd.Parameters.AddWithValue("@ContactType", 7);
         cmdParams[1] = cmd.Parameters.AddWithValue("@PatientId", patientId);
 
@@ -514,25 +533,52 @@ public class Escorted
         }
 
     }
-    
-    
-    
-    
-    
-    
-    //public DataTable read()
-    //{
-    //    DBservices dbs = new DBservices();
-    //    dbs = dbs.ReadFromDataBase("RoadDBconnectionString", "Escorted");
-    //    return dbs.dt;
-    //}
+    #endregion SetMethods
 
 
-    //    public List<Escorted> getListEscorted(string displayNamePat)
-    //{
-    //    DBservices dbs = new DBservices();
-    //    List<Escorted> listE = new List<Escorted>();
-    //    listE = dbs.getListEscorted("RoadDBconnectionString", "Escorted", displayNamePat);
-    //    return listE;
-    //}
+    #region ChangeLastUpdateBy
+
+    /// <summary>
+    /// ChangeLastUpdateBy is a private method for changing the lastUpdateBy in the Escorted table
+    /// this functionality is for track who was the last one who change any field in a record of 
+    /// Escorted table.
+    /// ------------------------------------------------------
+    /// the name of the last one who change a recorde is taken from the session
+    /// </summary>
+    private void ChangeLastUpdateBy(int id)
+    {
+        /*
+         Notice!
+            when user is not logged in propely
+            the HttpContext is not accessable !
+            therefore → loggedInName = "משתמש לא מזוהה";
+            error CS0103: The name 'HttpContext' does not exist in the current context
+         */
+        string loggedInName = (string)HttpContext.Current.Session["loggedInName"];
+        if (String.IsNullOrEmpty(loggedInName))
+        {
+            loggedInName = "משתמש לא מזוהה";
+        }
+
+        SqlCommand cmd = new SqlCommand();
+        cmd.CommandType = CommandType.Text;
+        SqlParameter[] cmdParams = new SqlParameter[2];
+
+        cmdParams[0] = cmd.Parameters.AddWithValue("@loggedInName", loggedInName);
+        cmdParams[1] = cmd.Parameters.AddWithValue("@Id", id);
+
+        string query = "exec spEscorted_ChangeLastUpdateBy @lastUpdateBy=@loggedInName, @id=@Id";
+        try
+        {
+            dbs = new DbService();
+            dbs.ExecuteQuery(query, cmd.CommandType, cmdParams);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+
+    }
+
+    #endregion ChangeLastUpdateBy
 }
