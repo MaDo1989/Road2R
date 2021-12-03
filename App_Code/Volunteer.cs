@@ -93,6 +93,8 @@ public class Volunteer
         public string Name { get; set; }
     }
 
+    public string MostCommonPath { get; set; }
+
     public string RegId { get; set; }
 
     public string Remarks { get; set; }
@@ -1427,7 +1429,8 @@ public class Volunteer
             v.NoOfDocumentedCalls = Convert.ToInt32(dr["NoOfDocumentedCalls"]);
             v.NoOfDocumentedRides = Convert.ToInt32(dr["NoOfDocumentedRides"]);
             v.NumOfRides_last2Months = Convert.ToInt32(dr["NumOfRides_last2Months"]);
-
+            v.MostCommonPath = dr["mostCommonPath"].ToString();
+                   
             //v.Day1 = dr["preferDay1"].ToString();
             //v.Hour1 = dr["preferHour1"].ToString();
             //v.Day2 = dr["preferDay2"].ToString();
