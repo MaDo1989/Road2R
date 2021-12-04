@@ -439,14 +439,29 @@ GROUP BY inner_select.DisplayName
     {
         DbService db = new DbService();
 
+        /* The inner query allows identifying unique rides.
+         * If we have same 'MainDriver, PickupTime, Origin, Destination', the ride is shared between patients
+         * So we partition over that field combination and generate a runnign index (row_number) for each ride
+         * Now to count just uniuqe ride, we put a CASE that gets '1' for each unique ride
+         * The unique rides count is the SUM of the new case field
+         */
+
         string query =
-             @"SELECT  MONTH(pickuptime) as MONTH_C ,  count(DISTINCT DisplayName) as COUNT_PAT,  count(*) as COUNT_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
-               FROM RPView 
-               WHERE MainDriver is not null
-               AND RPView.pickuptime > @start_date
-               AND RPView.pickuptime < @end_date
-               GROUP BY MONTH(pickuptime)
-               ORDER BY MONTH_C ASC";
+             @"SELECT  MONTH(pickuptime) as MONTH_C ,  count(DISTINCT DisplayName) as COUNT_PAT,  
+                        count(*) as COUNT_DUPLICATE_RIDES, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, count(DISTINCT MainDriver) as COUNT_VOL
+                FROM  (
+	                select MainDriver  , PickupTime, Origin, Destination, DisplayName, 
+	                ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) as row_num_C,
+	                CASE WHEN ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) = '1' THEN 1
+		                ELSE 0
+	                END AS Unique_Drive_C
+	                from RPView r 
+	                where pickuptime >= @start_date 
+	                AND pickuptime <= @end_date
+	                AND MainDriver is not null
+                ) s 
+                GROUP BY MONTH(pickuptime)
+                ORDER BY MONTH_C ASC";
 
         SqlCommand cmd = new SqlCommand(query);
         cmd.CommandType = CommandType.Text;
@@ -462,7 +477,7 @@ GROUP BY inner_select.DisplayName
         {
             MetricMonthlyInfo obj = new MetricMonthlyInfo();
             obj.Day = dr["MONTH_C"].ToString();
-            obj.Rides = dr["COUNT_RIDES"].ToString();
+            obj.Rides = dr["COUNT_UNIQUE_RIDES"].ToString();
             obj.Patients = dr["COUNT_PAT"].ToString();
             obj.Volunteers = dr["COUNT_VOL"].ToString();
             result.Add(obj);
@@ -534,11 +549,17 @@ GROUP BY inner_select.DisplayName
     internal MetricMonthlyInfo GetReportMonthlyDigestMetrics(string start_date, string end_date)
     {
         string query =
-             @"SELECT count(DISTINCT DisplayName) as COUNT_PAT,  count(*) as COUNT_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
-               FROM RPView 
-               WHERE MainDriver is not null
-               AND RPView.pickuptime > @start_date
-               AND RPView.pickuptime < @end_date";
+             @"SELECT count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
+                FROM  (
+	                select MainDriver  , PickupTime, Origin, Destination, DisplayName, 
+	                CASE WHEN ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) = '1' THEN 1
+		                ELSE 0
+	                END AS Unique_Drive_C
+	                from RPView r 
+	                where pickuptime >= @start_date 
+	                AND pickuptime <= @end_date
+	                AND MainDriver is not null
+                )  s";
 
         return GetReportRangeDigestMetrics(start_date, end_date, query);
     }

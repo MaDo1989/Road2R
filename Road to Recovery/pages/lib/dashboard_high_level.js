@@ -45,8 +45,6 @@ function start_current_day_row() {
 
     start_current_daily_need_drivers(query_object);
 
-    start_current_daily_new_volunteers(query_object);
-
 }
 
 function start_current_daily_totals(query_object) {
@@ -86,6 +84,8 @@ function start_current_daily_need_drivers(query_object) {
             // Update card numeric value
             $("#dsb_hl_daily_rides_attention").text(result.Value1);
             $("#dsb_hl_daily_patients_attention").text(result.Value2);
+
+            start_current_daily_new_volunteers(query_object);
         },
         error: function (err) {
         }
@@ -207,15 +207,12 @@ function get_month_card(dsg) {
 }
 function start_monthly_cards() {
 
-    for (const card_def of month_card_definitions) {
-    start_one_month_row(card_def);
-    }
+   start_one_month_row(get_month_card("curr"));
 
    start_month_graph(get_month_card("curr"));
 
-   for (const card_def of month_card_definitions) {
-      start_one_month_new_volunteers(card_def);
-    }
+   start_one_month_new_volunteers(get_month_card("curr"));
+
 
     $("#dsb_hl_monthly_tbl_curr_show").click(toggle_graph_datasets);
     $("#dsb_hl_monthly_tbl_prev_show").click(toggle_graph_datasets);
@@ -244,6 +241,11 @@ function start_one_month_row(card_def) {
         type: "POST",
         data: JSON.stringify(query_object),
         success: function (data) {
+            // Schedule fetch for next data-set if needed.
+            let next_card = get_month_card(card_def.next);
+            if (next_card) {
+                start_one_month_row(next_card);   // Not really recursive - called from incoming-data callback
+            }
             result = data.d;
             render_month_row(dsg, result);
         },
@@ -276,6 +278,12 @@ function start_one_month_new_volunteers(card_def) {
         type: "POST",
         data: JSON.stringify(query_object),
         success: function (data) {
+            // Schedule fetch for next data-set if needed.
+            let next_card = get_month_card(card_def.next);
+            if (next_card) {
+                start_one_month_new_volunteers(next_card);   // Not really recursive - called from incoming-data callback
+            }
+
             result = data.d;
             label_id = "#dsb_hl_monthly_tbl_" + dsg + "_new";
             $(label_id).text(result.Volunteers);
@@ -357,7 +365,7 @@ const r2rHTMLLegend = {
 function create_month_graph(prepared_data)
 {
     // We use version 2.1.4 of chart.js
-    //@@ Chart.pluginService.register(r2rHTMLLegend);
+    //FUTURE  Chart.pluginService.register(r2rHTMLLegend);
 
     var ctx = document.getElementById('dsb_hl_monthly_graph').getContext('2d');
     var myChart = new Chart(ctx, {
