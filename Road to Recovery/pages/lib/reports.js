@@ -197,6 +197,7 @@ var K_strategy = {
     "rp_pil_vl_ride_recent_period": rp_pil_vl_ride_recent_period__refresh_preview,
     "rp_center_daily_by_month": rp_center_daily_by_month__refresh_preview,
     "rp_center_monthly_by_year": rp_center_monthly_by_year__refresh_preview,
+    "rp_center_patients_rides": rp_center_patients_rides__refresh_preview,
 }
 
 
@@ -310,7 +311,23 @@ var K_fields_map = {
             template: 'div[name="template_YEAR"]',
             post_clone: rp_center_monthly_by_year__post_clone
         }
+    ],
+    "rp_center_patients_rides": [
+        {
+            id: "rp_patients_rides__volunteer",
+            template: 'div[name="template_VOLUNTEER"]',
+            type: "VOLUNTEER",
+            post_clone: field_volunteers_post_clone
+        },
+        {
+            id: "rp_patients_rides__month",
+            template: 'div[name="template_MONTH"]',
+            type: "MONTH",
+            post_clone: rp_center_patients_rides__post_clone
+        }
+
     ]
+
 
     
  }
@@ -507,7 +524,7 @@ function on_volunteer_selected(event, ui) {
     refreshPreview();
     return true;
 }
-// called when the async ajax call to laod volunteers has finished
+// called when the async ajax call to load volunteers has finished
 // Used to populate UI needing the volunteers list
 function populate_volunteer_field() {
     $("#select_driver").autocomplete({
@@ -902,6 +919,13 @@ function rp_center_monthly_by_year__post_clone(id) {
 
     rp_center_monthly_by_year__refresh_preview();
 }
+
+function rp_center_patients_rides__post_clone(id) {
+
+    populate_month_field(false);
+    rp_center_patients_rides__refresh_preview();
+}
+
 
 function rp_pil_vls_per_month__refresh_preview() {
     var start_date, end_date;
@@ -2044,6 +2068,91 @@ function rp_center_monthly_by_year__fix_records(records) {
     return new Array(patients, drivers);
 }
 
+
+// Checks if all fields are filled. If so refresh the report
+function rp_center_patients_rides__refresh_preview() {
+    var volunteerId = $("#select_driver").attr("itemID");
+    if (volunteerId) {
+        var selected_date = Date.parse($("#select_month").val());
+        if (selected_date) {
+            var start_month_date = moment(selected_date);
+            var end_month_date = start_month_date.clone().add(1, 'months');
+
+            rp_center_patients_rides__refresh_Table(volunteerId, 
+                start_month_date.format("YYYY-MM-DD"),
+                end_month_date.format("YYYY-MM-DD"));
+        }
+    }
+}
+
+function rp_center_patients_rides__refresh_Table(volunteerId, start_date, end_date) {
+    hide_all_tables();
+
+    $('#wait').show();
+    var query_object = {
+        volunteer: volunteerId,
+        start_date: start_date,
+        end_date: end_date
+    };
+
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportCenteryPatientsRides",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            $('#wait').hide();
+            var records = data.d;
+            console.log(records);
+
+            // records = rp_center_daily_by_month__fix_records(records, start_date);
+
+            $('#div_table_center_patients_rides').show();
+            tbl = $('#table_center_patients_rides').DataTable({
+                pageLength: 100,
+                bLengthChange: false,
+                data: records,
+                destroy: true,
+                "language": {
+                    "search": "חיפוש:"
+                },
+                columnDefs: [
+                    { "orderData": [0], "type": "num", "targets": 0 }],
+                columns: [
+                    {
+                        data: "PickupTime",
+                        render: function (data, type, row) {
+                            if (type == "sort") {
+                                return data;
+                            }
+                            return data;
+                        }
+
+                    },
+                    { data: "PatientName" },
+                    { data: "Origin" },
+                    { data: "Destination" },
+                    { data: "Hospital" },
+                ],
+                dom: 'Bfrtip',
+
+                buttons: [
+                    K_DataTable_CSV_EXPORT
+                ]
+            });
+        },
+        error: function (err) {
+            $('#wait').hide();
+        }
+
+    });
+
+}
 
 function hide_all_tables() {
     $('#div_weeklyRides').hide();

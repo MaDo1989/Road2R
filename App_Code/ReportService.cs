@@ -155,6 +155,16 @@ public class ReportService
         public string Volunteers { get; set; }
     }
 
+    public class CenteryPatientsRidesInfo
+    {
+        public string PatientID { get; set; }
+        public string PatientName { get; set; }
+        public string PickupTime { get; set; }
+        public string Origin { get; set; }
+        public string Destination { get; set; }
+        public string Hospital { get; set; }
+    }
+
     private DataTable getDriverByID(int driverID, DbService db)
     {
         string query = "select Id,DisplayName,CellPhone from Volunteer where Id = @ID";
@@ -1101,6 +1111,46 @@ ORDER  BY MONTH_G, TYPE_G ASC";
         return result;
     }
 
+
+    internal List<CenteryPatientsRidesInfo> GetReportCenteryPatientsRides(string volunteer, string start_date, string end_date)
+    {
+        DbService db = new DbService();
+
+        string query =
+        @"select
+        rp.DisplayName, rp.Id, PickupTime ,Origin , Destination, p.Hospital 
+        from RPView rp inner join Patient p 
+        on rp.Id = p.Id 
+        where maindriver=@volunteerID
+        AND pickuptime > @start_date
+        AND pickuptime < @end_date
+        order by pickuptime desc";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@volunteerID", SqlDbType.Int).Value = volunteer;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        List<CenteryPatientsRidesInfo> result = new List<CenteryPatientsRidesInfo>();
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            CenteryPatientsRidesInfo obj = new CenteryPatientsRidesInfo();
+            obj.PatientID = dr["Id"].ToString();
+            obj.PatientName = dr["DisplayName"].ToString();
+            obj.PickupTime = dr["PickupTime"].ToString();
+            obj.Origin = dr["Origin"].ToString();
+            obj.Destination = dr["Destination"].ToString();
+            obj.Hospital = dr["Hospital"].ToString();
+            result.Add(obj);
+        }
+
+        return result;
+    }
 
 
 
