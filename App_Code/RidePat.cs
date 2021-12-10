@@ -543,25 +543,23 @@ public class RidePat
             //SET THE COORDINATOR NAME IN RIDEPAT TABLE TO THE LAST ONE WHO TOUCHED THIS RIDEPAT 
             ChangeCoordinatoor(RidePatNum);
 
-            //string query = "select Status from RidePat where RidePatNum=" + RidePatNum;
-            //Status = db.GetObjectScalarByQuery(query).ToString();
-            //if (Status != "ממתינה לשיבוץ" && !isAnonymous) throw new Exception("נסיעה זו כבר הוקצתה לנהג ואין אפשרות לערוך אותה");
-
             RidePat rpc = GetRidePat(RidePatNum);
             if (rpc.Pat.DisplayName == ridePat.Pat.DisplayName && rpc.Origin.Name == ridePat.Origin.Name && rpc.Destination.Name == ridePat.Destination.Name && rpc.Date.TimeOfDay == ridePat.Date.TimeOfDay)
             {
                 sendMessage = false;
             }
 
-            //string query = "select Status from RidePat where RidePatNum=" + RidePatNum;
-            //Status = db.GetObjectScalarByQuery(query).ToString();
-            //if (Status == "הגענו ליעד") throw new Exception("נסיעה זו כבר הגיעה ליעד ואין אפשרות לערוך אותה");
-
             cmdParams[6] = cmd.Parameters.AddWithValue("@ridePatNum", RidePatNum);
 
             cmdParams[8] = cmd.Parameters.AddWithValue("@coordinatorID", -1); //THIS IS JUST SO YOU DONT GET EXCEPTION
 
-            var query = "update RidePat set Patient=@pat,Origin=@origin,Destination=@destination,PickupTime=@date,Remark=@remark,OnlyEscort=@onlyEscort,Area=@Area,lastModified=@lastModified where RidePatNum=@ridePatNum";
+            string query = "update RidePat set Patient=@pat,Origin=@origin,Destination=@destination,PickupTime=@date,Remark=@remark,OnlyEscort=@onlyEscort,Area=@Area,lastModified=@lastModified where RidePatNum=@ridePatNum ";
+            query += "DECLARE @RIDEID INT = (select RideId from RidePat where RidePatNum=@ridePatNum) ";
+            query += "if (select RideNum from ride where RideNum=@RIDEID) is not null ";
+            query += "begin ";
+            query += "update ride set Origin=@origin, Destination=@destination where RideNum=@RIDEID ";
+            query += "end";
+
             int res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
 
             if (res > 0)
@@ -601,12 +599,6 @@ public class RidePat
             Ride r = new Ride();
             RidePat rp = GetRidePat(RidePatNum);
 
-            //DateTime timeRightNow = DateTime.Now;
-            //if (Date > timeRightNow)
-            //{
-            //    //paam
-            //}
-
             if (isAnonymous && Pat.DisplayName.IndexOf("אנונימי") == -1 && (Date > timeRightNow))
             {
 
@@ -626,9 +618,7 @@ public class RidePat
                 }
             }
 
-            //   InformAllConnectedClientsAboutChnagesInThisRidepat();
             return RidePatNum;
-            //return res;
         }
         else if (func == "delete")
         {
@@ -1160,7 +1150,7 @@ public class RidePat
                         rp.pat.Equipment.Add(row.ItemArray[0].ToString());
                     }
 
-                    rp.pat.EscortedList = new List<Escorted>(); 
+                    rp.pat.EscortedList = new List<Escorted>();
                     rp.Escorts = new List<Escorted>();
                     string escortSearchExpression = "RidePatNum = " + rp.ridePatNum;
                     DataRow[] escortRow = escortTable.Select(escortSearchExpression);
@@ -1173,8 +1163,8 @@ public class RidePat
                         e.CellPhone = row["CellPhone"].ToString();
                         e.IsAnonymous = String.IsNullOrEmpty(row["IsAnonymous"].ToString()) ? false : true;
                         rp.Escorts.Add(e);
-                        rp.pat.EscortedList.Add(e); 
-                        
+                        rp.pat.EscortedList.Add(e);
+
                     }
 
                     Location origin = new Location();
@@ -1197,11 +1187,11 @@ public class RidePat
                     rp.Shift = dr["Shift"].ToString();
                     rp.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
                     rp.Status = dr["Status"].ToString();
-                   
+
                     bool result;
                     Boolean.TryParse(dr["OnlyEscort"].ToString(), out result);
                     rp.OnlyEscort = result;
-                    
+
                     rp.LastModified =
                                        String.IsNullOrEmpty(dr["lastModified"].ToString()) ? null :
                                        (DateTime?)Convert.ToDateTime(dr["lastModified"].ToString());
@@ -2159,7 +2149,7 @@ finally
     /// </summary>
     private void ChangeCoordinatoor(int ridePatNum)
     {
-        string loggedInName = String.IsNullOrEmpty((string)HttpContext.Current.Session["loggedInName"]) ? "sessionWasEmpty":
+        string loggedInName = String.IsNullOrEmpty((string)HttpContext.Current.Session["loggedInName"]) ? "sessionWasEmpty" :
             FixApostrophe((string)HttpContext.Current.Session["loggedInName"]);
 
         string query = "exec spRidePat_ChangeCoordinatorName @coordinatorName=N'" + loggedInName + "', @RidePatNum=" + ridePatNum;
@@ -2179,7 +2169,7 @@ finally
 
     private string FixApostrophe(string strWithChopchick)
     {
-        return strWithChopchick.Replace("'","''");
+        return strWithChopchick.Replace("'", "''");
     }
 
     private void BroadCast2Clients_driverHasAssigned2RidePat(RidePat rp)
