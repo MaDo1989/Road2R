@@ -1395,14 +1395,10 @@ public class Volunteer
     {
         #region DB functions
 
+        //this procdure has change due to Amir's request
+            //if active is false then fetch all (active and non active)
         string query = "exec spVolunteerTypeView_GetVolunteersList @isActive=" + active;
-        //string query = "select * from VolunteerTypeView";
-        //if (active)
-        //{
-        //    query += " where IsActive = 'True'";
-        //}
 
-        //query += " order by firstNameH";
 
         List<Volunteer> list = new List<Volunteer>();
         DbService db = new DbService();
