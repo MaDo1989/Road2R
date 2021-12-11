@@ -104,6 +104,11 @@ create procedure spVolunteer_GetActiveVolunteers_NotDriversYet
 	END
 	GO
 
+/****** Object:  StoredProcedure [dbo].[spVolunteerTypeView_GetVolunteersList]    Script Date: 12/11/2021 7:10:58 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
 ALTER procedure [dbo].[spVolunteerTypeView_GetVolunteersList]
 
 @IsActive bit
@@ -122,7 +127,7 @@ if (@IsActive = 0)
 					and pickuptime between DATEADD(Month, -2, GETDATE()) and  GETDATE()) as NumOfRides_last2Months
 					,
 					(
-				select origin + '->'+destination from
+				select origin + '→'+destination from
 					(
 					select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
 					where t.MainDriver = id
@@ -144,7 +149,7 @@ else
 					and pickuptime between DATEADD(Month, -2, GETDATE()) and  GETDATE()) as NumOfRides_last2Months
 					,
 					(
-				select origin + '->'+destination from
+				select origin + '→'+destination from
 					(
 					select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
 					where t.MainDriver = id
@@ -160,6 +165,7 @@ else
 	drop table #tempNotDeletedOnly 
 
 end
+
 GO
 
 
