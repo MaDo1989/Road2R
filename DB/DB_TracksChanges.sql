@@ -104,72 +104,6 @@ create procedure spVolunteer_GetActiveVolunteers_NotDriversYet
 	END
 	GO
 
-/****** Object:  StoredProcedure [dbo].[spVolunteerTypeView_GetVolunteersList]    Script Date: 12/11/2021 7:10:58 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-ALTER procedure [dbo].[spVolunteerTypeView_GetVolunteersList]
-
-@IsActive bit
-as
-begin
-select r.MainDriver, r.Origin, r.Destination into #tempNotDeletedOnly from  ridepat rp
-inner join ride r
-on r.RideNum=rp.RideId
-
-if (@IsActive = 0)
-	begin
-				select *, (select count(*)
-					from ridepat rp inner join ride r
-					on rp.rideid=r.ridenum
-					where r.maindriver = vtv.Id
-					and pickuptime between DATEADD(Month, -2, GETDATE()) and  GETDATE()) as NumOfRides_last2Months
-					,
-					(
-				select origin + '→'+destination from
-					(
-					select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
-					where t.MainDriver = id
-					group by maindriver, origin, destination
-					order by numberOfTimesDrove desc
-					) t
-				) mostCommonPath
-		from VolunteerTypeView vtv
-		where IsActive = @IsActive or IsActive = 1
-		order by firstNameH
-
-	end
-else
-	begin
-		select *, (select count(*)
-					from ridepat rp inner join ride r
-					on rp.rideid=r.ridenum
-					where r.maindriver = vtv.Id
-					and pickuptime between DATEADD(Month, -2, GETDATE()) and  GETDATE()) as NumOfRides_last2Months
-					,
-					(
-				select origin + '→'+destination from
-					(
-					select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
-					where t.MainDriver = id
-					group by maindriver, origin, destination
-					order by numberOfTimesDrove desc
-					) t
-				) mostCommonPath
-		from VolunteerTypeView vtv
-		where IsActive = @IsActive
-		order by firstNameH
-	end
-
-	drop table #tempNotDeletedOnly 
-
-end
-
-GO
-
-
-
 CREATE TABLE Region
 (
 	Id int primary key identity(1,1),
@@ -199,15 +133,23 @@ values
 ( N'באר שבע')
 GO
 
-/****** Object:  StoredProcedure [dbo].[spVolunteerTypeView_GetVolunteersList]    Script Date: 12/4/2021 11:00:53 PM ******/
-
+/****** Object:  StoredProcedure [dbo].[spVolunteerTypeView_GetVolunteersList]    Script Date: 12/11/2021 7:10:58 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
 ALTER procedure [dbo].[spVolunteerTypeView_GetVolunteersList]
+
 @IsActive bit
 as
 begin
+select r.MainDriver, r.Origin, r.Destination into #tempNotDeletedOnly from  ridepat rp
+inner join ride r
+on r.RideNum=rp.RideId
+
 if (@IsActive = 0)
 	begin
-		select *, (select count(*)
+				select *, (select count(*)
 					from ridepat rp inner join ride r
 					on rp.rideid=r.ridenum
 					where r.maindriver = vtv.Id
@@ -216,8 +158,8 @@ if (@IsActive = 0)
 					(
 				select origin + '-'+destination from
 					(
-					select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM RIDE r
-					where maindriver = id --and exists (select * from ridepat where RideId = r.RideNum) too slow solution
+					select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
+					where t.MainDriver = id
 					group by maindriver, origin, destination
 					order by numberOfTimesDrove desc
 					) t
@@ -225,6 +167,7 @@ if (@IsActive = 0)
 		from VolunteerTypeView vtv
 		where IsActive = @IsActive or IsActive = 1
 		order by firstNameH
+
 	end
 else
 	begin
@@ -237,8 +180,8 @@ else
 					(
 				select origin + '-'+destination from
 					(
-					select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM RIDE r
-					where maindriver = id --and exists (select * from ridepat where RideId = r.RideNum)
+					select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
+					where t.MainDriver = id
 					group by maindriver, origin, destination
 					order by numberOfTimesDrove desc
 					) t
@@ -247,7 +190,13 @@ else
 		where IsActive = @IsActive
 		order by firstNameH
 	end
+
+	drop table #tempNotDeletedOnly 
+
 end
+
+
+
 GO
 
 ALTER trigger [dbo].[RidePatRideTrigger]
