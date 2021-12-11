@@ -194,9 +194,6 @@ else
 	drop table #tempNotDeletedOnly 
 
 end
-
-
-
 GO
 
 ALTER trigger [dbo].[RidePatRideTrigger]
