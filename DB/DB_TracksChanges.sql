@@ -21,7 +21,6 @@ CREATE procedure  [dbo].[spEscorted_ChangeLastUpdateBy]
 			where Id=@id  
 		end    
 GO
->>>>>>> Stashed changes
 
 ALTER TABLE Escorted  ADD LastUpdateBy nvarchar(255)
 GO
@@ -142,8 +141,12 @@ as
 	and	IsActive=1
 	and	not exists (select distinct MainDriver from ride where MainDriver is not null and maindriver=v.id)
 END
->>>>>>> Stashed changes
 
+GO
+
+/*ADD REGION MODEL (COMMON GENERAL PATH)*/
+
+/**************************************************************************************DO NOT DEPLOY IT YET ↓ ===> consult with Benny weather to deploy or not due to changes can be in location table*/
 CREATE TABLE Region
 (
 	Id int primary key identity(1,1),
@@ -151,7 +154,7 @@ CREATE TABLE Region
 )
 GO
 
-/*DO NOT DEPLOY IT YET*/
+
 INSERT INTO Region (RegionName)
 values
 ( N'עזה'),
@@ -173,6 +176,152 @@ values
 ( N'בית שאן'),
 ( N'באר שבע')
 GO
+
+-- add column RegionId FK to Region to location table
+	ALTER TABLE Location
+    ADD RegionId int,
+    FOREIGN KEY(RegionId) REFERENCES Region(id);
+GO
+
+
+CREATE TABLE LOCATION_NAMEANDREGIONID(
+RegionName nvarchar(250),
+RegionId int
+)
+GO
+--INSERT VALUES BASED ON AMIRS TABLE
+insert into LOCATION_NAMEANDREGIONID (RegionName, RegionId)
+values
+(N'תרקומיא',2),
+(N'תל גיבורים חולון',5),
+(N'תל אביב',5),
+(N'תאנים',12),
+(N'שערי צדק',7),
+(N'שער אפרים',12),
+(N'שיבא',5),
+(N'שדה חמד',5),
+(N'רעות שד'' החיל 2 ת"א',5),
+(N'רמת ישי',15),
+(N'רמלה',4),
+(N'רמב"ם',14),
+(N'רכבת תל אביב',5),
+(N'ריחן',13),
+(N'ראש העין',6),
+(N'קרית גת',2),
+(N'קפלן',4),
+(N'קלנדיה',7),
+(N'קוכליאר',5),
+(N'צומת ראם (מסמיה)',4),
+(N'צומת אריאל',11),
+(N'פרדס חנה',13),
+(N'ענתא',8),
+(N'עזריאלי',5),
+(N'סנג''ון',8),
+(N'סינימה גלילות',5),
+(N'סטלה מאריס',14),
+(N'סביון',5),
+(N'נקודת אמצע',5),
+(N'נק'' אמצע - סיום',5),
+(N'נק'' אמצע - התחלה',5),
+(N'נק'' אמצע',5),
+(N'נען',3),
+(N'נעלין',6),
+(N'ניצני עוז',12),
+(N'נחלים',5),
+(N'נהריה',16),
+(N'מתן',12),
+(N'מרכז - מוצא',5),
+(N'מרכז',5),
+(N'מר יוסיף',8),
+(N'מצודת יהודה',18),
+(N'מענית',13),
+(N'מעבר אלנבי',10),
+(N'מכללת רופין',13),
+(N'מכון מאר ירושלים',7),
+(N'מכבים',6),
+(N'מיתר',18),
+(N'מוקסד',8),
+(N'מבשרת ציון',7),
+(N'מאר יוסף',8),
+(N'מאיר',5),
+(N'לניאדו',12),
+(N'לטרון - מוצא',6),
+(N'לטרון - יעד',6),
+(N'לוינשטיין',5),
+(N'להבות חביבה',13),
+(N'ל"ה',9),
+(N'כרם שלום',1),
+(N'כפר קרע',13),
+(N'כפר קאסם',6),
+(N'כפר אזר',5),
+(N'ירושלים',8),
+(N'יעד אורטופדיה תל גיבורים 5 ת"א',5),
+(N'חשמונאים',6),
+(N'חיפה',14),
+(N'חורשים',12),
+(N'חוצה שומרון',12),
+(N'חוסאן',9),
+(N'חדרה',13),
+(N'ורדיזר חיפה מרפאת עיניים',14),
+(N'וולפסון',5),
+(N'השרון פתח תקוה',5),
+(N'הפרחים',12),
+(N'הלל יפה',13),
+(N'הדסה הר הצופים',7),
+(N'הדסה',7),
+(N'הבקעה',17),
+(N'דומא',10),
+(N'גן שמואל מוצא',13),
+(N'גן שמואל יעד',13),
+(N'גן שמואל',13),
+(N'גן השומרון',13),
+(N'גלבוע (ג''למה)',15),
+(N'גבעתיים',5),
+(N'גבעת חביבה',13),
+(N'ג''יב',8),
+(N'ברזילי',3),
+(N'בקה אל גרביה יציאה',13),
+(N'בקה אל גרביה חזרה',13),
+(N'בני ציון חיפה',14),
+(N'בית לחם',9),
+(N'בית לוינשטיין',5),
+(N'בית חולים כרמל',14),
+(N'בית חולים הצרפתי',15),
+(N'בית אפק ר"ג',5),
+(N'בילינסון ושניידר',5),
+(N'בטוח לאומי נתניה',13),
+(N'באקה אל גרביה',13),
+(N'באב אל עמוד',8),
+(N'אשקלון',4),
+(N'אשדוד העיר',3),
+(N'אריאל',11),
+(N'ארז',1),
+(N'אסף הרופא',4),
+(N'אסותא אשדוד',3),
+(N'אסותא',5),
+(N'אלין ירושלים',7),
+(N'אליהו',12),
+(N'אל נג''אח',12),
+(N'אל מקאסד',8),
+(N'איקאה נתניה',13),
+(N'איכילוב',5),
+(N'אייל בדרך לבי"ח',12),
+(N'אייל',12),
+(N'אוגוסטה ויקטוריה',8),
+(N'אוגוסטה',8),
+(N'אג''נדה',13)
+GO
+--UPDATE LOCATION BASED ON THAT TABLE
+update Location
+set RegionId=(select RegionId from LOCATION_NAMEANDREGIONID where RegionName=Name)
+GO
+--DROP LOCATION_NAMEANDREGIONID
+DROP TABLE LOCATION_NAMEANDREGIONID
+GO
+
+/**************************************************************************************DO NOT DEPLOY IT YET ↑ ===> consult with Benny weather to deploy or not due to changes can be in location table*/
+
+
 
 /****** Object:  StoredProcedure [dbo].[spVolunteerTypeView_GetVolunteersList]    Script Date: 12/11/2021 7:10:58 PM ******/
 SET ANSI_NULLS ON
@@ -304,9 +453,8 @@ begin
 				update RidePat set Status=N'ממתינה לשיבוץ' where RidePatNum=@RPid
 			end
 end
+GO
 
-<<<<<<< Updated upstream
-=======
 CREATE procedure 
 [dbo].[spEscorted_ToggleIsActive]
 
@@ -463,7 +611,6 @@ order by totalScore desc
 
 END
 
->>>>>>> Stashed changes
 --THE LAST PROGRAMMER WHO 
 
 --if (select RideID from RidePat where RidePatNum=@RPid) is not null
