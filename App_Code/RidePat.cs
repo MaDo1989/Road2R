@@ -380,7 +380,6 @@ public class RidePat
         bool sendMessage = true;
         try
         {
-            //HERE
             Pat = ridePat.Pat;
             Location origin = new Location();
             origin.Name = ridePat.Origin.Name;
@@ -544,7 +543,18 @@ public class RidePat
             ChangeCoordinatoor(RidePatNum);
 
             RidePat ridePatView = CheckRidePat_V2(ridePat, isAnonymous);
-            if (ridePatView.RidePatNum != 0 && ridePatView.Status != "נמחקה" && !isAnonymous)
+            if (ridePatView.RidePatNum != 0 && ridePatView.Status != "נמחקה" && !isAnonymous
+                
+                /*
+                 * 17.12.2021 Yogi added this check in order to
+                 * recognize if a ridepat allready exists when changeing 
+                 * the patient from anonymous to specific patient.
+                 * 
+                 * BUT once did that I prevent any edit to the ridepat!
+                 * so I need to recognize when it is a change of patient and                 * 
+                 * when its any other edit.
+                 */
+                )
             {
                 return 1; // there is an issue - don't create new drive 
             }
