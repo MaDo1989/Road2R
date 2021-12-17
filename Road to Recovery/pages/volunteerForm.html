@@ -282,17 +282,18 @@
                     $("#volunteerEnglishName").val(volunteer.EnglishName);
                     $("#firstA").val(volunteer.FirstNameA);
                     $("#lastA").val(volunteer.LastNameA);
-                    var temp = volunteer.JoinDate.substring(volunteer.JoinDate.indexOf("(") + 1, volunteer.JoinDate.indexOf(")"))
-                    var jdate = new Date(parseInt(temp));//.toISOString();
-                    var jday = jdate.getDate();
-                    var jmonth = jdate.getMonth() + 1;
-                    var jyear = jdate.getFullYear();
-                    if (jday < 10) jday = "0" + jday;
-                    if (jmonth < 10) jmonth = "0" + jmonth;
-                    //jdate = jday + "/" + jmonth + "/" + jyear
-                    jdate = jyear + "-" + jmonth + "-" + jday;
-                    document.getElementById("joinDate").value = jdate;
-                    //$("#joinDate").value = jdate;
+
+                    if (volunteer.JoinDate) {
+                        var temp = volunteer.JoinDate.substring(volunteer.JoinDate.indexOf("(") + 1, volunteer.JoinDate.indexOf(")"))
+                        var jdate = new Date(parseInt(temp));
+                        var jday = jdate.getDate();
+                        var jmonth = jdate.getMonth() + 1;
+                        var jyear = jdate.getFullYear();
+                        if (jday < 10) jday = "0" + jday;
+                        if (jmonth < 10) jmonth = "0" + jmonth;
+                        jdate = jyear + "-" + jmonth + "-" + jday;
+                        document.getElementById("joinDate").value = jdate;
+                    }
                     $("#remarks").val(volunteer.Remarks);
                     $("#phone1").val(volunteer.CellPhone);
                     $("#phone2").val(volunteer.CellPhone2);
@@ -381,7 +382,7 @@
                 return [true, ""];
             }
         };
-                
+
     </script>
 </head>
 <body class="fixed-left">
@@ -922,9 +923,12 @@
                     //}
                     var nameA = $("#firstA").val();
                     var lastNameA = $("#lastA").val();
+
                     if ($("#joinDate").val() != "")
                         var joinDate = new Date($("#joinDate").val());
-                    else joinDate = new Date();
+                    else joinDate = null;
+
+
                     //if (joinDate != "") {
                     //    var joinDay = parseInt(joinDate.substring(0, 2));
                     //    var joinMonth = parseInt(joinDate.substring(3, 5)) - 1;
