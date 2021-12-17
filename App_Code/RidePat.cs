@@ -543,6 +543,12 @@ public class RidePat
             //SET THE COORDINATOR NAME IN RIDEPAT TABLE TO THE LAST ONE WHO TOUCHED THIS RIDEPAT 
             ChangeCoordinatoor(RidePatNum);
 
+            RidePat ridePatView = CheckRidePat_V2(ridePat, isAnonymous);
+            if (ridePatView.RidePatNum != 0 && ridePatView.Status != "נמחקה" && !isAnonymous)
+            {
+                return 1; // there is an issue - don't create new drive 
+            }
+
             RidePat rpc = GetRidePat(RidePatNum);
             if (rpc.Pat.DisplayName == ridePat.Pat.DisplayName && rpc.Origin.Name == ridePat.Origin.Name && rpc.Destination.Name == ridePat.Destination.Name && rpc.Date.TimeOfDay == ridePat.Date.TimeOfDay)
             {
