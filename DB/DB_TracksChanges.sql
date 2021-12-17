@@ -127,7 +127,7 @@ create procedure spVolunteer_GetActiveVolunteers_NotDriversYet
 			and   Id not in (select distinct MainDriver from ride where MainDriver is not null)
 	END
 	GO
-=======
+
 /*DO NOT DEPLOY IT YET*/
 CREATE procedure [dbo].[spVolunteer_GetActiveVolunteers_NotDriversYet] 
 @daysSinceJoin int
