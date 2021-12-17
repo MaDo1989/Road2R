@@ -1,7 +1,6 @@
 ﻿/*NEW CODE WHICH EXIST IN TEST AND YET EXIST IN PROD*/
 
-<<<<<<< Updated upstream
-=======
+
 
 CREATE procedure [dbo].[spEscorted_GetEscortById]
 @id int
@@ -103,7 +102,6 @@ GO
 	where LastUpdateBy is null   )
 	GO
 
-<<<<<<< Updated upstream
 	    create procedure  spEscorted_ChangeLastUpdateBy  
 		@lastUpdateBy nvarchar(255),  
 		@id int   
