@@ -1,5 +1,28 @@
 ﻿/*NEW CODE WHICH EXIST IN TEST AND YET EXIST IN PROD*/
 
+<<<<<<< Updated upstream
+=======
+
+CREATE procedure [dbo].[spEscorted_GetEscortById]
+@id int
+as 
+begin 
+	SET NOCOUNT ON; 
+	select * from Escorted where Id=@id
+end 
+GO
+
+CREATE procedure  [dbo].[spEscorted_ChangeLastUpdateBy]  
+		@lastUpdateBy nvarchar(255),  
+		@id int   
+		as 
+		begin  
+			update Escorted  
+			set LastUpdateBy=@lastUpdateBy 
+			where Id=@id  
+		end    
+GO
+>>>>>>> Stashed changes
 
 ALTER TABLE Escorted  ADD LastUpdateBy nvarchar(255)
 GO
@@ -80,6 +103,7 @@ GO
 	where LastUpdateBy is null   )
 	GO
 
+<<<<<<< Updated upstream
 	    create procedure  spEscorted_ChangeLastUpdateBy  
 		@lastUpdateBy nvarchar(255),  
 		@id int   
@@ -103,6 +127,24 @@ create procedure spVolunteer_GetActiveVolunteers_NotDriversYet
 			and   Id not in (select distinct MainDriver from ride where MainDriver is not null)
 	END
 	GO
+=======
+/*DO NOT DEPLOY IT YET*/
+CREATE procedure [dbo].[spVolunteer_GetActiveVolunteers_NotDriversYet] 
+@daysSinceJoin int
+as
+	BEGIN
+	select * from volunteer v
+	where 
+		(
+			CASE
+				WHEN JoinDate is not null
+					THEN DATEDIFF(DAY, JoinDate, getdate())
+			end
+		) > @daysSinceJoin
+	and	IsActive=1
+	and	not exists (select distinct MainDriver from ride where MainDriver is not null and maindriver=v.id)
+END
+>>>>>>> Stashed changes
 
 CREATE TABLE Region
 (
@@ -111,6 +153,7 @@ CREATE TABLE Region
 )
 GO
 
+/*DO NOT DEPLOY IT YET*/
 INSERT INTO Region (RegionName)
 values
 ( N'עזה'),
@@ -196,6 +239,7 @@ else
 end
 GO
 
+--decrease NoOfDocumentedRides in case of mark ridepat as deleted
 ALTER trigger [dbo].[RidePatRideTrigger]
 on [dbo].[RidePat]for update,insert
 as
@@ -263,6 +307,165 @@ begin
 			end
 end
 
+<<<<<<< Updated upstream
+=======
+CREATE procedure 
+[dbo].[spEscorted_ToggleIsActive]
+
+@isActive bit, 
+@id int 
+as 
+begin   
+UPDATE Escorted
+SET IsActive=@isActive 
+WHERE Id=@id
+end 
+
+/****** Object:  StoredProcedure [dbo].[spGetRideCandidates]    Script Date: 12/3/2021 12:11:18 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+--allign NoOfDocumentedRides TWO STEPS
+--DO NOT FORGET TO BACKUP VOLUNTEER TABLE !!!
+--STEP 1 GETE INTO A TEMP TABLE THE ISSUED ONES
+select max(v.Id) as V_Id,
+max(v.NoOfDocumentedRides) as V_NoOfDocumentedRides_notGood,
+Count(*) as V_NoOfDocumentedRides_real
+into #volunteersToUpdate_NoOfDocumentedRides
+from ridepat rp
+inner join ride r on rp.rideid=r.ridenum
+inner join volunteer v on v.Id=r.maindriver
+group by r.maindriver
+having max(v.NoOfDocumentedRides) <> Count(*)
+GO
+
+--STEP 2 UPDATE VOLUNTEER
+update volunteer
+set NoOfDocumentedRides = (select V_NoOfDocumentedRides_real from #volunteersToUpdate_NoOfDocumentedRides where volunteer.Id =V_Id)
+where exists (select * from #volunteersToUpdate_NoOfDocumentedRides where volunteer.Id =V_Id)
+
+GO
+
+-- =============================================
+-- Author:      <Benny Bornfeld>
+-- Create Date: <5-sep-2021 >
+-- Description: <get candidates for rides >
+-- =============================================
+/*DO NOT DEPLOY IT YET*/
+CREATE PROCEDURE [dbo].[spGetRideCandidates]
+(
+	@RidePatNum AS INT
+    -- Add the parameters for the stored procedure here
+    --<@Param1, sysname, @p1> <Datatype_For_Param1, , int> = <Default_Value_For_Param1, , 0>,
+    --<@Param2, sysname, @p2> <Datatype_For_Param2, , int> = <Default_Value_For_Param2, , 0>
+)
+AS
+BEGIN
+DECLARE @lookBackDaysPeriod AS INT = 180
+DECLARE @searchTime AS DATETIME = GETDATE()
+DECLARE @noOfferDaysWindow AS INT = 10
+DECLARE @superUserDrives AS INT = 15
+--DECLARE @RidePatNum AS INT = 42106
+
+DECLARE @origin AS NVARCHAR(50)
+SELECT @origin = [origin]
+FROM ridepat
+WHERE RidePatNum = @RidePatNum
+PRINT @origin
+
+DECLARE @destination AS NVARCHAR(50)
+SELECT @destination = [destination]
+FROM ridepat
+WHERE RidePatNum = @RidePatNum 
+PRINT @destination
+
+DECLARE @pickupDay AS char(10)
+SELECT @pickupDay = datename(dw,[pickupTime])
+FROM ridepat
+WHERE RidePatNum = @RidePatNum
+PRINT @pickupDay
+
+declare @originSubArea AS INT
+SELECT @originSubArea = [Remarks]
+FROM Location
+WHERE [Name] =  @origin
+PRINT @originSubArea
+
+declare @destinationSubArea AS INT
+SELECT @destinationSubArea = [Remarks]
+FROM Location
+WHERE [Name] =  @destination
+PRINT @destinationSubArea
+
+--select Name from Location where remarks = @originSubArea and isActive = 1
+--select Name from Location where remarks = @destinationSubArea and isActive = 1
+
+select MainDriver, MAX(v.DisplayName) as DisplayName, 
+				   MAX(v.cellPhone) as cellPhone,
+				   MAX(v.cityCityName) as city,
+				   MAX(v.joinYear) as joinYear,
+                   MAX(pathMatch) as maxPathMatch,
+				   MAX(dayMatch) as dayMatch,
+				   MAX(superDriver) as superUser,
+				   MIN(ABS(DATEDIFF(day, @searchTime, [Date]))) as closestRideInDays,
+				   (MAX(pathMatch) + MAX(dayMatch)) as totalScore
+ from
+(select rideNum, MainDriver, Origin, Destination, [Date],
+ CASE
+    WHEN Origin = @origin and Destination = @destination THEN 3
+	WHEN Destination = @destination and Origin <> @origin           and Origin in (select Name from Location where remarks = @originSubArea and isActive = 1) THEN 2
+	WHEN Origin = @origin           and Destination <> @destination and Destination in (select Name from Location where remarks = @destinationSubArea and isActive = 1) THEN 2
+	WHEN origin in (select Name from Location where remarks = @originSubArea and isActive = 1) and
+	     destination in (select Name from Location where remarks = @destinationSubArea and isActive = 1) THEN 1
+    ELSE 0
+ END
+as pathMatch,
+ CASE
+	 WHEN @pickupDay = datename(dw,[Date]) THEN 1
+	 ELSE 0
+ END
+ as dayMatch,
+ CASE
+	WHEN MainDriver in	(select MainDriver from ride 
+	     WHERE [Date] >= DATEADD(day,-@lookBackDaysPeriod, @searchTime) AND [Date] <= @searchTime
+		 group by MainDriver having count(*) > @superUserDrives) THEN 1
+	ELSE 0
+END
+as superDriver
+from ride
+WHERE [Date] >= DATEADD(day,-@lookBackDaysPeriod, @searchTime)
+and MainDriver is not null) as x
+join Volunteer v on v.Id = MainDriver
+where v.IsActive = 1
+group by MainDriver
+having ( (MAX(pathMatch) > 1 or MAX(dayMatch) > 0) and MAX([Date]) < DATEADD(day,-@noOfferDaysWindow, @searchTime)) 
+order by totalScore desc
+
+
+
+--****************************************
+--Get the number of Rides for each candidate in the last period
+--****************************************
+
+--DECLARE @lookBackDaysPeriod AS INT = 180
+--DECLARE @searchTime AS DATETIME = GETDATE()
+--DECLARE @noOfferDaysWindow AS INT = 10
+--DECLARE @superUserDrives AS INT = 15
+
+--select MainDriver, count(*) as cnt
+--from ride 
+--join volunteer v on v.id = MainDriver
+--WHERE [Date] >= DATEADD(day,-@lookBackDaysPeriod, @searchTime) AND [Date] <= @searchTime
+--and v.isActive = 1
+--group by MainDriver
+--order by cnt desc
+
+
+END
+
+>>>>>>> Stashed changes
 --THE LAST PROGRAMMER WHO 
 
 --if (select RideID from RidePat where RidePatNum=@RPid) is not null
@@ -278,20 +481,32 @@ update volunteer
 
 GO
 
+/*
+cases when:
+r.Destination <> rp.Destination
+or
+r.Origin <> rp.Origin
+*/
 --YOU HAVE TO DEACTIVATE [RideUpdateTrigger] BEFORE RUN THIS UPDATE!!!
 select * into ride_backUp_PUTDATEHERE from ride
 GO
-
 update ride
 set
-Origin	    = 
-(
-isnull((select top 1 Origin from ridepat where RideId = RideNum), N'נקודת אמצע')
-),
-Destination = isnull((select top 1 Destination from ridepat where RideId = RideNum), N'נקודת אמצע')
+Origin	    = (select top 1 Origin from ridepat where RideId = RideNum),
+Destination = (select top 1 Destination from ridepat where RideId = RideNum)
+where exists (
+				select rideNum from ridepat rp
+				inner join ride r
+				on r.ridenum = rp.rideid
+				where 
+				(r.Origin <> rp.Origin or r.destination <> rp.destination)
+				and
+				ride.ridenum=r.ridenum
+)
+
 GO
 
---TEST
+--TEST 
 select *
 from ride r inner join ridepat rp
 on rp.RideId=r.RideNum
@@ -300,3 +515,14 @@ r.Destination <> rp.Destination
 or
 r.Origin <> rp.Origin
 GO
+
+/*in case of messed up ridepat*/
+update ride_backUp_2021_12_16
+set Origin=N'תרקומיא', destination=N'שיבא'
+where ridenum=xxx
+
+delete ridepat 
+where ridepatnum=xxx
+
+delete  [PatientEscort_PatientInRide (RidePat)]
+where [PatientInRide (RidePat)RidePatNum] = 50
