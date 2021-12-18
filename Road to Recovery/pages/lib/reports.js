@@ -324,6 +324,18 @@ var K_fields_map = {
             template: 'div[name="template_MONTH"]',
             type: "MONTH",
             post_clone: rp_center_patients_rides__post_clone
+        },
+        {
+            id: "rp_patients_rides__hospital",
+            template: 'div[name="template_HOSPITAL"]',
+            type: "HOSPITAL",
+            post_clone: field_hospitals_post_clone
+        },
+        {
+            id: "rp_patients_rides__barrier",
+            template: 'div[name="template_BARRIER"]',
+            type: "BARRIER",
+            post_clone: field_barriers_post_clone
         }
 
     ]
@@ -468,7 +480,9 @@ function clone_template(template, parent_id) {
 
 var K_CACHE = {
     volunteers: [],
-    patients: []
+    patients: [],
+    hospitals: [],
+    barriers: []
 };
 
 
@@ -531,6 +545,89 @@ function populate_volunteer_field() {
         source: K_CACHE.volunteers,
         select: on_volunteer_selected
         });
+}
+
+// on_load_hospitals called when the async ajax call  has finished
+// Used to populate UI needing the hospitals list
+function loadHospitals(on_load_hospitals) {
+
+    if (K_CACHE.hospitals.length > 1) {
+        // One time loading already done.
+        on_load_hospitals();
+        return;
+    }
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportHospitals",
+        contentType: "application/json; charset=utf-8",
+        type: "POST",
+        async: true,
+        success: function (data) {
+            var hospitals = data.d;
+            hospitals.sort();
+            K_CACHE.hospitals = hospitals;
+            on_load_hospitals();
+        },
+        error: function (err) { alert("Error in loadHospitals"); }
+    });
+}
+
+
+function on_hospital_selected(event, ui) {
+    // store the selected value on the element
+    $("#" + event.target.id).attr("itemValue", ui.item.value);
+    rp_center_patients_rides__refresh_preview();
+    return true;
+}
+
+function populate_hospital_field() {
+     $("#select_hospital").autocomplete({
+        source: K_CACHE.hospitals,
+        select: on_hospital_selected
+    });
+    
+}
+
+
+function loadBarriers(on_load_barriers) {
+
+    if (K_CACHE.barriers.length > 1) {
+        // One time loading already done.
+        on_load_barriers();
+        return;
+    }
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportBarriers",
+        contentType: "application/json; charset=utf-8",
+        type: "POST",
+        async: true,
+        success: function (data) {
+            var barriers = data.d;
+            barriers.sort();
+            K_CACHE.barriers = barriers;
+            on_load_barriers();
+        },
+        error: function (err) { alert("Error in loadBarriers"); }
+    });
+}
+
+
+function on_barrier_selected(event, ui) {
+    // store the selected value on the element
+    $("#" + event.target.id).attr("itemValue", ui.item.value);
+    rp_center_patients_rides__refresh_preview();
+    return true;
+}
+
+function populate_barrier_field() {
+    $("#select_barrier").autocomplete({
+        source: K_CACHE.barriers,
+        select: on_barrier_selected
+    });
+
 }
 
 function get_last_month_date() {
@@ -616,6 +713,14 @@ function rp_add_one_parameter(def) {
 
 function field_volunteers_post_clone(id) {
     loadVolunteers(populate_volunteer_field);
+}
+
+function field_hospitals_post_clone(id) {
+    loadHospitals(populate_hospital_field);
+}
+
+function field_barriers_post_clone(id) {
+    loadBarriers(populate_barrier_field);
 }
 
 
@@ -1995,7 +2100,7 @@ function rp_center_monthly_by_year__refresh_table(start_date, end_date) {
 
     $.ajax({
         dataType: "json",
-        url: "ReportsWebService.asmx/GetReportCenteryMonthlyByYear",
+        url: "ReportsWebService.asmx/GetReportCenterMonthlyByYear",
         contentType: "application/json; charset=utf-8",
         beforeSend: function (xhr) {
             xhr.setRequestHeader("Content-Encoding", "gzip");
@@ -2073,6 +2178,15 @@ function rp_center_monthly_by_year__fix_records(records) {
 function rp_center_patients_rides__refresh_preview() {
     var volunteerId = $("#select_driver").attr("itemID");
     if (volunteerId) {
+        var hospital = $("#select_hospital").attr("itemValue");
+        if (!hospital) {
+            hospital = "*";
+        }
+        var barrier = $("#select_barrier").attr("itemValue");
+        if (!barrier) {
+            barrier = "*";
+        }
+
         var selected_date = Date.parse($("#select_month").val());
         if (selected_date) {
             var start_month_date = moment(selected_date);
@@ -2080,25 +2194,31 @@ function rp_center_patients_rides__refresh_preview() {
 
             rp_center_patients_rides__refresh_Table(volunteerId, 
                 start_month_date.format("YYYY-MM-DD"),
-                end_month_date.format("YYYY-MM-DD"));
+                end_month_date.format("YYYY-MM-DD"),
+                hospital, barrier
+            );
         }
     }
 }
 
-function rp_center_patients_rides__refresh_Table(volunteerId, start_date, end_date) {
+function rp_center_patients_rides__refresh_Table(volunteerId, start_date, end_date, hospital, barrier) {
     hide_all_tables();
 
     $('#wait').show();
     var query_object = {
         volunteer: volunteerId,
         start_date: start_date,
-        end_date: end_date
+        end_date: end_date,
+        hospital: hospital,
+        barrier: barrier
     };
 
 
+    console.log("rp_center_patients_rides__refresh_Table", query_object);
+
     $.ajax({
         dataType: "json",
-        url: "ReportsWebService.asmx/GetReportCenteryPatientsRides",
+        url: "ReportsWebService.asmx/GetReportCenterPatientsRides",
         contentType: "application/json; charset=utf-8",
         beforeSend: function (xhr) {
             xhr.setRequestHeader("Content-Encoding", "gzip");
@@ -2125,7 +2245,7 @@ function rp_center_patients_rides__refresh_Table(volunteerId, start_date, end_da
                     { "orderData": [0], "type": "num", "targets": 0 }],
                 columns: [
                     {
-                        data: "PickupTime",
+                        data: "Month",
                         render: function (data, type, row) {
                             if (type == "sort") {
                                 return data;
@@ -2134,10 +2254,9 @@ function rp_center_patients_rides__refresh_Table(volunteerId, start_date, end_da
                         }
 
                     },
-                    { data: "PatientName" },
                     { data: "Origin" },
                     { data: "Destination" },
-                    { data: "Hospital" },
+                    { data: "Count" },
                 ],
                 dom: 'Bfrtip',
 

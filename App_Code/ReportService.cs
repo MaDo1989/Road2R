@@ -155,14 +155,12 @@ public class ReportService
         public string Volunteers { get; set; }
     }
 
-    public class CenteryPatientsRidesInfo
+    public class CenterPatientsRidesInfo
     {
-        public string PatientID { get; set; }
-        public string PatientName { get; set; }
-        public string PickupTime { get; set; }
+        public string Month { get; set; }
+        public string Count { get; set; }
         public string Origin { get; set; }
         public string Destination { get; set; }
-        public string Hospital { get; set; }
     }
 
     private DataTable getDriverByID(int driverID, DbService db)
@@ -364,6 +362,38 @@ GROUP BY inner_select.DisplayName
 
         return "OK";
 
+    }
+
+    private List<string> GetDistinctListOfField(string field, string table)
+    {
+        DbService db = new DbService();
+        string query = string.Format("select DISTINCT {0} AS FIELD from {1}", field, table);
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        List<string> result = new List<string>();
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            result.Add(dr["FIELD"].ToString());
+        }
+
+        return result;
+    }
+
+
+    internal List<string> GetReportHospitals()
+    {
+        return GetDistinctListOfField("Hospital", "Patient");
+    }
+
+    internal List<string> GetReportBarriers()
+    {
+        return GetDistinctListOfField("Barrier", "Patient");
     }
 
     private DataTable getEscorts()
@@ -1112,40 +1142,44 @@ ORDER  BY MONTH_G, TYPE_G ASC";
     }
 
 
-    internal List<CenteryPatientsRidesInfo> GetReportCenteryPatientsRides(string volunteer, string start_date, string end_date)
+    internal List<CenterPatientsRidesInfo> GetReportCenterPatientsRides(string volunteer, string start_date, string end_date,
+        string hospital, string barrier)
     {
         DbService db = new DbService();
 
         string query =
         @"select
-        rp.DisplayName, rp.Id, PickupTime ,Origin , Destination, p.Hospital 
+        FORMAT (PickupTime, 'MM-yy') As MONTH_C ,Origin , Destination, p.Hospital, p.Barrier, COUNT(*) AS COUNT_C
         from RPView rp inner join Patient p 
         on rp.Id = p.Id 
         where maindriver=@volunteerID
         AND pickuptime > @start_date
         AND pickuptime < @end_date
-        order by pickuptime desc";
+        and p.Hospital = @Hospital
+        and p.Barrier = @Barrier
+        GROUP BY FORMAT (PickupTime, 'MM-yy'), Origin , Destination, p.Hospital, p.Barrier
+        order by MONTH_C ASC";
 
         SqlCommand cmd = new SqlCommand(query);
         cmd.CommandType = CommandType.Text;
         cmd.Parameters.Add("@volunteerID", SqlDbType.Int).Value = volunteer;
         cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
         cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+        cmd.Parameters.Add("@hospital", SqlDbType.NVarChar).Value = hospital;
+        cmd.Parameters.Add("@barrier", SqlDbType.NVarChar).Value = barrier;
 
         DataSet ds = db.GetDataSetBySqlCommand(cmd);
         DataTable dt = ds.Tables[0];
 
-        List<CenteryPatientsRidesInfo> result = new List<CenteryPatientsRidesInfo>();
+        List<CenterPatientsRidesInfo> result = new List<CenterPatientsRidesInfo>();
 
         foreach (DataRow dr in dt.Rows)
         {
-            CenteryPatientsRidesInfo obj = new CenteryPatientsRidesInfo();
-            obj.PatientID = dr["Id"].ToString();
-            obj.PatientName = dr["DisplayName"].ToString();
-            obj.PickupTime = dr["PickupTime"].ToString();
+            CenterPatientsRidesInfo obj = new CenterPatientsRidesInfo();
+            obj.Month = dr["MONTH_C"].ToString();
             obj.Origin = dr["Origin"].ToString();
             obj.Destination = dr["Destination"].ToString();
-            obj.Hospital = dr["Hospital"].ToString();
+            obj.Count = dr["COUNT_C"].ToString();
             result.Add(obj);
         }
 

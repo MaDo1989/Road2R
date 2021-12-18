@@ -481,11 +481,10 @@
                                 <table id="table_center_patients_rides" class="table table-striped table-bordered">
                                     <thead>
                                         <tr>
-                                            <th title="Date" class="timeCustomWidth">תאריך</th>
-                                            <th title="Patient" class="timeCustomWidth">חולה</th>
+                                            <th title="Month" class="timeCustomWidth">חודש</th>
                                             <th title="Origin" class="timeCustomWidth">מוצא</th>
                                             <th title="Destination" class="timeCustomWidth">יעד</th>
-                                            <th title="Hospital" class="timeCustomWidth">בית חולים</th>
+                                            <th title="Count" class="timeCustomWidth">מספר הסעות</th>
 
                                         </tr>
                                     </thead>
@@ -821,6 +820,43 @@
                             </div>
                             <div class="row report_template" name="template_PER_MONTH">
                             </div>
+                            <div class="row report_template" name="template_HOSPITAL">
+                                <div class="card-box">
+                                    <div class="row">
+
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label class="col-sm-2" style="padding: 0.5em 0px;">בית-חולים</label>
+                                                <div class="col-sm-10" id="selectHospital">
+                                                    <input placeholder="הזן שם" type="text" template_id="select_hospital" class="form-control ui-autocomplete-input" autocomplete="off" aria-required="true" aria-invalid="false">
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row report_template" name="template_BARRIER">
+                                <div class="card-box">
+                                    <div class="row">
+
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label class="col-sm-2" style="padding: 0.5em 0px;">מעבר</label>
+                                                <div class="col-sm-10" id="selectBarrier">
+                                                    <input placeholder="הזן שם" type="text" template_id="select_barrier" class="form-control ui-autocomplete-input" autocomplete="off" aria-required="true" aria-invalid="false">
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="row report_template" name="template_YTD">
                                 <div class="card-box">
                                     <div class="row">
