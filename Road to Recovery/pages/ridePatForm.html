@@ -210,6 +210,12 @@
         let generateLocationPromise;
         let getPatientByIdPromise;
 
+        Date.prototype.addDays = function (days) {
+            var date = new Date(this.valueOf());
+            date.setDate(date.getDate() + days);
+            return date;
+        }
+
         const DIFFER_RIDE_AXIS_MSG = 'ציר ההסעה של הסעה זו שונה ממה שהוגדר כברירת מחדל לחולה. ניתן לעדכן שדות אלו בהסעה.';
         const DIFFER_AREAS_MSG = 'מכיוון שקו ההסעה של החולה לא נמצא באזור של ההסעה האנונימית הזו, לא ניתן להשתמש בהסעה. יש לפתוח הסעה חדשה עבור החולה הספציפי.';
         const NOT_EXIST = 'ערך זה אינו קיים בבסיס הנתונים';
@@ -687,15 +693,27 @@
                     }
                     for (var i = 0; i < numberOfRides; i++) { // this is because creation of multiple rides when starts in gmt+2 and ends in gmt+3 ans vice versa
 
+                        if (i > 0) {
+
+                            if (request.repeatRideEvery === 'כל שבוע') {
+
+                                request.RidePat.Date = new Date(request.RidePat.Date).addDays(7);
+                            } else if (request.repeatRideEvery === 'מספר ימים ברצף') {
+
+                                request.RidePat.Date = new Date(request.RidePat.Date).addDays(1);
+                            }
+                        }
 
                         var dataString = JSON.stringify(request);
                         localStorage.setItem("PatientNameForRide", null);
+
                         $.ajax({
                             dataType: "json",
                             url: "WebService.asmx/setRidePat",
                             contentType: "application/json; charset=utf-8",
                             type: "POST",
                             data: dataString,
+                            async: false,
                             success: function (data) {
                                 //SaveAddresses(0, numberOfRecords, customerID);
                                 //    console.log("num: " + data.d);
@@ -2651,8 +2669,6 @@
                 $('#wait').hide();
             });
         }
-
-
 
     </script>
 </head>

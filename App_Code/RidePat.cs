@@ -380,7 +380,6 @@ public class RidePat
         bool sendMessage = true;
         try
         {
-            //HERE
             Pat = ridePat.Pat;
             Location origin = new Location();
             origin.Name = ridePat.Origin.Name;
