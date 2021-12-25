@@ -486,8 +486,7 @@ function loadHospitals(on_load_hospitals) {
 
 
 function on_hospital_selected(event, ui) {
-    // store the selected value on the element
-    $("#" + event.target.id).attr("itemValue", ui.item.value);
+    $("#" + event.target.id).val(ui.item.value);
     rp_center_patients_rides__refresh_preview();
     return true;
 }
@@ -527,8 +526,7 @@ function loadBarriers(on_load_barriers) {
 
 
 function on_barrier_selected(event, ui) {
-    // store the selected value on the element
-    $("#" + event.target.id).attr("itemValue", ui.item.value);
+    $("#" + event.target.id).val(ui.item.value);
     rp_center_patients_rides__refresh_preview();
     return true;
 }
@@ -2119,11 +2117,11 @@ function rp_center_monthly_by_year__fix_records(records) {
 function rp_center_patients_rides__refresh_preview() {
     var volunteerId = $("#select_driver").attr("itemID");
     if (volunteerId) {
-        var hospital = $("#select_hospital").attr("itemValue");
+        var hospital = $("#select_hospital").val();
         if (!hospital) {
             hospital = "*";
         }
-        var barrier = $("#select_barrier").attr("itemValue");
+        var barrier = $("#select_barrier").val();
         if (!barrier) {
             barrier = "*";
         }
@@ -2142,6 +2140,30 @@ function rp_center_patients_rides__refresh_preview() {
     }
 }
 
+function rp_center_patients_rides__fix_records(arr) {
+    for (let entry of arr) {
+        let orig_str = entry.Month;
+        entry.Month = {
+            str: orig_str,
+            timestamp: new moment(orig_str, "DD/MM/YYYY", true).valueOf()
+        }
+    }
+}
+
+function rp_center_patients_rides__footer_row(row, data, start, end, display) {
+  //    console.log("footerCallback", row, start, end, display);
+    var api = this.api();
+    // Total over this page
+    pageTotal = api
+        .column(3, { page: 'current' })
+        .data()
+        .reduce(function (a, b) {
+            return +a + +b;
+        }, 0);
+    $("#center_patients_rides_footer_total").html(pageTotal);
+}
+
+
 function rp_center_patients_rides__refresh_Table(volunteerId, start_date, end_date, hospital, barrier) {
     hide_all_tables();
 
@@ -2153,9 +2175,6 @@ function rp_center_patients_rides__refresh_Table(volunteerId, start_date, end_da
         hospital: hospital,
         barrier: barrier
     };
-
-
-    console.log("rp_center_patients_rides__refresh_Table", query_object);
 
     $.ajax({
         dataType: "json",
@@ -2169,9 +2188,8 @@ function rp_center_patients_rides__refresh_Table(volunteerId, start_date, end_da
         success: function (data) {
             $('#wait').hide();
             var records = data.d;
-            console.log(records);
 
-            // records = rp_center_daily_by_month__fix_records(records, start_date);
+            rp_center_patients_rides__fix_records(records);
 
             $('#div_table_center_patients_rides').show();
             tbl = $('#table_center_patients_rides').DataTable({
@@ -2179,6 +2197,7 @@ function rp_center_patients_rides__refresh_Table(volunteerId, start_date, end_da
                 bLengthChange: false,
                 data: records,
                 destroy: true,
+                "footerCallback": rp_center_patients_rides__footer_row,
                 "language": {
                     "search": "חיפוש:"
                 },
@@ -2189,11 +2208,10 @@ function rp_center_patients_rides__refresh_Table(volunteerId, start_date, end_da
                         data: "Month",
                         render: function (data, type, row) {
                             if (type == "sort") {
-                                return data;
+                                return (data.timestamp);
                             }
-                            return data;
+                            return data.str;
                         }
-
                     },
                     { data: "Origin" },
                     { data: "Destination" },
@@ -2226,6 +2244,7 @@ function hide_all_tables() {
     $("#div_table_pil_vl_ride_recent_period").hide();
     $("#div_table_center_daily_by_month").hide();
     $("#div_table_rp_center_monthly_by_year").hide();
+    $("#div_table_center_patients_rides").hide();
  }
 
 

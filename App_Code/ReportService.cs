@@ -1146,6 +1146,14 @@ ORDER  BY MONTH_G, TYPE_G ASC";
         string hospital, string barrier)
     {
         DbService db = new DbService();
+        string condition = "";
+        if ( !hospital.Equals("*") ) {
+            condition = "AND p.Hospital = @Hospital";
+        }
+        if (!barrier.Equals("*"))
+        {
+            condition = condition + " AND p.Barrier = @Barrier";
+        }
 
         string query =
         @"select
@@ -1154,10 +1162,9 @@ ORDER  BY MONTH_G, TYPE_G ASC";
         on rp.Id = p.Id 
         where maindriver=@volunteerID
         AND pickuptime > @start_date
-        AND pickuptime < @end_date
-        and p.Hospital = @Hospital
-        and p.Barrier = @Barrier
-        GROUP BY FORMAT (PickupTime, 'MM-yy'), Origin , Destination, p.Hospital, p.Barrier
+        AND pickuptime < @end_date " + 
+        condition  +
+        @" GROUP BY FORMAT (PickupTime, 'MM-yy'), Origin , Destination, p.Hospital, p.Barrier
         order by MONTH_C ASC";
 
         SqlCommand cmd = new SqlCommand(query);
