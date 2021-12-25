@@ -1,101 +1,6 @@
 ﻿// Purpose: JS code for the reports UI
 
 
-
-// 24-Nov:  Avishai
-//1.  . מספר המתנדבים השונים שהסיעו בכל חודש בשנתיים האחרונות. 
-
-
-
-// 31-Oct-20:  Implement code after populating template_DATE_LATER_THAN, so that if radio group
-// is checked, we respect it and get all volunteers.
-// Set default date to 1/1/2020 
-
-
-//   GetRidePatViewByTimeFilter    ==>   All RIDES  
-
-// 020Oct : Shlomit Meler bug.
-/* 
- * This is teh code that returns empty results:
- * 
- *
- ReportService.cs :   getPickupForDriver() 
-    SELECT *
-    FROM RPView
-    WHERE  MainDriver = '18312'
-    ;
-
- I do not recall from where I copied it.
-
-need to read notes on what RPView is, and see where I copied it from.... 
-
-
-
-
-// --------------------------------------
-
-// Downhill Park:
-
-
-           
-             * */
-
-/* Perf analsysis
- 
-  http://localhost:54573/Road%20to%20Recovery/pages/WebService.asmx/GetRidePatView
-  
-    {"volunteerId":-2,"maxDays":-1}
- 
- RidePat.cs :  GetRidePatView() 
-    //VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
-
-
-pages\ridePatForm.html  loadPage :     if (JSON.parse(GENERAL.RIDEPAT.getRidePatList()).length != 0)
-    Does not look like anyone is using arr_customer for its actuall array.
-    But it does need to be a non-epty array for something to happen.
-    So it's enough to store just a non-empty array.
-
-
- * */
-
-
-
-// 05-07: Focus on reports content, Use UI as-is fix it later.
-//  ==> finish all services is the goal.
-
-// Park: 06-06 : working  on week picker by customizing datepicker
-// see comments at end of  populate_week_field() - need to fix it
-// Then we can start implement the repot of amute week
-
-
-// DEBUG:  We  use אלון שדה  &  בני בורנפלד
-// new report:   פר אזור: רשימת המתנדבים      "מתנדבים שבועי"
-// TODO:  Implement GetReportRidesWeeklyPerRegion() to call  getVolunteerRidesPerWeek() and return result as an array of volunteers
-// TODO: GetReportRidesWeeklyPerRegion() is just a copy of old code now, so need to cleanit up and set values in Vounteer structure
-// TODO:  for some numeric values we need to return.
-
-// TODO: Implement UI of teh " "מתנדבים שבועי  report
-
-// TODO: make sure report is per requirements: add missing fields of  , ק"ם
-// TODO: Fix export to PDF
-// TODO: Customize print table for RTL   https://datatables.net/forums/discussion/44355/i-was-able-to-right-align-my-print-layout-how-do-i-apply-that-to-individual-columns
-// TODO: Do the actual post in "Print"
-
-
-/* Internal notes 
- *   getContactType --> The relationship types - Father,Sister etc...
- *  
- *  RidePat.cs :  GetRidePatView()     
- *  Escorted e = new Escorted();
- *  -		ItemArray	{object[3]}	object[]
-		[0]	2123	object {int}
-		[1]	"אבו בודק בדיקה1"	object {string}
-		[2]	"0547298598"	object {string}
-
- *   Query is "select * from RidePatEscortView where RidePatNum = 2123 "
-
- * */
-
 /* Documentation:
  * For each report, we have different input fields.
  * 'K_fields_map' is a global map that lists the fields to be used for each report.
@@ -320,8 +225,14 @@ var K_fields_map = {
             post_clone: field_volunteers_post_clone
         },
         {
-            id: "rp_patients_rides__month",
-            template: 'div[name="template_MONTH"]',
+            id: "rp_patients_rides__month_start",
+            template: 'div[name="template_MONTH_START"]',
+            type: "MONTH",
+            post_clone: empty_func
+        },
+        {
+            id: "rp_patients_rides__month_end",
+            template: 'div[name="template_MONTH_END"]',
             type: "MONTH",
             post_clone: rp_center_patients_rides__post_clone
         },
@@ -637,12 +548,15 @@ function get_last_month_date() {
     return prev_month;
 }
 
+
+function my_show_month_field(a) {
+    console.log("HERE", a);
+}
 function populate_month_field(is_last_month) {
-    
+
     var dt = $('#select_month').datepicker({
         format: "MM yyyy",
         minViewMode: 1,
-        onClose: function () { console.log("populate_month_field()::onClose; Does not work, maybe due to duplicate IDS??"); },
         autoclose: true
     });
     if (is_last_month) {
@@ -654,7 +568,29 @@ function populate_month_field(is_last_month) {
         dt.datepicker('setDate', new Date());
     }
     dt.on("changeDate", refreshPreview);
+    // dt.on("show", my_show_month_field);
 }
+
+function populate_month_range_fields(start_date, end_date, refresh_callback) {
+
+    var dt_start = $('#select_month_start').datepicker({
+        format: "MM yyyy",
+        minViewMode: 1,
+        autoclose: true
+    });
+    dt_start.datepicker('setDate', start_date);
+    dt_start.on("changeDate", refresh_callback);
+
+    var dt_end = $('#select_month_end').datepicker({
+        format: "MM yyyy",
+        minViewMode: 1,
+        autoclose: true
+    });
+    dt_end.datepicker('setDate', end_date);
+    dt_end.on("changeDate", refresh_callback);
+
+}
+
 
 function field_month_post_clone(id) {
     populate_month_field(true);
@@ -1027,7 +963,12 @@ function rp_center_monthly_by_year__post_clone(id) {
 
 function rp_center_patients_rides__post_clone(id) {
 
-    populate_month_field(false);
+    // range - last 12 month.
+    let start_date = new Date();
+    start_date.setFullYear(start_date.getFullYear() - 1);
+    let end_date = new Date();
+    
+    populate_month_range_fields(start_date, end_date, rp_center_patients_rides__refresh_preview);
     rp_center_patients_rides__refresh_preview();
 }
 
@@ -2187,14 +2128,14 @@ function rp_center_patients_rides__refresh_preview() {
             barrier = "*";
         }
 
-        var selected_date = Date.parse($("#select_month").val());
-        if (selected_date) {
-            var start_month_date = moment(selected_date);
-            var end_month_date = start_month_date.clone().add(1, 'months');
-
+        var start_date = Date.parse($("#select_month_start").val());
+        if (start_date) {
+            let end_date = Date.parse($("#select_month_end").val());
+            let start_moment = moment(start_date);
+            let end_moment = moment(end_date);
             rp_center_patients_rides__refresh_Table(volunteerId, 
-                start_month_date.format("YYYY-MM-DD"),
-                end_month_date.format("YYYY-MM-DD"),
+                start_moment.format("YYYY-MM-DD"),
+                end_moment.format("YYYY-MM-DD"),
                 hospital, barrier
             );
         }
