@@ -210,6 +210,24 @@
         let generateLocationPromise;
         let getPatientByIdPromise;
 
+        const showMyModal = (id) => {
+
+            //modal_x
+            if (numberofrides_GLOBAL > 1) {
+
+                document.getElementById("modal_x").style.visibility = 'hidden';
+            } else {
+
+                document.getElementById("modal_x").style.visibility = 'visible';
+            }
+
+            $(`#${id}`).modal({
+                backdrop: 'static', //prevent popup to close when clicking outside
+                keyboard: false     //prevent popup to close when press esc on the keyboard
+            });
+            $(`#${id}`).modal('show');
+        }
+
         Date.prototype.addDays = function (days) {
             var date = new Date(this.valueOf());
             date.setDate(date.getDate() + days);
@@ -458,6 +476,7 @@
                     if ($("#duplicateRidePat").is(':checked')) {
                         numberOfRides = parseInt($("#numberOfRides").val());
                         repeatRide = $("#repeatRide").val();
+
                     }
                     if (numberOfRides > 1 && arr_customer.func === "new") {
                         var validRides = PrintRides(repeatRide, numberOfRides);
@@ -467,6 +486,7 @@
                             return false;
                         }
                     }
+                    numberofrides_GLOBAL = numberOfRides;
 
                     localStorage.setItem("numberOfRides", numberOfRides);
                     localStorage.setItem("repeatRide", repeatRide);
@@ -713,7 +733,7 @@
                             contentType: "application/json; charset=utf-8",
                             type: "POST",
                             data: dataString,
-                            async: false,
+                            //async: false,
                             success: function (data) {
                                 //SaveAddresses(0, numberOfRecords, customerID);
                                 //    console.log("num: " + data.d);
@@ -768,14 +788,14 @@
                                                 document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
                                                 document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
                                                 document.getElementById('modalButtons').innerHTML += '<button onclick="createReturnRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn">יצירת החזרה &nbsp;<i class="ti-car m-r-5"></i></button>';
-                                                $("#Modal").modal('show');
 
+                                                showMyModal('Modal');
                                             } else { // dont offer return drive
                                                 document.getElementById('ModalTitle').innerHTML = 'הנסיעה שוחזרה בהצלחה';
                                                 document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
                                                 document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
 
-                                                $("#Modal").modal('show');
+                                                showMyModal('Modal');
                                             }
 
                                         },
@@ -788,7 +808,6 @@
                                 else {
                                     rideNumber = data.d;
                                     rideNumberForNo = rideNumber;
-                                    //$('#Modal').modal('show');
                                     var returnDriveExist = false;
 
                                     tmpOrigin = Origin;
@@ -823,14 +842,13 @@
                                                 document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
                                                 document.getElementById('modalButtons').innerHTML += '<button onclick="createReturnRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn">יצירת החזרה &nbsp;<i class="ti-car m-r-5"></i></button>';
 
-                                                $("#Modal").modal('show');
-
+                                                showMyModal('Modal');
                                             } else { // dont offer return drive
                                                 document.getElementById('ModalTitle').innerHTML = 'הנסיעה נשמרה';
                                                 document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
                                                 document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
 
-                                                $("#Modal").modal('show');
+                                                showMyModal('Modal');
                                             }
                                         },
                                         error: function (err) {
@@ -2655,6 +2673,14 @@
         const editThisRide = () => {
             x_wasClicked = true;
             arr_customer.func = 'edit';
+
+            //hide the multiples rides elements
+            $("#hideOnEdit").addClass('duplicateDisplay');
+            $("#hideDuplicate").addClass('duplicateDisplay');
+
+            //init multiple rides back to 1
+            $("#numberOfRides").val(1);
+
         }
 
         const request2TurnOffLoader = (promises2wait4) => {
@@ -3088,7 +3114,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="editThisRide()">
+                    <button type="button" id="modal_x" class="close" data-dismiss="modal" aria-label="Close" onclick="editThisRide()">
                         <span aria-hidden="true">&times;</span>
                     </button>
                     <h1 class="modal-title centerHeader" id="ModalTitle">הנסיעה נשמרה</h1>
