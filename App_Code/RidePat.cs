@@ -414,6 +414,7 @@ public class RidePat
         if (func == "new") //Insert new RidePat to DB
         {
             DateTime newDate = new DateTime();
+            bool needToCheckDaylightSaving = true;
             for (int i = 0; i < numberOfRides; i++)
             {
 
@@ -449,13 +450,13 @@ public class RidePat
                 User u = new User();
                 string CoordinatorID = u.getIdByUserName(Coordinator.DisplayName);
                 cmdParams[8] = cmd.Parameters.AddWithValue("@coordinatorID", CoordinatorID);
-
-                if (i == 1)
+             
+                if (i > 0 && needToCheckDaylightSaving)
                 {
-                    newDate = FixDateAfterUTCChange(newDate);
+                    newDate = FixDateAfterUTCChange(newDate, out needToCheckDaylightSaving);
                     cmdParams[3] = cmd.Parameters.AddWithValue("@date", newDate);
                 }
-
+                
                 string query = "insert into RidePat (Patient,Origin,Destination,PickupTime,Coordinator,Remark,OnlyEscort,Area,CoordinatorId,lastModified) values (@pat,@origin,@destination,@date,@coordinator,@remark,@onlyEscort,@Area,@coordinatorID,@lastModified);SELECT SCOPE_IDENTITY();";
                 RidePatNum = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
 
@@ -651,23 +652,26 @@ public class RidePat
 
     }
 
-    private DateTime FixDateAfterUTCChange(DateTime newDate)
+    private DateTime FixDateAfterUTCChange(DateTime newDate, out bool needToCheckDaylightSaving)
     {
-        //!!! times are considered to be the server time!!! UTC 0
-        //SO IsDaylightSavingTime WORKS ACCORDINGLY
-
         DateTime israelTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, "Israel Standard Time");
-        int diffBetweenIsraelAndUTC = israelTime.Hour - DateTime.UtcNow.Hour;
+        int diffBetweenIsraelNowAndUTC = israelTime.Hour - DateTime.UtcNow.Hour;
+        
+        TimeZoneInfo IsraelTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Israel Standard Time");
 
-        if (diffBetweenIsraelAndUTC == 2 && !newDate.IsDaylightSavingTime()) //Israel is in UTC+2 & try to save to UTC+3
+        if (diffBetweenIsraelNowAndUTC == 2 && IsraelTimeZone.IsDaylightSavingTime(newDate)) //Israel is in UTC+2 & try to save to UTC+3
         {
             newDate = newDate.AddHours(-1);
+            needToCheckDaylightSaving = false;
+            return newDate;
         }
-        if (diffBetweenIsraelAndUTC == 3 && newDate.IsDaylightSavingTime()) //Israel is in UTC+3 & try to save to UTC+2
+        if (diffBetweenIsraelNowAndUTC == 3 && !IsraelTimeZone.IsDaylightSavingTime(newDate)) //Israel is in UTC+3 & try to save to UTC+2
         {
             newDate = newDate.AddHours(1);
+            needToCheckDaylightSaving = false;
+            return newDate;
         }
-
+        needToCheckDaylightSaving = true;
         return newDate;
     }
 
