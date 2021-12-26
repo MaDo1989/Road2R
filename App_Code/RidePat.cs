@@ -370,14 +370,13 @@ public class RidePat
 
     public int setRidePat(RidePat ridePat, string func, bool isAnonymous, int numberOfRides, string repeatRideEvery)
     {
-
-
         DateTime timeRightNow = DateTime.Now;
         DbService db = new DbService();
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
         SqlParameter[] cmdParams = new SqlParameter[10];
         bool sendMessage = true;
+
         try
         {
             Pat = ridePat.Pat;
@@ -414,7 +413,6 @@ public class RidePat
 
         if (func == "new") //Insert new RidePat to DB
         {
-            //bool checkDaylightSaving = true;
             DateTime newDate = new DateTime();
             for (int i = 0; i < numberOfRides; i++)
             {
@@ -452,36 +450,11 @@ public class RidePat
                 string CoordinatorID = u.getIdByUserName(Coordinator.DisplayName);
                 cmdParams[8] = cmd.Parameters.AddWithValue("@coordinatorID", CoordinatorID);
 
-                #region THE OLD WAY WE DELT WITH TIMEZONE CHANGE YOGEV COMMENT IT OUT
-                //THE SOLUTION IS TO CONVERT THE CLIENT SIDE DATE TO UTC(0)
-                //PLUS IT CAME TO A POINT IT DOESNT WORK ANY MORE
-                /*
-                if (newDate != new DateTime() && checkDaylightSaving)
+                if (i == 1)
                 {
-                    bool DateDaylightSaving = Date.IsDaylightSavingTime();
-                    bool newDateDaylightSaving = newDate.IsDaylightSavingTime();
-
-                    if (DateDaylightSaving != newDateDaylightSaving)
-                    {
-                        if (DateDaylightSaving == true && newDateDaylightSaving == false)
-                        {
-                            newDate = newDate.AddHours(1);
-                            ridePat.Date = newDate;
-                            cmdParams[3] = cmd.Parameters.AddWithValue("@date", newDate);
-                            checkDaylightSaving = false;
-                        }
-                        else if (DateDaylightSaving == true && newDateDaylightSaving == false)
-                        {
-                            newDate = newDate.AddHours(-1);
-                            ridePat.Date = newDate;
-                            cmdParams[3] = cmd.Parameters.AddWithValue("@date", newDate);
-                            checkDaylightSaving = false;
-                        }
-                    }
+                    newDate = FixDateAfterUTCChange(newDate);
+                    cmdParams[3] = cmd.Parameters.AddWithValue("@date", newDate);
                 }
-
-                */
-                #endregion
 
                 string query = "insert into RidePat (Patient,Origin,Destination,PickupTime,Coordinator,Remark,OnlyEscort,Area,CoordinatorId,lastModified) values (@pat,@origin,@destination,@date,@coordinator,@remark,@onlyEscort,@Area,@coordinatorID,@lastModified);SELECT SCOPE_IDENTITY();";
                 RidePatNum = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
@@ -511,6 +484,7 @@ public class RidePat
                         }
                     }
                 }
+
                 if (repeatRideEvery == "כל שבוע")
                 {
                     if (i == 0)
@@ -676,6 +650,27 @@ public class RidePat
         return RidePatNum;
 
     }
+
+    private DateTime FixDateAfterUTCChange(DateTime newDate)
+    {
+        //!!! times are considered to be the server time!!! UTC 0
+        //SO IsDaylightSavingTime WORKS ACCORDINGLY
+
+        DateTime israelTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, "Israel Standard Time");
+        int diffBetweenIsraelAndUTC = israelTime.Hour - DateTime.UtcNow.Hour;
+
+        if (diffBetweenIsraelAndUTC == 2 && !newDate.IsDaylightSavingTime()) //Israel is in UTC+2 & try to save to UTC+3
+        {
+            newDate = newDate.AddHours(-1);
+        }
+        if (diffBetweenIsraelAndUTC == 3 && newDate.IsDaylightSavingTime()) //Israel is in UTC+3 & try to save to UTC+2
+        {
+            newDate = newDate.AddHours(1);
+        }
+
+        return newDate;
+    }
+
     public bool IsThereAnotherRidePat(RidePat rp)
     {
         //TimeZoneInfo sourceTimeZone = TimeZoneInfo.FindSystemTimeZoneById("UTC");
