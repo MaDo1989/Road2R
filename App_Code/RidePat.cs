@@ -415,16 +415,11 @@ public class RidePat
         {
             DateTime newDate = new DateTime();
             bool needToCheckDaylightSaving = true;
+            DateTime dateBeforeUTCevaluation = new DateTime();
             for (int i = 0; i < numberOfRides; i++)
             {
 
                 RidePat ridePatView = CheckRidePat_V2(ridePat, isAnonymous);
-                /* YOGEV - REPLACED IT: ↑↓ 
-                if (CheckRidePat(ridePat, isAnonymous))
-                {
-                    return 1;
-                }
-                */
 
                 if (ridePatView.RidePatNum != 0 && ridePatView.Status != "נמחקה" && !isAnonymous)
                 {
@@ -450,13 +445,15 @@ public class RidePat
                 User u = new User();
                 string CoordinatorID = u.getIdByUserName(Coordinator.DisplayName);
                 cmdParams[8] = cmd.Parameters.AddWithValue("@coordinatorID", CoordinatorID);
-             
+
                 if (i > 0 && needToCheckDaylightSaving)
                 {
-                    newDate = FixDateAfterUTCChange(newDate, out needToCheckDaylightSaving);
+                    newDate = FixDateAfterUTCChange(newDate, dateBeforeUTCevaluation, out needToCheckDaylightSaving);
                     cmdParams[3] = cmd.Parameters.AddWithValue("@date", newDate);
                 }
-                
+
+                dateBeforeUTCevaluation = i == 0 ? Date : newDate;
+
                 string query = "insert into RidePat (Patient,Origin,Destination,PickupTime,Coordinator,Remark,OnlyEscort,Area,CoordinatorId,lastModified) values (@pat,@origin,@destination,@date,@coordinator,@remark,@onlyEscort,@Area,@coordinatorID,@lastModified);SELECT SCOPE_IDENTITY();";
                 RidePatNum = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
 
@@ -504,6 +501,7 @@ public class RidePat
                         newDate = Date.AddDays(1);
                     }
                     else newDate = newDate.AddDays(1);
+
                     ridePat.Date = newDate;
                     cmdParams[3] = cmd.Parameters.AddWithValue("@date", newDate);
                 }
@@ -652,20 +650,30 @@ public class RidePat
 
     }
 
-    private DateTime FixDateAfterUTCChange(DateTime newDate, out bool needToCheckDaylightSaving)
+    private DateTime FixDateAfterUTCChange(DateTime newDate, DateTime previousDate, out bool needToCheckDaylightSaving)
     {
         DateTime israelTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, "Israel Standard Time");
         int diffBetweenIsraelNowAndUTC = israelTime.Hour - DateTime.UtcNow.Hour;
-        
-        TimeZoneInfo IsraelTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Israel Standard Time");
 
-        if (diffBetweenIsraelNowAndUTC == 2 && IsraelTimeZone.IsDaylightSavingTime(newDate)) //Israel is in UTC+2 & try to save to UTC+3
+        TimeZoneInfo israelTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Israel Standard Time");
+
+        if
+        (
+            diffBetweenIsraelNowAndUTC == 2 &&
+            israelTimeZone.IsDaylightSavingTime(newDate) &&
+            !israelTimeZone.IsDaylightSavingTime(previousDate)
+        ) //Israel is in UTC+2 && try to save to UTC+3 && previous date is utc+2
         {
             newDate = newDate.AddHours(-1);
             needToCheckDaylightSaving = false;
             return newDate;
         }
-        if (diffBetweenIsraelNowAndUTC == 3 && !IsraelTimeZone.IsDaylightSavingTime(newDate)) //Israel is in UTC+3 & try to save to UTC+2
+        if
+        (
+            diffBetweenIsraelNowAndUTC == 3 &&
+            !israelTimeZone.IsDaylightSavingTime(newDate)
+
+        )//Israel is in UTC+3 && try to save to UTC+2 && previous date is utc+3
         {
             newDate = newDate.AddHours(1);
             needToCheckDaylightSaving = false;
