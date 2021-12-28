@@ -1157,14 +1157,14 @@ ORDER  BY MONTH_G, TYPE_G ASC";
 
         string query =
         @"select
-        FORMAT (PickupTime, 'MM-yy') As MONTH_C ,Origin , Destination, p.Hospital, p.Barrier, COUNT(*) AS COUNT_C
+        FORMAT (PickupTime, 'MM-yy') As MONTH_C ,Origin , Destination, COUNT(*) AS COUNT_C
         from RPView rp inner join Patient p 
         on rp.Id = p.Id 
         where maindriver=@volunteerID
         AND pickuptime > @start_date
         AND pickuptime < @end_date " + 
         condition  +
-        @" GROUP BY FORMAT (PickupTime, 'MM-yy'), Origin , Destination, p.Hospital, p.Barrier
+        @" GROUP BY FORMAT (PickupTime, 'MM-yy'), Origin , Destination
         order by MONTH_C ASC";
 
         SqlCommand cmd = new SqlCommand(query);
