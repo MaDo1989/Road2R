@@ -1938,13 +1938,10 @@
 
             if (numOfEscorts > 0) {
 
-                if (numOfEscorts > 1) {
-                    numOfPassengers = `<span class="numOfPassengers">${numOfEscorts + (ridepat.OnlyEscort ? 0 : 1)//+1 is the patient himself
-                        } נוסעים</span>`;
-                    numOfPassengers_English = `<span class="numOfPassengers">${numOfEscorts + (ridepat.OnlyEscort ? 0 : 1)
-                        } passengers</span>`;
-
-                }
+                numOfPassengers = `<span class="numOfPassengers">${numOfEscorts + (ridepat.OnlyEscort ? 0 : 1)//+1 is the patient himself
+                    } נוסעים</span>`;
+                numOfPassengers_English = `<span class="numOfPassengers">${numOfEscorts + (ridepat.OnlyEscort ? 0 : 1)
+                    } passengers</span>`;
 
                 escortsPhone2render = '<span class="escortsPhone2render block">מלווים: ';
                 numOfRealEscorts = 0;
