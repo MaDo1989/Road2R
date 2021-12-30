@@ -17,7 +17,7 @@ public class Message
     int parentID;
     string type;
     string title;
-    
+
     string msgContent;
     int ridePatID;
     string dateTime;
@@ -28,7 +28,7 @@ public class Message
     bool isWhatsapp;
     string sender;
 
-  
+
 
     private static readonly ILog Log =
             LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -234,7 +234,7 @@ public class Message
             m.parentID = int.Parse(dr["ParentID"].ToString());
             m.type = dr["Type"].ToString();
             m.title = dr["Title"].ToString();
-            
+
             m.msgContent = dr["MsgContent"].ToString();
             m.ridePatID = int.Parse(dr["RidePatID"].ToString());
             m.dateTime = dr["DateTime"].ToString();
@@ -246,7 +246,7 @@ public class Message
             m.Sender = dr["Sender"].ToString();
             list.Add(m);
         }
-        
+
         return list;
     }
 
@@ -279,8 +279,8 @@ public class Message
         catch (Exception e)
         {
             //add to log
-            throw new Exception("sender : " + sender + " ");
-           // throw e;
+            throw e;
+            // throw e;
         }
     }
 
@@ -587,9 +587,10 @@ public class Message
         string sender1;
         try
         {
-             sender1 = (string)HttpContext.Current.Session["loggedInName"];
+            sender1 = (string)HttpContext.Current.Session["loggedInName"];
         }
-        catch {
+        catch
+        {
             sender1 = "הנהג";
         }
 
@@ -601,7 +602,8 @@ public class Message
         {
             msgID = insertMsg(0, "sign by driver", "הרשמה להסעה קרובה", message, ridePatID, System.DateTime.Now, user.Id, "", true, false, false, sender1); //XXX
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             throw new Exception("I1: " + ex.Message);
         }
 
@@ -842,9 +844,9 @@ public class Message
             userId = user.Id;
             message = "נסיעה בוטלה על ידי הרכז/ת " + abc.Coordinator.DisplayName + "." + " הנסיעה בתאריך " + abc.Date.ToShortDateString() + " בשעה " + time + " עם החולה " + abc.Pat.DisplayName + " על ידי הנהג/ת " + V.DisplayName;
         }
-     
+
         //insert msg to db
-        string sender = (string)HttpContext.Current.Session["loggedInName"];             
+        string sender = (string)HttpContext.Current.Session["loggedInName"];
         LogEntry log = new LogEntry(System.DateTime.Now, "hardware", message, 1234);
 
 
@@ -919,10 +921,19 @@ public class Message
 
         var msg = "בוצע שינוי בהסעה שנרשמת אליה. לאחר השינוי, " + displayName + escortsStr + ", מ" + abc.Origin.Name + " ל" + abc.Destination.Name + " ב-" + abc.Date.Day + "/" + abc.Date.Month + ", בשעה " + time;
 
-        //XXX
-        //insert msg to db
-        //int msgID = insertMsg(0, "Anonymous Patient changed", "עדכון שם חולה בהסעה", msg, ridePatID, DateTime.Now, user.Id, "", true, false, false);
-        string sender = (string)HttpContext.Current.Session["loggedInName"];
+
+        string sender;
+
+
+        if (HttpContext.Current.Session["loggedInName"] == null)
+        {
+            sender = "משתמש שהמערכת לא הצליחה לזהות";
+        }
+        else
+        {
+            sender = (string)HttpContext.Current.Session["loggedInName"];
+        }
+
         int msgID = insertMsg(0, "Changes in ride", "שינויים בהסעה", msg, ridePatID, System.DateTime.Now, user.Id, "", true, false, false, sender);
 
 
@@ -962,7 +973,7 @@ public class Message
 
     public void driverAddedToRide(int ridePatID, Volunteer user)
     {
-        
+
         //get ride details and generate message
         RidePat rp = new RidePat();
         var abc = rp.GetRidePat(ridePatID);
@@ -1017,8 +1028,9 @@ public class Message
         //insert msg to db
 
         string sender1;
-        try {  sender1 = (string)HttpContext.Current.Session["loggedInName"]; }
-        catch {
+        try { sender1 = (string)HttpContext.Current.Session["loggedInName"]; }
+        catch
+        {
             sender1 = "הנהג";
         }
 
@@ -1029,7 +1041,8 @@ public class Message
         {
             msgID = insertMsg(0, "You have been listed for a ride", "שובצת לנסיעה", message, ridePatID, System.DateTime.Now, user.Id, "", true, false, false, sender1);
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             throw new Exception("insertMsg Failed: sender2: " + sender1);
         }
 
@@ -1125,7 +1138,7 @@ public class Message
             sender = (string)HttpContext.Current.Session["loggedInName"];
 
         }
-        
+
 
 
         int msgID = insertMsg(0, "Ride canceled", "נסיעה בוטלה", message, ridePatID, System.DateTime.Now, user.Id, "", true, false, false, sender);
