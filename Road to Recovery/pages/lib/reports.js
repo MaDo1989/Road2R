@@ -35,35 +35,9 @@ need to read notes on what RPView is, and see where I copied it from....
 // --------------------------------------
 
 // Downhill Park:
-// 1. Export to PDF now prints in hebrew (as I created the font file), but it displayed reversed.
-// Need to look at pdfmake doc about RTL, or in data-table.
-// Also, shoudl check which font is used now in the HTML, maybe that font is better ?
 
 
-/* Instructions for printing PDF Hebrew 
- *  https://github.com/bpampuch/pdfmake/issues/1496
- *  
-  c.customize && c.customize(a);
-            a = d.pdfMake.createPdf(a);
-
-
-Downloaded font from:
-   https://fonts.google.com/specimen/Alef?subset=hebrew&preview.text=&preview.text_type=custom&sidebar.open=true&selection.family=Alef:wght@700
-
-
-https://pdfmake.github.io/docs/fonts/custom-fonts-client-side/vfs/
-
-
-Created vfs.js : 
-
-   git clone https://github.com/bpampuch/pdfmake.git .
-   cd examples/fonts/
-   explorer.exe  .
-   cd ..
-   node build-vfs.js
-
-and do a mnaul change to it, at teh end to regiser as .vfs
-            
+           
              * */
 
 /* Perf analsysis
@@ -221,6 +195,8 @@ var K_strategy = {
     "rp_pil_vls_per_month": rp_pil_vls_per_month__refresh_preview,
     "rp_pil_vl_ride_month": rp_pil_vl_ride_month__refresh_preview,
     "rp_pil_vl_ride_recent_period": rp_pil_vl_ride_recent_period__refresh_preview,
+    "rp_center_daily_by_month": rp_center_daily_by_month__refresh_preview,
+    "rp_center_monthly_by_year": rp_center_monthly_by_year__refresh_preview,
 }
 
 
@@ -318,15 +294,65 @@ var K_fields_map = {
             type: "RECENT_PERIOD",
             post_clone: rp_pil_vl_ride_recent_period__post_clone
         }
+    ],
+    "rp_center_daily_by_month": [
+        {
+            id: "rp_center_daily_by_month__month",
+            template: 'div[name="template_MONTH"]',
+            type: "MONTH",
+            post_clone: rp_center_daily_by_month___post_clone
+        }
+    ],
+    "rp_center_monthly_by_year": [
+        {
+            id: "rp_center_monthly_by_year__year",
+            type: "YEAR",
+            template: 'div[name="template_YEAR"]',
+            post_clone: rp_center_monthly_by_year__post_clone
+        }
     ]
 
     
  }
 
+/* Handling hebrew in PDF: 
+    Instructions for printing PDF Hebrew
+  https://github.com/bpampuch/pdfmake/issues/1496
+ 
+  c.customize && c.customize(a);
+  a = d.pdfMake.createPdf(a);
+
+Downloaded font from:
+   https://fonts.google.com/specimen/Alef?subset=hebrew&preview.text=&preview.text_type=custom&sidebar.open=true&selection.family=Alef:wght@700
+
+
+https://pdfmake.github.io/docs/fonts/custom-fonts-client-side/vfs/
+
+
+Created vfs.js :
+
+   git clone https://github.com/bpampuch/pdfmake.git .
+   cd examples/fonts/
+   explorer.exe  .
+   cd ..
+   node build-vfs.js
+
+and do a manual change to it, at the end to regiser as .vfs
+*/
+
 
 var K_DataTable_PDF_EXPORT = {
     extend: 'pdfHtml5',
     text: 'יצוא הדו"ח ל-PDF',
+    exportOptions: {
+        orthogonal: "exportpdf",
+        format: {
+            header: function (text, index, node) {
+                // https://datatables.net/forums/discussion/48856/is-there-a-way-to-target-table-header-using-export-options-while-exporting
+                return reverse_for_hebrew(text);
+            }
+        }
+    },
     orientation: 'landscape',
     pageSize: 'LEGAL',
     customize: function (doc) {
@@ -351,6 +377,26 @@ var K_DataTable_CSV_EXPORT = {
     text: 'יצוא הדו"ח ל-CSV',
 };
 
+
+function reverse_for_hebrew(input_str) {
+    // https://github.com/bpampuch/pdfmake/issues/184#issuecomment-677909980
+
+    let hebrew_char = input_str.search(/[\u0590-\u05FF]/);
+    if (hebrew_char >= 0) {
+        let rtl_string = input_str.split("").reverse().join("");
+        return rtl_string;
+    }
+    return input_str;
+}
+
+
+// https://datatables.net/forums/discussion/48267/can-a-column-be-defined-to-render-different-for-view-vs-printing#Comment_127032
+function render_cell_in_pdf_rtl(data, type, row) {
+    if (type === "exportpdf") {
+        return reverse_for_hebrew(data);
+    }
+    return data;
+}
 
 
 function populate_parameters(report_type) {
@@ -477,7 +523,7 @@ function get_last_month_date() {
     return prev_month;
 }
 
-function populate_month_field() {
+function populate_month_field(is_last_month) {
     
     var dt = $('#select_month').datepicker({
         format: "MM yyyy",
@@ -485,13 +531,23 @@ function populate_month_field() {
         onClose: function () { console.log("populate_month_field()::onClose; Does not work, maybe due to duplicate IDS??"); },
         autoclose: true
     });
-    // compute previous month
-    dt.datepicker('setDate', get_last_month_date());
+    if (is_last_month) {
+        // compute previous month
+        dt.datepicker('setDate', get_last_month_date());
+    }
+    else {
+        // current month
+        dt.datepicker('setDate', new Date());
+    }
     dt.on("changeDate", refreshPreview);
 }
 
 function field_month_post_clone(id) {
-    populate_month_field();
+    populate_month_field(true);
+}
+
+function field_month_current_post_clone(id) {
+    populate_month_field(false);
 }
 
 function empty_func(id) {
@@ -672,28 +728,34 @@ function rp_vl_ride_month__refresh_preview() {
 }   
 
 
+function convert_year_to_start_end_dates(year_selector) {
+    var end_date;
+    var selected_year = new Date($(year_selector).val());
+    var start_date = moment(selected_year);
+
+    // this year end today, not on 31-Dec 
+    var today = new Date();
+    if (today.getFullYear() == selected_year.getFullYear()) {
+        // this year end today, not on 31-Dec 
+        end_date = moment(today);
+    }
+    else {
+        selected_year.setMonth(11);
+        selected_year.setDate(31);
+        end_date = moment(selected_year);
+    }
+    return { start_date: start_date, end_date: end_date };
+}
+
 function rp_vl_ride_year__refresh_preview() {
     var volunteerId = $("#select_driver").attr("itemID");
     if (volunteerId) {
-        var end_date;
-        var selected_year = new Date( $("#select_year").val());
-        var start_date = moment(selected_year);
-        
-        // this year end today, not on 31-Dec 
-        var today = new Date();
-        if (today.getFullYear() == selected_year.getFullYear()) {
-            // this year end today, not on 31-Dec 
-            end_date = moment(today);
-        }
-        else {
-            selected_year.setMonth(11);
-            selected_year.setDate(31);
-            end_date = moment(selected_year);
-        }
 
+        obj = convert_year_to_start_end_dates("#select_year");
+        
         refreshTable(volunteerId,
-                start_date.format("YYYY-MM-DD"),
-                end_date.format("YYYY-MM-DD"));
+                obj.start_date.format("YYYY-MM-DD"),
+                obj.end_date.format("YYYY-MM-DD"));
     }
 }   
 
@@ -815,7 +877,7 @@ function rp_pil_vls_per_month__post_clone(id)
 
 
 function rp_pil_vl_ride_month__post_clone(id) {
-    populate_month_field();
+    populate_month_field(true);
     rp_pil_vl_ride_month__refresh_preview();
 }
 
@@ -828,6 +890,18 @@ function rp_pil_vl_ride_recent_period__post_clone(id) {
 }
 
 
+function rp_center_daily_by_month___post_clone(id) {
+    populate_month_field(false);
+    rp_center_daily_by_month__refresh_preview();
+}
+
+function rp_center_monthly_by_year__post_clone(id) {
+    var today = new Date();
+    $('#select_year').val(today.getFullYear());
+    $("#select_year").change(rp_center_monthly_by_year__refresh_preview);
+
+    rp_center_monthly_by_year__refresh_preview();
+}
 
 function rp_pil_vls_per_month__refresh_preview() {
     var start_date, end_date;
@@ -889,8 +963,14 @@ function refresh_amuta_vls_week_Table(start_date, end_date) {
                 columnDefs: [
                     { "orderData": [0, 1], "targets": 0 }],
                 columns: [
-                    { data: "Region" },
-                    { data: "Volunteer" }
+                    {
+                        data: "Region",
+                        render: render_cell_in_pdf_rtl
+                    },
+                    {
+                        data: "Volunteer",
+                        render: render_cell_in_pdf_rtl
+                    }
 
                 ],
                 dom: 'Bfrtip',
@@ -957,10 +1037,22 @@ function refresh_amuta_vls_km_Table(start_date, end_date) {
                             return data;
                         }
                     },
-                    { data: "Volunteer" },
-                    { data: "Patient" },
-                    { data: "Origin" },
-                    { data: "Destination" }
+                    {
+                        data: "Volunteer",
+                        render: render_cell_in_pdf_rtl
+                    },
+                    {
+                        data: "Patient",
+                        render: render_cell_in_pdf_rtl
+                    },
+                    {
+                        data: "Origin",
+                        render: render_cell_in_pdf_rtl
+                    },
+                    {
+                        data: "Destination",
+                        render: render_cell_in_pdf_rtl
+                    }
 
                 ],
                 dom: 'Bfrtip',
@@ -1041,7 +1133,6 @@ function refresh_amuta_vls_per_month_Table(start_date) {
 // 'start_date' :  a date formatted as YYYY-MM-DD
 function refresh_pil_vls_per_month_Table(start_date, end_date) {
     hide_all_tables();
-    console.log(start_date + " ; " + end_date);
     $('#wait').show();
     var query_object = {
         start_date: start_date,
@@ -1394,8 +1485,6 @@ function register_table_button_events() {
         let start_date = moment().subtract(+start_str, 'd');
         let end_date = moment().subtract(+end_str, 'd');
 
-        console.log(start_str, end_str, start_date, end_date);
-
         show_rides_history($(this), start_date, end_date);
     });
 
@@ -1496,6 +1585,15 @@ function refresh_amuta_vls_list_Table(query_object) {
 
 
 
+// Change Date field in every object, to have a string & index
+function update_date_field_for_sort(arr) {
+    for (let entry of arr) {
+        entry.Date = {
+            str: build_date_with_dow_string(entry.Date),
+            timestamp : new moment(entry.Date, "DD/MM/YYYY", true).valueOf()
+        }
+    }
+}
 
 function rp_amuta_vls_per_pat__refresh_preview() {
     var patient = $("#select_patient").attr("itemID");
@@ -1522,6 +1620,8 @@ function refresh_amuta_vls_per_pat_Table(patient) {
             $('#wait').hide();
             arr_rides = data.d;
 
+            update_date_field_for_sort(arr_rides);
+
             $('#div_table_amuta_vls_per_pat').show();
             tbl = $('#table_amuta_vls_per_pat').DataTable({
                 pageLength: 500,
@@ -1537,15 +1637,24 @@ function refresh_amuta_vls_per_pat_Table(patient) {
                     {
                         data: "Date",
                         render: function (data, type, row) {
-                            if (type == "display") {
-                                return build_date_with_dow_string(data);
+                            if (type == "sort") {
+                                return (data.timestamp);
                             }
-                            return data;
+                            return data.str;
                         }
                     },
-                    { data: "Volunteer" },
-                    { data: "Origin" },
-                    { data: "Destination" }
+                    {
+                        data: "Volunteer",
+                        render: render_cell_in_pdf_rtl
+                    },
+                    {
+                        data: "Origin",
+                        render: render_cell_in_pdf_rtl
+                    },
+                    {
+                        data: "Destination",
+                        render: render_cell_in_pdf_rtl
+                    }
 
                 ],
                 dom: 'Bfrtip',
@@ -1572,6 +1681,8 @@ function build_date_with_dow_string(in_date) {
     var result = HEBday + " " + date.format("DD/MM/YY");
     return result;
 }
+
+
 
 // 'start_date' :  a date formatted as YYYY-MM-DD
 // 'end_date'   :  a date formatted as YYYY-MM-DD
@@ -1622,7 +1733,7 @@ function refreshTable(volunteerId, start_date, end_date) {
 //@@                 }
 
                // date2 = HEBday + " " + day + "/" + month + "/" + date.getUTCFullYear() % 2000;
-                date2 = HEBday + " " + date.format("DD/MM/YY");
+                date2 = { str: HEBday + " " + date.format("DD/MM/YY"), timestamp: date.valueOf()};
                 time = date.format("HH:mm");
 
                 if (time == "22:14") { //22:14 is the default time to show afternoon אחה''צ
@@ -1653,11 +1764,28 @@ function refreshTable(volunteerId, start_date, end_date) {
                 columnDefs: [
                     { "orderData": [0, 3], "targets": 0 }],
                 columns: [
-                    { data: "Date" },
+                    {
+                        data: "Date",
+                        render: function (data, type, row) {
+                            if (type == "sort") {
+                                return (data.timestamp);
+                            }
+                            return data.str;
+                        }
+                    },
                     { data: "Time" },
-                    { data: "OriginName" },
-                    { data: "DestinationName" },
-                    { data: "PatDisplayName" },
+                    {
+                        data: "OriginName",
+                        render: render_cell_in_pdf_rtl
+                    },
+                    {
+                        data: "DestinationName",
+                        render: render_cell_in_pdf_rtl
+                    },
+                    {
+                        data: "PatDisplayName",
+                        render: render_cell_in_pdf_rtl
+                    },
 
                 ],
                 dom: 'Bfrtip',
@@ -1708,6 +1836,214 @@ function rp_amuta_vls_list__commit_to_ni_db() {
 
 }
 
+// Checks if all fields are filled. If so refresh the report
+function rp_center_daily_by_month__refresh_preview() {
+    var selected_date = Date.parse($("#select_month").val());
+    if (selected_date) {
+        var start_month_date = moment(selected_date);
+        var end_month_date = start_month_date.clone().add(1, 'months');
+
+        rp_center_daily_by_month__refresh_Table(
+            start_month_date.format("YYYY-MM-DD"),
+            end_month_date.format("YYYY-MM-DD"));
+    }
+}   
+
+
+
+function rp_center_daily_by_month__refresh_Table(start_date, end_date) {
+    hide_all_tables();
+
+    $('#wait').show();
+    var query_object = {
+        start_date: start_date,
+        end_date: end_date
+    };
+
+
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportCenterDailybyMonth",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            $('#wait').hide();
+            var records = data.d;
+            records = rp_center_daily_by_month__fix_records(records, start_date);
+
+            $('#div_table_center_daily_by_month').show();
+            tbl = $('#table_center_daily_by_month').DataTable({
+                pageLength: 100,
+                bLengthChange: false,
+                data: records,
+                destroy: true,
+                "language": {
+                    "search": "חיפוש:"
+                },
+                columnDefs: [
+                    { "orderData": [0], "type": "num", "targets": 0 }],
+                columns: [
+                    {
+                        data: "Date",
+                        render: function (data, type, row) {
+                            if (type == "sort") {
+                                return data.Index;
+                            }
+                            return data.Str;
+                        }
+
+                    },
+                    { data: "VolunteerCount" },
+                    { data: "PatientCount" }
+                ],
+                dom: 'Bfrtip',
+
+                buttons: [
+                    K_DataTable_CSV_EXPORT
+                ]
+            });
+        },
+        error: function (err) {
+            $('#wait').hide();
+        }
+
+    });
+
+}
+
+function rp_center_daily_by_month__fix_records(records, start_date_str) {
+    // Change date format, inject empty rows, add total row
+
+    daysArr = { 0: "יום א", 1: "יום ב", 2: "יום ג", 3: "יום ד", 4: "יום ה", 5: "יום ו", 6: "יום שבת", };
+
+    // First, we create an array with every entry being 0 count
+    let curr_date = moment(start_date_str, "YYYY-MM-DD");
+    let days_in_month = curr_date.daysInMonth()
+    let result = new Array();
+    for (i = 0; i < days_in_month; i++) {
+        let new_date_str = `${daysArr[curr_date.day()]} - ${i + 1}`;
+        result.push({ Date: { Str: new_date_str, Index: i}, VolunteerCount: 0, PatientCount: 0 });
+        curr_date = curr_date.add(1, 'days');
+    }
+
+    let total_vols = 0, total_pats = 0;
+
+    for (a_rec of records) {
+        let d = moment(a_rec.Date.split(" ")[0], "DD/MM/YYYY");
+        let day_in_month = d.date();
+        let new_date_str = `${daysArr[d.day()]} - ${day_in_month}`;
+        a_rec.Date = { Str: new_date_str, Index: day_in_month - 1 };
+
+        result[day_in_month - 1] = a_rec; //override actual value in placeholder
+        total_vols = total_vols + +a_rec.VolunteerCount;
+        total_pats = total_pats + +a_rec.PatientCount;
+    }
+
+    result.push({ Date: { Str: 'סה"כ', Index: 1001 }, VolunteerCount: total_vols, PatientCount: total_pats });
+
+    return result;
+}
+
+function rp_center_monthly_by_year__refresh_preview() {
+
+    obj = convert_year_to_start_end_dates("#select_year");
+
+    rp_center_monthly_by_year__refresh_table(
+        obj.start_date.format("YYYY-MM-DD"),
+        obj.end_date.format("YYYY-MM-DD"));
+}
+
+function rp_center_monthly_by_year__refresh_table(start_date, end_date) {
+    hide_all_tables();
+
+    $('#wait').show();
+    var query_object = {
+        start_date: start_date,
+        end_date: end_date
+    };
+
+
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportCenteryMonthlyByYear",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            $('#wait').hide();
+            var records = data.d;
+
+            records = rp_center_monthly_by_year__fix_records(records);
+
+            $('#div_table_rp_center_monthly_by_year').show();
+            tbl = $('#table_rp_center_monthly_by_year').DataTable({
+                pageLength: 100,
+                bLengthChange: false,
+                data: records,
+                destroy: true,
+                "language": {
+                    "search": "חיפוש:"
+                },
+                columnDefs: [
+                    { "orderData": [0], "type": "num", "targets": 0 }],
+                columns: [
+                    {
+                        data: "People"
+                    },
+                    { data: "1", "defaultContent": ""  },
+                    { data: "2", "defaultContent": ""  },
+                    { data: "3", "defaultContent": ""  },
+                    { data: "4", "defaultContent": ""  },
+                    { data: "5", "defaultContent": "" },
+                    { data: "6", "defaultContent": "" },
+                    { data: "7", "defaultContent": ""  },
+                    { data: "8", "defaultContent": ""  },
+                    { data: "9", "defaultContent": ""  },
+                    { data: "10", "defaultContent": ""  },
+                    { data: "11", "defaultContent": ""  },
+                    { data: "12", "defaultContent": ""  },
+                    { data: "Total" },
+                ],
+                dom: 'Bfrtip',
+
+                buttons: [
+                    K_DataTable_CSV_EXPORT
+                ]
+            });
+        },
+        error: function (err) {
+            $('#wait').hide();
+        }
+
+    });
+
+
+}
+
+function rp_center_monthly_by_year__fix_records(records) {
+    let drivers = { "People": "מתנדבים", Total: 0 };
+    let patients = { "People": "חולים", Total: 0 };
+    
+    for (a_rec of records) {
+        let obj = patients;
+        if (a_rec.Type == "DRIVER") {
+            obj = drivers;
+        }
+        obj[a_rec.Month] = a_rec.Count;
+        obj.Total += +a_rec.Count;
+    }
+    return new Array(patients, drivers);
+}
+
 
 function hide_all_tables() {
     $('#div_weeklyRides').hide();
@@ -1719,6 +2055,8 @@ function hide_all_tables() {
     $("#div_table_pil_vls_per_month").hide();
     $("#div_table_pil_vl_ride_month").hide();
     $("#div_table_pil_vl_ride_recent_period").hide();
+    $("#div_table_center_daily_by_month").hide();
+    $("#div_table_rp_center_monthly_by_year").hide();
  }
 
 
