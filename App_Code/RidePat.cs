@@ -378,7 +378,7 @@ public class RidePat
         bool sendMessage = true;
 
         try
-        {
+        {   
             Pat = ridePat.Pat;
             Location origin = new Location();
             origin.Name = ridePat.Origin.Name;
@@ -479,12 +479,21 @@ public class RidePat
         else if (func == "edit") //Edit existing RidePat in DB
         {
             RidePatNum = ridePat.RidePatNum;
+            RidePat ridePatPreEdit = GetRidePat(RidePatNum);
+            bool isTargetPatientAnonumous = isAnonymous;
+            if (ridePatPreEdit.Pat.IsAnonymous == bool.TrueString && !isTargetPatientAnonumous)
+            {
+                RidePat ridePatView = CheckRidePat_V2(ridePat, isAnonymous);
+                if (ridePatView.RidePatNum != 0 && !isAnonymous)
+                {
+                    return 1; // there is an issue - don't create new drive 
+                }
+            }
 
             //SET THE COORDINATOR NAME IN RIDEPAT TABLE TO THE LAST ONE WHO TOUCHED THIS RIDEPAT 
             ChangeCoordinatoor(RidePatNum);
 
-            RidePat rpc = GetRidePat(RidePatNum);
-            if (rpc.Pat.DisplayName == ridePat.Pat.DisplayName && rpc.Origin.Name == ridePat.Origin.Name && rpc.Destination.Name == ridePat.Destination.Name && rpc.Date.TimeOfDay == ridePat.Date.TimeOfDay)
+            if (ridePatPreEdit.Pat.DisplayName == ridePat.Pat.DisplayName && ridePatPreEdit.Origin.Name == ridePat.Origin.Name && ridePatPreEdit.Destination.Name == ridePat.Destination.Name && ridePatPreEdit.Date.TimeOfDay == ridePat.Date.TimeOfDay)
             {
                 sendMessage = false;
             }
