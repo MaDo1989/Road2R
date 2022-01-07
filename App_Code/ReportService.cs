@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
@@ -124,6 +124,36 @@ public class ReportService
         public string CellPhone { get; set; }
     }
 
+    public class CenterDailybyMonthInfo
+    {
+        public string Date { get; set; }
+        public string PatientCount { get; set; }
+        public string VolunteerCount { get; set; }
+    }
+
+    public class CenterMonthlyByYearInfo
+    {
+        public string Count { get; set; }
+        public string Type { get; set; }
+        public string Month { get; set; }
+    }
+
+
+    public class MetricInfo
+    {
+        public string MetricName { get; set; }
+        public int Value1 { get; set; }
+        public int Value2 { get; set; }
+    }
+
+
+    public class MetricMonthlyInfo
+    {
+        public string Day { get; set; }
+        public string Rides { get; set; }
+        public string Patients { get; set; }
+        public string Volunteers { get; set; }
+    }
 
     private DataTable getDriverByID(int driverID, DbService db)
     {
@@ -295,6 +325,7 @@ GROUP BY Volunteer.DisplayName
         return dt;
     }
 
+
     internal string CommitReportedVolunteerListToNI_DB(string cell_phone, string start_date, string only_with_rides)
     {
         // This service is not to be used by everybody, check if user is entitled for it
@@ -362,6 +393,196 @@ GROUP BY Volunteer.DisplayName
         return result;
     }
 
+    internal MetricMonthlyInfo GetReportNewDriversInRange(string start_date, string end_date)
+    {
+        DbService db = new DbService();
+
+        string query =
+             @"select  count (DISTINCT MainDriver)  AS COUNT_VOL
+            from RPView
+            where MainDriver is not null
+            and pickuptime > @start_date
+            and pickuptime < @end_date
+            AND not MainDriver in (
+	            select distinct MainDriver
+	            from RPView
+	            where MainDriver is not null
+	            and pickuptime < @start_date)";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        MetricMonthlyInfo result = new MetricMonthlyInfo();
+
+        DataRow dr = dt.Rows[0];
+        result.Volunteers = dr["COUNT_VOL"].ToString();
+
+        return result;
+    }
+
+    internal List<MetricMonthlyInfo> GetReportYearlyGraphMetrics(string start_date, string end_date)
+    {
+        DbService db = new DbService();
+
+        string query =
+             @"SELECT  MONTH(pickuptime) as MONTH_C ,  count(DISTINCT DisplayName) as COUNT_PAT,  count(*) as COUNT_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
+               FROM RPView 
+               WHERE MainDriver is not null
+               AND RPView.pickuptime > @start_date
+               AND RPView.pickuptime < @end_date
+               GROUP BY MONTH(pickuptime)
+               ORDER BY MONTH_C ASC";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        List<MetricMonthlyInfo> result = new List<MetricMonthlyInfo>();
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            MetricMonthlyInfo obj = new MetricMonthlyInfo();
+            obj.Day = dr["MONTH_C"].ToString();
+            obj.Rides = dr["COUNT_RIDES"].ToString();
+            obj.Patients = dr["COUNT_PAT"].ToString();
+            obj.Volunteers = dr["COUNT_VOL"].ToString();
+            result.Add(obj);
+        }
+
+        return result;
+    }
+
+    internal MetricInfo GetReportRangeNeedDriversMetrics(string start_date, string end_date)
+    {
+        DbService db = new DbService();
+
+        string query =
+             @"select ID from RPView
+                where MainDriver is NULL
+                and pickuptime > @start_date
+                and pickuptime < @end_date
+                and Status = N'ממתינה לשיבוץ' ";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+
+        int count = 0;
+        HashSet<string> uniqueIDs = new HashSet<string>();
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            uniqueIDs.Add(dr["ID"].ToString());
+            count++;
+        }
+
+        MetricInfo result = new MetricInfo
+        {
+            MetricName = "NeedDrivers",
+            Value1 = count,
+            Value2 = uniqueIDs.Count
+        };
+        return result;
+    }
+
+    internal MetricMonthlyInfo GetReportRangeDigestMetrics(string start_date, string end_date, string query)
+    {
+        DbService db = new DbService();
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        MetricMonthlyInfo result = new MetricMonthlyInfo();
+
+        DataRow dr = dt.Rows[0];
+        result.Rides = dr["COUNT_RIDES"].ToString();
+        result.Patients = dr["COUNT_PAT"].ToString();
+        result.Volunteers = dr["COUNT_VOL"].ToString();
+
+        return result;
+    }
+    
+    internal MetricMonthlyInfo GetReportMonthlyDigestMetrics(string start_date, string end_date)
+    {
+        string query =
+             @"SELECT count(DISTINCT DisplayName) as COUNT_PAT,  count(*) as COUNT_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
+               FROM RPView 
+               WHERE MainDriver is not null
+               AND RPView.pickuptime > @start_date
+               AND RPView.pickuptime < @end_date";
+
+        return GetReportRangeDigestMetrics(start_date, end_date, query);
+    }
+
+    internal MetricMonthlyInfo GetReportDailyDigestMetrics(string start_date, string end_date)
+    {
+        // Gets info also on rides without an allocted driver
+        string query =
+             @"SELECT count(DISTINCT DisplayName) as COUNT_PAT,  count(*) as COUNT_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
+               FROM RPView 
+               WHERE RPView.pickuptime > @start_date
+               AND RPView.pickuptime < @end_date";
+
+        return GetReportRangeDigestMetrics(start_date, end_date, query);
+    }
+
+    internal List<ReportService.MetricMonthlyInfo> GetReportMonthlyGraphMetrics(string start_date, string end_date)
+    {
+        DbService db = new DbService();
+
+        string query =
+             @"SELECT  DAY(pickuptime) as DAY_C ,  count(DISTINCT DisplayName) as COUNT_PAT,  count(*) as COUNT_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
+               FROM RPView 
+               WHERE MainDriver is not null
+               AND RPView.pickuptime > @start_date
+               AND RPView.pickuptime < @end_date
+               GROUP BY DAY(pickuptime)
+               ORDER BY DAY_C ASC";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        List<MetricMonthlyInfo> result = new List<MetricMonthlyInfo>();
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            MetricMonthlyInfo obj = new MetricMonthlyInfo();
+            obj.Day = dr["DAY_C"].ToString();
+            obj.Rides = dr["COUNT_RIDES"].ToString();
+            obj.Patients = dr["COUNT_PAT"].ToString();
+            obj.Volunteers = dr["COUNT_VOL"].ToString();
+            result.Add(obj);
+        }
+
+        return result;
+
+    }
+
+    
     internal List<VolunteersPerMonthInfo> GetReportVolunteerPerMonth(string start_date)
     {
         DbService db = new DbService();
@@ -772,6 +993,84 @@ INNER JOIN Volunteer ON BUFF.MainDriver=Volunteer.Id";
         }
 
     }
+
+    internal List<CenterDailybyMonthInfo> GetReportCenterDailybyMonth(string start_date, string end_date)
+    {
+        DbService db = new DbService();
+
+        string query =
+@"select  count(DISTINCT rp.MainDriver) AS Drivers, count(DISTINCT rp.Id) As Patients, CONVERT(date, pickuptime) as DayInMonth
+FROM RPView  rp
+where pickuptime >= @start_date 
+and pickuptime <= @end_date
+and rp.MainDriver is not null
+group by CONVERT(date, pickuptime) ";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        List<CenterDailybyMonthInfo> result = new List<CenterDailybyMonthInfo>();
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            CenterDailybyMonthInfo obj = new CenterDailybyMonthInfo();
+            obj.Date = dr["DayInMonth"].ToString();
+            obj.VolunteerCount = dr["Drivers"].ToString();
+            obj.PatientCount = dr["Patients"].ToString();
+            result.Add(obj);
+        }
+
+        return result;
+    }
+
+
+    internal List<CenterMonthlyByYearInfo> GetReportCenterMonthlyByYear(string start_date, string end_date)
+    {
+        DbService db = new DbService();
+
+        string query =
+@"select count(DISTINCT Id )as COUNT_G, 'PATIENT' as TYPE_G, MONTH(PickupTime) as MONTH_G
+FROM RPView r 
+where PickupTime >= @start_date
+and PickupTime <= @end_date
+and RideNum  is not null
+GROUP BY  MONTH(PickupTime) 
+UNION
+SELECT count(DISTINCT MainDriver )as COUNT_G, 'DRIVER' as TYPE_G, MONTH(date) as MONTH_G
+FROM Ride 
+where date >= @start_date
+and date <= @end_date
+GROUP BY  MONTH(Date) 
+ORDER  BY MONTH_G, TYPE_G ASC";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        List<CenterMonthlyByYearInfo> result = new List<CenterMonthlyByYearInfo>();
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            CenterMonthlyByYearInfo obj = new CenterMonthlyByYearInfo();
+            obj.Count = dr["COUNT_G"].ToString();
+            obj.Type = dr["TYPE_G"].ToString();
+            obj.Month = dr["MONTH_G"].ToString();
+            result.Add(obj);
+        }
+
+        return result;
+    }
+
+
 
 
     //@@ TODO:  See notes on this method name in reports.js
