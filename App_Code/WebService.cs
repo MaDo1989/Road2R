@@ -147,6 +147,22 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
+    public string GetRegions()
+    {
+        List<Region> regions;
+        Region regionManager = new Region();
+        try
+        {
+            regions = regionManager.GetAllRegions();
+            return j.Serialize(regions);
+        }
+        catch (Exception e)
+        {
+            Log.Error("Error in GetRegions", e);
+            throw new Exception("שגיאה בשליפת תתי אזורים");
+        }
+    }
+    [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string getAreas_AsLocationObj()
     {
