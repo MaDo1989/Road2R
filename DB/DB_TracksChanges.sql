@@ -146,7 +146,8 @@ GO
 
 /*ADD REGION MODEL (COMMON GENERAL PATH)*/
 
-/**************************************************************************************DO NOT DEPLOY IT YET ↓ ===> consult with Benny weather to deploy or not due to changes can be in location table*/
+/**************************************************************************************DO NOT DEPLOY IT YET ↓*/
+--1. CREATE TABLE REGION
 CREATE TABLE Region
 (
 	Id int primary key identity(1,1),
@@ -154,6 +155,7 @@ CREATE TABLE Region
 )
 GO
 
+--2. INSERT VALUES TO TABLE REGION
 
 INSERT INTO Region (RegionName)
 values
@@ -177,19 +179,19 @@ values
 ( N'באר שבע')
 GO
 
--- add column RegionId FK to Region to location table
+--3. add column RegionId FK to Region to location table
 	ALTER TABLE Location
     ADD RegionId int,
     FOREIGN KEY(RegionId) REFERENCES Region(id);
 GO
 
-
+--4. HELP TABLE TO UPDATE LOCATION TABLE
 CREATE TABLE LOCATION_NAMEANDREGIONID(
 RegionName nvarchar(250),
 RegionId int
 )
 GO
---INSERT VALUES BASED ON AMIRS TABLE
+--5. INSERT VALUES BASED ON AMIRS TABLE
 insert into LOCATION_NAMEANDREGIONID (RegionName, RegionId)
 values
 (N'תרקומיא',2),
@@ -311,15 +313,48 @@ values
 (N'אוגוסטה',8),
 (N'אג''נדה',13)
 GO
---UPDATE LOCATION BASED ON THAT TABLE
+
+--6. UPDATE LOCATION BASED ON THAT TABLE
 update Location
 set RegionId=(select RegionId from LOCATION_NAMEANDREGIONID where RegionName=Name)
 GO
---DROP LOCATION_NAMEANDREGIONID
+--7. DROP LOCATION_NAMEANDREGIONID
 DROP TABLE LOCATION_NAMEANDREGIONID
 GO
 
-/**************************************************************************************DO NOT DEPLOY IT YET ↑ ===> consult with Benny weather to deploy or not due to changes can be in location table*/
+--8. create procedure spGetAllRegions
+create procedure spGetAllRegions
+	as
+	set nocount on
+	begin
+		select * from Region
+	end
+GO
+--9. create procedure spGetAllLocation @active=0/1
+
+/*ADD REGION MODEL (COMMON GENERAL PATH)*/
+-- =============================================
+-- Author:      Yogev Strauber
+-- Create Date: January 12 2022
+-- Description: fetches all location with their region
+-- =============================================
+CREATE PROCEDURE spGetAllLocation
+(
+	@isActive bit
+)
+AS
+BEGIN
+    SET NOCOUNT ON
+
+		SELECT L.*, R.RegionName
+		FROM Location L INNER JOIN Region R ON L.RegionId=R.Id
+		WHERE IsActive=@isActive
+END
+GO
+
+
+
+/**************************************************************************************DO NOT DEPLOY IT YET ↑*/
 
 
 
