@@ -157,10 +157,13 @@ public class ReportService
 
     public class CenterPatientsRidesInfo
     {
+        public string Volunteer { get; set; }
         public string Month { get; set; }
         public string Count { get; set; }
         public string Origin { get; set; }
         public string Destination { get; set; }
+        public string Hospital { get; set; }
+        public string Barrier { get; set; }
     }
 
     private DataTable getDriverByID(int driverID, DbService db)
@@ -1155,21 +1158,33 @@ ORDER  BY MONTH_G, TYPE_G ASC";
             condition = condition + " AND p.Barrier = @Barrier";
         }
 
+        if (volunteer.Equals("*"))
+        {
+            condition = condition + " AND MainDriver is not null";
+        }
+        else
+        {
+            condition = condition + " AND maindriver=@volunteerID";
+        }
+
         string query =
         @"select
-        FORMAT (PickupTime, 'MM-yy') As MONTH_C ,Origin , Destination, COUNT(*) AS COUNT_C
-        from RPView rp inner join Patient p 
-        on rp.Id = p.Id 
-        where maindriver=@volunteerID
-        AND pickuptime > @start_date
+        FORMAT (PickupTime, 'MM-yy') As MONTH_C ,Origin , Destination, p.Hospital, p.Barrier, Volunteer.DisplayName, COUNT(*) AS COUNT_C
+        from RPView rp 
+        INNER JOIN Patient p on rp.Id = p.Id
+        INNER JOIN Volunteer  ON rp.MainDriver=Volunteer.Id
+        where pickuptime > @start_date
         AND pickuptime < @end_date " + 
         condition  +
-        @" GROUP BY FORMAT (PickupTime, 'MM-yy'), Origin , Destination
+        @" GROUP BY FORMAT (PickupTime, 'MM-yy'), Origin , Destination, p.Hospital, p.Barrier, Volunteer.DisplayName
         order by MONTH_C ASC";
 
         SqlCommand cmd = new SqlCommand(query);
         cmd.CommandType = CommandType.Text;
-        cmd.Parameters.Add("@volunteerID", SqlDbType.Int).Value = volunteer;
+        if (!volunteer.Equals("*"))
+        {
+            cmd.Parameters.Add("@volunteerID", SqlDbType.Int).Value = volunteer;
+        }
         cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
         cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
         cmd.Parameters.Add("@hospital", SqlDbType.NVarChar).Value = hospital;
@@ -1183,9 +1198,12 @@ ORDER  BY MONTH_G, TYPE_G ASC";
         foreach (DataRow dr in dt.Rows)
         {
             CenterPatientsRidesInfo obj = new CenterPatientsRidesInfo();
+            obj.Volunteer = dr["DisplayName"].ToString();
             obj.Month = dr["MONTH_C"].ToString();
             obj.Origin = dr["Origin"].ToString();
             obj.Destination = dr["Destination"].ToString();
+            obj.Hospital = dr["Hospital"].ToString();
+            obj.Barrier = dr["Barrier"].ToString();
             obj.Count = dr["COUNT_C"].ToString();
             result.Add(obj);
         }

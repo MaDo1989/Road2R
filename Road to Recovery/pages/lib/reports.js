@@ -88,7 +88,7 @@ function on_report_click(event) {
  }
 
 
-// How to refresh the table, per each report type
+// How to refresh the table, per each report type  (Hooked into volunteer selection)
 var K_strategy = {
     "rp_vl_ride_month": rp_vl_ride_month__refresh_preview,
     "rp_vl_ride_year": rp_vl_ride_year__refresh_preview,
@@ -102,7 +102,7 @@ var K_strategy = {
     "rp_pil_vl_ride_recent_period": rp_pil_vl_ride_recent_period__refresh_preview,
     "rp_center_daily_by_month": rp_center_daily_by_month__refresh_preview,
     "rp_center_monthly_by_year": rp_center_monthly_by_year__refresh_preview,
-    "rp_center_patients_rides": rp_center_patients_rides__refresh_preview,
+    "rp_center_patients_rides": empty_func,
 }
 
 
@@ -247,7 +247,14 @@ var K_fields_map = {
             template: 'div[name="template_BARRIER"]',
             type: "BARRIER",
             post_clone: field_barriers_post_clone
+        },
+        {
+            id: "rp_patients_rides__barrier",
+            template: 'div[name="template_GENERATE_REPORT"]',
+            type: "GENERATE_REPORT",
+            post_clone: field_generate_report_post_clone
         }
+
 
     ]
 
@@ -487,7 +494,6 @@ function loadHospitals(on_load_hospitals) {
 
 function on_hospital_selected(event, ui) {
     $("#" + event.target.id).val(ui.item.value);
-    rp_center_patients_rides__refresh_preview();
     return true;
 }
 
@@ -527,7 +533,6 @@ function loadBarriers(on_load_barriers) {
 
 function on_barrier_selected(event, ui) {
     $("#" + event.target.id).val(ui.item.value);
-    rp_center_patients_rides__refresh_preview();
     return true;
 }
 
@@ -586,7 +591,6 @@ function populate_month_range_fields(start_date, end_date, refresh_callback) {
     });
     dt_end.datepicker('setDate', end_date);
     dt_end.on("changeDate", refresh_callback);
-
 }
 
 
@@ -655,6 +659,10 @@ function field_hospitals_post_clone(id) {
 
 function field_barriers_post_clone(id) {
     loadBarriers(populate_barrier_field);
+}
+
+function field_generate_report_post_clone(id) {
+    $("#generate_report_period").click(rp_center_patients_rides__refresh_preview);
 }
 
 
@@ -966,8 +974,7 @@ function rp_center_patients_rides__post_clone(id) {
     start_date.setFullYear(start_date.getFullYear() - 1);
     let end_date = new Date();
     
-    populate_month_range_fields(start_date, end_date, rp_center_patients_rides__refresh_preview);
-    rp_center_patients_rides__refresh_preview();
+    populate_month_range_fields(start_date, end_date, empty_func);
 }
 
 
@@ -2116,27 +2123,28 @@ function rp_center_monthly_by_year__fix_records(records) {
 // Checks if all fields are filled. If so refresh the report
 function rp_center_patients_rides__refresh_preview() {
     var volunteerId = $("#select_driver").attr("itemID");
-    if (volunteerId) {
-        var hospital = $("#select_hospital").val();
-        if (!hospital) {
-            hospital = "*";
-        }
-        var barrier = $("#select_barrier").val();
-        if (!barrier) {
-            barrier = "*";
-        }
+    if (!volunteerId) {
+        volunteerId = "*";
+    }
+    var hospital = $("#select_hospital").val();
+    if (!hospital) {
+        hospital = "*";
+    }
+    var barrier = $("#select_barrier").val();
+    if (!barrier) {
+        barrier = "*";
+    }
 
-        var start_date = Date.parse($("#select_month_start").val());
-        if (start_date) {
-            let end_date = Date.parse($("#select_month_end").val());
-            let start_moment = moment(start_date);
-            let end_moment = moment(end_date);
-            rp_center_patients_rides__refresh_Table(volunteerId, 
-                start_moment.format("YYYY-MM-DD"),
-                end_moment.format("YYYY-MM-DD"),
-                hospital, barrier
-            );
-        }
+    var start_date = Date.parse($("#select_month_start").val());
+    if (start_date) {
+        let end_date = Date.parse($("#select_month_end").val());
+        let start_moment = moment(start_date);
+        let end_moment = moment(end_date);
+        rp_center_patients_rides__refresh_Table(volunteerId, 
+            start_moment.format("YYYY-MM-DD"),
+            end_moment.format("YYYY-MM-DD"),
+            hospital, barrier
+        );
     }
 }
 
@@ -2213,8 +2221,11 @@ function rp_center_patients_rides__refresh_Table(volunteerId, start_date, end_da
                             return data.str;
                         }
                     },
+                    { data: "Volunteer" },
                     { data: "Origin" },
                     { data: "Destination" },
+                    { data: "Hospital" },
+                    { data: "Barrier" },
                     { data: "Count" },
                 ],
                 dom: 'Bfrtip',
