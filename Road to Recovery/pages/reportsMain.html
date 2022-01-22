@@ -482,8 +482,11 @@
                                     <thead>
                                         <tr>
                                             <th title="Month" class="timeCustomWidth">חודש</th>
+                                            <th title="Volunteer" class="timeCustomWidth">מתנדב</th>
                                             <th title="Origin" class="timeCustomWidth">מוצא</th>
                                             <th title="Destination" class="timeCustomWidth">יעד</th>
+                                            <th title="Hospital" class="timeCustomWidth">בית חולים</th>
+                                            <th title="Barrier" class="timeCustomWidth">מחסום</th>
                                             <th title="Count" class="timeCustomWidth">מספר הסעות</th>
 
                                         </tr>
@@ -872,10 +875,7 @@
                                                 <input placeholder="הזן שם" type="text" template_id="select_hospital" class="form-control ui-autocomplete-input" autocomplete="off" aria-required="true" aria-invalid="false">
                                             </div>
                                         </div>
-
                                     </div>
-
-
                                 </div>
                             </div>
                         </div>
@@ -890,10 +890,19 @@
                                                 <input placeholder="הזן שם" type="text" template_id="select_barrier" class="form-control ui-autocomplete-input" autocomplete="off" aria-required="true" aria-invalid="false">
                                             </div>
                                         </div>
-
                                     </div>
+                                </div>
+                            </div>
+                        </div>
 
-
+                        <div class="row report_template" name="template_GENERATE_REPORT">
+                            <div class="card-box">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <div class="col-sm-2"><input type="button" template_id="generate_report_period" value='הפקת דו"ח' class="btn btn-default buttons-html5" /> </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
