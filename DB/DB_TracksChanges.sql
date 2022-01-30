@@ -356,71 +356,6 @@ GO
 
 /**************************************************************************************DO NOT DEPLOY IT YET ↑*/
 
-
-
-/****** Object:  StoredProcedure [dbo].[spVolunteerTypeView_GetVolunteersList]    Script Date: 12/11/2021 7:10:58 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-ALTER procedure [dbo].[spVolunteerTypeView_GetVolunteersList]
-
-@IsActive bit
-as
-begin
-select r.MainDriver, r.Origin, r.Destination into #tempNotDeletedOnly from  ridepat rp
-inner join ride r
-on r.RideNum=rp.RideId
-
-if (@IsActive = 0)
-	begin
-				select *, (select count(*)
-					from ridepat rp inner join ride r
-					on rp.rideid=r.ridenum
-					where r.maindriver = vtv.Id
-					and pickuptime between DATEADD(Month, -2, GETDATE()) and  GETDATE()) as NumOfRides_last2Months
-					,
-					(
-				select origin + '-'+destination from
-					(
-					select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
-					where t.MainDriver = id
-					group by maindriver, origin, destination
-					order by numberOfTimesDrove desc
-					) t
-				) mostCommonPath
-		from VolunteerTypeView vtv
-		where IsActive = @IsActive or IsActive = 1
-		order by firstNameH
-
-	end
-else
-	begin
-		select *, (select count(*)
-					from ridepat rp inner join ride r
-					on rp.rideid=r.ridenum
-					where r.maindriver = vtv.Id
-					and pickuptime between DATEADD(Month, -2, GETDATE()) and  GETDATE()) as NumOfRides_last2Months
-					,
-					(
-				select origin + '-'+destination from
-					(
-					select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
-					where t.MainDriver = id
-					group by maindriver, origin, destination
-					order by numberOfTimesDrove desc
-					) t
-				) mostCommonPath
-		from VolunteerTypeView vtv
-		where IsActive = @IsActive
-		order by firstNameH
-	end
-
-	drop table #tempNotDeletedOnly 
-
-end
-GO
-
 --decrease NoOfDocumentedRides in case of mark ridepat as deleted
 ALTER trigger [dbo].[RidePatRideTrigger]
 on [dbo].[RidePat]for update,insert
@@ -658,7 +593,6 @@ update volunteer
 	set NoOfDocumentedRides = (select count(*) from ride 
 								where MainDriver=Id
 								and exists (select * from ridepat where RideId=RideNum))
-
 GO
 
 /*
@@ -700,9 +634,143 @@ GO
 update ride_backUp_2021_12_16
 set Origin=N'תרקומיא', destination=N'שיבא'
 where ridenum=xxx
+GO
 
 delete ridepat 
 where ridepatnum=xxx
+GO
 
 delete  [PatientEscort_PatientInRide (RidePat)]
 where [PatientInRide (RidePat)RidePatNum] = 50
+GO
+
+-- =============================================
+-- Author:      Yogev Strauber
+-- Description: Fetches the region name of a given location
+-- Date:		January 21 2022
+-- =============================================
+CREATE   FUNCTION [dbo].[SVF_GET_REGION_NAME]
+(
+    -- Add the parameters for the function here
+	@LOCATION_NAME NVARCHAR(100)
+)
+RETURNS NVARCHAR(100)
+AS
+BEGIN
+    ---- Declare the return variable here
+	DECLARE @REGION_NAME AS NVARCHAR(100)
+
+    ---- Add the T-SQL statements to compute the return value here
+	SELECT @REGION_NAME = (SELECT RegionName FROM Region WHERE Id = (SELECT RegionId FROM Location WHERE Name=@LOCATION_NAME))
+
+    ---- Return the result of the function
+	RETURN @REGION_NAME ;
+END
+GO
+
+
+ALTER procedure [dbo].[spVolunteerTypeView_GetVolunteersList]
+
+@IsActive bit
+as
+begin
+select r.MainDriver, r.Origin, r.Destination into #tempNotDeletedOnly from  ridepat rp
+inner join ride r
+on r.RideNum=rp.RideId
+
+if (@IsActive = 0)
+	begin
+				select *, (select count(*)
+					from ridepat rp inner join ride r
+					on rp.rideid=r.ridenum
+					where r.maindriver = vtv.Id
+					and pickuptime between DATEADD(Month, -2, GETDATE()) and  GETDATE()) as NumOfRides_last2Months
+					,
+					(
+				select origin + '-'+destination from
+													(
+														select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
+														where t.MainDriver = id
+														group by maindriver, origin, destination
+														order by numberOfTimesDrove desc
+														) t
+					) mostCommonPath,
+					( 
+				select dbo.SVF_GET_REGION_NAME(
+					(
+				select origin from
+									(
+										select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
+										where t.MainDriver = id
+										group by maindriver, origin, destination
+										order by numberOfTimesDrove desc
+										) t)
+									 )
+				 ) AS mostCommonRegionalOrigin,
+				 				( 
+	select dbo.SVF_GET_REGION_NAME(
+				(
+				select destination from
+										(
+										select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
+										where t.MainDriver = id
+										group by maindriver, origin, destination
+										order by numberOfTimesDrove desc
+										) t)
+									 )
+				 ) AS mostCommonRegionalDestination
+		from VolunteerTypeView vtv
+		where IsActive = @IsActive or IsActive = 1
+		order by firstNameH
+
+	end
+else
+	begin
+	select *, (select count(*)
+					from ridepat rp inner join ride r
+					on rp.rideid=r.ridenum
+					where r.maindriver = vtv.Id
+					and pickuptime between DATEADD(Month, -2, GETDATE()) and  GETDATE()) as NumOfRides_last2Months
+					,
+					(
+				select origin + '-'+destination from
+													(
+														select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
+														where t.MainDriver = id
+														group by maindriver, origin, destination
+														order by numberOfTimesDrove desc
+														) t
+					) mostCommonPath,
+					( 
+				select dbo.SVF_GET_REGION_NAME(
+					(
+				select origin from
+									(
+										select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
+										where t.MainDriver = id
+										group by maindriver, origin, destination
+										order by numberOfTimesDrove desc
+										) t)
+									 )
+				 ) AS mostCommonRegionalOrigin,
+				 				( 
+	select dbo.SVF_GET_REGION_NAME(
+				(
+				select destination from
+										(
+										select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
+										where t.MainDriver = id
+										group by maindriver, origin, destination
+										order by numberOfTimesDrove desc
+										) t)
+									 )
+				 ) AS mostCommonRegionalDestination
+		from VolunteerTypeView vtv
+		where IsActive = @IsActive
+		order by firstNameH
+	end
+
+	drop table #tempNotDeletedOnly 
+
+end
+GO
