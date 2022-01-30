@@ -92,7 +92,7 @@
             $("#closeModal").click(function () {
 
             });
-          
+
 
             refreshTable();
             jQuery.extend(jQuery.fn.dataTableExt.oSort, {
@@ -179,7 +179,6 @@
                     $('#wait').hide();
                     var arr_volunteers = JSON.parse(data.d);
                     GENERAL.VOLUNTEERS.setVolunteersList(JSON.stringify(arr_volunteers));
-
                     for (i in arr_volunteers) {
                         if (driveVol === true && (!arr_volunteers[i].IsDriving)) continue;
                         var btnStr = '';
@@ -206,10 +205,16 @@
                         else cellphone2 = arr_volunteers[i].HomePhone;
 
                         let showDocumentedRidesBtn = '';
-                        // showDocumentedRidesBtn += arr_volunteers[i].NoOfDocumentedRides < 10 ? '&nbsp' : '';
                         showDocumentedRidesBtn += `<div class='btnWrapper-left'><span class="badge badge-default">${arr_volunteers[i].NoOfDocumentedRides}</span>`;
                         showDocumentedRidesBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedRidesBtn" title="תיעוד הסעות" data-toggle="modal" data-target="#documentedRidesModal"><i class="fa fa-car" aria-hidden="true"></i></button></div>';
                         btnStr += showDocumentedRidesBtn;
+
+                        let mostCommonRegionalPath = '';
+
+                        if (arr_volunteers[i].MostCommonRegionalOrigin.length > 0 && arr_volunteers[i].MostCommonRegionalDestination.length > 0) {
+
+                            mostCommonRegionalPath = arr_volunteers[i].MostCommonRegionalOrigin + '-' + arr_volunteers[i].MostCommonRegionalDestination;
+                        }
 
                         let showDocumentedCallsBtn = '';
                         showDocumentedCallsBtn += `<div class='btnWrapper-left'><span id="badgeOf_${arr_volunteers[i].Id}" class="badge badge-pill badge-default">${arr_volunteers[i].NoOfDocumentedCalls}</span>`;
@@ -241,7 +246,8 @@
                             LastModified: arr_volunteers[i].LastModified,
                             EnglishName: arr_volunteers[i].EnglishName,
                             NumOfRides_last2Months: arr_volunteers[i].NumOfRides_last2Months,
-                            MostCommonPath: arr_volunteers[i].MostCommonPath
+                            MostCommonPath: arr_volunteers[i].MostCommonPath,
+                            MostCoomonRegionalPath: mostCommonRegionalPath
                         }
                         allVolunteersFromDb.push(Volunteer);
                     }
@@ -265,21 +271,22 @@
                                 targets: 3,
                                 className: 'text-left-strong'
                             },
-                            { "targets": [9], "orderable": false },
+                            { "targets": [10], "orderable": false },
 
 
                         ],
                         columns: [
                             { data: "DisplayName", width: "5%" },              //0
-                            { data: "TypeVol", width: "5%" },                  //1
-                            { data: "CellPhone", width: "5%" },                //2
-                            { data: "EnglishName", width: "10%" },             //3
-                            { data: "City", width: "5%" },                     //4
-                            { data: "Remarks", width: "20%" },                 //5
-                            { data: "LastModified", width: "15%" },            //6
-                            { data: "NumOfRides_last2Months", width: "5%" },   //7
-                            { data: "MostCommonPath", width: "10%" },          //8
-                            { data: "Buttons", width: "20%" },                 //9
+                            { data: "TypeVol", width: "4%" },                  //1
+                            { data: "CellPhone", width: "4%" },                //2
+                            { data: "EnglishName", width: "7%" } ,             //3
+                            { data: "City", width: "4%" },                     //4
+                            { data: "Remarks", width: "14%" },                 //5
+                            { data: "LastModified", width: "8%" },             //6
+                            { data: "NumOfRides_last2Months", width: "4%" },   //7
+                            { data: "MostCommonPath", width: "8%" },           //8
+                            { data: "MostCoomonRegionalPath", width: "8%" },   //9
+                            { data: "Buttons", width: "22%" },                 //10
                         ],
                     });
 
@@ -1003,19 +1010,19 @@
                             <div class="card-box table-responsive">
 
                                 <!--<div class="row">
-                            <div class="col-sm-8">
-                                <h4 class="m-t-0 header-title"><b>טבלת מתנדבים</b></h4>
-                                <p class="text-muted font-13 m-b-30">
-                                    מבט כללי על המתנדבים שבוצעו, ניתן לצפות בפרטים נוספים בלחיצה על כפתור ההרחבה.
-                                </p>
-                            </div>
-                            <div class="col-sm-4 text-right">
-                                <button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button> צפייה
-                                <button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button> עריכה
-                                <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button> מחיקה
-                                <button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo'></i></button> שחזור
-                            </div>
-                        </div>-->
+                                    <div class="col-sm-8">
+                                        <h4 class="m-t-0 header-title"><b>טבלת מתנדבים</b></h4>
+                                        <p class="text-muted font-13 m-b-30">
+                                            מבט כללי על המתנדבים שבוצעו, ניתן לצפות בפרטים נוספים בלחיצה על כפתור ההרחבה.
+                                        </p>
+                                    </div>
+                                    <div class="col-sm-4 text-right">
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button> צפייה
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button> עריכה
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button> מחיקה
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo'></i></button> שחזור
+                                    </div>
+                                </div>-->
                                 <div class="row">
                                     <div class="col-sm-3 checkbox checkbox-primary text-left">
                                         <input id="activeCustomers" type="checkbox" onchange="ActiveMode()" checked>
@@ -1044,6 +1051,7 @@
                                             <th>עודכן לאחרונה</th>
                                             <th>מס' הסעות בחודשיים אחרונים</th>
                                             <th>מסלול שכיח</th>
+                                            <th>מסלול שכיח אזורי</th>
                                             <th>פעולות</th>
                                         </tr>
                                     </thead>
