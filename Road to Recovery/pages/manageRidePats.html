@@ -462,6 +462,26 @@
             });
             //#endregion
 
+
+            //#region copyMessage ridepat
+            $('#datatable-morning tbody').on('click', '.copyMessage', function () {
+                copyMessageButton(this, tMorning);
+            });
+
+            $('#datatable-afternoon tbody').on('click', '.copyMessage', function () {
+                copyMessageButton(this, tAfternoon);
+            });
+
+
+            $('#datatable-tomorrow tbody').on('click', '.copyMessage', function () {
+                copyMessageButton(this, tTomorrow);
+            });
+
+            $('#datatable-future tbody').on('click', '.copyMessage', function () {
+                copyMessageButton(this, tFuture);
+            });
+            //#endregion
+
             //#region show target form
             /*
              IMPORTANT NOTE
@@ -1043,6 +1063,51 @@
 
         }
 
+        function copyMessageButton(copyMsgBtn, table) {
+            let ridePatNum = parseInt(copyMsgBtn.id);
+
+
+            const ridepat = arr_rides.find((r) => r.RidePatNum === ridePatNum);
+
+            let jsDate = convertDBDate2FrontEndDate(ridepat.Date);
+
+            let isAfterNoon = jsDate.getMinutes() === 14;
+            let isToday = table.context[0].sTableId === "datatable-afternoon" || table.context[0].sTableId === "datatable-morning";
+
+            const date2copy = isToday ? 'היום' : `בתאריך ${jsDate.toLocaleString('he-IL', { dateStyle: 'short' })}`;
+            const time2copy = isAfterNoon ? ` אחה"צ` : ` בשעה ${jsDate.toLocaleString('he-IL', { timeStyle: 'short' })} `
+
+            let textMessageToCopy = `שלום ${ridepat.Drivers[0]?.DisplayName ?? 'נהג'},`;
+            textMessageToCopy += `\n`;
+            textMessageToCopy += `יש לאסוף את ${ridepat.Pat.DisplayName}`;
+            textMessageToCopy += `\n`;
+            textMessageToCopy += `מ${ridepat.Origin.Name} `;
+            textMessageToCopy += `ולהסיע אל ${ridepat.Destination.Name} `;
+            textMessageToCopy += `\n`;
+            textMessageToCopy += date2copy;
+            textMessageToCopy += time2copy;
+            textMessageToCopy += `\n`;
+            textMessageToCopy += `תודה ונסיעה טובה`;
+
+
+            navigator.clipboard.writeText(textMessageToCopy)
+                .then(function () {
+                    swal({
+                        title: "ההודעה מוכנה בפעולת הדבק",
+                        timer: 1000,
+                        type: "success",
+                        showConfirmButton: false
+                    });
+                }, function () {
+                    swal({
+                        title: "העתקת ההודעה נכשלה",
+                        timer: 1000,
+                        type: "error",
+                        showConfirmButton: false
+                    });
+                });
+        }
+
         //const candidatesButton = (btn) => {
         //    let ridePatNum = btn.id;
         //    GENERAL.RIDEPAT.setRidePatNum4_viewCandidate(ridePatNum);
@@ -1433,7 +1498,7 @@
                     xhr.setRequestHeader("Content-Encoding", "gzip");
                 },
                 type: "POST",
-                data: JSON.stringify({ volunteerId: volunteerId, maxDays: 30 }),
+                data: JSON.stringify({ volunteerId: volunteerId, maxDays: 15 }),
                 success: function (data) {
                     $('#wait').hide();
                     arr_rides = JSON.parse(data.d);
@@ -1444,6 +1509,7 @@
                     let thisRidePat = {};
                     let editBtn;
                     let deleteBtn;
+                    let messageToCopyBtn;
                     let btnStr = '';
                     //     let lastModified = convertDBDate2FrontEndDate(arr_rides[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     let numOfRealEscorts = 0; //not anonymous
@@ -1493,7 +1559,9 @@
                         //#region buttons
                         editBtn = `<button type='button' class='edit btn btn-icon waves-effect waves-light btn-secondary btn-sm m-r-5 m-b-5' id='${arr_rides[i].RidePatNum}' name='${arr_rides[i].RidePatNum}' title='עריכה'><i class='ti-pencil'></i></button>`;
                         deleteBtn = `<button type='button' class='remove btn btn-icon waves-effect waves-light btn-secondary btn-sm m-b-5'id='${arr_rides[i].RidePatNum}' name='${arr_rides[i].RidePatNum}' title='מחיקה'><i class='fa fa-remove'></i></button>`;
+                        messageToCopyBtn = `<button type='button' class='copyMessage btn btn-icon waves-effect waves-light btn-secondary btn-sm m-b-5'id='${arr_rides[i].RidePatNum}' name='${arr_rides[i].RidePatNum}' title='העתקת הודעה'><i class='fa fa-envelope'></i></button>`;
                         btnStr = `<div class='btnsInSameLine'>${editBtn} ${deleteBtn}</div>`;
+                        btnStr += `<div class='btnsInSameLine'>${messageToCopyBtn}</div>`;
                         //#endregion buttons
 
                         thisRidePat = {
