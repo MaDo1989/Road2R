@@ -2401,72 +2401,11 @@ public class Volunteer
             throw e;
         }
 
-        //try
-        //{
-        //    query = "insert into VolunteerGood_30_05_20 (UserName, CellPhone, FirstNameH, LastNameH, DisplayName, Gender, isActive, isAssistant, lastModified, JoinDate)";
-        //    query += " values (@UserName, @cell,@firstNameH,@lastNameH,@displayName,@gender,1,0,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
-
-        //    db = new DbService();
-        //    Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
-        //}
-        //catch (SqlException ex)
-        //{
-        //    //throw new Exception("error inserting to VolunteerGood_30_05_20 table");
-        //    try
-        //    {
-        //        query = "insert into VolunteerGood_30_05_20 (Id, UserName, CellPhone, FirstNameH, LastNameH, DisplayName, Gender, isActive, isAssistant, lastModified, JoinDate)";
-        //        query += " values ((select max(id) + 1 from VolunteerGood_30_05_20), @UserName, @cell,@firstNameH,@lastNameH,@displayName,@gender,1,0,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
-
-        //        db = new DbService();
-        //        db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams);
-        //    }
-        //    catch (SqlException ex2)
-        //    {
-        //        throw new Exception("error inserting to VolunteerGood_30_05_20 table " + ex2.Message);
-        //    }
-        //}
-        //catch (Exception e)
-        //{
-        //    throw e;
-        //}
 
         Email em = new Email();
         string messageText = "";
 
-        //Send email to coordinator - (coorEmail)
-        //if (coorEmail != "")
-        //{
-        //    messageText = "שלום " + coorName + "! <br/>";
-        //    if (v.Gender == "מתנדבת")
-        //    {
-        //        messageText += v.DisplayName + " - מתנדבת חדשה, הצטרפה אלינו. <br/>";
-        //        messageText += "הטלפון שלה: " + v.CellPhone + " <br/>";
-        //        messageText += "היא מצפה לשיחה איתך. <br/><br/>";
-        //    }
-        //    else
-        //    {
-        //        messageText += v.DisplayName + " - מתנדב חדש, הצטרף אלינו. <br/>";
-        //        messageText += "הטלפון שלו: " + v.CellPhone + " <br/>";
-        //        messageText += "הוא מצפה לשיחה איתך. <br/><br/>";
-        //    }
-        //    messageText += "בברכה, <br/>";
-        //    messageText += "יובל רוט <br/>";
-        //    em.sendMessageTo("New volunteer", coorEmail, messageText);
-        //}
-
-        //string longurl = ConfigurationManager.AppSettings["SMSserver"] + "&" + ConfigurationManager.AppSettings["SMSpass"];
-        //var uriBuilder = new UriBuilder(longurl);
-        //var SMSquery = HttpUtility.ParseQueryString(uriBuilder.Query);
-        //SMSquery["to"] = "972" + v.cellPhone.Substring(1, v.cellPhone.Length - 1);
-        //string SMSmessage = "להשלמת ההצטרפות לעמותת 'בדרך להחלמה' לחץ על הקישור הבא: http://roadtorecovery.org.il/test/Road%20to%20Recovery/pages/Welcome.html?vol=" + v.CellPhone + "&coor=" + coorPhone;
-        //SMSquery["text"] = SMSmessage;
-        //uriBuilder.Query = SMSquery.ToString();
-        //longurl = uriBuilder.ToString();
-
-        //WebRequest wr = WebRequest.Create(longurl);
-        //HttpWebResponse response = (HttpWebResponse)wr.GetResponse();
-        //Console.WriteLine(response.StatusDescription);
-
+      
         foreach (Volunteer coor in coordinators)
         {
 
@@ -2510,15 +2449,7 @@ public class Volunteer
 
         WebRequest wr = WebRequest.Create(longurl);
         HttpWebResponse response = (HttpWebResponse)wr.GetResponse();
-        Console.WriteLine(response.StatusDescription);
-
-
-        //if (instructions == "True")//Send email to instructor
-        //{
-        //    messageText = "המשתמש.ת " + v.DisplayName + " נרשם.ה למערכת.<br/>המשתמש.ת מעוניין.ת בהדרכה.<br/>טלפון נייד: " + v.CellPhone;
-        //    em.sendMessageTo("New volunteer", ConfigurationManager.AppSettings["instructorMail"], messageText); //Change to instructor's email
-        //}
-
+        string status = response.StatusDescription;
     }
 
     /// <summary>
