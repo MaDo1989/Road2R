@@ -1048,19 +1048,14 @@
 
     <style>
 
-        <!-- https://uxsolutions.github.io/bootstrap-datepicker -->
-        .datepicker-months td span {
-            width: 23%;
-            text-align: center;
-            float: left;
-            margin: 1%;
-            cursor: pointer;
-            border-radius: 4px;
+        <!-- https://uxsolutions.github.io/bootstrap-datepicker   -->
+        .datepicker-months table tr td span.month {
+            color: black;
+        }
+        .datepicker-months table tr td span.month.disabled {
+            color: lightgray;
         }
 
-        .datepicker-months td span:hover {
-            background: #eee;
-        }
     </style>
 
     <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>

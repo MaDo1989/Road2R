@@ -591,6 +591,13 @@ function populate_month_range_fields(start_date, end_date, refresh_callback) {
     });
     dt_end.datepicker('setDate', end_date);
     dt_end.on("changeDate", refresh_callback);
+
+    let start_date_boundary = "01 2019";
+    dt_start.datepicker('setStartDate', start_date_boundary);
+    dt_end.datepicker('setStartDate', start_date_boundary);
+    let end_date_boundary = moment(end_date).format("MM yyyy");
+    dt_start.datepicker('setEndDate', end_date_boundary);
+    dt_end.datepicker('setEndDate', end_date_boundary);
 }
 
 
@@ -2135,17 +2142,32 @@ function rp_center_patients_rides__refresh_preview() {
         barrier = "*";
     }
 
-    var start_date = Date.parse($("#select_month_start").val());
-    if (start_date) {
-        let end_date = Date.parse($("#select_month_end").val());
-        let start_moment = moment(start_date);
-        let end_moment = moment(end_date);
-        rp_center_patients_rides__refresh_Table(volunteerId, 
-            start_moment.format("YYYY-MM-DD"),
-            end_moment.format("YYYY-MM-DD"),
-            hospital, barrier
-        );
+    // Parse dates, with fallback to default Jan'19 ==> Today
+    let start_date = Date.parse($("#select_month_start").val());
+    if (isNaN(start_date)) {
+        $("#select_month_start").val("January 2019");
+        start_date = Date.parse($("#select_month_start").val());
     }
+    let end_date = Date.parse($("#select_month_end").val());
+    if (isNaN(end_date)) {
+        end_date = moment();
+        $("#select_month_end").val(end_date.format("MMMM YYYY"));
+    }
+
+    let start_moment = moment(start_date);
+    let end_moment = moment(end_date);
+    // use end of month, or current-date
+    end_moment.endOf("month");
+    end_moment = moment.min(end_moment, moment());
+
+    console.log(start_moment.format("YYYY-MM-DD"),
+        end_moment.format("YYYY-MM-DD"));
+
+    rp_center_patients_rides__refresh_Table(volunteerId, 
+        start_moment.format("YYYY-MM-DD"),
+        end_moment.format("YYYY-MM-DD"),
+        hospital, barrier
+    );
 }
 
 function rp_center_patients_rides__fix_records(arr) {
