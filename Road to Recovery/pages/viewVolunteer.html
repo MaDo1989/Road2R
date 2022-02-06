@@ -240,7 +240,8 @@
                             Buttons: btnStr,
                             LastModified: arr_volunteers[i].LastModified,
                             EnglishName: arr_volunteers[i].EnglishName,
-                            NumOfRides_last2Months: arr_volunteers[i].NumOfRides_last2Months
+                            NumOfRides_last2Months: arr_volunteers[i].NumOfRides_last2Months,
+                            MostCommonPath: arr_volunteers[i].MostCommonPath
                         }
                         allVolunteersFromDb.push(Volunteer);
                     }
@@ -264,7 +265,7 @@
                                 targets: 3,
                                 className: 'text-left-strong'
                             },
-                            { "targets": [8], "orderable": false },
+                            { "targets": [9], "orderable": false },
 
 
                         ],
@@ -277,7 +278,8 @@
                             { data: "Remarks", width: "20%" },                 //5
                             { data: "LastModified", width: "15%" },            //6
                             { data: "NumOfRides_last2Months", width: "5%" },   //7
-                            { data: "Buttons", width: "30%" },                 //8
+                            { data: "MostCommonPath", width: "10%" },          //8
+                            { data: "Buttons", width: "20%" },                 //9
                         ],
                     });
 
@@ -1041,6 +1043,7 @@
                                             <th style="text-align:right">הערות</th>
                                             <th>עודכן לאחרונה</th>
                                             <th>מס' הסעות בחודשיים אחרונים</th>
+                                            <th>מסלול שכיח</th>
                                             <th>פעולות</th>
                                         </tr>
                                     </thead>

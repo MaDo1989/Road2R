@@ -130,9 +130,6 @@
                 }
             });
 
-
-
-
             refreshTable('day');
         });
 
@@ -343,6 +340,9 @@
                 case 'Patient':
                     ajaxCall('GetPatientById', JSON.stringify({ id: identifier }), getPatient_SCB, getPatient_ECB);
                     break;
+                case 'Escorted':
+                    ajaxCall('GetEscortById', JSON.stringify({ id: identifier }), getEscort_SCB, getPEscort_ECB);
+                    break;
                 default:
                     $('#wait').hide();
                     break;
@@ -350,6 +350,21 @@
 
 
         }
+
+        const getEscort_SCB = (data) => {
+            $('#wait').hide();
+            let escort = JSON.parse(data.d);
+
+            swal(`${escort.DisplayName}`);
+        }
+
+        const getPEscort_ECB = (err) => {
+            $('#wait').hide();
+            swal("תקלה", "הבאת מלווה מבסיס הנתונים נכשלה", "error");
+            console.warn(err);
+        }
+
+
 
         const getPatient_SCB = (data) => {
             $('#wait').hide();
