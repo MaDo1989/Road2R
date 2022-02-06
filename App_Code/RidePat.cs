@@ -370,17 +370,15 @@ public class RidePat
 
     public int setRidePat(RidePat ridePat, string func, bool isAnonymous, int numberOfRides, string repeatRideEvery)
     {
-
-
         DateTime timeRightNow = DateTime.Now;
         DbService db = new DbService();
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
         SqlParameter[] cmdParams = new SqlParameter[10];
         bool sendMessage = true;
+
         try
         {
-            //HERE
             Pat = ridePat.Pat;
             Location origin = new Location();
             origin.Name = ridePat.Origin.Name;
@@ -389,9 +387,6 @@ public class RidePat
             Area = NEWCheckLocationForRidepatArea(origin.Name, destination.Name);
             Date = ridePat.Date;
             Coordinator = new Volunteer();
-
-
-
 
             Coordinator.DisplayName = ridePat.Coordinator.DisplayName;
             Remark = ridePat.Remark;
@@ -415,18 +410,16 @@ public class RidePat
 
         if (func == "new") //Insert new RidePat to DB
         {
-            //bool checkDaylightSaving = true;
-            DateTime newDate = new DateTime();
+            List<DateTime> listOfDatesAfterUTCfix = numberOfRides > 1 ?
+                BuildFutureRidesDates(Date, repeatRideEvery, numberOfRides)
+                : new List<DateTime>() { Date };
+
             for (int i = 0; i < numberOfRides; i++)
             {
+                ridePat.Date = listOfDatesAfterUTCfix[i];
+                cmdParams[3] = cmd.Parameters.AddWithValue("@date", listOfDatesAfterUTCfix[i]);
 
                 RidePat ridePatView = CheckRidePat_V2(ridePat, isAnonymous);
-                /* YOGEV - REPLACED IT: ↑↓ 
-                if (CheckRidePat(ridePat, isAnonymous))
-                {
-                    return 1;
-                }
-                */
 
                 if (ridePatView.RidePatNum != 0 && ridePatView.Status != "נמחקה" && !isAnonymous)
                 {
@@ -446,43 +439,10 @@ public class RidePat
                     return -1 * ridePatView.ridePatNum;
                 }
 
-
-
                 cmdParams[6] = cmd.Parameters.AddWithValue("@coordinator", Coordinator.DisplayName);
                 User u = new User();
                 string CoordinatorID = u.getIdByUserName(Coordinator.DisplayName);
                 cmdParams[8] = cmd.Parameters.AddWithValue("@coordinatorID", CoordinatorID);
-
-                #region THE OLD WAY WE DELT WITH TIMEZONE CHANGE YOGEV COMMENT IT OUT
-                //THE SOLUTION IS TO CONVERT THE CLIENT SIDE DATE TO UTC(0)
-                //PLUS IT CAME TO A POINT IT DOESNT WORK ANY MORE
-                /*
-                if (newDate != new DateTime() && checkDaylightSaving)
-                {
-                    bool DateDaylightSaving = Date.IsDaylightSavingTime();
-                    bool newDateDaylightSaving = newDate.IsDaylightSavingTime();
-
-                    if (DateDaylightSaving != newDateDaylightSaving)
-                    {
-                        if (DateDaylightSaving == true && newDateDaylightSaving == false)
-                        {
-                            newDate = newDate.AddHours(1);
-                            ridePat.Date = newDate;
-                            cmdParams[3] = cmd.Parameters.AddWithValue("@date", newDate);
-                            checkDaylightSaving = false;
-                        }
-                        else if (DateDaylightSaving == true && newDateDaylightSaving == false)
-                        {
-                            newDate = newDate.AddHours(-1);
-                            ridePat.Date = newDate;
-                            cmdParams[3] = cmd.Parameters.AddWithValue("@date", newDate);
-                            checkDaylightSaving = false;
-                        }
-                    }
-                }
-
-                */
-                #endregion
 
                 string query = "insert into RidePat (Patient,Origin,Destination,PickupTime,Coordinator,Remark,OnlyEscort,Area,CoordinatorId,lastModified) values (@pat,@origin,@destination,@date,@coordinator,@remark,@onlyEscort,@Area,@coordinatorID,@lastModified);SELECT SCOPE_IDENTITY();";
                 RidePatNum = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
@@ -512,27 +472,7 @@ public class RidePat
                         }
                     }
                 }
-                if (repeatRideEvery == "כל שבוע")
-                {
-                    if (i == 0)
-                    {
-                        newDate = Date.AddDays(7);
-                    }
-                    else newDate = newDate.AddDays(7);
 
-                    ridePat.Date = newDate;
-                    cmdParams[3] = cmd.Parameters.AddWithValue("@date", newDate);
-                }
-                else if (repeatRideEvery == "מספר ימים ברצף")
-                {
-                    if (i == 0)
-                    {
-                        newDate = Date.AddDays(1);
-                    }
-                    else newDate = newDate.AddDays(1);
-                    ridePat.Date = newDate;
-                    cmdParams[3] = cmd.Parameters.AddWithValue("@date", newDate);
-                }
             }
 
         }
@@ -543,25 +483,23 @@ public class RidePat
             //SET THE COORDINATOR NAME IN RIDEPAT TABLE TO THE LAST ONE WHO TOUCHED THIS RIDEPAT 
             ChangeCoordinatoor(RidePatNum);
 
-            //string query = "select Status from RidePat where RidePatNum=" + RidePatNum;
-            //Status = db.GetObjectScalarByQuery(query).ToString();
-            //if (Status != "ממתינה לשיבוץ" && !isAnonymous) throw new Exception("נסיעה זו כבר הוקצתה לנהג ואין אפשרות לערוך אותה");
-
             RidePat rpc = GetRidePat(RidePatNum);
             if (rpc.Pat.DisplayName == ridePat.Pat.DisplayName && rpc.Origin.Name == ridePat.Origin.Name && rpc.Destination.Name == ridePat.Destination.Name && rpc.Date.TimeOfDay == ridePat.Date.TimeOfDay)
             {
                 sendMessage = false;
             }
 
-            //string query = "select Status from RidePat where RidePatNum=" + RidePatNum;
-            //Status = db.GetObjectScalarByQuery(query).ToString();
-            //if (Status == "הגענו ליעד") throw new Exception("נסיעה זו כבר הגיעה ליעד ואין אפשרות לערוך אותה");
-
             cmdParams[6] = cmd.Parameters.AddWithValue("@ridePatNum", RidePatNum);
 
             cmdParams[8] = cmd.Parameters.AddWithValue("@coordinatorID", -1); //THIS IS JUST SO YOU DONT GET EXCEPTION
 
-            var query = "update RidePat set Patient=@pat,Origin=@origin,Destination=@destination,PickupTime=@date,Remark=@remark,OnlyEscort=@onlyEscort,Area=@Area,lastModified=@lastModified where RidePatNum=@ridePatNum";
+            string query = "update RidePat set Patient=@pat,Origin=@origin,Destination=@destination,PickupTime=@date,Remark=@remark,OnlyEscort=@onlyEscort,Area=@Area,lastModified=@lastModified where RidePatNum=@ridePatNum ";
+            query += "DECLARE @RIDEID INT = (select RideId from RidePat where RidePatNum=@ridePatNum) ";
+            query += "if (select RideNum from ride where RideNum=@RIDEID) is not null ";
+            query += "begin ";
+            query += "update ride set Origin=@origin, Destination=@destination where RideNum=@RIDEID ";
+            query += "end";
+
             int res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
 
             if (res > 0)
@@ -601,12 +539,6 @@ public class RidePat
             Ride r = new Ride();
             RidePat rp = GetRidePat(RidePatNum);
 
-            //DateTime timeRightNow = DateTime.Now;
-            //if (Date > timeRightNow)
-            //{
-            //    //paam
-            //}
-
             if (isAnonymous && Pat.DisplayName.IndexOf("אנונימי") == -1 && (Date > timeRightNow))
             {
 
@@ -626,9 +558,7 @@ public class RidePat
                 }
             }
 
-            //   InformAllConnectedClientsAboutChnagesInThisRidepat();
             return RidePatNum;
-            //return res;
         }
         else if (func == "delete")
         {
@@ -686,6 +616,37 @@ public class RidePat
 
         return RidePatNum;
 
+    }
+
+    private List<DateTime> BuildFutureRidesDates(DateTime date, string repeatRideEvery, int numberOfRides)
+    {
+        List<DateTime> listOfDatesAfterUTCfix = new List<DateTime>();
+        listOfDatesAfterUTCfix.Add(date);
+        DateTime firstDate = date;
+
+        DateTime dateAfterIncrement;
+        for (int i = 1; i < numberOfRides; i++)
+        {
+            dateAfterIncrement = repeatRideEvery == "כל שבוע" ? date.AddDays(7) : date.AddDays(1);
+            listOfDatesAfterUTCfix.Add(dateAfterIncrement);
+            date = listOfDatesAfterUTCfix[i];
+        }
+
+        TimeZoneInfo israelTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Israel Standard Time");
+        bool isFirstRideDateDayLightSaving = israelTimeZone.IsDaylightSavingTime(firstDate);
+
+        for (int i = 1; i < listOfDatesAfterUTCfix.Count; i++)
+        {
+            if (isFirstRideDateDayLightSaving && !israelTimeZone.IsDaylightSavingTime(listOfDatesAfterUTCfix[i]))
+            {
+                listOfDatesAfterUTCfix[i] = listOfDatesAfterUTCfix[i].AddHours(1);
+            }
+            else if (!isFirstRideDateDayLightSaving && israelTimeZone.IsDaylightSavingTime(listOfDatesAfterUTCfix[i]))
+            {
+                listOfDatesAfterUTCfix[i] = listOfDatesAfterUTCfix[i].AddHours(-1);
+            }
+        }
+        return listOfDatesAfterUTCfix;
     }
     public bool IsThereAnotherRidePat(RidePat rp)
     {
@@ -990,7 +951,7 @@ public class RidePat
     }
 
 
-    //This method is used for שבץ אותי
+    //This method is used for שבץ אותי in mobile app & manageRidepats
     public List<RidePat> GetRidePatView(int volunteerId, int maxDays) //VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
     {
 
@@ -1160,8 +1121,7 @@ public class RidePat
                         rp.pat.Equipment.Add(row.ItemArray[0].ToString());
                     }
 
-                    rp.pat.EscortedList = new List<Escorted>(); //this is have no logic sence! BUT due to fucked up mobile app  it has to stay
-                    //↓↑ yogev switched that↓↑
+                    rp.pat.EscortedList = new List<Escorted>();
                     rp.Escorts = new List<Escorted>();
                     string escortSearchExpression = "RidePatNum = " + rp.ridePatNum;
                     DataRow[] escortRow = escortTable.Select(escortSearchExpression);
@@ -1174,8 +1134,8 @@ public class RidePat
                         e.CellPhone = row["CellPhone"].ToString();
                         e.IsAnonymous = String.IsNullOrEmpty(row["IsAnonymous"].ToString()) ? false : true;
                         rp.Escorts.Add(e);
-                        rp.pat.EscortedList.Add(e); //this is have no logic sence! BUT due to fucked up mobile app it has to stay
-                        //↓↑ yogev switched that↓↑
+                        rp.pat.EscortedList.Add(e);
+
                     }
 
                     Location origin = new Location();
@@ -1198,6 +1158,10 @@ public class RidePat
                     rp.Shift = dr["Shift"].ToString();
                     rp.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
                     rp.Status = dr["Status"].ToString();
+
+                    bool result;
+                    Boolean.TryParse(dr["OnlyEscort"].ToString(), out result);
+                    rp.OnlyEscort = result;
 
                     rp.LastModified =
                                        String.IsNullOrEmpty(dr["lastModified"].ToString()) ? null :
@@ -2156,8 +2120,8 @@ finally
     /// </summary>
     private void ChangeCoordinatoor(int ridePatNum)
     {
-        string loggedInName = (string)HttpContext.Current.Session["loggedInName"];
-
+        string loggedInName = String.IsNullOrEmpty((string)HttpContext.Current.Session["loggedInName"]) ? "sessionWasEmpty" :
+            FixApostrophe((string)HttpContext.Current.Session["loggedInName"]);
 
         string query = "exec spRidePat_ChangeCoordinatorName @coordinatorName=N'" + loggedInName + "', @RidePatNum=" + ridePatNum;
         SqlCommand cmd = new SqlCommand();
@@ -2174,6 +2138,10 @@ finally
 
     }
 
+    private string FixApostrophe(string strWithChopchick)
+    {
+        return strWithChopchick.Replace("'", "''");
+    }
 
     private void BroadCast2Clients_driverHasAssigned2RidePat(RidePat rp)
     {
