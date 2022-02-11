@@ -1550,7 +1550,7 @@ public class WebService : System.Web.Services.WebService
         catch (Exception ex)
         {
             Log.Error("Error in getDestinationView", ex);
-            throw new Exception("שגיאה בשליפת נקודות איסוף והורדה");
+            throw new Exception("שגיאה בשליפת נקודות איסוף והורדה " + ex.Message);
         }
     }
 

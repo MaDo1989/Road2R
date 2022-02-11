@@ -388,7 +388,8 @@
             addSeperator2MobileNum,
             convertDBDate2FrontEndDate,
             getHoursGap,
-            convert2DBDateToInt
+            convert2DBDateToInt,
+            getHebrew_WeekDay
 
         } = GENERAL.USEFULL_FUNCTIONS;
 
@@ -1074,7 +1075,7 @@
             let isAfterNoon = jsDate.getMinutes() === 14;
             let isToday = table.context[0].sTableId === "datatable-afternoon" || table.context[0].sTableId === "datatable-morning";
 
-            const date2copy = isToday ? 'היום' : `בתאריך ${jsDate.toLocaleString('he-IL', { dateStyle: 'short' })}`;
+            const date2copy = isToday ? 'היום' : `בתאריך ${jsDate.toLocaleString('he-IL', { dateStyle: 'short' })} ${getHebrew_WeekDay(jsDate.getDay())}`;
             const time2copy = isAfterNoon ? ` אחה"צ` : ` בשעה ${jsDate.toLocaleString('he-IL', { timeStyle: 'short' })} `
 
             let textMessageToCopy = `שלום ${ridepat.Drivers[0]?.DisplayName ?? 'נהג'},`;
@@ -1087,8 +1088,38 @@
             textMessageToCopy += date2copy;
             textMessageToCopy += time2copy;
             textMessageToCopy += `\n`;
-            textMessageToCopy += `תודה ונסיעה טובה`;
+            textMessageToCopy += `תודה ונסיעה טובה.`;
+            textMessageToCopy += `\n`;
 
+            if (validateMobileNumFullVersion(ridepat.Pat.CellPhone)) {
+                textMessageToCopy += `לנוחיותך מצורף פרטים ליצירת קשר`;
+                textMessageToCopy += `\n`;
+                textMessageToCopy += `${ridepat.Pat.DisplayName}: `;
+                textMessageToCopy += addSeperator2MobileNum(ridepat.Pat.CellPhone, "-");
+                textMessageToCopy += `\n`;
+            }
+
+            let numOfEscorts = ridepat.Escorts.length;
+            if (numOfEscorts > 0) {
+
+
+                ridepat.Escorts.map((es, i) => {
+                    if (validateMobileNumFullVersion(es.CellPhone)) {
+
+                        if (!validateMobileNumFullVersion(ridepat.Pat.CellPhone) && i == 0) {
+
+                            textMessageToCopy += `לנוחיותך מצורף פרטים ליצירת קשר`;
+                            textMessageToCopy += `\n`;
+                        }
+
+
+                        textMessageToCopy += `${es.DisplayName}: `;
+                        textMessageToCopy += addSeperator2MobileNum(es.CellPhone, "-");
+                        textMessageToCopy += `\n`;
+
+                    }
+                });
+            }
 
             navigator.clipboard.writeText(textMessageToCopy)
                 .then(function () {
@@ -1498,7 +1529,7 @@
                     xhr.setRequestHeader("Content-Encoding", "gzip");
                 },
                 type: "POST",
-                data: JSON.stringify({ volunteerId: volunteerId, maxDays: 15 }),
+                data: JSON.stringify({ volunteerId: volunteerId, maxDays: 7 }),
                 success: function (data) {
                     $('#wait').hide();
                     arr_rides = JSON.parse(data.d);

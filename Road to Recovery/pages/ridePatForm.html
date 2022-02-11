@@ -1314,7 +1314,8 @@
                         return resolve(1);
                     },
                     error: function (err) {
-                        alert("Error in generateLocation");
+                        alert("Error in generateLocation" + err.responseText);
+                        console.log(err);
                         return reject(0);
                     }
                 });

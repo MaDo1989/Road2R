@@ -1,95 +1,5 @@
-﻿/*NEW CODE WHICH EXIST IN TEST AND YET EXIST IN PROD*/
-
-
-
-CREATE procedure [dbo].[spEscorted_GetEscortById]
-@id int
-as 
-begin 
-	SET NOCOUNT ON; 
-	select * from Escorted where Id=@id
-end 
-GO
-
-CREATE procedure  [dbo].[spEscorted_ChangeLastUpdateBy]  
-		@lastUpdateBy nvarchar(255),  
-		@id int   
-		as 
-		begin  
-			update Escorted  
-			set LastUpdateBy=@lastUpdateBy 
-			where Id=@id  
-		end    
-GO
-
-ALTER TABLE Escorted  ADD LastUpdateBy nvarchar(255)
-GO
-/**/
- CREATE  trigger [dbo].[EscortedTrigger_AFTER_UPDATE_LOGGER]
-   on [dbo].[Escorted] for update  as 
-   BEGIN 
-		SET NOCOUNT ON; 
-		create table #updatedCols (Id int identity(1, 1), updateCol nvarchar(500)) 
-		--find all columns names that were updated and write them to temp table  
-		
-		insert into #updatedCols (updateCol)   
-		select   
-		column_name    
-		from     
-		information_schema.columns    
-		where         
-		table_name = 'Escorted'  
-		and convert(varbinary, reverse(columns_updated())) & power(convert(bigint, 2), ordinal_position - 1) > 0    
-		
-		--temp tables are used because inserted and deleted tables are not available in dynamic SQL
-			select top 1 * into #tempInserted from inserted order by Id
-			select top 1 * into #tempDeleted from deleted order by Id  
-			 
-		declare @counter int = 1     
-		declare @n int       
-		declare @columnName nvarchar(255)    
-		declare @query nvarchar(1000)      
-		declare @lastUpdateBy nvarchar(255) set @lastUpdateBy = (select LastUpdateBy from #tempInserted); 
-		
-		if CHARINDEX('''',@lastUpdateBy) > 0 
-			begin
-				set @lastUpdateBy =
-				SUBSTRING(@lastUpdateBy,1, charindex('''', @lastUpdateBy) - 1)
-				+ '''''' + -- this is wil converts into two '
-				SUBSTRING(@lastUpdateBy, charindex('''', @lastUpdateBy) + 1, len(@lastUpdateBy))
-			end
-		declare @Id nvarchar(255) set @Id = CAST((select Id from #tempInserted) AS NVARCHAR);    
-		select @n = count(*) from #updatedCols  
-
-	----execute insert statement for each updated column     
-		while @counter <= @n    
-			
-			begin   
-			select @columnName = updateCol from #updatedCols where id = @counter  
-			if(@columnName <> 'LastUpdateBy')
-				begin     
-					set @query ='IF(isnull(CAST((select d.' + @columnName + ' from #tempDeleted d) AS NVARCHAR), ''(null)'')  
-					<> 
-					isnull(CAST((select i.' + @columnName + ' from #tempInserted i) AS NVARCHAR), ''(null)'')) 
-						BEGIN     
-							insert into LogTable_AutoTrackChanges (WhoChanged, TableName, Recorde_UniqueId, ColumnName, OldValue, Newvalue)     
-							values (N''' + @lastUpdateBy + ''', ''Escorted'',' + @Id + ', ''' + @columnName + '''            , 
-								CASE 
-									WHEN isnull(CAST((select d.' + @columnName + ' from #tempDeleted d) AS NVARCHAR), ''(null)'') = ''?????? ??????'' 
-										THEN ''(null)''  
-									ELSE      
-									isnull(CAST((select d.' + @columnName + ' from #tempDeleted d) AS NVARCHAR), ''(null)'')      
-								END      
-							, isnull(CAST((select i.' + @columnName + ' from #tempInserted i) AS NVARCHAR), ''(null)''))
-						END';   
-					exec sp_executesql @query  
-				end 
-				set @counter = @counter + 1 
-			end  
-		END  
-	--© YOGEV ©-- 
-	-------------  
-GO
+﻿
+/*NEW CODE WHICH EXIST IN TEST AND YET EXIST IN PROD*/
 
 --remove nulls from the column "lastupdateby"
     update  
@@ -101,18 +11,11 @@ GO
 	where LastUpdateBy is null   )
 	GO
 
-	    create procedure  spEscorted_ChangeLastUpdateBy  
-		@lastUpdateBy nvarchar(255),  
-		@id int   
-		as 
-		begin  
-			update Escorted  
-			set LastUpdateBy=@lastUpdateBy 
-			where Id=@id  
-		end    
-GO
 
-create procedure spVolunteer_GetActiveVolunteers_NotDriversYet 
+
+
+	/*exist in server, yet exist in client - I dont think it is nessecery to deploy it*/
+CREATE PROCEDURE spVolunteer_GetActiveVolunteers_NotDriversYet 
 @daysSinceJoin int  as  
 	BEGIN 
 		select * from volunteer 
@@ -141,12 +44,10 @@ as
 	and	IsActive=1
 	and	not exists (select distinct MainDriver from ride where MainDriver is not null and maindriver=v.id)
 END
-
 GO
-
-/*ADD REGION MODEL (COMMON GENERAL PATH)*/
-
 /**************************************************************************************DO NOT DEPLOY IT YET ↓*/
+
+/*ADD R ENERAL PATH)*/
 --1. CREATE TABLE REGION
 CREATE TABLE Region
 (
@@ -179,7 +80,7 @@ values
 ( N'באר שבע')
 GO
 
---3. add column RegionId FK to Region to location table
+--3. add column RegionId FK to RegionTable in locationTable
 	ALTER TABLE Location
     ADD RegionId int,
     FOREIGN KEY(RegionId) REFERENCES Region(id);
@@ -336,7 +237,7 @@ GO
 -- =============================================
 -- Author:      Yogev Strauber
 -- Create Date: January 12 2022
--- Description: fetches all location with their region
+-- Description: fetches all location with their region 
 -- =============================================
 CREATE PROCEDURE spGetAllLocation
 (
@@ -355,87 +256,12 @@ GO
 
 
 /**************************************************************************************DO NOT DEPLOY IT YET ↑*/
-
---decrease NoOfDocumentedRides in case of mark ridepat as deleted
-ALTER trigger [dbo].[RidePatRideTrigger]
-on [dbo].[RidePat]for update,insert
-as
-
-begin
-	declare @RPid int = (select Top 1 RidePatNum from inserted)
-	declare @time datetime = CURRENT_TIMESTAMP
-	declare @Rid int
-		if (select top 1 RideId from inserted) is not null --case there is a driver
-			set @Rid = (select top 1 RideId from inserted)
-		else
-			set @Rid = (select top 1 RideId from RidePat where RidePatNum=@RPid) --Q - DOESNT IT ALWAYS BE NULL ??
--- © ↓YOGEV↓ ©--
-		if (select RideID from RidePat where RidePatNum=@RPid) is not null --case there is a driver 
-			begin
-				if (select Status from RidePat where RidePatNum=@RPid) = N'נמחקה'
-					begin --change ridepat status when there is a driver  
-				
-						--step 1 check if need to update driver (case drive is in the future)
-						--if yes ==> fetch the maindriver (aka volenteer ID) & Coordinator
-						if (select PickupTime from RidePat where RideId = @Rid) > @time
-							begin
-							SELECT r.MainDriver, v.DisplayName, v.pnRegId--, rp.CoordinatorID
-							from ride r inner join volunteer v on r.MainDriver = v.Id 
-							where r.RideNum = @Rid
-							end 
-
-						--step 2 decrease NoOfDocumentedRides
-						update volunteer set NoOfDocumentedRides -= 1 where Id = (select MainDriver from Ride where RideNum = @Rid)
-
-						--step 3 DEACTIVATE RidePat FK TO RIDE
-						update RidePat set RideId = null where RidePatNum = @RPid
-								
-						--step 4 DEACTIVATE RidePat FK TO status_Ride
-						delete status_Ride where RideRideNum = @Rid
-									
-						--step 5 delete ride (can not be done with out the first two steps)
-						--delete ride where RideNum = @Rid
-
-						--FINALLY can change ridepat status 
-						update RidePat set status = N'נמחקה' where RidePatNum = @RPid
-						--IN RIDE update TRIGER THE STATUS CHANGING TO SOMETHING ELSE AND THAT IS THE REASON NEEDED TO HANDLE THE CHANGE HERE AGAIN
-					end
--- © ↑YOGEV↑ ©--
--- ALON: כרגע ביטלנו (מהקליינט) את האפשרות שיהיה סטטוס 'אין נסיעת הלוך' ולכן השורות שמתחת להערה זו לא יכנסו לפעולה באף סיטואציה.
-				else if (select Status from RidePat where RidePatNum=@RPid) = N'אין נסיעת הלוך'
-					begin
-						update RidePat set Status=N'אין נסיעת הלוך ויש נהג משובץ' where RidePatNum=@RPid
-					end
-				else
-					begin
-						update RidePat set Status=(select TOP 1 statusStatusName from status_Ride where RideRideNum=@Rid order by [Timestamp] desc) where RideId=@Rid
-					end
-			end
--- © ↓YOGEV↓ ©--
-		else if (select Status from RidePat where RidePatNum=@RPid) = N'נמחקה'
-			begin
-				update RidePat set Status=N'נמחקה' where RidePatNum=@RPid
-			end
---IN RIDE update TRIGER THE STATUS CHANGING TO SOMETHING ELSE AND THAT IS THE REASON NEEDED TO HANDLE THE CHANGE HERE AGAIN
--- © ↑YOGEV↑ ©--
-		else if (select Status from RidePat where RidePatNum=@RPid) <> N'אין נסיעת הלוך' 
-			begin
-				update RidePat set Status=N'ממתינה לשיבוץ' where RidePatNum=@RPid
-			end
-end
-GO
-
-CREATE procedure 
-[dbo].[spEscorted_ToggleIsActive]
-
-@isActive bit, 
-@id int 
-as 
-begin   
-UPDATE Escorted
-SET IsActive=@isActive 
-WHERE Id=@id
-end 
+/*DO NOT DEPLOY IT YET*/
+-- =============================================
+-- Author:      <Benny Bornfeld>
+-- Create Date: <5-sep-2021 >
+-- Description: <get candidates for rides >
+-- =============================================
 
 /****** Object:  StoredProcedure [dbo].[spGetRideCandidates]    Script Date: 12/3/2021 12:11:18 PM ******/
 SET ANSI_NULLS ON
@@ -443,33 +269,6 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
---allign NoOfDocumentedRides TWO STEPS
---DO NOT FORGET TO BACKUP VOLUNTEER TABLE !!!
---STEP 1 GETE INTO A TEMP TABLE THE ISSUED ONES
-select max(v.Id) as V_Id,
-max(v.NoOfDocumentedRides) as V_NoOfDocumentedRides_notGood,
-Count(*) as V_NoOfDocumentedRides_real
-into #volunteersToUpdate_NoOfDocumentedRides
-from ridepat rp
-inner join ride r on rp.rideid=r.ridenum
-inner join volunteer v on v.Id=r.maindriver
-group by r.maindriver
-having max(v.NoOfDocumentedRides) <> Count(*)
-GO
-
---STEP 2 UPDATE VOLUNTEER
-update volunteer
-set NoOfDocumentedRides = (select V_NoOfDocumentedRides_real from #volunteersToUpdate_NoOfDocumentedRides where volunteer.Id =V_Id)
-where exists (select * from #volunteersToUpdate_NoOfDocumentedRides where volunteer.Id =V_Id)
-
-GO
-
--- =============================================
--- Author:      <Benny Bornfeld>
--- Create Date: <5-sep-2021 >
--- Description: <get candidates for rides >
--- =============================================
-/*DO NOT DEPLOY IT YET*/
 CREATE PROCEDURE [dbo].[spGetRideCandidates]
 (
 	@RidePatNum AS INT
@@ -595,54 +394,7 @@ update volunteer
 								and exists (select * from ridepat where RideId=RideNum))
 GO
 
-/*
-cases when:
-r.Destination <> rp.Destination
-or
-r.Origin <> rp.Origin
-*/
---YOU HAVE TO DEACTIVATE [RideUpdateTrigger] BEFORE RUN THIS UPDATE!!!
-select * into ride_backUp_PUTDATEHERE from ride
-GO
-update ride
-set
-Origin	    = (select top 1 Origin from ridepat where RideId = RideNum),
-Destination = (select top 1 Destination from ridepat where RideId = RideNum)
-where exists (
-				select rideNum from ridepat rp
-				inner join ride r
-				on r.ridenum = rp.rideid
-				where 
-				(r.Origin <> rp.Origin or r.destination <> rp.destination)
-				and
-				ride.ridenum=r.ridenum
-)
 
-GO
-
---TEST 
-select *
-from ride r inner join ridepat rp
-on rp.RideId=r.RideNum
-where
-r.Destination <> rp.Destination
-or
-r.Origin <> rp.Origin
-GO
-
-/*in case of messed up ridepat*/
-update ride_backUp_2021_12_16
-set Origin=N'תרקומיא', destination=N'שיבא'
-where ridenum=xxx
-GO
-
-delete ridepat 
-where ridepatnum=xxx
-GO
-
-delete  [PatientEscort_PatientInRide (RidePat)]
-where [PatientInRide (RidePat)RidePatNum] = 50
-GO
 
 -- =============================================
 -- Author:      Yogev Strauber
