@@ -1528,7 +1528,7 @@
                     xhr.setRequestHeader("Content-Encoding", "gzip");
                 },
                 type: "POST",
-                data: JSON.stringify({ volunteerId: volunteerId, maxDays: 15 }),
+                data: JSON.stringify({ volunteerId: volunteerId, maxDays: 7 }),
                 success: function (data) {
                     $('#wait').hide();
                     arr_rides = JSON.parse(data.d);
