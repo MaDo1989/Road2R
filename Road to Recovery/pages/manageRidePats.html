@@ -1066,8 +1066,35 @@
         function copyMessageButton(copyMsgBtn, table) {
             let ridePatNum = parseInt(copyMsgBtn.id);
 
+            let additionalPatients = '';
+            let additionalInfo = '';
+
 
             const ridepat = arr_rides.find((r) => r.RidePatNum === ridePatNum);
+
+            const onlyRidepatsWithDriver = arr_rides.filter(r => r.Drivers.length > 0);
+
+
+            let additionalRidesForSameDriver = arr_rides.filter((r) => {
+                return (
+                    r.Destination.Name === ridepat.Destination.Name &&
+                    r.Origin.Name === ridepat.Origin.Name &&
+                    r.Drivers[0].Id === ridepat.Drivers[0].Id &&
+                    r.Date === ridepat.Date &&
+                    r.RidePatNum != ridepat.RidePatNum
+                )
+            });
+
+            if (additionalRidesForSameDriver.length > 0) {
+
+                additionalPatients += ', '
+                additionalRidesForSameDriver.map((r, i) => {
+
+                    additionalPatients += r.Pat.DisplayName;
+                    additionalPatients += i !== additionalRidesForSameDriver.length - 1 ? ', ' : '';
+
+                });
+            }
 
             let jsDate = convertDBDate2FrontEndDate(ridepat.Date);
 
@@ -1079,7 +1106,7 @@
 
             let textMessageToCopy = `שלום ${ridepat.Drivers[0]?.DisplayName ?? 'נהג'},`;
             textMessageToCopy += `\n`;
-            textMessageToCopy += `יש לאסוף את ${ridepat.Pat.DisplayName}`;
+            textMessageToCopy += `יש לאסוף את ${ridepat.Pat.DisplayName}` + additionalPatients;
             textMessageToCopy += `\n`;
             textMessageToCopy += `מ${ridepat.Origin.Name} `;
             textMessageToCopy += `ולהסיע אל ${ridepat.Destination.Name} `;
