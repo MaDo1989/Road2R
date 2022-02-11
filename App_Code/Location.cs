@@ -248,6 +248,11 @@ public class Location
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
 
+        if (ds == null)
+        {
+            throw new Exception("failed to read list of locations");
+        }
+
         SqlCommand cmd2 = new SqlCommand();
         cmd2.CommandType = CommandType.Text;
         SqlParameter[] cmdParams2 = new SqlParameter[1];
