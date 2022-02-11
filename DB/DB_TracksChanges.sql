@@ -1,20 +1,12 @@
 ﻿
 /*NEW CODE WHICH EXIST IN TEST AND YET EXIST IN PROD*/
 
---remove nulls from the column "lastupdateby"
-    update  
-	Patient --Escorted --Volunteer 
-	set LastUpdateBy = N'אדמין מערכת' 
-	where id in   (  
-	select id from RidePat
-	--Patient --Escorted --Volunteer   
-	where LastUpdateBy is null   )
-	GO
 
 
 
 
-	/*exist in server, yet exist in client - I dont think it is nessecery to deploy it*/
+/*DO NOT DEPLOY IT YET*/
+
 CREATE PROCEDURE spVolunteer_GetActiveVolunteers_NotDriversYet 
 @daysSinceJoin int  as  
 	BEGIN 
@@ -28,7 +20,6 @@ CREATE PROCEDURE spVolunteer_GetActiveVolunteers_NotDriversYet
 	END
 	GO
 
-/*DO NOT DEPLOY IT YET*/
 CREATE procedure [dbo].[spVolunteer_GetActiveVolunteers_NotDriversYet] 
 @daysSinceJoin int
 as
@@ -49,209 +40,17 @@ GO
 
 /*ADD R ENERAL PATH)*/
 --1. CREATE TABLE REGION
-CREATE TABLE Region
-(
-	Id int primary key identity(1,1),
-	RegionName nvarchar(255) not null
-)
-GO
 
---2. INSERT VALUES TO TABLE REGION
 
-INSERT INTO Region (RegionName)
-values
-( N'עזה'),
-( N'תרקומיא'),
-( N'אשדוד'),
-( N'רחובות'),
-( N'תל אביב'),
-( N'מודיעין'),
-( N'ירושלים - מערב'),
-( N'ירושלים - מזרח'),
-( N'בית לחם'),
-( N'מעלה אפריים'),
-( N'אריאל'),
-( N'טייבה'),
-( N'חדרה'),
-( N'חיפה'),
-( N'ג''למה'),
-( N'נהריה'),
-( N'בית שאן'),
-( N'באר שבע')
-GO
 
---3. add column RegionId FK to RegionTable in locationTable
-	ALTER TABLE Location
-    ADD RegionId int,
-    FOREIGN KEY(RegionId) REFERENCES Region(id);
-GO
 
---4. HELP TABLE TO UPDATE LOCATION TABLE
-CREATE TABLE LOCATION_NAMEANDREGIONID(
-RegionName nvarchar(250),
-RegionId int
-)
-GO
---5. INSERT VALUES BASED ON AMIRS TABLE
-insert into LOCATION_NAMEANDREGIONID (RegionName, RegionId)
-values
-(N'תרקומיא',2),
-(N'תל גיבורים חולון',5),
-(N'תל אביב',5),
-(N'תאנים',12),
-(N'שערי צדק',7),
-(N'שער אפרים',12),
-(N'שיבא',5),
-(N'שדה חמד',5),
-(N'רעות שד'' החיל 2 ת"א',5),
-(N'רמת ישי',15),
-(N'רמלה',4),
-(N'רמב"ם',14),
-(N'רכבת תל אביב',5),
-(N'ריחן',13),
-(N'ראש העין',6),
-(N'קרית גת',2),
-(N'קפלן',4),
-(N'קלנדיה',7),
-(N'קוכליאר',5),
-(N'צומת ראם (מסמיה)',4),
-(N'צומת אריאל',11),
-(N'פרדס חנה',13),
-(N'ענתא',8),
-(N'עזריאלי',5),
-(N'סנג''ון',8),
-(N'סינימה גלילות',5),
-(N'סטלה מאריס',14),
-(N'סביון',5),
-(N'נקודת אמצע',5),
-(N'נק'' אמצע - סיום',5),
-(N'נק'' אמצע - התחלה',5),
-(N'נק'' אמצע',5),
-(N'נען',3),
-(N'נעלין',6),
-(N'ניצני עוז',12),
-(N'נחלים',5),
-(N'נהריה',16),
-(N'מתן',12),
-(N'מרכז - מוצא',5),
-(N'מרכז',5),
-(N'מר יוסיף',8),
-(N'מצודת יהודה',18),
-(N'מענית',13),
-(N'מעבר אלנבי',10),
-(N'מכללת רופין',13),
-(N'מכון מאר ירושלים',7),
-(N'מכבים',6),
-(N'מיתר',18),
-(N'מוקסד',8),
-(N'מבשרת ציון',7),
-(N'מאר יוסף',8),
-(N'מאיר',5),
-(N'לניאדו',12),
-(N'לטרון - מוצא',6),
-(N'לטרון - יעד',6),
-(N'לוינשטיין',5),
-(N'להבות חביבה',13),
-(N'ל"ה',9),
-(N'כרם שלום',1),
-(N'כפר קרע',13),
-(N'כפר קאסם',6),
-(N'כפר אזר',5),
-(N'ירושלים',8),
-(N'יעד אורטופדיה תל גיבורים 5 ת"א',5),
-(N'חשמונאים',6),
-(N'חיפה',14),
-(N'חורשים',12),
-(N'חוצה שומרון',12),
-(N'חוסאן',9),
-(N'חדרה',13),
-(N'ורדיזר חיפה מרפאת עיניים',14),
-(N'וולפסון',5),
-(N'השרון פתח תקוה',5),
-(N'הפרחים',12),
-(N'הלל יפה',13),
-(N'הדסה הר הצופים',7),
-(N'הדסה',7),
-(N'הבקעה',17),
-(N'דומא',10),
-(N'גן שמואל מוצא',13),
-(N'גן שמואל יעד',13),
-(N'גן שמואל',13),
-(N'גן השומרון',13),
-(N'גלבוע (ג''למה)',15),
-(N'גבעתיים',5),
-(N'גבעת חביבה',13),
-(N'ג''יב',8),
-(N'ברזילי',3),
-(N'בקה אל גרביה יציאה',13),
-(N'בקה אל גרביה חזרה',13),
-(N'בני ציון חיפה',14),
-(N'בית לחם',9),
-(N'בית לוינשטיין',5),
-(N'בית חולים כרמל',14),
-(N'בית חולים הצרפתי',15),
-(N'בית אפק ר"ג',5),
-(N'בילינסון ושניידר',5),
-(N'בטוח לאומי נתניה',13),
-(N'באקה אל גרביה',13),
-(N'באב אל עמוד',8),
-(N'אשקלון',4),
-(N'אשדוד העיר',3),
-(N'אריאל',11),
-(N'ארז',1),
-(N'אסף הרופא',4),
-(N'אסותא אשדוד',3),
-(N'אסותא',5),
-(N'אלין ירושלים',7),
-(N'אליהו',12),
-(N'אל נג''אח',12),
-(N'אל מקאסד',8),
-(N'איקאה נתניה',13),
-(N'איכילוב',5),
-(N'אייל בדרך לבי"ח',12),
-(N'אייל',12),
-(N'אוגוסטה ויקטוריה',8),
-(N'אוגוסטה',8),
-(N'אג''נדה',13)
-GO
 
---6. UPDATE LOCATION BASED ON THAT TABLE
-update Location
-set RegionId=(select RegionId from LOCATION_NAMEANDREGIONID where RegionName=Name)
-GO
---7. DROP LOCATION_NAMEANDREGIONID
-DROP TABLE LOCATION_NAMEANDREGIONID
-GO
 
---8. create procedure spGetAllRegions
-create procedure spGetAllRegions
-	as
-	set nocount on
-	begin
-		select * from Region
-	end
-GO
---9. create procedure spGetAllLocation @active=0/1
 
-/*ADD REGION MODEL (COMMON GENERAL PATH)*/
--- =============================================
--- Author:      Yogev Strauber
--- Create Date: January 12 2022
--- Description: fetches all location with their region 
--- =============================================
-CREATE PROCEDURE spGetAllLocation
-(
-	@isActive bit
-)
-AS
-BEGIN
-    SET NOCOUNT ON
 
-		SELECT L.*, R.RegionName
-		FROM Location L INNER JOIN Region R ON L.RegionId=R.Id
-		WHERE IsActive=@isActive
-END
-GO
+
+
+
 
 
 
@@ -396,133 +195,6 @@ GO
 
 
 
--- =============================================
--- Author:      Yogev Strauber
--- Description: Fetches the region name of a given location
--- Date:		January 21 2022
--- =============================================
-CREATE   FUNCTION [dbo].[SVF_GET_REGION_NAME]
-(
-    -- Add the parameters for the function here
-	@LOCATION_NAME NVARCHAR(100)
-)
-RETURNS NVARCHAR(100)
-AS
-BEGIN
-    ---- Declare the return variable here
-	DECLARE @REGION_NAME AS NVARCHAR(100)
-
-    ---- Add the T-SQL statements to compute the return value here
-	SELECT @REGION_NAME = (SELECT RegionName FROM Region WHERE Id = (SELECT RegionId FROM Location WHERE Name=@LOCATION_NAME))
-
-    ---- Return the result of the function
-	RETURN @REGION_NAME ;
-END
-GO
 
 
-ALTER procedure [dbo].[spVolunteerTypeView_GetVolunteersList]
 
-@IsActive bit
-as
-begin
-select r.MainDriver, r.Origin, r.Destination into #tempNotDeletedOnly from  ridepat rp
-inner join ride r
-on r.RideNum=rp.RideId
-
-if (@IsActive = 0)
-	begin
-				select *, (select count(*)
-					from ridepat rp inner join ride r
-					on rp.rideid=r.ridenum
-					where r.maindriver = vtv.Id
-					and pickuptime between DATEADD(Month, -2, GETDATE()) and  GETDATE()) as NumOfRides_last2Months
-					,
-					(
-				select origin + '-'+destination from
-													(
-														select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
-														where t.MainDriver = id
-														group by maindriver, origin, destination
-														order by numberOfTimesDrove desc
-														) t
-					) mostCommonPath,
-					( 
-				select dbo.SVF_GET_REGION_NAME(
-					(
-				select origin from
-									(
-										select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
-										where t.MainDriver = id
-										group by maindriver, origin, destination
-										order by numberOfTimesDrove desc
-										) t)
-									 )
-				 ) AS mostCommonRegionalOrigin,
-				 				( 
-	select dbo.SVF_GET_REGION_NAME(
-				(
-				select destination from
-										(
-										select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
-										where t.MainDriver = id
-										group by maindriver, origin, destination
-										order by numberOfTimesDrove desc
-										) t)
-									 )
-				 ) AS mostCommonRegionalDestination
-		from VolunteerTypeView vtv
-		where IsActive = @IsActive or IsActive = 1
-		order by firstNameH
-
-	end
-else
-	begin
-	select *, (select count(*)
-					from ridepat rp inner join ride r
-					on rp.rideid=r.ridenum
-					where r.maindriver = vtv.Id
-					and pickuptime between DATEADD(Month, -2, GETDATE()) and  GETDATE()) as NumOfRides_last2Months
-					,
-					(
-				select origin + '-'+destination from
-													(
-														select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
-														where t.MainDriver = id
-														group by maindriver, origin, destination
-														order by numberOfTimesDrove desc
-														) t
-					) mostCommonPath,
-					( 
-				select dbo.SVF_GET_REGION_NAME(
-					(
-				select origin from
-									(
-										select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
-										where t.MainDriver = id
-										group by maindriver, origin, destination
-										order by numberOfTimesDrove desc
-										) t)
-									 )
-				 ) AS mostCommonRegionalOrigin,
-				 				( 
-	select dbo.SVF_GET_REGION_NAME(
-				(
-				select destination from
-										(
-										select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
-										where t.MainDriver = id
-										group by maindriver, origin, destination
-										order by numberOfTimesDrove desc
-										) t)
-									 )
-				 ) AS mostCommonRegionalDestination
-		from VolunteerTypeView vtv
-		where IsActive = @IsActive
-		order by firstNameH
-	end
-
-	drop table #tempNotDeletedOnly 
-
-end
-GO
