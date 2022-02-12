@@ -463,6 +463,8 @@ public class Location
             l.managerPhones = dr2["Phone"].ToString();
            
         }
+        l.Region = new Region(Convert.ToInt32(dr["RegionId"]));
+
         #endregion
 
         return l;
