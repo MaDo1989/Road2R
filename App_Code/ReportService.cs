@@ -1184,15 +1184,19 @@ ORDER  BY MONTH_G, TYPE_G ASC";
 
         string query =
         @"select
-        FORMAT (PickupTime, 'MM-yy') As MONTH_C ,Origin , Destination, p.Hospital, p.Barrier, Volunteer.DisplayName, COUNT(*) AS COUNT_C
-        from RPView rp 
-        INNER JOIN Patient p on rp.Id = p.Id
-        INNER JOIN Volunteer  ON rp.MainDriver=Volunteer.Id
-        where pickuptime > @start_date
-        AND pickuptime < @end_date " + 
-        condition  +
-        @" GROUP BY FORMAT (PickupTime, 'MM-yy'), Origin , Destination, p.Hospital, p.Barrier, Volunteer.DisplayName
-        order by MONTH_C ASC";
+            FORMAT (PICKUP_TIME_C, 'MM-yy') AS MONTH_C, Origin , Destination, HOSPITAL_C, BARRIER_C, DISPLAY_NAME_C, count(*) AS COUNT_C
+            from 
+            (  select rp.PickupTime AS PICKUP_TIME_C, Origin , Destination, p.Hospital AS HOSPITAL_C, p.Barrier AS BARRIER_C , Volunteer.DisplayName AS DISPLAY_NAME_C
+	            FROM RPView rp 
+	            INNER JOIN Patient p on rp.Id = p.Id
+	            INNER JOIN Volunteer  ON rp.MainDriver=Volunteer.Id
+	            where pickuptime > @start_date
+                AND pickuptime < @end_date " +
+                condition +
+                @" GROUP BY rp.PickupTime, Origin , Destination, p.Hospital, p.Barrier, Volunteer.DisplayName
+            ) s
+            GROUP BY FORMAT (PICKUP_TIME_C, 'MM-yy'),  Origin , Destination, HOSPITAL_C, BARRIER_C , DISPLAY_NAME_C
+            order by MONTH_C ASC";
 
         SqlCommand cmd = new SqlCommand(query);
         cmd.CommandType = CommandType.Text;
@@ -1213,12 +1217,12 @@ ORDER  BY MONTH_G, TYPE_G ASC";
         foreach (DataRow dr in dt.Rows)
         {
             CenterPatientsRidesInfo obj = new CenterPatientsRidesInfo();
-            obj.Volunteer = dr["DisplayName"].ToString();
+            obj.Volunteer = dr["DISPLAY_NAME_C"].ToString();
             obj.Month = dr["MONTH_C"].ToString();
             obj.Origin = dr["Origin"].ToString();
             obj.Destination = dr["Destination"].ToString();
-            obj.Hospital = dr["Hospital"].ToString();
-            obj.Barrier = dr["Barrier"].ToString();
+            obj.Hospital = dr["HOSPITAL_C"].ToString();
+            obj.Barrier = dr["BARRIER_C"].ToString();
             obj.Count = dr["COUNT_C"].ToString();
             result.Add(obj);
         }
