@@ -1,6 +1,8 @@
 ﻿// Purpose: Dashboard UI for Amuta
 
-// next step - first note in GitHub Project Trello board - Dashboard column.
+
+window.is_debugging_dsb = false;
+window.full_loading = true;
 
 
 const CHART_COLORS = {
@@ -17,9 +19,16 @@ const CHART_COLORS = {
 function dashboard_hl_init() {
     $("#reports_content_div").hide();
     $("#dsb_hl_content_div").show();
-    start_daily_cards();
-    start_monthly_cards();
-    start_yearly_cards();
+    if (window.full_loading) {
+        start_daily_cards();
+        start_monthly_cards();
+        start_yearly_cards();
+    }
+    else {
+        // For fast debugging
+        start_month_graph(get_month_card("curr"));
+        start_one_month_row(get_month_card("curr"));
+    }
 }
 
 function start_daily_cards() {
@@ -177,6 +186,12 @@ function get_month_range(month_designator) {
         start_date: moment(dateObj).format("YYYY-MM-DD"),
         end_date: moment(endDate).format("YYYY-MM-DD")
     }
+    if (window.is_debugging_dsb) {
+        result = {
+            start_date: "2021-10-01",
+            end_date: "2021-10-31"
+        }
+    }
     return result;
 }
 
@@ -310,7 +325,9 @@ function start_month_graph(card_def) {
             // Schedule fetch for next data-set if needed.
             let next_card = get_month_card(card_def.next);
             if (next_card) {
-                start_month_graph(next_card);   // Not really recursive - called from incoming-data callback
+                if (window.full_loading) {
+                    start_month_graph(next_card);   // Not really recursive - called from incoming-data callback
+                }
             }
             result = data.d;
             render_month_graph(card_def, result);

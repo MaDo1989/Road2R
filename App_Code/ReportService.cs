@@ -582,7 +582,7 @@ GROUP BY inner_select.DisplayName
         MetricMonthlyInfo result = new MetricMonthlyInfo();
 
         DataRow dr = dt.Rows[0];
-        result.Rides = dr["COUNT_RIDES"].ToString();
+        result.Rides = dr["COUNT_UNIQUE_RIDES"].ToString();
         result.Patients = dr["COUNT_PAT"].ToString();
         result.Volunteers = dr["COUNT_VOL"].ToString();
 
@@ -592,7 +592,7 @@ GROUP BY inner_select.DisplayName
     internal MetricMonthlyInfo GetReportMonthlyDigestMetrics(string start_date, string end_date)
     {
         string query =
-             @"SELECT count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
+             @"SELECT count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
                 FROM  (
 	                select MainDriver  , PickupTime, Origin, Destination, DisplayName, 
 	                CASE WHEN ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) = '1' THEN 1
@@ -611,10 +611,17 @@ GROUP BY inner_select.DisplayName
     {
         // Gets info also on rides without an allocted driver
         string query =
-             @"SELECT count(DISTINCT DisplayName) as COUNT_PAT,  count(*) as COUNT_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
-               FROM RPView 
-               WHERE RPView.pickuptime > @start_date
-               AND RPView.pickuptime < @end_date";
+             @"SELECT   count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, count(DISTINCT MainDriver) as COUNT_VOL
+                FROM (
+	                Select  MainDriver  , PickupTime, Origin, Destination, DisplayName, 
+                    CASE WHEN ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) = '1' THEN 1
+	                    ELSE 0
+                    END AS Unique_Drive_C
+                    FROM RPView 
+                    WHERE  Status != N'נמחקה'
+                    AND RPView.pickuptime > @start_date
+                    AND RPView.pickuptime < @end_date
+                    ) s";
 
         return GetReportRangeDigestMetrics(start_date, end_date, query);
     }
@@ -624,13 +631,21 @@ GROUP BY inner_select.DisplayName
         DbService db = new DbService();
 
         string query =
-             @"SELECT  DAY(pickuptime) as DAY_C ,  count(DISTINCT DisplayName) as COUNT_PAT,  count(*) as COUNT_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
-               FROM RPView 
-               WHERE MainDriver is not null
-               AND RPView.pickuptime > @start_date
-               AND RPView.pickuptime < @end_date
-               GROUP BY DAY(pickuptime)
-               ORDER BY DAY_C ASC";
+             @"SELECT  DAY(pickuptime) as DAY_C ,  count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, count(DISTINCT MainDriver) as COUNT_VOL
+                FROM (
+	                Select  MainDriver  , PickupTime, Origin, Destination, DisplayName, 
+                    CASE 
+                        WHEN ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) = '1' THEN 1
+	                    ELSE 0
+                    END AS Unique_Drive_C
+                    FROM RPView 
+                    WHERE MainDriver is not null
+                    AND RPView.pickuptime > @start_date
+                    AND RPView.pickuptime < @end_date
+                ) s 
+            GROUP BY DAY(pickuptime)
+            ORDER BY DAY_C ASC					
+            ";
 
         SqlCommand cmd = new SqlCommand(query);
         cmd.CommandType = CommandType.Text;
@@ -646,7 +661,7 @@ GROUP BY inner_select.DisplayName
         {
             MetricMonthlyInfo obj = new MetricMonthlyInfo();
             obj.Day = dr["DAY_C"].ToString();
-            obj.Rides = dr["COUNT_RIDES"].ToString();
+            obj.Rides = dr["COUNT_UNIQUE_RIDES"].ToString();
             obj.Patients = dr["COUNT_PAT"].ToString();
             obj.Volunteers = dr["COUNT_VOL"].ToString();
             result.Add(obj);
