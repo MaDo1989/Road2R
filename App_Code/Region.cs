@@ -13,7 +13,10 @@ public class Region
         Id = id;
         Name = name;
     }
-
+    public Region(int id)
+    {
+        Id = id;
+    }
     public Region(){}
 
     public int Id { get; set; }

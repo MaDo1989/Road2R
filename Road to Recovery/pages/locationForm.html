@@ -144,6 +144,7 @@
                     $("#locationName").val(location.Name);
                     $("#locationName").attr('disabled', 'disabled');
                     $("#area").val(location.Area);
+                    $("#sub-area").val(location.Region.Id);
                     $("#remarks").val(location.Remarks);
                     $("#phone1").val(location.ManagerPhones);
                     if (location.IsActive) {
@@ -174,6 +175,17 @@
             });
         }
 
+        const compareFunc = (a, b) => {
+
+            if (a.Name < b.Name) {
+                return -1;
+            }
+            if (a.Name > b.Name) {
+                return 1;
+            }
+            return 0;
+        }
+
         const getSubAreas = () => {
             ajaxCall('GetRegions', '', getSubAreas_SCB, getSubAreas_ECB);
         }
@@ -181,6 +193,7 @@
         const getSubAreas_SCB = (data) => {
 
             regions = JSON.parse(data.d);
+            regions.sort(compareFunc);
             let $select = $("#sub-area");
 
             for (var i = 0; i < regions.length; i++) {
@@ -418,6 +431,9 @@
         <!-- ============================================================== -->
         <!-- End page content here -->
         <!-- ============================================================== -->
+        <div id="wait">
+            <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
+        </div>
     </div>
     <!-- END wrapper -->
     <script>
