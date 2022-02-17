@@ -1285,22 +1285,6 @@ public class Volunteer
         }
     }
 
-
-
-
-    //public string KnowsArabic
-    //{
-    //    get
-    //    {
-    //        return KnowsArabic;
-    //    }
-
-    //    set
-    //    {
-    //        KnowsArabic = value;
-    //    }
-    //}
-
     public Volunteer()
     {
         //
@@ -1308,80 +1292,20 @@ public class Volunteer
         //
     }
 
-    //public Volunteer(string _firstNameH, string __firstNameA, string _lastNameH, string _lastNameA, string _cellPhone, string _cellPhone2, string _homePhone,
-    //    string _city, string _address, string _email, string _birthdate, string _joindate, string _status, string _gender, string _KnowsArabic,
-    //    string _preferRoute1, string _preferRoute2, string _preferRoute3, string _day1, string _day2, string _day3,
-    //    string _hour1, string _hour2, string _hour3, string _typeVol)
-    //{
-    //    FirstNameH = _firstNameH;
-    //    FirstNameA = __firstNameA;
-    //    LastNameH = _lastNameH;
-    //    LastNameA = _lastNameA;
-    //    CellPhone = _cellPhone;
-    //    CellPhone2 = _cellPhone2;
-    //    HomePhone = _homePhone;
-    //    City = _city;
-    //    Address = _address;
-    //    Email = _email;
-    //    Birthdate = _birthdate;
-    //    JoinDate = _joindate;
-    //    Status = _status;
-    //    Gender = _gender;
-    //    //PreferRoute1 = _preferRoute1;
-    //    //PreferRoute2 = _preferRoute2;
-    //    //PreferRoute3 = _preferRoute3;
-    //    //Day1 = _day1;
-    //    //Hour1 = _hour1;
-    //    //Day2 = _day2;
-    //    //Hour2 = _hour2;
-    //    //Day3 = _day3;
-    //    //Hour3 = _hour3;
-    //    TypeVol = _typeVol;
-    //    KnowsArabic = _KnowsArabic;
-    //}
-
-    //public Volunteer(string _displayName, string _firstNameA, string _firstNameH, string _lastNameH, string _lastNameA,
-    //string _cellPhone, string _cellPhone2, string _homePhone, string _city, string _street, string _typeVol, string _email, string _preferDay1,
-    //string _preferHour1, string _preferDay2, string _preferHour2, string _preferDay3, string _preferHour3, string _preferRoute1, string _preferRoute2,
-    //string _preferRoute3, string _joinDate, string _statusVolunteer, string _KnowsArabic, string _birthdate, string _gender)
-    //{
-    //    DisplayName = _displayName;
-    //    FirstNameH = _firstNameH;
-    //    FirstNameA = _firstNameA;
-    //    LastNameH = _lastNameH;
-    //    LastNameA = _lastNameA;
-    //    CellPhone = _cellPhone;
-    //    CellPhone2 = _cellPhone2;
-    //    HomePhone = _homePhone;
-    //    City = _city;
-    //    Address = _street;
-    //    Email = _email;
-    //    Birthdate = _birthdate;
-    //    JoinDate = _joinDate;
-    //    Status = _statusVolunteer;
-    //    Gender = _gender;
-    //    //PreferRoute1 = _preferRoute1;
-    //    //PreferRoute2 = _preferRoute2;
-    //    //PreferRoute3 = _preferRoute3;
-    //    //Day1 = _preferDay1;
-    //    //Hour1 = _preferHour1;
-    //    //Day2 = _preferDay2;
-    //    //Hour2 = _preferHour2;
-    //    //Day3 = _preferDay3;
-    //    //Hour3 = _preferHour3;
-    //    TypeVol = _typeVol;
-    //    KnowsArabic = _KnowsArabic;
-    //}
-
+    public Volunteer(int id, string displayName)
+    {
+        Id = id;
+        DisplayName = displayName;
+    }
+    public Volunteer(string _displayName)
+    {
+        DisplayName = _displayName;
+    }
     public Volunteer(string _firstNameH, string _lastNameH, string _cellPhone)
     {
         FirstNameH = _firstNameH;
         LastNameH = _lastNameH;
         CellPhone = _cellPhone;
-    }
-    public Volunteer(string _displayName)
-    {
-        DisplayName = _displayName;
     }
     public Volunteer(string _displayName, string _firstNameH, string _lastNameH, string _cellPhone)
     {

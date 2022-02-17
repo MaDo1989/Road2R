@@ -1,6 +1,8 @@
 ﻿checkCookie();
 let { convertDBDate2FrontEndDate, getHebrew_WeekDay } = GENERAL.USEFULL_FUNCTIONS;
-let { getRidePatNum4_viewCandidate } = GENERAL.RIDEPAT;
+//let { getRidePatNum4_viewCandidate } = GENERAL.RIDEPAT;
+let getRidePatNum4_viewCandidate = () => { return 26353;}//this is only temp
+
 let { ajaxCall } = GENERAL.FETCH_DATA;
 let thisRidePat;
 let { COPYWRITE } = GENERAL;
@@ -111,7 +113,7 @@ const fetchData4ThisRidepat = () => {
 
     let ridePatNum = JSON.parse(getRidePatNum4_viewCandidate());
     ajaxCall(
-        'GetRidePat',
+        'GetCandidates',
         JSON.stringify({ ridePatNum }),
         fetchData4ThisRidepat_SCB,
         fetchData4ThisRidepat_ECB
@@ -122,10 +124,15 @@ const fetchData4ThisRidepat_SCB = (data) => {
     thisRidePat = JSON.parse(data.d); //think if this variable should be global or local & pass throw this function below
 
     //temp ↓
+    console.log('%c ↓ R2R custom error ↓', 'background: green; color: white');
+
     console.log(thisRidePat);
+
+    console.log('%c ↑ R2R custom error ↑', 'background: green; color: white');
+
     //temp ↑
 
-    useRidePatData();
+    //useRidePatData();
 }
 
 const fetchData4ThisRidepat_ECB = (data) => {
