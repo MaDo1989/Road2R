@@ -1,101 +1,6 @@
 ﻿// Purpose: JS code for the reports UI
 
 
-
-// 24-Nov:  Avishai
-//1.  . מספר המתנדבים השונים שהסיעו בכל חודש בשנתיים האחרונות. 
-
-
-
-// 31-Oct-20:  Implement code after populating template_DATE_LATER_THAN, so that if radio group
-// is checked, we respect it and get all volunteers.
-// Set default date to 1/1/2020 
-
-
-//   GetRidePatViewByTimeFilter    ==>   All RIDES  
-
-// 020Oct : Shlomit Meler bug.
-/* 
- * This is teh code that returns empty results:
- * 
- *
- ReportService.cs :   getPickupForDriver() 
-    SELECT *
-    FROM RPView
-    WHERE  MainDriver = '18312'
-    ;
-
- I do not recall from where I copied it.
-
-need to read notes on what RPView is, and see where I copied it from.... 
-
-
-
-
-// --------------------------------------
-
-// Downhill Park:
-
-
-           
-             * */
-
-/* Perf analsysis
- 
-  http://localhost:54573/Road%20to%20Recovery/pages/WebService.asmx/GetRidePatView
-  
-    {"volunteerId":-2,"maxDays":-1}
- 
- RidePat.cs :  GetRidePatView() 
-    //VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
-
-
-pages\ridePatForm.html  loadPage :     if (JSON.parse(GENERAL.RIDEPAT.getRidePatList()).length != 0)
-    Does not look like anyone is using arr_customer for its actuall array.
-    But it does need to be a non-epty array for something to happen.
-    So it's enough to store just a non-empty array.
-
-
- * */
-
-
-
-// 05-07: Focus on reports content, Use UI as-is fix it later.
-//  ==> finish all services is the goal.
-
-// Park: 06-06 : working  on week picker by customizing datepicker
-// see comments at end of  populate_week_field() - need to fix it
-// Then we can start implement the repot of amute week
-
-
-// DEBUG:  We  use אלון שדה  &  בני בורנפלד
-// new report:   פר אזור: רשימת המתנדבים      "מתנדבים שבועי"
-// TODO:  Implement GetReportRidesWeeklyPerRegion() to call  getVolunteerRidesPerWeek() and return result as an array of volunteers
-// TODO: GetReportRidesWeeklyPerRegion() is just a copy of old code now, so need to cleanit up and set values in Vounteer structure
-// TODO:  for some numeric values we need to return.
-
-// TODO: Implement UI of teh " "מתנדבים שבועי  report
-
-// TODO: make sure report is per requirements: add missing fields of  , ק"ם
-// TODO: Fix export to PDF
-// TODO: Customize print table for RTL   https://datatables.net/forums/discussion/44355/i-was-able-to-right-align-my-print-layout-how-do-i-apply-that-to-individual-columns
-// TODO: Do the actual post in "Print"
-
-
-/* Internal notes 
- *   getContactType --> The relationship types - Father,Sister etc...
- *  
- *  RidePat.cs :  GetRidePatView()     
- *  Escorted e = new Escorted();
- *  -		ItemArray	{object[3]}	object[]
-		[0]	2123	object {int}
-		[1]	"אבו בודק בדיקה1"	object {string}
-		[2]	"0547298598"	object {string}
-
- *   Query is "select * from RidePatEscortView where RidePatNum = 2123 "
-
- * */
-
 /* Documentation:
  * For each report, we have different input fields.
  * 'K_fields_map' is a global map that lists the fields to be used for each report.
@@ -183,7 +88,7 @@ function on_report_click(event) {
  }
 
 
-// How to refresh the table, per each report type
+// How to refresh the table, per each report type  (Hooked into volunteer selection)
 var K_strategy = {
     "rp_vl_ride_month": rp_vl_ride_month__refresh_preview,
     "rp_vl_ride_year": rp_vl_ride_year__refresh_preview,
@@ -197,6 +102,7 @@ var K_strategy = {
     "rp_pil_vl_ride_recent_period": rp_pil_vl_ride_recent_period__refresh_preview,
     "rp_center_daily_by_month": rp_center_daily_by_month__refresh_preview,
     "rp_center_monthly_by_year": rp_center_monthly_by_year__refresh_preview,
+    "rp_center_patients_rides": empty_func,
 }
 
 
@@ -310,7 +216,48 @@ var K_fields_map = {
             template: 'div[name="template_YEAR"]',
             post_clone: rp_center_monthly_by_year__post_clone
         }
+    ],
+    "rp_center_patients_rides": [
+        {
+            id: "rp_patients_rides__volunteer",
+            template: 'div[name="template_VOLUNTEER"]',
+            type: "VOLUNTEER",
+            post_clone: field_volunteers_post_clone
+        },
+        {
+            id: "rp_patients_rides__month_start",
+            template: 'div[name="template_MONTH_START"]',
+            type: "MONTH",
+            post_clone: empty_func
+        },
+        {
+            id: "rp_patients_rides__month_end",
+            template: 'div[name="template_MONTH_END"]',
+            type: "MONTH",
+            post_clone: rp_center_patients_rides__post_clone
+        },
+        {
+            id: "rp_patients_rides__hospital",
+            template: 'div[name="template_HOSPITAL"]',
+            type: "HOSPITAL",
+            post_clone: field_hospitals_post_clone
+        },
+        {
+            id: "rp_patients_rides__barrier",
+            template: 'div[name="template_BARRIER"]',
+            type: "BARRIER",
+            post_clone: field_barriers_post_clone
+        },
+        {
+            id: "rp_patients_rides__barrier",
+            template: 'div[name="template_GENERATE_REPORT"]',
+            type: "GENERATE_REPORT",
+            post_clone: field_generate_report_post_clone
+        }
+
+
     ]
+
 
     
  }
@@ -451,7 +398,9 @@ function clone_template(template, parent_id) {
 
 var K_CACHE = {
     volunteers: [],
-    patients: []
+    patients: [],
+    hospitals: [],
+    barriers: []
 };
 
 
@@ -507,13 +456,92 @@ function on_volunteer_selected(event, ui) {
     refreshPreview();
     return true;
 }
-// called when the async ajax call to laod volunteers has finished
+// called when the async ajax call to load volunteers has finished
 // Used to populate UI needing the volunteers list
 function populate_volunteer_field() {
     $("#select_driver").autocomplete({
         source: K_CACHE.volunteers,
         select: on_volunteer_selected
         });
+}
+
+// on_load_hospitals called when the async ajax call  has finished
+// Used to populate UI needing the hospitals list
+function loadHospitals(on_load_hospitals) {
+
+    if (K_CACHE.hospitals.length > 1) {
+        // One time loading already done.
+        on_load_hospitals();
+        return;
+    }
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportHospitals",
+        contentType: "application/json; charset=utf-8",
+        type: "POST",
+        async: true,
+        success: function (data) {
+            var hospitals = data.d;
+            hospitals.sort();
+            K_CACHE.hospitals = hospitals;
+            on_load_hospitals();
+        },
+        error: function (err) { alert("Error in loadHospitals"); }
+    });
+}
+
+
+function on_hospital_selected(event, ui) {
+    $("#" + event.target.id).val(ui.item.value);
+    return true;
+}
+
+function populate_hospital_field() {
+     $("#select_hospital").autocomplete({
+        source: K_CACHE.hospitals,
+        select: on_hospital_selected
+    });
+    
+}
+
+
+function loadBarriers(on_load_barriers) {
+
+    if (K_CACHE.barriers.length > 1) {
+        // One time loading already done.
+        on_load_barriers();
+        return;
+    }
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportBarriers",
+        contentType: "application/json; charset=utf-8",
+        type: "POST",
+        async: true,
+        success: function (data) {
+            var barriers = data.d;
+            barriers.sort();
+            K_CACHE.barriers = barriers;
+            on_load_barriers();
+        },
+        error: function (err) { alert("Error in loadBarriers"); }
+    });
+}
+
+
+function on_barrier_selected(event, ui) {
+    $("#" + event.target.id).val(ui.item.value);
+    return true;
+}
+
+function populate_barrier_field() {
+    $("#select_barrier").autocomplete({
+        source: K_CACHE.barriers,
+        select: on_barrier_selected
+    });
+
 }
 
 function get_last_month_date() {
@@ -523,12 +551,15 @@ function get_last_month_date() {
     return prev_month;
 }
 
+
+function my_show_month_field(a) {
+    console.log("HERE", a);
+}
 function populate_month_field(is_last_month) {
-    
+
     var dt = $('#select_month').datepicker({
         format: "MM yyyy",
         minViewMode: 1,
-        onClose: function () { console.log("populate_month_field()::onClose; Does not work, maybe due to duplicate IDS??"); },
         autoclose: true
     });
     if (is_last_month) {
@@ -540,7 +571,35 @@ function populate_month_field(is_last_month) {
         dt.datepicker('setDate', new Date());
     }
     dt.on("changeDate", refreshPreview);
+    // dt.on("show", my_show_month_field);
 }
+
+function populate_month_range_fields(start_date, end_date, refresh_callback) {
+
+    var dt_start = $('#select_month_start').datepicker({
+        format: "MM yyyy",
+        minViewMode: 1,
+        autoclose: true
+    });
+    dt_start.datepicker('setDate', start_date);
+    dt_start.on("changeDate", refresh_callback);
+
+    var dt_end = $('#select_month_end').datepicker({
+        format: "MM yyyy",
+        minViewMode: 1,
+        autoclose: true
+    });
+    dt_end.datepicker('setDate', end_date);
+    dt_end.on("changeDate", refresh_callback);
+
+    let start_date_boundary = "01 2019";
+    dt_start.datepicker('setStartDate', start_date_boundary);
+    dt_end.datepicker('setStartDate', start_date_boundary);
+    let end_date_boundary = moment(end_date).format("MM yyyy");
+    dt_start.datepicker('setEndDate', end_date_boundary);
+    dt_end.datepicker('setEndDate', end_date_boundary);
+}
+
 
 function field_month_post_clone(id) {
     populate_month_field(true);
@@ -564,7 +623,7 @@ function rp_amuta_vls_per_km_field_year_post_clone(id) {
 
 function rp_amuta_vls_list_field_radio_post_clone(id) {
     var today = new Date();
-    $('#select_date_later').val("2021-01-01");
+    $('#select_date_later').val("2022-01-01");
     $("#select_date_later").change(rp_amuta_vls_list__refresh_preview);
 
     $("#ck_only_with_rides").change(rp_amuta_vls_list__refresh_preview);
@@ -599,6 +658,18 @@ function rp_add_one_parameter(def) {
 
 function field_volunteers_post_clone(id) {
     loadVolunteers(populate_volunteer_field);
+}
+
+function field_hospitals_post_clone(id) {
+    loadHospitals(populate_hospital_field);
+}
+
+function field_barriers_post_clone(id) {
+    loadBarriers(populate_barrier_field);
+}
+
+function field_generate_report_post_clone(id) {
+    $("#generate_report_period").click(rp_center_patients_rides__refresh_preview);
 }
 
 
@@ -902,6 +973,17 @@ function rp_center_monthly_by_year__post_clone(id) {
 
     rp_center_monthly_by_year__refresh_preview();
 }
+
+function rp_center_patients_rides__post_clone(id) {
+
+    // range - last 12 month.
+    let start_date = new Date();
+    start_date.setFullYear(start_date.getFullYear() - 1);
+    let end_date = new Date();
+    
+    populate_month_range_fields(start_date, end_date, empty_func);
+}
+
 
 function rp_pil_vls_per_month__refresh_preview() {
     var start_date, end_date;
@@ -1971,7 +2053,7 @@ function rp_center_monthly_by_year__refresh_table(start_date, end_date) {
 
     $.ajax({
         dataType: "json",
-        url: "ReportsWebService.asmx/GetReportCenteryMonthlyByYear",
+        url: "ReportsWebService.asmx/GetReportCenterMonthlyByYear",
         contentType: "application/json; charset=utf-8",
         beforeSend: function (xhr) {
             xhr.setRequestHeader("Content-Encoding", "gzip");
@@ -2045,6 +2127,144 @@ function rp_center_monthly_by_year__fix_records(records) {
 }
 
 
+// Checks if all fields are filled. If so refresh the report
+function rp_center_patients_rides__refresh_preview() {
+    var volunteerId = $("#select_driver").attr("itemID");
+    if (!volunteerId) {
+        volunteerId = "*";
+    }
+    var hospital = $("#select_hospital").val();
+    if (!hospital) {
+        hospital = "*";
+    }
+    var barrier = $("#select_barrier").val();
+    if (!barrier) {
+        barrier = "*";
+    }
+
+    // Parse dates, with fallback to default Jan'19 ==> Today
+    let start_date = Date.parse($("#select_month_start").val());
+    if (isNaN(start_date)) {
+        $("#select_month_start").val("January 2019");
+        start_date = Date.parse($("#select_month_start").val());
+    }
+    let end_date = Date.parse($("#select_month_end").val());
+    if (isNaN(end_date)) {
+        end_date = moment();
+        $("#select_month_end").val(end_date.format("MMMM YYYY"));
+    }
+
+    let start_moment = moment(start_date);
+    let end_moment = moment(end_date);
+    // use end of month, or current-date
+    end_moment.endOf("month");
+    end_moment = moment.min(end_moment, moment());
+
+    console.log(start_moment.format("YYYY-MM-DD"),
+        end_moment.format("YYYY-MM-DD"));
+
+    rp_center_patients_rides__refresh_Table(volunteerId, 
+        start_moment.format("YYYY-MM-DD"),
+        end_moment.format("YYYY-MM-DD"),
+        hospital, barrier
+    );
+}
+
+function rp_center_patients_rides__fix_records(arr) {
+    for (let entry of arr) {
+        let orig_str = entry.Month;
+        entry.Month = {
+            str: orig_str,
+            timestamp: new moment(orig_str, "DD/MM/YYYY", true).valueOf()
+        }
+    }
+}
+
+function rp_center_patients_rides__footer_row(row, data, start, end, display) {
+  //    console.log("footerCallback", row, start, end, display);
+    var api = this.api();
+    // Total over this page
+    pageTotal = api
+        .column(6, { page: 'current' })
+        .data()
+        .reduce(function (a, b) {
+            return +a + +b;
+        }, 0);
+    $("#center_patients_rides_footer_total").html(pageTotal);
+}
+
+
+function rp_center_patients_rides__refresh_Table(volunteerId, start_date, end_date, hospital, barrier) {
+    hide_all_tables();
+
+    $('#wait').show();
+    var query_object = {
+        volunteer: volunteerId,
+        start_date: start_date,
+        end_date: end_date,
+        hospital: hospital,
+        barrier: barrier
+    };
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportCenterPatientsRides",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            $('#wait').hide();
+            var records = data.d;
+
+            rp_center_patients_rides__fix_records(records);
+
+            $('#div_table_center_patients_rides').show();
+            tbl = $('#table_center_patients_rides').DataTable({
+                pageLength: 100,
+                bLengthChange: false,
+                data: records,
+                destroy: true,
+                "footerCallback": rp_center_patients_rides__footer_row,
+                "language": {
+                    "search": "חיפוש:"
+                },
+                columnDefs: [
+                    { "orderData": [0], "type": "num", "targets": 0 }],
+                columns: [
+                    {
+                        data: "Month",
+                        render: function (data, type, row) {
+                            if (type == "sort") {
+                                return (data.timestamp);
+                            }
+                            return data.str;
+                        }
+                    },
+                    { data: "Volunteer" },
+                    { data: "Origin" },
+                    { data: "Destination" },
+                    { data: "Hospital" },
+                    { data: "Barrier" },
+                    { data: "Count" },
+                ],
+                dom: 'Bfrtip',
+
+                buttons: [
+                    K_DataTable_CSV_EXPORT
+                ]
+            });
+        },
+        error: function (err) {
+            $('#wait').hide();
+        }
+
+    });
+
+}
+
 function hide_all_tables() {
     $('#div_weeklyRides').hide();
     $('#div_table_amuta_vls_week').hide();
@@ -2057,6 +2277,7 @@ function hide_all_tables() {
     $("#div_table_pil_vl_ride_recent_period").hide();
     $("#div_table_center_daily_by_month").hide();
     $("#div_table_rp_center_monthly_by_year").hide();
+    $("#div_table_center_patients_rides").hide();
  }
 
 
