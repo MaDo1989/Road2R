@@ -47,7 +47,9 @@ public class CandidatesLogic
                     Convert.ToBoolean(sdr["IsSuperDriver"]),
                     ammountOfPathMatch,
                     Convert.ToInt32(sdr["AmmountOfMatchByDay"]),
-                    Convert.ToInt32(sdr["AmmountOfDissMatchByDay"])
+                    Convert.ToInt32(sdr["AmmountOfDissMatchByDay"]),
+                    Convert.ToInt32(sdr["AmmountOfAfterNoonRides"]),
+                    Convert.ToInt32(sdr["AmmountOfMorningRides"])
                 );
                 candidates.Add(Convert.ToString(candidate.Id), candidate);
             }
