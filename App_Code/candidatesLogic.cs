@@ -63,7 +63,51 @@ public class CandidatesLogic
             dbs.CloseConnection();
         }
 
-        return candidates;
+        return FillExtraDetails(candidates);
     }
-   
+
+    public Dictionary<string, Candidate> FillExtraDetails(Dictionary<string, Candidate> candidates)
+    {
+        HashSet<string> ids = candidates.Select(i => i.Key).ToHashSet();
+        string query = "DECLARE @CandidatesIds [IntList] INSERT INTO @CandidatesIds VALUES";
+
+        foreach (string id in ids)
+        {
+            query += "(" + id + ")";
+            query += ids.Last() != id ? "," : "";
+        }
+
+        query += "exec spGetCandidatesDetails @IDs=@CandidatesIds";
+
+        try
+        {
+            dbs = new DbService();
+            SqlDataReader sdr = dbs.GetDataReader(query);
+            string idPointer;
+
+            while (sdr.Read())
+            {
+                idPointer = Convert.ToString(sdr["Id"]);
+                candidates[idPointer].CellPhone = Convert.ToString(sdr["CellPhone"]);
+                candidates[idPointer].DaysSinceLastRide = Convert.ToInt32(sdr["DaysSinceLastRide"]);
+                candidates[idPointer].NumOfRides_last2Months = Convert.ToInt32(sdr["NumOfRides_last2Months"]);
+                candidates[idPointer].DaysUntilNextRide = String.IsNullOrEmpty(sdr["DaysUntilNextRide"].ToString()) ? null :
+                                                          (int?)Convert.ToInt32(sdr["DaysUntilNextRide"]);
+                candidates[idPointer].LatestDocumentedCallDate = String.IsNullOrEmpty(sdr["LatestDocumentedCallDate"].ToString()) ? null :
+                                                                 (DateTime?)Convert.ToDateTime(sdr["LatestDocumentedCallDate"].ToString());
+                candidates[idPointer].SeniorityInYears = Convert.ToDouble(sdr["SeniorityInYears"]);
+            }
+
+            return candidates;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+        finally
+        {
+            dbs.CloseConnection();
+        }
+
+    }
 }

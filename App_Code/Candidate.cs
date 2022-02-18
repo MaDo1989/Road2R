@@ -7,12 +7,9 @@ using System.Web;
 /// <summary>
 /// Summary description for Candidate
 /// </summary>
-public class Candidate: Volunteer
+public class Candidate : Volunteer
 {
-    public Candidate()
-    {
-
-    }
+    public Candidate() { }
     public Candidate(int id, string displayName, bool isSuperDriver, List<int> ammountOfPathMatch,
                      int ammountOfMatchByDay, int ammountOfDissMatchByDay,
                      int ammountOfAfterNoonRides, int ammountOfMorningRides
@@ -32,5 +29,9 @@ public class Candidate: Volunteer
     public int AmmountOfDissMatchByDay { get; set; }
     public int AmmountOfAfterNoonRides { get; set; }
     public int AmmountOfMorningRides { get; set; }
+    public int DaysSinceLastRide { get; set; }
+    public int? DaysUntilNextRide { get; set; }
+    public DateTime? LatestDocumentedCallDate { get; set; }
+    public double SeniorityInYears { get; set; }
 
 }
