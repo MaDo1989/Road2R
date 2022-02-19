@@ -2181,16 +2181,46 @@ function rp_center_patients_rides__fix_records(arr) {
 }
 
 function rp_center_patients_rides__footer_row(row, data, start, end, display) {
-  //    console.log("footerCallback", row, start, end, display);
     var api = this.api();
-    // Total over this page
-    pageTotal = api
+    window.dbg = api;
+
+    // Do Totals over this page
+    let volunteers = new Set();
+    api
+        .column(1, { page: 'current' })
+        .data()
+        .reduce(function (acc, e) {
+            acc.add(e); return acc;
+        }, volunteers);
+    $("#center_patients_rides_footer_vol_page").html(volunteers.size);
+
+    let ridesPage = api
         .column(6, { page: 'current' })
         .data()
         .reduce(function (a, b) {
             return +a + +b;
         }, 0);
-    $("#center_patients_rides_footer_total").html(pageTotal);
+    $("#center_patients_rides_footer_rides_page").html(ridesPage);
+
+    // Do Totals over entire table
+    volunteers = new Set();
+    api
+        .column(1, { page: 'all' })
+        .data()
+        .reduce(function (acc, e) {
+            acc.add(e); return acc;
+        }, volunteers);
+    $("#center_patients_rides_footer_vol_total").html(volunteers.size);
+
+    let ridesTotal = api
+        .column(6, { page: 'all' })
+        .data()
+        .reduce(function (a, b) {
+            return +a + +b;
+        }, 0);
+    $("#center_patients_rides_footer_rides_total").html(ridesTotal);
+
+
 }
 
 
