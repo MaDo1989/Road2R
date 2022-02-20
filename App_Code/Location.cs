@@ -523,7 +523,7 @@ public class Location
 
             query = "update Location set Type=@type, Name=@name,";
             query += "Area=@area, Adress=@adress, IsActive=@IsActive, Remarks=@remarks, ";
-            query += "RegionId=@RegionId";
+            query += "RegionId=@RegionId,";
             query += "DestinationManager=@DestinationManager, CityCityName=@cityCityName,EnglishName=@EnglishName where Name=@name"; 
 
             res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
