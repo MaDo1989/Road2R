@@ -1,7 +1,7 @@
 ﻿checkCookie();
 let { convertDBDate2FrontEndDate, getHebrew_WeekDay } = GENERAL.USEFULL_FUNCTIONS;
 //let { getRidePatNum4_viewCandidate } = GENERAL.RIDEPAT;
-let getRidePatNum4_viewCandidate = () => { return 26353;}//this is only temp
+
 
 let { ajaxCall } = GENERAL.FETCH_DATA;
 let thisRidePat;
@@ -18,8 +18,15 @@ const wiringDataTables = () => {
 
 }
 
-$(document).ready(() => {
+
+function handleClick() {
     fetchData4ThisRidepat();
+
+}
+$(document).ready(() => {
+    $("#GetCandidatesBTN").click(handleClick);
+
+   
     $('#rights').html(COPYWRITE());
 
     if (!JSON.parse(localStorage.getItem("isProductionDatabase"))) {
@@ -111,7 +118,9 @@ $(document).ready(() => {
 
 const fetchData4ThisRidepat = () => {
 
-    let ridePatNum = JSON.parse(getRidePatNum4_viewCandidate());
+    //let ridePatNum = JSON.parse(getRidePatNum4_viewCandidate());
+    let ridePatNum =  $("#rideId").val();
+
     ajaxCall(
         'GetCandidates',
         JSON.stringify({ ridePatNum }),
