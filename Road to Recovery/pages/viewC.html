@@ -1,0 +1,134 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css">
+
+    <style type="text/css">
+
+        button {
+            margin-left: 10px;
+        }
+    </style>
+
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
+
+    <script>
+
+        $(document).ready(function () {
+
+            $("#GetCandidatesBTN").click(fetchData4ThisRidepat);
+
+        })
+
+        const fetchData4ThisRidepat = () => {
+
+            let ridePatNum = parseInt($("#rideId").val());
+
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/GetCandidates",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                async: false,
+                data: JSON.stringify({ ridePatNum: ridePatNum }),
+                success: function (data) {
+
+                    drawResults(JSON.parse(data.d));
+                    
+                },
+                error: function (err) {
+                    alert("Error in loginUser: " + err.responseText);
+                }
+            });
+        }
+
+
+        function drawResults(candidates) {
+
+            superVol = [];
+            vol = [];
+            for (k in candidates) {
+                v = {
+                    id: k,
+                    name: candidates[k].DisplayName,
+                    super: candidates[k].IsSuperDriver,
+                    afterNoonRides: candidates[k].AmmountOfAfterNoonRides,
+                    morningRides: candidates[k].AmmountOfMorningRides,
+                    sameDay: candidates[k].AmmountOfMatchByDay,
+                    otherDays: candidates[k].AmmountOfDissMatchByDay,
+                    otherAreas: candidates[k].AmmountOfPathMatch[0],
+                    sameAreas: candidates[k].AmmountOfPathMatch[1],
+                    areaToPoint: candidates[k].AmmountOfPathMatch[2],
+                    oppsiteDirection: candidates[k].AmmountOfPathMatch[3],
+                    pointToPoint: candidates[k].AmmountOfPathMatch[4]
+                }
+                vol.push(v);
+                //console.log(v);
+            }
+
+            tbl = $('#candidatesTbl').DataTable({
+                data: vol,
+                pageLength: 100,
+                columns: [
+                    { data: "id" },
+                    { data: "name" },
+                    { data: "super" },
+                    { data: "afterNoonRides" },
+                    { data: "morningRides" },
+                    { data: "sameDay" },
+                    { data: "otherDays" },
+                    { data: "otherAreas" },
+                    { data: "sameAreas" },
+                    { data: "areaToPoint" },
+                    { data: "oppsiteDirection" },
+                    { data: "pointToPoint" }
+                ]
+            });
+
+
+        }
+
+
+    </script>
+</head>
+<body>
+
+    <div>
+        <input type="number" id="rideId" />
+        <button id="GetCandidatesBTN">Get Candidates</button>
+    </div>
+
+    <table id="candidatesTbl" class="display nowrap" style="width:100%">
+        <thead>
+            <tr>
+                <th>מזהה</th>
+                <th>שם</th>
+                <th>סופר</th>
+                <th>אחה"צ</th>
+                <th>בוקר</th>
+                <th>ביום הזה</th>
+                <th>בימים אחרים</th>
+                <th>באיזורים אחרים</th>
+                <th>בין אותם איזורים</th>
+                <th>נקודה לאיזור</th>
+                <th>בכיוון ההפוך</th>
+                <th>אותו המסלול</th>
+            </tr>
+        </thead>
+    </table>
+
+</body>
+</html>
