@@ -2247,6 +2247,8 @@ function rp_center_patients_rides__refresh_Table(volunteerId, start_date, end_da
         data: JSON.stringify(query_object),
         success: function (data) {
             $('#wait').hide();
+            // Invoke another async ajax to get count of patients
+            rp_center_patients_rides__query_patients_count(query_object); 
             var records = data.d;
 
             rp_center_patients_rides__fix_records(records);
@@ -2294,6 +2296,23 @@ function rp_center_patients_rides__refresh_Table(volunteerId, start_date, end_da
     });
 
 }
+
+function rp_center_patients_rides__query_patients_count(query_object) {
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportCenterPatientsRidesCount",
+        contentType: "application/json; charset=utf-8",
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            $("#center_patients_rides_footer_pat_total").html(data.d);
+        },
+        error: function (err) {
+            $('#wait').hide();
+        }
+    });
+}
+
 
 function hide_all_tables() {
     $('#div_weeklyRides').hide();

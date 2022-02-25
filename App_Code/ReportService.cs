@@ -1160,27 +1160,54 @@ ORDER  BY MONTH_G, TYPE_G ASC";
     }
 
 
-    internal List<CenterPatientsRidesInfo> GetReportCenterPatientsRides(string volunteer, string start_date, string end_date,
-        string hospital, string barrier)
+    internal string build_condition_ReportCenterPatientsRides(string volunteer, string hospital, string barrier)
     {
-        DbService db = new DbService();
         string condition = "";
-        if ( !hospital.Equals("*") ) {
+        if (!hospital.Equals("*"))
+        {
             condition = "AND p.Hospital = @Hospital";
         }
         if (!barrier.Equals("*"))
         {
-            condition = condition + " AND p.Barrier = @Barrier";
+            condition += " AND p.Barrier = @Barrier";
         }
 
         if (volunteer.Equals("*"))
         {
-            condition = condition + " AND MainDriver is not null";
+            condition +=  " AND MainDriver is not null";
         }
         else
         {
-            condition = condition + " AND maindriver=@volunteerID";
+            condition += " AND maindriver=@volunteerID";
         }
+        return condition;
+    }
+
+
+    internal SqlCommand build_command_ReportCenterPatientsRides(string volunteer, string start_date, string end_date,
+        string hospital, string barrier)
+    {
+        SqlCommand cmd = new SqlCommand();
+        cmd.CommandType = CommandType.Text;
+        if (!volunteer.Equals("*"))
+        {
+            cmd.Parameters.Add("@volunteerID", SqlDbType.Int).Value = volunteer;
+        }
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+        cmd.Parameters.Add("@hospital", SqlDbType.NVarChar).Value = hospital;
+        cmd.Parameters.Add("@barrier", SqlDbType.NVarChar).Value = barrier;
+
+        return cmd;
+    }
+
+        internal List<CenterPatientsRidesInfo> GetReportCenterPatientsRides(string volunteer, string start_date, string end_date,
+        string hospital, string barrier)
+    {
+        DbService db = new DbService();
+        SqlCommand cmd = build_command_ReportCenterPatientsRides(volunteer, start_date, end_date, hospital, barrier);
+
+        string condition = build_condition_ReportCenterPatientsRides(volunteer, hospital, barrier);
 
         string query =
         @"select
@@ -1198,16 +1225,7 @@ ORDER  BY MONTH_G, TYPE_G ASC";
             GROUP BY FORMAT (PICKUP_TIME_C, 'MM-yy'),  Origin , Destination, HOSPITAL_C, BARRIER_C , DISPLAY_NAME_C
             order by MONTH_C ASC";
 
-        SqlCommand cmd = new SqlCommand(query);
-        cmd.CommandType = CommandType.Text;
-        if (!volunteer.Equals("*"))
-        {
-            cmd.Parameters.Add("@volunteerID", SqlDbType.Int).Value = volunteer;
-        }
-        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
-        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
-        cmd.Parameters.Add("@hospital", SqlDbType.NVarChar).Value = hospital;
-        cmd.Parameters.Add("@barrier", SqlDbType.NVarChar).Value = barrier;
+        cmd.CommandText = query;
 
         DataSet ds = db.GetDataSetBySqlCommand(cmd);
         DataTable dt = ds.Tables[0];
@@ -1227,6 +1245,32 @@ ORDER  BY MONTH_G, TYPE_G ASC";
             result.Add(obj);
         }
 
+        return result;
+    }
+
+
+    internal string GetReportCenterPatientsRidesCount(string volunteer, string start_date, string end_date,
+string hospital, string barrier)
+    {
+        DbService db = new DbService();
+        SqlCommand cmd = build_command_ReportCenterPatientsRides(volunteer, start_date, end_date, hospital, barrier);
+
+        string condition = build_condition_ReportCenterPatientsRides(volunteer, hospital, barrier);
+
+        string query =
+        @"select count(rp.Id) , count(DISTINCT rp.Id) AS PAT_COUNT
+          from RPView rp
+	      INNER JOIN Patient p on rp.Id = p.Id
+	      where pickuptime > @start_date
+	      AND pickuptime < @end_date  
+          " + condition;
+
+        cmd.CommandText = query;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        string result = dt.Rows[0]["PAT_COUNT"].ToString();
         return result;
     }
 
