@@ -63,7 +63,92 @@ public class CandidatesLogic
             dbs.CloseConnection();
         }
 
-        return FillExtraDetails(candidates);
+        // ADDED BY BENNY
+        // THE LOGIC OF CHOOSING CANDIDATES
+
+        Dictionary<string, Candidate> bestCandidates = selectBestCandidates(candidates,true);
+
+        return FillExtraDetails(bestCandidates);
+    }
+
+
+    private Dictionary<string, Candidate> selectBestCandidates(Dictionary<string, Candidate> candidates,bool rand) {
+
+        Dictionary<string, double> weights = new Dictionary<string, double>{
+            {"point2point",50 },
+            {"oposite",20 },
+            {"point2area",20 },
+            {"area2area",8 },
+            {"otherAears",2 },
+            {"routeWeight",0.7 },
+            {"sameDay", 40 },
+            {"DifferentDays",10 },
+            {"SameDayPart",40},
+            {"DifferentDayPart",10},
+            {"timeWeight", 0.3 }
+        };
+
+        Dictionary<string, Candidate> super  = new Dictionary<string, Candidate>();
+        Dictionary<string, Candidate> regular = new Dictionary<string, Candidate>();
+
+
+        // seperate them to super volunteers and regular
+        foreach (KeyValuePair<string, Candidate> kv in candidates) {
+            if (kv.Value.IsSuperDriver) super.Add(kv.Key, kv.Value);
+            else regular.Add(kv.Key, kv.Value);
+        }
+
+        Dictionary<string, double> superScore = calculateScore(super, weights);
+        Dictionary<string, double> regularScore = calculateScore(regular, weights);
+
+
+        Dictionary<string,double> topSuper = selectTop(superScore, 10);
+        Dictionary<string, double> topRegular = selectTop(regularScore, 10);
+
+        Dictionary<string, Candidate> topCandidates = new Dictionary<string, Candidate>();
+
+        foreach (KeyValuePair<string, double> kv in topSuper)
+            topCandidates.Add(kv.Key, candidates[kv.Key]);
+
+        foreach (KeyValuePair<string, double> kv in topRegular)
+            topCandidates.Add(kv.Key, candidates[kv.Key]);
+
+        return topCandidates;
+    }
+
+    private Dictionary<string,double> selectTop(Dictionary<string, double> scores, int num) {
+        var sortedDict = (from entry in scores orderby entry.Value descending select entry)
+            .ToDictionary(pair => pair.Key, pair => pair.Value).Take(num);
+
+        Dictionary<string, double> res = new Dictionary<string, double>();
+        foreach (KeyValuePair<string, double> kv in sortedDict) {
+            res.Add(kv.Key, kv.Value);
+        }
+        return res;
+    }
+
+    private Dictionary<string, double> calculateScore(Dictionary<string, Candidate> candidates, Dictionary<string, double> weights) {
+
+
+        Dictionary<string, double> score = new Dictionary<string, double>();
+
+        foreach (KeyValuePair<string, Candidate> kv in candidates)
+        {
+            Candidate c = kv.Value;
+            int totalDrives = c.AmmountOfAfterNoonRides + c.AmmountOfMorningRides; // I will use Mornings as the rightones
+            double routeScore = Math.Log(c.AmmountOfPathMatch[0] + 1 ,2) * weights["otherAears"] +
+                           Math.Log(c.AmmountOfPathMatch[1] + 1, 2) * weights["area2area"] +
+                           Math.Log(c.AmmountOfPathMatch[2] + 1, 2) * weights["point2area"] +
+                           Math.Log(c.AmmountOfPathMatch[3] + 1, 2) * weights["oposite"] +
+                           Math.Log(c.AmmountOfPathMatch[4] + 1, 2) * weights["point2point"];
+
+            double timeScore = Math.Log(c.AmmountOfMatchByDay + 1, 2) * weights["sameDay"] +
+                               Math.Log(c.AmmountOfDissMatchByDay + 1, 2) * weights["DifferentDays"] +
+                               Math.Log(c.AmmountOfMorningRides + 1, 2) * weights["SameDayPart"] +
+                               Math.Log(c.AmmountOfAfterNoonRides + 1, 2) * weights["DifferentDayPart"];
+            score.Add(kv.Key, routeScore * timeScore);
+        }
+        return score;
     }
 
     public Dictionary<string, Candidate> FillExtraDetails(Dictionary<string, Candidate> candidates)
@@ -112,3 +197,4 @@ public class CandidatesLogic
 
     }
 }
+ 

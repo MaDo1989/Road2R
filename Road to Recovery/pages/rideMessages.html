@@ -1,0 +1,132 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css">
+
+    <style type="text/css">
+
+        button {
+            margin-left: 10px;
+        }
+        #message {
+            direction:rtl
+        }
+    </style>
+
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
+
+    <script src="lib/master.js"></script>
+    <script src="lib/rideMessages.js"></script>
+
+    <script>
+
+        days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+
+        $(document).ready(function () {
+
+            $("#GetRidesBTN").click(fetchRides);
+            $("#chooseRide").click(showMessages);
+
+        })
+
+
+        const showMessages = () => {
+
+            let msg = "";
+            let ridePatNum = parseInt($("#rideId").val());
+            if (!isNaN(ridePatNum)) {
+                msg = showMessage(arr_rides,ridePatNum);
+                buildMessage(msg);
+            }
+            else { 
+                let onlyRidepatsWithDriver = arr_rides.filter(r => r.Drivers.length > 0);
+                for (var i = 0; i < onlyRidepatsWithDriver.length; i++) {
+                    console.log("RidePatNum: " + onlyRidepatsWithDriver[i].RidePatNum);
+                    msg = showMessage(arr_rides,onlyRidepatsWithDriver[i].RidePatNum);
+                    buildMessage(msg);
+                    }
+            }
+
+            
+        }
+
+
+
+
+        const fetchRides = () => {
+
+            volunteerId = -1;
+
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/GetRidePatView",
+                contentType: "application/json; charset=utf-8",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-Encoding", "gzip");
+                },
+                type: "POST",
+                async: false,
+                data: JSON.stringify({ volunteerId: volunteerId, maxDays: 7 }),
+                success: function (data) {
+                    arr_rides = JSON.parse(data.d);
+                    console.log("loaded " + arr_rides.length + " ridepats");
+                    $("#chooseRide").css("visibility", "visible");
+                    //console.log(arr_rides);
+                },
+                error: function (err) {
+                    alert("Error in GetRidePatView: " + err.responseText);
+                }
+            });
+        }
+
+
+
+
+    </script>
+</head>
+<body>
+
+    <div>
+
+        <button id="GetRidesBTN">Get Rides</button>
+        <br /><br /><br />
+        <input type="number" id="rideId" /> <button id="chooseRide" style="visibility:hidden">choose ride</button>
+    </div>
+    <div>
+        <p id="message"></p>
+    </div>
+
+    <!--<table id="candidatesTbl" class="display nowrap" style="width:100%">
+        <thead>
+            <tr>
+                <th>מזהה</th>
+                <th>שם</th>
+                <th>סופר</th>
+                <th>אחה"צ</th>
+                <th>בוקר</th>
+                <th>ביום הזה</th>
+                <th>בימים אחרים</th>
+                <th>באיזורים אחרים</th>
+                <th>בין אותם איזורים</th>
+                <th>נקודה לאיזור</th>
+                <th>בכיוון ההפוך</th>
+                <th>אותו המסלול</th>
+            </tr>
+        </thead>
+    </table>-->
+
+</body>
+</html>
