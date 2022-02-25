@@ -20,6 +20,8 @@ var S_refresh_preview = null;
 
 let S_HistoryTable = null;
 
+let K_DateFormat_DatePicker = "dd/mm/yyyy";
+let K_DateFormat_Moment = "DD/MM/YYYY";
 
 function init_reports_page() {
     includeHTML();
@@ -225,15 +227,15 @@ var K_fields_map = {
             post_clone: field_volunteers_post_clone
         },
         {
-            id: "rp_patients_rides__month_start",
-            template: 'div[name="template_MONTH_START"]',
-            type: "MONTH",
+            id: "rp_patients_rides__date_start",
+            template: 'div[name="template_DATE_START"]',
+            type: "DATE",
             post_clone: empty_func
         },
         {
-            id: "rp_patients_rides__month_end",
-            template: 'div[name="template_MONTH_END"]',
-            type: "MONTH",
+            id: "rp_patients_rides__date_end",
+            template: 'div[name="template_DATE_END"]',
+            type: "DATE",
             post_clone: rp_center_patients_rides__post_clone
         },
         {
@@ -599,6 +601,30 @@ function populate_month_range_fields(start_date, end_date, refresh_callback) {
     dt_start.datepicker('setEndDate', end_date_boundary);
     dt_end.datepicker('setEndDate', end_date_boundary);
 }
+
+function populate_date_range_fields(start_date, end_date, refresh_callback) {
+    var dt_start = $('#select_date_start').datepicker({
+        format: K_DateFormat_DatePicker,
+        autoclose: true
+    });
+    dt_start.datepicker('setDate', start_date);
+    dt_start.on("changeDate", refresh_callback);
+
+    var dt_end = $('#select_date_end').datepicker({
+        format: K_DateFormat_DatePicker,
+        autoclose: true
+    });
+    dt_end.datepicker('setDate', end_date);
+    dt_end.on("changeDate", refresh_callback);
+
+    let start_date_boundary = "01/01/2019";
+    dt_start.datepicker('setStartDate', start_date_boundary);
+    dt_end.datepicker('setStartDate', start_date_boundary);
+    let end_date_boundary = moment(end_date).format(K_DateFormat_Moment);
+    dt_start.datepicker('setEndDate', end_date_boundary);
+    dt_end.datepicker('setEndDate', end_date_boundary);
+}
+
 
 
 function field_month_post_clone(id) {
@@ -980,8 +1006,8 @@ function rp_center_patients_rides__post_clone(id) {
     let start_date = new Date();
     start_date.setFullYear(start_date.getFullYear() - 1);
     let end_date = new Date();
-    
-    populate_month_range_fields(start_date, end_date, empty_func);
+
+    populate_date_range_fields(start_date, end_date, empty_func);
 }
 
 
@@ -1672,7 +1698,7 @@ function update_date_field_for_sort(arr) {
     for (let entry of arr) {
         entry.Date = {
             str: build_date_with_dow_string(entry.Date),
-            timestamp : new moment(entry.Date, "DD/MM/YYYY", true).valueOf()
+            timestamp : new moment(entry.Date, K_DateFormat_Moment, true).valueOf()
         }
     }
 }
@@ -1757,7 +1783,7 @@ function refresh_amuta_vls_per_pat_Table(patient) {
 }
 
 function build_date_with_dow_string(in_date) {
-    var date = moment(in_date, "DD/MM/YYYY", true);
+    var date = moment(in_date, K_DateFormat_Moment, true);
     var HEBday = getDayString(date.day());
 
     var result = HEBday + " " + date.format("DD/MM/YY");
@@ -2016,7 +2042,7 @@ function rp_center_daily_by_month__fix_records(records, start_date_str) {
     let total_vols = 0, total_pats = 0;
 
     for (a_rec of records) {
-        let d = moment(a_rec.Date.split(" ")[0], "DD/MM/YYYY");
+        let d = moment(a_rec.Date.split(" ")[0], K_DateFormat_Moment);
         let day_in_month = d.date();
         let new_date_str = `${daysArr[d.day()]} - ${day_in_month}`;
         a_rec.Date = { Str: new_date_str, Index: day_in_month - 1 };
@@ -2143,25 +2169,21 @@ function rp_center_patients_rides__refresh_preview() {
     }
 
     // Parse dates, with fallback to default Jan'19 ==> Today
-    let start_date = Date.parse($("#select_month_start").val());
-    if (isNaN(start_date)) {
-        $("#select_month_start").val("January 2019");
-        start_date = Date.parse($("#select_month_start").val());
+    let start_moment = moment($("#select_date_start").val(), K_DateFormat_Moment);
+    if (!start_moment.isValid()) {
+        $("#select_date_start").val("01/01/2019");
+        start_moment = moment($("#select_date_start").val(), K_DateFormat_Moment);
     }
-    let end_date = Date.parse($("#select_month_end").val());
-    if (isNaN(end_date)) {
-        end_date = moment();
-        $("#select_month_end").val(end_date.format("MMMM YYYY"));
+    let end_moment = moment($("#select_date_end").val(), K_DateFormat_Moment); 
+    if (!end_moment.isValid()) {
+        end_moment = moment();
+        $("#select_date_end").val(end_moment.format(K_DateFormat_Moment));
     }
 
-    let start_moment = moment(start_date);
-    let end_moment = moment(end_date);
     // use end of month, or current-date
-    end_moment.endOf("month");
     end_moment = moment.min(end_moment, moment());
 
-    console.log(start_moment.format("YYYY-MM-DD"),
-        end_moment.format("YYYY-MM-DD"));
+    console.log(start_moment.format("YYYY-MM-DD"), end_moment.format("YYYY-MM-DD"));
 
     rp_center_patients_rides__refresh_Table(volunteerId, 
         start_moment.format("YYYY-MM-DD"),
@@ -2175,7 +2197,7 @@ function rp_center_patients_rides__fix_records(arr) {
         let orig_str = entry.Month;
         entry.Month = {
             str: orig_str,
-            timestamp: new moment(orig_str, "DD/MM/YYYY", true).valueOf()
+            timestamp: new moment(orig_str, K_DateFormat_Moment, true).valueOf()
         }
     }
 }
