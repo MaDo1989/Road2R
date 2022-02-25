@@ -96,6 +96,7 @@ public class CandidatesLogic
                 candidates[idPointer].LatestDocumentedCallDate = String.IsNullOrEmpty(sdr["LatestDocumentedCallDate"].ToString()) ? null :
                                                                  (DateTime?)Convert.ToDateTime(sdr["LatestDocumentedCallDate"].ToString());
                 candidates[idPointer].SeniorityInYears = Convert.ToDouble(sdr["SeniorityInYears"]);
+                candidates[idPointer].City = Convert.ToString(sdr["CityCityName"]);
             }
 
             return candidates;

@@ -151,7 +151,7 @@ GO
 -- Create Date: 18/02/2022
 -- Description: For given list of candidates's ids provided candidate details
 -- =============================================
-CREATE OR ALTER PROCEDURE spGetCandidatesDetails
+CREATE OR ALTER PROCEDURE [dbo].[spGetCandidatesDetails]
 (
 	@IDs [IntList] readonly
 )
@@ -162,7 +162,7 @@ BEGIN
     SET NOCOUNT ON
 
 
-SELECT Id, CellPhone, 
+SELECT Id, CellPhone, CityCityName,
   (SELECT top 1 DATEDIFF(DAY,Date,GETDATE()) from Ride where MainDriver=V.Id AND Date <= GETDATE() order by Date desc) DaysSinceLastRide,
 
   (SELECT COUNT(*)

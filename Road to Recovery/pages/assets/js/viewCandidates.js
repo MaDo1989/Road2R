@@ -1,11 +1,14 @@
 ﻿checkCookie();
 let { convertDBDate2FrontEndDate, getHebrew_WeekDay } = GENERAL.USEFULL_FUNCTIONS;
-//let { getRidePatNum4_viewCandidate } = GENERAL.RIDEPAT;
-
-
+let { getRidePatNum4_viewCandidate } = GENERAL.RIDEPAT;
 let { ajaxCall } = GENERAL.FETCH_DATA;
-let thisRidePat;
+let allCandidatedFromDB;
 let { COPYWRITE } = GENERAL;
+let candidatesTable;
+let regularCandidated_clientVersion = [];
+let superCandidated_clientVersion = [];
+let ridePatNum;
+
 
 const wiringDataTables = () => {
     //manage button clicks on tables
@@ -18,15 +21,16 @@ const wiringDataTables = () => {
 
 }
 
-
-function handleClick() {
-    fetchData4ThisRidepat();
-
-}
 $(document).ready(() => {
-    $("#GetCandidatesBTN").click(handleClick);
 
-   
+    candidatesTable = $('#datatable-candidates').DataTable({ data: [], destroy: true });
+    superDriversTable = $('#datatable-superDrivers').DataTable({ data: [], destroy: true });
+
+    ridePatNum = JSON.parse(getRidePatNum4_viewCandidate());
+    getCandidates();
+    getRidePat();
+
+
     $('#rights').html(COPYWRITE());
 
     if (!JSON.parse(localStorage.getItem("isProductionDatabase"))) {
@@ -53,54 +57,178 @@ $(document).ready(() => {
 
     }
     includeHTML();//with out this there is no side bar!
+});
+
+const getRidePat = () => {
+
+    let ridePatObj = localStorage.getItem(`ridePatObj_${ridePatNum}`);
+    renderRidePatDetails(JSON.parse(ridePatObj));
+}
+
+const renderRidePatDetails = (ridepat) => {
+    console.log(ridepat);
+    let ridepatDate = convertDBDate2FrontEndDate(ridepat.Date);
+    let isToday = isItToday(ridepatDate);
+    let isAfterNoon = ridepatDate.getMinutes() === 14;
 
 
-    //#region ↓DATATABLES PROPERTIES↓|
+    let ridePatDetails = `מ`;
+    ridePatDetails += ridepat.Origin.Name;
+    ridePatDetails += ' ';
+    ridePatDetails += `ל`;
+    ridePatDetails += ridepat.Destination.Name;
+    ridePatDetails += ' ';
+    ridePatDetails += isToday ? 'היום' : `ב` + getHebrew_WeekDay(ridepatDate.getDay());
+    ridePatDetails += ' ';
+    ridePatDetails += ridepatDate.getDate() + '/' + parseInt(ridepatDate.getMonth() + 1) + '/' + ridepatDate.getFullYear();
+    ridePatDetails += ' ';
+    ridePatDetails += isAfterNoon ? `אחה"צ` : `בשעה  ${ridepatDate.toLocaleString('he-IL', { timeStyle: 'short' })}`;
+    ridePatDetails += ' ';
+    ridePatDetails += 'מקומות: ' + parseInt(ridepat.Escorts.length + 1);
+    //ridePatDetails += ridepatDate.Equipment.length > 0 && ridepatDate.Equipment.includes(''); 
 
+    document.getElementById('RideCandidates_ph').innerHTML = ridePatDetails;
+}
 
-    /* 
-                 ============================
-                 || ↓DATATABLES PROPERTIES↓||
-                 ============================
-    */
-    candidatesTable = $('#datatable-candidates').DataTable(
-        {
-            "stateDuration": 60 * 60,
-            "columnDefs": []
-        },
-        {
-            "paging": false
-        },
-        {
-            "visible": false,
-            "targets": [1]
-        },
-        {
-            "className": "dt-body-left",
-            "targets": [3]
-        }
+const isItToday = (d) => {
+
+    let now = new Date(Date.now());
+    let daysMatch = d.getDate() === now.getDate();
+    let monthMatch = d.getMonth() === now.getMonth();
+    let yearMatch = d.getFullYear() === now.getFullYear();
+
+    let result = daysMatch && monthMatch && yearMatch;
+
+    return result;
+}
+
+const getCandidates = () => {
+
+    $('#wait').show();
+    ajaxCall(
+        'GetCandidates',
+        JSON.stringify({ ridePatNum }),
+        getCandidates_SCB,
+        getCandidates_ECB
     );
+}
 
+const getCandidates_SCB = (data) => {
+
+    $('#wait').hide();
+
+    allCandidatedFromDB = JSON.parse(data.d);
+    fillTableWithData();
+
+}
+
+const getCandidates_ECB = (data) => {
+
+    $('#wait').hide();
+
+    console.log('%c ↓ R2R custom error ↓', 'background: red; color: white');
+    console.log(data);
+    console.log('%c ↑ R2R custom error ↑', 'background: red; color: white');
+}
+
+const fillTableWithData = () => {
+
+    let thisCandidate = {};
+    regularCandidated_clientVersion = [];
+    superCandidated_clientVersion = [];
+    let date2display;
+
+    for (let i in allCandidatedFromDB) {
+
+        date2display = convertDBDate2FrontEndDate(allCandidatedFromDB[i].LatestDocumentedCallDate).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+
+        thisCandidate = {
+            id: i,
+            displayName: allCandidatedFromDB[i].DisplayName,
+            cellphone: allCandidatedFromDB[i].CellPhone,
+            city: allCandidatedFromDB[i].City,
+            daysSinceLastRide: allCandidatedFromDB[i].DaysSinceLastRide,
+            numOfRides_last2Months: allCandidatedFromDB[i].NumOfRides_last2Months,
+            daysUntilNextRide: allCandidatedFromDB[i].DaysUntilNextRide,
+            latestDocumentedCallDate: date2display,
+            seniorityInYears: allCandidatedFromDB[i].SeniorityInYears,
+            buttons: '',
+        }
+
+        allCandidatedFromDB[i].IsSuperDriver ?
+            superCandidated_clientVersion.push(thisCandidate) :
+            regularCandidated_clientVersion.push(thisCandidate);
+
+
+
+
+
+        //#region ↓DATATABLES PROPERTIES↓|
+
+        /* 
+                     ============================
+                     || ↓DATATABLES PROPERTIES↓||
+                     ============================
+        */
+    }
+    candidatesTable = $('#datatable-candidates').DataTable({
+        data: regularCandidated_clientVersion,
+        rowId: 'id',
+        pageLength: 10,
+        stateSave: true,
+        destroy: true,
+        stateDuration: 60 * 60,
+        autoWidth: false,
+        columns: [
+            //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
+            //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
+            { data: "displayName" },                                //0
+            { data: "cellphone" },                                  //1
+            { data: "city" },                                       //2
+            { data: "daysSinceLastRide" },                          //3
+            { data: "numOfRides_last2Months" },                     //4
+            { data: "daysUntilNextRide" },                          //5
+            { data: "latestDocumentedCallDate" },                   //6
+            { data: "seniorityInYears" },                           //7
+            { data: "buttons" },                                    //8
+        ],
+        columnDefs: [
+            { width: '20%', "targets": [0, 1] },
+            { width: '10%', "targets": [2] },
+            { width: '5%', "targets": [3, 4, 5, 7] },
+            { width: '10%', "targets": [6, 8] },
+        ]
+    });
 
     superDriversTable = $('#datatable-superDrivers').DataTable(
         {
-            "stateDuration": 60 * 60,
-            "columnDefs": []
-        },
-        {
-            "paging": false
-        },
-        {
-            "visible": false,
-            "targets": [1]
-        },
-        {
-            "className": "dt-body-left",
-            "targets": [3]
-        }
-    );
+            data: superCandidated_clientVersion,
+            rowId: 'id',
+            pageLength: 10,
+            stateSave: true,
+            destroy: true,
+            stateDuration: 60 * 60,
+            autoWidth: false,
+            columns: [
+                //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
+                { data: "displayName" },                                //0
+                { data: "cellphone" },                                  //1
+                { data: "city" },                                       //2
+                { data: "daysSinceLastRide" },                          //3
+                { data: "numOfRides_last2Months" },                     //4
+                { data: "daysUntilNextRide" },                          //5
+                { data: "latestDocumentedCallDate" },                   //6
+                { data: "seniorityInYears" },                           //7
+                { data: "buttons" },                                    //8
 
-
+            ],
+            columnDefs: [
+                { width: '20%', "targets": [0, 1] },
+                { width: '10%', "targets": [2] },
+                { width: '5%', "targets": [3, 4, 5, 7] },
+                { width: '10%', "targets": [6, 8] },
+            ]
+        });
 
     /*
                      ============================
@@ -110,97 +238,5 @@ $(document).ready(() => {
     //#endregion ↑DATATABLES PROPERTIES↑
 
 
-
-});
-
-
-
-
-const fetchData4ThisRidepat = () => {
-
-    //let ridePatNum = JSON.parse(getRidePatNum4_viewCandidate());
-    let ridePatNum =  $("#rideId").val();
-
-    ajaxCall(
-        'GetCandidates',
-        JSON.stringify({ ridePatNum }),
-        fetchData4ThisRidepat_SCB,
-        fetchData4ThisRidepat_ECB
-    );
 }
 
-const fetchData4ThisRidepat_SCB = (data) => {
-    thisRidePat = JSON.parse(data.d); //think if this variable should be global or local & pass throw this function below
-
-    //temp ↓
-    console.log('%c ↓ R2R custom error ↓', 'background: green; color: white');
-
-    console.log(thisRidePat);
-
-    console.log('%c ↑ R2R custom error ↑', 'background: green; color: white');
-
-    //temp ↑
-
-    //useRidePatData();
-}
-
-const fetchData4ThisRidepat_ECB = (data) => {
-    console.log('%c ↓ R2R custom error ↓', 'background: red; color: white');
-    console.log(data);
-    console.log('%c ↑ R2R custom error ↑', 'background: red; color: white');
-}
-
-
-const useRidePatData = () => {
-
-    let date = convertDBDate2FrontEndDate(thisRidePat.Date);
-    let dd = date.getDate();
-    let mm = date.getMonth() + 1;
-
-    let now = new Date(Date.now());
-
-    let hours = date.getHours();
-    let minutes = date.getMinutes();
-
-    // general: מ<מוצא> ל<יעד>, <היום או יום <יום בשבוע>, <תאריך ללא שנה>> ב-<שעה> <בבוקר או רחה"צ>
-    // example:  מועמדים להסעה: מתרקומיא לשיבא, היום ב6:15 בבוקר
-    let ridePatCandidatesHeadLine = `מ${thisRidePat.Origin.Name} `;
-    ridePatCandidatesHeadLine += `ל${thisRidePat.Destination.Name} `;
-    if (dd === now.getDate() &&
-        mm === now.getMonth() + 1 &&
-        date.getFullYear() === now.getFullYear()
-    ) {
-        ridePatCandidatesHeadLine += 'היום ';
-    } else {
-        ridePatCandidatesHeadLine += `ב${getHebrew_WeekDay(date.getDay())}, ${dd}.${mm} ` ;
-    }
-
-    if (date.getMinutes() === 14) {
-        if (date.getHours() === 19 || date.getHours() === 20 || date.getHours() === 21 || date.getHours() === 22) {
-            ridePatCandidatesHeadLine += 'אחה"צ ';
-        }
-    } else {
-        ridePatCandidatesHeadLine += ` ב-${hours}:${minutes < 10 ? '0' + minutes : minutes} `;
-        ridePatCandidatesHeadLine += hours <= 11 ? 'בבוקר' : 'בצהריים'
-    }
-
-    document.getElementById('RideCandidates_ph').innerHTML = ridePatCandidatesHeadLine;
-    //here I stop and went to develop sort by regions
-
-}
-
-
-//function refreshTable() {
-//    //???
-
-//}
-
-
-
-
-//function manipulateTables() {
-
-//    tableMorning = document.getElementById("datatable-morning");
-//    tableAfternoon = document.getElementById("datatable-afternoon");
-
-//}

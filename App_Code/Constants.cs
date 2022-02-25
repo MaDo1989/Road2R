@@ -17,6 +17,6 @@ public static class Constants
         public static readonly int NumOfDaysToTheFuture_CheckRides_Regular = 5;
         public static readonly int NumOfDaysToThePast_CheckRides_Super = 1;
         public static readonly int NumOfDaysToTheFuture_CheckRides_Super = 1;
-        public static readonly int AmountBottomLimitToBeSuperUserDriver = 15;
+        public static readonly int AmountBottomLimitToBeSuperUserDriver = 60;
     }
 }
