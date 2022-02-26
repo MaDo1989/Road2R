@@ -133,8 +133,8 @@ public class ReportService
 
     public class CenterMonthlyByYearInfo
     {
-        public string Count { get; set; }
-        public string Type { get; set; }
+        public string PatientCount { get; set; }
+        public string VolunteerCount { get; set; }
         public string Month { get; set; }
     }
 
@@ -677,11 +677,11 @@ GROUP BY inner_select.DisplayName
         DbService db = new DbService();
 
         string query =
-             @"SELECT count(DISTINCT MainDriver )as COUNT_G, YEAR(date) as YEAR_G, MONTH(date) as MONTH_G
-                FROM Ride 
-                where date >= @start_date
-                and date <= CURRENT_TIMESTAMP
-                GROUP BY YEAR(Date), MONTH(Date) 
+             @"SELECT count(DISTINCT MainDriver )as COUNT_G, YEAR(PickupTime) as YEAR_G, MONTH(PickupTime) as MONTH_G
+                FROM RPView r  
+                where PickupTime >= @start_date
+                and PickupTime <= CURRENT_TIMESTAMP
+                GROUP BY YEAR(PickupTime), MONTH(PickupTime) 
                 ORDER  BY YEAR_G, MONTH_G ASC";
 
         SqlCommand cmd = new SqlCommand(query);
@@ -1123,19 +1123,14 @@ group by CONVERT(date, pickuptime) ";
         DbService db = new DbService();
 
         string query =
-@"select count(DISTINCT Id )as COUNT_G, 'PATIENT' as TYPE_G, MONTH(PickupTime) as MONTH_G
+@"select count(DISTINCT Id )as COUNT_PATS, count(DISTINCT MainDriver )as COUNT_DRIVERS,  MONTH(PickupTime) as MONTH_G
 FROM RPView r 
 where PickupTime >= @start_date
 and PickupTime <= @end_date
 and RideNum  is not null
-GROUP BY  MONTH(PickupTime) 
-UNION
-SELECT count(DISTINCT MainDriver )as COUNT_G, 'DRIVER' as TYPE_G, MONTH(date) as MONTH_G
-FROM Ride 
-where date >= @start_date
-and date <= @end_date
-GROUP BY  MONTH(Date) 
-ORDER  BY MONTH_G, TYPE_G ASC";
+and MainDriver is not null
+GROUP BY  MONTH(PickupTime)                 
+ORDER  BY MONTH_G";
 
         SqlCommand cmd = new SqlCommand(query);
         cmd.CommandType = CommandType.Text;
@@ -1150,8 +1145,8 @@ ORDER  BY MONTH_G, TYPE_G ASC";
         foreach (DataRow dr in dt.Rows)
         {
             CenterMonthlyByYearInfo obj = new CenterMonthlyByYearInfo();
-            obj.Count = dr["COUNT_G"].ToString();
-            obj.Type = dr["TYPE_G"].ToString();
+            obj.PatientCount = dr["COUNT_PATS"].ToString();
+            obj.VolunteerCount = dr["COUNT_DRIVERS"].ToString();
             obj.Month = dr["MONTH_G"].ToString();
             result.Add(obj);
         }

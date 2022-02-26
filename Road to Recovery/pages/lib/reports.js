@@ -2006,8 +2006,8 @@ function rp_center_daily_by_month__refresh_Table(start_date, end_date) {
                         }
 
                     },
-                    { data: "VolunteerCount" },
-                    { data: "PatientCount" }
+                    { data: "PatientCount" },
+                    { data: "VolunteerCount" }
                 ],
                 dom: 'Bfrtip',
 
@@ -2142,13 +2142,12 @@ function rp_center_monthly_by_year__fix_records(records) {
     let patients = { "People": "חולים", Total: 0 };
     
     for (a_rec of records) {
-        let obj = patients;
-        if (a_rec.Type == "DRIVER") {
-            obj = drivers;
-        }
-        obj[a_rec.Month] = a_rec.Count;
-        obj.Total += +a_rec.Count;
+        patients[a_rec.Month] = a_rec.PatientCount;
+        patients.Total += +a_rec.PatientCount;
+        drivers[a_rec.Month] = a_rec.VolunteerCount;
+        drivers.Total += +a_rec.VolunteerCount;
     }
+
     return new Array(patients, drivers);
 }
 
@@ -2180,8 +2179,11 @@ function rp_center_patients_rides__refresh_preview() {
         $("#select_date_end").val(end_moment.format(K_DateFormat_Moment));
     }
 
-    // use end of month, or current-date
+    // Do not allow future end dates
     end_moment = moment.min(end_moment, moment());
+
+    // Bump end-date by one day, so can query can find dame-day.
+    end_moment.add(1, 'days');
 
     console.log(start_moment.format("YYYY-MM-DD"), end_moment.format("YYYY-MM-DD"));
 
