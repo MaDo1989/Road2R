@@ -1,6 +1,8 @@
-﻿const showMessage = (arr_rides, ridePatNum) => {
+﻿let days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+
+const showMessage = (arr_rides, ridePatNum) => {
     const ridepat = arr_rides.find((r) => r.RidePatNum === ridePatNum);
-    console.log(ridepat);
+    
     if (ridepat.Drivers.length == 0) return;
     // get all the rides going to this direction with this driver
     const onlyRidepatsWithDriver = arr_rides.filter(r => r.Drivers.length > 0);
@@ -95,8 +97,8 @@ function buildMessage(message) {
 
     //txt += `***********************************` + sep;
     //txt += `***********************************` + sep;
-
-    $("#message").append(txt);
+    return txt;
+  //  $("#message").append(txt);
 }
 
 const getPatientsPhonesText = (patient) => {
@@ -112,7 +114,6 @@ const getPatientsPhonesText = (patient) => {
     }
     return txt;
 }
-
 
 validateMobileNumFullVersion = (mobileNum) => {
 
@@ -155,14 +156,12 @@ const datesAreOnSameDay = (first, second) =>
     first.getMonth() === second.getMonth() &&
     first.getDate() === second.getDate();
 
-
 const netDate = (fullTimeStempStr) => {
     let startTrim = fullTimeStempStr.indexOf('(') + 1;
     let endTrim = fullTimeStempStr.indexOf(')');
     let fullTimeStempNumber = fullTimeStempStr.substring(startTrim, endTrim);
     return parseInt(fullTimeStempNumber);
 }
-
 
 const patientMessage = (patient) => {
     let txt = "";

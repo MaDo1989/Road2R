@@ -13,6 +13,7 @@
     <!--GENERAL object and additional functions-->
     <script src="lib/lz-string.js"></script>
     <script src="lib/master.js"></script>
+    <script src="lib/rideMessages.js"></script>
 
 
     <!-- #region REAL-TIME BY SIGNALR - FOR ANY COMPLAINTS WHATSOEVER YOU CAN TALK 2 YOGEV-->
@@ -1067,86 +1068,9 @@
         function copyMessageButton(copyMsgBtn, table) {
 
             let ridePatNum = parseInt(copyMsgBtn.id);
-            let additionalPatients = '';
-            let additionalInfo = '';
-            let additionalRidesForSameDriver;
-            const ridepat = arr_rides.find((r) => r.RidePatNum === ridePatNum);
-            const onlyRidepatsWithDriver = arr_rides.filter(r => r.Drivers.length > 0);
-
-            if (ridepat.Drivers.length > 0) {
-
-                additionalRidesForSameDriver = onlyRidepatsWithDriver.filter((r) => {
-                    return (
-                        r.Destination.Name === ridepat.Destination.Name &&
-                        r.Origin.Name === ridepat.Origin.Name &&
-                        r.Drivers[0].Id === ridepat.Drivers[0].Id &&
-                        r.Date === ridepat.Date &&
-                        r.RidePatNum != ridepat.RidePatNum
-                    )
-                });
-
-                if (additionalRidesForSameDriver.length > 0) {
-
-                    additionalPatients += ', '
-                    additionalRidesForSameDriver.map((r, i) => {
-
-                        additionalPatients += r.Pat.DisplayName;
-                        additionalPatients += i !== additionalRidesForSameDriver.length - 1 ? ', ' : '';
-
-                    });
-                }
-
-            }
-            let jsDate = convertDBDate2FrontEndDate(ridepat.Date);
-
-            let isAfterNoon = jsDate.getMinutes() === 14;
-            let isToday = table.context[0].sTableId === "datatable-afternoon" || table.context[0].sTableId === "datatable-morning";
-
-            const date2copy = isToday ? 'היום' : `בתאריך ${jsDate.toLocaleString('he-IL', { dateStyle: 'short' })} ${getHebrew_WeekDay(jsDate.getDay())}`;
-            const time2copy = isAfterNoon ? ` אחה"צ` : ` בשעה ${jsDate.toLocaleString('he-IL', { timeStyle: 'short' })} `
-
-            let textMessageToCopy = `שלום ${ridepat.Drivers[0]?.DisplayName ?? 'נהג'},`;
-            textMessageToCopy += `\n`;
-            textMessageToCopy += `יש לאסוף את ${ridepat.Pat.DisplayName}` + additionalPatients;
-            textMessageToCopy += `\n`;
-            textMessageToCopy += `מ${ridepat.Origin.Name} `;
-            textMessageToCopy += `ולהסיע אל ${ridepat.Destination.Name} `;
-            textMessageToCopy += `\n`;
-            textMessageToCopy += date2copy;
-            textMessageToCopy += time2copy;
-            textMessageToCopy += `\n`;
-            textMessageToCopy += `תודה ונסיעה טובה.`;
-            textMessageToCopy += `\n`;
-
-            if (validateMobileNumFullVersion(ridepat.Pat.CellPhone)) {
-                textMessageToCopy += `לנוחיותך מצורף פרטים ליצירת קשר`;
-                textMessageToCopy += `\n`;
-                textMessageToCopy += `${ridepat.Pat.DisplayName}: `;
-                textMessageToCopy += addSeperator2MobileNum(ridepat.Pat.CellPhone, "-");
-                textMessageToCopy += `\n`;
-            }
-
-            let numOfEscorts = ridepat.Escorts.length;
-            if (numOfEscorts > 0) {
-
-
-                ridepat.Escorts.map((es, i) => {
-                    if (validateMobileNumFullVersion(es.CellPhone)) {
-
-                        if (!validateMobileNumFullVersion(ridepat.Pat.CellPhone) && i == 0) {
-
-                            textMessageToCopy += `לנוחיותך מצורף פרטים ליצירת קשר`;
-                            textMessageToCopy += `\n`;
-                        }
-
-
-                        textMessageToCopy += `${es.DisplayName}: `;
-                        textMessageToCopy += addSeperator2MobileNum(es.CellPhone, "-");
-                        textMessageToCopy += `\n`;
-
-                    }
-                });
-            }
+            let messageObject = showMessage(arr_rides, ridePatNum);
+            let textMessageToCopy = buildMessage(messageObject);
+            console.log(textMessageToCopy);
 
             navigator.clipboard.writeText(textMessageToCopy)
                 .then(function () {
@@ -1176,9 +1100,9 @@
             localStorage.setItem(`ridePatObj_${ridePatNum}`, JSON.stringify(thisridePatObj));
 
             let a = document.createElement('a');
-           // a.target = '_blank';
-            a.href = "viewCandidates.html";
 
+            a.target = '_blank';
+            a.href = "viewCandidates.html";
             a.click();
         }
 
@@ -1630,7 +1554,7 @@
                         deleteBtn = `<button type='button' class='remove               btn btn-icon waves-effect waves-light btn-secondary'        id='${arr_rides[i].RidePatNum}' name='${arr_rides[i].RidePatNum}' title='מחיקה'><i class='fa fa-remove'></i></button>`;
                         messageToCopyBtn = `<button type='button' class='copyMessage   btn btn-icon waves-effect waves-light btn-secondary'        id='${arr_rides[i].RidePatNum}' name='${arr_rides[i].RidePatNum}' title='העתקת הודעה'><i class='fa fa-envelope'></i></button>`;
                         candidateBtn = `<button type='button' class='candidatesBtn btn btn-icon waves-effect waves-light btn-secondary'            id='${arr_rides[i].RidePatNum}' name='${arr_rides[i].RidePatNum}' title='מועמדים להסעה'><i class='fa fa-car'></i></button>`;
-                        btnStr = `<div class='btnsInSameLine'>${editBtn} ${deleteBtn} ${messageToCopyBtn} ${candidateBtn}</div>`;
+                        btnStr = `<div class='btnsInSameLine'>${editBtn} ${deleteBtn} ${arr_rides[i].Drivers.length > 0 ? messageToCopyBtn : ''} ${arr_rides[i].Drivers.length > 0 ? '' : candidateBtn}</div>`;
                         //#endregion buttons
 
                         thisRidePat = {

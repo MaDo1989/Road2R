@@ -26,7 +26,7 @@ $(document).ready(() => {
     candidatesTable = $('#datatable-candidates').DataTable({ data: [], destroy: true });
     superDriversTable = $('#datatable-superDrivers').DataTable({ data: [], destroy: true });
 
-    ridePatNum = JSON.parse(getRidePatNum4_viewCandidate());
+    ridePatNum = JSON.parse( getRidePatNum4_viewCandidate());
     getCandidates();
     getRidePat();
 

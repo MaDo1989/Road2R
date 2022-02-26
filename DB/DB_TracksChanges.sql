@@ -43,7 +43,7 @@ AS
 			-- interfering with SELECT statements.
 			SET NOCOUNT ON
  
-		DECLARE 
+			DECLARE
 				@TimeWindowPastLimit DATETIME = DATEADD(DAY, -@NumOfDaysToThePast, GETDATE()),
 				@TimeWindowFutureLimit DATETIME = DATEADD(DAY, @NumOfDaysToTheFuture, GETDATE()),
 				@TimeWindowPastLimit_CheckRides_Regular DATETIME = DATEADD(DAY, -@NumOfDaysToThePast_CheckRides_Regular, GETDATE()),
@@ -52,13 +52,18 @@ AS
 				@TimeWindowFutureLimit_CheckRides_Super DATETIME = DATEADD(DAY, @NumOfDaysToTheFuture_CheckRides_Super, GETDATE()),
 				@Origin NVARCHAR(50), @Destination NVARCHAR(50),  @OriginSubArea INT,
 				@DestinationSubArea INT, @pickupDay NVARCHAR(10),
-				@AfterNoonString NVARCHAR(10) = ':14';
+				@AfterNoonString NVARCHAR(10) = ':14',
+				@pickupTime DATETIME;
+
+
+
 
 		SELECT @Origin = origin FROM ridepat WHERE RidePatNum = @RidePatNum
 		SELECT @Destination = destination FROM ridepat WHERE RidePatNum = @RidePatNum 
 		SELECT @OriginSubArea = RegionId FROM Location WHERE Name =  @origin
 		SELECT @DestinationSubArea = RegionId FROM Location WHERE Name =  @Destination
 		SELECT @pickupDay = DATENAME(dw, pickupTime) FROM ridepat WHERE RidePatNum = @RidePatNum
+		SELECT @pickupTime= pickupTime FROM ridepat WHERE RidePatNum = @RidePatNum
 
 		SELECT *, 
 		CASE
@@ -90,28 +95,44 @@ AS
 		END
 		AS IsSuperDriver,
 		(
-			SELECT COUNT(*) FROM Ride R_In
-			WHERE R_In.MainDriver=R_Out.MainDriver AND CHARINDEX(':14',Date) > 0
-		) AmmountOfAfterNoonRides,
-
+		 CASE
+			 WHEN 
+			 (
 				(
-			SELECT COUNT(*) FROM Ride R_In
-			WHERE R_In.MainDriver=R_Out.MainDriver AND CHARINDEX(':14',Date) = 0
-		) AmmountOfMorningRides
+				(CHARINDEX(@AfterNoonString,Date) > 0 OR  CAST(Date as time) >= '12:00:00')
+				 AND
+				(CHARINDEX(@AfterNoonString,@pickupTime) > 0 OR  CAST(@pickupTime as time) >= '12:00:00')
+				) -- = afternoon match
+				OR
+				(
+				(CHARINDEX(@AfterNoonString,Date) = 0 AND  CAST(Date as time) < '12:00:00')
+				 AND
+				(CHARINDEX(@AfterNoonString,@pickupTime) = 0 AND  CAST(@pickupTime as time) < '12:00:00')
+				)-- = morning match
+			 )
+			 THEN 1 ELSE 0
+		 END
+
+		) DayPartMatch
 		 INTO #TempScoreTable
 		 FROM RIDE R_Out
 		 WHERE Date BETWEEN @TimeWindowPastLimit AND @TimeWindowFutureLimit
 		 AND MainDriver IS NOT NULL
 
+
+		 --SELECT * FROM #TempScoreTable
+
 		SELECT 
-		MainDriver, IsSuperDriver, AmmountOfAfterNoonRides, AmmountOfMorningRides,
-		COUNT(CASE WHEN PathMatchScore = 0 THEN 1 END) AS AmmountOfPathMatchScoreOfType_0,
-		COUNT(CASE WHEN PathMatchScore = 1 THEN 1 END) AS AmmountOfPathMatchScoreOfType_1,
-		COUNT(CASE WHEN PathMatchScore = 2 THEN 1 END) AS AmmountOfPathMatchScoreOfType_2,
-		COUNT(CASE WHEN PathMatchScore = 3 THEN 1 END) AS AmmountOfPathMatchScoreOfType_3,
-		COUNT(CASE WHEN PathMatchScore = 4 THEN 1 END) AS AmmountOfPathMatchScoreOfType_4,
-		COUNT(CASE WHEN IsDayMatch = 1 THEN 1 END)	   AS AmmountOfMatchByDay,
-		COUNT(CASE WHEN IsDayMatch = 0 THEN 1 END)     AS AmmountOfDissMatchByDay
+		MainDriver, IsSuperDriver,
+		COUNT(CASE WHEN PathMatchScore = 0 THEN 1 END)		 AS AmmountOfPathMatchScoreOfType_0,
+		COUNT(CASE WHEN PathMatchScore = 1 THEN 1 END)		 AS AmmountOfPathMatchScoreOfType_1,
+		COUNT(CASE WHEN PathMatchScore = 2 THEN 1 END)		 AS AmmountOfPathMatchScoreOfType_2,
+		COUNT(CASE WHEN PathMatchScore = 3 THEN 1 END)		 AS AmmountOfPathMatchScoreOfType_3,
+		COUNT(CASE WHEN PathMatchScore = 4 THEN 1 END)		 AS AmmountOfPathMatchScoreOfType_4,
+		COUNT(CASE WHEN IsDayMatch = 1 THEN 1 END)			 AS AmmountOfMatchByDay,
+		COUNT(CASE WHEN IsDayMatch = 0 THEN 1 END)		     AS AmmountOfDisMatchByDay,
+		COUNT(CASE WHEN DayPartMatch = 1 THEN 1 END)         AS AmmountOfMatchDayPart,
+		COUNT(CASE WHEN DayPartMatch = 0 THEN 1 END)         AS AmmountOfDisMatchDayPart
 		INTO  #CandidatesBucketsTable FROM #TempScoreTable T
 		WHERE NOT EXISTS
 		(
@@ -122,12 +143,12 @@ AS
 				AND
 					IIF(IsSuperDriver = 1, @TimeWindowFutureLimit_CheckRides_Super, @TimeWindowFutureLimit_CheckRides_Regular)
 		)
-		GROUP BY MainDriver, IsSuperDriver, AmmountOfAfterNoonRides, AmmountOfMorningRides
+		GROUP BY MainDriver, IsSuperDriver
 
 		SELECT
-		MainDriver as Id,V.DisplayName, IsSuperDriver, AmmountOfAfterNoonRides, AmmountOfMorningRides, AmmountOfPathMatchScoreOfType_0,
+		MainDriver as Id,V.DisplayName, IsSuperDriver, AmmountOfMatchDayPart, AmmountOfDisMatchDayPart, AmmountOfPathMatchScoreOfType_0,
 		AmmountOfPathMatchScoreOfType_1, AmmountOfPathMatchScoreOfType_2, AmmountOfPathMatchScoreOfType_3,
-		AmmountOfPathMatchScoreOfType_4, AmmountOfMatchByDay, AmmountOfDissMatchByDay
+		AmmountOfPathMatchScoreOfType_4, AmmountOfMatchByDay, AmmountOfDisMatchByDay
 		FROM #CandidatesBucketsTable C INNER JOIN Volunteer V ON C.MainDriver = V.Id
 			WHERE 
 				AmmountOfPathMatchScoreOfType_1 +
@@ -138,7 +159,7 @@ AS
 		DROP TABLE #CandidatesBucketsTable
 		DROP TABLE #TempScoreTable
 	END
-GO
+
 
 CREATE TYPE [dbo].[IntList] AS TABLE(
 	item INT NOT NULL

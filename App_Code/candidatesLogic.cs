@@ -47,9 +47,9 @@ public class CandidatesLogic
                     Convert.ToBoolean(sdr["IsSuperDriver"]),
                     ammountOfPathMatch,
                     Convert.ToInt32(sdr["AmmountOfMatchByDay"]),
-                    Convert.ToInt32(sdr["AmmountOfDissMatchByDay"]),
-                    Convert.ToInt32(sdr["AmmountOfAfterNoonRides"]),
-                    Convert.ToInt32(sdr["AmmountOfMorningRides"])
+                    Convert.ToInt32(sdr["AmmountOfDisMatchByDay"]),
+                    Convert.ToInt32(sdr["AmmountOfMatchDayPart"]),
+                    Convert.ToInt32(sdr["AmmountOfDisMatchDayPart"])
                 );
                 candidates.Add(Convert.ToString(candidate.Id), candidate);
             }
@@ -135,7 +135,7 @@ public class CandidatesLogic
         foreach (KeyValuePair<string, Candidate> kv in candidates)
         {
             Candidate c = kv.Value;
-            int totalDrives = c.AmmountOfAfterNoonRides + c.AmmountOfMorningRides; // I will use Mornings as the rightones
+            int totalDrives = c.AmmountOfDisMatchByDay + c.AmmountOfMatchByDay; // I will use Mornings as the rightones
             double routeScore = Math.Log(c.AmmountOfPathMatch[0] + 1 ,2) * weights["otherAears"] +
                            Math.Log(c.AmmountOfPathMatch[1] + 1, 2) * weights["area2area"] +
                            Math.Log(c.AmmountOfPathMatch[2] + 1, 2) * weights["point2area"] +
@@ -143,9 +143,9 @@ public class CandidatesLogic
                            Math.Log(c.AmmountOfPathMatch[4] + 1, 2) * weights["point2point"];
 
             double timeScore = Math.Log(c.AmmountOfMatchByDay + 1, 2) * weights["sameDay"] +
-                               Math.Log(c.AmmountOfDissMatchByDay + 1, 2) * weights["DifferentDays"] +
-                               Math.Log(c.AmmountOfMorningRides + 1, 2) * weights["SameDayPart"] +
-                               Math.Log(c.AmmountOfAfterNoonRides + 1, 2) * weights["DifferentDayPart"];
+                               Math.Log(c.AmmountOfDisMatchByDay + 1, 2) * weights["DifferentDays"] +
+                               Math.Log(c.AmmountOfMatchDayPart + 1, 2) * weights["SameDayPart"] +
+                               Math.Log(c.AmmountOfDisMatchDayPart + 1, 2) * weights["DifferentDayPart"];
             score.Add(kv.Key, routeScore * timeScore);
         }
         return score;

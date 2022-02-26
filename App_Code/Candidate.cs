@@ -11,24 +11,24 @@ public class Candidate : Volunteer
 {
     public Candidate() { }
     public Candidate(int id, string displayName, bool isSuperDriver, List<int> ammountOfPathMatch,
-                     int ammountOfMatchByDay, int ammountOfDissMatchByDay,
-                     int ammountOfAfterNoonRides, int ammountOfMorningRides
+                     int ammountOfMatchByDay, int ammountOfDisMatchByDay,
+                     int ammountOfMatchDayPart, int ammountOfDisMatchDayPart
                     ) : base(id, displayName)
     {
         IsSuperDriver = isSuperDriver;
         AmmountOfPathMatch = ammountOfPathMatch;
         AmmountOfMatchByDay = ammountOfMatchByDay;
-        AmmountOfDissMatchByDay = ammountOfDissMatchByDay;
-        AmmountOfAfterNoonRides = ammountOfAfterNoonRides;
-        AmmountOfMorningRides = ammountOfMorningRides;
+        AmmountOfDisMatchByDay = ammountOfDisMatchByDay;
+        AmmountOfMatchDayPart = ammountOfMatchDayPart;
+        AmmountOfDisMatchDayPart = ammountOfDisMatchDayPart;
     }
 
     public bool IsSuperDriver { get; set; }
     public List<int> AmmountOfPathMatch { get; set; }
     public int AmmountOfMatchByDay { get; set; }
-    public int AmmountOfDissMatchByDay { get; set; }
-    public int AmmountOfAfterNoonRides { get; set; }
-    public int AmmountOfMorningRides { get; set; }
+    public int AmmountOfDisMatchByDay { get; set; }
+    public int AmmountOfMatchDayPart { get; set; }
+    public int AmmountOfDisMatchDayPart { get; set; }
     public int DaysSinceLastRide { get; set; }
     public int? DaysUntilNextRide { get; set; }
     public DateTime? LatestDocumentedCallDate { get; set; }
