@@ -94,11 +94,12 @@
             var userName = GENERAL.USER.getUserDisplayName();
             $("#userName").html(userName);
             getAreas();
-            getSubAreas();
+            // BENNY MOVED TO THE SUCCESS OF get Areas: getSubAreas();
             if (JSON.parse(GENERAL.LOCATIONS.getDestinationsList()).length != 0) {
                 arr_location = JSON.parse(GENERAL.LOCATIONS.getDestinationsList());
-                if (arr_location.func == "edit" || arr_location.func == "show") {
-                    uploadDataVol(arr_location.displayName);
+                // BENNY moved to getSubAreas success callback
+                //if (arr_location.func == "edit" || arr_location.func == "show") {
+                //    uploadDataVol(arr_location.displayName);
 
                     if (arr_location.func == "show") {
 
@@ -123,7 +124,7 @@
                 else {
                     $("#activeLocation").prop('checked', 'checked');
                 }
-            }
+     //   }
         }
 
         //function to fill form for edit
@@ -170,6 +171,7 @@
                             $('<option>', { value: areas[i], text: areas[i] }).appendTo($select);
                         }
                     }
+                    getSubAreas();
                 },
                 error: function (err) { alert("Error in getArea: " + err.responseText); }
             });
@@ -199,6 +201,11 @@
             for (var i = 0; i < regions.length; i++) {
                 $('<option>', { value: regions[i].Id, text: regions[i].Name }).appendTo($select);
             }
+
+            // Benny moved here
+            if (arr_location.func == "edit" || arr_location.func == "show") {
+                uploadDataVol(arr_location.displayName);
+                }
 
         }
 

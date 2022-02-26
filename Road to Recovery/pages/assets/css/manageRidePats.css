@@ -161,8 +161,7 @@ input:checked + .slider:before {
 
 .btnsInSameLine {
     display: flex;
-    justify-content: center;
-    width: 100px;
+    justify-content: space-between;
 }
 
 .within2HoursSinceChange {

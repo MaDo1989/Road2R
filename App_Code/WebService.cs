@@ -245,12 +245,12 @@ public class WebService : System.Web.Services.WebService
 
     //Benny Candidates
     [WebMethod(EnableSession = true)]
-    public string getCandidates(int ridePatNum) {
+    public string GetCandidates(int ridePatNum) {
 
         try
         {
-            candidatesLogic cl = new candidatesLogic();
-            return j.Serialize(cl.getCandidates(ridePatNum));
+            CandidatesLogic cl = new CandidatesLogic();
+            return j.Serialize(cl.GetCandidates(ridePatNum));
         }
         catch (Exception ex)
         {

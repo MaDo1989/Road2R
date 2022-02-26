@@ -1,24 +1,10 @@
-﻿
-/*NEW CODE WHICH EXIST IN TEST AND YET EXIST IN PROD*/
+﻿/*---------------------------------------------------------*/
+/*---------------------------------------------------------*/
 
+/* ↓ NEW CODE WHICH EXIST IN TEST AND YET EXIST IN PROD ↓ */
 
-
-
-
-/*DO NOT DEPLOY IT YET*/
-
-CREATE PROCEDURE spVolunteer_GetActiveVolunteers_NotDriversYet 
-@daysSinceJoin int  as  
-	BEGIN 
-		select * from volunteer 
-		where  ( 
-				CASE WHEN JoinDate is not null THEN DATEDIFF(DAY, JoinDate, getdate())
-				end
-			   ) > @daysSinceJoin  
-			and   IsActive=1
-			and   Id not in (select distinct MainDriver from ride where MainDriver is not null)
-	END
-	GO
+/*---------------------------------------------------------*/
+/*---------------------------------------------------------*/
 
 CREATE procedure [dbo].[spVolunteer_GetActiveVolunteers_NotDriversYet] 
 @daysSinceJoin int
@@ -36,164 +22,185 @@ as
 	and	not exists (select distinct MainDriver from ride where MainDriver is not null and maindriver=v.id)
 END
 GO
-/**************************************************************************************DO NOT DEPLOY IT YET ↓*/
 
-/*ADD R ENERAL PATH)*/
---1. CREATE TABLE REGION
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/**************************************************************************************DO NOT DEPLOY IT YET ↑*/
-/*DO NOT DEPLOY IT YET*/
 -- =============================================
--- Author:      <Benny Bornfeld>
--- Create Date: <5-sep-2021 >
--- Description: <get candidates for rides >
+-- Authors:     Dr. Benny Bornfeld & Yogev Strauber
+-- Create Date: 17/02/2022
+-- Description: RETURNS TABLE OF CANDIDATE TO A GIVEN RIDEPAT WITH VARIOUS SCORES TO EACH CANDIDATE
 -- =============================================
-
-/****** Object:  StoredProcedure [dbo].[spGetRideCandidates]    Script Date: 12/3/2021 12:11:18 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE PROCEDURE [dbo].[spGetRideCandidates]
+CREATE OR ALTER PROCEDURE [dbo].[spGetCandidatesForRidePat]
 (
-	@RidePatNum AS INT
-    -- Add the parameters for the stored procedure here
-    --<@Param1, sysname, @p1> <Datatype_For_Param1, , int> = <Default_Value_For_Param1, , 0>,
-    --<@Param2, sysname, @p2> <Datatype_For_Param2, , int> = <Default_Value_For_Param2, , 0>
+	@RidePatNum INT,
+	@NumOfDaysToThePast INT, @NUmOfDaysToTheFuture INT,
+	@NumOfDaysToThePast_CheckRides_Regular INT,	@NumOfDaysToTheFuture_CheckRides_Regular INT,
+	@NumOfDaysToThePast_CheckRides_Super INT,   @NumOfDaysToTheFuture_CheckRides_Super INT,
+	@AmountBottomLimitToBeSuperUserDriver INT
+
+)
+AS
+	BEGIN
+			-- SET NOCOUNT ON added to prevent extra result sets from
+			-- interfering with SELECT statements.
+			SET NOCOUNT ON
+ 
+			DECLARE
+				@TimeWindowPastLimit DATETIME = DATEADD(DAY, -@NumOfDaysToThePast, GETDATE()),
+				@TimeWindowFutureLimit DATETIME = DATEADD(DAY, @NumOfDaysToTheFuture, GETDATE()),
+				@TimeWindowPastLimit_CheckRides_Regular DATETIME = DATEADD(DAY, -@NumOfDaysToThePast_CheckRides_Regular, GETDATE()),
+				@TimeWindowFutureLimit_CheckRides_Regular DATETIME = DATEADD(DAY, @NumOfDaysToTheFuture_CheckRides_Regular, GETDATE()),
+				@TimeWindowPastLimit_CheckRides_Super DATETIME = DATEADD(DAY, -@NumOfDaysToThePast_CheckRides_Super, GETDATE()),
+				@TimeWindowFutureLimit_CheckRides_Super DATETIME = DATEADD(DAY, @NumOfDaysToTheFuture_CheckRides_Super, GETDATE()),
+				@Origin NVARCHAR(50), @Destination NVARCHAR(50),  @OriginSubArea INT,
+				@DestinationSubArea INT, @pickupDay NVARCHAR(10),
+				@AfterNoonString NVARCHAR(10) = ':14',
+				@pickupTime DATETIME;
+
+
+
+
+		SELECT @Origin = origin FROM ridepat WHERE RidePatNum = @RidePatNum
+		SELECT @Destination = destination FROM ridepat WHERE RidePatNum = @RidePatNum 
+		SELECT @OriginSubArea = RegionId FROM Location WHERE Name =  @origin
+		SELECT @DestinationSubArea = RegionId FROM Location WHERE Name =  @Destination
+		SELECT @pickupDay = DATENAME(dw, pickupTime) FROM ridepat WHERE RidePatNum = @RidePatNum
+		SELECT @pickupTime= pickupTime FROM ridepat WHERE RidePatNum = @RidePatNum
+
+		SELECT *, 
+		CASE
+			WHEN Origin = @Origin and Destination = @Destination THEN 4
+			WHEN Origin = @Destination and Destination = @Origin THEN 3
+			WHEN Destination = @Destination 
+				 and 
+				 Origin <> @Origin
+				 and exists (select Name from Location where RegionId = @OriginSubArea and isActive = 1 and Name=Origin) THEN 2
+			WHEN Origin = @Origin 
+				and
+				Destination <> @Destination and exists
+					(select Name from Location where RegionId = @DestinationSubArea and isActive = 1 and Name=Destination) THEN 2
+			WHEN exists (select Name from Location where RegionId = @OriginSubArea and isActive = 1 and Name=Origin) 
+				and exists (select Name from Location where RegionId = @destinationSubArea and isActive = 1 and Name=Destination) THEN 1
+			ELSE 0
+		 END as PathMatchScore,
+		  CASE
+			 WHEN @pickupDay = DATENAME(DW, Date) THEN 1 ELSE 0
+		 END
+		 as IsDayMatch
+		 ,
+		  CASE
+			WHEN exists
+				(
+					select MainDriver from ride R_In where R_In.MainDriver=R_Out.MainDriver and Date BETWEEN @TimeWindowPastLimit AND @TimeWindowFutureLimit
+					group by MainDriver having COUNT(*) > @AmountBottomLimitToBeSuperUserDriver
+				 ) THEN 1 ELSE 0
+		END
+		AS IsSuperDriver,
+		(
+		 CASE
+			 WHEN 
+			 (
+				(
+				(CHARINDEX(@AfterNoonString,Date) > 0 OR  CAST(Date as time) >= '12:00:00')
+				 AND
+				(CHARINDEX(@AfterNoonString,@pickupTime) > 0 OR  CAST(@pickupTime as time) >= '12:00:00')
+				) -- = afternoon match
+				OR
+				(
+				(CHARINDEX(@AfterNoonString,Date) = 0 AND  CAST(Date as time) < '12:00:00')
+				 AND
+				(CHARINDEX(@AfterNoonString,@pickupTime) = 0 AND  CAST(@pickupTime as time) < '12:00:00')
+				)-- = morning match
+			 )
+			 THEN 1 ELSE 0
+		 END
+
+		) DayPartMatch
+		 INTO #TempScoreTable
+		 FROM RIDE R_Out
+		 WHERE Date BETWEEN @TimeWindowPastLimit AND @TimeWindowFutureLimit
+		 AND MainDriver IS NOT NULL
+
+
+		 --SELECT * FROM #TempScoreTable
+
+		SELECT 
+		MainDriver, IsSuperDriver,
+		COUNT(CASE WHEN PathMatchScore = 0 THEN 1 END)		 AS AmmountOfPathMatchScoreOfType_0,
+		COUNT(CASE WHEN PathMatchScore = 1 THEN 1 END)		 AS AmmountOfPathMatchScoreOfType_1,
+		COUNT(CASE WHEN PathMatchScore = 2 THEN 1 END)		 AS AmmountOfPathMatchScoreOfType_2,
+		COUNT(CASE WHEN PathMatchScore = 3 THEN 1 END)		 AS AmmountOfPathMatchScoreOfType_3,
+		COUNT(CASE WHEN PathMatchScore = 4 THEN 1 END)		 AS AmmountOfPathMatchScoreOfType_4,
+		COUNT(CASE WHEN IsDayMatch = 1 THEN 1 END)			 AS AmmountOfMatchByDay,
+		COUNT(CASE WHEN IsDayMatch = 0 THEN 1 END)		     AS AmmountOfDisMatchByDay,
+		COUNT(CASE WHEN DayPartMatch = 1 THEN 1 END)         AS AmmountOfMatchDayPart,
+		COUNT(CASE WHEN DayPartMatch = 0 THEN 1 END)         AS AmmountOfDisMatchDayPart
+		INTO  #CandidatesBucketsTable FROM #TempScoreTable T
+		WHERE NOT EXISTS
+		(
+			select * from Ride
+			where MainDriver=T.MainDriver and Date 
+				BETWEEN 
+					IIF(IsSuperDriver = 1, @TimeWindowPastLimit_CheckRides_Super, @TimeWindowPastLimit_CheckRides_Regular)
+				AND
+					IIF(IsSuperDriver = 1, @TimeWindowFutureLimit_CheckRides_Super, @TimeWindowFutureLimit_CheckRides_Regular)
+		)
+		GROUP BY MainDriver, IsSuperDriver
+
+		SELECT
+		MainDriver as Id,V.DisplayName, IsSuperDriver, AmmountOfMatchDayPart, AmmountOfDisMatchDayPart, AmmountOfPathMatchScoreOfType_0,
+		AmmountOfPathMatchScoreOfType_1, AmmountOfPathMatchScoreOfType_2, AmmountOfPathMatchScoreOfType_3,
+		AmmountOfPathMatchScoreOfType_4, AmmountOfMatchByDay, AmmountOfDisMatchByDay
+		FROM #CandidatesBucketsTable C INNER JOIN Volunteer V ON C.MainDriver = V.Id
+			WHERE 
+				AmmountOfPathMatchScoreOfType_1 +
+				AmmountOfPathMatchScoreOfType_2 +
+				AmmountOfPathMatchScoreOfType_3 +
+				AmmountOfPathMatchScoreOfType_4		> 0
+
+		DROP TABLE #CandidatesBucketsTable
+		DROP TABLE #TempScoreTable
+	END
+
+
+CREATE TYPE [dbo].[IntList] AS TABLE(
+	item INT NOT NULL
+)
+GO
+
+
+-- =============================================
+-- Author:      Yogev Strauber
+-- Create Date: 18/02/2022
+-- Description: For given list of candidates's ids provided candidate details
+-- =============================================
+CREATE OR ALTER PROCEDURE [dbo].[spGetCandidatesDetails]
+(
+	@IDs [IntList] readonly
 )
 AS
 BEGIN
-DECLARE @lookBackDaysPeriod AS INT = 180
-DECLARE @searchTime AS DATETIME = GETDATE()
-DECLARE @noOfferDaysWindow AS INT = 10
-DECLARE @superUserDrives AS INT = 15
---DECLARE @RidePatNum AS INT = 42106
-
-DECLARE @origin AS NVARCHAR(50)
-SELECT @origin = [origin]
-FROM ridepat
-WHERE RidePatNum = @RidePatNum
-PRINT @origin
-
-DECLARE @destination AS NVARCHAR(50)
-SELECT @destination = [destination]
-FROM ridepat
-WHERE RidePatNum = @RidePatNum 
-PRINT @destination
-
-DECLARE @pickupDay AS char(10)
-SELECT @pickupDay = datename(dw,[pickupTime])
-FROM ridepat
-WHERE RidePatNum = @RidePatNum
-PRINT @pickupDay
-
-declare @originSubArea AS INT
-SELECT @originSubArea = [Remarks]
-FROM Location
-WHERE [Name] =  @origin
-PRINT @originSubArea
-
-declare @destinationSubArea AS INT
-SELECT @destinationSubArea = [Remarks]
-FROM Location
-WHERE [Name] =  @destination
-PRINT @destinationSubArea
-
---select Name from Location where remarks = @originSubArea and isActive = 1
---select Name from Location where remarks = @destinationSubArea and isActive = 1
-
-select MainDriver, MAX(v.DisplayName) as DisplayName, 
-				   MAX(v.cellPhone) as cellPhone,
-				   MAX(v.cityCityName) as city,
-				   MAX(v.joinYear) as joinYear,
-                   MAX(pathMatch) as maxPathMatch,
-				   MAX(dayMatch) as dayMatch,
-				   MAX(superDriver) as superUser,
-				   MIN(ABS(DATEDIFF(day, @searchTime, [Date]))) as closestRideInDays,
-				   (MAX(pathMatch) + MAX(dayMatch)) as totalScore
- from
-(select rideNum, MainDriver, Origin, Destination, [Date],
- CASE
-    WHEN Origin = @origin and Destination = @destination THEN 3
-	WHEN Destination = @destination and Origin <> @origin           and Origin in (select Name from Location where remarks = @originSubArea and isActive = 1) THEN 2
-	WHEN Origin = @origin           and Destination <> @destination and Destination in (select Name from Location where remarks = @destinationSubArea and isActive = 1) THEN 2
-	WHEN origin in (select Name from Location where remarks = @originSubArea and isActive = 1) and
-	     destination in (select Name from Location where remarks = @destinationSubArea and isActive = 1) THEN 1
-    ELSE 0
- END
-as pathMatch,
- CASE
-	 WHEN @pickupDay = datename(dw,[Date]) THEN 1
-	 ELSE 0
- END
- as dayMatch,
- CASE
-	WHEN MainDriver in	(select MainDriver from ride 
-	     WHERE [Date] >= DATEADD(day,-@lookBackDaysPeriod, @searchTime) AND [Date] <= @searchTime
-		 group by MainDriver having count(*) > @superUserDrives) THEN 1
-	ELSE 0
-END
-as superDriver
-from ride
-WHERE [Date] >= DATEADD(day,-@lookBackDaysPeriod, @searchTime)
-and MainDriver is not null) as x
-join Volunteer v on v.Id = MainDriver
-where v.IsActive = 1
-group by MainDriver
-having ( (MAX(pathMatch) > 1 or MAX(dayMatch) > 0) and MAX([Date]) < DATEADD(day,-@noOfferDaysWindow, @searchTime)) 
-order by totalScore desc
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+    SET NOCOUNT ON
 
 
+SELECT Id, CellPhone, CityCityName,
+  (SELECT top 1 DATEDIFF(DAY,Date,GETDATE()) from Ride where MainDriver=V.Id AND Date <= GETDATE() order by Date desc) DaysSinceLastRide,
 
---****************************************
---Get the number of Rides for each candidate in the last period
---****************************************
+  (SELECT COUNT(*)
+	FROM Ridepat RP INNER JOIN Ride R
+	ON RP.RideId=R.RideNum
+	WHERE R.MainDriver = V.Id AND PickupTime BETWEEN DATEADD(Month, -2, GETDATE()) and  GETDATE())  NumOfRides_last2Months,
 
---DECLARE @lookBackDaysPeriod AS INT = 180
---DECLARE @searchTime AS DATETIME = GETDATE()
---DECLARE @noOfferDaysWindow AS INT = 10
---DECLARE @superUserDrives AS INT = 15
+  (SELECT TOP 1 DATEDIFF(d,Date,GETDATE()) from Ride where MainDriver=V.Id AND Date > GETDATE() order by Date desc)*-1 DaysUntilNextRide,
+  (SELECT TOP 1 Concat(CallRecordedDate,' ', CallRecordedTime) DateAndTime FROM DocumentedCall WHERE DriverId=V.Id Order by DateAndTime desc) LatestDocumentedCallDate,
 
---select MainDriver, count(*) as cnt
---from ride 
---join volunteer v on v.id = MainDriver
---WHERE [Date] >= DATEADD(day,-@lookBackDaysPeriod, @searchTime) AND [Date] <= @searchTime
---and v.isActive = 1
---group by MainDriver
---order by cnt desc
-
+FLOOR((DATEDIFF(MONTH,V.JoinDate, GETDATE())/12.0)*4) / 4 SeniorityInYears
+FROM 
+	Volunteer V 
+INNER JOIN @IDs ON V.Id=item
 
 END
-
---THE LAST PROGRAMMER WHO 
-
---if (select RideID from RidePat where RidePatNum=@RPid) is not null
-	--update RidePat set Status=(select TOP 1 statusStatusName from status_Ride where RideRideNum=@Rid order by [Timestamp] desc) where RideId=@Rid
-	--else update RidePat set Status=N'ממתינה לשיבוץ' where RidePatNum=@RPid
---end
-
---dont forget to back volunteer table
-update volunteer 
-	set NoOfDocumentedRides = (select count(*) from ride 
-								where MainDriver=Id
-								and exists (select * from ridepat where RideId=RideNum))
 GO
-
-
 
 
 

@@ -10,7 +10,7 @@ using log4net;
 /// <summary>
 /// Summary description for DbService
 /// </summary>
-public class DbService
+public class DbService: IDisposable
 {
     SqlTransaction tran;
     SqlCommand cmd;
@@ -231,6 +231,11 @@ public class DbService
 
 
          */
+    }
+
+    public void Dispose()
+    {
+        CloseConnection();
     }
     //Yogev ↑
 
