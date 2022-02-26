@@ -372,6 +372,30 @@ public class ReportsWebService : System.Web.Services.WebService
     }
 
 
+    
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetReportCenterPatientsRidesCount(string volunteer, string start_date, string end_date,
+        string hospital, string barrier)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            ReportService report = new ReportService();
+            string r = report.GetReportCenterPatientsRidesCount(volunteer, start_date, end_date, hospital, barrier);
+            return r;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReportCenterPatientsRidesCount", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
+
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public List<string> GetReportHospitals()

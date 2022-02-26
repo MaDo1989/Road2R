@@ -494,8 +494,22 @@
                                     <tbody></tbody>
                                     <tfoot>
                                         <tr>
-                                            <th colspan="6" style="text-align:left">סה"כ הסעות:</th>
-                                            <th id="center_patients_rides_footer_total"></th>
+                                            <th style="text-align:left">סה"כ מתנדבים בדף:</th>
+                                            <th id="center_patients_rides_footer_vol_page"></th>
+                                            <th style="text-align:left"></th>
+                                            <th id="center_patients_rides_footer_pat_page"></th>
+                                            <th></th>
+                                            <th style="text-align:left">סה"כ הסעות בדף:</th>
+                                            <th id="center_patients_rides_footer_rides_page"></th>
+                                        </tr>
+                                        <tr>
+                                            <th style="text-align:left">סה"כ מתנדבים כללי:</th>
+                                            <th id="center_patients_rides_footer_vol_total"></th>
+                                            <th style="text-align:left">סה"כ חולים כללי:</th>
+                                            <th id="center_patients_rides_footer_pat_total"></th>
+                                            <th></th>
+                                            <th style="text-align:left">סה"כ הסעות כללי:</th>
+                                            <th id="center_patients_rides_footer_rides_total"></th>
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -734,6 +748,37 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row report_template" name="template_DATE_START">
+                            <div class="card-box">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label class="col-sm-2" style="padding: 0.5em 0px;">מתאריך</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" template_id="select_date_start" class="form-control" aria-required="true" aria-invalid="false">
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row report_template" name="template_DATE_END">
+                            <div class="card-box">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label class="col-sm-2" style="padding: 0.5em 0px;">עד תאריך</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" template_id="select_date_end" class="form-control" aria-required="true" aria-invalid="false">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="row report_template" name="template_MONTH_START">
                             <div class="card-box">
                                 <div class="row">
@@ -761,10 +806,7 @@
                                                 <input type="text" template_id="select_month_end" class="form-control" aria-required="true" aria-invalid="false">
                                             </div>
                                         </div>
-
                                     </div>
-
-
                                 </div>
                             </div>
                         </div>
