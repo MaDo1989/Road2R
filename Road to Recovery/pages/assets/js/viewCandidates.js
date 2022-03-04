@@ -1,5 +1,5 @@
 ﻿checkCookie();
-let { convertDBDate2FrontEndDate, getHebrew_WeekDay } = GENERAL.USEFULL_FUNCTIONS;
+let { convertDBDate2FrontEndDate, getHebrew_WeekDay, addSeperator2MobileNum } = GENERAL.USEFULL_FUNCTIONS;
 let { getRidePatNum4_viewCandidate } = GENERAL.RIDEPAT;
 let { ajaxCall } = GENERAL.FETCH_DATA;
 let allCandidatedFromDB;
@@ -59,18 +59,21 @@ $(document).ready(() => {
     includeHTML();//with out this there is no side bar!
 });
 
+
+const deceideWhichTable2Show = () => {
+    $('#collapse1').addClass("in");
+    $('#collapsed1_aTag').removeClass('collapsed');
+}
 const viewCharactaristics = () => {
     window.open("viewC.html?ridePatNum=" + ridePatNum, '_blank').focus();
 }
 
 const getRidePat = () => {
-
     let ridePatObj = localStorage.getItem(`ridePatObj_${ridePatNum}`);
     renderRidePatDetails(JSON.parse(ridePatObj));
 }
 
 const renderRidePatDetails = (ridepat) => {
-    console.log(ridepat);
     let ridepatDate = convertDBDate2FrontEndDate(ridepat.Date);
     let isToday = isItToday(ridepatDate);
     let isAfterNoon = ridepatDate.getMinutes() === 14;
@@ -84,7 +87,7 @@ const renderRidePatDetails = (ridepat) => {
     ridePatDetails += ' ';
     ridePatDetails += isToday ? 'היום' : `ב` + getHebrew_WeekDay(ridepatDate.getDay());
     ridePatDetails += ' ';
-    ridePatDetails += ridepatDate.getDate() + '/' + parseInt(ridepatDate.getMonth() + 1) + '/' + ridepatDate.getFullYear();
+    ridePatDetails += `${ridepatDate.getDate()}.${parseInt(ridepatDate.getMonth() + 1)}`;
     ridePatDetails += ' ';
     ridePatDetails += isAfterNoon ? `אחה"צ` : `בשעה  ${ridepatDate.toLocaleString('he-IL', { timeStyle: 'short' })}`;
     ridePatDetails += ' ';
@@ -123,6 +126,7 @@ const getCandidates = () => {
 const getCandidates_SCB = (data) => {
 
     $('#wait').hide();
+    deceideWhichTable2Show();
 
     allCandidatedFromDB = JSON.parse(data.d);
     fillTableWithData();
@@ -152,8 +156,8 @@ const fillTableWithData = () => {
         thisCandidate = {
             id: i,
             displayName: allCandidatedFromDB[i].DisplayName,
-            cellphone: allCandidatedFromDB[i].CellPhone,
-            city: allCandidatedFromDB[i].City,
+            cellphone: addSeperator2MobileNum(allCandidatedFromDB[i].CellPhone),
+            city: allCandidatedFromDB[i].City + '<br />בדיקה',
             daysSinceLastRide: allCandidatedFromDB[i].DaysSinceLastRide,
             numOfRides_last2Months: allCandidatedFromDB[i].NumOfRides_last2Months,
             daysUntilNextRide: allCandidatedFromDB[i].DaysUntilNextRide,
@@ -165,10 +169,6 @@ const fillTableWithData = () => {
         allCandidatedFromDB[i].IsSuperDriver ?
             superCandidated_clientVersion.push(thisCandidate) :
             regularCandidated_clientVersion.push(thisCandidate);
-
-
-
-
 
         //#region ↓DATATABLES PROPERTIES↓|
 
@@ -184,6 +184,7 @@ const fillTableWithData = () => {
         pageLength: 10,
         stateSave: true,
         destroy: true,
+        "lengthChange": false, // for somereason this property must be string
         stateDuration: 60 * 60,
         autoWidth: false,
         columns: [
@@ -200,10 +201,12 @@ const fillTableWithData = () => {
             { data: "buttons" },                                    //8
         ],
         columnDefs: [
-            { width: '20%', "targets": [0, 1] },
-            { width: '10%', "targets": [2] },
-            { width: '5%', "targets": [3, 4, 5, 7] },
-            { width: '10%', "targets": [6, 8] },
+            { width: '20%', "targets": [0] },
+            { width: '10%', "targets": [1] },
+            { width: '15%', "targets": [2] },
+            { width: '10%', "targets": [3] },
+            { width: '5%', "targets": [4, 5, 7] },
+            { width: '12%', "targets": [6, 8] },
         ]
     });
 
@@ -214,6 +217,7 @@ const fillTableWithData = () => {
             pageLength: 10,
             stateSave: true,
             destroy: true,
+            "lengthChange": false, // for somereason this property must be string
             stateDuration: 60 * 60,
             autoWidth: false,
             columns: [
@@ -230,10 +234,12 @@ const fillTableWithData = () => {
 
             ],
             columnDefs: [
-                { width: '20%', "targets": [0, 1] },
-                { width: '10%', "targets": [2] },
-                { width: '5%', "targets": [3, 4, 5, 7] },
-                { width: '10%', "targets": [6, 8] },
+                { width: '20%', "targets": [0] },
+                { width: '10%', "targets": [1] },
+                { width: '15%', "targets": [2] },
+                { width: '10%', "targets": [3] },
+                { width: '5%', "targets": [4, 5, 7] },
+                { width: '12%', "targets": [6, 8] },
             ]
         });
 

@@ -22,7 +22,21 @@ public class Candidate : Volunteer
         AmmountOfMatchDayPart = ammountOfMatchDayPart;
         AmmountOfDisMatchDayPart = ammountOfDisMatchDayPart;
     }
+    public Candidate(int id, string displayName, bool isSuperDriver, List<int> ammountOfPathMatch,
+                 int ammountOfMatchByDay, int ammountOfDisMatchByDay,
+                 int ammountOfMatchDayPart, int ammountOfDisMatchDayPart, bool isNewbie
+                ) : base(id, displayName)
+    {
+        IsSuperDriver = isSuperDriver;
+        AmmountOfPathMatch = ammountOfPathMatch;
+        AmmountOfMatchByDay = ammountOfMatchByDay;
+        AmmountOfDisMatchByDay = ammountOfDisMatchByDay;
+        AmmountOfMatchDayPart = ammountOfMatchDayPart;
+        AmmountOfDisMatchDayPart = ammountOfDisMatchDayPart;
+        IsNewbie = isNewbie;
+    }
 
+    public bool IsNewbie { get; set; }
     public double Score { get; set; }
     public bool IsSuperDriver { get; set; }
     public List<int> AmmountOfPathMatch { get; set; }

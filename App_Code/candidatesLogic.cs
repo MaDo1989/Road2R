@@ -11,7 +11,7 @@ public class CandidatesLogic
 {
     DbService dbs;
     Dictionary<string, Candidate> candidates;
-
+    Dictionary<string, Candidate> newbies;
 
     public Dictionary<string, Candidate> GetCandidates(int ridePatNum, int numOfCandidates)
     {
@@ -24,6 +24,8 @@ public class CandidatesLogic
         query += ",@NumOfDaysToThePast_CheckRides_Super=" + Constants.Candidate.NumOfDaysToThePast_CheckRides_Super;
         query += ",@NumOfDaysToTheFuture_CheckRides_Super=" + Constants.Candidate.NumOfDaysToTheFuture_CheckRides_Super;
         query += ",@AmountBottomLimitToBeSuperUserDriver=" + Constants.Candidate.AmountBottomLimitToBeSuperUserDriver;
+        query += ",@AmountOfRidesInNewDriverTimeWindow=" + Constants.Candidate.AmountOfRidesInNewDriverTimeWindow;
+        query += ",@NewDriverTimeWindow=" + Constants.Candidate.NewDriverTimeWindow;
 
         try
         {
@@ -53,6 +55,9 @@ public class CandidatesLogic
                 );
                 candidates.Add(Convert.ToString(candidate.Id), candidate);
             }
+            Dictionary<string, Candidate> newbies = GetNewbiesCandidates(ridePatNum);
+
+            //merge between thw two candidates & newbies
         }
         catch (Exception ex)
         {
@@ -71,6 +76,61 @@ public class CandidatesLogic
         return FillExtraDetails(bestCandidates);
     }
 
+    private Dictionary<string, Candidate> GetNewbiesCandidates(int ridePatNum)
+    {
+        const bool isNewbie = true; 
+        string query = "exec spGetNoobsCandidatesForRidePat @RidePatNum=" + ridePatNum;
+        query += ",@NumOfDaysToThePast=" + Constants.Candidate.NumOfDaysToThePast;
+        query += ",@NUmOfDaysToTheFuture=" + Constants.Candidate.NUmOfDaysToTheFuture;
+        query += ",@NumOfDaysToThePast_CheckRides_Regular=" + Constants.Candidate.NumOfDaysToThePast_CheckRides_Regular;
+        query += ",@NumOfDaysToTheFuture_CheckRides_Regular=" + Constants.Candidate.NumOfDaysToTheFuture_CheckRides_Regular;
+        query += ",@NumOfDaysToThePast_CheckRides_Super=" + Constants.Candidate.NumOfDaysToThePast_CheckRides_Super;
+        query += ",@NumOfDaysToTheFuture_CheckRides_Super=" + Constants.Candidate.NumOfDaysToTheFuture_CheckRides_Super;
+        query += ",@AmountBottomLimitToBeSuperUserDriver=" + Constants.Candidate.AmountBottomLimitToBeSuperUserDriver;
+        query += ",@AmountOfRidesInNewDriverTimeWindow=" + Constants.Candidate.AmountOfRidesInNewDriverTimeWindow;
+        query += ",@NewDriverTimeWindow=" + Constants.Candidate.NewDriverTimeWindow;
+
+        try
+        {
+            dbs = new DbService();
+            SqlDataReader sdr = dbs.GetDataReader(query);
+            Candidate candidate;
+            newbies = new Dictionary<string, Candidate>();
+            List<int> ammountOfPathMatch;
+            while (sdr.Read())
+            {
+                ammountOfPathMatch = new List<int>();
+                ammountOfPathMatch.Add(Convert.ToInt32(sdr["AmmountOfPathMatchScoreOfType_0"]));
+                ammountOfPathMatch.Add(Convert.ToInt32(sdr["AmmountOfPathMatchScoreOfType_1"]));
+                ammountOfPathMatch.Add(Convert.ToInt32(sdr["AmmountOfPathMatchScoreOfType_2"]));
+                ammountOfPathMatch.Add(Convert.ToInt32(sdr["AmmountOfPathMatchScoreOfType_3"]));
+                ammountOfPathMatch.Add(Convert.ToInt32(sdr["AmmountOfPathMatchScoreOfType_4"]));
+
+                candidate = new Candidate(
+                    Convert.ToInt32(sdr["Id"]),
+                    Convert.ToString(sdr["DisplayName"]),
+                    Convert.ToBoolean(sdr["IsSuperDriver"]),
+                    ammountOfPathMatch,
+                    Convert.ToInt32(sdr["AmmountOfMatchByDay"]),
+                    Convert.ToInt32(sdr["AmmountOfDisMatchByDay"]),
+                    Convert.ToInt32(sdr["AmmountOfMatchDayPart"]),
+                    Convert.ToInt32(sdr["AmmountOfDisMatchDayPart"]),
+                    isNewbie
+                );
+                
+                newbies.Add(Convert.ToString(candidate.Id), candidate);
+            }
+            return newbies;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+        finally
+        {
+            dbs.CloseConnection();
+        }
+    }
 
     private Dictionary<string, Candidate> selectBestCandidates(Dictionary<string, Candidate> candidates,bool rand, int numOfCandidates) {
 
