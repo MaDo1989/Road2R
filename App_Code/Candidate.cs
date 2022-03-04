@@ -23,6 +23,7 @@ public class Candidate : Volunteer
         AmmountOfDisMatchDayPart = ammountOfDisMatchDayPart;
     }
 
+    public double Score { get; set; }
     public bool IsSuperDriver { get; set; }
     public List<int> AmmountOfPathMatch { get; set; }
     public int AmmountOfMatchByDay { get; set; }

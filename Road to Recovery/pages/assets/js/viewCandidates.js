@@ -59,6 +59,10 @@ $(document).ready(() => {
     includeHTML();//with out this there is no side bar!
 });
 
+const viewCharactaristics = () => {
+    window.open("viewC.html?ridePatNum=" + ridePatNum, '_blank').focus();
+}
+
 const getRidePat = () => {
 
     let ridePatObj = localStorage.getItem(`ridePatObj_${ridePatNum}`);
@@ -104,10 +108,13 @@ const isItToday = (d) => {
 
 const getCandidates = () => {
 
+    // BENNY
+    let numOfCandidates = 10;
+
     $('#wait').show();
     ajaxCall(
         'GetCandidates',
-        JSON.stringify({ ridePatNum }),
+        JSON.stringify({ ridePatNum, numOfCandidates }),
         getCandidates_SCB,
         getCandidates_ECB
     );

@@ -25,17 +25,25 @@
     <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
 
+    <script src="lib/master.js"></script>
+
     <script>
 
         $(document).ready(function () {
+            $("#GetCandidatesBTN").hide();
+            //$("#GetCandidatesBTN").click(fetchData4ThisRidepat);
+            ridePatNum = getParameterByName('ridePatNum');
+            //ridePatNum = JSON.parse(getRidePatNum4_viewCandidate());
+            fetchData4ThisRidepat(ridePatNum);
 
-            $("#GetCandidatesBTN").click(fetchData4ThisRidepat);
-
+            $("#GetCandidatesBTN").click(drawResults);
         })
 
-        const fetchData4ThisRidepat = () => {
+        const fetchData4ThisRidepat = (ridePatNum) => {
 
-            let ridePatNum = parseInt($("#rideId").val());
+            //let ridePatNum = parseInt($("#rideId").val());
+            //ridePatNum = JSON.parse(getRidePatNum4_viewCandidate());
+            let numOfCandidates = 100;
 
             $.ajax({
                 dataType: "json",
@@ -43,10 +51,11 @@
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
                 async: false,
-                data: JSON.stringify({ ridePatNum: ridePatNum }),
+                data: JSON.stringify({ ridePatNum: ridePatNum, numOfCandidates: numOfCandidates}),
                 success: function (data) {
-
-                    drawResults(JSON.parse(data.d));
+                    $("#GetCandidatesBTN").show();
+                    candidates = JSON.parse(data.d);
+                    //drawResults(JSON.parse(data.d));
                     
                 },
                 error: function (err) {
@@ -56,7 +65,7 @@
         }
 
 
-        function drawResults(candidates) {
+        function drawResults() {
 
             superVol = [];
             vol = [];
@@ -64,30 +73,47 @@
                 v = {
                     id: k,
                     name: candidates[k].DisplayName,
+                    score: parseInt(candidates[k].Score),
                     super: candidates[k].IsSuperDriver,
-                    afterNoonRides: candidates[k].AmmountOfAfterNoonRides,
-                    morningRides: candidates[k].AmmountOfMorningRides,
+                    SameDayPart: candidates[k].AmmountOfMatchDayPart,
+                    DifferentDayPart: candidates[k].AmmountOfDisMatchDayPart,
                     sameDay: candidates[k].AmmountOfMatchByDay,
-                    otherDays: candidates[k].AmmountOfDissMatchByDay,
+                    otherDays: candidates[k].AmmountOfDisMatchByDay,
                     otherAreas: candidates[k].AmmountOfPathMatch[0],
                     sameAreas: candidates[k].AmmountOfPathMatch[1],
                     areaToPoint: candidates[k].AmmountOfPathMatch[2],
                     oppsiteDirection: candidates[k].AmmountOfPathMatch[3],
                     pointToPoint: candidates[k].AmmountOfPathMatch[4]
                 }
+
                 vol.push(v);
                 //console.log(v);
             }
 
+            let volType = $("#volTypeDDL").val();
+
+            if (volType == "super")
+                candidatesByType = vol.filter(v => v.super);
+            else if (volType == "regular")
+                candidatesByType = vol.filter(v => !(v.super));
+            else
+                candidatesByType = vol;
+
+
+            if ($.fn.DataTable.isDataTable('#candidatesTbl')) {
+                $('#candidatesTbl').DataTable().destroy();
+            }
+
             tbl = $('#candidatesTbl').DataTable({
-                data: vol,
-                pageLength: 100,
+                data: candidatesByType,
+                pageLength: 15,
                 columns: [
                     { data: "id" },
+                    { data: "score" },
                     { data: "name" },
                     { data: "super" },
-                    { data: "afterNoonRides" },
-                    { data: "morningRides" },
+                    { data: "SameDayPart" },
+                    { data: "DifferentDayPart" },
                     { data: "sameDay" },
                     { data: "otherDays" },
                     { data: "otherAreas" },
@@ -97,8 +123,15 @@
                     { data: "pointToPoint" }
                 ]
             });
+        }
 
-
+        function getParameterByName(name, url = window.location.href) {
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
         }
 
 
@@ -107,18 +140,25 @@
 <body>
 
     <div>
-        <input type="number" id="rideId" />
-        <button id="GetCandidatesBTN">Get Candidates</button>
+        <!--<input type="number" id="rideId" />-->
+        <button id="GetCandidatesBTN">Show Candidates</button>
+        <select id="volTypeDDL">
+            <option value="-1">all</option>
+            <option value="super">super</option>
+            <option value="regular">regular</option>
+
+        </select>
     </div>
 
     <table id="candidatesTbl" class="display nowrap" style="width:100%">
         <thead>
             <tr>
                 <th>מזהה</th>
+                <th>ציון</th>
                 <th>שם</th>
                 <th>סופר</th>
-                <th>אחה"צ</th>
-                <th>בוקר</th>
+                <th>אותו חלק של היום</th>
+                <th>החלק השני של היום</th>
                 <th>ביום הזה</th>
                 <th>בימים אחרים</th>
                 <th>באיזורים אחרים</th>

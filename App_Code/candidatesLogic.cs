@@ -13,7 +13,7 @@ public class CandidatesLogic
     Dictionary<string, Candidate> candidates;
 
 
-    public Dictionary<string, Candidate> GetCandidates(int ridePatNum)
+    public Dictionary<string, Candidate> GetCandidates(int ridePatNum, int numOfCandidates)
     {
 
         string query = "exec spGetCandidatesForRidePat @RidePatNum=" + ridePatNum;
@@ -66,13 +66,13 @@ public class CandidatesLogic
         // ADDED BY BENNY
         // THE LOGIC OF CHOOSING CANDIDATES
 
-        Dictionary<string, Candidate> bestCandidates = selectBestCandidates(candidates,true);
+        Dictionary<string, Candidate> bestCandidates = selectBestCandidates(candidates,true, numOfCandidates);
 
         return FillExtraDetails(bestCandidates);
     }
 
 
-    private Dictionary<string, Candidate> selectBestCandidates(Dictionary<string, Candidate> candidates,bool rand) {
+    private Dictionary<string, Candidate> selectBestCandidates(Dictionary<string, Candidate> candidates,bool rand, int numOfCandidates) {
 
         Dictionary<string, double> weights = new Dictionary<string, double>{
             {"point2point",50 },
@@ -102,16 +102,21 @@ public class CandidatesLogic
         Dictionary<string, double> regularScore = calculateScore(regular, weights);
 
 
-        Dictionary<string,double> topSuper = selectTop(superScore, 10);
-        Dictionary<string, double> topRegular = selectTop(regularScore, 10);
+        Dictionary<string,double> topSuper = selectTop(superScore, numOfCandidates);
+        Dictionary<string, double> topRegular = selectTop(regularScore, numOfCandidates);
 
         Dictionary<string, Candidate> topCandidates = new Dictionary<string, Candidate>();
 
-        foreach (KeyValuePair<string, double> kv in topSuper)
+        foreach (KeyValuePair<string, double> kv in topSuper) {
+            candidates[kv.Key].Score = kv.Value;
             topCandidates.Add(kv.Key, candidates[kv.Key]);
+            }
+            
 
-        foreach (KeyValuePair<string, double> kv in topRegular)
+        foreach (KeyValuePair<string, double> kv in topRegular) {
+            candidates[kv.Key].Score = kv.Value;
             topCandidates.Add(kv.Key, candidates[kv.Key]);
+            }
 
         return topCandidates;
     }
@@ -146,6 +151,8 @@ public class CandidatesLogic
                                Math.Log(c.AmmountOfDisMatchByDay + 1, 2) * weights["DifferentDays"] +
                                Math.Log(c.AmmountOfMatchDayPart + 1, 2) * weights["SameDayPart"] +
                                Math.Log(c.AmmountOfDisMatchDayPart + 1, 2) * weights["DifferentDayPart"];
+            routeScore = Math.Pow(routeScore, weights["routeWeight"]);
+            timeScore  = Math.Pow(routeScore, weights["timeWeight"]);
             score.Add(kv.Key, routeScore * timeScore);
         }
         return score;
