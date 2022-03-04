@@ -1099,11 +1099,15 @@
 
             localStorage.setItem(`ridePatObj_${ridePatNum}`, JSON.stringify(thisridePatObj));
 
+            window.open("viewCandidates.html", '_blank').focus();
+
+            /*
             let a = document.createElement('a');
 
             a.target = '_blank';
             a.href = "viewCandidates.html";
             a.click();
+            */
         }
 
         function editButton(ridePat) {

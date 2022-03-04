@@ -12,6 +12,7 @@ using System.Configuration;
 using System.Collections;
 using System.Activities.Statements;
 using Microsoft.AspNet.SignalR;
+using Newtonsoft.Json.Linq;
 
 /// <summary>
 /// Summary description for WebService
@@ -243,14 +244,16 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+
+
     //Benny Candidates
     [WebMethod(EnableSession = true)]
-    public string GetCandidates(int ridePatNum) {
+    public string GetCandidates(int ridePatNum,int numOfCandidates) {
 
         try
         {
             CandidatesLogic cl = new CandidatesLogic();
-            return j.Serialize(cl.GetCandidates(ridePatNum));
+            return j.Serialize(cl.GetCandidates(ridePatNum, numOfCandidates));
         }
         catch (Exception ex)
         {
