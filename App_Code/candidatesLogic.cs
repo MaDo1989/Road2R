@@ -13,8 +13,17 @@ public class CandidatesLogic
     Dictionary<string, Candidate> candidates;
     Dictionary<string, Candidate> newbies;
 
+    enum  Level
+    {
+        Newbee,
+        Regular,
+        Super
+    }
+
     public Dictionary<string, Candidate> GetCandidates(int ridePatNum, int numOfCandidates)
     {
+
+        Dictionary<string, Candidate> newbies;
 
         string query = "exec spGetCandidatesForRidePat @RidePatNum=" + ridePatNum;
         query += ",@NumOfDaysToThePast=" + Constants.Candidate.NumOfDaysToThePast;
@@ -43,10 +52,15 @@ public class CandidatesLogic
                 ammountOfPathMatch.Add(Convert.ToInt32(sdr["AmmountOfPathMatchScoreOfType_3"]));
                 ammountOfPathMatch.Add(Convert.ToInt32(sdr["AmmountOfPathMatchScoreOfType_4"]));
 
+                bool superUser = Convert.ToBoolean(sdr["IsSuperDriver"]);
+                int driverLevel = (int) Level.Regular;
+                if (superUser) driverLevel = (int) Level.Super;
+                
+
                 candidate = new Candidate(
                     Convert.ToInt32(sdr["Id"]),
                     Convert.ToString(sdr["DisplayName"]),
-                    Convert.ToBoolean(sdr["IsSuperDriver"]),
+                    driverLevel,
                     ammountOfPathMatch,
                     Convert.ToInt32(sdr["AmmountOfMatchByDay"]),
                     Convert.ToInt32(sdr["AmmountOfDisMatchByDay"]),
@@ -55,7 +69,7 @@ public class CandidatesLogic
                 );
                 candidates.Add(Convert.ToString(candidate.Id), candidate);
             }
-            Dictionary<string, Candidate> newbies = GetNewbiesCandidates(ridePatNum);
+            newbies = GetNewbiesCandidates(ridePatNum,1000); // 100 is just a big number to get all the new drivers
 
             //merge between thw two candidates & newbies
         }
@@ -71,14 +85,20 @@ public class CandidatesLogic
         // ADDED BY BENNY
         // THE LOGIC OF CHOOSING CANDIDATES
 
-        Dictionary<string, Candidate> bestCandidates = selectBestCandidates(candidates,true, numOfCandidates);
+       
+
+        foreach (KeyValuePair<string,Candidate> kv in newbies) // add the newbies to the candidates
+        {
+            candidates.Add(kv.Key, kv.Value);
+        }
+
+        Dictionary<string, Candidate> bestCandidates = selectBestCandidates(candidates, true, numOfCandidates);
 
         return FillExtraDetails(bestCandidates);
     }
 
-    private Dictionary<string, Candidate> GetNewbiesCandidates(int ridePatNum)
+    public Dictionary<string, Candidate> GetNewbiesCandidates(int ridePatNum, int numOfCandidates)
     {
-        const bool isNewbie = true; 
         string query = "exec spGetNoobsCandidatesForRidePat @RidePatNum=" + ridePatNum;
         query += ",@NumOfDaysToThePast=" + Constants.Candidate.NumOfDaysToThePast;
         query += ",@NUmOfDaysToTheFuture=" + Constants.Candidate.NUmOfDaysToTheFuture;
@@ -109,13 +129,12 @@ public class CandidatesLogic
                 candidate = new Candidate(
                     Convert.ToInt32(sdr["Id"]),
                     Convert.ToString(sdr["DisplayName"]),
-                    Convert.ToBoolean(sdr["IsSuperDriver"]),
+                    (int) Level.Newbee,
                     ammountOfPathMatch,
                     Convert.ToInt32(sdr["AmmountOfMatchByDay"]),
                     Convert.ToInt32(sdr["AmmountOfDisMatchByDay"]),
                     Convert.ToInt32(sdr["AmmountOfMatchDayPart"]),
-                    Convert.ToInt32(sdr["AmmountOfDisMatchDayPart"]),
-                    isNewbie
+                    Convert.ToInt32(sdr["AmmountOfDisMatchDayPart"])
                 );
                 
                 newbies.Add(Convert.ToString(candidate.Id), candidate);
@@ -150,20 +169,27 @@ public class CandidatesLogic
 
         Dictionary<string, Candidate> super  = new Dictionary<string, Candidate>();
         Dictionary<string, Candidate> regular = new Dictionary<string, Candidate>();
+        Dictionary<string, Candidate> newbee = new Dictionary<string, Candidate>();
+
 
 
         // seperate them to super volunteers and regular
         foreach (KeyValuePair<string, Candidate> kv in candidates) {
-            if (kv.Value.IsSuperDriver) super.Add(kv.Key, kv.Value);
-            else regular.Add(kv.Key, kv.Value);
+            if (kv.Value.DriverLevel == (int)Level.Super) super.Add(kv.Key, kv.Value);
+            else if (kv.Value.DriverLevel == (int)Level.Regular) regular.Add(kv.Key, kv.Value);
+            else if (kv.Value.DriverLevel == (int)Level.Newbee) newbee.Add(kv.Key, kv.Value);
+            else throw new Exception("must be Super or Regular or Newbee");
+
         }
 
         Dictionary<string, double> superScore = calculateScore(super, weights);
         Dictionary<string, double> regularScore = calculateScore(regular, weights);
+        Dictionary<string, double> newbeeScore = calculateScore(newbee, weights);
 
 
         Dictionary<string,double> topSuper = selectTop(superScore, numOfCandidates);
         Dictionary<string, double> topRegular = selectTop(regularScore, numOfCandidates);
+        Dictionary<string, double> topNewbee = selectTop(newbeeScore, 1000);
 
         Dictionary<string, Candidate> topCandidates = new Dictionary<string, Candidate>();
 
@@ -172,11 +198,16 @@ public class CandidatesLogic
             topCandidates.Add(kv.Key, candidates[kv.Key]);
             }
             
-
         foreach (KeyValuePair<string, double> kv in topRegular) {
             candidates[kv.Key].Score = kv.Value;
             topCandidates.Add(kv.Key, candidates[kv.Key]);
             }
+
+        foreach (KeyValuePair<string, double> kv in topNewbee)
+        {
+            candidates[kv.Key].Score = kv.Value;
+            topCandidates.Add(kv.Key, candidates[kv.Key]);
+        }
 
         return topCandidates;
     }

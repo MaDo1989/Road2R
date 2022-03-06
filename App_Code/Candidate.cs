@@ -10,33 +10,21 @@ using System.Web;
 public class Candidate : Volunteer
 {
     public Candidate() { }
-    public Candidate(int id, string displayName, bool isSuperDriver, List<int> ammountOfPathMatch,
+    public Candidate(int id, string displayName, int driverLevel, List<int> ammountOfPathMatch,
                      int ammountOfMatchByDay, int ammountOfDisMatchByDay,
                      int ammountOfMatchDayPart, int ammountOfDisMatchDayPart
                     ) : base(id, displayName)
     {
-        IsSuperDriver = isSuperDriver;
+        DriverLevel = driverLevel;
         AmmountOfPathMatch = ammountOfPathMatch;
         AmmountOfMatchByDay = ammountOfMatchByDay;
         AmmountOfDisMatchByDay = ammountOfDisMatchByDay;
         AmmountOfMatchDayPart = ammountOfMatchDayPart;
         AmmountOfDisMatchDayPart = ammountOfDisMatchDayPart;
-    }
-    public Candidate(int id, string displayName, bool isSuperDriver, List<int> ammountOfPathMatch,
-                 int ammountOfMatchByDay, int ammountOfDisMatchByDay,
-                 int ammountOfMatchDayPart, int ammountOfDisMatchDayPart, bool isNewbie
-                ) : base(id, displayName)
-    {
-        IsSuperDriver = isSuperDriver;
-        AmmountOfPathMatch = ammountOfPathMatch;
-        AmmountOfMatchByDay = ammountOfMatchByDay;
-        AmmountOfDisMatchByDay = ammountOfDisMatchByDay;
-        AmmountOfMatchDayPart = ammountOfMatchDayPart;
-        AmmountOfDisMatchDayPart = ammountOfDisMatchDayPart;
-        IsNewbie = isNewbie;
     }
 
-    public bool IsNewbie { get; set; }
+
+    public int DriverLevel { get; set; }
     public double Score { get; set; }
     public bool IsSuperDriver { get; set; }
     public List<int> AmmountOfPathMatch { get; set; }

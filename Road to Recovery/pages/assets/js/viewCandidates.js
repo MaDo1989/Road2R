@@ -23,8 +23,9 @@ const wiringDataTables = () => {
 
 $(document).ready(() => {
 
-    candidatesTable = $('#datatable-candidates').DataTable({ data: [], destroy: true });
+    candidatesTable   = $('#datatable-candidates').DataTable({ data: [], destroy: true });
     superDriversTable = $('#datatable-superDrivers').DataTable({ data: [], destroy: true });
+    newDriversTable   = $('#datatable-newDrivers').DataTable({ data: [], destroy: true });
 
     ridePatNum = JSON.parse( getRidePatNum4_viewCandidate());
     getCandidates();
@@ -113,11 +114,12 @@ const getCandidates = () => {
 
     // BENNY
     let numOfCandidates = 10;
+    let newFlag = false;
 
     $('#wait').show();
     ajaxCall(
         'GetCandidates',
-        JSON.stringify({ ridePatNum, numOfCandidates }),
+        JSON.stringify({ ridePatNum, numOfCandidates, newFlag }),
         getCandidates_SCB,
         getCandidates_ECB
     );
@@ -147,6 +149,8 @@ const fillTableWithData = () => {
     let thisCandidate = {};
     regularCandidated_clientVersion = [];
     superCandidated_clientVersion = [];
+    newCandidated_clientVersion = [];
+
     let date2display;
 
     for (let i in allCandidatedFromDB) {
@@ -156,19 +160,35 @@ const fillTableWithData = () => {
         thisCandidate = {
             id: i,
             displayName: allCandidatedFromDB[i].DisplayName,
-            cellphone: addSeperator2MobileNum(allCandidatedFromDB[i].CellPhone),
+            cellphone: addSeperator2MobileNum(allCandidatedFromDB[i].CellPhone, "-"),
             city: allCandidatedFromDB[i].City + '<br />בדיקה',
             daysSinceLastRide: allCandidatedFromDB[i].DaysSinceLastRide,
             numOfRides_last2Months: allCandidatedFromDB[i].NumOfRides_last2Months,
             daysUntilNextRide: allCandidatedFromDB[i].DaysUntilNextRide,
             latestDocumentedCallDate: date2display,
             seniorityInYears: allCandidatedFromDB[i].SeniorityInYears,
-            buttons: '',
+            buttons: ''
         }
 
-        allCandidatedFromDB[i].IsSuperDriver ?
-            superCandidated_clientVersion.push(thisCandidate) :
-            regularCandidated_clientVersion.push(thisCandidate);
+        switch (allCandidatedFromDB[i].DriverLevel) {
+
+            case 0:
+                newCandidated_clientVersion.push(thisCandidate);
+                break;
+            case 1:
+                regularCandidated_clientVersion.push(thisCandidate);
+                break;
+            case 2:
+                superCandidated_clientVersion.push(thisCandidate);
+                break;
+            default:
+                alert("illegal DriverType");
+                break;
+        }
+
+        //allCandidatedFromDB[i].IsSuperDriver ?
+        //    superCandidated_clientVersion.push(thisCandidate) :
+        //    regularCandidated_clientVersion.push(thisCandidate);
 
         //#region ↓DATATABLES PROPERTIES↓|
 
@@ -198,7 +218,7 @@ const fillTableWithData = () => {
             { data: "daysUntilNextRide" },                          //5
             { data: "latestDocumentedCallDate" },                   //6
             { data: "seniorityInYears" },                           //7
-            { data: "buttons" },                                    //8
+            { data: "buttons" }                                    //8
         ],
         columnDefs: [
             { width: '20%', "targets": [0] },
@@ -206,7 +226,7 @@ const fillTableWithData = () => {
             { width: '15%', "targets": [2] },
             { width: '10%', "targets": [3] },
             { width: '5%', "targets": [4, 5, 7] },
-            { width: '12%', "targets": [6, 8] },
+            { width: '12%', "targets": [6, 8] }
         ]
     });
 
@@ -230,7 +250,7 @@ const fillTableWithData = () => {
                 { data: "daysUntilNextRide" },                          //5
                 { data: "latestDocumentedCallDate" },                   //6
                 { data: "seniorityInYears" },                           //7
-                { data: "buttons" },                                    //8
+                { data: "buttons" }                                    //8
 
             ],
             columnDefs: [
@@ -239,7 +259,40 @@ const fillTableWithData = () => {
                 { width: '15%', "targets": [2] },
                 { width: '10%', "targets": [3] },
                 { width: '5%', "targets": [4, 5, 7] },
-                { width: '12%', "targets": [6, 8] },
+                { width: '12%', "targets": [6, 8] }
+            ]
+        });
+
+    newDriversTable = $('#datatable-newDrivers').DataTable(
+        {
+            data: newCandidated_clientVersion,
+            rowId: 'id',
+            pageLength: 10,
+            stateSave: true,
+            destroy: true,
+            "lengthChange": false, // for somereason this property must be string
+            stateDuration: 60 * 60,
+            autoWidth: false,
+            columns: [
+                //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
+                { data: "displayName" },                                //0
+                { data: "cellphone" },                                  //1
+                { data: "city" },                                       //2
+                { data: "daysSinceLastRide" },                          //3
+                { data: "numOfRides_last2Months" },                     //4
+                { data: "daysUntilNextRide" },                          //5
+                { data: "latestDocumentedCallDate" },                   //6
+                { data: "seniorityInYears" },                           //7
+                { data: "buttons" }                                    //8
+
+            ],
+            columnDefs: [
+                { width: '20%', "targets": [0] },
+                { width: '10%', "targets": [1] },
+                { width: '15%', "targets": [2] },
+                { width: '10%', "targets": [3] },
+                { width: '5%', "targets": [4, 5, 7] },
+                { width: '12%', "targets": [6, 8] }
             ]
         });
 
