@@ -248,12 +248,15 @@ public class WebService : System.Web.Services.WebService
 
     //Benny Candidates
     [WebMethod(EnableSession = true)]
-    public string GetCandidates(int ridePatNum,int numOfCandidates) {
+    public string GetCandidates(int ridePatNum,int numOfCandidates, bool newFlag) {
 
         try
         {
             CandidatesLogic cl = new CandidatesLogic();
-            return j.Serialize(cl.GetCandidates(ridePatNum, numOfCandidates));
+            if(newFlag)
+                return j.Serialize(cl.GetNewbiesCandidates(ridePatNum, numOfCandidates));
+            else
+                return j.Serialize(cl.GetCandidates(ridePatNum, numOfCandidates));
         }
         catch (Exception ex)
         {
@@ -262,6 +265,8 @@ public class WebService : System.Web.Services.WebService
 
         }
     }
+
+    
     
 
     [WebMethod(EnableSession = true)]

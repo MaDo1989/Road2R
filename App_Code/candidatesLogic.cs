@@ -11,10 +11,19 @@ public class CandidatesLogic
 {
     DbService dbs;
     Dictionary<string, Candidate> candidates;
+    Dictionary<string, Candidate> newbies;
 
+    enum  Level
+    {
+        Newbee,
+        Regular,
+        Super
+    }
 
     public Dictionary<string, Candidate> GetCandidates(int ridePatNum, int numOfCandidates)
     {
+
+        Dictionary<string, Candidate> newbies;
 
         string query = "exec spGetCandidatesForRidePat @RidePatNum=" + ridePatNum;
         query += ",@NumOfDaysToThePast=" + Constants.Candidate.NumOfDaysToThePast;
@@ -24,6 +33,8 @@ public class CandidatesLogic
         query += ",@NumOfDaysToThePast_CheckRides_Super=" + Constants.Candidate.NumOfDaysToThePast_CheckRides_Super;
         query += ",@NumOfDaysToTheFuture_CheckRides_Super=" + Constants.Candidate.NumOfDaysToTheFuture_CheckRides_Super;
         query += ",@AmountBottomLimitToBeSuperUserDriver=" + Constants.Candidate.AmountBottomLimitToBeSuperUserDriver;
+        query += ",@AmountOfRidesInNewDriverTimeWindow=" + Constants.Candidate.AmountOfRidesInNewDriverTimeWindow;
+        query += ",@NewDriverTimeWindow=" + Constants.Candidate.NewDriverTimeWindow;
 
         try
         {
@@ -41,10 +52,15 @@ public class CandidatesLogic
                 ammountOfPathMatch.Add(Convert.ToInt32(sdr["AmmountOfPathMatchScoreOfType_3"]));
                 ammountOfPathMatch.Add(Convert.ToInt32(sdr["AmmountOfPathMatchScoreOfType_4"]));
 
+                bool superUser = Convert.ToBoolean(sdr["IsSuperDriver"]);
+                int driverLevel = (int) Level.Regular;
+                if (superUser) driverLevel = (int) Level.Super;
+                
+
                 candidate = new Candidate(
                     Convert.ToInt32(sdr["Id"]),
                     Convert.ToString(sdr["DisplayName"]),
-                    Convert.ToBoolean(sdr["IsSuperDriver"]),
+                    driverLevel,
                     ammountOfPathMatch,
                     Convert.ToInt32(sdr["AmmountOfMatchByDay"]),
                     Convert.ToInt32(sdr["AmmountOfDisMatchByDay"]),
@@ -53,6 +69,9 @@ public class CandidatesLogic
                 );
                 candidates.Add(Convert.ToString(candidate.Id), candidate);
             }
+            newbies = GetNewbiesCandidates(ridePatNum,1000); // 100 is just a big number to get all the new drivers
+
+            //merge between thw two candidates & newbies
         }
         catch (Exception ex)
         {
@@ -66,11 +85,71 @@ public class CandidatesLogic
         // ADDED BY BENNY
         // THE LOGIC OF CHOOSING CANDIDATES
 
-        Dictionary<string, Candidate> bestCandidates = selectBestCandidates(candidates,true, numOfCandidates);
+       
+
+        foreach (KeyValuePair<string,Candidate> kv in newbies) // add the newbies to the candidates
+        {
+            candidates.Add(kv.Key, kv.Value);
+        }
+
+        Dictionary<string, Candidate> bestCandidates = selectBestCandidates(candidates, true, numOfCandidates);
 
         return FillExtraDetails(bestCandidates);
     }
 
+    public Dictionary<string, Candidate> GetNewbiesCandidates(int ridePatNum, int numOfCandidates)
+    {
+        string query = "exec spGetNoobsCandidatesForRidePat @RidePatNum=" + ridePatNum;
+        query += ",@NumOfDaysToThePast=" + Constants.Candidate.NumOfDaysToThePast;
+        query += ",@NUmOfDaysToTheFuture=" + Constants.Candidate.NUmOfDaysToTheFuture;
+        query += ",@NumOfDaysToThePast_CheckRides_Regular=" + Constants.Candidate.NumOfDaysToThePast_CheckRides_Regular;
+        query += ",@NumOfDaysToTheFuture_CheckRides_Regular=" + Constants.Candidate.NumOfDaysToTheFuture_CheckRides_Regular;
+        query += ",@NumOfDaysToThePast_CheckRides_Super=" + Constants.Candidate.NumOfDaysToThePast_CheckRides_Super;
+        query += ",@NumOfDaysToTheFuture_CheckRides_Super=" + Constants.Candidate.NumOfDaysToTheFuture_CheckRides_Super;
+        query += ",@AmountBottomLimitToBeSuperUserDriver=" + Constants.Candidate.AmountBottomLimitToBeSuperUserDriver;
+        query += ",@AmountOfRidesInNewDriverTimeWindow=" + Constants.Candidate.AmountOfRidesInNewDriverTimeWindow;
+        query += ",@NewDriverTimeWindow=" + Constants.Candidate.NewDriverTimeWindow;
+
+        try
+        {
+            dbs = new DbService();
+            SqlDataReader sdr = dbs.GetDataReader(query);
+            Candidate candidate;
+            newbies = new Dictionary<string, Candidate>();
+            List<int> ammountOfPathMatch;
+            while (sdr.Read())
+            {
+                ammountOfPathMatch = new List<int>();
+                ammountOfPathMatch.Add(Convert.ToInt32(sdr["AmmountOfPathMatchScoreOfType_0"]));
+                ammountOfPathMatch.Add(Convert.ToInt32(sdr["AmmountOfPathMatchScoreOfType_1"]));
+                ammountOfPathMatch.Add(Convert.ToInt32(sdr["AmmountOfPathMatchScoreOfType_2"]));
+                ammountOfPathMatch.Add(Convert.ToInt32(sdr["AmmountOfPathMatchScoreOfType_3"]));
+                ammountOfPathMatch.Add(Convert.ToInt32(sdr["AmmountOfPathMatchScoreOfType_4"]));
+
+                candidate = new Candidate(
+                    Convert.ToInt32(sdr["Id"]),
+                    Convert.ToString(sdr["DisplayName"]),
+                    (int) Level.Newbee,
+                    ammountOfPathMatch,
+                    Convert.ToInt32(sdr["AmmountOfMatchByDay"]),
+                    Convert.ToInt32(sdr["AmmountOfDisMatchByDay"]),
+                    Convert.ToInt32(sdr["AmmountOfMatchDayPart"]),
+                    Convert.ToInt32(sdr["AmmountOfDisMatchDayPart"])
+                );
+                
+                newbies.Add(Convert.ToString(candidate.Id), candidate);
+            }
+            return newbies;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+        finally
+        {
+            dbs.CloseConnection();
+        }
+    }
 
     private Dictionary<string, Candidate> selectBestCandidates(Dictionary<string, Candidate> candidates,bool rand, int numOfCandidates) {
 
@@ -90,20 +169,27 @@ public class CandidatesLogic
 
         Dictionary<string, Candidate> super  = new Dictionary<string, Candidate>();
         Dictionary<string, Candidate> regular = new Dictionary<string, Candidate>();
+        Dictionary<string, Candidate> newbee = new Dictionary<string, Candidate>();
+
 
 
         // seperate them to super volunteers and regular
         foreach (KeyValuePair<string, Candidate> kv in candidates) {
-            if (kv.Value.IsSuperDriver) super.Add(kv.Key, kv.Value);
-            else regular.Add(kv.Key, kv.Value);
+            if (kv.Value.DriverLevel == (int)Level.Super) super.Add(kv.Key, kv.Value);
+            else if (kv.Value.DriverLevel == (int)Level.Regular) regular.Add(kv.Key, kv.Value);
+            else if (kv.Value.DriverLevel == (int)Level.Newbee) newbee.Add(kv.Key, kv.Value);
+            else throw new Exception("must be Super or Regular or Newbee");
+
         }
 
         Dictionary<string, double> superScore = calculateScore(super, weights);
         Dictionary<string, double> regularScore = calculateScore(regular, weights);
+        Dictionary<string, double> newbeeScore = calculateScore(newbee, weights);
 
 
         Dictionary<string,double> topSuper = selectTop(superScore, numOfCandidates);
         Dictionary<string, double> topRegular = selectTop(regularScore, numOfCandidates);
+        Dictionary<string, double> topNewbee = selectTop(newbeeScore, 1000);
 
         Dictionary<string, Candidate> topCandidates = new Dictionary<string, Candidate>();
 
@@ -112,11 +198,16 @@ public class CandidatesLogic
             topCandidates.Add(kv.Key, candidates[kv.Key]);
             }
             
-
         foreach (KeyValuePair<string, double> kv in topRegular) {
             candidates[kv.Key].Score = kv.Value;
             topCandidates.Add(kv.Key, candidates[kv.Key]);
             }
+
+        foreach (KeyValuePair<string, double> kv in topNewbee)
+        {
+            candidates[kv.Key].Score = kv.Value;
+            topCandidates.Add(kv.Key, candidates[kv.Key]);
+        }
 
         return topCandidates;
     }
@@ -181,14 +272,22 @@ public class CandidatesLogic
             {
                 idPointer = Convert.ToString(sdr["Id"]);
                 candidates[idPointer].CellPhone = Convert.ToString(sdr["CellPhone"]);
-                candidates[idPointer].DaysSinceLastRide = Convert.ToInt32(sdr["DaysSinceLastRide"]);
+
+                candidates[idPointer].City = String.IsNullOrEmpty(sdr["CityCityName"].ToString()) ? null :
+                                                          Convert.ToString(sdr["CityCityName"]);
+
+                candidates[idPointer].DaysSinceLastRide = String.IsNullOrEmpty(sdr["DaysSinceLastRide"].ToString()) ? null :
+                                                         (int?) Convert.ToInt32(sdr["DaysSinceLastRide"]);
+                
                 candidates[idPointer].NumOfRides_last2Months = Convert.ToInt32(sdr["NumOfRides_last2Months"]);
+                
                 candidates[idPointer].DaysUntilNextRide = String.IsNullOrEmpty(sdr["DaysUntilNextRide"].ToString()) ? null :
                                                           (int?)Convert.ToInt32(sdr["DaysUntilNextRide"]);
+                
                 candidates[idPointer].LatestDocumentedCallDate = String.IsNullOrEmpty(sdr["LatestDocumentedCallDate"].ToString()) ? null :
                                                                  (DateTime?)Convert.ToDateTime(sdr["LatestDocumentedCallDate"].ToString());
+                
                 candidates[idPointer].SeniorityInYears = Convert.ToDouble(sdr["SeniorityInYears"]);
-                candidates[idPointer].City = Convert.ToString(sdr["CityCityName"]);
             }
 
             return candidates;

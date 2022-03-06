@@ -246,7 +246,7 @@ var GENERAL = {
           * Gets a string of israeli phone number with no "-".
           * Returns a new string of the phone number with a string seperator
         */
-        addSeperator2MobileNum: (mobileNum, Seperator) => {
+        addSeperator2MobileNum: (mobileNum, Seperator = '-') => {
 
             let newStr = '';
             newStr = mobileNum.substring(0, 3);
