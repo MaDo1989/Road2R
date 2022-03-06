@@ -161,7 +161,7 @@ const fillTableWithData = () => {
             id: i,
             displayName: allCandidatedFromDB[i].DisplayName,
             cellphone: addSeperator2MobileNum(allCandidatedFromDB[i].CellPhone, "-"),
-            city: allCandidatedFromDB[i].City + '<br />בדיקה',
+            city: allCandidatedFromDB[i].City,// + '<br />בדיקה',
             daysSinceLastRide: allCandidatedFromDB[i].DaysSinceLastRide,
             numOfRides_last2Months: allCandidatedFromDB[i].NumOfRides_last2Months,
             daysUntilNextRide: allCandidatedFromDB[i].DaysUntilNextRide,

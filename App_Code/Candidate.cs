@@ -32,7 +32,7 @@ public class Candidate : Volunteer
     public int AmmountOfDisMatchByDay { get; set; }
     public int AmmountOfMatchDayPart { get; set; }
     public int AmmountOfDisMatchDayPart { get; set; }
-    public int DaysSinceLastRide { get; set; }
+    public int? DaysSinceLastRide { get; set; }
     public int? DaysUntilNextRide { get; set; }
     public DateTime? LatestDocumentedCallDate { get; set; }
     public double SeniorityInYears { get; set; }

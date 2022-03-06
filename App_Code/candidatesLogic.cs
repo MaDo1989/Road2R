@@ -272,14 +272,22 @@ public class CandidatesLogic
             {
                 idPointer = Convert.ToString(sdr["Id"]);
                 candidates[idPointer].CellPhone = Convert.ToString(sdr["CellPhone"]);
-                candidates[idPointer].DaysSinceLastRide = Convert.ToInt32(sdr["DaysSinceLastRide"]);
+
+                candidates[idPointer].City = String.IsNullOrEmpty(sdr["CityCityName"].ToString()) ? null :
+                                                          Convert.ToString(sdr["CityCityName"]);
+
+                candidates[idPointer].DaysSinceLastRide = String.IsNullOrEmpty(sdr["DaysSinceLastRide"].ToString()) ? null :
+                                                         (int?) Convert.ToInt32(sdr["DaysSinceLastRide"]);
+                
                 candidates[idPointer].NumOfRides_last2Months = Convert.ToInt32(sdr["NumOfRides_last2Months"]);
+                
                 candidates[idPointer].DaysUntilNextRide = String.IsNullOrEmpty(sdr["DaysUntilNextRide"].ToString()) ? null :
                                                           (int?)Convert.ToInt32(sdr["DaysUntilNextRide"]);
+                
                 candidates[idPointer].LatestDocumentedCallDate = String.IsNullOrEmpty(sdr["LatestDocumentedCallDate"].ToString()) ? null :
                                                                  (DateTime?)Convert.ToDateTime(sdr["LatestDocumentedCallDate"].ToString());
+                
                 candidates[idPointer].SeniorityInYears = Convert.ToDouble(sdr["SeniorityInYears"]);
-                candidates[idPointer].City = Convert.ToString(sdr["CityCityName"]);
             }
 
             return candidates;
