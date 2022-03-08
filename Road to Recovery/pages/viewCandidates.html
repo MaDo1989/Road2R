@@ -57,6 +57,27 @@
 
     <!-- this page assets -->
     <!--<link href="assets/css/viewCandidatescss.css" rel="stylesheet" type="text/css" />-->
+
+    <style>
+
+        #characteristics {
+            padding-right:10px;
+            left:550px;
+            top:150px;
+            position:fixed;
+            height:300px;
+            width:320px;
+            background-color:yellow;
+            z-index:1;
+            color:black;
+        }
+
+        .boldC {
+            font-weight:bolder
+        }
+
+    </style>
+
     <script src="assets/js/viewCandidates.js"></script>
 </head>
 
@@ -162,9 +183,12 @@
                                                                 (ימים)
                                                             </th>
                                                             <th class="middle" title="Status  حالة السفرية">שיחה אחרונה</th>
-                                                            <th class="middle" title="Last modified">
+                                                            <th class="middle" title="Seniority">
                                                                 ותק בעמותה
                                                                 (שנים)
+                                                            </th>
+                                                            <th class="middle" title="Match Score">
+                                                                ציון התאמה
                                                             </th>
                                                             <th class="middle" title="Actions  اعمال">פעולות</th>
                                                         </tr>
@@ -209,6 +233,9 @@
                                                                 ותק בעמותה
                                                                 (שנים)
                                                             </th>
+                                                            <th class="middle" title="Match Score">
+                                                                ציון התאמה
+                                                            </th>
                                                             <th class="middle" title="Actions  اعمال">פעולות</th>
                                                         </tr>
                                                     </thead>
@@ -220,7 +247,7 @@
 
 
 
-                                    <div class="panel panel-primary">
+                                    <!--<div class="panel panel-primary">
                                         <div class="panel-heading" id="col2">
                                             <h4 data-toggle="tooltip" data-placement="top" title="" class="panel-title">
                                                 <a href="#collapse3" data-parent="#accordion" data-toggle="collapse">
@@ -252,6 +279,9 @@
                                                                 ותק בעמותה
                                                                 (שנים)
                                                             </th>
+                                                            <th class="middle" title="Match Score">
+                                                                ציון התאמה
+                                                            </th>
                                                             <th class="middle" title="Actions  اعمال">פעולות</th>
                                                         </tr>
                                                     </thead>
@@ -259,7 +289,7 @@
                                                 </table>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div>-->
 
 
 
@@ -369,6 +399,11 @@
         </div>
     </div>
     <!-- ↑ RidesHistoryModal ↑  -->
+
+    <div id="characteristics">
+
+    </div>
+
     <footer id="rights" data-toggle="tooltip" data-placement="top" title="© All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء" class="footer text-right">
     </footer>
 </body>
