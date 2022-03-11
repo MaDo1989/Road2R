@@ -108,6 +108,9 @@ $(document).ready(() => {
 const deceideWhichTable2Show = () => {
     $('#collapse1').addClass("in");
     $('#collapsed1_aTag').removeClass('collapsed');
+
+    $('#collapsed2_aTag').addClass('collapsed');
+
 }
 const viewCharactaristics = () => {
     window.open("viewC.html?ridePatNum=" + ridePatNum, '_blank').focus();
