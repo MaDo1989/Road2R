@@ -104,7 +104,7 @@ function buildMessage(message) {
 const getPatientsPhonesText = (patient) => {
     let txt = ``;
     if (validateMobileNumFullVersion(patient.cellPhone)) {
-        let cellphone = patient.cellPhone.slice(0, 3) + "-" + patient.cellPhone.slice(3, 9)
+        let cellphone = patient.cellPhone.slice(0, 3) + "-" + patient.cellPhone.slice(3, patient.cellPhone.length)
         txt += `${patient.name}: ${cellphone}` + sep;
     }
 
