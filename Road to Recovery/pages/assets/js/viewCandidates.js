@@ -21,11 +21,55 @@ const wiringDataTables = () => {
 
 }
 
-$(document).ready(() => {
 
+function hideCharacteristics() {
+    $("#characteristics").css("visibility", "hidden");
+}
+
+function showCharacteristics() {
+
+    let id = this.getAttribute('data-driverId');
+    let c = allCandidatedFromDB[id];
+    let boldArr = ["נסיעות בציר המדויק הזה", "הסעות ביום הזה", "הסעות בחלק הנדרש של היום"];
+    let txt = {
+        "נסיעות בציר המדויק הזה": c.AmmountOfPathMatch[4],
+        "נסיעות בציר ההפוך": c.AmmountOfPathMatch[3],
+        "נסיעות מאותה נקודה לאותו איזור": c.AmmountOfPathMatch[2],
+        "נסיעות בין אותם איזורים": c.AmmountOfPathMatch[1],
+        "נסיעות נוספות": c.AmmountOfPathMatch[0],
+        "הסעות ביום הזה": c.AmmountOfMatchByDay,
+        "הסעות בימים אחרים": c.AmmountOfDisMatchByDay,
+        "הסעות בחלק הנדרש של היום": c.AmmountOfMatchDayPart,
+        "הסעות בחלקו השני של היום": c.AmmountOfDisMatchDayPart
+    };
+
+    let str = "<h3> נתוני נסיעות בחצי שנה האחרונה </h3>";
+    str += "<h3>" + c.DisplayName + "</h3>";
+    for (k in txt) {
+        if (txt[k] != 0)
+            if (boldArr.indexOf(k) >= 0)
+                str += "<p class='boldC'>" + k + " : " + txt[k] + "</p>";  
+            else
+                str += "<p>" + k + " : " + txt[k] + "</p>";
+    }
+    let position = $(this).position();
+    
+    //$("#characteristics").css("left", position.left - 300);
+    //$("#characteristics").css("top", position.top - 310);
+    $("#characteristics").css("visibility", "visible");
+    $("#characteristics").html(str);
+
+}
+
+$(document).ready(() => {
+    $("#characteristics").css("visibility", "hidden");
+
+    $(document).on("mouseover", ".c1", showCharacteristics);
+    $(document).on("mouseout", ".c1", hideCharacteristics);
+    
     candidatesTable   = $('#datatable-candidates').DataTable({ data: [], destroy: true });
     superDriversTable = $('#datatable-superDrivers').DataTable({ data: [], destroy: true });
-    newDriversTable   = $('#datatable-newDrivers').DataTable({ data: [], destroy: true });
+    //newDriversTable   = $('#datatable-newDrivers').DataTable({ data: [], destroy: true });
 
     ridePatNum = JSON.parse( getRidePatNum4_viewCandidate());
     getCandidates();
@@ -167,6 +211,7 @@ const fillTableWithData = () => {
             daysUntilNextRide: allCandidatedFromDB[i].DaysUntilNextRide,
             latestDocumentedCallDate: date2display,
             seniorityInYears: allCandidatedFromDB[i].SeniorityInYears,
+            score: parseInt(allCandidatedFromDB[i].Score),
             buttons: ''
         }
 
@@ -210,7 +255,12 @@ const fillTableWithData = () => {
         columns: [
             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
-            { data: "displayName" },                                //0
+            { data: "displayName",
+                render: function (data, type, row, meta) {
+                                let did = "data-driverId='" + row.id + "'";
+                                return '<p class="c1" ' + did + '>' +  data  + ' </p>';
+                    }
+            },                                                      //0
             { data: "cellphone" },                                  //1
             { data: "city" },                                       //2
             { data: "daysSinceLastRide" },                          //3
@@ -218,7 +268,8 @@ const fillTableWithData = () => {
             { data: "daysUntilNextRide" },                          //5
             { data: "latestDocumentedCallDate" },                   //6
             { data: "seniorityInYears" },                           //7
-            { data: "buttons" }                                    //8
+            { data: "score" },                                      //8
+            { data: "buttons" }                                     //9
         ],
         columnDefs: [
             { width: '20%', "targets": [0] },
@@ -226,7 +277,8 @@ const fillTableWithData = () => {
             { width: '15%', "targets": [2] },
             { width: '10%', "targets": [3] },
             { width: '5%', "targets": [4, 5, 7] },
-            { width: '12%', "targets": [6, 8] }
+            { width: '4%', "targets": [8] },
+            { width: '10%', "targets": [6, 9] }
         ]
     });
 
@@ -242,7 +294,13 @@ const fillTableWithData = () => {
             autoWidth: false,
             columns: [
                 //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
-                { data: "displayName" },                                //0
+                {
+                    data: "displayName",
+                    render: function (data, type, row, meta) {
+                        let did = "data-driverId='" + row.id + "'";
+                        return '<p class="c1" ' + did + '>' + data + ' </p>';
+                    }
+                },                                                      //0
                 { data: "cellphone" },                                  //1
                 { data: "city" },                                       //2
                 { data: "daysSinceLastRide" },                          //3
@@ -250,7 +308,8 @@ const fillTableWithData = () => {
                 { data: "daysUntilNextRide" },                          //5
                 { data: "latestDocumentedCallDate" },                   //6
                 { data: "seniorityInYears" },                           //7
-                { data: "buttons" }                                    //8
+                { data: "score" },                                      //8
+                { data: "buttons" }                                     //9
 
             ],
             columnDefs: [
@@ -259,42 +318,51 @@ const fillTableWithData = () => {
                 { width: '15%', "targets": [2] },
                 { width: '10%', "targets": [3] },
                 { width: '5%', "targets": [4, 5, 7] },
-                { width: '12%', "targets": [6, 8] }
+                { width: '4%', "targets": [8] },
+                { width: '10%', "targets": [6, 9] }
             ]
         });
 
-    newDriversTable = $('#datatable-newDrivers').DataTable(
-        {
-            data: newCandidated_clientVersion,
-            rowId: 'id',
-            pageLength: 10,
-            stateSave: true,
-            destroy: true,
-            "lengthChange": false, // for somereason this property must be string
-            stateDuration: 60 * 60,
-            autoWidth: false,
-            columns: [
-                //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
-                { data: "displayName" },                                //0
-                { data: "cellphone" },                                  //1
-                { data: "city" },                                       //2
-                { data: "daysSinceLastRide" },                          //3
-                { data: "numOfRides_last2Months" },                     //4
-                { data: "daysUntilNextRide" },                          //5
-                { data: "latestDocumentedCallDate" },                   //6
-                { data: "seniorityInYears" },                           //7
-                { data: "buttons" }                                    //8
+    //newDriversTable = $('#datatable-newDrivers').DataTable(
+    //    {
+    //        data: newCandidated_clientVersion,
+    //        rowId: 'id',
+    //        pageLength: 10,
+    //        stateSave: true,
+    //        destroy: true,
+    //        "lengthChange": false, // for somereason this property must be string
+    //        stateDuration: 60 * 60,
+    //        autoWidth: false,
+    //        columns: [
+    //            //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
+    //            {
+    //                data: "displayName",
+    //                render: function (data, type, row, meta) {
+    //                    let did = "data-driverId='" + row.id + "'";
+    //                    return '<p class="c1" ' + did + '>' + data + ' </p>';
+    //                }
+    //            },                                                      //0
+    //            { data: "cellphone" },                                  //1
+    //            { data: "city" },                                       //2
+    //            { data: "daysSinceLastRide" },                          //3
+    //            { data: "numOfRides_last2Months" },                     //4
+    //            { data: "daysUntilNextRide" },                          //5
+    //            { data: "latestDocumentedCallDate" },                   //6
+    //            { data: "seniorityInYears" },                           //7
+    //            { data: "score" },                                      //8
+    //            { data: "buttons" }                                     //9
 
-            ],
-            columnDefs: [
-                { width: '20%', "targets": [0] },
-                { width: '10%', "targets": [1] },
-                { width: '15%', "targets": [2] },
-                { width: '10%', "targets": [3] },
-                { width: '5%', "targets": [4, 5, 7] },
-                { width: '12%', "targets": [6, 8] }
-            ]
-        });
+    //        ],
+    //        columnDefs: [
+    //            { width: '20%', "targets": [0] },
+    //            { width: '10%', "targets": [1] },
+    //            { width: '15%', "targets": [2] },
+    //            { width: '10%', "targets": [3] },
+    //            { width: '5%', "targets": [4, 5, 7] },
+    //            { width: '4%', "targets": [8] },
+    //            { width: '10%', "targets": [6, 9] }
+    //        ]
+    //    });
 
     /*
                      ============================

@@ -1559,7 +1559,7 @@
                         messageToCopyBtn = `<button type='button' class='copyMessage   btn btn-icon waves-effect waves-light btn-secondary'        id='${arr_rides[i].RidePatNum}' name='${arr_rides[i].RidePatNum}' title='העתקת הודעה'><i class='fa fa-envelope'></i></button>`;
                         candidateBtn = `<button type='button' class='candidatesBtn btn btn-icon waves-effect waves-light btn-secondary'            id='${arr_rides[i].RidePatNum}' name='${arr_rides[i].RidePatNum}' title='מועמדים להסעה'><i class='fa fa-car'></i></button>`;
 
-                        let candidateFeature = localStorage.getItem('candidateFeature');
+                        candidateFeature = true;
 
                         if (candidateFeature !== null) {
 
