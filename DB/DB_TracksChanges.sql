@@ -6,21 +6,9 @@
 /*---------------------------------------------------------*/
 /*---------------------------------------------------------*/
 
-CREATE procedure [dbo].[spVolunteer_GetActiveVolunteers_NotDriversYet] 
-@daysSinceJoin int
-as
-	BEGIN
-	select * from volunteer v
-	where 
-		(
-			CASE
-				WHEN JoinDate is not null
-					THEN DATEDIFF(DAY, JoinDate, getdate())
-			end
-		) > @daysSinceJoin
-	and	IsActive=1
-	and	not exists (select distinct MainDriver from ride where MainDriver is not null and maindriver=v.id)
-END
+CREATE TYPE [dbo].[IntList] AS TABLE(
+	item INT NOT NULL
+)
 GO
 
 -- =============================================
@@ -28,7 +16,7 @@ GO
 -- Create Date: 17/02/2022
 -- Description: RETURNS TABLE OF CANDIDATE TO A GIVEN RIDEPAT WITH VARIOUS SCORES TO EACH CANDIDATE
 -- =============================================
-CREATE OR ALTER PROCEDURE [dbo].[spGetCandidatesForRidePat]
+	CREATE PROCEDURE [dbo].[spGetCandidatesForRidePat]
 	(
 		@RidePatNum INT,
 		@NumOfDaysToThePast INT,					@NUmOfDaysToTheFuture INT,
@@ -70,9 +58,9 @@ CREATE OR ALTER PROCEDURE [dbo].[spGetCandidatesForRidePat]
 			INTO #CANDIDATES_NO_NEWBIES
 			FROM #NUMOFRIDE_PER_VOLUNTEER NPV INNER JOIN Volunteer V
 			ON NPV.MainDriver=V.Id
-			WHERE NUMOFRIDES > 3 OR DATEDIFF(d,v.JoinDate, getdate()) > 60
+			WHERE NUMOFRIDES > @AmountOfRidesInNewDriverTimeWindow OR DATEDIFF(d,v.JoinDate, getdate()) > @NewDriverTimeWindow
 		
-			--3
+			--3 
 			SELECT *
 			INTO #NO_NEWBIESRIDES
 			FROM #CANDIDATES_NO_NEWBIES CNN INNER JOIN RIDE R ON CNN.CandidateId=R.MainDriver
@@ -176,62 +164,18 @@ CREATE OR ALTER PROCEDURE [dbo].[spGetCandidatesForRidePat]
 					AmmountOfPathMatchScoreOfType_3 +
 					AmmountOfPathMatchScoreOfType_4		> 0
 
+
 			DROP TABLE #CandidatesBucketsTable, #TempScoreTable, #NUMOFRIDE_PER_VOLUNTEER, #CANDIDATES_NO_NEWBIES, #NO_NEWBIESRIDES
-	END		
+		
+		END		
 GO
 
-CREATE TYPE [dbo].[IntList] AS TABLE(
-	item INT NOT NULL
-)
-GO
-
-
--- =============================================
--- Author:      Yogev Strauber
--- Create Date: 18/02/2022
--- Description: For given list of candidates's ids provided candidate details
--- =============================================
-CREATE OR ALTER PROCEDURE [dbo].[spGetCandidatesDetails]
-(
-	@IDs [IntList] readonly
-)
-AS
-BEGIN
-    -- SET NOCOUNT ON added to prevent extra result sets from
-    -- interfering with SELECT statements.
-    SET NOCOUNT ON
-
-
-SELECT Id, CellPhone, CityCityName,
-  (SELECT top 1 DATEDIFF(DAY,Date,GETDATE()) from Ride where MainDriver=V.Id AND Date <= GETDATE() order by Date desc) DaysSinceLastRide,
-
-  (SELECT COUNT(*)
-	FROM Ridepat RP INNER JOIN Ride R
-	ON RP.RideId=R.RideNum
-	WHERE R.MainDriver = V.Id AND PickupTime BETWEEN DATEADD(Month, -2, GETDATE()) and  GETDATE())  NumOfRides_last2Months,
-
-  (SELECT TOP 1 DATEDIFF(d,Date,GETDATE()) from Ride where MainDriver=V.Id AND Date > GETDATE() order by Date desc)*-1 DaysUntilNextRide,
-  (SELECT TOP 1 Concat(CallRecordedDate,' ', CallRecordedTime) DateAndTime FROM DocumentedCall WHERE DriverId=V.Id Order by DateAndTime desc) LatestDocumentedCallDate,
-
-FLOOR((DATEDIFF(MONTH,V.JoinDate, GETDATE())/12.0)*4) / 4 SeniorityInYears
-FROM 
-	Volunteer V 
-INNER JOIN @IDs ON V.Id=item
-
-END
-GO
-
-/****** Object:  StoredProcedure [dbo].[spGetCandidatesForRidePat]    Script Date: 2/25/2022 3:01:36 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
 -- =============================================
 -- Authors:     Dr. Benny Bornfeld & Yogev Strauber
 -- Create Date: 04/03/2022
 -- Description: RETURNS TABLE OF CANDIDATE TO A GIVEN RIDEPAT WITH VARIOUS SCORES TO EACH NEWBIE CANDIDATE
 -- =============================================
-CREATE PROCEDURE [dbo].[spGetNoobsCandidatesForRidePat]
+	CREATE PROCEDURE [dbo].[spGetNoobsCandidatesForRidePat]
 	(
 		@RidePatNum INT,
 		@NumOfDaysToThePast INT,					@NUmOfDaysToTheFuture INT,
@@ -270,7 +214,7 @@ CREATE PROCEDURE [dbo].[spGetNoobsCandidatesForRidePat]
 			INTO #CANDIDATES_NEWBIES_NO_ZERORIDES
 			FROM #NUMOFRIDE_PER_VOLUNTEER NPV INNER JOIN Volunteer V
 			ON NPV.MainDriver=V.Id
-			WHERE NUMOFRIDES <= 3 AND DATEDIFF(d,v.JoinDate, getdate()) < 60
+			WHERE NUMOFRIDES <= @AmountOfRidesInNewDriverTimeWindow AND DATEDIFF(d,v.JoinDate, getdate()) < @NewDriverTimeWindow
 		
 			SELECT *
 			INTO #NO_NEWBIESRIDES
@@ -368,7 +312,7 @@ CREATE PROCEDURE [dbo].[spGetNoobsCandidatesForRidePat]
 			SELECT V.Id, COUNT(RIDENUM) NumOfRides
 			INTO #NEBIEWSWITHZERORIDES
 			FROM Volunteer V LEFT JOIN RIDE R ON V.Id=R.MainDriver
-			WHERE DATEDIFF(d,V.JoinDate, getdate()) < 60
+			WHERE DATEDIFF(d,V.JoinDate, getdate()) < @NewDriverTimeWindow
 			GROUP BY V.Id
 			HAVING  COUNT(RIDENUM) = 0 
 
@@ -391,7 +335,42 @@ CREATE PROCEDURE [dbo].[spGetNoobsCandidatesForRidePat]
 
 			DROP TABLE #CandidatesBucketsTable, #TempScoreTable, #NUMOFRIDE_PER_VOLUNTEER, #CANDIDATES_NEWBIES_NO_ZERORIDES, #NO_NEWBIESRIDES
 		
-		END		
+		END	
+GO
+
+-- =============================================
+-- Author:      Yogev Strauber
+-- Create Date: 18/02/2022
+-- Description: For given list of candidates's ids provided candidate details
+-- =============================================
+CREATE PROCEDURE [dbo].[spGetCandidatesDetails]
+(
+	@IDs [IntList] readonly
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+    SET NOCOUNT ON
+
+
+SELECT Id, CellPhone, CityCityName,
+  (SELECT top 1 DATEDIFF(DAY,Date,GETDATE()) from Ride where MainDriver=V.Id AND Date <= GETDATE() order by Date desc) DaysSinceLastRide,
+
+  (SELECT COUNT(*)
+	FROM Ridepat RP INNER JOIN Ride R
+	ON RP.RideId=R.RideNum
+	WHERE R.MainDriver = V.Id AND PickupTime BETWEEN DATEADD(Month, -2, GETDATE()) and  GETDATE())  NumOfRides_last2Months,
+
+  (SELECT TOP 1 DATEDIFF(d,Date,GETDATE()) from Ride where MainDriver=V.Id AND Date > GETDATE() order by Date desc)*-1 DaysUntilNextRide,
+  (SELECT TOP 1 Concat(CallRecordedDate,' ', CallRecordedTime) DateAndTime FROM DocumentedCall WHERE DriverId=V.Id Order by DateAndTime desc) LatestDocumentedCallDate,
+
+FLOOR((DATEDIFF(MONTH,V.JoinDate, GETDATE())/12.0)*4) / 4 SeniorityInYears
+FROM 
+	Volunteer V 
+INNER JOIN @IDs ON V.Id=item
+
+END
 GO
 
 
