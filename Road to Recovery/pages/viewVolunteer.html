@@ -52,17 +52,9 @@
         var msgTable;
         let historyTable;
         let documentedCallsTable;
-        let preDefinedContents = [
-            { key: 0, value: '&lt;בחר.י מהרשימה או הכנס.י מלל חופשי בשדה הבא&gt;' },
-            { key: 1, value: 'תרשם/ירשם להסעה' },
-            { key: 2, value: 'לא נרשמ.ה להסעה' },
-            { key: 3, value: 'לא פנוי.ה לשיחה' },
-            { key: 4, value: 'להתקשר במועד מאוחד יותר' },
-            { key: 5, value: 'לא מסיע.ה בתקופה הקרובה' },
-            { key: 6, value: 'נא להסיר מהמערכת' }
-        ];
         let spanBadgeId;
         let thisVolunteerId = 0;
+        let { preDefinedContents } = GENERAL.DOCUMENTEDCALLS;
 
         checkCookie();
         var allVolunteersFromDb = [];
@@ -279,7 +271,7 @@
                             { data: "DisplayName", width: "5%" },              //0
                             { data: "TypeVol", width: "4%" },                  //1
                             { data: "CellPhone", width: "4%" },                //2
-                            { data: "EnglishName", width: "7%" } ,             //3
+                            { data: "EnglishName", width: "7%" },             //3
                             { data: "City", width: "4%" },                     //4
                             { data: "Remarks", width: "14%" },                 //5
                             { data: "LastModified", width: "8%" },             //6
@@ -785,16 +777,6 @@
 
             }
         }
-
-        //$('#DocumentAcall_choooseContent').change(function () {
-        //    let value = $('#DocumentAcall_choooseContent').val();
-        //    value > 0 ?
-
-        //        :
-        //        $('#DocumentAcall_writeContent').prop('disabled', false);
-        //});
-
-
 
         const documentAcall2DB = () => {
             $('#saveCallBtn').prop('disabled', true);

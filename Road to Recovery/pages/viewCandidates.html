@@ -56,28 +56,7 @@
     <script src="lib/includeHTML.js"></script>
 
     <!-- this page assets -->
-    <!--<link href="assets/css/viewCandidatescss.css" rel="stylesheet" type="text/css" />-->
-
-    <style>
-
-        #characteristics {
-            padding-right:10px;
-            left:550px;
-            top:150px;
-            position:fixed;
-            height:300px;
-            width:320px;
-            background-color:yellow;
-            z-index:1;
-            color:black;
-        }
-
-        .boldC {
-            font-weight:bolder
-        }
-
-    </style>
-
+    <link href="assets/css/viewCandidates.css" rel="stylesheet" type="text/css" />
     <script src="assets/js/viewCandidates.js"></script>
 </head>
 
@@ -406,5 +385,106 @@
 
     <footer id="rights" data-toggle="tooltip" data-placement="top" title="© All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء" class="footer text-right">
     </footer>
+        <!-- ↓ DocumentedCallsModal ↓ -->
+    <div class="modal fade" id="DocumentedCallsModal" tabindex="-1" role="dialog" aria-labelledby="DocumentedCallsTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content modal-lg">
+                <div class="modal-header">
+                    <button id="overRideBS_modal_4changeClose_x" type="button" class="close closeBtn_DocumentAcallsModal" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h2 class="modal-title" id="DocumentedCallsTitle">שיחות עם</h2>
+                </div>
+                <div class="modal-body">
+                    <div class="text-right">
+                        <button type="button" id="documentAcallPlusBtn" class="btn btn-default"
+                                data-keyboard="false"
+                                data-target="#DocumentAcallsModal" onclick="openDocumentAcallModal()">
+                            <i class="fa fa-plus"></i>
+                        </button>
+                    </div>
+                    <table id="DocumentedCallsTable" class="table table-striped table-bordered">
+                        <thead>
+                            <tr dir="rtl">
+                                <th>תאריך</th>
+                                <th>שעה</th>
+                                <th>רכז.ת</th>
+                                <th>פרטים</th>
+                                <th id="invisible">z</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <!-- ↓ DocumentAcallsModal ↓ -->
+
+                <div class="modal fade" id="DocumentAcallsModal" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div id="overRideBS_modal-dialog" class="modal-dialog" role="document">
+                        <div id="overRideBS_modal_4changeBg" class="modal-content">
+                            <div class="modal-header">
+                                <h2 class="modal-title">תיעוד שיחה</h2>
+                            </div>
+                            <div id="overRideBS_modal_4changelinesColor" class="modal-body">
+                                <span class="redTxt">* שדה חובה</span>
+                                <br />
+                                <br />
+                                <table id="DocumentAcallTable">
+                                    <tr>
+                                        <td class="rightCol">בתאריך</td>
+                                        <td class="leftCol">
+                                            <input name="DocumentAcallDatePicker" id="DocumentAcallDatePicker" type="date" onclick="disableFutureIn_DocumentAcallDatePicker()" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="rightCol">שעה <span class="redTxt">*</span></td>
+                                        <td class="leftCol">
+                                            <input id="DocumentAcallTime" type="time" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="rightCol">רכז.ת <span class="redTxt">*</span></td>
+                                        <td class="leftCol">
+                                            <select id="DocumentAcall_choooseCoordinator" onchange="DocumentAcall_choooseCoordinator_changed()">
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="rightCol">תוכן השיחה <span class="redTxt">*</span></td>
+                                        <td class="leftCol">
+                                            <select id="DocumentAcall_choooseContent" onchange="DocumentAcall_choooseContent_changed()">
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="rightCol"></td>
+                                        <td class="leftCol">
+                                            <textarea onblur="DocumentAcall_writeContent_blured()" onclick="DocumentedAcall_writeContent_clicked()" id="DocumentAcall_writeContent" maxlength="400" placeholder="&lt;מלל חופשי עד 400 תווים&gt;"></textarea>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <span id="DocumentAcall_contentErrorMsg" class="redTxt">יש למלא לפחות אחד מהשדות של תוכן השיחה</span>
+                                <span id="DocumentAcall_CoordinatorErrorMsg" class="redTxt">יש לבחור רכז.ת מהרשימה</span>
+
+                            </div>
+                            <div class="text-right modal-footer">
+                                <!-- for some reason right in bs means left -->
+                                <button type="button" id="saveCallBtn" class="fixWidth btn btn-secondary" onclick="documentAcall2DB()">שמירה</button>
+                                <button type="button" id="cancellCallBtn" class="fixWidth btn btn-secondary" onclick="cancelCallDocument()">ביטול</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ↑ DocumentAcallsModal ↑ -->
+                <div class="text-right modal-footer">
+                    <!-- for some reason right in bs means left -->
+                    <button type="button" class="btn btn-secondary closeBtn_DocumentAcallsModal" data-dismiss="modal">סגירה</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ↑ DocumentedCallsModal ↑  -->
+
+
 </body>
 </html>

@@ -1,0 +1,151 @@
+#characteristics {
+    padding-right: 10px;
+    left: 550px;
+    top: 150px;
+    position: fixed;
+    height: 300px;
+    width: 320px;
+    background-color: yellow;
+    z-index: 1;
+    color: black;
+}
+
+.boldC {
+    font-weight: bolder
+}
+/* ↓ over ride bootstrap ↓ */
+
+.badge {
+    margin-top: 0px;
+    margin-bottom: 25px;
+    position: relative;
+    right: 10px;
+    z-index: 2;
+}
+
+/* ↑ over ride bootstrap ↑ */
+
+/*.dt-body-right {
+    text-align: right;
+}*/
+
+#documentAcallPlusBtn {
+    width: 30px;
+    height: 30px;
+    padding: 6px 0px;
+    border-radius: 15px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.42857;
+    margin-bottom: 2vh;
+}
+
+#wrap_DocumentAcallsModal {
+    height: 35vh;
+    border: solid 1px black;
+}
+
+.redTxt {
+    color: red;
+    margin-bottom: 2px;
+}
+
+/*
+    x button on top left of
+    calls 
+    doesnt compile with
+    that funcionality
+    so I make him ↓
+*/
+button:disabled:hover,
+select:disabled:hover,
+textarea:disabled:hover {
+    cursor: not-allowed;
+}
+
+#DocumentAcallsModal {
+    position: inherit;
+}
+
+#overRideBS_modal-dialog {
+    border: 2px solid;
+    margin: 0;
+    width: 820px;
+}
+
+.leftCol {
+    width: 10vw;
+}
+
+.rightCol {
+    width: 10vw;
+}
+
+#DocumentAcallTable {
+    border-collapse: separate;
+    border-spacing: 1em;
+}
+
+#DocumentAcallDatePicker,
+#DocumentAcallTime,
+#DocumentAcall_choooseCoordinator,
+#DocumentAcall_choooseContent,
+#DocumentAcall_writeContent {
+    width: 20vw;
+}
+
+#DocumentAcall_choooseCoordinator {
+    position: relative;
+}
+/*by setting resize to vertical
+    the horizonatal is disabled*/
+#DocumentAcall_writeContent:focus {
+    resize: vertical;
+}
+
+#DocumentAcall_contentErrorMsg,
+#DocumentAcall_CoordinatorErrorMsg,
+#invisible {
+    display: none;
+}
+
+.fixWidth {
+    width: 70px;
+}
+
+#overRideBS_modal_4changeBg {
+    background: #f9f9f9;
+}
+
+#overRideBS_modal_4changelinesColor {
+    border-top: 1px solid #948e8e;
+    border-bottom: 1px solid #948e8e;
+}
+
+.futureRide {
+    color: #0022f9;
+}
+
+#DocumentedCallTable_filter {
+    margin-left: -5px;
+}
+
+/*override bs */
+#overRideBS_modal_4changeClose_x {
+    font-size: 42px;
+}
+
+.btnWrapper-right {
+    display: inline-block;
+    width: 40px;
+}
+
+.btnWrapper-left {
+    display: inline-block;
+    width: 70px;
+}
+
+/*override bootstrap*/
+.badge {
+    width: 30px;
+}
