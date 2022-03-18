@@ -115,15 +115,17 @@
                         $("#ManagerName").attr('disabled', 'disabled');
                         $("#saveLocation").attr('disabled', 'disabled');
                         $("#locationEnglishName").attr('disabled', 'disabled');
-
+                        $("#locationName").attr('disabled', 'disabled');
                     }
                     else {
-                        $("#locationName").attr('disabled', 'disabled');
+                        
                     }
                 }
                 else {
-                    $("#activeLocation").prop('checked', 'checked');
+                    //$("#activeLocation").prop('checked', 'checked');
                 }
+                if(arr_location.func == "edit")
+                    $("#locationName").attr('disabled', 'disabled');
      //   }
         }
 
@@ -166,6 +168,7 @@
                 type: "POST",
                 success: function (data) {
                     var areas = JSON.parse(data.d);
+                    $('<option>', { value: "-1", text: "בחר איזור" }).appendTo($select);
                     for (var i = 0; i < areas.length; i++) {
                         if (areas[i].indexOf("-") === -1) {
                             $('<option>', { value: areas[i], text: areas[i] }).appendTo($select);
@@ -197,7 +200,7 @@
             regions = JSON.parse(data.d);
             regions.sort(compareFunc);
             let $select = $("#sub-area");
-
+            $('<option>', { value: "-1", text: "בחר תת איזור" }).appendTo($select);
             for (var i = 0; i < regions.length; i++) {
                 $('<option>', { value: regions[i].Id, text: regions[i].Name }).appendTo($select);
             }
@@ -296,7 +299,7 @@
                                         <br />
 
                                         <div class="col-md-6 checkbox checkbox-primary text-left">
-                                            <input id="activeLocation" type="checkbox">
+                                            <input id="activeLocation" type="checkbox" checked>
                                             <label for="activeLocation">
                                                 אזור פעיל
                                             </label>

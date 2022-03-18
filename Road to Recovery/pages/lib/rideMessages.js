@@ -145,9 +145,9 @@ function messageDate(date) {
     else if (sameDay && afternoonRide)
         txt = `היום אחר הצהריים`;
     else if (!sameDay && !afternoonRide)
-        txt = `ביום ${dayInWeek} ${rideDate.getDate()}.${rideDate.getMonth()} בשעה ${hour}:${min}`;
+        txt = `ביום ${dayInWeek} ${rideDate.getDate()}.${rideDate.getMonth()+1} בשעה ${hour}:${min}`;
     else
-        txt = `ביום ${dayInWeek} ${rideDate.getDate()}.${rideDate.getMonth()} בשעות אחר הצהריים`;
+        txt = `ביום ${dayInWeek} ${rideDate.getDate()}.${rideDate.getMonth()+1} בשעות אחר הצהריים`;
     return txt;
 }
 
