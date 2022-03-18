@@ -895,7 +895,9 @@
                 refreshInterval = setInterval("refreshTable()", refreshTime);
             }
 
-            let allSortsSwitch = JSON.parse(localStorage.getItem('allSortsSwitch'));
+            let allSortsSwitch = true;
+            if (localStorage.getItem('allSortsSwitch') != null)
+                allSortsSwitch = JSON.parse(localStorage.getItem('allSortsSwitch'));
 
             if (allSortsSwitch) {
                 $('#allSortsSwitch').prop('checked', true);
