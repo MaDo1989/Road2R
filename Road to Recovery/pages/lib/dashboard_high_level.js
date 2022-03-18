@@ -1,9 +1,9 @@
 ﻿// Purpose: Dashboard UI for Amuta
 
 
-window.is_debugging_dsb = false;
-window.full_loading = true;
-
+window.is_debugging_dsb = false; 
+window.full_loading = true; 
+window.all_graphs = true;
 
 const CHART_COLORS = {
     red: 'rgb(255, 99, 132)',
@@ -21,13 +21,15 @@ function dashboard_hl_init() {
     $("#dsb_hl_content_div").show();
     if (window.full_loading) {
         start_daily_cards();
+        start_weekly_cards();
         start_monthly_cards();
         start_yearly_cards();
     }
     else {
         // For fast debugging
-        start_month_graph(get_month_card("curr"));
-        start_one_month_row(get_month_card("curr"));
+        start_weekly_cards();
+        // start_month_graph(get_month_card("curr"));
+        // start_one_week_row(get_week_card("curr"));
     }
 }
 
@@ -146,7 +148,262 @@ const daily_card_definitions = [
 
  
 
+/*  ==================   WEEK  related code     =========================== */
 
+function start_weekly_cards() {
+    //@@ start_one_week_row(get_week_card("curr"));
+
+    start_week_all_graphs();
+
+    //@@ start_one_week_new_volunteers(get_week_card("curr"));
+
+    $("#dsb_hl_weekly_tbl_curr_show").click(toggle_month_week_graph_datasets);
+    $("#dsb_hl_weekly_tbl_prev_show").click(toggle_month_week_graph_datasets);
+    $("#dsb_hl_weekly_tbl_2wks_ago_show").click(toggle_month_week_graph_datasets);
+}
+
+
+const week_card_definitions = [
+    {
+        designator: "curr",
+        next: "prev"
+    },
+    {
+        designator: "prev",
+        borderDash: [8, 8],
+        next: "2wks_ago"
+    },
+    {
+        designator: "2wks_ago",
+        borderDash: [10, 4],
+        next: null
+    }
+];
+
+function get_week_card(dsg) {
+    for (const card_def of week_card_definitions) {
+        if (card_def.designator.localeCompare(dsg) == 0) {
+            return card_def;
+        }
+    }
+    return null;
+}
+
+function get_week_name_in_hebrew(week_designator) {
+    if (week_designator.localeCompare("prev") == 0) {
+        return "השבוע הקודם";
+    }
+    if (week_designator.localeCompare("2wks_ago") == 0) {
+        return "השבוע שלפניו";
+    }
+
+    return "השבוע";
+}
+
+
+function get_week_range(week_designator) {
+    let end_date = moment();
+    let start_date = moment();
+
+    if (week_designator.localeCompare("curr") == 0) {
+        start_date.subtract(7, 'days');
+    }
+    if (week_designator.localeCompare("prev") == 0) {
+        start_date.subtract(14, 'days');
+        end_date.subtract(7, 'days');
+    }
+    if (week_designator.localeCompare("2wks_ago") == 0) {
+        start_date.subtract(21, 'days');
+        end_date.subtract(14, 'days');
+    }
+
+    let result = {
+        start_date: start_date.format("YYYY-MM-DD"),
+        end_date: end_date.format("YYYY-MM-DD")
+    }
+    if (window.is_debugging_dsb) {
+        console.log("Overriding", result);
+        result = {
+            start_date: "2022-02-08",
+            end_date: "2022-02-15"
+        }
+    }
+    return result;
+}
+
+
+// To improve performance, we query the entire last 21 days in one shot
+function start_week_all_graphs() {
+    let end_date = moment();
+    let start_date = moment();
+    start_date.subtract(21, 'days');
+    let query_object = {
+        start_date: start_date.format("YYYY-MM-DD"),
+        end_date: end_date.format("YYYY-MM-DD")
+    }
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportWeeklyGraphMetrics",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            result = data.d;
+            render_week_all_graphs(result, query_object);
+        },
+        error: function (err) {
+        }
+
+
+    });
+
+}
+
+
+
+function start_one_week_row(card_def) {
+    let dsg = card_def.designator;
+    let label_id = "#dsb_hl_weekly_tbl_" + dsg + "_week_name";
+    let week_name = get_week_name_in_hebrew(dsg);
+    $(label_id).text(week_name);
+
+    // Invok Async call, to get info for this row.
+
+    var query_object = get_week_range(dsg);
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportMonthlyDigestMetrics",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            // Schedule fetch for next data-set if needed.
+            let next_card = get_week_card(card_def.next);
+            if (next_card) {
+                start_one_week_row(next_card);   // Not really recursive - called from incoming-data callback
+            }
+            result = data.d;
+            render_week_row(dsg, result);
+        },
+        error: function (err) {
+        }
+    });
+}
+
+function render_week_row(dsg, result) {
+    let label_id = "#dsb_hl_weekly_tbl_" + dsg + "_pats";
+    $(label_id).text(result.Patients);
+    label_id = "#dsb_hl_weekly_tbl_" + dsg + "_rides";
+    $(label_id).text(result.Rides);
+    label_id = "#dsb_hl_weekly_tbl_" + dsg + "_vols";
+    $(label_id).text(result.Volunteers);
+}
+
+
+function start_one_week_new_volunteers(card_def) {
+    let dsg = card_def.designator;
+    var query_object = get_week_range(dsg);
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportNewDriversInRange",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            // Schedule fetch for next data-set if needed.
+            let next_card = get_week_card(card_def.next);
+            if (next_card) {
+                start_one_week_new_volunteers(next_card);   // Not really recursive - called from incoming-data callback
+            }
+
+            result = data.d;
+            label_id = "#dsb_hl_weekly_tbl_" + dsg + "_new";
+            $(label_id).text(result.Volunteers);
+        },
+        error: function (err) {
+        }
+    });
+}
+
+function prepare_one_week_span_data(the_date, dict) {
+    let prepared_data = {
+        labels: [],
+        rides: [],
+        volunteers: [],
+        patients: []
+    }
+
+    for (i = 0; i < 7; ++i) {
+        let hebrew_day_name = the_date.toDate().toLocaleString("he", { weekday: 'long' });
+        prepared_data.labels.push(hebrew_day_name);
+
+        // check if we have info on this specific day:
+        let ddmm = the_date.format("MM-DD");
+        if (ddmm in dict) {
+            let dayinfo = dict[ddmm];
+            prepared_data.rides.push(dayinfo.Rides);
+            prepared_data.volunteers.push(dayinfo.Volunteers);
+            prepared_data.patients.push(dayinfo.Patients);
+        }
+        else {
+            prepared_data.rides.push(0);
+            prepared_data.volunteers.push(0);
+            prepared_data.patients.push(0);
+        }
+        the_date.add(1, "days");
+    }
+
+    return prepared_data;
+}
+
+
+function render_week_all_graphs(data, range) {
+    // we want to "rescale" the 3 weeks on the same 7 days range
+
+    // building a reverse index - dictionary
+    let dict = {};
+    data.map(function (obj) {
+        dict[obj.Day] = obj;
+    });
+
+    //First span - this week (7-days-ago ==> end_date)
+    let the_date = moment(range.end_date, "YYYY-MM-DD");
+    the_date.subtract(7, "days");
+    let prepared_data = prepare_one_week_span_data(the_date, dict);
+
+    let element_id = "dsb_hl_weekly_graph";
+    create_month_week_graph(prepared_data, element_id);
+
+    // Compute the data for the previous week
+    the_date = moment(range.end_date, "YYYY-MM-DD");
+    the_date.subtract(14, "days");
+    prepared_data = prepare_one_week_span_data(the_date, dict);
+
+    var myChart = find_chart_by_id(element_id);
+    add_to_month_week_graph(myChart, prepared_data, get_week_card("prev"));
+
+    // Compute the data for two weeks ago
+    the_date = moment(range.end_date, "YYYY-MM-DD");
+    the_date.subtract(21, "days");
+    prepared_data = prepare_one_week_span_data(the_date, dict);
+
+    add_to_month_week_graph(myChart, prepared_data, get_week_card("2wks_ago"));
+}
+
+
+
+/*  ==================   MONTH  related code     =========================== */
 
 function get_month_name_in_hebrew(month_designator) {
     let dateObj = new Date();
@@ -229,9 +486,9 @@ function start_monthly_cards() {
    start_one_month_new_volunteers(get_month_card("curr"));
 
 
-    $("#dsb_hl_monthly_tbl_curr_show").click(toggle_graph_datasets);
-    $("#dsb_hl_monthly_tbl_prev_show").click(toggle_graph_datasets);
-    $("#dsb_hl_monthly_tbl_yoy_show").click(toggle_graph_datasets);
+    $("#dsb_hl_monthly_tbl_curr_show").click(toggle_month_week_graph_datasets);
+    $("#dsb_hl_monthly_tbl_prev_show").click(toggle_month_week_graph_datasets);
+    $("#dsb_hl_monthly_tbl_yoy_show").click(toggle_month_week_graph_datasets);
 }
 
 
@@ -325,12 +582,12 @@ function start_month_graph(card_def) {
             // Schedule fetch for next data-set if needed.
             let next_card = get_month_card(card_def.next);
             if (next_card) {
-                if (window.full_loading) {
+                if (window.full_loading || window.all_graphs) {
                     start_month_graph(next_card);   // Not really recursive - called from incoming-data callback
                 }
             }
             result = data.d;
-            render_month_graph(card_def, result);
+            render_month_week_graph(card_def, result, "dsb_hl_monthly_graph");
 
         },
         error: function (err) {
@@ -352,7 +609,7 @@ function find_chart_by_id(chart_id) {
     return result;
 }
 
-function render_month_graph(card_def, data)
+function render_month_week_graph(card_def, data, element_id)
 {
     let prepared_data = {
         labels: data.map(function (obj) { return obj.Day; }),
@@ -361,14 +618,14 @@ function render_month_graph(card_def, data)
         patients: data.map(function (obj) { return obj.Patients; })
     };
 
-    var myChart = find_chart_by_id("dsb_hl_monthly_graph");
+    var myChart = find_chart_by_id(element_id); 
 
     if (myChart) {
         // window.myd = myChart;
-        add_to_month_graph(myChart, prepared_data, card_def);
+        add_to_month_week_graph(myChart, prepared_data, card_def);
     }
     else {
-        create_month_graph(prepared_data);
+        create_month_week_graph(prepared_data, element_id);
     }
 }
 
@@ -379,12 +636,12 @@ const r2rHTMLLegend = {
     }
 };
 
-function create_month_graph(prepared_data)
+function create_month_week_graph(prepared_data, graph_id)
 {
     // We use version 2.1.4 of chart.js
     //FUTURE  Chart.pluginService.register(r2rHTMLLegend);
 
-    var ctx = document.getElementById('dsb_hl_monthly_graph').getContext('2d');
+    var ctx = document.getElementById(graph_id).getContext('2d');
     var myChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -433,7 +690,7 @@ function create_month_graph(prepared_data)
 }
 
 
-function add_to_month_graph(myChart, prepared_data, card_def) {
+function add_to_month_week_graph(myChart, prepared_data, card_def) {
     let updated = myChart.data.datasets.concat(
         [
             {
@@ -468,8 +725,9 @@ function add_to_month_graph(myChart, prepared_data, card_def) {
     myChart.update();
 }
 
-function toggle_graph_datasets(event) {
-    let chart = find_chart_by_id("dsb_hl_monthly_graph");
+function toggle_month_week_graph_datasets(event) {
+    let chart_id = event.target.getAttribute("r2chart")
+    let chart = find_chart_by_id(chart_id);
     if (chart) {
         let indices = event.target.getAttribute("r2data").split(",");
         for (const idx of indices) {
