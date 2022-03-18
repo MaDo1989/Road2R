@@ -196,7 +196,8 @@
         let patients_JSONArray = [];
         let { buildStringforEquipment,
             convertDBDate2FrontEndDate,
-            buildStringforDriverResponsibilityEquipment
+            buildStringforDriverResponsibilityEquipment,
+            compareFunc
         } = GENERAL.USEFULL_FUNCTIONS;
         let patients_Names = []
         let rideNumber = 0;
@@ -1282,17 +1283,6 @@
             function generateStatusErrorCB() {
                 alert("Error in generateStatus");
             }
-        }
-
-        const compareFunc = (a, b) => {
-
-            if (a.Name < b.Name) {
-                return -1;
-            }
-            if (a.Name > b.Name) {
-                return 1;
-            }
-            return 0;
         }
 
         async function generateLocation() {
