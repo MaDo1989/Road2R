@@ -239,19 +239,19 @@ var K_fields_map = {
             post_clone: rp_center_patients_rides__post_clone
         },
         {
-            id: "rp_patients_rides__hospital",
-            template: 'div[name="template_HOSPITAL"]',
-            type: "HOSPITAL",
-            post_clone: field_hospitals_post_clone
+            id: "rp_patients_rides__origin",
+            template: 'div[name="template_ORIGIN"]',
+            type: "ORIGIN",
+            post_clone: field_origins_post_clone
         },
         {
-            id: "rp_patients_rides__barrier",
-            template: 'div[name="template_BARRIER"]',
-            type: "BARRIER",
-            post_clone: field_barriers_post_clone
+            id: "rp_patients_rides__destination",
+            template: 'div[name="template_DESTINATION"]',
+            type: "DESTINATION",
+            post_clone: field_destinations_post_clone
         },
         {
-            id: "rp_patients_rides__barrier",
+            id: "rp_patients_rides__generate",
             template: 'div[name="template_GENERATE_REPORT"]',
             type: "GENERATE_REPORT",
             post_clone: field_generate_report_post_clone
@@ -401,8 +401,7 @@ function clone_template(template, parent_id) {
 var K_CACHE = {
     volunteers: [],
     patients: [],
-    hospitals: [],
-    barriers: []
+    locations: []
 };
 
 
@@ -467,81 +466,53 @@ function populate_volunteer_field() {
         });
 }
 
-// on_load_hospitals called when the async ajax call  has finished
-// Used to populate UI needing the hospitals list
-function loadHospitals(on_load_hospitals) {
+// on_load_locations called when the async ajax call  has finished
+// Used to populate UI needing the origins list
+function loadLocations(on_load_locations) {
 
-    if (K_CACHE.hospitals.length > 1) {
+    if (K_CACHE.locations.length > 1) {
         // One time loading already done.
-        on_load_hospitals();
+        on_load_locations();
         return;
     }
 
     $.ajax({
         dataType: "json",
-        url: "ReportsWebService.asmx/GetReportHospitals",
+        url: "ReportsWebService.asmx/GetReportLocations",
         contentType: "application/json; charset=utf-8",
         type: "POST",
         async: true,
         success: function (data) {
-            var hospitals = data.d;
-            hospitals.sort();
-            K_CACHE.hospitals = hospitals;
-            on_load_hospitals();
+            var locations = data.d;
+            locations.sort();
+            K_CACHE.locations = locations;
+            on_load_locations();
         },
-        error: function (err) { alert("Error in loadHospitals"); }
+        error: function (err) { alert("Error in loadLocations"); }
     });
 }
 
 
-function on_hospital_selected(event, ui) {
+function on_origin_selected(event, ui) {
     $("#" + event.target.id).val(ui.item.value);
     return true;
 }
 
-function populate_hospital_field() {
-     $("#select_hospital").autocomplete({
-        source: K_CACHE.hospitals,
-        select: on_hospital_selected
-    });
-    
-}
-
-
-function loadBarriers(on_load_barriers) {
-
-    if (K_CACHE.barriers.length > 1) {
-        // One time loading already done.
-        on_load_barriers();
-        return;
-    }
-
-    $.ajax({
-        dataType: "json",
-        url: "ReportsWebService.asmx/GetReportBarriers",
-        contentType: "application/json; charset=utf-8",
-        type: "POST",
-        async: true,
-        success: function (data) {
-            var barriers = data.d;
-            barriers.sort();
-            K_CACHE.barriers = barriers;
-            on_load_barriers();
-        },
-        error: function (err) { alert("Error in loadBarriers"); }
-    });
-}
-
-
-function on_barrier_selected(event, ui) {
+function on_destination_selected(event, ui) {
     $("#" + event.target.id).val(ui.item.value);
     return true;
 }
 
-function populate_barrier_field() {
-    $("#select_barrier").autocomplete({
-        source: K_CACHE.barriers,
-        select: on_barrier_selected
+
+function populate_origin_field() {
+     $("#select_origin").autocomplete({
+        source: K_CACHE.locations,
+        select: on_origin_selected
+    });
+
+    $("#select_destination").autocomplete({
+        source: K_CACHE.locations,
+        select: on_destination_selected
     });
 
 }
@@ -686,12 +657,12 @@ function field_volunteers_post_clone(id) {
     loadVolunteers(populate_volunteer_field);
 }
 
-function field_hospitals_post_clone(id) {
-    loadHospitals(populate_hospital_field);
+function field_origins_post_clone(id) {
+    loadLocations(populate_origin_field);
 }
 
-function field_barriers_post_clone(id) {
-    loadBarriers(populate_barrier_field);
+function field_destinations_post_clone(id) {
+    
 }
 
 function field_generate_report_post_clone(id) {
@@ -715,14 +686,14 @@ function populate_week_field() {
    });
 
 */
-    //@@ dt.on("show", function (e) {
+    // dt.on("show", function (e) {
 
         // This is working. Need to  do it for the tr and support mouseleave and hide()
 
         //console.log("Show", e);
         //$(document).on('mouseenter', '.datepicker-days',
         //    function () { console.log($(this)); $(this).find('td a').addClass('ui-state-hover'); });
-    //@@ });
+    // });
 
     // DEBUG: set date to March
     /* 
@@ -1090,7 +1061,6 @@ function refresh_amuta_vls_week_Table(start_date, end_date) {
         },
         error: function (err) {
             $('#wait').hide();
-            // @@ alert("Error in GetRidePatView: " + err.responseText);
         }
 
 
@@ -1229,7 +1199,6 @@ function refresh_amuta_vls_per_month_Table(start_date) {
         },
         error: function (err) {
             $('#wait').hide();
-            // @@ alert("Error in GetRidePatView: " + err.responseText);
         }
 
 
@@ -1682,7 +1651,6 @@ function refresh_amuta_vls_list_Table(query_object) {
         },
         error: function (err) {
             $('#wait').hide();
-            // @@ alert("Error in GetRidePatView: " + err.responseText);
         }
 
 
@@ -1774,7 +1742,6 @@ function refresh_amuta_vls_per_pat_Table(patient) {
         },
         error: function (err) {
             $('#wait').hide();
-            // @@ alert("Error in GetRidePatView: " + err.responseText);
         }
 
 
@@ -1835,10 +1802,6 @@ function refreshTable(volunteerId, start_date, end_date) {
                 } else {
                     patDisplayName = obj.PatDisplayName;
                 }
-
-//@@                if (arr_rides[i].Pat.EscortedList.length != 0) {
-//@@                    patDisplayName += " + " + arr_rides[i].Pat.EscortedList.length;
-//@@                 }
 
                // date2 = HEBday + " " + day + "/" + month + "/" + date.getUTCFullYear() % 2000;
                 date2 = { str: HEBday + " " + date.format("DD/MM/YY"), timestamp: date.valueOf()};
@@ -1905,7 +1868,6 @@ function refreshTable(volunteerId, start_date, end_date) {
         },
         error: function (err) {
             $('#wait').hide();
-            // @@ alert("Error in GetRidePatView: " + err.responseText);
         }
 
 
@@ -2158,13 +2120,13 @@ function rp_center_patients_rides__refresh_preview() {
     if (!volunteerId) {
         volunteerId = "*";
     }
-    var hospital = $("#select_hospital").val();
-    if (!hospital) {
-        hospital = "*";
+    var origin = $("#select_origin").val();
+    if (!origin) {
+        origin = "*";
     }
-    var barrier = $("#select_barrier").val();
-    if (!barrier) {
-        barrier = "*";
+    var destination = $("#select_destination").val();
+    if (!destination) {
+        destination = "*";
     }
 
     // Parse dates, with fallback to default Jan'19 ==> Today
@@ -2190,7 +2152,7 @@ function rp_center_patients_rides__refresh_preview() {
     rp_center_patients_rides__refresh_Table(volunteerId, 
         start_moment.format("YYYY-MM-DD"),
         end_moment.format("YYYY-MM-DD"),
-        hospital, barrier
+        origin, destination
     );
 }
 
@@ -2219,7 +2181,7 @@ function rp_center_patients_rides__footer_row(row, data, start, end, display) {
     $("#center_patients_rides_footer_vol_page").html(volunteers.size);
 
     let ridesPage = api
-        .column(6, { page: 'current' })
+        .column(4, { page: 'current' })
         .data()
         .reduce(function (a, b) {
             return +a + +b;
@@ -2237,7 +2199,7 @@ function rp_center_patients_rides__footer_row(row, data, start, end, display) {
     $("#center_patients_rides_footer_vol_total").html(volunteers.size);
 
     let ridesTotal = api
-        .column(6, { page: 'all' })
+        .column(4, { page: 'all' })
         .data()
         .reduce(function (a, b) {
             return +a + +b;
@@ -2248,7 +2210,7 @@ function rp_center_patients_rides__footer_row(row, data, start, end, display) {
 }
 
 
-function rp_center_patients_rides__refresh_Table(volunteerId, start_date, end_date, hospital, barrier) {
+function rp_center_patients_rides__refresh_Table(volunteerId, start_date, end_date, origin, destination) {
     hide_all_tables();
 
     $('#wait').show();
@@ -2256,8 +2218,8 @@ function rp_center_patients_rides__refresh_Table(volunteerId, start_date, end_da
         volunteer: volunteerId,
         start_date: start_date,
         end_date: end_date,
-        hospital: hospital,
-        barrier: barrier
+        origin: origin,
+        destination: destination
     };
 
     $.ajax({
@@ -2277,6 +2239,7 @@ function rp_center_patients_rides__refresh_Table(volunteerId, start_date, end_da
 
             rp_center_patients_rides__fix_records(records);
 
+            // console.table(records);
             $('#div_table_center_patients_rides').show();
             tbl = $('#table_center_patients_rides').DataTable({
                 pageLength: 100,
@@ -2302,8 +2265,6 @@ function rp_center_patients_rides__refresh_Table(volunteerId, start_date, end_da
                     { data: "Volunteer" },
                     { data: "Origin" },
                     { data: "Destination" },
-                    { data: "Hospital" },
-                    { data: "Barrier" },
                     { data: "Count" },
                 ],
                 dom: 'Bfrtip',

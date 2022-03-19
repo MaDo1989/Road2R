@@ -353,14 +353,14 @@ public class ReportsWebService : System.Web.Services.WebService
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public List<ReportService.CenterPatientsRidesInfo> GetReportCenterPatientsRides(string volunteer, string start_date, string end_date,
-        string hospital, string barrier)
+        string origin, string destination)
     {
         try
         {
             HttpResponse response = GzipMe();
 
             ReportService report = new ReportService();
-            List<ReportService.CenterPatientsRidesInfo> r = report.GetReportCenterPatientsRides(volunteer, start_date, end_date, hospital, barrier);
+            List<ReportService.CenterPatientsRidesInfo> r = report.GetReportCenterPatientsRides(volunteer, start_date, end_date, origin, destination);
             return r;
         }
         catch (Exception ex)
@@ -377,14 +377,14 @@ public class ReportsWebService : System.Web.Services.WebService
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string GetReportCenterPatientsRidesCount(string volunteer, string start_date, string end_date,
-        string hospital, string barrier)
+        string origin, string destination)
     {
         try
         {
             HttpResponse response = GzipMe();
 
             ReportService report = new ReportService();
-            string r = report.GetReportCenterPatientsRidesCount(volunteer, start_date, end_date, hospital, barrier);
+            string r = report.GetReportCenterPatientsRidesCount(volunteer, start_date, end_date, origin, destination);
             return r;
         }
         catch (Exception ex)
@@ -430,7 +430,47 @@ public class ReportsWebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
-            Log.Error("Error in GetReportHospitals", ex);
+            Log.Error("Error in GetReportBarriers", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public List<string> GetReportLocations()
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            ReportService report = new ReportService();
+            List<string> r = report.GetReportLocations();
+            return r;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReportLocations", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public List<ReportService.MetricMonthlyInfo> GetReportWeeklyGraphMetrics(string start_date, string end_date)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            ReportService report = new ReportService();
+            List<ReportService.MetricMonthlyInfo> r = report.GetReportWeeklyGraphMetrics(start_date, end_date);
+            return r;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReportMonthlyMetrics", ex);
             throw new Exception("שגיאה בשליפת נתוני הסעות");
         }
 
