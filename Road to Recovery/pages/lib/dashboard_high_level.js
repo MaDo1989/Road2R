@@ -2,8 +2,26 @@
 
 
 window.is_debugging_dsb = false; 
-window.full_loading = true; 
+window.full_loading = true;  
 window.all_graphs = true;
+
+
+// a mapping of event names to the next code that should be called
+// used to avoid flooding the server with dozens of queries at startup.
+// determines order of what gets populated first. -  TODAY & Daily.
+// search for event names in code to see usage.
+let K_chained_loading_table = {}; 
+
+function set_chain_cb_for_event(event_name, cb) {
+    K_chained_loading_table[event_name] = cb;
+}
+
+function call_next_in_chain(event_name) {
+    if (event_name in K_chained_loading_table) {
+        cb = K_chained_loading_table[event_name];
+        cb();
+    }
+}
 
 const CHART_COLORS = {
     red: 'rgb(255, 99, 132)',
@@ -20,10 +38,11 @@ function dashboard_hl_init() {
     $("#reports_content_div").hide();
     $("#dsb_hl_content_div").show();
     if (window.full_loading) {
+        set_chain_cb_for_event("on_daily_finished", start_yearly_cards);
+        set_chain_cb_for_event("on_weekly_finished", start_monthly_cards);
+
         start_daily_cards();
         start_weekly_cards();
-        start_monthly_cards();
-        start_yearly_cards();
     }
     else {
         // For fast debugging
@@ -116,6 +135,7 @@ function start_current_daily_new_volunteers(query_object) {
         type: "POST",
         data: JSON.stringify(query_object),
         success: function (data) {
+            call_next_in_chain("on_daily_finished");
             result = data.d;
             $("#dsb_hl_daily_volunteers_attention").text(result.Volunteers);
         },
@@ -151,11 +171,11 @@ const daily_card_definitions = [
 /*  ==================   WEEK  related code     =========================== */
 
 function start_weekly_cards() {
-    //@@ start_one_week_row(get_week_card("curr"));
+    start_one_week_row(get_week_card("curr"));
 
     start_week_all_graphs();
 
-    //@@ start_one_week_new_volunteers(get_week_card("curr"));
+    start_one_week_new_volunteers(get_week_card("curr"));
 
     $("#dsb_hl_weekly_tbl_curr_show").click(toggle_month_week_graph_datasets);
     $("#dsb_hl_weekly_tbl_prev_show").click(toggle_month_week_graph_datasets);
@@ -325,6 +345,9 @@ function start_one_week_new_volunteers(card_def) {
             let next_card = get_week_card(card_def.next);
             if (next_card) {
                 start_one_week_new_volunteers(next_card);   // Not really recursive - called from incoming-data callback
+            }
+            else {
+                call_next_in_chain("on_weekly_finished");
             }
 
             result = data.d;

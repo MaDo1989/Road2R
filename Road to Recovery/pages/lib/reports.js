@@ -686,14 +686,14 @@ function populate_week_field() {
    });
 
 */
-    //@@ dt.on("show", function (e) {
+    // dt.on("show", function (e) {
 
         // This is working. Need to  do it for the tr and support mouseleave and hide()
 
         //console.log("Show", e);
         //$(document).on('mouseenter', '.datepicker-days',
         //    function () { console.log($(this)); $(this).find('td a').addClass('ui-state-hover'); });
-    //@@ });
+    // });
 
     // DEBUG: set date to March
     /* 
@@ -1061,7 +1061,6 @@ function refresh_amuta_vls_week_Table(start_date, end_date) {
         },
         error: function (err) {
             $('#wait').hide();
-            // @@ alert("Error in GetRidePatView: " + err.responseText);
         }
 
 
@@ -1200,7 +1199,6 @@ function refresh_amuta_vls_per_month_Table(start_date) {
         },
         error: function (err) {
             $('#wait').hide();
-            // @@ alert("Error in GetRidePatView: " + err.responseText);
         }
 
 
@@ -1653,7 +1651,6 @@ function refresh_amuta_vls_list_Table(query_object) {
         },
         error: function (err) {
             $('#wait').hide();
-            // @@ alert("Error in GetRidePatView: " + err.responseText);
         }
 
 
@@ -1745,7 +1742,6 @@ function refresh_amuta_vls_per_pat_Table(patient) {
         },
         error: function (err) {
             $('#wait').hide();
-            // @@ alert("Error in GetRidePatView: " + err.responseText);
         }
 
 
@@ -1806,10 +1802,6 @@ function refreshTable(volunteerId, start_date, end_date) {
                 } else {
                     patDisplayName = obj.PatDisplayName;
                 }
-
-//@@                if (arr_rides[i].Pat.EscortedList.length != 0) {
-//@@                    patDisplayName += " + " + arr_rides[i].Pat.EscortedList.length;
-//@@                 }
 
                // date2 = HEBday + " " + day + "/" + month + "/" + date.getUTCFullYear() % 2000;
                 date2 = { str: HEBday + " " + date.format("DD/MM/YY"), timestamp: date.valueOf()};
@@ -1876,7 +1868,6 @@ function refreshTable(volunteerId, start_date, end_date) {
         },
         error: function (err) {
             $('#wait').hide();
-            // @@ alert("Error in GetRidePatView: " + err.responseText);
         }
 
 
