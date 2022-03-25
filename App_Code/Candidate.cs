@@ -10,10 +10,10 @@ using System.Web;
 public class Candidate : Volunteer
 {
     public Candidate() { }
-    public Candidate(int id, string displayName, int driverLevel, List<int> ammountOfPathMatch,
+    public Candidate(int id, string displayName, int noOfDocumentedCalls, int driverLevel, List<int> ammountOfPathMatch,
                      int ammountOfMatchByDay, int ammountOfDisMatchByDay,
                      int ammountOfMatchDayPart, int ammountOfDisMatchDayPart
-                    ) : base(id, displayName)
+                    ) : base(id, displayName, noOfDocumentedCalls)
     {
         DriverLevel = driverLevel;
         AmmountOfPathMatch = ammountOfPathMatch;

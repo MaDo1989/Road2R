@@ -1292,10 +1292,11 @@ public class Volunteer
         //
     }
 
-    public Volunteer(int id, string displayName)
+    public Volunteer(int id, string displayName, int noOfDocumentedCalls)
     {
         Id = id;
         DisplayName = displayName;
+        NoOfDocumentedCalls = noOfDocumentedCalls;
     }
     public Volunteer(string _displayName)
     {
