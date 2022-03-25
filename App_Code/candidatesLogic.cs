@@ -20,7 +20,7 @@ public class CandidatesLogic
         Super
     }
 
-    public Dictionary<string, Candidate> GetCandidates(int ridePatNum, int numOfCandidates)
+    public Dictionary<string, Candidate> GetCandidates(int ridePatNum, int numOfCandidates, int dayInWeek)
     {
 
         Dictionary<string, Candidate> newbies;
@@ -92,7 +92,7 @@ public class CandidatesLogic
             candidates.Add(kv.Key, kv.Value);
         }
 
-        Dictionary<string, Candidate> bestCandidates = selectBestCandidates(candidates, true, numOfCandidates);
+        Dictionary<string, Candidate> bestCandidates = selectBestCandidates(candidates, true, numOfCandidates, dayInWeek);
 
         return FillExtraDetails(bestCandidates);
     }
@@ -152,9 +152,12 @@ public class CandidatesLogic
         }
     }
 
-    private Dictionary<string, Candidate> selectBestCandidates(Dictionary<string, Candidate> candidates,bool rand, int numOfCandidates) {
+    private Dictionary<string, Candidate> selectBestCandidates(Dictionary<string, Candidate> candidates,bool rand, int numOfCandidates, int dayInWeek) {
 
-        Dictionary<string, double> weights = new Dictionary<string, double>{
+        Dictionary<string, double> weights;
+        if (dayInWeek < 5) 
+        {
+            weights = new Dictionary<string, double>{
             {"point2point",50 },
             {"oposite",20 },
             {"point2area",20 },
@@ -167,6 +170,25 @@ public class CandidatesLogic
             {"DifferentDayPart",10},
             {"timeWeight", 0.3 }
         };
+        }
+        else // friday of saturday
+        {
+            weights = new Dictionary<string, double>{
+            {"point2point",50 },
+            {"oposite",20 },
+            {"point2area",20 },
+            {"area2area",8 },
+            {"otherAears",2 },
+            {"routeWeight",0.3 },
+            {"sameDay", 70 },
+            {"DifferentDays",5 },
+            {"SameDayPart",20},
+            {"DifferentDayPart",5},
+            {"timeWeight", 0.7 }
+        };
+        }
+
+
 
         Dictionary<string, Candidate> super  = new Dictionary<string, Candidate>();
         Dictionary<string, Candidate> regular = new Dictionary<string, Candidate>();
@@ -244,7 +266,7 @@ public class CandidatesLogic
                                Math.Log(c.AmmountOfMatchDayPart + 1, 2) * weights["SameDayPart"] +
                                Math.Log(c.AmmountOfDisMatchDayPart + 1, 2) * weights["DifferentDayPart"];
             routeScore = Math.Pow(routeScore, weights["routeWeight"]);
-            timeScore  = Math.Pow(routeScore, weights["timeWeight"]);
+            timeScore  = Math.Pow(timeScore, weights["timeWeight"]);
             score.Add(kv.Key, routeScore * timeScore);
         }
         return score;
