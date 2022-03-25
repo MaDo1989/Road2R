@@ -71,9 +71,9 @@ $(document).ready(() => {
     superDriversTable = $('#datatable-superDrivers').DataTable({ data: [], destroy: true });
     //newDriversTable   = $('#datatable-newDrivers').DataTable({ data: [], destroy: true });
 
-    ridePatNum = JSON.parse( getRidePatNum4_viewCandidate());
-    getCandidates();
+    ridePatNum = JSON.parse(getRidePatNum4_viewCandidate());
     getRidePat();
+    getCandidates();
 
 
     $('#rights').html(COPYWRITE());
@@ -110,7 +110,7 @@ const deceideWhichTable2Show = () => {
     $('#collapsed1_aTag').removeClass('collapsed');
 }
 const viewCharactaristics = () => {
-    window.open("viewC.html?ridePatNum=" + ridePatNum, '_blank').focus();
+    window.open("viewC.html?ridePatNum=" + ridePatNum + "&dayInWeek=" + ridepatDate.getDay(), '_blank').focus();
 }
 
 const getRidePat = () => {
@@ -119,10 +119,10 @@ const getRidePat = () => {
 }
 
 const renderRidePatDetails = (ridepat) => {
-    let ridepatDate = convertDBDate2FrontEndDate(ridepat.Date);
+    ridepatDate = convertDBDate2FrontEndDate(ridepat.Date);
     let isToday = isItToday(ridepatDate);
     let isAfterNoon = ridepatDate.getMinutes() === 14;
-
+    
 
     let ridePatDetails = `מ`;
     ridePatDetails += ridepat.Origin.Name;
@@ -138,7 +138,7 @@ const renderRidePatDetails = (ridepat) => {
     ridePatDetails += ' ';
     ridePatDetails += 'מקומות: ' + parseInt(ridepat.Escorts.length + 1);
     //ridePatDetails += ridepatDate.Equipment.length > 0 && ridepatDate.Equipment.includes(''); 
-
+     
     document.getElementById('RideCandidates_ph').innerHTML = ridePatDetails;
 }
 
@@ -159,11 +159,12 @@ const getCandidates = () => {
     // BENNY
     let numOfCandidates = 10;
     let newFlag = false;
+    let dayInWeek = ridepatDate.getDay();
 
     $('#wait').show();
     ajaxCall(
         'GetCandidates',
-        JSON.stringify({ ridePatNum, numOfCandidates, newFlag }),
+        JSON.stringify({ ridePatNum, numOfCandidates, newFlag, dayInWeek }),
         getCandidates_SCB,
         getCandidates_ECB
     );

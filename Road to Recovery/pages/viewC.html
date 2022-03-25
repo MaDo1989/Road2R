@@ -36,6 +36,7 @@
             $('#GetCandidatesBTN').hide();
             //$("#GetCandidatesBTN").click(fetchData4ThisRidepat);
             ridePatNum = getParameterByName('ridePatNum');
+            dayInWeek = getParameterByName('dayInWeek');
             //ridePatNum = JSON.parse(getRidePatNum4_viewCandidate());
             fetchData4ThisRidepat(ridePatNum);
 
@@ -54,7 +55,7 @@
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
                 async: false,
-                data: JSON.stringify({ ridePatNum: ridePatNum, numOfCandidates: numOfCandidates, newFlag : false}),
+                data: JSON.stringify({ ridePatNum: ridePatNum, numOfCandidates: numOfCandidates, newFlag : false, dayInWeek: dayInWeek}),
                 success: function (data) {
                     $('#GetCandidatesBTN').show();
                     candidates = JSON.parse(data.d);
