@@ -115,6 +115,7 @@
         arr_addressRows = [];
         numOfPatinetEscorts = 0;
         var sender = "";
+        let { compareFunc } = GENERAL.USEFULL_FUNCTIONS;
         $.jgrid.defaults.responsive = true;
         $.jgrid.defaults.styleUI = 'Bootstrap';
         $(document).ready(function () {
@@ -276,6 +277,7 @@
         function generateCitiesErrorCB(e) {
             alert("Error in generateCities: " + e.responseText);
         }
+        
         function generateLocation() {
             var $select = $("#hospital");
             var $select1 = $("#barrier");
@@ -288,13 +290,13 @@
                 data: JSON.stringify({ active: true }),
                 success: function (data) {
                     var arr_locations = JSON.parse(data.d);
-                    arr_locations.sort();
+                    arr_locations.sort(compareFunc);
                     $('<option>', { value: "", text: "בחר " }).appendTo($select);
                     $('<option>', { value: "", text: "בחר " }).appendTo($select1);
                     for (i in arr_locations) {
 
-                        $('<option>', { value: arr_locations[i].Name, text: arr_locations[i].EnglishName }).appendTo($select);
-                        $('<option>', { value: arr_locations[i].Name, text: arr_locations[i].EnglishName }).appendTo($select1);
+                        $('<option>', { value: arr_locations[i].Name, text: arr_locations[i].Name }).appendTo($select);
+                        $('<option>', { value: arr_locations[i].Name, text: arr_locations[i].Name }).appendTo($select1);
 
                     }
                 },

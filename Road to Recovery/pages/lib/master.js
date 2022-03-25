@@ -273,6 +273,29 @@ var GENERAL = {
             let hours_gap = miliSeconds_gap / (1000 * 60 * 60); //1000 ms in 1 sec, 60 sec in 1m, 60 min in 1h
             return hours_gap;
         },
+        /**
+     * This function used when use in arr.sort(compareFunc)
+     * 
+    */
+        compareFunc: (a, b) => {
+
+            let x = a.Name.trim();
+            let y = b.Name.trim();
+
+            return x < y ? -1 : x > y ? 1 : 0;  
+        }
+    },
+
+    DOCUMENTEDCALLS: {
+        preDefinedContents: [
+            { key: 0, value: '&lt;בחר.י מהרשימה או הכנס.י מלל חופשי בשדה הבא&gt;' },
+            { key: 1, value: 'תרשם/ירשם להסעה' },
+            { key: 2, value: 'לא נרשמ.ה להסעה' },
+            { key: 3, value: 'לא פנוי.ה לשיחה' },
+            { key: 4, value: 'להתקשר במועד מאוחד יותר' },
+            { key: 5, value: 'לא מסיע.ה בתקופה הקרובה' },
+            { key: 6, value: 'נא להסיר מהמערכת' }
+        ]
     },
 
     COPYWRITE: () => {
