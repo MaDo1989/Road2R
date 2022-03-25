@@ -248,7 +248,7 @@ public class WebService : System.Web.Services.WebService
 
     //Benny Candidates
     [WebMethod(EnableSession = true)]
-    public string GetCandidates(int ridePatNum,int numOfCandidates, bool newFlag) {
+    public string GetCandidates(int ridePatNum,int numOfCandidates, bool newFlag, int dayInWeek) {
 
         try
         {
@@ -256,7 +256,7 @@ public class WebService : System.Web.Services.WebService
             if(newFlag)
                 return j.Serialize(cl.GetNewbiesCandidates(ridePatNum, numOfCandidates));
             else
-                return j.Serialize(cl.GetCandidates(ridePatNum, numOfCandidates));
+                return j.Serialize(cl.GetCandidates(ridePatNum, numOfCandidates, dayInWeek));
         }
         catch (Exception ex)
         {
