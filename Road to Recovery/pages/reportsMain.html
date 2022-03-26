@@ -774,7 +774,10 @@
                                         <div class="form-group">
                                             <label class="col-sm-2" style="padding: 0.5em 0px;">מתנדב</label>
                                             <div class="col-sm-10" id="selectDriver">
-                                                <input placeholder="הזן שם" type="text" template_id="select_driver" class="form-control ui-autocomplete-input" autocomplete="off" aria-required="true" aria-invalid="false">
+                                                <input placeholder="מקבל רשימת שמות..." type="text" template_id="select_driver" 
+                                                       class="form-control ui-autocomplete-input" autocomplete="off" 
+                                                       disabled
+                                                       aria-required="true" aria-invalid="false">
                                             </div>
                                         </div>
 
@@ -996,7 +999,8 @@
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <div class="form-group">
-                                            <div class="col-sm-2"><input type="button" template_id="generate_report_period" value='הפקת דו"ח' class="btn btn-default buttons-html5" /> </div>
+                                            <div class="col-sm-4"><input type="button" template_id="generate_report_period" value='הפקת דו"ח' class="btn btn-default buttons-html5" /> </div>
+                                            <div class="col-sm-8"><span template_id="report_validation_text" style="color: red"></span> </div>
                                         </div>
                                     </div>
                                 </div>
