@@ -9,6 +9,7 @@
 -- Authors:     Dr. Benny Bornfeld & Yogev Strauber
 -- Create Date: 11/03/2022
 -- Description: RETURNS TABLE OF CANDIDATE TO A GIVEN RIDEPAT WITH VARIOUS SCORES TO EACH NEWBIE CANDIDATE
+-- Yet exists in PROD: add ref to NoOfDocumentedCalls
 -- =============================================
 	ALTER PROCEDURE [dbo].[spGetNoobsCandidatesForRidePat]
 	(
@@ -177,6 +178,7 @@ GO
 -- Authors:     Dr. Benny Bornfeld & Yogev Strauber
 -- Create Date: 17/02/2022
 -- Description: RETURNS TABLE OF CANDIDATE TO A GIVEN RIDEPAT WITH VARIOUS SCORES TO EACH CANDIDATE
+-- Yet exists in PROD: add ref to NoOfDocumentedCalls
 -- =============================================
 	ALTER PROCEDURE [dbo].[spGetCandidatesForRidePat]
 	(
@@ -334,8 +336,78 @@ GO
 		END		
 GO
 
+-- TOTALY NEW SCRIPT
+
+ALTER TABLE AREA
+ADD IsRoute bit
+GO
+
+UPDATE AREA
+SET IsRoute = 1
+WHERE AreaName LIKE N'%-%'
+GO
+
+UPDATE AREA
+SET IsRoute = 0
+WHERE AreaName NOT LIKE N'%-%'
+GO
+
+UPDATE Area
+SET IsRoute = 0
+WHERE AreaName=N'תרקומיא - ירושלים'
+GO
+
+UPDATE Area
+SET IsRoute = 1
+WHERE AreaName=N'מרכז' OR AreaName=N'צפון'
+GO
 
 
+-- =============================================
+-- Author:      Yogev Strauber
+-- Create Date: 25/03/2022
+-- Description: Returns Driver Past Rides
+-- =============================================
+CREATE PROCEDURE [dbo].[GetDriverPastRides]
+(
+	@driverId int
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+    SET NOCOUNT ON
 
+	SELECT RPView.* 
+	FROM RPView INNER JOIN status_Ride
+	ON RPView.ridenum = status_Ride.rideridenum  
+	WHERE 
+		MainDriver=@driverId
+		AND
+		(CONVERT(date,pickuptime) < CONVERT(DATE,getdate()) OR status_Ride.statusStatusName=N'הגענו ליעד') 
+		ORDER BY PICKUPTIME
 
+END
+GO
+
+-- Create Date: 25/03/2022
+-- Description: Returns Driver Future Rides
+-- =============================================
+CREATE PROCEDURE [dbo].[GetDriverFutureRides]
+(
+	@driverId int
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+    SET NOCOUNT ON
+
+	SELECT * FROM RPView
+	WHERE 
+		MainDriver=@driverId
+		AND 
+		CONVERT(date,pickuptime)>=CONVERT(DATE,getdate()) ORDER BY PICKUPTIME
+END
+GO
 

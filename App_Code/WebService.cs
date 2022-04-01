@@ -135,9 +135,9 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            List<string> areas = new List<string>();
+            List<Area> areas = new List<Area>();
             Location l = new Location();
-            areas = l.getAreas();
+            areas = l.getAreasAsClass();
             return j.Serialize(areas);
         }
         catch (Exception e)

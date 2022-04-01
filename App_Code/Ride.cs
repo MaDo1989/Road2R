@@ -495,7 +495,7 @@ public class Ride
     //Get My FUTURE RIDES
     public List<Ride> GetMyFutureRides(int volunteerId)
     {
-        string query = "select * from RPView where (MainDriver=" + volunteerId + " or secondaryDriver=" + volunteerId + ") and CONVERT(date,pickuptime)>=CONVERT(DATE,getdate())";
+        string query = "EXEC GetDriverFutureRides @driverId=" + volunteerId;
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         DataSet EscortDS = new DataSet(); ;
@@ -645,7 +645,7 @@ public class Ride
 
     public List<Ride> GetMyPastRides(int volunteerId)
     {
-        string query = "select RPView.* from RPView inner join status_Ride on RPView.ridenum = status_Ride.rideridenum  where (MainDriver=" + volunteerId + " or secondaryDriver=" + volunteerId + ") and (CONVERT(date,pickuptime)<CONVERT(DATE,getdate()) or status_Ride.statusStatusName=N'הגענו ליעד')";
+        string query = "EXEC GetDriverPastRides @driverId=" + volunteerId;
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         DataSet EscortDS = new DataSet(); ;
