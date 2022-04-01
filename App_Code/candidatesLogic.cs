@@ -180,10 +180,10 @@ public class CandidatesLogic
             {"area2area",8 },
             {"otherAears",2 },
             {"routeWeight",0.3 },
-            {"sameDay", 70 },
-            {"DifferentDays",5 },
-            {"SameDayPart",20},
-            {"DifferentDayPart",5},
+            {"sameDay", 90 },
+            {"DifferentDays",10 },
+            {"SameDayPart",0},
+            {"DifferentDayPart",0},
             {"timeWeight", 0.7 }
         };
         }
