@@ -295,7 +295,14 @@ var GENERAL = {
             { key: 4, value: 'להתקשר במועד מאוחד יותר' },
             { key: 5, value: 'לא מסיע.ה בתקופה הקרובה' },
             { key: 6, value: 'נא להסיר מהמערכת' }
-        ]
+        ],
+
+        getDocumentedCallsByDriverId: (driverId, successCB, errorCB) => {
+
+            const { ajaxCall } = GENERAL.FETCH_DATA;
+            ajaxCall('GetDocumentedCallsByDriverId', JSON.stringify({ driverId }), successCB, errorCB);
+        },
+        
     },
 
     COPYWRITE: () => {

@@ -328,7 +328,28 @@ public class Location
         }
         return areas;
     }
-    
+
+    public List<Area> getAreasAsClass()
+    {
+        List<Area> areas = new List<Area>();
+        string query = "select * from Area order by AreaName";
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+
+        Area area;
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+            string hebrewName = dr["AreaName"].ToString();
+            string englishName = dr["AreaEnglishName"].ToString();
+            bool isRoute =  Convert.ToBoolean(dr["IsRoute"]);
+
+            area = new Area(hebrewName, englishName, isRoute);
+            areas.Add(area);
+        }
+        return areas;
+    }
+
+
     public List<Location> getAreas_AsLocationObj()
     {//in this method I (Yogev) use area like it was location
 
