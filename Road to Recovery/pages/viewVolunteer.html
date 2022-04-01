@@ -44,7 +44,6 @@
     <link href="assets/css/select2.css" rel="stylesheet" />
     <script src="assets/js/select2.min.js"></script>
     <script src="lib/includeHTML.js"></script>
-    <script></script>
 
     <script>
 
@@ -54,7 +53,7 @@
         let documentedCallsTable;
         let spanBadgeId;
         let thisVolunteerId = 0;
-        let { preDefinedContents } = GENERAL.DOCUMENTEDCALLS;
+        let { preDefinedContents, getDocumentedCallsByDriverId } = GENERAL.DOCUMENTEDCALLS;
 
         checkCookie();
         var allVolunteersFromDb = [];
@@ -384,7 +383,6 @@
             $('#datatable-buttons tbody').on('click', '#showDocumentedCallsBtn', function () {
 
                 $('#wait').show();
-
                 let rowData = tbl.row($(this).parents('tr')).data();
 
                 let childrenof_td = this.parentElement.children;
@@ -396,79 +394,72 @@
                 }
 
                 thisVolunteerId = rowData.Id; //this variable is goobal to this page & used also in documentAcall2DB !!!
-
                 $('#DocumentedCallsTitle').text("שיחות עם " + rowData.DisplayName)
 
-                $.ajax({
-                    dataType: "json",
-                    url: "WebService.asmx/GetDocumentedCallsByDriverId",
-                    contentType: "application/json; charset=utf-8",
-                    type: "POST",
-                    data: JSON.stringify({ driverId: thisVolunteerId }),
-                    success: function (data) {
-                        data = JSON.parse(data.d)
-                        if (documentedCallsTable != null) {
-                            documentedCallsTable.destroy();
-                        }
-                        documentedCallsTable = $('#DocumentedCallsTable').DataTable({
-                            order: [[4, "desc"]],
-                            pageLength: 5,
-                            data: data,
-                            columns: [
-                                {
-                                    data: (data) => {
-                                        return ConvertDBDate2UIDate(data.CallRecordedDate);
-                                    }
-                                },
-                                {
-                                    data: (data) => {
-                                        if (data.CallRecordedTime === undefined) return;
-                                        let time = data.CallRecordedTime;
 
-                                        let hh = time.Hours < 10 && time.Hours.toString().length === 1 ? "0" + time.Hours : time.Hours;
-                                        hh += ":";
-                                        let mm = time.Minutes < 10 && time.Minutes.toString().length === 1 ? "0" + time.Minutes : time.Minutes;
-                                        return hh + mm;
-                                    }
-                                },
-                                {
-                                    data: "CoordinatorName"
-                                },
-                                {
-                                    data: "CallContent"
-                                }
-                                ,
-                                {
-                                    data: (data) => {
-                                        return ConvertDBDate2UIFullStempDate(data.FullDateStemp);
-                                    }
-                                }
-                            ],
-                            columnDefs: [
-                                { "targets": [0], type: 'de_date' },
-                                /*
-                                 Amir wanted a seperated columns to date and time but still sort by the full time stemps (or the acctual ticks)
-                                 so my (Yogev) soolution was to
-                                 1. fetch the fulltime stemp from the back-end
-                                 2. render and sort by this column
-                                 3. not showing it to the user
-                                  ↓*/
-                                { "targets": [4], visible: false },
-                                //↑
-
-                            ]
-
-                        });
-                        $('#wait').hide();
-
-                    },
-                    error: function (err) {
-                        alert("Error in GetVolunteersRideHistory: " + err.responseText);
-                        $('#wait').hide();
+                const successCB = (data) => {
+                    data = JSON.parse(data.d)
+                    if (documentedCallsTable != null) {
+                        documentedCallsTable.destroy();
                     }
-                });
+                    documentedCallsTable = $('#DocumentedCallsTable').DataTable({
+                        order: [[4, "desc"]],
+                        pageLength: 5,
+                        data: data,
+                        columns: [
+                            {
+                                data: (data) => {
+                                    return ConvertDBDate2UIDate(data.CallRecordedDate);
+                                }
+                            },
+                            {
+                                data: (data) => {
+                                    if (data.CallRecordedTime === undefined) return;
+                                    let time = data.CallRecordedTime;
 
+                                    let hh = time.Hours < 10 && time.Hours.toString().length === 1 ? "0" + time.Hours : time.Hours;
+                                    hh += ":";
+                                    let mm = time.Minutes < 10 && time.Minutes.toString().length === 1 ? "0" + time.Minutes : time.Minutes;
+                                    return hh + mm;
+                                }
+                            },
+                            {
+                                data: "CoordinatorName"
+                            },
+                            {
+                                data: "CallContent"
+                            }
+                            ,
+                            {
+                                data: (data) => {
+                                    return ConvertDBDate2UIFullStempDate(data.FullDateStemp);
+                                }
+                            }
+                        ],
+                        columnDefs: [
+                            { "targets": [0], type: 'de_date' },
+                            /*
+                             Amir wanted a seperated columns to date and time but still sort by the full time stemps (or the acctual ticks)
+                             so my (Yogev) soolution was to
+                             1. fetch the fulltime stemp from the back-end
+                             2. render and sort by this column
+                             3. not showing it to the user
+                              ↓*/
+                            { "targets": [4], visible: false },
+                            //↑
 
+                        ]
+
+                    });
+                    $('#wait').hide();
+
+                }
+
+                const errorCB = (err) => {
+                    alert("Error in GetVolunteersRideHistory: " + err.responseText);
+                    $('#wait').hide();
+                }
+                getDocumentedCallsByDriverId(thisVolunteerId, successCB, errorCB);
             });
 
             $('#datatable-buttons tbody').on('click', '#showDocumentedRidesBtn', function () {
