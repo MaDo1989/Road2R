@@ -129,7 +129,7 @@ public class User
     public string getUserNameByCellphone(string cellphone)
     {
         #region DB functions
-        string query = "select displayName,englishname from Volunteer where Cellphone ='" + cellphone + " AND isDriving=1 AND IsActive=1'";
+        string query = "select displayName,englishname from Volunteer where Cellphone ='" + cellphone + "'";
 
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
