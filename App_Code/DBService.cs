@@ -43,6 +43,7 @@ public class DbService: IDisposable
     {
         try
         {
+            
             if (con.State == ConnectionState.Closed)
             {
                 con.Open();
@@ -119,6 +120,40 @@ public class DbService: IDisposable
                 throw ex;
             }
             return row_affected;
+        }
+        finally
+        {
+            con.Close();
+        }
+    }
+
+
+    public SqlDataReader GetDataReader(SqlCommand command)
+    {
+        
+        SqlDataReader dr = null;
+
+        try
+        {
+            if (con == null)
+                con = new SqlConnection();
+
+            if (con.State == ConnectionState.Closed)
+            {
+                con.Open();
+            }
+
+            command.Connection = con;
+
+            try
+            {
+                dr = command.ExecuteReader();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return dr;
         }
         finally
         {
