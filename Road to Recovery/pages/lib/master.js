@@ -159,8 +159,9 @@ var GENERAL = {
          */
         convertDBDate2FrontEndDate: (fullTimeStempStr) => { // fullTimeStempStr = this form → "/Date(1608581640000)/" OR '2022-04-02T03:00:00'
 
+            if (typeof fullTimeStempStr === 'undefined' || !fullTimeStempStr) return "";
+
             if (fullTimeStempStr.includes('Date')) {
-                if (typeof fullTimeStempStr === 'undefined' || !fullTimeStempStr) return "";
                 return new Date(GENERAL.USEFULL_FUNCTIONS.convert2DBDateToInt(fullTimeStempStr));
             } else {
                 return new Date(fullTimeStempStr);
