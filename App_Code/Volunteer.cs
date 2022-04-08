@@ -757,19 +757,46 @@ public class Volunteer
 
     }
 
-    public Volunteer getVolunteerByMobile(string mobile)
+    public Volunteer GetVolunteerByCellphone_V2(string cellphone)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Volunteer GetVolunteerByMobile(string mobile)
     {
         Volunteer v = new Volunteer();
-        int Id = -1;
-        DbService db = new DbService();
-        string query = "select Id,DisplayName from VolunteerTypeView where CellPhone = '" + mobile + "'";
-        DataSet ds = db.GetDataSetByQuery(query);
+        DataSet ds = new DataSet();
+        dbs = new DbService();
+        string query = "exec spVolunteer_GetVolunteerByCellphone @cellphone= '" + mobile + "'";
+        try
+        {
+            ds = dbs.GetDataSetByQuery(query);
+            if (ds.Tables[0].Rows.Count == 0)
+            {
+                throw new Exception("volunteer not found");
+            }
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+        
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
             v.Id = int.Parse(dr["Id"].ToString());
             v.displayName = dr["DisplayName"].ToString();
+            v.IsActive = Convert.ToBoolean(dr["IsActive"]);
+            v.IsDriving = string.IsNullOrEmpty(dr["isDriving"].ToString()) ? false : Convert.ToBoolean(dr["isDriving"]);
         }
-        return v;
+
+        if (v.IsDriving.Value && v.IsActive)
+        {
+            return v;
+        }
+        else
+        {
+            throw new Exception("not active or not driving or both");
+        }
     }
 
     public Volunteer getVolunteerByMobile(string mobile, string regId, string device)

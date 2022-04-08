@@ -584,6 +584,24 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+    [WebMethod(EnableSession = true)]
+    public string GetVolunteerByMobile(string cellphone)
+    {
+        try
+        {
+            Volunteer volunteer = new Volunteer();
+            volunteer = volunteer.GetVolunteerByMobile(cellphone);
+         
+            return j.Serialize(volunteer);
+        }
+        catch (Exception ex)
+        {
+
+            Log.Error("Error in GetVolunteerByCellphone", ex);
+            throw ex;
+        }
+    }
+
 
     [WebMethod(EnableSession = true)]
     public int getSpaceInCar(int ridePatNum, int driverId)
@@ -1082,7 +1100,7 @@ public class WebService : System.Web.Services.WebService
         try
         {
             Volunteer v = new Volunteer();
-            v = v.getVolunteerByMobile(mobile);
+            v = v.GetVolunteerByMobile(mobile);
 
             return j.Serialize(v.DisplayName);
         }
@@ -1179,7 +1197,7 @@ public class WebService : System.Web.Services.WebService
     public string AssignRideToRidePatWithMobile(int ridePatId, string mobile, string fromDevice) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
     {
         Volunteer v = new Volunteer();
-        v = v.getVolunteerByMobile(mobile);
+        v = v.GetVolunteerByMobile(mobile);
 
 
         if (v.Id == 0)
