@@ -1519,8 +1519,18 @@ public class RidePat
         Destination = new Location();
         Destination.Name = dr["Destination"].ToString();
         Date = Convert.ToDateTime(dr["PickupTime"].ToString());
-        if (dr["Status"].ToString() == "שובץ נהג וגיבוי") throw new Exception("הנסיעה אליה נרשמתם כבר מלאה");
-        //XXX DOESNT GO HERE WITH MY LOGIC (always ELSE):
+        
+        
+        //TEST IF THERE IS A MAIN DRIVER (2ND ONE IS NOT SUPPORTED)
+        int mainDriverId;
+        int.TryParse(dr["MainDriver"].ToString(), out mainDriverId);
+
+        if (mainDriverId != 0)
+        {
+            throw new Exception("הנסיעה אליה נרשמתם כבר מלאה");
+        }
+
+
         if (dr["RideNum"].ToString() != "") //Ride aleady exists
         {
             RideId = int.Parse(dr["RideNum"].ToString());

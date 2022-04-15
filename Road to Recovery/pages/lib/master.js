@@ -159,8 +159,9 @@ var GENERAL = {
          */
         convertDBDate2FrontEndDate: (fullTimeStempStr) => { // fullTimeStempStr = this form → "/Date(1608581640000)/" OR '2022-04-02T03:00:00'
 
+            if (typeof fullTimeStempStr === 'undefined' || !fullTimeStempStr) return "";
+
             if (fullTimeStempStr.includes('Date')) {
-                if (typeof fullTimeStempStr === 'undefined' || !fullTimeStempStr) return "";
                 return new Date(GENERAL.USEFULL_FUNCTIONS.convert2DBDateToInt(fullTimeStempStr));
             } else {
                 return new Date(fullTimeStempStr);
@@ -287,25 +288,6 @@ var GENERAL = {
 
             return x < y ? -1 : x > y ? 1 : 0;
         }
-    },
-
-    DOCUMENTEDCALLS: {
-        preDefinedContents: [
-            { key: 0, value: '&lt;בחר.י מהרשימה או הכנס.י מלל חופשי בשדה הבא&gt;' },
-            { key: 1, value: 'תרשם/ירשם להסעה' },
-            { key: 2, value: 'לא נרשמ.ה להסעה' },
-            { key: 3, value: 'לא פנוי.ה לשיחה' },
-            { key: 4, value: 'להתקשר במועד מאוחד יותר' },
-            { key: 5, value: 'לא מסיע.ה בתקופה הקרובה' },
-            { key: 6, value: 'נא להסיר מהמערכת' }
-        ],
-
-        getDocumentedCallsByDriverId: (driverId, successCB, errorCB) => {
-
-            const { ajaxCall } = GENERAL.FETCH_DATA;
-            ajaxCall('GetDocumentedCallsByDriverId', JSON.stringify({ driverId }), successCB, errorCB);
-        },
-
     },
 
     COPYWRITE: () => {
