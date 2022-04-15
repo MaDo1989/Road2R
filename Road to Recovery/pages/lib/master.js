@@ -290,25 +290,6 @@ var GENERAL = {
         }
     },
 
-    DOCUMENTEDCALLS: {
-        preDefinedContents: [
-            { key: 0, value: '&lt;בחר.י מהרשימה או הכנס.י מלל חופשי בשדה הבא&gt;' },
-            { key: 1, value: 'תרשם/ירשם להסעה' },
-            { key: 2, value: 'לא נרשמ.ה להסעה' },
-            { key: 3, value: 'לא פנוי.ה לשיחה' },
-            { key: 4, value: 'להתקשר במועד מאוחד יותר' },
-            { key: 5, value: 'לא מסיע.ה בתקופה הקרובה' },
-            { key: 6, value: 'נא להסיר מהמערכת' }
-        ],
-
-        getDocumentedCallsByDriverId: (driverId, successCB, errorCB) => {
-
-            const { ajaxCall } = GENERAL.FETCH_DATA;
-            ajaxCall('GetDocumentedCallsByDriverId', JSON.stringify({ driverId }), successCB, errorCB);
-        },
-
-    },
-
     COPYWRITE: () => {
         return "2022 - 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה";
     }
