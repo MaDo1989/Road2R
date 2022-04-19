@@ -56,29 +56,9 @@
     <script src="lib/includeHTML.js"></script>
 
     <!-- this page assets -->
-    <!--<link href="assets/css/viewCandidatescss.css" rel="stylesheet" type="text/css" />-->
-
-    <style>
-
-        #characteristics {
-            padding-right:10px;
-            left:550px;
-            top:150px;
-            position:fixed;
-            height:300px;
-            width:320px;
-            background-color:yellow;
-            z-index:1;
-            color:black;
-        }
-
-        .boldC {
-            font-weight:bolder
-        }
-
-    </style>
-
+    <link href="assets/css/viewCandidates.css" rel="stylesheet" type="text/css" />
     <script src="assets/js/viewCandidates.js"></script>
+    <script src="assets/js/documentedCalls.js"></script>
 </head>
 
 
@@ -156,7 +136,7 @@
                                     <div class="panel panel-primary">
                                         <div class="panel-heading" id="col1">
                                             <h4 data-toggle="tooltip" data-placement="top" title="" class="panel-title">
-                                                <a href="#collapse1" data-parent="#accordion" data-toggle="collapse" class="dropdown active open">
+                                                <a id="collapsed1_aTag" href="#collapse1" data-parent="#accordion" data-toggle="collapse" class="dropdown active open">
                                                     <span class="m-l-15">
                                                         מסיעים רגילים
                                                     </span>
@@ -204,7 +184,7 @@
                                     <div class="panel panel-primary">
                                         <div class="panel-heading" id="col2">
                                             <h4 data-toggle="tooltip" data-placement="top" title="" class="panel-title">
-                                                <a href="#collapse2" data-parent="#accordion" data-toggle="collapse">
+                                                <a id="collapsed2_aTag" href="#collapse2" data-parent="#accordion" data-toggle="collapse">
                                                     <span class="m-l-15">
                                                         סופר מסיעים
                                                     </span>
@@ -404,7 +384,8 @@
 
     </div>
 
-    <footer id="rights" data-toggle="tooltip" data-placement="top" title="© All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء" class="footer text-right">
-    </footer>
+    <footer id="rights" data-toggle="tooltip" data-placement="top" title="© All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء" class="footer text-right"></footer>
+    <div class="modal fade" id="DocumentedCallsModal" tabindex="-1" role="dialog" aria-labelledby="DocumentedCallsTitle" aria-hidden="true"></div>
+
 </body>
 </html>

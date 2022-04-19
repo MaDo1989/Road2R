@@ -1,5 +1,5 @@
 ﻿checkCookie();
-let { convertDBDate2FrontEndDate, getHebrew_WeekDay, addSeperator2MobileNum } = GENERAL.USEFULL_FUNCTIONS;
+let { getHebrew_WeekDay, addSeperator2MobileNum } = GENERAL.USEFULL_FUNCTIONS;
 let { getRidePatNum4_viewCandidate } = GENERAL.RIDEPAT;
 let { ajaxCall } = GENERAL.FETCH_DATA;
 let allCandidatedFromDB;
@@ -10,17 +10,40 @@ let superCandidated_clientVersion = [];
 let ridePatNum;
 
 
+
 const wiringDataTables = () => {
     //manage button clicks on tables
 
-    //      EXAMPLE:
+    $('#datatable-candidates tbody').on('click', '#showDocumentedCallsBtn', function () {
 
-    //$('#datatable-morning tbody').on('click', '#candidatesBtn', function () {
-    //    candidatesButton(this);
-    //});
+        manipulateDocumentedCallsModal(this, candidatesTable);
 
+    });
+
+    $('#datatable-superDrivers tbody').on('click', '#showDocumentedCallsBtn', function () {
+
+        manipulateDocumentedCallsModal(this, superDriversTable);
+
+    });
 }
 
+const ConvertDBDate2UIDate = (fullTimeStempStr) => {
+    if (fullTimeStempStr === undefined) return;
+    let startTrim = fullTimeStempStr.indexOf('(') + 1;
+    let endTrim = fullTimeStempStr.indexOf(')');
+    let fullTimeStempNumber = fullTimeStempStr.substring(startTrim, endTrim);
+    let fullTimeStemp = new Date(parseInt(fullTimeStempNumber));
+
+    //Note: in getMOnth function 0=January, 1=February etc...
+
+    let dd = fullTimeStemp.getDate();
+
+    let mm = fullTimeStemp.getMonth() + 1;
+
+    let yyyy = fullTimeStemp.getFullYear();
+
+    return `${dd}.${mm}.${yyyy}`;
+}
 
 function hideCharacteristics() {
     $("#characteristics").css("visibility", "hidden");
@@ -48,12 +71,12 @@ function showCharacteristics() {
     for (k in txt) {
         if (txt[k] != 0)
             if (boldArr.indexOf(k) >= 0)
-                str += "<p class='boldC'>" + k + " : " + txt[k] + "</p>";  
+                str += "<p class='boldC'>" + k + " : " + txt[k] + "</p>";
             else
                 str += "<p>" + k + " : " + txt[k] + "</p>";
     }
     let position = $(this).position();
-    
+
     //$("#characteristics").css("left", position.left - 300);
     //$("#characteristics").css("top", position.top - 310);
     $("#characteristics").css("visibility", "visible");
@@ -62,16 +85,19 @@ function showCharacteristics() {
 }
 
 $(document).ready(() => {
+    $("#DocumentedCallsModal").attr("w3-include-html", "DocumentedCallsModal.html");
+
     $("#characteristics").css("visibility", "hidden");
 
     $(document).on("mouseover", ".c1", showCharacteristics);
     $(document).on("mouseout", ".c1", hideCharacteristics);
-    
-    candidatesTable   = $('#datatable-candidates').DataTable({ data: [], destroy: true });
+
+    candidatesTable = $('#datatable-candidates').DataTable({ data: [], destroy: true });
     superDriversTable = $('#datatable-superDrivers').DataTable({ data: [], destroy: true });
     //newDriversTable   = $('#datatable-newDrivers').DataTable({ data: [], destroy: true });
 
     ridePatNum = JSON.parse(getRidePatNum4_viewCandidate());
+
     getRidePat();
     getCandidates();
 
@@ -102,13 +128,63 @@ $(document).ready(() => {
 
     }
     includeHTML();//with out this there is no side bar!
+
+    wiringDataTables();
+
+    jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+        "de_date-asc": function (a, b) {
+            /*a and b are a couple of dates to compare
+            return value will be:
+            0 if a=b
+            1 if a > b
+           -1 if a < b
+            */
+            let dateAsArr_a = $.trim(a).split('.');
+            let dateAsArr_b = $.trim(b).split('.');
+
+            let a_date = new Date(parseInt(dateAsArr_a[2]), parseInt(dateAsArr_a[1]), parseInt(dateAsArr_a[0]));
+            let b_date = new Date(parseInt(dateAsArr_b[2]), parseInt(dateAsArr_b[1]), parseInt(dateAsArr_b[0]));
+
+            a = a_date.getTime();
+            b = b_date.getTime();
+
+            return a === b ? 0 : a > b ? 1 : -1;
+            //var z = ((x < y) ? -1 : ((x > y) ? 1 : 0));
+            //return z;
+        },
+        "de_date-desc": function (a, b) {
+            /*a and b are a couple of dates to compare
+              return value will be:
+              0 if a=b
+             -1 if a > b
+              1 if a < b
+              */
+            let dateAsArr_a = $.trim(a).split('.');
+            let dateAsArr_b = $.trim(b).split('.');
+
+            let a_date = new Date(parseInt(dateAsArr_a[2]), parseInt(dateAsArr_a[1]), parseInt(dateAsArr_a[0]));
+            let b_date = new Date(parseInt(dateAsArr_b[2]), parseInt(dateAsArr_b[1]), parseInt(dateAsArr_b[0]));
+
+            a = a_date.getTime();
+            b = b_date.getTime();
+
+            return a === b ? 0 : a > b ? -1 : 1;
+            //var z = 0//((x < y) ? 1 : ((x > y) ? -1 : 0));
+            //return z;
+        }
+    });
+
 });
 
 
 const deceideWhichTable2Show = () => {
     $('#collapse1').addClass("in");
     $('#collapsed1_aTag').removeClass('collapsed');
+
+    $('#collapsed2_aTag').addClass('collapsed');
+
 }
+
 const viewCharactaristics = () => {
     window.open("viewC.html?ridePatNum=" + ridePatNum + "&dayInWeek=" + ridepatDate.getDay(), '_blank').focus();
 }
@@ -197,14 +273,20 @@ const fillTableWithData = () => {
     newCandidated_clientVersion = [];
 
     let date2display;
-
+    let btnStr;
     for (let i in allCandidatedFromDB) {
-
+        btnStr = '';
         date2display = convertDBDate2FrontEndDate(allCandidatedFromDB[i].LatestDocumentedCallDate).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
 
+        let showDocumentedCallsBtn = '';
+        showDocumentedCallsBtn += `<div class='btnWrapper-left'><span id="badgeOf_${allCandidatedFromDB[i].Id}" class="badge badge-pill badge-default">${allCandidatedFromDB[i].NoOfDocumentedCalls}</span>`;
+        showDocumentedCallsBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedCallsBtn" title="שיחות מתועדות" data-backdrop="static" data-keyboard="false" data-toggle="modal" data-target="#DocumentedCallsModal"><i class="fa fa-phone" aria-hidden="true"></i></button></div>';
+
+        btnStr += showDocumentedCallsBtn;
+
         thisCandidate = {
-            id: i,
-            displayName: allCandidatedFromDB[i].DisplayName,
+            Id: i,
+            DisplayName: allCandidatedFromDB[i].DisplayName,
             cellphone: addSeperator2MobileNum(allCandidatedFromDB[i].CellPhone, "-"),
             city: allCandidatedFromDB[i].City,// + '<br />בדיקה',
             daysSinceLastRide: allCandidatedFromDB[i].DaysSinceLastRide,
@@ -213,7 +295,7 @@ const fillTableWithData = () => {
             latestDocumentedCallDate: date2display,
             seniorityInYears: allCandidatedFromDB[i].SeniorityInYears,
             score: parseInt(allCandidatedFromDB[i].Score),
-            buttons: ''
+            buttons: btnStr
         }
 
         switch (allCandidatedFromDB[i].DriverLevel) {
@@ -244,9 +326,10 @@ const fillTableWithData = () => {
                      ============================
         */
     }
+
     candidatesTable = $('#datatable-candidates').DataTable({
         data: regularCandidated_clientVersion,
-        rowId: 'id',
+        rowId: 'Id',
         pageLength: 10,
         stateSave: true,
         destroy: true,
@@ -255,12 +338,12 @@ const fillTableWithData = () => {
         autoWidth: false,
         columns: [
             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
-            //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
-            { data: "displayName",
+            {
+                data: "DisplayName",
                 render: function (data, type, row, meta) {
-                                let did = "data-driverId='" + row.id + "'";
-                                return '<p class="c1" ' + did + '>' +  data  + ' </p>';
-                    }
+                    let did = "data-driverId='" + row.id + "'";
+                    return '<p class="c1" ' + did + '>' + data + ' </p>';
+                }
             },                                                      //0
             { data: "cellphone" },                                  //1
             { data: "city" },                                       //2
@@ -286,7 +369,7 @@ const fillTableWithData = () => {
     superDriversTable = $('#datatable-superDrivers').DataTable(
         {
             data: superCandidated_clientVersion,
-            rowId: 'id',
+            rowId: 'Id',
             pageLength: 10,
             stateSave: true,
             destroy: true,
@@ -296,7 +379,7 @@ const fillTableWithData = () => {
             columns: [
                 //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
                 {
-                    data: "displayName",
+                    data: "DisplayName",
                     render: function (data, type, row, meta) {
                         let did = "data-driverId='" + row.id + "'";
                         return '<p class="c1" ' + did + '>' + data + ' </p>';
@@ -337,7 +420,7 @@ const fillTableWithData = () => {
     //        columns: [
     //            //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
     //            {
-    //                data: "displayName",
+    //                data: "DisplayName",
     //                render: function (data, type, row, meta) {
     //                    let did = "data-driverId='" + row.id + "'";
     //                    return '<p class="c1" ' + did + '>' + data + ' </p>';
@@ -374,4 +457,3 @@ const fillTableWithData = () => {
 
 
 }
-

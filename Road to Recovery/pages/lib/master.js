@@ -157,11 +157,15 @@ var GENERAL = {
           * Gets a string of /Date(1608581640000).
           * Returns a Date obj → new Date(1608581640000)
          */
-        convertDBDate2FrontEndDate: (fullTimeStempStr) => { // fullTimeStempStr = this form → "/Date(1608581640000)/"
+        convertDBDate2FrontEndDate: (fullTimeStempStr) => { // fullTimeStempStr = this form → "/Date(1608581640000)/" OR '2022-04-02T03:00:00'
 
             if (typeof fullTimeStempStr === 'undefined' || !fullTimeStempStr) return "";
 
-            return new Date(GENERAL.USEFULL_FUNCTIONS.convert2DBDateToInt(fullTimeStempStr));
+            if (fullTimeStempStr.includes('Date')) {
+                return new Date(GENERAL.USEFULL_FUNCTIONS.convert2DBDateToInt(fullTimeStempStr));
+            } else {
+                return new Date(fullTimeStempStr);
+            }
         },
 
         getHebrew_WeekDay: (day) => {
@@ -273,6 +277,17 @@ var GENERAL = {
             let hours_gap = miliSeconds_gap / (1000 * 60 * 60); //1000 ms in 1 sec, 60 sec in 1m, 60 min in 1h
             return hours_gap;
         },
+        /**
+     * This function used when use in arr.sort(compareFunc)
+     * 
+    */
+        compareFunc: (a, b) => {
+
+            let x = a.Name.trim();
+            let y = b.Name.trim();
+
+            return x < y ? -1 : x > y ? 1 : 0;
+        }
     },
 
     COPYWRITE: () => {

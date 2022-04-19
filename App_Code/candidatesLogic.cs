@@ -60,6 +60,7 @@ public class CandidatesLogic
                 candidate = new Candidate(
                     Convert.ToInt32(sdr["Id"]),
                     Convert.ToString(sdr["DisplayName"]),
+                    Convert.ToInt32(sdr["NoOfDocumentedCalls"]),
                     driverLevel,
                     ammountOfPathMatch,
                     Convert.ToInt32(sdr["AmmountOfMatchByDay"]),
@@ -71,7 +72,6 @@ public class CandidatesLogic
             }
             newbies = GetNewbiesCandidates(ridePatNum,1000); // 100 is just a big number to get all the new drivers
 
-            //merge between thw two candidates & newbies
         }
         catch (Exception ex)
         {
@@ -129,6 +129,7 @@ public class CandidatesLogic
                 candidate = new Candidate(
                     Convert.ToInt32(sdr["Id"]),
                     Convert.ToString(sdr["DisplayName"]),
+                    Convert.ToInt32(sdr["NoOfDocumentedCalls"]),
                     (int) Level.Newbee,
                     ammountOfPathMatch,
                     Convert.ToInt32(sdr["AmmountOfMatchByDay"]),
@@ -179,10 +180,12 @@ public class CandidatesLogic
             {"area2area",8 },
             {"otherAears",2 },
             {"routeWeight",0.3 },
-            {"sameDay", 80 },
-            {"DifferentDays",5 },
-            {"SameDayPart",10},
-            {"DifferentDayPart",5},
+
+            {"sameDay", 90 },
+            {"DifferentDays",10 },
+            {"SameDayPart",0},
+            {"DifferentDayPart",0},
+
             {"timeWeight", 0.7 }
         };
         }
