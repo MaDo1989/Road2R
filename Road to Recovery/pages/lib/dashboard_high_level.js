@@ -174,15 +174,16 @@ function start_weekly_cards() {
     if (window.full_loading) {
         start_one_week_row(get_week_card("curr"));
 
-        start_week_all_graphs();
+        start_week_all_graphs(moment());
 
         start_one_week_new_volunteers(get_week_card("curr"));
     }
     else {
         // For debugging 
-        start_week_all_graphs();
+        start_week_all_graphs(moment());
     }
 
+    setup_weekly_choose_combo();
     $("#dsb_hl_weekly_tbl_curr_show").click(toggle_month_week_graph_datasets);
     $("#dsb_hl_weekly_tbl_prev_show").click(toggle_month_week_graph_datasets);
     $("#dsb_hl_weekly_tbl_2wks_ago_show").click(toggle_month_week_graph_datasets);
@@ -258,11 +259,26 @@ function get_week_range(week_designator) {
 }
 
 
+function on_weekly_date_change() {
+    let selected_day = moment($("#dsb_select_week").val(), K_DateFormat_Moment);
+    start_week_all_graphs(selected_day);
+}
+
+function setup_weekly_choose_combo() {
+    var dt = $('#dsb_select_week').datepicker({
+        format: K_DateFormat_DatePicker,
+        autoclose: true
+    });
+    let today = new Date();
+    dt.datepicker('setDate', today);
+    dt.on("changeDate", on_weekly_date_change);
+}
+
 // To improve performance, we query the entire range of last 3 weeks in one shot
-function start_week_all_graphs() {
-    let end_date = moment();
+function start_week_all_graphs(end_date) {
+    let start_date = moment(end_date);
     // The week-range in the graph always start on Sunday
-    let start_date = moment().startOf('isoWeek'); // Avoid L10N problems - ISO says week start on Monday.
+    start_date.startOf('isoWeek'); // Avoid L10N problems - ISO says week start on Monday.
     start_date.subtract(15, 'days'); // two weeks back + 1 day from Mon-->Sun
 
     let query_object = {
@@ -382,7 +398,7 @@ function prepare_one_week_span_data(start_date, dict) {
         prepared_data.labels.push(hebrew_day_name);
 
         // check if we have info on this specific day:
-        let ddmm = the_date.format("MM-DD");
+        let ddmm = the_date.format("YYYY-MM-DD");
         if (ddmm in dict) {
             let dayinfo = dict[ddmm];
             prepared_data.rides.push(dayinfo.Rides);
@@ -438,6 +454,13 @@ function dbg_validate_weekly_graph(myChart, server_data) {
 }
 
 function render_week_all_graphs(server_data, range) {
+    let element_id = "dsb_hl_weekly_graph";
+    var myChart = find_chart_by_id(element_id);
+    if (myChart) {
+        myChart.data.datasets = new Array();  // reset content of Chart
+        myChart.update();  
+    }
+
     // we want to "rescale" the 3 weeks on the same 7 days range
 
     // building a reverse index - dictionary
@@ -452,8 +475,13 @@ function render_week_all_graphs(server_data, range) {
     the_date.subtract(1, "days");
     let prepared_data = prepare_one_week_span_data(the_date, dict);
 
-    let element_id = "dsb_hl_weekly_graph";
-    create_month_week_graph(prepared_data, element_id);
+    if (!myChart) {
+        create_month_week_graph(prepared_data, element_id);
+        myChart = find_chart_by_id(element_id);
+    }
+    else {
+        add_to_month_week_graph(myChart, prepared_data, get_week_card("curr"));
+    }
 
     // Compute the data for the previous week
     the_date.subtract(7, "days");

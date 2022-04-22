@@ -196,7 +196,7 @@
             $("#dsb_hl").click(dashboard_hl_init);
 
             // fast-load dashboard:
-            // dashboard_hl_init();
+            dashboard_hl_init();  //@@ 
         });
 
 
@@ -571,7 +571,15 @@
                         <!-- Second row - Weekly - 1 Graph -->
                         <h2> &nbsp; &nbsp;מבט שבועי</h2>
                         <div class="col-sm-3">
-                            &nbsp;
+                            <div class="form-group">
+                                <label class="col-sm-2">&nbsp;</label>
+                                <label class="col-sm-2" style="padding: 0.5em 0px;">שבוע</label>
+                                <div class="col-sm-4">
+                                    <input type="text" id="dsb_select_week" placeholder="..." class="form-control">
+                                </div>
+                            </div>
+
+
                         </div>
                         <div class="col-sm-6">
                             <canvas id="dsb_hl_weekly_graph" width="700" height="420" style="padding-bottom: 20px"></canvas>
