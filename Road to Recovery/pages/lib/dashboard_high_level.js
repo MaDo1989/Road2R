@@ -1,9 +1,9 @@
 ﻿// Purpose: Dashboard UI for Amuta
 
 
-window.is_debugging_dsb = false; 
-window.full_loading = true;  
-window.all_graphs = true;
+window.is_debugging_dsb = true;  // @@
+window.full_loading = false;   // @@
+window.all_graphs = false; // @@
 
 
 // a mapping of event names to the next code that should be called
@@ -171,11 +171,17 @@ const daily_card_definitions = [
 /*  ==================   WEEK  related code     =========================== */
 
 function start_weekly_cards() {
-    start_one_week_row(get_week_card("curr"));
+    if (window.full_loading) {
+        start_one_week_row(get_week_card("curr"));
 
-    start_week_all_graphs();
+        start_week_all_graphs();
 
-    start_one_week_new_volunteers(get_week_card("curr"));
+        start_one_week_new_volunteers(get_week_card("curr"));
+    }
+    else {
+        // For debugging 
+        start_week_all_graphs();
+    }
 
     $("#dsb_hl_weekly_tbl_curr_show").click(toggle_month_week_graph_datasets);
     $("#dsb_hl_weekly_tbl_prev_show").click(toggle_month_week_graph_datasets);
@@ -252,11 +258,13 @@ function get_week_range(week_designator) {
 }
 
 
-// To improve performance, we query the entire last 21 days in one shot
+// To improve performance, we query the entire range of last 3 weeks in one shot
 function start_week_all_graphs() {
     let end_date = moment();
-    let start_date = moment();
-    start_date.subtract(21, 'days');
+    // The week-range in the graph always start on Sunday
+    let start_date = moment().startOf('isoWeek'); // Avoid L10N problems - ISO says week start on Monday.
+    start_date.subtract(15, 'days'); // two weeks back + 1 day from Mon-->Sun
+
     let query_object = {
         start_date: start_date.format("YYYY-MM-DD"),
         end_date: end_date.format("YYYY-MM-DD")
@@ -359,13 +367,15 @@ function start_one_week_new_volunteers(card_def) {
     });
 }
 
-function prepare_one_week_span_data(the_date, dict) {
+function prepare_one_week_span_data(start_date, dict) {
     let prepared_data = {
         labels: [],
         rides: [],
         volunteers: [],
         patients: []
     }
+
+    let the_date = moment(start_date); // avoid mutating input
 
     for (i = 0; i < 7; ++i) {
         let hebrew_day_name = the_date.toDate().toLocaleString("he", { weekday: 'long' });
@@ -390,38 +400,77 @@ function prepare_one_week_span_data(the_date, dict) {
     return prepared_data;
 }
 
+function dbg_compare_scalar_arrays(lhs, rhs) {
+    if (lhs.length === rhs.length &&
+        lhs.every(function (value, index) { return value === rhs[index] })) {
+        return true;
+    }
+    console.error("dbg_compare_scalar_arrays() - arrays are different", lhs, rhs);
+    return false;
+}
 
-function render_week_all_graphs(data, range) {
+
+function dbg_validate_weekly_graph(myChart, server_data) {
+    // confirm we display what we expect
+    // Scan Graph datasets from end, and for each patients dataset, add it to test array
+    let patients_arr = new Array();
+    for (let idx of [7, 4, 1]) {   
+        let dataset = myChart.data.datasets[idx];
+        if (dataset.label.localeCompare("חולים") == 0) {
+            for (elem of dataset.data) {
+                if (elem) { // If not a zero value
+                    patients_arr.push(elem);
+                }
+            }
+        }
+    }
+
+    // confirm now that the "column" of Patients in server_data is the same
+    let server_patients = server_data.map(
+        function (elem) { return elem.Patients; });
+
+    if (!dbg_compare_scalar_arrays(patients_arr, server_patients)) {
+        console.error("dbg_validate_weekly_graph() FAILED");
+        console.table(server_data);
+        console.log(patients_arr);
+        console.log(server_patients);
+    }
+}
+
+function render_week_all_graphs(server_data, range) {
     // we want to "rescale" the 3 weeks on the same 7 days range
 
     // building a reverse index - dictionary
     let dict = {};
-    data.map(function (obj) {
+    server_data.map(function (obj) {
         dict[obj.Day] = obj;
     });
 
-    //First span - this week (7-days-ago ==> end_date)
+    //First span - this week (last Sunday ==> end_date)
     let the_date = moment(range.end_date, "YYYY-MM-DD");
-    the_date.subtract(7, "days");
+    the_date.startOf('isoWeek'); // << Monday
+    the_date.subtract(1, "days");
     let prepared_data = prepare_one_week_span_data(the_date, dict);
 
     let element_id = "dsb_hl_weekly_graph";
     create_month_week_graph(prepared_data, element_id);
 
     // Compute the data for the previous week
-    the_date = moment(range.end_date, "YYYY-MM-DD");
-    the_date.subtract(14, "days");
+    the_date.subtract(7, "days");
     prepared_data = prepare_one_week_span_data(the_date, dict);
 
     var myChart = find_chart_by_id(element_id);
     add_to_month_week_graph(myChart, prepared_data, get_week_card("prev"));
 
     // Compute the data for two weeks ago
-    the_date = moment(range.end_date, "YYYY-MM-DD");
-    the_date.subtract(21, "days");
+    the_date.subtract(7, "days");
     prepared_data = prepare_one_week_span_data(the_date, dict);
 
     add_to_month_week_graph(myChart, prepared_data, get_week_card("2wks_ago"));
+
+    if (window.is_debugging_dsb) {
+        dbg_validate_weekly_graph(myChart, server_data);
+    }
 }
 
 
