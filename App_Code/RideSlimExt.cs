@@ -14,6 +14,8 @@ public class RideSlimExt : RideSlim
     string area;
     List<EscoretSlim> escorts;
     List<string> equipment;
+    bool onlyEscort;
+    int rideNum;
 
 
     public RideSlimExt()
@@ -67,6 +69,32 @@ public class RideSlimExt : RideSlim
         }
     }
 
+    public bool OnlyEscort
+    {
+        get
+        {
+            return onlyEscort;
+        }
+
+        set
+        {
+            onlyEscort = value;
+        }
+    }
+
+    public int RideNum
+    {
+        get
+        {
+            return rideNum;
+        }
+
+        set
+        {
+            rideNum = value;
+        }
+    }
+
     public Object GetRidePatView(int daysAhead) {
 
         // get the basic ride data
@@ -104,6 +132,7 @@ public class RideSlimExt : RideSlim
             CellPhone = dr["CellPhone"].ToString();
             RideSlimExt rse = new RideSlimExt(PatientName, "", 0, Origin, Destination, PickUpTime, Id, CellPhone);
             rse.Area = dr["area"].ToString();
+            rse.OnlyEscort = Convert.ToBoolean(dr["onlyEscort"]);
             dic.Add(Id,rse );
         }
 
@@ -211,6 +240,7 @@ public class RideSlimExt : RideSlim
                     },
                     Date = r.PickUpTime,
                     Area = r.Area,
+                    OnlyEscorts = r.OnlyEscort
                 });
             }
             catch (Exception ex) {
@@ -222,6 +252,80 @@ public class RideSlimExt : RideSlim
         return listObjs;
     }
 
+    private Object RideSlimExtToObjectWithRideId(List<RideSlimExt> RideList)
+    {
+
+        List<Object> listObjs = new List<Object>();
+        int escortCounter = 0;
+
+        foreach (RideSlimExt r in RideList)
+        {
+            try
+            {
+                List<Object> escorts = new List<Object>();
+                List<Object> equipment = new List<object>();
+                if (r.Escorts != null)
+                    foreach (EscoretSlim e in r.Escorts)
+                    {
+                        bool isAnonymous = false;
+                        if (e.DisplayName == "אנונימי") isAnonymous = true;
+                        escorts.Add(new
+                        {
+                            DisplayName = e.DisplayName,
+                            CellPhone = e.CellPhone,
+                            IsAnonymous = isAnonymous,
+                            Id = escortCounter
+                        });
+                        escortCounter++;
+                    }
+                if (r.equipment != null)
+                    equipment = r.equipment.ToList<Object>();
+                bool isAnonymousP = false;
+                if (r.PatientName == "אנונימי")
+                    isAnonymousP = true;
+
+                List<Object> rpList = new List<object>();
+
+                rpList.Add(new
+                {
+                    Escorts = escorts,
+                    Pat = new
+                    {
+                        DisplayName = r.PatientName,
+                        Equipment = equipment,
+                        CellPhone = r.CellPhone,
+                        IsAnonymous = isAnonymousP
+                    },
+                    RidePatNum = r.Id,
+                    Origin = new
+                    {
+                        Name = r.Origin
+                    },
+                    Destination = new
+                    {
+                        Name = r.Destination
+                    },
+                    Date = r.PickUpTime,
+                    Area = r.Area,
+                    OnlyEscorts = r.OnlyEscort
+                });
+
+                listObjs.Add(new
+                {
+                    Id = r.RideNum,
+                    RidePats = rpList
+                });
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+        }
+
+        return listObjs;
+    }
     public Object GetFutureRides(int driverId)
     {
 
@@ -255,6 +359,8 @@ public class RideSlimExt : RideSlim
             CellPhone = dr["CellPhone"].ToString();
             RideSlimExt rse = new RideSlimExt(PatientName, "", 0, Origin, Destination, PickUpTime, Id, CellPhone);
             rse.Area = dr["area"].ToString();
+            rse.OnlyEscort = Convert.ToBoolean(dr["onlyEscort"]);
+            rse.RideNum = Convert.ToInt32(dr["rideNum"]);
             dic.Add(Id, rse);
         }
 
@@ -269,6 +375,7 @@ public class RideSlimExt : RideSlim
             dic[ridepatnum].escorts = new List<EscoretSlim>();
             string displayName = dr["DisplayName"].ToString();
             bool isAnonymous = true;
+            
             if (dr["IsAnonymous"] == System.DBNull.Value)
                 isAnonymous = false;
             else
@@ -307,7 +414,7 @@ public class RideSlimExt : RideSlim
 
         List<RideSlimExt> l = dic.Values.ToList<RideSlimExt>();
 
-        Object o = RideSlimExtToObject(l);
+        Object o = RideSlimExtToObjectWithRideId(l);
 
         return o;
 
@@ -346,6 +453,8 @@ public class RideSlimExt : RideSlim
                 rse.Area = "";
             else
                 rse.Area = dr["area"].ToString();
+            rse.OnlyEscort = Convert.ToBoolean(dr["onlyEscort"]);
+            rse.RideNum = Convert.ToInt32(dr["rideNum"]);
 
             dic.Add(Id, rse);
         }
@@ -360,9 +469,6 @@ public class RideSlimExt : RideSlim
             try
             {
                 int ridepatnum = Convert.ToInt32(dr["ridepatnum"]);
-                //List<EscoretSlim> escorlList = new List<EscoretSlim>();
-                //if (dic[ridepatnum].escorts == null)
-                //    dic[ridepatnum].escorts = new Dictionary<string, string>();
                 dic[ridepatnum].escorts = new List<EscoretSlim>();
                 string displayName = dr["DisplayName"].ToString();
                 bool isAnonymous = true;
@@ -408,7 +514,7 @@ public class RideSlimExt : RideSlim
 
         List<RideSlimExt> l = dic.Values.ToList<RideSlimExt>();
 
-        Object o = RideSlimExtToObject(l);
+        Object o = RideSlimExtToObjectWithRideId(l);
 
         return o;
 
