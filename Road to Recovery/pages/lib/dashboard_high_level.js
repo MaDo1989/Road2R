@@ -261,6 +261,17 @@ function get_week_range(week_designator) {
 
 function on_weekly_date_change() {
     let selected_day = moment($("#dsb_select_week").val(), K_DateFormat_Moment);
+    // make sure it ends on Saturday, unless in current week
+    if (selected_day.weekday() == 0) {
+        selected_day.add(6, 'days');
+    }
+    else {
+        selected_day.endOf('isoWeek').subtract(1, 'days');
+    }
+    let today = moment();
+    if (selected_day.isAfter(today)) {
+        selected_day = today;
+    }
     start_week_all_graphs(selected_day);
 }
 
@@ -480,7 +491,8 @@ function render_week_all_graphs(server_data, range) {
         myChart = find_chart_by_id(element_id);
     }
     else {
-        add_to_month_week_graph(myChart, prepared_data, get_week_card("curr"));
+        add_to_month_week_graph(myChart, prepared_data, get_week_card("curr"),
+            !$("#dsb_hl_weekly_tbl_curr_show").is(':checked') );
     }
 
     // Compute the data for the previous week
@@ -488,13 +500,15 @@ function render_week_all_graphs(server_data, range) {
     prepared_data = prepare_one_week_span_data(the_date, dict);
 
     var myChart = find_chart_by_id(element_id);
-    add_to_month_week_graph(myChart, prepared_data, get_week_card("prev"));
+    add_to_month_week_graph(myChart, prepared_data, get_week_card("prev"),
+        !$("#dsb_hl_weekly_tbl_prev_show").is(':checked') );
 
     // Compute the data for two weeks ago
     the_date.subtract(7, "days");
     prepared_data = prepare_one_week_span_data(the_date, dict);
 
-    add_to_month_week_graph(myChart, prepared_data, get_week_card("2wks_ago"));
+    add_to_month_week_graph(myChart, prepared_data, get_week_card("2wks_ago"),
+        !$("#dsb_hl_weekly_tbl_2wks_ago_show").is(':checked') );
 
     if (window.is_debugging_dsb) {
         dbg_validate_weekly_graph(myChart, server_data);
@@ -790,7 +804,7 @@ function create_month_week_graph(prepared_data, graph_id)
 }
 
 
-function add_to_month_week_graph(myChart, prepared_data, card_def) {
+function add_to_month_week_graph(myChart, prepared_data, card_def, is_hidden) {
     let updated = myChart.data.datasets.concat(
         [
             {
@@ -800,7 +814,8 @@ function add_to_month_week_graph(myChart, prepared_data, card_def) {
                 borderColor: CHART_COLORS.green,
                 backgroundColor: CHART_COLORS.green,
                 borderWidth: 1,
-                borderDash: card_def.borderDash
+                borderDash: card_def.borderDash,
+                hidden: is_hidden
             },
             {
                 label: 'חולים',
@@ -809,7 +824,8 @@ function add_to_month_week_graph(myChart, prepared_data, card_def) {
                 borderColor: CHART_COLORS.purple,
                 backgroundColor: CHART_COLORS.purple,
                 borderWidth: 1,
-                borderDash: card_def.borderDash
+                borderDash: card_def.borderDash,
+                hidden: is_hidden
             },
             {
                 label: 'מתנדבים',
@@ -818,7 +834,8 @@ function add_to_month_week_graph(myChart, prepared_data, card_def) {
                 borderColor: CHART_COLORS.orange,
                 backgroundColor: CHART_COLORS.orange,
                 borderWidth: 1,
-                borderDash: card_def.borderDash
+                borderDash: card_def.borderDash,
+                hidden: is_hidden
             }
         ]);
     myChart.data.datasets = updated;

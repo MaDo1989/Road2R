@@ -22,6 +22,7 @@ let S_HistoryTable = null;
 
 let K_DateFormat_DatePicker = "dd/mm/yyyy";
 let K_DateFormat_Moment = "DD/MM/YYYY";
+let K_DateFormat_Debug_Moment = "dddd, MMMM Do YYYY, h:mm:ss a";
 
 function init_reports_page() {
     includeHTML();
