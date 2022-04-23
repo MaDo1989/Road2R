@@ -29,13 +29,30 @@ public class WebServiceMobile : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string getPastRides(int volunteerId)
+    public string getPastRidesSlim(int volunteerId)
     {
         try
         {
             GzipMe();
-            RideSlim r = new RideSlim();
-            List<RideSlim> rl = r.GetPastRides(volunteerId);
+            RideSlimExt r = new RideSlimExt();
+            Object rl = r.GetPastRides(volunteerId);
+            return j.Serialize(rl);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(" שגיאה בשליפת נתוני הסעות עבר");
+        }
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string getMyRidesSlim(int volunteerId) // returns future rides only
+    {
+        try
+        {
+            GzipMe();
+            RideSlimExt r = new RideSlimExt();
+            Object rl = r.GetFutureRides(volunteerId);
             return j.Serialize(rl);
         }
         catch (Exception ex)
@@ -56,6 +73,29 @@ public class WebServiceMobile : System.Web.Services.WebService
             Response.AppendHeader("Content-Encoding", "gzip");
         }
         return Response;
+    }
+
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetRidePatViewSlim(int maxDays)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            RideSlimExt rp = new RideSlimExt();
+            Object r = rp.GetRidePatView(maxDays);
+            j.MaxJsonLength = Int32.MaxValue;
+            return j.Serialize(r);
+        }
+        catch (Exception ex)
+        {
+            CatchErrors catchErrors = new CatchErrors("WebService: Exception in GetRidePatView", ex + " " + ex.Message + " " + ex.InnerException + " " + ex.Source, ex.StackTrace);
+            //Log.Error("Error in GetRidePatView", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
     }
 
 }

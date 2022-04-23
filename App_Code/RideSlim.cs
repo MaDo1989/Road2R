@@ -13,14 +13,13 @@ public class RideSlim
 {
 
     string patientName;
+    string cellPhone;
     string driverName;
     int driverId;
     string origin;
     string destination;
     DateTime pickUpTime;
     int id;
-    
-
 
     public RideSlim()
     {
@@ -29,7 +28,7 @@ public class RideSlim
         //
     }
 
-    public RideSlim(string patientName, string driverName, int driverId, string origin, string destination, DateTime pickUpTime, int id)
+    public RideSlim(string patientName, string driverName, int driverId, string origin, string destination, DateTime pickUpTime, int id,string cellPhone)
     {
         this.patientName = patientName;
         this.driverName = driverName;
@@ -38,29 +37,8 @@ public class RideSlim
         this.destination = destination;
         this.pickUpTime = pickUpTime;
         this.id = id;
+        this.cellPhone = cellPhone;
     }
-
-    public List<RideSlim> GetPastRides(int volunteerID) {
-
-        List<RideSlim> pastRides = new List<RideSlim>();
-
-        DbService db = new DbService();
-        SqlCommand cmd = new SqlCommand();
-        cmd.CommandType = CommandType.Text;
-        cmd.Parameters.AddWithValue("@volunteerId", volunteerID);
-        cmd.CommandText = "exec spRideAndRidePat_GetVolunteersRideHistory volunteerID = @volunteerId";
-        SqlDataReader dr = db.GetDataReader(cmd);
-        while (dr.Read()) {
-            Id = Convert.ToInt32(dr["id"]);
-            Destination = dr["destination"].ToString();
-            Origin = dr["origin"].ToString();
-            PickUpTime = Convert.ToDateTime(dr["PickUpTime"].ToString());
-            patientName = dr["patient"].ToString();
-            pastRides.Add(new RideSlim(patientName, "", volunteerID, origin, destination, PickUpTime, id));
-        }
-        return pastRides;
-    }
-
 
     public string PatientName
     {
@@ -150,6 +128,19 @@ public class RideSlim
         set
         {
             id = value;
+        }
+    }
+
+    public string CellPhone
+    {
+        get
+        {
+            return cellPhone;
+        }
+
+        set
+        {
+            cellPhone = value;
         }
     }
 }

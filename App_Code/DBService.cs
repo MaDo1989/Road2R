@@ -268,6 +268,46 @@ public class DbService: IDisposable
          */
     }
 
+
+    public SqlDataReader GetDataReaderSP(SqlCommand cmd)
+    {
+        /*
+
+
+        !!!
+
+        I intentionally do not use finally and then close con here
+        BE AWARE !
+        IF USE THIS METHOD CLOSE THE CONNECTION VIA CloseConnection() METHOD
+        FROM WHERE YOU USE IT !
+
+        !!!
+
+         */
+        try
+        {
+            if (con.State == ConnectionState.Closed) { con.Open(); cmd.Connection = con; }
+            return cmd.ExecuteReader();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("exception in DBService →  GetDataReader(string query) " + ex);
+        }
+        /*
+
+        !!!
+        
+        I intentionally do not use finally and then close con here
+        BE AWARE !
+        IF USE THIS METHOD CLOSE THE CONNECTION VIA CloseConnection() METHOD
+        FROM WHERE YOU USE IT !
+        
+        !!!
+
+
+         */
+    }
+
     public void Dispose()
     {
         CloseConnection();
