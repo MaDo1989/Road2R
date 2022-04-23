@@ -458,8 +458,8 @@ GROUP BY inner_select.DisplayName
              @"select  count (DISTINCT MainDriver)  AS COUNT_VOL
             from RPView
             where MainDriver is not null
-            and pickuptime > @start_date
-            and pickuptime < @end_date
+            and pickuptime >= @start_date
+            and pickuptime <= @end_date
             AND not MainDriver in (
 	            select distinct MainDriver
 	            from RPView
