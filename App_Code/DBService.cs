@@ -43,6 +43,7 @@ public class DbService: IDisposable
     {
         try
         {
+            
             if (con.State == ConnectionState.Closed)
             {
                 con.Open();
@@ -119,6 +120,40 @@ public class DbService: IDisposable
                 throw ex;
             }
             return row_affected;
+        }
+        finally
+        {
+            con.Close();
+        }
+    }
+
+
+    public SqlDataReader GetDataReader(SqlCommand command)
+    {
+        
+        SqlDataReader dr = null;
+
+        try
+        {
+            if (con == null)
+                con = new SqlConnection();
+
+            if (con.State == ConnectionState.Closed)
+            {
+                con.Open();
+            }
+
+            command.Connection = con;
+
+            try
+            {
+                dr = command.ExecuteReader();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return dr;
         }
         finally
         {
@@ -212,6 +247,46 @@ public class DbService: IDisposable
         {
             if (con.State == ConnectionState.Closed) { con.Open(); }
             cmd = new SqlCommand(query, con);
+            return cmd.ExecuteReader();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("exception in DBService →  GetDataReader(string query) " + ex);
+        }
+        /*
+
+        !!!
+        
+        I intentionally do not use finally and then close con here
+        BE AWARE !
+        IF USE THIS METHOD CLOSE THE CONNECTION VIA CloseConnection() METHOD
+        FROM WHERE YOU USE IT !
+        
+        !!!
+
+
+         */
+    }
+
+
+    public SqlDataReader GetDataReaderSP(SqlCommand cmd)
+    {
+        /*
+
+
+        !!!
+
+        I intentionally do not use finally and then close con here
+        BE AWARE !
+        IF USE THIS METHOD CLOSE THE CONNECTION VIA CloseConnection() METHOD
+        FROM WHERE YOU USE IT !
+
+        !!!
+
+         */
+        try
+        {
+            if (con.State == ConnectionState.Closed) { con.Open(); cmd.Connection = con; }
             return cmd.ExecuteReader();
         }
         catch (Exception ex)

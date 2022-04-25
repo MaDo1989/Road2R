@@ -839,6 +839,13 @@ public class Volunteer
                 ac = true;
             }
             v.IsActive = ac;
+            bool isDriving = false;
+            if (dr["IsDriving"].ToString().ToLower() == "true")
+            {
+                isDriving = true;
+            }
+            v.IsDriving = isDriving;
+
             bool arabic = false;
             if (dr["KnowsArabic"].ToString().ToLower() == "true")
             {
