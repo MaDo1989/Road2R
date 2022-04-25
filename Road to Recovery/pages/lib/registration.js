@@ -120,6 +120,11 @@ function registerDriverSuccessCB() {
     $("#nameConfirmationModal").modal('hide');
 }
 
+function registerDriverErrorCB(err) {
+
+    alert(err);
+}
+
 function GetVolunteerByMobileErrorCB(err) {
     if (err.responseJSON.Message === "volunteer not found") {
         swal({
