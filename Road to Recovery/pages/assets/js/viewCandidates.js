@@ -15,15 +15,20 @@ const wiringDataTables = () => {
     //manage button clicks on tables
 
     $('#datatable-candidates tbody').on('click', '#showDocumentedCallsBtn', function () {
-
         manipulateDocumentedCallsModal(this, candidatesTable);
-
     });
 
     $('#datatable-superDrivers tbody').on('click', '#showDocumentedCallsBtn', function () {
-
         manipulateDocumentedCallsModal(this, superDriversTable);
+    });
 
+
+    $('#datatable-candidates tbody').on('click', '#showDocumentedRidesBtn', function () {
+        manipulateDocumentedRidesModal(this, candidatesTable);
+    });
+
+    $('#datatable-superDrivers tbody').on('click', '#showDocumentedRidesBtn', function () {
+        manipulateDocumentedRidesModal(this, superDriversTable);
     });
 }
 
@@ -86,6 +91,7 @@ function showCharacteristics() {
 
 $(document).ready(() => {
     $("#DocumentedCallsModal").attr("w3-include-html", "DocumentedCallsModal.html");
+    $("#documentedRidesModal").attr("w3-include-html", "documentedRidesModal.html");
 
     $("#characteristics").css("visibility", "hidden");
 
@@ -274,16 +280,27 @@ const fillTableWithData = () => {
 
     let date2display;
     let btnStr;
+    let showDocumentedCallsBtn;
+    let showDocumentedRidesBtn;
+
+
     for (let i in allCandidatedFromDB) {
-        btnStr = '';
+        btnStr = `<div class='btnsInSameLine'>`;
         date2display = convertDBDate2FrontEndDate(allCandidatedFromDB[i].LatestDocumentedCallDate).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
 
-        let showDocumentedCallsBtn = '';
+        showDocumentedCallsBtn= '';
         showDocumentedCallsBtn += `<div class='btnWrapper-left'><span id="badgeOf_${allCandidatedFromDB[i].Id}" class="badge badge-pill badge-default">${allCandidatedFromDB[i].NoOfDocumentedCalls}</span>`;
         showDocumentedCallsBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedCallsBtn" title="שיחות מתועדות" data-backdrop="static" data-keyboard="false" data-toggle="modal" data-target="#DocumentedCallsModal"><i class="fa fa-phone" aria-hidden="true"></i></button></div>';
 
         btnStr += showDocumentedCallsBtn;
 
+        showDocumentedRidesBtn = '';
+        showDocumentedRidesBtn += `<div><span class="badge badge-default">${allCandidatedFromDB[i].NoOfDocumentedRides}</span>`;
+        showDocumentedRidesBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedRidesBtn" title="תיעוד הסעות" data-toggle="modal" data-target="#documentedRidesModal"><i class="fa fa-car" aria-hidden="true"></i></button></div>';
+
+        btnStr += showDocumentedRidesBtn;
+
+        btnStr += '</div>';
         thisCandidate = {
             Id: i,
             DisplayName: allCandidatedFromDB[i].DisplayName,

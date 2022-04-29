@@ -46,11 +46,11 @@
     <script src="lib/includeHTML.js"></script>
 
     <script src="assets/js/documentedCalls.js"></script>
+    <script src="assets/js/documentedRides.js"></script>
     <script>
 
         var cleanPhoneNumber;
         var msgTable;
-        let historyTable;
 
 
         checkCookie();
@@ -58,6 +58,7 @@
 
         $(document).ready(function () {
             $("#DocumentedCallsModal").attr("w3-include-html", "DocumentedCallsModal.html");
+            $("#documentedRidesModal").attr("w3-include-html", "documentedRidesModal.html");
 
 
             let { COPYWRITE } = GENERAL;
@@ -133,11 +134,6 @@
         function ActiveMode() {
             localStorage.activeVol = $("#activeCustomers").prop('checked');
             refreshTable();
-        }
-
-        const disableFutureIn_DocumentAcallDatePicker = () => {
-            let today = new Date().toISOString().split('T')[0];
-            document.getElementById('DocumentAcallDatePicker').setAttribute('max', today);
         }
 
         const driveMode = () => {
@@ -387,116 +383,7 @@
 
             $('#datatable-buttons tbody').on('click', '#showDocumentedRidesBtn', function () {
 
-                $('#wait').show();
-
-                let rowData = tbl.row($(this).parents('tr')).data();
-
-                $('#documentedRidesTitle').text("תיעוד הסעות " + rowData.DisplayName)
-                $.ajax({
-                    dataType: "json",
-                    url: "WebService.asmx/GetVolunteersDocumentedRides",
-                    contentType: "application/json; charset=utf-8",
-                    type: "POST",
-                    data: JSON.stringify({ volunteerId: rowData.Id }),
-                    success: function (data) {
-                        data = JSON.parse(data.d)
-
-                        if (historyTable != null) {
-                            historyTable.destroy();
-                        }
-
-
-                        historyTable = $('#documentedRidesTable').DataTable({
-                            order: [[5, "desc"]],
-                            pageLength: 10,
-                            data: data,
-                            columns: [
-                                {
-                                    data: (data) => {
-                                        // if (data.Date === undefined) return;
-                                        return ConvertDBDate2UIDate(data.Date);
-                                    }
-                                },
-                                {
-                                    data: (data) => {
-                                        if (data.Date === undefined) return;
-
-                                        let fullTimeStempStr = data.Date;
-                                        let startTrim = fullTimeStempStr.indexOf('(') + 1;
-                                        let endTrim = fullTimeStempStr.indexOf(')');
-                                        let fullTimeStempNumber = fullTimeStempStr.substring(startTrim, endTrim);
-                                        let fullTimeStemp = new Date(parseInt(fullTimeStempNumber));
-
-                                        if (fullTimeStemp.getMinutes() === 14) {
-                                            if (fullTimeStemp.getHours() === 19 || fullTimeStemp.getHours() === 20 || fullTimeStemp.getHours() === 21 || fullTimeStemp.getHours() === 22) {
-                                                return 'אחה"צ';
-                                            }
-                                        }
-
-                                        let hh = fullTimeStemp.getHours() < 10 ? "0" + fullTimeStemp.getHours() : fullTimeStemp.getHours();
-                                        hh += ":";
-                                        let mm = fullTimeStemp.getMinutes() < 10 ? "0" + fullTimeStemp.getMinutes() : fullTimeStemp.getMinutes();
-                                        return hh + mm;
-                                    }
-                                },
-                                {
-                                    data: (data) => {
-                                        if (data.Origin === undefined || data.Destination === undefined) return;
-
-                                        let fullPath = data.Origin.Name + " ← " + data.Destination.Name;
-                                        return fullPath;
-                                    }
-                                },
-                                { data: "Pat.DisplayName" },
-                                { data: "Remark" },
-                                {
-                                    data: (data) => {
-                                        return ConvertDBDate2UIFullStempDate(data.Date);
-                                    }
-                                },
-
-                            ],
-                            columnDefs: [
-                                { "targets": [0], type: 'de_date' },
-                                /*
-                                 Amir wanted a seperated columns to date and time but still sort by the full time stemps (or the acctual ticks)
-                                 so my (Yogev) soolution was to
-                                 1. fetch the fulltime stemp from the back-end
-                                 2. render and sort by this column
-                                 3. not showing it to the user
-                                  ↓*/
-                                { "targets": [5], visible: false },
-                                //↑
-                                {
-                                    "targets": [0],
-                                    render: function (data, type, full, meta) {
-                                        let now = new Date();
-                                        if (ConvertDBDate2UIFullStempDate(full.Date) > now) {
-                                            var rowIndex = meta.row + 1;
-                                            $('#documentedRidesTable tbody tr:nth-child(' + rowIndex + ')').addClass('futureRide');
-                                            return data;
-                                        } else {
-                                            return data;
-                                        }
-                                    }
-                                },
-                                { "targets": 0, width: "10%" },
-                                { "targets": 1, width: "10%" },
-                                { "targets": 2, width: "20%" },
-                                { "targets": 3, width: "25%" },
-                                { "targets": 4, width: "35%" }
-
-                            ]
-                        });
-                        $('#wait').hide();
-
-                    },
-                    error: function (err) {
-                        alert("Error in GetVolunteersRideHistory: " + err.responseText);
-                        $('#wait').hide();
-                    }
-                });
-
+                manipulateDocumentedRidesModal(this, tbl);
 
             });
 
@@ -833,45 +720,8 @@
         </div>
     </div>
     <!-- ↑ Message Modal ↑ -->
-    <!-- ↓ documentedRidesModal ↓ -->
-    <div class="modal fade" id="documentedRidesModal" tabindex="-1" role="dialog" aria-labelledby="documentedRidesTitle" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content modal-lg">
-                <div class="modal-header">
-                    <button id="overRideBS_modal_4changeClose_x" type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <h2 class="modal-title" id="documentedRidesTitle">היסטורית הסעות</h2>
-                </div>
-                <div class="modal-body">
-                    <table id="documentedRidesTable" class="table table-striped table-bordered">
-                        <thead>
-                            <tr dir="rtl">
-                                <th>תאריך</th>
-                                <th>שעה</th>
-                                <th>קו</th>
-                                <th>חולה</th>
-                                <th>הערות</th>
-                                <th id="invisible">z</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-                <div class="text-right modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">סגירה</button>
-
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- ↑ documentedRidesModal ↑  -->
-
+   
+    <div class="modal fade" id="documentedRidesModal" tabindex="-1" role="dialog" aria-labelledby="documentedRidesTitle" aria-hidden="true"></div>
     <div class="modal fade" id="DocumentedCallsModal" tabindex="-1" role="dialog" aria-labelledby="DocumentedCallsTitle" aria-hidden="true"></div>
-
-
-
-
-
 </body>
 </html>

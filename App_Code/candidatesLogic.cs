@@ -13,7 +13,7 @@ public class CandidatesLogic
     Dictionary<string, Candidate> candidates;
     Dictionary<string, Candidate> newbies;
 
-    enum  Level
+    enum Level
     {
         Newbee,
         Regular,
@@ -53,14 +53,15 @@ public class CandidatesLogic
                 ammountOfPathMatch.Add(Convert.ToInt32(sdr["AmmountOfPathMatchScoreOfType_4"]));
 
                 bool superUser = Convert.ToBoolean(sdr["IsSuperDriver"]);
-                int driverLevel = (int) Level.Regular;
-                if (superUser) driverLevel = (int) Level.Super;
-                
+                int driverLevel = (int)Level.Regular;
+                if (superUser) driverLevel = (int)Level.Super;
+
 
                 candidate = new Candidate(
                     Convert.ToInt32(sdr["Id"]),
                     Convert.ToString(sdr["DisplayName"]),
                     Convert.ToInt32(sdr["NoOfDocumentedCalls"]),
+                    Convert.ToInt32(sdr["NoOfDocumentedRides"]),
                     driverLevel,
                     ammountOfPathMatch,
                     Convert.ToInt32(sdr["AmmountOfMatchByDay"]),
@@ -70,7 +71,7 @@ public class CandidatesLogic
                 );
                 candidates.Add(Convert.ToString(candidate.Id), candidate);
             }
-            newbies = GetNewbiesCandidates(ridePatNum,1000); // 100 is just a big number to get all the new drivers
+            newbies = GetNewbiesCandidates(ridePatNum, 1000); // 100 is just a big number to get all the new drivers
 
         }
         catch (Exception ex)
@@ -85,9 +86,9 @@ public class CandidatesLogic
         // ADDED BY BENNY
         // THE LOGIC OF CHOOSING CANDIDATES
 
-       
 
-        foreach (KeyValuePair<string,Candidate> kv in newbies) // add the newbies to the candidates
+
+        foreach (KeyValuePair<string, Candidate> kv in newbies) // add the newbies to the candidates
         {
             candidates.Add(kv.Key, kv.Value);
         }
@@ -130,14 +131,15 @@ public class CandidatesLogic
                     Convert.ToInt32(sdr["Id"]),
                     Convert.ToString(sdr["DisplayName"]),
                     Convert.ToInt32(sdr["NoOfDocumentedCalls"]),
-                    (int) Level.Newbee,
+                    Convert.ToInt32(sdr["NoOfDocumentedRides"]),
+                    (int)Level.Newbee,
                     ammountOfPathMatch,
                     Convert.ToInt32(sdr["AmmountOfMatchByDay"]),
                     Convert.ToInt32(sdr["AmmountOfDisMatchByDay"]),
                     Convert.ToInt32(sdr["AmmountOfMatchDayPart"]),
                     Convert.ToInt32(sdr["AmmountOfDisMatchDayPart"])
                 );
-                
+
                 newbies.Add(Convert.ToString(candidate.Id), candidate);
             }
             return newbies;
@@ -152,10 +154,11 @@ public class CandidatesLogic
         }
     }
 
-    private Dictionary<string, Candidate> selectBestCandidates(Dictionary<string, Candidate> candidates,bool rand, int numOfCandidates, int dayInWeek) {
+    private Dictionary<string, Candidate> selectBestCandidates(Dictionary<string, Candidate> candidates, bool rand, int numOfCandidates, int dayInWeek)
+    {
 
         Dictionary<string, double> weights;
-        if (dayInWeek < 5) 
+        if (dayInWeek < 5)
         {
             weights = new Dictionary<string, double>{
             {"point2point",50 },
@@ -192,14 +195,15 @@ public class CandidatesLogic
 
 
 
-        Dictionary<string, Candidate> super  = new Dictionary<string, Candidate>();
+        Dictionary<string, Candidate> super = new Dictionary<string, Candidate>();
         Dictionary<string, Candidate> regular = new Dictionary<string, Candidate>();
         Dictionary<string, Candidate> newbee = new Dictionary<string, Candidate>();
 
 
 
         // seperate them to super volunteers and regular
-        foreach (KeyValuePair<string, Candidate> kv in candidates) {
+        foreach (KeyValuePair<string, Candidate> kv in candidates)
+        {
             if (kv.Value.DriverLevel == (int)Level.Super) super.Add(kv.Key, kv.Value);
             else if (kv.Value.DriverLevel == (int)Level.Regular) regular.Add(kv.Key, kv.Value);
             else if (kv.Value.DriverLevel == (int)Level.Newbee) newbee.Add(kv.Key, kv.Value);
@@ -212,21 +216,23 @@ public class CandidatesLogic
         Dictionary<string, double> newbeeScore = calculateScore(newbee, weights);
 
 
-        Dictionary<string,double> topSuper = selectTop(superScore, numOfCandidates);
+        Dictionary<string, double> topSuper = selectTop(superScore, numOfCandidates);
         Dictionary<string, double> topRegular = selectTop(regularScore, numOfCandidates);
         Dictionary<string, double> topNewbee = selectTop(newbeeScore, 1000);
 
         Dictionary<string, Candidate> topCandidates = new Dictionary<string, Candidate>();
 
-        foreach (KeyValuePair<string, double> kv in topSuper) {
+        foreach (KeyValuePair<string, double> kv in topSuper)
+        {
             candidates[kv.Key].Score = kv.Value;
             topCandidates.Add(kv.Key, candidates[kv.Key]);
-            }
-            
-        foreach (KeyValuePair<string, double> kv in topRegular) {
+        }
+
+        foreach (KeyValuePair<string, double> kv in topRegular)
+        {
             candidates[kv.Key].Score = kv.Value;
             topCandidates.Add(kv.Key, candidates[kv.Key]);
-            }
+        }
 
         foreach (KeyValuePair<string, double> kv in topNewbee)
         {
@@ -237,18 +243,21 @@ public class CandidatesLogic
         return topCandidates;
     }
 
-    private Dictionary<string,double> selectTop(Dictionary<string, double> scores, int num) {
+    private Dictionary<string, double> selectTop(Dictionary<string, double> scores, int num)
+    {
         var sortedDict = (from entry in scores orderby entry.Value descending select entry)
             .ToDictionary(pair => pair.Key, pair => pair.Value).Take(num);
 
         Dictionary<string, double> res = new Dictionary<string, double>();
-        foreach (KeyValuePair<string, double> kv in sortedDict) {
+        foreach (KeyValuePair<string, double> kv in sortedDict)
+        {
             res.Add(kv.Key, kv.Value);
         }
         return res;
     }
 
-    private Dictionary<string, double> calculateScore(Dictionary<string, Candidate> candidates, Dictionary<string, double> weights) {
+    private Dictionary<string, double> calculateScore(Dictionary<string, Candidate> candidates, Dictionary<string, double> weights)
+    {
 
 
         Dictionary<string, double> score = new Dictionary<string, double>();
@@ -257,7 +266,7 @@ public class CandidatesLogic
         {
             Candidate c = kv.Value;
             int totalDrives = c.AmmountOfDisMatchByDay + c.AmmountOfMatchByDay; // I will use Mornings as the rightones
-            double routeScore = Math.Log(c.AmmountOfPathMatch[0] + 1 ,2) * weights["otherAears"] +
+            double routeScore = Math.Log(c.AmmountOfPathMatch[0] + 1, 2) * weights["otherAears"] +
                            Math.Log(c.AmmountOfPathMatch[1] + 1, 2) * weights["area2area"] +
                            Math.Log(c.AmmountOfPathMatch[2] + 1, 2) * weights["point2area"] +
                            Math.Log(c.AmmountOfPathMatch[3] + 1, 2) * weights["oposite"] +
@@ -268,7 +277,7 @@ public class CandidatesLogic
                                Math.Log(c.AmmountOfMatchDayPart + 1, 2) * weights["SameDayPart"] +
                                Math.Log(c.AmmountOfDisMatchDayPart + 1, 2) * weights["DifferentDayPart"];
             routeScore = Math.Pow(routeScore, weights["routeWeight"]);
-            timeScore  = Math.Pow(timeScore, weights["timeWeight"]);
+            timeScore = Math.Pow(timeScore, weights["timeWeight"]);
             score.Add(kv.Key, routeScore * timeScore);
         }
         return score;
@@ -302,16 +311,16 @@ public class CandidatesLogic
                                                           Convert.ToString(sdr["CityCityName"]);
 
                 candidates[idPointer].DaysSinceLastRide = String.IsNullOrEmpty(sdr["DaysSinceLastRide"].ToString()) ? null :
-                                                         (int?) Convert.ToInt32(sdr["DaysSinceLastRide"]);
-                
+                                                         (int?)Convert.ToInt32(sdr["DaysSinceLastRide"]);
+
                 candidates[idPointer].NumOfRides_last2Months = Convert.ToInt32(sdr["NumOfRides_last2Months"]);
-                
+
                 candidates[idPointer].DaysUntilNextRide = String.IsNullOrEmpty(sdr["DaysUntilNextRide"].ToString()) ? null :
                                                           (int?)Convert.ToInt32(sdr["DaysUntilNextRide"]);
-                
+
                 candidates[idPointer].LatestDocumentedCallDate = String.IsNullOrEmpty(sdr["LatestDocumentedCallDate"].ToString()) ? null :
                                                                  (DateTime?)Convert.ToDateTime(sdr["LatestDocumentedCallDate"].ToString());
-                
+
                 candidates[idPointer].SeniorityInYears = Convert.ToDouble(sdr["SeniorityInYears"]);
             }
 
@@ -328,4 +337,3 @@ public class CandidatesLogic
 
     }
 }
- 

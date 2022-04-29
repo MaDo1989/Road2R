@@ -1326,11 +1326,12 @@ public class Volunteer
         //
     }
 
-    public Volunteer(int id, string displayName, int noOfDocumentedCalls)
+    public Volunteer(int id, string displayName, int noOfDocumentedCalls, int noOfDocumentedRides)
     {
         Id = id;
         DisplayName = displayName;
         NoOfDocumentedCalls = noOfDocumentedCalls;
+        NoOfDocumentedRides = noOfDocumentedRides;
     }
     public Volunteer(string _displayName)
     {

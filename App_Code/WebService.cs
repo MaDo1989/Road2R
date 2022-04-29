@@ -248,7 +248,8 @@ public class WebService : System.Web.Services.WebService
 
     //Benny Candidates
     [WebMethod(EnableSession = true)]
-    public string GetCandidates(int ridePatNum,int numOfCandidates, bool newFlag, int dayInWeek) {
+    public string GetCandidates(int ridePatNum,int numOfCandidates, bool newFlag, int dayInWeek) 
+    {
 
         try
         {

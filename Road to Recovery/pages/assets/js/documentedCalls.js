@@ -220,6 +220,11 @@ const DocumentAcall_choooseContent_changed = () => {
     }
 }
 
+const disableFutureIn_DocumentAcallDatePicker = () => {
+    let today = new Date().toISOString().split('T')[0];
+    document.getElementById('DocumentAcallDatePicker').setAttribute('max', today);
+}
+
 const documentAcall2DB = () => {
     $('#saveCallBtn').prop('disabled', true);
 
