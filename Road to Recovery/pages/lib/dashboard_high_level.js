@@ -2,8 +2,8 @@
 
 
 window.is_debugging_dsb = false; 
-window.full_loading = true;  
-window.all_graphs = true;
+window.full_loading = true;
+window.all_graphs = true; 
 
 
 // a mapping of event names to the next code that should be called
@@ -19,6 +19,8 @@ function set_chain_cb_for_event(event_name, cb) {
 function call_next_in_chain(event_name) {
     if (event_name in K_chained_loading_table) {
         cb = K_chained_loading_table[event_name];
+        // remove it so will not be called again when section combo is updated
+        delete K_chained_loading_table[event_name];
         cb();
     }
 }
@@ -39,42 +41,66 @@ function dashboard_hl_init() {
     $("#dsb_hl_content_div").show();
     if (window.full_loading) {
         set_chain_cb_for_event("on_daily_finished", start_yearly_cards);
-        set_chain_cb_for_event("on_weekly_finished", start_monthly_cards);
+        set_chain_cb_for_event("on_weekly_finished", start_monthly_cards_this_month);
 
         start_daily_cards();
         start_weekly_cards();
     }
     else {
         // For fast debugging
-        start_weekly_cards();
+        // start_daily_cards();
+        // start_weekly_cards();
+        start_monthly_cards_this_month();
         // start_month_graph(get_month_card("curr"));
         // start_one_week_row(get_week_card("curr"));
     }
 }
 
+function start_monthly_cards_this_month() {
+    start_monthly_cards(moment());
+}
+ 
+function on_daily_date_change() {
+    let selected_day = moment($("#dsb_select_day").val(), K_DateFormat_Moment);
+    let today = moment();
+    if (selected_day.isAfter(today)) {
+        selected_day = today;
+    }
+
+    $(".dsb_daily_num").text("--");  // reset all the weekly number fields.
+
+    start_current_day_row(selected_day);
+}
+
+function setup_daily_choose_combo() {
+    var dt = $('#dsb_select_day').datepicker({
+        format: K_DateFormat_DatePicker,
+        autoclose: true
+    });
+    let today = new Date();
+    dt.datepicker('setDate', today);
+    dt.on("changeDate", on_daily_date_change);
+}
+
 function start_daily_cards() {
-    start_current_day_row();
+    start_current_day_row(new Date());
+    setup_daily_choose_combo();
+
 }
 
 // Initiate async ajax call. When call finishes, invoke card's on_data callback
-function start_current_day_row() {
+function start_current_day_row(the_date) {
 
-    // let today = new Date(2021, 09, 12); // 12-Oct-2020
-    // let today = new Date(2021, 10, 05); // 05-Nov-2020
-    
-    let today = new Date();
-
-    $("#dsb_hl_daily_rides_todays_date").text(moment(today).format('DD.MM'));
+    $("#dsb_hl_daily_rides_todays_date").text(moment(the_date).format('DD.MM'));
 
     var query_object = {
-        start_date: moment(today).format('YYYY-MM-DD'),
-        end_date: moment(today).add(1, 'days').format('YYYY-MM-DD')
+        start_date: moment(the_date).format('YYYY-MM-DD'),
+        end_date: moment(the_date).add(1, 'days').format('YYYY-MM-DD')
     }
 
     start_current_daily_totals(query_object);
 
     start_current_daily_need_drivers(query_object);
-
 }
 
 function start_current_daily_totals(query_object) {
@@ -171,12 +197,22 @@ const daily_card_definitions = [
 /*  ==================   WEEK  related code     =========================== */
 
 function start_weekly_cards() {
-    start_one_week_row(get_week_card("curr"));
+    if (window.full_loading) {
+        start_one_week_row(get_week_card("curr"), moment());
 
-    start_week_all_graphs();
+        start_week_all_graphs(moment());
 
-    start_one_week_new_volunteers(get_week_card("curr"));
+        start_one_week_new_volunteers(get_week_card("curr"), moment());
+    }
+    else {
+        // For debugging 
+        start_week_all_graphs(moment());
+        // start_one_week_row(get_week_card("curr"), moment());
+        //start_one_week_new_volunteers(get_week_card("curr"), moment());
 
+    }
+
+    setup_weekly_choose_combo();
     $("#dsb_hl_weekly_tbl_curr_show").click(toggle_month_week_graph_datasets);
     $("#dsb_hl_weekly_tbl_prev_show").click(toggle_month_week_graph_datasets);
     $("#dsb_hl_weekly_tbl_2wks_ago_show").click(toggle_month_week_graph_datasets);
@@ -220,10 +256,31 @@ function get_week_name_in_hebrew(week_designator) {
     return "השבוע";
 }
 
+// move ahead the date to the Saturday of that week.  
+// May return a day that in the future
+function bump_week_end_range(end_date) {
+    if (end_date.weekday() == 0) {
+        end_date.add(6, 'days');  // Sunday + 6 days = Saturday
+    }
+    else {
+        end_date.endOf('isoWeek').subtract(1, 'days');
+    }
+}
 
-function get_week_range(week_designator) {
-    let end_date = moment();
-    let start_date = moment();
+function dbg_validate_bump_week_end_range() {
+    let k = moment();
+    for (let idx = 0; idx < 16; ++idx) {
+        let d = moment(k);
+        bump_week_end_range(d);
+        console.log(moment(k).format(K_DateFormat_Debug_Moment), "==>", d.format(K_DateFormat_Debug_Moment));
+        k.subtract(1, 'days');
+    }
+}
+
+function get_week_range(week_designator, end_date) {
+    bump_week_end_range(end_date);
+    end_date.add(1, 'days'); // This is needed for DB query <= @end_date
+    let start_date = moment(end_date);
 
     if (week_designator.localeCompare("curr") == 0) {
         start_date.subtract(7, 'days');
@@ -237,26 +294,57 @@ function get_week_range(week_designator) {
         end_date.subtract(14, 'days');
     }
 
+    console.log(week_designator, " (query):", start_date.format("YYYY-MM-DD"), "--", end_date.format("YYYY-MM-DD"));
     let result = {
         start_date: start_date.format("YYYY-MM-DD"),
         end_date: end_date.format("YYYY-MM-DD")
     }
-    if (window.is_debugging_dsb) {
-        console.log("Overriding", result);
-        result = {
-            start_date: "2022-02-08",
-            end_date: "2022-02-15"
-        }
-    }
+    //if (window.is_debugging_dsb) {
+    //    console.log("Overriding", result);
+    //    result = {
+    //        start_date: "2022-02-08",
+    //        end_date: "2022-02-15"
+    //    }
+    //}
     return result;
 }
 
 
-// To improve performance, we query the entire last 21 days in one shot
-function start_week_all_graphs() {
-    let end_date = moment();
-    let start_date = moment();
-    start_date.subtract(21, 'days');
+function on_weekly_date_change() {
+    let selected_day = moment($("#dsb_select_week").val(), K_DateFormat_Moment);
+    // make sure it ends on Saturday,
+    bump_week_end_range(selected_day);
+    // unless in current week
+    let today = moment();
+    if (selected_day.isAfter(today)) {
+        selected_day = today;
+    }
+
+    reset_graph("dsb_hl_weekly_graph");
+    $(".dsb_weekly_num").text("--");  // reset all the weekly number fields.
+
+    start_week_all_graphs(selected_day);
+    start_one_week_row(get_week_card("curr"), moment(selected_day));
+    start_one_week_new_volunteers(get_week_card("curr"), moment(selected_day));
+}
+
+function setup_weekly_choose_combo() {
+    var dt = $('#dsb_select_week').datepicker({
+        format: K_DateFormat_DatePicker,
+        autoclose: true
+    });
+    let today = new Date();
+    dt.datepicker('setDate', today);
+    dt.on("changeDate", on_weekly_date_change);
+}
+
+// To improve performance, we query the entire range of last 3 weeks in one shot
+function start_week_all_graphs(end_date) {
+    let start_date = moment(end_date);
+    // The week-range in the graph always start on Sunday
+    start_date.startOf('isoWeek'); // Avoid L10N problems - ISO says week start on Monday.
+    start_date.subtract(15, 'days'); // two weeks back + 1 day from Mon-->Sun
+
     let query_object = {
         start_date: start_date.format("YYYY-MM-DD"),
         end_date: end_date.format("YYYY-MM-DD")
@@ -284,7 +372,7 @@ function start_week_all_graphs() {
 
 
 
-function start_one_week_row(card_def) {
+function start_one_week_row(card_def, end_date) {
     let dsg = card_def.designator;
     let label_id = "#dsb_hl_weekly_tbl_" + dsg + "_week_name";
     let week_name = get_week_name_in_hebrew(dsg);
@@ -292,7 +380,7 @@ function start_one_week_row(card_def) {
 
     // Invok Async call, to get info for this row.
 
-    var query_object = get_week_range(dsg);
+    var query_object = get_week_range(dsg, moment(end_date));
 
     $.ajax({
         dataType: "json",
@@ -307,7 +395,7 @@ function start_one_week_row(card_def) {
             // Schedule fetch for next data-set if needed.
             let next_card = get_week_card(card_def.next);
             if (next_card) {
-                start_one_week_row(next_card);   // Not really recursive - called from incoming-data callback
+                start_one_week_row(next_card, moment(end_date));   // Not really recursive - called from incoming-data callback
             }
             result = data.d;
             render_week_row(dsg, result);
@@ -327,9 +415,9 @@ function render_week_row(dsg, result) {
 }
 
 
-function start_one_week_new_volunteers(card_def) {
+function start_one_week_new_volunteers(card_def, end_date) {
     let dsg = card_def.designator;
-    var query_object = get_week_range(dsg);
+    var query_object = get_week_range(dsg, moment(end_date));
 
     $.ajax({
         dataType: "json",
@@ -344,7 +432,7 @@ function start_one_week_new_volunteers(card_def) {
             // Schedule fetch for next data-set if needed.
             let next_card = get_week_card(card_def.next);
             if (next_card) {
-                start_one_week_new_volunteers(next_card);   // Not really recursive - called from incoming-data callback
+                start_one_week_new_volunteers(next_card, moment(end_date));   // Not really recursive - called from incoming-data callback
             }
             else {
                 call_next_in_chain("on_weekly_finished");
@@ -359,7 +447,7 @@ function start_one_week_new_volunteers(card_def) {
     });
 }
 
-function prepare_one_week_span_data(the_date, dict) {
+function prepare_one_week_span_data(start_date, dict) {
     let prepared_data = {
         labels: [],
         rides: [],
@@ -367,12 +455,14 @@ function prepare_one_week_span_data(the_date, dict) {
         patients: []
     }
 
+    let the_date = moment(start_date); // avoid mutating input
+
     for (i = 0; i < 7; ++i) {
         let hebrew_day_name = the_date.toDate().toLocaleString("he", { weekday: 'long' });
         prepared_data.labels.push(hebrew_day_name);
 
         // check if we have info on this specific day:
-        let ddmm = the_date.format("MM-DD");
+        let ddmm = the_date.format("YYYY-MM-DD");
         if (ddmm in dict) {
             let dayinfo = dict[ddmm];
             prepared_data.rides.push(dayinfo.Rides);
@@ -390,46 +480,103 @@ function prepare_one_week_span_data(the_date, dict) {
     return prepared_data;
 }
 
+function dbg_compare_scalar_arrays(lhs, rhs) {
+    if (lhs.length === rhs.length &&
+        lhs.every(function (value, index) { return value === rhs[index] })) {
+        return true;
+    }
+    console.error("dbg_compare_scalar_arrays() - arrays are different", lhs, rhs);
+    return false;
+}
 
-function render_week_all_graphs(data, range) {
+
+function dbg_validate_weekly_graph(myChart, server_data) {
+    // confirm we display what we expect
+    // Scan Graph datasets from end, and for each patients dataset, add it to test array
+    let patients_arr = new Array();
+    for (let idx of [7, 4, 1]) {   
+        let dataset = myChart.data.datasets[idx];
+        if (dataset.label.localeCompare("חולים") == 0) {
+            for (elem of dataset.data) {
+                if (elem) { // If not a zero value
+                    patients_arr.push(elem);
+                }
+            }
+        }
+    }
+
+    // confirm now that the "column" of Patients in server_data is the same
+    let server_patients = server_data.map(
+        function (elem) { return elem.Patients; });
+
+    if (!dbg_compare_scalar_arrays(patients_arr, server_patients)) {
+        console.error("dbg_validate_weekly_graph() FAILED");
+        console.table(server_data);
+        console.log(patients_arr);
+        console.log(server_patients);
+    }
+}
+
+function reset_graph(element_id) {
+    var myChart = find_chart_by_id(element_id);
+    if (myChart) {
+        myChart.data.datasets = new Array();  // reset content of Chart
+        myChart.update();
+    }
+}
+function render_week_all_graphs(server_data, range) {
+    let element_id = "dsb_hl_weekly_graph";
+    var myChart = find_chart_by_id(element_id);
+
     // we want to "rescale" the 3 weeks on the same 7 days range
 
     // building a reverse index - dictionary
     let dict = {};
-    data.map(function (obj) {
+    server_data.map(function (obj) {
         dict[obj.Day] = obj;
     });
 
-    //First span - this week (7-days-ago ==> end_date)
+    //First span - this week (last Sunday ==> end_date)
     let the_date = moment(range.end_date, "YYYY-MM-DD");
-    the_date.subtract(7, "days");
+    the_date.startOf('isoWeek'); // << Monday
+    the_date.subtract(1, "days");
     let prepared_data = prepare_one_week_span_data(the_date, dict);
 
-    let element_id = "dsb_hl_weekly_graph";
-    create_month_week_graph(prepared_data, element_id);
+    if (!myChart) {
+        create_month_week_graph(prepared_data, element_id);
+        myChart = find_chart_by_id(element_id);
+    }
+    else {
+        add_to_month_week_graph(myChart, prepared_data, get_week_card("curr"),
+            !$("#dsb_hl_weekly_tbl_curr_show").is(':checked') );
+    }
 
     // Compute the data for the previous week
-    the_date = moment(range.end_date, "YYYY-MM-DD");
-    the_date.subtract(14, "days");
+    the_date.subtract(7, "days");
     prepared_data = prepare_one_week_span_data(the_date, dict);
 
     var myChart = find_chart_by_id(element_id);
-    add_to_month_week_graph(myChart, prepared_data, get_week_card("prev"));
+    add_to_month_week_graph(myChart, prepared_data, get_week_card("prev"),
+        !$("#dsb_hl_weekly_tbl_prev_show").is(':checked') );
 
     // Compute the data for two weeks ago
-    the_date = moment(range.end_date, "YYYY-MM-DD");
-    the_date.subtract(21, "days");
+    the_date.subtract(7, "days");
     prepared_data = prepare_one_week_span_data(the_date, dict);
 
-    add_to_month_week_graph(myChart, prepared_data, get_week_card("2wks_ago"));
+    add_to_month_week_graph(myChart, prepared_data, get_week_card("2wks_ago"),
+        !$("#dsb_hl_weekly_tbl_2wks_ago_show").is(':checked') );
+
+    if (window.is_debugging_dsb) {
+        dbg_validate_weekly_graph(myChart, server_data);
+    }
 }
 
 
 
 /*  ==================   MONTH  related code     =========================== */
 
-function get_month_name_in_hebrew(month_designator) {
-    let dateObj = new Date();
+function get_month_name_in_hebrew(month, month_designator) {
+    let dateObj = moment(month).toDate();
 
     if (month_designator.localeCompare("prev") == 0) {
         dateObj.setMonth(dateObj.getMonth() - 1);
@@ -442,51 +589,59 @@ function get_month_name_in_hebrew(month_designator) {
 }
 
 
-function get_month_range(month_designator) {
-    let endDate, dateObj = new Date();
-    dateObj.setDate(1);
+function get_month_range(month, month_designator) {
+    // Just like in weeks, we provide the range from 1 - end of month
+    let endDate, inMonth = moment(month).toDate();
+    inMonth.setDate(1);
 
     if (month_designator.localeCompare("curr") == 0) {
+        endDate = moment(month);
+        endDate.endOf('month').add(1, 'days');
         // Bound end date with current date
-        endDate = new Date();
-        endDate.setDate(endDate.getDate() + 1);
+        if (endDate.isAfter(moment())) {
+           endDate = moment().add(1, 'days');;
+        }
     }
     if (month_designator.localeCompare("prev") == 0) {
-        dateObj.setMonth(dateObj.getMonth() - 1);
+        inMonth.setMonth(inMonth.getMonth() - 1);
         // set end date to be first day of next month
-        endDate = new Date(dateObj.getFullYear(), dateObj.getMonth() + 1, 1);
+        endDate = new Date(inMonth.getFullYear(), inMonth.getMonth() + 1, 1);
     }
     if (month_designator.localeCompare("yoy") == 0) {
-        dateObj.setFullYear(dateObj.getFullYear() - 1);
+        inMonth.setFullYear(inMonth.getFullYear() - 1);
         // set end date to be first day of next month
-        endDate = new Date(dateObj.getFullYear(), dateObj.getMonth() + 1, 1);
+        endDate = new Date(inMonth.getFullYear(), inMonth.getMonth() + 1, 1);
     }
 
     let result = {
-        start_date: moment(dateObj).format("YYYY-MM-DD"),
+        start_date: moment(inMonth).format("YYYY-MM-DD"),
         end_date: moment(endDate).format("YYYY-MM-DD")
     }
     if (window.is_debugging_dsb) {
-        result = {
-            start_date: "2021-10-01",
-            end_date: "2021-10-31"
-        }
+//        result = {
+//            start_date: "2021-10-01",
+//            end_date: "2021-10-31"
+//        }
     }
+    // console.log("get_month_range()", month.format("YYYY-MM-DD"), "@", month_designator, "==>", result);
     return result;
 }
 
 const month_card_definitions = [
     {
         designator: "curr",
+        checkbox: "#dsb_hl_monthly_tbl_curr_show",
         next: "prev"
     },
     {
         designator: "prev",
+        checkbox: "#dsb_hl_monthly_tbl_prev_show",
         borderDash: [8,8],
         next: "yoy"
     },
     {
         designator: "yoy", 
+        checkbox: "#dsb_hl_monthly_tbl_yoy_show",
         borderDash: [10, 4],
         next: null
     }
@@ -500,15 +655,44 @@ function get_month_card(dsg) {
     }
     return null;
 }
-function start_monthly_cards() {
 
-   start_one_month_row(get_month_card("curr"));
+function on_monthly_date_change() {
+    let selected_day = moment($("#dsb_select_month").val(), K_DateFormat_Moment);
+    let today = moment();
+    if (selected_day.isAfter(today)) {
+        selected_day = today;
+    }
 
-   start_month_graph(get_month_card("curr"));
+    reset_graph("dsb_hl_monthly_graph");
+    $(".dsb_monthly_num").text("--");  // reset all the weekly number fields.
 
-   start_one_month_new_volunteers(get_month_card("curr"));
+
+    start_one_month_row(selected_day, get_month_card("curr"));
+    start_month_graph(selected_day, get_month_card("curr"));
+    start_one_month_new_volunteers(selected_day, get_month_card("curr"));
+
+}
+
+function setup_monthly_choose_combo() {
+    var dt = $('#dsb_select_month').datepicker({
+        format: K_DateFormat_DatePicker,
+        autoclose: true
+    });
+    let today = new Date();
+    dt.datepicker('setDate', today);
+    dt.on("changeDate", on_monthly_date_change);
+}
 
 
+function start_monthly_cards(month) {
+
+   start_one_month_row(month, get_month_card("curr"));
+
+   start_month_graph(month, get_month_card("curr"));
+
+   start_one_month_new_volunteers(month, get_month_card("curr"));
+
+    setup_monthly_choose_combo();
     $("#dsb_hl_monthly_tbl_curr_show").click(toggle_month_week_graph_datasets);
     $("#dsb_hl_monthly_tbl_prev_show").click(toggle_month_week_graph_datasets);
     $("#dsb_hl_monthly_tbl_yoy_show").click(toggle_month_week_graph_datasets);
@@ -516,16 +700,15 @@ function start_monthly_cards() {
 
 
 
-function start_one_month_row(card_def) {
+function start_one_month_row(month, card_def) {
     let dsg = card_def.designator;
     let label_id = "#dsb_hl_monthly_tbl_" + dsg + "_month_name";
-    let month_name = get_month_name_in_hebrew(dsg);
+    let month_name = get_month_name_in_hebrew(month, dsg);
     $(label_id).text(month_name);
 
+    var query_object = get_month_range(month, dsg);
+
     // Invok Async call, to get info for this row.
-
-    var query_object = get_month_range(dsg);
-
     $.ajax({
         dataType: "json",
         url: "ReportsWebService.asmx/GetReportMonthlyDigestMetrics",
@@ -539,7 +722,7 @@ function start_one_month_row(card_def) {
             // Schedule fetch for next data-set if needed.
             let next_card = get_month_card(card_def.next);
             if (next_card) {
-                start_one_month_row(next_card);   // Not really recursive - called from incoming-data callback
+                start_one_month_row(moment(month), next_card);   // Not really recursive - called from incoming-data callback
             }
             result = data.d;
             render_month_row(dsg, result);
@@ -559,9 +742,9 @@ function render_month_row(dsg, result) {
 }
 
 
-function start_one_month_new_volunteers(card_def) {
+function start_one_month_new_volunteers(month, card_def) {
     let dsg = card_def.designator;
-    var query_object = get_month_range(dsg);
+    var query_object = get_month_range(month, dsg);
 
     $.ajax({
         dataType: "json",
@@ -576,7 +759,7 @@ function start_one_month_new_volunteers(card_def) {
             // Schedule fetch for next data-set if needed.
             let next_card = get_month_card(card_def.next);
             if (next_card) {
-                start_one_month_new_volunteers(next_card);   // Not really recursive - called from incoming-data callback
+                start_one_month_new_volunteers(moment(month), next_card);   // Not really recursive - called from incoming-data callback
             }
 
             result = data.d;
@@ -589,8 +772,8 @@ function start_one_month_new_volunteers(card_def) {
 }
 
 
-function start_month_graph(card_def) {
-    var query_object = get_month_range(card_def.designator);
+function start_month_graph(month, card_def) {
+    var query_object = get_month_range(month, card_def.designator);
 
     $.ajax({
         dataType: "json",
@@ -606,11 +789,11 @@ function start_month_graph(card_def) {
             let next_card = get_month_card(card_def.next);
             if (next_card) {
                 if (window.full_loading || window.all_graphs) {
-                    start_month_graph(next_card);   // Not really recursive - called from incoming-data callback
+                    start_month_graph(moment(month), next_card);   // Not really recursive - called from incoming-data callback
                 }
             }
             result = data.d;
-            render_month_week_graph(card_def, result, "dsb_hl_monthly_graph");
+            render_one_month_graph(card_def, result, "dsb_hl_monthly_graph");
 
         },
         error: function (err) {
@@ -632,22 +815,56 @@ function find_chart_by_id(chart_id) {
     return result;
 }
 
-function render_month_week_graph(card_def, data, element_id)
-{
+
+function prepare_one_month_span_data(server_data) {
+    // building a reverse index - dictionary
+    let dict = {};
+    server_data.map(function (obj) {
+        dict[obj.Day] = obj;
+    });
+
     let prepared_data = {
-        labels: data.map(function (obj) { return obj.Day; }),
-        rides: data.map(function (obj) { return obj.Rides; }),
-        volunteers: data.map(function (obj) { return obj.Volunteers; }),
-        patients: data.map(function (obj) { return obj.Patients; })
-    };
+        labels: [],
+        rides: [],
+        volunteers: [],
+        patients: []
+    }
+
+    for (i = 1; i < 32; ++i) {
+        let day_num = i.toString();
+        prepared_data.labels.push(day_num);
+
+        // check if we have info on this specific day:
+        if (day_num in dict) {
+            let dayinfo = dict[day_num];
+            prepared_data.rides.push(dayinfo.Rides);
+            prepared_data.volunteers.push(dayinfo.Volunteers);
+            prepared_data.patients.push(dayinfo.Patients);
+        }
+        else {
+            prepared_data.rides.push(0);
+            prepared_data.volunteers.push(0);
+            prepared_data.patients.push(0);
+        }
+    }
+
+    return prepared_data;
+}
+
+function render_one_month_graph(card_def, server_data, element_id)
+{
+    let prepared_data = prepare_one_month_span_data(server_data);
 
     var myChart = find_chart_by_id(element_id); 
 
     if (myChart) {
         // window.myd = myChart;
-        add_to_month_week_graph(myChart, prepared_data, card_def);
+        let is_hidden = !$(card_def.checkbox).is(':checked');
+        add_to_month_week_graph(myChart, prepared_data, card_def, is_hidden );
     }
     else {
+        // make sure labels end with 31
+        window.dbg = prepared_data;
         create_month_week_graph(prepared_data, element_id);
     }
 }
@@ -656,6 +873,56 @@ const r2rHTMLLegend = {
     id: 'r2rHTMLLegend',
     afterUpdate(chart, args) {
         console.log("r2rHTMLLegend::afterUpdate", chart, args);
+    }
+};
+
+// https://stackoverflow.com/a/71382202
+const ChartJScustomTitle = {
+    id: 'customTitle',
+    beforeLayout: (chart, args, opts) => {
+        const {
+            display,
+            font
+        } = opts;
+        if (!display) {
+            return;
+        }
+        const {
+            ctx
+        } = chart;
+        ctx.font = font || '11px sans-serif'
+
+        const {
+            fontBoundingBoxAscent,
+            fontBoundingBoxDescent
+        } = ctx.measureText(opts.text);
+        chart.options.layout.padding.top = fontBoundingBoxAscent + fontBoundingBoxDescent + 20;
+    },
+    afterDraw: (chart, args, opts) => {
+        const {
+            font,
+            text,
+            color
+        } = opts;
+        const {
+            ctx,
+            chartArea: {
+                top,
+                bottom,
+                left,
+                right
+            }
+        } = chart;
+        if (opts.display) {
+            ctx.fillStyle = color || Chart.defaults.color
+            ctx.font = font || '11px sans-serif'
+            const {
+                width,
+                fontBoundingBoxAscent,
+                fontBoundingBoxDescent
+            } = ctx.measureText(text);
+            ctx.fillText(text, width, fontBoundingBoxAscent + fontBoundingBoxDescent);
+        }
     }
 };
 
@@ -701,19 +968,25 @@ function create_month_week_graph(prepared_data, graph_id)
             plugins: {
                 legend: {
                     display: false
+                },
+                customTitle: {
+                    display: true,
+                    text: 'מספר האנשים / הסעות',
+                    color: 'black'
                 }
             },
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
                 }
             }
-        }
+        },
+        plugins: [ChartJScustomTitle]
     });
 }
 
 
-function add_to_month_week_graph(myChart, prepared_data, card_def) {
+function add_to_month_week_graph(myChart, prepared_data, card_def, is_hidden) {
     let updated = myChart.data.datasets.concat(
         [
             {
@@ -723,7 +996,8 @@ function add_to_month_week_graph(myChart, prepared_data, card_def) {
                 borderColor: CHART_COLORS.green,
                 backgroundColor: CHART_COLORS.green,
                 borderWidth: 1,
-                borderDash: card_def.borderDash
+                borderDash: card_def.borderDash,
+                hidden: is_hidden
             },
             {
                 label: 'חולים',
@@ -732,7 +1006,8 @@ function add_to_month_week_graph(myChart, prepared_data, card_def) {
                 borderColor: CHART_COLORS.purple,
                 backgroundColor: CHART_COLORS.purple,
                 borderWidth: 1,
-                borderDash: card_def.borderDash
+                borderDash: card_def.borderDash,
+                hidden: is_hidden
             },
             {
                 label: 'מתנדבים',
@@ -741,7 +1016,8 @@ function add_to_month_week_graph(myChart, prepared_data, card_def) {
                 borderColor: CHART_COLORS.orange,
                 backgroundColor: CHART_COLORS.orange,
                 borderWidth: 1,
-                borderDash: card_def.borderDash
+                borderDash: card_def.borderDash,
+                hidden: is_hidden
             }
         ]);
     myChart.data.datasets = updated;

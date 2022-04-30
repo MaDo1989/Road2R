@@ -458,8 +458,8 @@ GROUP BY inner_select.DisplayName
              @"select  count (DISTINCT MainDriver)  AS COUNT_VOL
             from RPView
             where MainDriver is not null
-            and pickuptime > @start_date
-            and pickuptime < @end_date
+            and pickuptime >= @start_date
+            and pickuptime <= @end_date
             AND not MainDriver in (
 	            select distinct MainDriver
 	            from RPView
@@ -638,7 +638,7 @@ GROUP BY inner_select.DisplayName
         DbService db = new DbService();
 
         string query =
-             @"SELECT FORMAT (PickupTime, 'MM-dd') as DAY_C ,  count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, count(DISTINCT MainDriver) as COUNT_VOL
+             @"SELECT FORMAT (PickupTime, 'yyyy-MM-dd') as DAY_C ,  count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, count(DISTINCT MainDriver) as COUNT_VOL
                 FROM (
 	                Select  MainDriver  , PickupTime, Origin, Destination, DisplayName, 
                     CASE 
@@ -650,7 +650,7 @@ GROUP BY inner_select.DisplayName
                     AND RPView.pickuptime > @start_date
                     AND RPView.pickuptime < @end_date
                 ) s 
-            GROUP BY FORMAT (PickupTime, 'MM-dd')
+            GROUP BY FORMAT (PickupTime, 'yyyy-MM-dd')
             ORDER BY DAY_C ASC					
             ";
 

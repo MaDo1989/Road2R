@@ -196,7 +196,7 @@
             $("#dsb_hl").click(dashboard_hl_init);
 
             // fast-load dashboard:
-            // dashboard_hl_init();
+            // dashboard_hl_init();  
         });
 
 
@@ -534,14 +534,20 @@
                     <div class="row" style="border-width: thin; border-style: solid">
                         <!-- First row - Daily - 3 cards -->
                         <h2> &nbsp; &nbsp;היום&nbsp;<span id="dsb_hl_daily_rides_todays_date">  </span></h2>
-                        <div class="col-sm-1">
-                            &nbsp;
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="col-sm-4">&nbsp;</label>
+                                <label class="col-sm-2" style="padding: 0.5em 0px;">בחרו יום:</label>
+                                <div class="col-sm-4">
+                                    <input type="text" id="dsb_select_day" placeholder="..." class="form-control">
+                                </div>
+                            </div>
                         </div>
 
                         <div class="col-sm-2" id="dsb_hl_daily_rides">
                             <h3>הסעות</h3><p />
-                            <p id="dsb_hl_daily_rides_total">--</p>
-                            <strong class="lead">ל - <span id="dsb_hl_daily_rides_attention"> -- </span> אין עדיין נהג</strong>
+                            <p id="dsb_hl_daily_rides_total" class="dsb_daily_num">--</p>
+                            <strong class="lead">ל - <span id="dsb_hl_daily_rides_attention" class="dsb_daily_num"> -- </span> אין עדיין נהג</strong>
                         </div>
 
 
@@ -551,8 +557,8 @@
 
                         <div class="col-sm-2" id="dsb_hl_daily_patients">
                             <h3>חולים</h3><p />
-                            <p id="dsb_hl_daily_patients_total">--</p>
-                            <p>ל - <span id="dsb_hl_daily_patients_attention"> -- </span> אין עדיין הסעה</p>
+                            <p id="dsb_hl_daily_patients_total" class="dsb_daily_num">--</p>
+                            <p>ל - <span id="dsb_hl_daily_patients_attention" class="dsb_daily_num"> -- </span> אין עדיין הסעה</p>
                         </div>
 
                         <div class="col-sm-1">
@@ -561,178 +567,192 @@
 
                         <div class="col-sm-2" id="dsb_hl_daily_volunteers">
                             <h3>מתנדבים</h3><p />
-                            <p id="dsb_hl_daily_volunteers_total">--</p>
-                            <p> <span id="dsb_hl_daily_volunteers_attention"> -- </span> חדשים</p>
+                            <p id="dsb_hl_daily_volunteers_total" class="dsb_daily_num">--</p>
+                            <p> <span id="dsb_hl_daily_volunteers_attention" class="dsb_daily_num"> -- </span> חדשים</p>
                         </div>
 
                     </div>
 
-                    <div class="row">
-                        <!-- Second row - Weekly - 1 Graph -->
-                        <h2> &nbsp; &nbsp;מבט שבועי</h2>
-                        <div class="col-sm-3">
-                            &nbsp;
-                        </div>
-                        <div class="col-sm-6">
-                            <canvas id="dsb_hl_weekly_graph" width="700" height="420" style="padding-bottom: 20px"></canvas>
-                        </div>
-                        <div class="col-sm-3">
-                            &nbsp;
-                        </div>
-                    </div>
-                    <div class="row" style="border-style: none none solid none; border-width: thin">
-                        <!-- Third row - Weekly - Table -->
-                        <div class="col-sm-1">
-                            &nbsp;
-                        </div>
-                        <div class="col-sm-1">
-                            <div class="row">&nbsp;             </div>
-                            <div class="row">
-                                <input type="checkbox" id="dsb_hl_weekly_tbl_curr_show" r2data="0,1,2" r2chart="dsb_hl_weekly_graph" style="margin-top: 0px;" checked>
-                                <span id="dsb_hl_weekly_tbl_curr_week_name"> </span>
-                            </div>
-                            <div class="row">
-                                <input type="checkbox" id="dsb_hl_weekly_tbl_prev_show" r2data="3,4,5"  r2chart="dsb_hl_weekly_graph" style="margin-top: 0px;" checked>
-                                <span id="dsb_hl_weekly_tbl_prev_week_name"></span>
-                            </div>
-                            <div class="row">
-                                <input type="checkbox" id="dsb_hl_weekly_tbl_2wks_ago_show" r2data="6,7,8"  r2chart="dsb_hl_weekly_graph" style="margin-top: 0px;" checked>
-                                <span id="dsb_hl_weekly_tbl_2wks_ago_week_name"></span>
-                            </div>
-                        </div>
-                        <div class="col-sm-1">
-                            <div class="row">חולים      <div class="dsb_hl_legend_header" style="background-color: rgb(153, 102, 255)"></div> </div>
-                            <div class="row" id="dsb_hl_weekly_tbl_curr_pats"> --            </div>
-                            <div class="row" id="dsb_hl_weekly_tbl_prev_pats">--</div>
-                            <div class="row" id="dsb_hl_weekly_tbl_2wks_ago_pats"> --        </div>
-                        </div>
-                        <div class="col-sm-1">
-                            <div class="row">הסעות         <div class="dsb_hl_legend_header" style="background-color: rgb(75, 192, 192)"></div>   </div>
-                            <div class="row" id="dsb_hl_weekly_tbl_curr_rides"> --            </div>
-                            <div class="row" id="dsb_hl_weekly_tbl_prev_rides">--</div>
-                            <div class="row" id="dsb_hl_weekly_tbl_2wks_ago_rides"> --        </div>
-                        </div>
-                        <div class="col-sm-1">
-                            <div class="row">מתנדבים      <div class="dsb_hl_legend_header" style="background-color: rgb(255, 159, 64)"></div>      </div>
-                            <div class="row" id="dsb_hl_weekly_tbl_curr_vols">  --           </div>
-                            <div class="row" id="dsb_hl_weekly_tbl_prev_vols">--</div>
-                            <div class="row" id="dsb_hl_weekly_tbl_2wks_ago_vols"> --        </div>
-                        </div>
-                        <div class="col-sm-1">
-                            <div class="row">מתנדבים חדשים          </div>
-                            <div class="row" id="dsb_hl_weekly_tbl_curr_new">--             </div>
-                            <div class="row" id="dsb_hl_weekly_tbl_prev_new">--</div>
-                            <div class="row" id="dsb_hl_weekly_tbl_2wks_ago_new">--         </div>
-                        </div>
-                        <div class="col-sm-3">
-                            &nbsp;
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <!-- Fourth row - Monthly - 1 Graph -->
-                        <h2> &nbsp; &nbsp;מבט חודשי</h2>
-                        <div class="col-sm-3">
-                            &nbsp;
-                        </div>
-                        <div class="col-sm-6">
-                            <canvas id="dsb_hl_monthly_graph" width="700" height="420" style="padding-bottom: 20px"></canvas>
-                        </div>
-                        <div class="col-sm-3">
-                            &nbsp;
-                        </div>
-                    </div>
-                    <div class="row" style="border-style: none none solid none; border-width: thin">
-                        <!-- Fifth row - Monthly - Table -->
-                        <div class="col-sm-1">
-                            &nbsp;
-                        </div>
-                        <div class="col-sm-1">
-                            <div class="row">&nbsp;             </div>
-                            <div class="row">
-                                <input type="checkbox" id="dsb_hl_monthly_tbl_curr_show" r2data="0,1,2"  r2chart="dsb_hl_monthly_graph"  style="margin-top: 0px;" checked>
-                                <span id="dsb_hl_monthly_tbl_curr_month_name"> </span>
-                            </div>
-                            <div class="row">
-                                <input type="checkbox" id="dsb_hl_monthly_tbl_prev_show" r2data="3,4,5" r2chart="dsb_hl_monthly_graph" style="margin-top: 0px;" checked>
-                                <span id="dsb_hl_monthly_tbl_prev_month_name"></span>
-                            </div>
-                            <div class="row">
-                                <input type="checkbox" id="dsb_hl_monthly_tbl_yoy_show" r2data="6,7,8" r2chart="dsb_hl_monthly_graph" style="margin-top: 0px;" checked>
-                                <span id="dsb_hl_monthly_tbl_yoy_month_name"></span>
-                            </div>
-                        </div>
-                        <div class="col-sm-1">
-                            <div class="row">חולים      <div class="dsb_hl_legend_header" style="background-color: rgb(153, 102, 255)"></div> </div>
-                            <div class="row" id="dsb_hl_monthly_tbl_curr_pats"> --            </div>
-                            <div class="row" id="dsb_hl_monthly_tbl_prev_pats">--</div>
-                            <div class="row" id="dsb_hl_monthly_tbl_yoy_pats"> --        </div>
-                        </div>
-                        <div class="col-sm-1">
-                            <div class="row">הסעות         <div class="dsb_hl_legend_header" style="background-color: rgb(75, 192, 192)"></div>   </div>
-                            <div class="row" id="dsb_hl_monthly_tbl_curr_rides"> --            </div>
-                            <div class="row" id="dsb_hl_monthly_tbl_prev_rides">--</div>
-                            <div class="row" id="dsb_hl_monthly_tbl_yoy_rides"> --        </div>
-                        </div>
-                        <div class="col-sm-1">
-                            <div class="row">מתנדבים      <div class="dsb_hl_legend_header" style="background-color: rgb(255, 159, 64)"></div>      </div>
-                            <div class="row" id="dsb_hl_monthly_tbl_curr_vols">  --           </div>
-                            <div class="row" id="dsb_hl_monthly_tbl_prev_vols">--</div>
-                            <div class="row" id="dsb_hl_monthly_tbl_yoy_vols"> --        </div>
-                        </div>
-                        <div class="col-sm-1">
-                            <div class="row">מתנדבים חדשים          </div>
-                            <div class="row" id="dsb_hl_monthly_tbl_curr_new">--             </div>
-                            <div class="row" id="dsb_hl_monthly_tbl_prev_new">--</div>
-                            <div class="row" id="dsb_hl_monthly_tbl_yoy_new">--         </div>
-                        </div>
-                        <div class="col-sm-3">
-                            &nbsp;
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <!-- Sixth row - Yearly - 1 Graph -->
-                        <h2> &nbsp; &nbsp;מבט שנתי</h2>
-                        <div class="col-sm-3">
-                            &nbsp;
-                        </div>
-                        <div class="col-sm-6">
-                            <canvas id="dsb_hl_yearly_graph" width="600" height="450" style="padding-bottom: 20px"></canvas>
-                        </div>
-                        <div class="col-sm-3">
-                            &nbsp;
-                        </div>
-                    </div>
-                    <div class="row">
-                        <!-- Seventh row - yearly - Table -->
-                        <div class="col-sm-1">
-                            &nbsp;
-                        </div>
-                        <div class="col-sm-1">
-                            <div class="row">&nbsp;             </div>
-                            <div class="row">    YTD       </div>
-                            <div class="row">     המקבילה בשנה שעברה        </div>
-                        </div>
-                        <div class="col-sm-1">
-                            <div class="row">חולים        <div class="dsb_hl_legend_header" style="background-color: rgb(153, 102, 255)"></div>   </div>
-                            <div class="row" id="dsb_hl_yearly_tbl_ytd_pats"> --            </div>
-                            <div class="row" id="dsb_hl_yearly_tbl_yoy_pats">--</div>
-                        </div>
-                        <div class="col-sm-1">
-                            <div class="row">הסעות      <div class="dsb_hl_legend_header" style="background-color: rgb(75, 192, 192)"></div>     </div>
-                            <div class="row" id="dsb_hl_yearly_tbl_ytd_rides"> --            </div>
-                            <div class="row" id="dsb_hl_yearly_tbl_yoy_rides">--</div>
-                        </div>
-                        <div class="col-sm-1">
-                            <div class="row">מתנדבים     <div class="dsb_hl_legend_header" style="background-color: rgb(255, 159, 64)"></div>       </div>
-                            <div class="row" id="dsb_hl_yearly_tbl_ytd_vols">  --           </div>
-                            <div class="row" id="dsb_hl_yearly_tbl_yoy_vols">--</div>
-                        </div>
-                    </div>
+                        <div class="row">
+                            <!-- Second row - Weekly - 1 Graph -->
+                            <h2> &nbsp; &nbsp;מבט שבועי</h2>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label class="col-sm-4">&nbsp;</label>
+                                    <label class="col-sm-2" style="padding: 0.5em 0px;">בחרו שבוע:</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" id="dsb_select_week" placeholder="..." class="form-control">
+                                    </div>
+                                </div>
 
 
-                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <canvas id="dsb_hl_weekly_graph" width="700" height="420" style="padding-bottom: 20px"></canvas>
+                            </div>
+                            <div class="col-sm-3">
+                                &nbsp;
+                            </div>
+                        </div>
+                        <div class="row" style="border-style: none none solid none; border-width: thin">
+                            <!-- Third row - Weekly - Table -->
+                            <div class="col-sm-1">
+                                &nbsp;
+                            </div>
+                            <div class="col-sm-1">
+                                <div class="row">&nbsp;             </div>
+                                <div class="row">
+                                    <input type="checkbox" id="dsb_hl_weekly_tbl_curr_show" r2data="0,1,2" r2chart="dsb_hl_weekly_graph" style="margin-top: 0px;" checked>
+                                    <span id="dsb_hl_weekly_tbl_curr_week_name"> </span>
+                                </div>
+                                <div class="row">
+                                    <input type="checkbox" id="dsb_hl_weekly_tbl_prev_show" r2data="3,4,5" r2chart="dsb_hl_weekly_graph" style="margin-top: 0px;" checked>
+                                    <span id="dsb_hl_weekly_tbl_prev_week_name"></span>
+                                </div>
+                                <div class="row">
+                                    <input type="checkbox" id="dsb_hl_weekly_tbl_2wks_ago_show" r2data="6,7,8" r2chart="dsb_hl_weekly_graph" style="margin-top: 0px;" checked>
+                                    <span id="dsb_hl_weekly_tbl_2wks_ago_week_name"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <div class="row">חולים      <div class="dsb_hl_legend_header" style="background-color: rgb(153, 102, 255)"></div> </div>
+                                <div class="row dsb_weekly_num" id="dsb_hl_weekly_tbl_curr_pats"> --            </div>
+                                <div class="row dsb_weekly_num" id="dsb_hl_weekly_tbl_prev_pats">--</div>
+                                <div class="row dsb_weekly_num" id="dsb_hl_weekly_tbl_2wks_ago_pats"> --        </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <div class="row">הסעות         <div class="dsb_hl_legend_header" style="background-color: rgb(75, 192, 192)"></div>   </div>
+                                <div class="row dsb_weekly_num" id="dsb_hl_weekly_tbl_curr_rides"> --            </div>
+                                <div class="row dsb_weekly_num" id="dsb_hl_weekly_tbl_prev_rides">--</div>
+                                <div class="row dsb_weekly_num" id="dsb_hl_weekly_tbl_2wks_ago_rides"> --        </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <div class="row">מתנדבים      <div class="dsb_hl_legend_header" style="background-color: rgb(255, 159, 64)"></div>      </div>
+                                <div class="row dsb_weekly_num" id="dsb_hl_weekly_tbl_curr_vols">  --           </div>
+                                <div class="row dsb_weekly_num" id="dsb_hl_weekly_tbl_prev_vols">--</div>
+                                <div class="row dsb_weekly_num" id="dsb_hl_weekly_tbl_2wks_ago_vols"> --        </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <div class="row">מתוכם מתנדבים חדשים          </div>
+                                <div class="row dsb_weekly_num" id="dsb_hl_weekly_tbl_curr_new">--             </div>
+                                <div class="row dsb_weekly_num" id="dsb_hl_weekly_tbl_prev_new">--</div>
+                                <div class="row dsb_weekly_num" id="dsb_hl_weekly_tbl_2wks_ago_new">--         </div>
+                            </div>
+                            <div class="col-sm-3">
+                                &nbsp;
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Fourth row - Monthly - 1 Graph -->
+                            <h2> &nbsp; &nbsp;מבט חודשי</h2>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label class="col-sm-4">&nbsp;</label>
+                                    <label class="col-sm-2" style="padding: 0.5em 0px;">בחרו חודש:</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" id="dsb_select_month" placeholder="..." class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <canvas id="dsb_hl_monthly_graph" width="700" height="420" style="padding-bottom: 20px"></canvas>
+                            </div>
+                            <div class="col-sm-3">
+                                &nbsp;
+                            </div>
+                        </div>
+                        <div class="row" style="border-style: none none solid none; border-width: thin">
+                            <!-- Fifth row - Monthly - Table -->
+                            <div class="col-sm-1">
+                                &nbsp;
+                            </div>
+                            <div class="col-sm-1">
+                                <div class="row">&nbsp;             </div>
+                                <div class="row">
+                                    <input type="checkbox" id="dsb_hl_monthly_tbl_curr_show" r2data="0,1,2" r2chart="dsb_hl_monthly_graph" style="margin-top: 0px;" checked>
+                                    <span id="dsb_hl_monthly_tbl_curr_month_name"> </span>
+                                </div>
+                                <div class="row">
+                                    <input type="checkbox" id="dsb_hl_monthly_tbl_prev_show" r2data="3,4,5" r2chart="dsb_hl_monthly_graph" style="margin-top: 0px;" checked>
+                                    <span id="dsb_hl_monthly_tbl_prev_month_name"></span>
+                                </div>
+                                <div class="row">
+                                    <input type="checkbox" id="dsb_hl_monthly_tbl_yoy_show" r2data="6,7,8" r2chart="dsb_hl_monthly_graph" style="margin-top: 0px;" checked>
+                                    <span id="dsb_hl_monthly_tbl_yoy_month_name"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <div class="row">חולים      <div class="dsb_hl_legend_header" style="background-color: rgb(153, 102, 255)"></div> </div>
+                                <div class="row dsb_monthly_num" id="dsb_hl_monthly_tbl_curr_pats"> --            </div>
+                                <div class="row dsb_monthly_num" id="dsb_hl_monthly_tbl_prev_pats">--</div>
+                                <div class="row dsb_monthly_num" id="dsb_hl_monthly_tbl_yoy_pats"> --        </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <div class="row">הסעות         <div class="dsb_hl_legend_header" style="background-color: rgb(75, 192, 192)"></div>   </div>
+                                <div class="row dsb_monthly_num" id="dsb_hl_monthly_tbl_curr_rides"> --            </div>
+                                <div class="row dsb_monthly_num" id="dsb_hl_monthly_tbl_prev_rides">--</div>
+                                <div class="row dsb_monthly_num" id="dsb_hl_monthly_tbl_yoy_rides"> --        </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <div class="row">מתנדבים      <div class="dsb_hl_legend_header" style="background-color: rgb(255, 159, 64)"></div>      </div>
+                                <div class="row dsb_monthly_num" id="dsb_hl_monthly_tbl_curr_vols">  --           </div>
+                                <div class="row dsb_monthly_num" id="dsb_hl_monthly_tbl_prev_vols">--</div>
+                                <div class="row dsb_monthly_num" id="dsb_hl_monthly_tbl_yoy_vols"> --        </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <div class="row">מתוכם מתנדבים חדשים          </div>
+                                <div class="row dsb_monthly_num" id="dsb_hl_monthly_tbl_curr_new">--             </div>
+                                <div class="row dsb_monthly_num" id="dsb_hl_monthly_tbl_prev_new">--</div>
+                                <div class="row dsb_monthly_num" id="dsb_hl_monthly_tbl_yoy_new">--         </div>
+                            </div>
+                            <div class="col-sm-3">
+                                &nbsp;
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Sixth row - Yearly - 1 Graph -->
+                            <h2> &nbsp; &nbsp;מבט שנתי</h2>
+                            <div class="col-sm-3">
+                                &nbsp;
+                            </div>
+                            <div class="col-sm-6">
+                                <canvas id="dsb_hl_yearly_graph" width="600" height="450" style="padding-bottom: 20px"></canvas>
+                            </div>
+                            <div class="col-sm-3">
+                                &nbsp;
+                            </div>
+                        </div>
+                        <div class="row">
+                            <!-- Seventh row - yearly - Table -->
+                            <div class="col-sm-1">
+                                &nbsp;
+                            </div>
+                            <div class="col-sm-1">
+                                <div class="row">&nbsp;             </div>
+                                <div class="row">    YTD       </div>
+                                <div class="row">     המקבילה בשנה שעברה        </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <div class="row">חולים        <div class="dsb_hl_legend_header" style="background-color: rgb(153, 102, 255)"></div>   </div>
+                                <div class="row" id="dsb_hl_yearly_tbl_ytd_pats"> --            </div>
+                                <div class="row" id="dsb_hl_yearly_tbl_yoy_pats">--</div>
+                            </div>
+                            <div class="col-sm-1">
+                                <div class="row">הסעות      <div class="dsb_hl_legend_header" style="background-color: rgb(75, 192, 192)"></div>     </div>
+                                <div class="row" id="dsb_hl_yearly_tbl_ytd_rides"> --            </div>
+                                <div class="row" id="dsb_hl_yearly_tbl_yoy_rides">--</div>
+                            </div>
+                            <div class="col-sm-1">
+                                <div class="row">מתנדבים     <div class="dsb_hl_legend_header" style="background-color: rgb(255, 159, 64)"></div>       </div>
+                                <div class="row" id="dsb_hl_yearly_tbl_ytd_vols">  --           </div>
+                                <div class="row" id="dsb_hl_yearly_tbl_yoy_vols">--</div>
+                            </div>
+                        </div>
+
+
+                    </div>
                 <div class="row" name="Container_for_wide_tables">
                     <div class="col-sm-12">
                         <div id="div_table_pil_vls_per_month" style="display:none" class="card-box table-responsive">
@@ -774,7 +794,10 @@
                                         <div class="form-group">
                                             <label class="col-sm-2" style="padding: 0.5em 0px;">מתנדב</label>
                                             <div class="col-sm-10" id="selectDriver">
-                                                <input placeholder="הזן שם" type="text" template_id="select_driver" class="form-control ui-autocomplete-input" autocomplete="off" aria-required="true" aria-invalid="false">
+                                                <input placeholder="מקבל רשימת שמות..." type="text" template_id="select_driver" 
+                                                       class="form-control ui-autocomplete-input" autocomplete="off" 
+                                                       disabled
+                                                       aria-required="true" aria-invalid="false">
                                             </div>
                                         </div>
 
@@ -996,7 +1019,8 @@
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <div class="form-group">
-                                            <div class="col-sm-2"><input type="button" template_id="generate_report_period" value='הפקת דו"ח' class="btn btn-default buttons-html5" /> </div>
+                                            <div class="col-sm-4"><input type="button" template_id="generate_report_period" value='הפקת דו"ח' class="btn btn-default buttons-html5" /> </div>
+                                            <div class="col-sm-8"><span template_id="report_validation_text" style="color: red"></span> </div>
                                         </div>
                                     </div>
                                 </div>

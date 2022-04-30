@@ -22,6 +22,7 @@ let S_HistoryTable = null;
 
 let K_DateFormat_DatePicker = "dd/mm/yyyy";
 let K_DateFormat_Moment = "DD/MM/YYYY";
+let K_DateFormat_Debug_Moment = "dddd, MMMM Do YYYY, h:mm:ss a";
 
 function init_reports_page() {
     includeHTML();
@@ -224,7 +225,7 @@ var K_fields_map = {
             id: "rp_patients_rides__volunteer",
             template: 'div[name="template_VOLUNTEER"]',
             type: "VOLUNTEER",
-            post_clone: field_volunteers_post_clone
+            post_clone: rp_center_patients_volunteer__post_clone
         },
         {
             id: "rp_patients_rides__date_start",
@@ -391,6 +392,14 @@ function clone_template(template, parent_id) {
     var select = result.find("input[type=radio]");
     select.prop("name", select.attr("template_name"));
 
+    // assign unique id to any span child
+    var spans = result.find("span");
+    spans.each(function () {
+        var new_id = $(this).attr("template_id");
+        if (new_id) {
+            $(this).prop("id", new_id);
+        }
+    })
 
      
     result.appendTo("#" + parent_id);
@@ -449,10 +458,9 @@ function loadVolunteers(on_load_volunteers) {
         error: function (err) { alert("Error in loadVolunteers"); }
     });
 }
-
 // Called when a volunteer is selected in auto-complete
 function on_volunteer_selected(event, ui) {
-    // store teh selected value on the element
+    // store the selected value on the element
     $("#" + event.target.id).attr("itemID", ui.item.id);
     refreshPreview();
     return true;
@@ -460,11 +468,48 @@ function on_volunteer_selected(event, ui) {
 // called when the async ajax call to load volunteers has finished
 // Used to populate UI needing the volunteers list
 function populate_volunteer_field() {
+    $("#select_driver").attr("placeholder", "הזן שם");
+    $("#select_driver").prop("disabled", false);
     $("#select_driver").autocomplete({
         source: K_CACHE.volunteers,
         select: on_volunteer_selected
         });
 }
+
+// used in a report that has "generate_report_period" button
+function on_volunteer_selected_with_validation(event, ui) {
+    // store the selected value on the element
+    $("#" + event.target.id).attr("itemID", ui.item.id);
+    $("#report_validation_text").text("");
+    $("#generate_report_period").prop("disabled", false);
+    return true;
+}
+
+function on_volunteer_changed_with_validation(event, ui) {
+    let name = $("#select_driver").val();  // What the user has typed
+    // check if we find it in the volunteers list:
+    let obj = K_CACHE.volunteers.find(obj => obj.label.localeCompare(name) == 0);
+    if (obj) {
+        $("#select_driver").attr("itemID", obj.id);
+    }
+    else {
+        $("#select_driver").attr("itemID", null);
+    }
+
+    return true;
+}
+
+
+function populate_volunteer_field_with_validation() {
+    $("#select_driver").attr("placeholder", "הזן שם");
+    $("#select_driver").prop("disabled", false);
+    $("#select_driver").autocomplete({
+        source: K_CACHE.volunteers,
+        change: on_volunteer_changed_with_validation,
+        select: on_volunteer_selected_with_validation
+    });
+}
+
 
 // on_load_locations called when the async ajax call  has finished
 // Used to populate UI needing the origins list
@@ -771,7 +816,7 @@ function loadPatients(on_load_patients) {
 
             on_load_patients();
         },
-        error: function (err) { alert("Error in loadVolunteers"); }
+        error: function (err) { alert("Error in loadPatients"); }
     });
 }
 
@@ -970,6 +1015,12 @@ function rp_center_monthly_by_year__post_clone(id) {
 
     rp_center_monthly_by_year__refresh_preview();
 }
+
+
+function rp_center_patients_volunteer__post_clone(id) {
+    loadVolunteers(populate_volunteer_field_with_validation);
+}
+
 
 function rp_center_patients_rides__post_clone(id) {
 
@@ -2118,8 +2169,17 @@ function rp_center_monthly_by_year__fix_records(records) {
 function rp_center_patients_rides__refresh_preview() {
     var volunteerId = $("#select_driver").attr("itemID");
     if (!volunteerId) {
-        volunteerId = "*";
-    }
+        if ($("#select_driver").val().length == 0) {
+            volunteerId = "*";
+        }
+        else {
+            // The user typed some text, but did not select a valid name
+            $("#report_validation_text").text("אנא בחר שם מלא של מתנדב");
+            $("#generate_report_period").prop("disabled", true);
+            return; // EXIT. Not doing any query if the volunteer was not properly selected.
+        }
+    } 
+
     var origin = $("#select_origin").val();
     if (!origin) {
         origin = "*";
