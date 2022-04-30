@@ -1,9 +1,9 @@
 ﻿// Purpose: Dashboard UI for Amuta
 
 
-window.is_debugging_dsb = true;  // @@
-window.full_loading = false;   // @@
-window.all_graphs = false; // @@
+window.is_debugging_dsb = false; 
+window.full_loading = true;
+window.all_graphs = true; 
 
 
 // a mapping of event names to the next code that should be called
@@ -19,6 +19,8 @@ function set_chain_cb_for_event(event_name, cb) {
 function call_next_in_chain(event_name) {
     if (event_name in K_chained_loading_table) {
         cb = K_chained_loading_table[event_name];
+        // remove it so will not be called again when section combo is updated
+        delete K_chained_loading_table[event_name];
         cb();
     }
 }
@@ -39,42 +41,66 @@ function dashboard_hl_init() {
     $("#dsb_hl_content_div").show();
     if (window.full_loading) {
         set_chain_cb_for_event("on_daily_finished", start_yearly_cards);
-        set_chain_cb_for_event("on_weekly_finished", start_monthly_cards);
+        set_chain_cb_for_event("on_weekly_finished", start_monthly_cards_this_month);
 
         start_daily_cards();
         start_weekly_cards();
     }
     else {
         // For fast debugging
-        start_weekly_cards();
+        // start_daily_cards();
+        // start_weekly_cards();
+        start_monthly_cards_this_month();
         // start_month_graph(get_month_card("curr"));
         // start_one_week_row(get_week_card("curr"));
     }
 }
 
+function start_monthly_cards_this_month() {
+    start_monthly_cards(moment());
+}
+ 
+function on_daily_date_change() {
+    let selected_day = moment($("#dsb_select_day").val(), K_DateFormat_Moment);
+    let today = moment();
+    if (selected_day.isAfter(today)) {
+        selected_day = today;
+    }
+
+    $(".dsb_daily_num").text("--");  // reset all the weekly number fields.
+
+    start_current_day_row(selected_day);
+}
+
+function setup_daily_choose_combo() {
+    var dt = $('#dsb_select_day').datepicker({
+        format: K_DateFormat_DatePicker,
+        autoclose: true
+    });
+    let today = new Date();
+    dt.datepicker('setDate', today);
+    dt.on("changeDate", on_daily_date_change);
+}
+
 function start_daily_cards() {
-    start_current_day_row();
+    start_current_day_row(new Date());
+    setup_daily_choose_combo();
+
 }
 
 // Initiate async ajax call. When call finishes, invoke card's on_data callback
-function start_current_day_row() {
+function start_current_day_row(the_date) {
 
-    // let today = new Date(2021, 09, 12); // 12-Oct-2020
-    // let today = new Date(2021, 10, 05); // 05-Nov-2020
-    
-    let today = new Date();
-
-    $("#dsb_hl_daily_rides_todays_date").text(moment(today).format('DD.MM'));
+    $("#dsb_hl_daily_rides_todays_date").text(moment(the_date).format('DD.MM'));
 
     var query_object = {
-        start_date: moment(today).format('YYYY-MM-DD'),
-        end_date: moment(today).add(1, 'days').format('YYYY-MM-DD')
+        start_date: moment(the_date).format('YYYY-MM-DD'),
+        end_date: moment(the_date).add(1, 'days').format('YYYY-MM-DD')
     }
 
     start_current_daily_totals(query_object);
 
     start_current_daily_need_drivers(query_object);
-
 }
 
 function start_current_daily_totals(query_object) {
@@ -549,8 +575,8 @@ function render_week_all_graphs(server_data, range) {
 
 /*  ==================   MONTH  related code     =========================== */
 
-function get_month_name_in_hebrew(month_designator) {
-    let dateObj = new Date();
+function get_month_name_in_hebrew(month, month_designator) {
+    let dateObj = moment(month).toDate();
 
     if (month_designator.localeCompare("prev") == 0) {
         dateObj.setMonth(dateObj.getMonth() - 1);
@@ -563,51 +589,59 @@ function get_month_name_in_hebrew(month_designator) {
 }
 
 
-function get_month_range(month_designator) {
-    let endDate, dateObj = new Date();
-    dateObj.setDate(1);
+function get_month_range(month, month_designator) {
+    // Just like in weeks, we provide the range from 1 - end of month
+    let endDate, inMonth = moment(month).toDate();
+    inMonth.setDate(1);
 
     if (month_designator.localeCompare("curr") == 0) {
+        endDate = moment(month);
+        endDate.endOf('month').add(1, 'days');
         // Bound end date with current date
-        endDate = new Date();
-        endDate.setDate(endDate.getDate() + 1);
+        if (endDate.isAfter(moment())) {
+           endDate = moment().add(1, 'days');;
+        }
     }
     if (month_designator.localeCompare("prev") == 0) {
-        dateObj.setMonth(dateObj.getMonth() - 1);
+        inMonth.setMonth(inMonth.getMonth() - 1);
         // set end date to be first day of next month
-        endDate = new Date(dateObj.getFullYear(), dateObj.getMonth() + 1, 1);
+        endDate = new Date(inMonth.getFullYear(), inMonth.getMonth() + 1, 1);
     }
     if (month_designator.localeCompare("yoy") == 0) {
-        dateObj.setFullYear(dateObj.getFullYear() - 1);
+        inMonth.setFullYear(inMonth.getFullYear() - 1);
         // set end date to be first day of next month
-        endDate = new Date(dateObj.getFullYear(), dateObj.getMonth() + 1, 1);
+        endDate = new Date(inMonth.getFullYear(), inMonth.getMonth() + 1, 1);
     }
 
     let result = {
-        start_date: moment(dateObj).format("YYYY-MM-DD"),
+        start_date: moment(inMonth).format("YYYY-MM-DD"),
         end_date: moment(endDate).format("YYYY-MM-DD")
     }
     if (window.is_debugging_dsb) {
-        result = {
-            start_date: "2021-10-01",
-            end_date: "2021-10-31"
-        }
+//        result = {
+//            start_date: "2021-10-01",
+//            end_date: "2021-10-31"
+//        }
     }
+    // console.log("get_month_range()", month.format("YYYY-MM-DD"), "@", month_designator, "==>", result);
     return result;
 }
 
 const month_card_definitions = [
     {
         designator: "curr",
+        checkbox: "#dsb_hl_monthly_tbl_curr_show",
         next: "prev"
     },
     {
         designator: "prev",
+        checkbox: "#dsb_hl_monthly_tbl_prev_show",
         borderDash: [8,8],
         next: "yoy"
     },
     {
         designator: "yoy", 
+        checkbox: "#dsb_hl_monthly_tbl_yoy_show",
         borderDash: [10, 4],
         next: null
     }
@@ -621,15 +655,44 @@ function get_month_card(dsg) {
     }
     return null;
 }
-function start_monthly_cards() {
 
-   start_one_month_row(get_month_card("curr"));
+function on_monthly_date_change() {
+    let selected_day = moment($("#dsb_select_month").val(), K_DateFormat_Moment);
+    let today = moment();
+    if (selected_day.isAfter(today)) {
+        selected_day = today;
+    }
 
-   start_month_graph(get_month_card("curr"));
+    reset_graph("dsb_hl_monthly_graph");
+    $(".dsb_monthly_num").text("--");  // reset all the weekly number fields.
 
-   start_one_month_new_volunteers(get_month_card("curr"));
+
+    start_one_month_row(selected_day, get_month_card("curr"));
+    start_month_graph(selected_day, get_month_card("curr"));
+    start_one_month_new_volunteers(selected_day, get_month_card("curr"));
+
+}
+
+function setup_monthly_choose_combo() {
+    var dt = $('#dsb_select_month').datepicker({
+        format: K_DateFormat_DatePicker,
+        autoclose: true
+    });
+    let today = new Date();
+    dt.datepicker('setDate', today);
+    dt.on("changeDate", on_monthly_date_change);
+}
 
 
+function start_monthly_cards(month) {
+
+   start_one_month_row(month, get_month_card("curr"));
+
+   start_month_graph(month, get_month_card("curr"));
+
+   start_one_month_new_volunteers(month, get_month_card("curr"));
+
+    setup_monthly_choose_combo();
     $("#dsb_hl_monthly_tbl_curr_show").click(toggle_month_week_graph_datasets);
     $("#dsb_hl_monthly_tbl_prev_show").click(toggle_month_week_graph_datasets);
     $("#dsb_hl_monthly_tbl_yoy_show").click(toggle_month_week_graph_datasets);
@@ -637,16 +700,15 @@ function start_monthly_cards() {
 
 
 
-function start_one_month_row(card_def) {
+function start_one_month_row(month, card_def) {
     let dsg = card_def.designator;
     let label_id = "#dsb_hl_monthly_tbl_" + dsg + "_month_name";
-    let month_name = get_month_name_in_hebrew(dsg);
+    let month_name = get_month_name_in_hebrew(month, dsg);
     $(label_id).text(month_name);
 
+    var query_object = get_month_range(month, dsg);
+
     // Invok Async call, to get info for this row.
-
-    var query_object = get_month_range(dsg);
-
     $.ajax({
         dataType: "json",
         url: "ReportsWebService.asmx/GetReportMonthlyDigestMetrics",
@@ -660,7 +722,7 @@ function start_one_month_row(card_def) {
             // Schedule fetch for next data-set if needed.
             let next_card = get_month_card(card_def.next);
             if (next_card) {
-                start_one_month_row(next_card);   // Not really recursive - called from incoming-data callback
+                start_one_month_row(moment(month), next_card);   // Not really recursive - called from incoming-data callback
             }
             result = data.d;
             render_month_row(dsg, result);
@@ -680,9 +742,9 @@ function render_month_row(dsg, result) {
 }
 
 
-function start_one_month_new_volunteers(card_def) {
+function start_one_month_new_volunteers(month, card_def) {
     let dsg = card_def.designator;
-    var query_object = get_month_range(dsg);
+    var query_object = get_month_range(month, dsg);
 
     $.ajax({
         dataType: "json",
@@ -697,7 +759,7 @@ function start_one_month_new_volunteers(card_def) {
             // Schedule fetch for next data-set if needed.
             let next_card = get_month_card(card_def.next);
             if (next_card) {
-                start_one_month_new_volunteers(next_card);   // Not really recursive - called from incoming-data callback
+                start_one_month_new_volunteers(moment(month), next_card);   // Not really recursive - called from incoming-data callback
             }
 
             result = data.d;
@@ -710,8 +772,8 @@ function start_one_month_new_volunteers(card_def) {
 }
 
 
-function start_month_graph(card_def) {
-    var query_object = get_month_range(card_def.designator);
+function start_month_graph(month, card_def) {
+    var query_object = get_month_range(month, card_def.designator);
 
     $.ajax({
         dataType: "json",
@@ -727,11 +789,11 @@ function start_month_graph(card_def) {
             let next_card = get_month_card(card_def.next);
             if (next_card) {
                 if (window.full_loading || window.all_graphs) {
-                    start_month_graph(next_card);   // Not really recursive - called from incoming-data callback
+                    start_month_graph(moment(month), next_card);   // Not really recursive - called from incoming-data callback
                 }
             }
             result = data.d;
-            render_month_week_graph(card_def, result, "dsb_hl_monthly_graph");
+            render_one_month_graph(card_def, result, "dsb_hl_monthly_graph");
 
         },
         error: function (err) {
@@ -753,22 +815,56 @@ function find_chart_by_id(chart_id) {
     return result;
 }
 
-function render_month_week_graph(card_def, data, element_id)
-{
+
+function prepare_one_month_span_data(server_data) {
+    // building a reverse index - dictionary
+    let dict = {};
+    server_data.map(function (obj) {
+        dict[obj.Day] = obj;
+    });
+
     let prepared_data = {
-        labels: data.map(function (obj) { return obj.Day; }),
-        rides: data.map(function (obj) { return obj.Rides; }),
-        volunteers: data.map(function (obj) { return obj.Volunteers; }),
-        patients: data.map(function (obj) { return obj.Patients; })
-    };
+        labels: [],
+        rides: [],
+        volunteers: [],
+        patients: []
+    }
+
+    for (i = 1; i < 32; ++i) {
+        let day_num = i.toString();
+        prepared_data.labels.push(day_num);
+
+        // check if we have info on this specific day:
+        if (day_num in dict) {
+            let dayinfo = dict[day_num];
+            prepared_data.rides.push(dayinfo.Rides);
+            prepared_data.volunteers.push(dayinfo.Volunteers);
+            prepared_data.patients.push(dayinfo.Patients);
+        }
+        else {
+            prepared_data.rides.push(0);
+            prepared_data.volunteers.push(0);
+            prepared_data.patients.push(0);
+        }
+    }
+
+    return prepared_data;
+}
+
+function render_one_month_graph(card_def, server_data, element_id)
+{
+    let prepared_data = prepare_one_month_span_data(server_data);
 
     var myChart = find_chart_by_id(element_id); 
 
     if (myChart) {
         // window.myd = myChart;
-        add_to_month_week_graph(myChart, prepared_data, card_def);
+        let is_hidden = !$(card_def.checkbox).is(':checked');
+        add_to_month_week_graph(myChart, prepared_data, card_def, is_hidden );
     }
     else {
+        // make sure labels end with 31
+        window.dbg = prepared_data;
         create_month_week_graph(prepared_data, element_id);
     }
 }
