@@ -180,9 +180,9 @@ function start_weekly_cards() {
     }
     else {
         // For debugging 
-        //  start_week_all_graphs(moment());
+        start_week_all_graphs(moment());
         // start_one_week_row(get_week_card("curr"), moment());
-        start_one_week_new_volunteers(get_week_card("curr"), moment());
+        //start_one_week_new_volunteers(get_week_card("curr"), moment());
 
     }
 
@@ -780,6 +780,56 @@ const r2rHTMLLegend = {
     }
 };
 
+// https://stackoverflow.com/a/71382202
+const ChartJScustomTitle = {
+    id: 'customTitle',
+    beforeLayout: (chart, args, opts) => {
+        const {
+            display,
+            font
+        } = opts;
+        if (!display) {
+            return;
+        }
+        const {
+            ctx
+        } = chart;
+        ctx.font = font || '11px sans-serif'
+
+        const {
+            fontBoundingBoxAscent,
+            fontBoundingBoxDescent
+        } = ctx.measureText(opts.text);
+        chart.options.layout.padding.top = fontBoundingBoxAscent + fontBoundingBoxDescent + 20;
+    },
+    afterDraw: (chart, args, opts) => {
+        const {
+            font,
+            text,
+            color
+        } = opts;
+        const {
+            ctx,
+            chartArea: {
+                top,
+                bottom,
+                left,
+                right
+            }
+        } = chart;
+        if (opts.display) {
+            ctx.fillStyle = color || Chart.defaults.color
+            ctx.font = font || '11px sans-serif'
+            const {
+                width,
+                fontBoundingBoxAscent,
+                fontBoundingBoxDescent
+            } = ctx.measureText(text);
+            ctx.fillText(text, width, fontBoundingBoxAscent + fontBoundingBoxDescent);
+        }
+    }
+};
+
 function create_month_week_graph(prepared_data, graph_id)
 {
     // We use version 2.1.4 of chart.js
@@ -822,14 +872,20 @@ function create_month_week_graph(prepared_data, graph_id)
             plugins: {
                 legend: {
                     display: false
+                },
+                customTitle: {
+                    display: true,
+                    text: 'מספר האנשים / הסעות',
+                    color: 'black'
                 }
             },
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
                 }
             }
-        }
+        },
+        plugins: [ChartJScustomTitle]
     });
 }
 
