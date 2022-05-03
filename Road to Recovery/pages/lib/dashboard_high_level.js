@@ -63,7 +63,7 @@ function dashboard_hl_init() {
         // start_daily_cards();
         // start_weekly_cards();
         // start_monthly_cards_this_month();
-        start_month_graph(moment(), get_month_card("curr"));      setup_monthly_choose_combo();
+        start_month_graph(moment(), get_month_card("curr_and_prev"));      setup_monthly_choose_combo();
 
         // start_one_week_row(get_week_card("curr"));
     }
@@ -620,6 +620,15 @@ function get_month_range(month, month_designator) {
         // set end date to be first day of next month
         endDate = new Date(inMonth.getFullYear(), inMonth.getMonth() + 1, 1);
     }
+    if (month_designator.localeCompare("curr_and_prev") == 0) {
+        endDate = moment(month);
+        endDate.endOf('month').add(1, 'days');
+        // Bound end date with current date
+        if (endDate.isAfter(moment())) {
+            endDate = moment().add(1, 'days');;
+        }
+        inMonth.setMonth(inMonth.getMonth() - 1);
+    }
     if (month_designator.localeCompare("yoy") == 0) {
         inMonth.setFullYear(inMonth.getFullYear() - 1);
         // set end date to be first day of next month
@@ -656,6 +665,11 @@ const month_card_definitions = [
         next: "yoy"
     },
     {
+        designator: "curr_and_prev",
+        checkbox: "#dsb_hl_monthly_tbl_curr_show",
+        next: "yoy"
+    },
+    {
         designator: "yoy", 
         checkbox: "#dsb_hl_monthly_tbl_yoy_show",
         borderDash: [10, 4],
@@ -683,7 +697,7 @@ function on_monthly_date_change() {
     $(".dsb_monthly_num").text("--");  // reset all the weekly number fields.
 
 
-    start_month_graph(selected_day, get_month_card("curr"));
+    start_month_graph(selected_day, get_month_card("curr_and_prev"));
     if (window.ConfigFlags.load_rows) {
         start_one_month_row(selected_day, get_month_card("curr"));
         start_one_month_new_volunteers(selected_day, get_month_card("curr"));
@@ -706,7 +720,7 @@ function start_monthly_cards(month) {
 
    start_one_month_row(month, get_month_card("curr"));
 
-   start_month_graph(month, get_month_card("curr"));
+   start_month_graph(month, get_month_card("curr_and_prev"));
 
    start_one_month_new_volunteers(month, get_month_card("curr"));
 
@@ -811,7 +825,7 @@ function start_month_graph(month, card_def) {
                 }
             }
             result = data.d;
-            render_one_month_graph(card_def, query_object, result, "dsb_hl_monthly_graph");
+            render_months_graph_data(card_def, query_object, result, "dsb_hl_monthly_graph");
 
         },
         error: function (err) {
@@ -915,14 +929,29 @@ function prepare_one_month_span_data(server_data, year_and_month_prefix) {
     return prepared_data;
 }
 
-function render_one_month_graph(card_def, query_object, server_data, element_id)
-{
-    // the server query may contain more info that this month needs ( due to reduce-server-query optimization)
-    // So we use the range and only take a slice of the data, 
-    let year_and_month_prefix = query_object.start_date.substring(0, 8);  // YYYY-MM-
-    console.log("render_one_month_graph", query_object, "==>", year_and_month_prefix );
-    let prepared_data = prepare_one_month_span_data(server_data, year_and_month_prefix);
+// The data returned from server  may contain more info that this month needs (due to reduce-server-query optimization)
+// So we use the range and only take a slice of the data, identified using 'year_and_month_prefix'
+function render_months_graph_data(card_def, query_object, server_data, element_id) {
 
+    if (card_def.designator.localeCompare("curr_and_prev") == 0) {
+        // We can render also the 'curr' month using the given data
+        let t = moment(query_object.start_date, "YYYY-MM-DD");
+        t.add(1, 'months');
+        let year_and_month_prefix = t.format("YYYY-MM-");
+        console.log("render_months_graph_data", query_object, "==>", year_and_month_prefix);
+        let prepared_data = prepare_one_month_span_data(server_data, year_and_month_prefix);
+        render_one_month_graph(card_def, prepared_data, element_id);
+    }
+
+    let year_and_month_prefix = query_object.start_date.substring(0, 8);  // YYYY-MM-
+    console.log("render_months_graph_data", query_object, "==>", year_and_month_prefix);
+    let prepared_data = prepare_one_month_span_data(server_data, year_and_month_prefix);
+    render_one_month_graph(card_def, prepared_data, element_id);
+
+}
+
+function render_one_month_graph(card_def, prepared_data, element_id)
+{
     var myChart = find_chart_by_id(element_id); 
 
     if (myChart) {
