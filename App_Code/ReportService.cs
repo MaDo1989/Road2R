@@ -631,8 +631,9 @@ GROUP BY inner_select.DisplayName
     }
 
 
-    // Very much like GetReportMonthlyGraphMetrics(), but it returns the day info as MM-dd string
-    // Is expected to be called once per dashboard, with teh 3 consecutive weeks in one range.
+    // Returns the day info as MM-dd string
+    // Function Name is incorrect, is used by Month Graph as well.
+    // This allows optimizations - all 3 weeks spans in one call, 2 months in one call etc..
     internal List<ReportService.MetricMonthlyInfo> GetReportWeeklyGraphMetrics(string start_date, string end_date)
     {
         DbService db = new DbService();
@@ -677,52 +678,6 @@ GROUP BY inner_select.DisplayName
         return result;
 
     }
-
-    internal List<ReportService.MetricMonthlyInfo> GetReportMonthlyGraphMetrics(string start_date, string end_date)
-    {
-        DbService db = new DbService();
-
-        string query =
-             @"SELECT  DAY(pickuptime) as DAY_C ,  count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, count(DISTINCT MainDriver) as COUNT_VOL
-                FROM (
-	                Select  MainDriver  , PickupTime, Origin, Destination, DisplayName, 
-                    CASE 
-                        WHEN ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) = '1' THEN 1
-	                    ELSE 0
-                    END AS Unique_Drive_C
-                    FROM RPView 
-                    WHERE MainDriver is not null
-                    AND RPView.pickuptime > @start_date
-                    AND RPView.pickuptime < @end_date
-                ) s 
-            GROUP BY DAY(pickuptime)
-            ORDER BY DAY_C ASC					
-            ";
-
-        SqlCommand cmd = new SqlCommand(query);
-        cmd.CommandType = CommandType.Text;
-        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
-        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
-
-        DataSet ds = db.GetDataSetBySqlCommand(cmd);
-        DataTable dt = ds.Tables[0];
-
-        List<MetricMonthlyInfo> result = new List<MetricMonthlyInfo>();
-
-        foreach (DataRow dr in dt.Rows)
-        {
-            MetricMonthlyInfo obj = new MetricMonthlyInfo();
-            obj.Day = dr["DAY_C"].ToString();
-            obj.Rides = dr["COUNT_UNIQUE_RIDES"].ToString();
-            obj.Patients = dr["COUNT_PAT"].ToString();
-            obj.Volunteers = dr["COUNT_VOL"].ToString();
-            result.Add(obj);
-        }
-
-        return result;
-
-    }
-
 
 
     internal List<VolunteersPerMonthInfo> GetReportVolunteerPerMonth(string start_date)

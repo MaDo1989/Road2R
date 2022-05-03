@@ -1,10 +1,22 @@
 ﻿// Purpose: Dashboard UI for Amuta
 
 
-window.is_debugging_dsb = false; 
-window.full_loading = true;
-window.all_graphs = true; 
+window.ConfigFlags = {
+    is_debugging_dsb: false,
+    full_loading: true,
+    all_graphs: true,
+    load_rows: true,
+};
 
+window.DebugFlags = {
+    is_debugging_dsb: true,
+    full_loading: false,
+    all_graphs: true,
+    load_rows: false,
+};
+
+// Set this (and tweak DebugFlags) to get only specific web-requests done
+window.ConfigFlags = window.DebugFlags;  // @@
 
 // a mapping of event names to the next code that should be called
 // used to avoid flooding the server with dozens of queries at startup.
@@ -39,7 +51,7 @@ const CHART_COLORS = {
 function dashboard_hl_init() {
     $("#reports_content_div").hide();
     $("#dsb_hl_content_div").show();
-    if (window.full_loading) {
+    if (window.ConfigFlags.full_loading) {
         set_chain_cb_for_event("on_daily_finished", start_yearly_cards);
         set_chain_cb_for_event("on_weekly_finished", start_monthly_cards_this_month);
 
@@ -50,8 +62,9 @@ function dashboard_hl_init() {
         // For fast debugging
         // start_daily_cards();
         // start_weekly_cards();
-        start_monthly_cards_this_month();
-        // start_month_graph(get_month_card("curr"));
+        // start_monthly_cards_this_month();
+        start_month_graph(moment(), get_month_card("curr"));      setup_monthly_choose_combo();
+
         // start_one_week_row(get_week_card("curr"));
     }
 }
@@ -197,7 +210,7 @@ const daily_card_definitions = [
 /*  ==================   WEEK  related code     =========================== */
 
 function start_weekly_cards() {
-    if (window.full_loading) {
+    if (window.ConfigFlags.full_loading) {
         start_one_week_row(get_week_card("curr"), moment());
 
         start_week_all_graphs(moment());
@@ -299,7 +312,7 @@ function get_week_range(week_designator, end_date) {
         start_date: start_date.format("YYYY-MM-DD"),
         end_date: end_date.format("YYYY-MM-DD")
     }
-    //if (window.is_debugging_dsb) {
+    //if (window.ConfigFlags.is_debugging_dsb) {
     //    console.log("Overriding", result);
     //    result = {
     //        start_date: "2022-02-08",
@@ -566,7 +579,7 @@ function render_week_all_graphs(server_data, range) {
     add_to_month_week_graph(myChart, prepared_data, get_week_card("2wks_ago"),
         !$("#dsb_hl_weekly_tbl_2wks_ago_show").is(':checked') );
 
-    if (window.is_debugging_dsb) {
+    if (window.ConfigFlags.is_debugging_dsb) {
         dbg_validate_weekly_graph(myChart, server_data);
     }
 }
@@ -617,7 +630,7 @@ function get_month_range(month, month_designator) {
         start_date: moment(inMonth).format("YYYY-MM-DD"),
         end_date: moment(endDate).format("YYYY-MM-DD")
     }
-    if (window.is_debugging_dsb) {
+    if (window.ConfigFlags.is_debugging_dsb) {
 //        result = {
 //            start_date: "2021-10-01",
 //            end_date: "2021-10-31"
@@ -626,6 +639,9 @@ function get_month_range(month, month_designator) {
     // console.log("get_month_range()", month.format("YYYY-MM-DD"), "@", month_designator, "==>", result);
     return result;
 }
+
+
+
 
 const month_card_definitions = [
     {
@@ -667,9 +683,11 @@ function on_monthly_date_change() {
     $(".dsb_monthly_num").text("--");  // reset all the weekly number fields.
 
 
-    start_one_month_row(selected_day, get_month_card("curr"));
     start_month_graph(selected_day, get_month_card("curr"));
-    start_one_month_new_volunteers(selected_day, get_month_card("curr"));
+    if (window.ConfigFlags.load_rows) {
+        start_one_month_row(selected_day, get_month_card("curr"));
+        start_one_month_new_volunteers(selected_day, get_month_card("curr"));
+    }
 
 }
 
@@ -777,7 +795,7 @@ function start_month_graph(month, card_def) {
 
     $.ajax({
         dataType: "json",
-        url: "ReportsWebService.asmx/GetReportMonthlyGraphMetrics",
+        url: "ReportsWebService.asmx/GetReportWeeklyGraphMetrics",
         contentType: "application/json; charset=utf-8",
         beforeSend: function (xhr) {
             xhr.setRequestHeader("Content-Encoding", "gzip");
@@ -788,12 +806,12 @@ function start_month_graph(month, card_def) {
             // Schedule fetch for next data-set if needed.
             let next_card = get_month_card(card_def.next);
             if (next_card) {
-                if (window.full_loading || window.all_graphs) {
+                if (window.ConfigFlags.full_loading || window.ConfigFlags.all_graphs) {
                     start_month_graph(moment(month), next_card);   // Not really recursive - called from incoming-data callback
                 }
             }
             result = data.d;
-            render_one_month_graph(card_def, result, "dsb_hl_monthly_graph");
+            render_one_month_graph(card_def, query_object, result, "dsb_hl_monthly_graph");
 
         },
         error: function (err) {
@@ -815,12 +833,53 @@ function find_chart_by_id(chart_id) {
     return result;
 }
 
+// dump given array to csv file
+// Works for small files (less than 1,000 rows)
+// https://stackoverflow.com/a/14966131
+function dbg_dump_rows_as_csv(rows, file_name) {
+    let csvContent = "data:text/csv;charset=utf-8,";
 
-function prepare_one_month_span_data(server_data) {
+    rows.forEach(function (rowArray) {
+        let row = rowArray.join(",");
+        csvContent += row + "\r\n";
+    });
+
+    let encodedUri = encodeURI(csvContent);
+    let link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", file_name);
+    document.body.appendChild(link); // Required for FF
+
+    link.click(); // This will download the data file 
+}
+
+// Call from console as    dbg_dump_graph("dsb_hl_monthly_graph") 
+function dbg_dump_graph(chart_id) {
+    let myChart = find_chart_by_id(chart_id);
+    let data = myChart.data;
+
+    let rows = new Array();
+    data.labels.forEach(function add_row(label, index) {
+        let a_row = new Array();
+        a_row.push(label);
+        for (a_dataset of data.datasets) {
+            a_row.push(a_dataset.data[index]);
+        }
+        rows.push(a_row);
+    });
+
+    let selected_day = moment($("#dsb_select_month").val(), K_DateFormat_Moment);
+    let file_name = selected_day.format("DD-MMM-YYYY") + "__gen_at_v2_" + moment().format("HH_mm_SS__DD-MMM-YYYY") + ".csv";
+    // console.table(rows)
+    dbg_dump_rows_as_csv(rows, file_name);
+}
+
+
+function prepare_one_month_span_data(server_data, year_and_month_prefix) {
     // building a reverse index - dictionary
-    let dict = {};
+    let key, dict = {};
     server_data.map(function (obj) {
-        dict[obj.Day] = obj;
+        dict[obj.Day] = obj;    // day is YYYY-MM-DD
     });
 
     let prepared_data = {
@@ -833,10 +892,15 @@ function prepare_one_month_span_data(server_data) {
     for (i = 1; i < 32; ++i) {
         let day_num = i.toString();
         prepared_data.labels.push(day_num);
-
+        if (i < 10) {
+            key = year_and_month_prefix + "0" + i;   // Build key that is YYYY-MM-DD
+        }
+        else {
+            key = year_and_month_prefix + i;
+        }
         // check if we have info on this specific day:
-        if (day_num in dict) {
-            let dayinfo = dict[day_num];
+        if (key in dict) {
+            let dayinfo = dict[key];
             prepared_data.rides.push(dayinfo.Rides);
             prepared_data.volunteers.push(dayinfo.Volunteers);
             prepared_data.patients.push(dayinfo.Patients);
@@ -851,9 +915,13 @@ function prepare_one_month_span_data(server_data) {
     return prepared_data;
 }
 
-function render_one_month_graph(card_def, server_data, element_id)
+function render_one_month_graph(card_def, query_object, server_data, element_id)
 {
-    let prepared_data = prepare_one_month_span_data(server_data);
+    // the server query may contain more info that this month needs ( due to reduce-server-query optimization)
+    // So we use the range and only take a slice of the data, 
+    let year_and_month_prefix = query_object.start_date.substring(0, 8);  // YYYY-MM-
+    console.log("render_one_month_graph", query_object, "==>", year_and_month_prefix );
+    let prepared_data = prepare_one_month_span_data(server_data, year_and_month_prefix);
 
     var myChart = find_chart_by_id(element_id); 
 
