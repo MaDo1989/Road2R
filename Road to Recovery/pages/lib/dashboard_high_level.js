@@ -16,7 +16,7 @@ window.DebugFlags = {
 };
 
 // Set this (and tweak DebugFlags) to get only specific web-requests done
-window.ConfigFlags = window.DebugFlags;  // @@
+// window.ConfigFlags = window.DebugFlags;  
 
 // a mapping of event names to the next code that should be called
 // used to avoid flooding the server with dozens of queries at startup.
@@ -62,13 +62,14 @@ function dashboard_hl_init() {
     else {
         // For fast debugging
         // start_daily_cards();
-        start_weekly_cards();
+        // start_weekly_cards();
         // start_monthly_cards_this_month();
-        // start_one_month_row(moment(), get_month_card("curr_and_prev"));
+        start_all_months_rows(moment());
 
         // start_month_graph(moment(), get_month_card("curr_and_prev"));
         // setup_monthly_choose_combo();
 
+        // start_all_years_rows();
     }
 }
 
@@ -130,7 +131,7 @@ function start_current_daily_totals(query_object) {
         type: "POST",
         data: JSON.stringify(query_object),
         success: function (data) {
-            result = data.d;
+            result = data.d[0];
             // Update card numeric value
             $("#dsb_hl_daily_rides_total").text(result.Rides);
             $("#dsb_hl_daily_patients_total").text(result.Patients);
@@ -305,6 +306,8 @@ function get_all_weeks_range(end_date) {
     let result = {
         start_date: start_date.format("YYYY-MM-DD"),
         end_date: end_date.format("YYYY-MM-DD"),
+        prev_start: "NA",
+        prev_end: "NA",
         span: "WEEK"
     }
     return result;
@@ -335,6 +338,8 @@ function get_week_range(week_designator, end_date) {
     let result = {
         start_date: start_date.format("YYYY-MM-DD"),
         end_date: end_date.format("YYYY-MM-DD"),
+        prev_start: "NA",
+        prev_end: "NA",
         span:   "WEEK"
     }
     return result;
@@ -672,17 +677,44 @@ function get_month_range(month, month_designator) {
     let result = {
         start_date: moment(inMonth).format("YYYY-MM-DD"),
         end_date: moment(endDate).format("YYYY-MM-DD"),
+        prev_start: "NA",
+        prev_end: "NA",
         span: "MONTH"
     }
-    if (window.ConfigFlags.is_debugging_dsb) {
-//        result = {
-//            start_date: "2021-10-01",
-//            end_date: "2021-10-31"
-//        }
-    }
-    // console.log("get_month_range()", month.format("YYYY-MM-DD"), "@", month_designator, "==>", result);
     return result;
 }
+
+function get_all_months_range(month) {
+    // Just like in weeks, we provide the range from 1 - end of month
+    let endDate, inMonth = moment(month).toDate();
+    inMonth.setDate(1);
+    endDate = moment(month);
+    endDate.endOf('month').add(1, 'days');
+    // Bound end date with current date
+    if (endDate.isAfter(moment())) {
+        endDate = moment().add(1, 'days');;
+    }
+
+    let prev_start = new Date(inMonth);
+    let prev_end = new Date(inMonth.getFullYear(), inMonth.getMonth() + 1, 1);
+
+    inMonth.setMonth(inMonth.getMonth() - 1);
+
+    prev_start.setFullYear(prev_start.getFullYear() - 1);
+    prev_end.setFullYear(prev_end.getFullYear() - 1);
+
+    let result = {
+        start_date: moment(inMonth).format("YYYY-MM-DD"),
+        end_date: moment(endDate).format("YYYY-MM-DD"),
+        prev_start: moment(prev_start).format("YYYY-MM-DD"),
+        prev_end: moment(prev_end).format("YYYY-MM-DD"),
+        span: "MONTH"
+    }
+
+    console.log("get_all_months_range()", month.format("YYYY-MM-DD"), "==>", result);
+    return result;
+}
+
 
 
 
@@ -734,7 +766,7 @@ function on_monthly_date_change() {
 
     start_month_graph(selected_day, get_month_card("curr_and_prev"));
     if (window.ConfigFlags.load_rows) {
-        start_one_month_row(selected_day, get_month_card("curr_and_prev"));
+        start_all_months_rows(selected_day);
         start_one_month_new_volunteers(selected_day, get_month_card("curr"));
     }
 
@@ -753,7 +785,7 @@ function setup_monthly_choose_combo() {
 
 function start_monthly_cards(month) {
 
-   start_one_month_row(month, get_month_card("curr_and_prev"));
+   start_all_months_rows(month);
 
    start_month_graph(month, get_month_card("curr_and_prev"));
 
@@ -765,11 +797,10 @@ function start_monthly_cards(month) {
     $("#dsb_hl_monthly_tbl_yoy_show").click(toggle_month_week_graph_datasets);
 }
 
-function start_one_month_row(month, card_def) {
-    let dsg = card_def.designator;
-    update_month_rows_names(month, dsg);
+function start_all_months_rows(month) {
+    update_all_month_rows_names(month);
 
-    var query_object = get_month_range(month, dsg);
+    var query_object = get_all_months_range(month);
 
     // Invok Async call, to get info for this row.
     $.ajax({
@@ -782,30 +813,20 @@ function start_one_month_row(month, card_def) {
         type: "POST",
         data: JSON.stringify(query_object),
         success: function (data) {
-            // Schedule fetch for next data-set if needed.
-            let next_card = get_month_card(card_def.next);
-            if (next_card) {
-                start_one_month_row(moment(month), next_card);   // Not really recursive - called from incoming-data callback
-            }
             result = data.d;
-            render_month_rows(dsg, result);
+            render_month_rows(result);
         },
         error: function (err) {
         }
     });
 }
 
-function render_month_rows(dsg, result) {
-    console.log("render_month_row", dsg, "==>", result);
+function render_month_rows(result) {
+    console.log("render_month_row ==>", result);
 
-    if (dsg.localeCompare("curr_and_prev") == 0) {
-        // we have 2 results
-        render_one_month_row("curr", result[1]);  // sorted ASC
-        render_one_month_row("prev", result[0]);  
-    }
-    else {
-        render_one_month_row(dsg, result[0]);
-    }
+    render_one_month_row("yoy", result[0]); // sorted ASC
+    render_one_month_row("prev", result[1]);  
+    render_one_month_row("curr", result[2]);  
 }
 
 function render_one_month_row(dsg, entry) {
@@ -828,7 +849,13 @@ function update_month_rows_names(month, dsg) {
     }
 }
 
-function update_one_month_row_name(month, dsg) {
+function update_all_month_rows_names(month) {
+    update_one_month_row_name("yoy", month);
+    update_one_month_row_name("prev", month);
+    update_one_month_row_name("curr", month);
+}
+
+function update_one_month_row_name(dsg, month) {
     let label_id = "#dsb_hl_monthly_tbl_" + dsg + "_month_name";
     let month_name = get_month_name_in_hebrew(month, dsg);
     $(label_id).text(month_name);
@@ -1215,10 +1242,7 @@ function toggle_month_week_graph_datasets(event) {
 }
 
 function start_yearly_cards() {
-
-    start_one_year_row("ytd");
-    start_one_year_row("yoy");
-
+    start_all_years_rows();
     start_year_graph("12months");
 }
 
@@ -1258,13 +1282,34 @@ function get_year_range(year_designator) {
     return result;
 }
 
+function get_years_range() {
+    let end = new Date();
+    let start = new Date(end.getFullYear(), 0, 1); // 01-Jan
 
-function start_one_year_row(dsg) {
-    var query_object = get_year_range(dsg);
+    let yoy_start = new Date(start);
+    let yoy_end = new Date(end);
+    yoy_end.setFullYear(end.getFullYear() - 1);
+    yoy_start.setFullYear(start.getFullYear() - 1);
+
+    let result = {
+        start_date: moment(start).format("YYYY-MM-DD"),
+        end_date: moment(end).format("YYYY-MM-DD"),
+        prev_start: moment(yoy_start).format("YYYY-MM-DD"),
+        prev_end: moment(yoy_end).format("YYYY-MM-DD"),
+        span: "YEAR"
+    }
+    return result;
+}
+
+function start_all_years_rows() {
+    var query_object = get_years_range();
+
+    console.log("start_all_years_rows", query_object);
+
 
     $.ajax({
         dataType: "json",
-        url: "ReportsWebService.asmx/GetReportMonthlyDigestMetrics",
+        url: "ReportsWebService.asmx/GetReportWithPeriodDigestMetrics",
         contentType: "application/json; charset=utf-8",
         beforeSend: function (xhr) {
             xhr.setRequestHeader("Content-Encoding", "gzip");
@@ -1273,12 +1318,19 @@ function start_one_year_row(dsg) {
         data: JSON.stringify(query_object),
         success: function (data) {
             result = data.d;
-            render_year_row(dsg, result);
+            render_years_rows(result);
         },
         error: function (err) {
         }
     });
 }
+
+function render_years_rows(result) {
+    render_year_row("ytd", result[1]);
+    render_year_row("yoy", result[0]);
+}
+
+
 
 function render_year_row(dsg, result) {
     let label_id = "#dsb_hl_yearly_tbl_" + dsg + "_pats";

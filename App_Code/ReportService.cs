@@ -571,7 +571,7 @@ GROUP BY inner_select.DisplayName
         return result;
     }
 
-    internal List<MetricMonthlyInfo> GetReportRangeDigestMetrics(string start_date, string end_date, string query)
+    internal List<MetricMonthlyInfo> GetReportRangeDigestMetrics(string start_date, string end_date, string prev_start, string prev_end, string query)
     {
         DbService db = new DbService();
 
@@ -579,6 +579,11 @@ GROUP BY inner_select.DisplayName
         cmd.CommandType = CommandType.Text;
         cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
         cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+        if (!prev_start.Equals("NA"))
+        {
+            cmd.Parameters.Add("@prev_start", SqlDbType.Date).Value = prev_start;
+            cmd.Parameters.Add("@prev_end", SqlDbType.Date).Value = prev_end;
+        }
 
         DataSet ds = db.GetDataSetBySqlCommand(cmd);
         DataTable dt = ds.Tables[0];
@@ -598,10 +603,10 @@ GROUP BY inner_select.DisplayName
         return result;
     }
     
-    internal MetricMonthlyInfo GetReportMonthlyDigestMetrics(string start_date, string end_date)
+    internal List<MetricMonthlyInfo> GetReportMonthlyDigestMetrics(string start_date, string end_date)
     {
         string query =
-             @"SELECT count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
+             @"SELECT 1 AS SPAN_C, count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
                 FROM  (
 	                select MainDriver  , PickupTime, Origin, Destination, DisplayName, 
 	                CASE WHEN ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) = '1' THEN 1
@@ -613,14 +618,25 @@ GROUP BY inner_select.DisplayName
 	                AND MainDriver is not null
                 )  s";
 
-        return null;
-            
-            // GetReportRangeDigestMetrics(start_date, end_date, query);
+        return GetReportRangeDigestMetrics(start_date, end_date, "NA", "NA", query);
     }
 
-    
 
-    internal List<MetricMonthlyInfo> GetReportWithPeriodDigestMetrics(string start_date, string end_date, string span)
+    // pickuptime >= @start_date      AND pickuptime <= @end_date
+
+    internal string buildTimeCondition(string field_name, string prev_start)
+    {
+        if (prev_start.Equals("NA"))
+        {
+            return string.Format("{0} >= @start_date  AND {0} <= @end_date", field_name);
+        }
+        else
+        {
+            return string.Format("( ({0} >= @start_date  AND {0} <= @end_date) OR ( {0} >= @prev_start  AND {0} <= @prev_end) )", field_name);
+        }
+    }
+
+    internal List<MetricMonthlyInfo> GetReportWithPeriodDigestMetrics(string start_date, string end_date, string prev_start, string prev_end, string span)
     {
         string span_column;
         if (span.Equals("WEEK"))
@@ -638,31 +654,31 @@ GROUP BY inner_select.DisplayName
         else
         {
             return null;
-        } 
+        }
+
+        string pickup_time_condition = buildTimeCondition("PickupTime", prev_start);
 
 
-        string query = "select " + span_column +
-             @" AS SPAN_C, count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
+        string query = string.Format(@"SELECT {0} AS SPAN_C, count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
                 FROM  (
 	                select MainDriver  , PickupTime, Origin, Destination, DisplayName, 
 	                CASE WHEN ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) = '1' THEN 1
 		                ELSE 0
 	                END AS Unique_Drive_C
 	                from RPView r 
-	                where pickuptime >= @start_date 
-	                AND pickuptime <= @end_date
-	                AND MainDriver is not null
+	                where {1} AND MainDriver is not null
                 )  s
-                GROUP BY " + span_column + " ORDER BY " + span_column + " ASC";
+                GROUP BY {0} ORDER BY {0} ASC",
+                span_column, pickup_time_condition);
 
-        return GetReportRangeDigestMetrics(start_date, end_date, query);
+        return GetReportRangeDigestMetrics(start_date, end_date, prev_start, prev_end, query);
     }
 
-    internal MetricMonthlyInfo GetReportDailyDigestMetrics(string start_date, string end_date)
+    internal List<MetricMonthlyInfo> GetReportDailyDigestMetrics(string start_date, string end_date)
     {
         // Gets info also on rides without an allocted driver
         string query =
-             @"SELECT   count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, count(DISTINCT MainDriver) as COUNT_VOL
+             @"SELECT  1 AS SPAN_C, count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, count(DISTINCT MainDriver) as COUNT_VOL
                 FROM (
 	                Select  MainDriver  , PickupTime, Origin, Destination, DisplayName, 
                     CASE WHEN ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) = '1' THEN 1
@@ -674,8 +690,7 @@ GROUP BY inner_select.DisplayName
                     AND RPView.pickuptime < @end_date
                     ) s";
 
-        return null;
-            // GetReportRangeDigestMetrics(start_date, end_date, query);
+        return GetReportRangeDigestMetrics(start_date, end_date, "NA", "NA", query);
     }
 
 

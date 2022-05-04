@@ -480,14 +480,14 @@ public class ReportsWebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public ReportService.MetricMonthlyInfo GetReportDailyDigestMetrics(string start_date, string end_date)
+    public List<ReportService.MetricMonthlyInfo> GetReportDailyDigestMetrics(string start_date, string end_date)
     {
         try
         {
             HttpResponse response = GzipMe();
 
             ReportService report = new ReportService();
-            ReportService.MetricMonthlyInfo r = report.GetReportDailyDigestMetrics(start_date, end_date);
+            List<ReportService.MetricMonthlyInfo> r = report.GetReportDailyDigestMetrics(start_date, end_date);
             return r;
         }
         catch (Exception ex)
@@ -500,14 +500,14 @@ public class ReportsWebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public ReportService.MetricMonthlyInfo GetReportMonthlyDigestMetrics(string start_date, string end_date)
+    public List<ReportService.MetricMonthlyInfo> GetReportMonthlyDigestMetrics(string start_date, string end_date)
     {
         try
         {
             HttpResponse response = GzipMe();
 
             ReportService report = new ReportService();
-            ReportService.MetricMonthlyInfo r = report.GetReportMonthlyDigestMetrics(start_date, end_date);
+            List<ReportService.MetricMonthlyInfo> r = report.GetReportMonthlyDigestMetrics(start_date, end_date);
             return r;
         }
         catch (Exception ex)
@@ -520,14 +520,15 @@ public class ReportsWebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public List<ReportService.MetricMonthlyInfo> GetReportWithPeriodDigestMetrics(string start_date, string end_date, string span)
+    public List<ReportService.MetricMonthlyInfo> GetReportWithPeriodDigestMetrics(string start_date, string end_date, 
+        string prev_start, string prev_end, string span)
     {
         try
         {
             HttpResponse response = GzipMe();
 
             ReportService report = new ReportService();
-            List<ReportService.MetricMonthlyInfo> r = report.GetReportWithPeriodDigestMetrics(start_date, end_date, span);
+            List<ReportService.MetricMonthlyInfo> r = report.GetReportWithPeriodDigestMetrics(start_date, end_date, prev_start, prev_end, span);
             return r;
         }
         catch (Exception ex)
