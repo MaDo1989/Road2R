@@ -571,7 +571,7 @@ GROUP BY inner_select.DisplayName
         return result;
     }
 
-    internal MetricMonthlyInfo GetReportRangeDigestMetrics(string start_date, string end_date, string query)
+    internal List<MetricMonthlyInfo> GetReportRangeDigestMetrics(string start_date, string end_date, string query)
     {
         DbService db = new DbService();
 
@@ -583,12 +583,17 @@ GROUP BY inner_select.DisplayName
         DataSet ds = db.GetDataSetBySqlCommand(cmd);
         DataTable dt = ds.Tables[0];
 
-        MetricMonthlyInfo result = new MetricMonthlyInfo();
+        List<MetricMonthlyInfo> result = new List<MetricMonthlyInfo>();
 
-        DataRow dr = dt.Rows[0];
-        result.Rides = dr["COUNT_UNIQUE_RIDES"].ToString();
-        result.Patients = dr["COUNT_PAT"].ToString();
-        result.Volunteers = dr["COUNT_VOL"].ToString();
+        foreach (DataRow dr in dt.Rows)
+        {
+            MetricMonthlyInfo obj = new MetricMonthlyInfo();
+            obj.Day = dr["SPAN_C"].ToString();
+            obj.Rides = dr["COUNT_UNIQUE_RIDES"].ToString();
+            obj.Patients = dr["COUNT_PAT"].ToString();
+            obj.Volunteers = dr["COUNT_VOL"].ToString();
+            result.Add(obj);
+        }
 
         return result;
     }
@@ -607,6 +612,48 @@ GROUP BY inner_select.DisplayName
 	                AND pickuptime <= @end_date
 	                AND MainDriver is not null
                 )  s";
+
+        return null;
+            
+            // GetReportRangeDigestMetrics(start_date, end_date, query);
+    }
+
+    
+
+    internal List<MetricMonthlyInfo> GetReportWithPeriodDigestMetrics(string start_date, string end_date, string span)
+    {
+        string span_column;
+        if (span.Equals("WEEK"))
+        {
+            span_column = "DATEPART(week, PickupTime)";
+        }
+        else if (span.Equals("MONTH"))
+        {
+            span_column = "CONVERT(nvarchar(7), PickupTime, 23)";  // YYYY-MM
+        }
+        else if (span.Equals("YEAR"))
+        {
+            span_column = "YEAR(PickupTime)";
+        }
+        else
+        {
+            return null;
+        } 
+
+
+        string query = "select " + span_column +
+             @" AS SPAN_C, count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
+                FROM  (
+	                select MainDriver  , PickupTime, Origin, Destination, DisplayName, 
+	                CASE WHEN ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) = '1' THEN 1
+		                ELSE 0
+	                END AS Unique_Drive_C
+	                from RPView r 
+	                where pickuptime >= @start_date 
+	                AND pickuptime <= @end_date
+	                AND MainDriver is not null
+                )  s
+                GROUP BY " + span_column + " ORDER BY " + span_column + " ASC";
 
         return GetReportRangeDigestMetrics(start_date, end_date, query);
     }
@@ -627,7 +674,8 @@ GROUP BY inner_select.DisplayName
                     AND RPView.pickuptime < @end_date
                     ) s";
 
-        return GetReportRangeDigestMetrics(start_date, end_date, query);
+        return null;
+            // GetReportRangeDigestMetrics(start_date, end_date, query);
     }
 
 

@@ -492,7 +492,7 @@ public class ReportsWebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
-            Log.Error("Error in GetReportMonthlyDigestMetrics", ex);
+            Log.Error("Error in GetReportDailyDigestMetrics", ex);
             throw new Exception("שגיאה בשליפת נתוני הסעות");
         }
 
@@ -520,6 +520,28 @@ public class ReportsWebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public List<ReportService.MetricMonthlyInfo> GetReportWithPeriodDigestMetrics(string start_date, string end_date, string span)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            ReportService report = new ReportService();
+            List<ReportService.MetricMonthlyInfo> r = report.GetReportWithPeriodDigestMetrics(start_date, end_date, span);
+            return r;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReportWithPeriodDigestMetrics", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+
+
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public ReportService.MetricMonthlyInfo GetReportNewDriversInRange(string start_date, string end_date)
     {
         try
@@ -532,7 +554,7 @@ public class ReportsWebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
-            Log.Error("Error in GetReportMonthlyDigestMetrics", ex);
+            Log.Error("Error in GetReportNewDriversInRange", ex);
             throw new Exception("שגיאה בשליפת נתוני הסעות");
         }
 
