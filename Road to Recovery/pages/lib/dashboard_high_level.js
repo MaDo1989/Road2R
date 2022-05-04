@@ -24,16 +24,17 @@ window.ConfigFlags = window.DebugFlags;  // @@
 // search for event names in code to see usage.
 let K_chained_loading_table = {}; 
 
-function set_chain_cb_for_event(event_name, cb) {
-    K_chained_loading_table[event_name] = cb;
+function set_chain_cb_for_event(event_name, cb, data) {
+    K_chained_loading_table[event_name] = { callback: cb, user_data: data };
 }
 
 function call_next_in_chain(event_name) {
     if (event_name in K_chained_loading_table) {
-        cb = K_chained_loading_table[event_name];
+        entry = K_chained_loading_table[event_name];
+
         // remove it so will not be called again when section combo is updated
         delete K_chained_loading_table[event_name];
-        cb();
+        entry.callback(entry.user_data);
     }
 }
 
@@ -52,8 +53,8 @@ function dashboard_hl_init() {
     $("#reports_content_div").hide();
     $("#dsb_hl_content_div").show();
     if (window.ConfigFlags.full_loading) {
-        set_chain_cb_for_event("on_daily_finished", start_yearly_cards);
-        set_chain_cb_for_event("on_weekly_finished", start_monthly_cards_this_month);
+        set_chain_cb_for_event("on_daily_finished", start_yearly_cards, null);
+        set_chain_cb_for_event("on_weekly_finished", start_monthly_cards_this_month, null);
 
         start_daily_cards();
         start_weekly_cards();
@@ -61,14 +62,13 @@ function dashboard_hl_init() {
     else {
         // For fast debugging
         // start_daily_cards();
-        // start_weekly_cards();
+        start_weekly_cards();
         // start_monthly_cards_this_month();
-        start_one_month_row(moment(), get_month_card("curr_and_prev"));
+        // start_one_month_row(moment(), get_month_card("curr_and_prev"));
 
         // start_month_graph(moment(), get_month_card("curr_and_prev"));
-        setup_monthly_choose_combo();
+        // setup_monthly_choose_combo();
 
-        // start_one_week_row(get_week_card("curr"));
     }
 }
 
@@ -214,7 +214,7 @@ const daily_card_definitions = [
 
 function start_weekly_cards() {
     if (window.ConfigFlags.full_loading) {
-        start_one_week_row(get_week_card("curr"), moment());
+        start_all_weeks_rows(moment());
 
         start_week_all_graphs(moment());
 
@@ -222,8 +222,8 @@ function start_weekly_cards() {
     }
     else {
         // For debugging 
-        start_week_all_graphs(moment());
-        // start_one_week_row(get_week_card("curr"), moment());
+        // start_week_all_graphs(moment());
+        start_all_weeks_rows(moment());
         //start_one_week_new_volunteers(get_week_card("curr"), moment());
 
     }
@@ -244,6 +244,11 @@ const week_card_definitions = [
         designator: "prev",
         borderDash: [8, 8],
         next: "2wks_ago"
+    },
+    {
+        designator: "all_3weeks",
+        borderDash: [8, 8],
+        next: null
     },
     {
         designator: "2wks_ago",
@@ -293,6 +298,19 @@ function dbg_validate_bump_week_end_range() {
     }
 }
 
+function get_all_weeks_range(end_date) {
+    bump_week_end_range(end_date);
+    end_date.add(1, 'days'); // This is needed for DB query <= @end_date
+    let start_date = moment(end_date).subtract(21, 'days');
+    let result = {
+        start_date: start_date.format("YYYY-MM-DD"),
+        end_date: end_date.format("YYYY-MM-DD"),
+        span: "WEEK"
+    }
+    return result;
+}
+
+// Soon to be obsolete ...
 function get_week_range(week_designator, end_date) {
     bump_week_end_range(end_date);
     end_date.add(1, 'days'); // This is needed for DB query <= @end_date
@@ -305,23 +323,20 @@ function get_week_range(week_designator, end_date) {
         start_date.subtract(14, 'days');
         end_date.subtract(7, 'days');
     }
+    if (week_designator.localeCompare("all_3weeks") == 0) {
+        start_date.subtract(21, 'days');
+    }
+
     if (week_designator.localeCompare("2wks_ago") == 0) {
         start_date.subtract(21, 'days');
         end_date.subtract(14, 'days');
     }
 
-    console.log(week_designator, " (query):", start_date.format("YYYY-MM-DD"), "--", end_date.format("YYYY-MM-DD"));
     let result = {
         start_date: start_date.format("YYYY-MM-DD"),
-        end_date: end_date.format("YYYY-MM-DD")
+        end_date: end_date.format("YYYY-MM-DD"),
+        span:   "WEEK"
     }
-    //if (window.ConfigFlags.is_debugging_dsb) {
-    //    console.log("Overriding", result);
-    //    result = {
-    //        start_date: "2022-02-08",
-    //        end_date: "2022-02-15"
-    //    }
-    //}
     return result;
 }
 
@@ -340,10 +355,15 @@ function on_weekly_date_change() {
     $(".dsb_weekly_num").text("--");  // reset all the weekly number fields.
 
     start_week_all_graphs(selected_day);
-    start_one_week_row(get_week_card("curr"), moment(selected_day));
-    start_one_week_new_volunteers(get_week_card("curr"), moment(selected_day));
+    start_all_weeks_rows(moment(selected_day));
+    set_chain_cb_for_event("on_weekly_rows_finished", delayed_start_week_new_volunteers, selected_day);
+
 }
 
+function delayed_start_week_new_volunteers(selected_day) {
+    console.log("delayed_start_week_new_volunteers", selected_day);
+    start_one_week_new_volunteers(get_week_card("curr"), moment(selected_day));
+}
 function setup_weekly_choose_combo() {
     var dt = $('#dsb_select_week').datepicker({
         format: K_DateFormat_DatePicker,
@@ -388,19 +408,15 @@ function start_week_all_graphs(end_date) {
 
 
 
-function start_one_week_row(card_def, end_date) {
-    let dsg = card_def.designator;
-    let label_id = "#dsb_hl_weekly_tbl_" + dsg + "_week_name";
-    let week_name = get_week_name_in_hebrew(dsg);
-    $(label_id).text(week_name);
-
+function start_all_weeks_rows(end_date) {
+    update_day_rows_names();
     // Invok Async call, to get info for this row.
 
-    var query_object = get_week_range(dsg, moment(end_date));
+    var query_object = get_all_weeks_range(moment(end_date));
 
     $.ajax({
         dataType: "json",
-        url: "ReportsWebService.asmx/GetReportMonthlyDigestMetrics",
+        url: "ReportsWebService.asmx/GetReportWithPeriodDigestMetrics",
         contentType: "application/json; charset=utf-8",
         beforeSend: function (xhr) {
             xhr.setRequestHeader("Content-Encoding", "gzip");
@@ -408,26 +424,41 @@ function start_one_week_row(card_def, end_date) {
         type: "POST",
         data: JSON.stringify(query_object),
         success: function (data) {
-            // Schedule fetch for next data-set if needed.
-            let next_card = get_week_card(card_def.next);
-            if (next_card) {
-                start_one_week_row(next_card, moment(end_date));   // Not really recursive - called from incoming-data callback
-            }
             result = data.d;
-            render_week_row(dsg, result);
+            render_weeks_rows(result);
+            call_next_in_chain("on_weekly_rows_finished");
         },
         error: function (err) {
         }
     });
 }
 
-function render_week_row(dsg, result) {
+function render_weeks_rows(result) {
+    console.log("render_weeks_rows", result);
+    render_on_week_row("2wks_ago", result[0]);
+    render_on_week_row("prev", result[1]);
+    render_on_week_row("curr", result[2]);
+}
+
+function render_on_week_row(dsg, entry) {
     let label_id = "#dsb_hl_weekly_tbl_" + dsg + "_pats";
-    $(label_id).text(result.Patients);
+    $(label_id).text(entry.Patients);
     label_id = "#dsb_hl_weekly_tbl_" + dsg + "_rides";
-    $(label_id).text(result.Rides);
+    $(label_id).text(entry.Rides);
     label_id = "#dsb_hl_weekly_tbl_" + dsg + "_vols";
-    $(label_id).text(result.Volunteers);
+    $(label_id).text(entry.Volunteers);
+}
+
+function update_day_rows_names() {
+    update_one_day_row_name("curr");
+    update_one_day_row_name("prev");
+    update_one_day_row_name("2wks_ago");
+}
+
+function update_one_day_row_name(dsg) {
+    let label_id = "#dsb_hl_weekly_tbl_" + dsg + "_week_name";
+    let week_name = get_week_name_in_hebrew(dsg);
+    $(label_id).text(week_name);
 }
 
 
@@ -929,7 +960,7 @@ function dbg_dump_card_rows(designator) {
     let rows = new Array();
     $("." + row_class).each(function (index) { rows.push([$(this).attr("id"), $(this).text()]); });
     let selected_day = moment($(select_field).val(), K_DateFormat_Moment);
-    let file_name = row_class +  "__" + selected_day.format("DD-MMM-YYYY") + "__gen_at_v1_" + moment().format("HH_mm_SS__DD-MMM-YYYY") + ".csv";
+    let file_name = row_class +  "__" + selected_day.format("DD-MMM-YYYY") + "__gen_at_v2_" + moment().format("HH_mm_SS__DD-MMM-YYYY") + ".csv";
     dbg_dump_rows_as_csv(rows, file_name);
     console.table(rows);
 }

@@ -625,7 +625,7 @@ GROUP BY inner_select.DisplayName
         string span_column;
         if (span.Equals("WEEK"))
         {
-            span_column = "DATEPART(week, PickupTime)";
+            span_column = "CONCAT (YEAR(PickupTime), '-', DATEPART(week, PickupTime) )";  // YYYY-WKNUM
         }
         else if (span.Equals("MONTH"))
         {
