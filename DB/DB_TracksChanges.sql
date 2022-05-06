@@ -6,20 +6,12 @@
 /*---------------------------------------------------------*/
 /*---------------------------------------------------------*/
 
-
-
-
-
-
-
-
-
-
 -- =============================================
 -- Authors:     Dr. Benny Bornfeld & Yogev Strauber
 -- Create Date: 17/02/2022
 -- Description: RETURNS TABLE OF CANDIDATE TO A GIVEN RIDEPAT WITH VARIOUS SCORES TO EACH CANDIDATE
 -- ALTER DATE: 29/04/2022
+-- ALTER REASON: Add NoOfDocumentedRides
 -- =============================================
 	ALTER PROCEDURE [dbo].[spGetCandidatesForRidePat]
 	(
@@ -181,6 +173,7 @@ GO
 -- Create Date: 11/03/2022
 -- Description: RETURNS TABLE OF CANDIDATE TO A GIVEN RIDEPAT WITH VARIOUS SCORES TO EACH NEWBIE CANDIDATE
 -- ALTER DATE: 29/04/2022
+-- ALTER REASON: Add NoOfDocumentedRides
 -- =============================================
 	ALTER PROCEDURE [dbo].[spGetNoobsCandidatesForRidePat]
 	(
