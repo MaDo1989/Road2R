@@ -16,7 +16,7 @@ window.DebugFlags = {
 };
 
 // Set this (and tweak DebugFlags) to get only specific web-requests done
-// window.ConfigFlags = window.DebugFlags;  
+// window.ConfigFlags = window.DebugFlags; 
 
 // a mapping of event names to the next code that should be called
 // used to avoid flooding the server with dozens of queries at startup.
@@ -52,6 +52,11 @@ const CHART_COLORS = {
 function dashboard_hl_init() {
     $("#reports_content_div").hide();
     $("#dsb_hl_content_div").show();
+    setup_daily_choose_combo();
+    setup_weekly_choose_combo();
+    setup_monthly_choose_combo();
+    setup_yearly_choose_combo();
+
     if (window.ConfigFlags.full_loading) {
         set_chain_cb_for_event("on_daily_finished", start_yearly_cards, null);
         set_chain_cb_for_event("on_weekly_finished", start_monthly_cards_this_month, null);
@@ -61,15 +66,14 @@ function dashboard_hl_init() {
     }
     else {
         // For fast debugging
-        // start_daily_cards();
+        start_daily_cards();
         // start_weekly_cards();
         // start_monthly_cards_this_month();
         //start_all_months_rows(moment());
 
         // start_month_graph(moment(), get_month_card("curr_and_prev"));
-        // setup_monthly_choose_combo();
 
-        start_all_years_rows(new Date().getFullYear()); setup_yearly_choose_combo();
+        // start_all_years_rows(new Date().getFullYear()); 
     }
 }
 
@@ -84,7 +88,7 @@ function on_daily_date_change() {
         selected_day = today;
     }
 
-    $(".dsb_daily_num").text("--");  // reset all the weekly number fields.
+    $(".dsb_daily_num").text("--");  // reset all the daily number fields.
 
     start_current_day_row(selected_day);
 }
@@ -96,18 +100,18 @@ function setup_daily_choose_combo() {
     });
     let today = new Date();
     dt.datepicker('setDate', today);
+    dt.datepicker('setEndDate', today);
     dt.on("changeDate", on_daily_date_change);
 }
 
 function start_daily_cards() {
     start_current_day_row(new Date());
-    setup_daily_choose_combo();
 }
 
 // Initiate async ajax call. When call finishes, invoke card's on_data callback
 function start_current_day_row(the_date) {
 
-    $("#dsb_hl_daily_rides_todays_date").text(moment(the_date).format('DD.MM'));
+    $("#dsb_hl_daily_rides_todays_date").text(moment(the_date).format('D.M'));
 
     var query_object = {
         start_date: moment(the_date).format('YYYY-MM-DD'),
@@ -228,7 +232,6 @@ function start_weekly_cards() {
 
     }
 
-    setup_weekly_choose_combo();
     $("#dsb_hl_weekly_tbl_curr_show").click(toggle_month_week_graph_datasets);
     $("#dsb_hl_weekly_tbl_prev_show").click(toggle_month_week_graph_datasets);
     $("#dsb_hl_weekly_tbl_2wks_ago_show").click(toggle_month_week_graph_datasets);
@@ -374,6 +377,7 @@ function setup_weekly_choose_combo() {
     });
     let today = new Date();
     dt.datepicker('setDate', today);
+    dt.datepicker('setEndDate', today);
     dt.on("changeDate", on_weekly_date_change);
 }
 
@@ -780,22 +784,19 @@ function setup_monthly_choose_combo() {
     });
     let today = new Date();
     dt.datepicker('setDate', today);
+    dt.datepicker('setEndDate', today);
     dt.on("changeDate", on_monthly_date_change);
 }
 
 
 function start_monthly_cards(month) {
-
    start_all_months_rows(month);
-
    start_month_graph(month, get_month_card("curr_and_prev"));
-
    start_one_month_new_volunteers(month, get_month_card("curr"));
 
-    setup_monthly_choose_combo();
     $("#dsb_hl_monthly_tbl_curr_show").click(toggle_month_week_graph_datasets);
-    $("#dsb_hl_monthly_tbl_prev_show").click(toggle_month_week_graph_datasets);
-    $("#dsb_hl_monthly_tbl_yoy_show").click(toggle_month_week_graph_datasets);
+   $("#dsb_hl_monthly_tbl_prev_show").click(toggle_month_week_graph_datasets);
+   $("#dsb_hl_monthly_tbl_yoy_show").click(toggle_month_week_graph_datasets);
 }
 
 function start_all_months_rows(month) {
@@ -1313,7 +1314,6 @@ function start_yearly_cards() {
     let curr_year = new Date().getFullYear();
     start_all_years_rows(curr_year);
     start_year_graph(curr_year, "12months");
-    setup_yearly_choose_combo();
 }
 
 function get_year_range(year_designator, year) {
@@ -1503,6 +1503,11 @@ function create_year_graph(data) {
         options: {
             responsive: false,
             plugins: {
+                customTitle: {
+                    display: true,
+                    text: 'מספר האנשים / הסעות',
+                    color: 'black'
+                },
                 legend: {
                     display: false
                 }
@@ -1512,7 +1517,8 @@ function create_year_graph(data) {
                     beginAtZero: true
                 }
             }
-        }
+        },
+        plugins: [ChartJScustomTitle]
     });
 }
 
