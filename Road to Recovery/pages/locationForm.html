@@ -170,8 +170,8 @@
                     var areas = JSON.parse(data.d);
                     $('<option>', { value: "-1", text: "בחר איזור" }).appendTo($select);
                     for (var i = 0; i < areas.length; i++) {
-                        if (areas[i].indexOf("-") === -1) {
-                            $('<option>', { value: areas[i], text: areas[i] }).appendTo($select);
+                        if (areas[i].HebrewName.indexOf("-") === -1) {
+                            $('<option>', { value: areas[i].HebrewName, text: areas[i].HebrewName }).appendTo($select);
                         }
                     }
                     getSubAreas();
