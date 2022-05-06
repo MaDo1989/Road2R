@@ -5,6 +5,7 @@ let { ajaxCall } = GENERAL.FETCH_DATA;
 let allCandidatedFromDB;
 let { COPYWRITE } = GENERAL;
 let candidatesTable;
+let superDriversTable;
 let regularCandidated_clientVersion = [];
 let superCandidated_clientVersion = [];
 let ridePatNum;
@@ -100,7 +101,6 @@ $(document).ready(() => {
 
     candidatesTable = $('#datatable-candidates').DataTable({ data: [], destroy: true });
     superDriversTable = $('#datatable-superDrivers').DataTable({ data: [], destroy: true });
-    //newDriversTable   = $('#datatable-newDrivers').DataTable({ data: [], destroy: true });
 
     ridePatNum = JSON.parse(getRidePatNum4_viewCandidate());
 
@@ -220,7 +220,7 @@ const renderRidePatDetails = (ridepat) => {
     ridePatDetails += ' ';
     ridePatDetails += 'מקומות: ' + parseInt(ridepat.Escorts.length + 1);
     //ridePatDetails += ridepatDate.Equipment.length > 0 && ridepatDate.Equipment.includes(''); 
-     
+
     document.getElementById('RideCandidates_ph').innerHTML = ridePatDetails;
 }
 
@@ -288,7 +288,7 @@ const fillTableWithData = () => {
         btnStr = `<div class='btnsInSameLine'>`;
         date2display = convertDBDate2FrontEndDate(allCandidatedFromDB[i].LatestDocumentedCallDate).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
 
-        showDocumentedCallsBtn= '';
+        showDocumentedCallsBtn = '';
         showDocumentedCallsBtn += `<div class='btnWrapper-left'><span id="badgeOf_${allCandidatedFromDB[i].Id}" class="badge badge-pill badge-default">${allCandidatedFromDB[i].NoOfDocumentedCalls}</span>`;
         showDocumentedCallsBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedCallsBtn" title="שיחות מתועדות" data-backdrop="static" data-keyboard="false" data-toggle="modal" data-target="#DocumentedCallsModal"><i class="fa fa-phone" aria-hidden="true"></i></button></div>';
 
@@ -379,7 +379,8 @@ const fillTableWithData = () => {
             { width: '10%', "targets": [3] },
             { width: '5%', "targets": [4, 5, 7] },
             { width: '4%', "targets": [8] },
-            { width: '10%', "targets": [6, 9] }
+            { width: '10%', "targets": [6, 9] },
+            { targets: [9], orderable: false }
         ]
     });
 
@@ -420,50 +421,10 @@ const fillTableWithData = () => {
                 { width: '10%', "targets": [3] },
                 { width: '5%', "targets": [4, 5, 7] },
                 { width: '4%', "targets": [8] },
-                { width: '10%', "targets": [6, 9] }
+                { width: '10%', "targets": [6, 9] },
+                { targets: [9], orderable: false }
             ]
         });
-
-    //newDriversTable = $('#datatable-newDrivers').DataTable(
-    //    {
-    //        data: newCandidated_clientVersion,
-    //        rowId: 'id',
-    //        pageLength: 10,
-    //        stateSave: true,
-    //        destroy: true,
-    //        "lengthChange": false, // for somereason this property must be string
-    //        stateDuration: 60 * 60,
-    //        autoWidth: false,
-    //        columns: [
-    //            //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
-    //            {
-    //                data: "DisplayName",
-    //                render: function (data, type, row, meta) {
-    //                    let did = "data-driverId='" + row.id + "'";
-    //                    return '<p class="c1" ' + did + '>' + data + ' </p>';
-    //                }
-    //            },                                                      //0
-    //            { data: "cellphone" },                                  //1
-    //            { data: "city" },                                       //2
-    //            { data: "daysSinceLastRide" },                          //3
-    //            { data: "numOfRides_last2Months" },                     //4
-    //            { data: "daysUntilNextRide" },                          //5
-    //            { data: "latestDocumentedCallDate" },                   //6
-    //            { data: "seniorityInYears" },                           //7
-    //            { data: "score" },                                      //8
-    //            { data: "buttons" }                                     //9
-
-    //        ],
-    //        columnDefs: [
-    //            { width: '20%', "targets": [0] },
-    //            { width: '10%', "targets": [1] },
-    //            { width: '15%', "targets": [2] },
-    //            { width: '10%', "targets": [3] },
-    //            { width: '5%', "targets": [4, 5, 7] },
-    //            { width: '4%', "targets": [8] },
-    //            { width: '10%', "targets": [6, 9] }
-    //        ]
-    //    });
 
     /*
                      ============================
