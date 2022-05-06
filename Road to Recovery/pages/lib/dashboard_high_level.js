@@ -11,7 +11,7 @@ window.ConfigFlags = {
 window.DebugFlags = {
     is_debugging_dsb: true,
     full_loading: false,
-    all_graphs: false,
+    all_graphs: true,
     load_rows: true,
 };
 
@@ -64,12 +64,12 @@ function dashboard_hl_init() {
         // start_daily_cards();
         // start_weekly_cards();
         // start_monthly_cards_this_month();
-        start_all_months_rows(moment());
+        //start_all_months_rows(moment());
 
         // start_month_graph(moment(), get_month_card("curr_and_prev"));
         // setup_monthly_choose_combo();
 
-        // start_all_years_rows();
+        start_all_years_rows(new Date().getFullYear()); setup_yearly_choose_combo();
     }
 }
 
@@ -102,7 +102,6 @@ function setup_daily_choose_combo() {
 function start_daily_cards() {
     start_current_day_row(new Date());
     setup_daily_choose_combo();
-
 }
 
 // Initiate async ajax call. When call finishes, invoke card's on_data callback
@@ -366,7 +365,6 @@ function on_weekly_date_change() {
 }
 
 function delayed_start_week_new_volunteers(selected_day) {
-    console.log("delayed_start_week_new_volunteers", selected_day);
     start_one_week_new_volunteers(get_week_card("curr"), moment(selected_day));
 }
 function setup_weekly_choose_combo() {
@@ -417,6 +415,10 @@ function start_all_weeks_rows(end_date) {
     update_day_rows_names();
     // Invok Async call, to get info for this row.
 
+    // If we are on the edge of a year (e.g 26-Dec --> 2-January) then the grouping in optimized query will not work well 
+
+    console.log("Need to query one-by-one if on edge of a year <<<<<<<<");
+
     var query_object = get_all_weeks_range(moment(end_date));
 
     $.ajax({
@@ -439,7 +441,6 @@ function start_all_weeks_rows(end_date) {
 }
 
 function render_weeks_rows(result) {
-    console.log("render_weeks_rows", result);
     render_on_week_row("2wks_ago", result[0]);
     render_on_week_row("prev", result[1]);
     render_on_week_row("curr", result[2]);
@@ -955,11 +956,25 @@ function dbg_dump_rows_as_csv(rows, file_name) {
     link.click(); // This will download the data file 
 }
 
-// Call from console as    dbg_dump_graph("dsb_hl_monthly_graph") 
-function dbg_dump_graph(chart_id) {
-    let myChart = find_chart_by_id(chart_id);
-    let data = myChart.data;
+function dbg_get_host_info() {
+    if (window.location.host.startsWith("localhost")) {
+        return "localhost";
+    }
+    if (window.location.pathname.startsWith("/test/")) {
+        return "TEST";
+    }
+    else {
+        return encodeURIComponent(window.location.host);
+    }
+}
 
+function dbg_collect_graph(chart_id) {
+    let myChart = find_chart_by_id(chart_id);
+    if (!myChart) {
+        return new Array([chart_id, "NOT FOUND"]);
+    }
+
+    let data = myChart.data;
     let rows = new Array();
     data.labels.forEach(function add_row(label, index) {
         let a_row = new Array();
@@ -969,27 +984,64 @@ function dbg_dump_graph(chart_id) {
         }
         rows.push(a_row);
     });
-
-    let selected_day = moment($("#dsb_select_month").val(), K_DateFormat_Moment);
-    let file_name = selected_day.format("DD-MMM-YYYY") + "__gen_at_v2_" + moment().format("HH_mm_SS__DD-MMM-YYYY") + ".csv";
-    // console.table(rows)
-    dbg_dump_rows_as_csv(rows, file_name);
+    return rows;
 }
+
+// Call from console as    dbg_dump_graph("week")   or dbg_dump_graph("month")  
+function dbg_dump_graph(chart_name) {
+    let dict = {
+        "week": ["dsb_hl_weekly_graph", "#dsb_select_week"],
+        "month": ["dsb_hl_monthly_graph", "#dsb_select_month"],
+        "year": ["dsb_hl_yearly_graph", "#dsb_select_year"],
+    }
+    let entry = dict[chart_name];
+    if (entry) {
+        let rows = dbg_collect_graph(entry[0]);
+        rows.unshift([chart_name, $(entry[1]).val()]);
+        let file_name = dbg_get_host_info() + "__v2___" + moment().format("HH_mm_SS__DD-MMM-YYYY") + ".csv";
+        // console.table(rows)
+        dbg_dump_rows_as_csv(rows, file_name);
+    }
+}
+
+function dbg_collect_rows(designator) {
+    let rows = new Array();
+    let dict = {
+        "day": ["dsb_daily_num", "#dsb_select_day"],
+        "week": ["dsb_weekly_num", "#dsb_select_week"],
+        "month": ["dsb_monthly_num", "#dsb_select_month"],
+        "year": ["dsb_yearly_num", "#dsb_select_year"],
+    }
+
+    let entry = dict[designator];
+    if (entry) {
+        let row_class = entry[0], select_field = entry[1];
+        rows.push([designator, $(entry[1]).val()]);
+        $("." + row_class).each(function (index) { rows.push([$(this).attr("id"), $(this).text()]); });
+    }
+    return rows;
+ }
 
 // Call from console with class of labels e.g.   dbg_dump_card_rows("month")
 function dbg_dump_card_rows(designator) {
-    let row_class = "dsb_monthly_num", select_field = "#dsb_select_month";
-    if (designator.localeCompare("week") == 0) {
-        row_class = "dsb_weekly_num";
-        select_field = "#dsb_select_week";
-    }
-
-    let rows = new Array();
-    $("." + row_class).each(function (index) { rows.push([$(this).attr("id"), $(this).text()]); });
-    let selected_day = moment($(select_field).val(), K_DateFormat_Moment);
-    let file_name = row_class +  "__" + selected_day.format("DD-MMM-YYYY") + "__gen_at_v2_" + moment().format("HH_mm_SS__DD-MMM-YYYY") + ".csv";
+    let rows = dbg_collect_rows(designator);
+    let file_name = dbg_get_host_info() + "__v2___" + moment().format("HH_mm_SS__DD-MMM-YYYY") + ".csv";
     dbg_dump_rows_as_csv(rows, file_name);
     console.table(rows);
+}
+
+
+function dbg_dump_all_dashboard() {
+    let meta_data = new Array([moment().format("HH_mm_SS__DD-MMM-YYYY"), dbg_get_host_info()]);
+    let daily_rows = dbg_collect_rows("day");
+    let week_rows = dbg_collect_rows("week");
+    let week_graph = dbg_collect_graph("dsb_hl_weekly_graph");
+    let month_rows = dbg_collect_rows("month");
+    let month_graph = dbg_collect_graph("dsb_hl_monthly_graph");
+    let year_rows = dbg_collect_rows("year");
+    let year_graph = dbg_collect_graph("dsb_hl_yearly_graph");
+    let result = meta_data.concat(daily_rows, week_rows, week_graph, month_rows, month_graph, year_rows, year_graph);
+    dbg_dump_rows_as_csv(result, dbg_get_host_info() + "__" + moment().format("HH_mm_SS__DD-MMM-YYYY") + ".csv");
 }
 
 function prepare_one_month_span_data(server_data, year_and_month_prefix) {
@@ -1241,23 +1293,42 @@ function toggle_month_week_graph_datasets(event) {
     }
 }
 
-function start_yearly_cards() {
-    start_all_years_rows();
-    start_year_graph("12months");
+
+function on_yearly_date_change() {
+    let year = $("#dsb_select_year").val()
+
+    $(".dsb_yearly_num").text("--");  // reset all the weekly number fields.
+
+    start_all_years_rows(+year);
+    start_year_graph(+year, "12months");
+    reset_graph("dsb_hl_yearly_graph");
 }
 
-function get_year_range(year_designator) {
+function setup_yearly_choose_combo() {
+    $("#dsb_select_year").change(on_yearly_date_change);
+}
+
+
+function start_yearly_cards() {
+    let curr_year = new Date().getFullYear();
+    start_all_years_rows(curr_year);
+    start_year_graph(curr_year, "12months");
+    setup_yearly_choose_combo();
+}
+
+function get_year_range(year_designator, year) {
     let end = new Date();
-    let start = new Date(end.getFullYear(), 0, 1); // 01-Jan
+    end.setFullYear(year);
+    let start = new Date(year, 0, 1); // 01-Jan
 
     if (year_designator.localeCompare("yoy") == 0) {
-        end.setFullYear(end.getFullYear() - 1);
-        start.setFullYear(start.getFullYear() - 1);
+        end.setFullYear(year - 1);
+        start.setFullYear(year - 1);
     }
 
     if (year_designator.localeCompare("12months") == 0) {
         start = new Date();
-        start.setFullYear(start.getFullYear() - 1);
+        start.setFullYear(year - 1);
         // Avoid counting teh rides of the same month ayear ago, under this month
         // e.g. if today is 17-Nov-2021, we do not want to count rides of range
         // 01-Nov-2020 --> 17-Nov-2020 in November (due to GROUP BY MONTH(PickupTime))
@@ -1267,10 +1338,10 @@ function get_year_range(year_designator) {
 
     if (year_designator.localeCompare("prev12months") == 0) {
         start = new Date();
-        start.setFullYear(start.getFullYear() - 2);
+        start.setFullYear(year - 2);
         start.setMonth(start.getMonth() + 1);
         start.setDate(1);
-        end.setFullYear(end.getFullYear() - 1);
+        end.setFullYear(year - 1);
         end.setMonth(end.getMonth() + 1);
         end.setDate(1);
     }
@@ -1282,14 +1353,15 @@ function get_year_range(year_designator) {
     return result;
 }
 
-function get_years_range() {
+function get_years_range(year) {
+    let start = new Date(year, 0, 1); // 01-Jan
     let end = new Date();
-    let start = new Date(end.getFullYear(), 0, 1); // 01-Jan
+    end.setFullYear(year);
 
     let yoy_start = new Date(start);
     let yoy_end = new Date(end);
-    yoy_end.setFullYear(end.getFullYear() - 1);
-    yoy_start.setFullYear(start.getFullYear() - 1);
+    yoy_end.setFullYear(year - 1);
+    yoy_start.setFullYear(year - 1);
 
     let result = {
         start_date: moment(start).format("YYYY-MM-DD"),
@@ -1301,11 +1373,10 @@ function get_years_range() {
     return result;
 }
 
-function start_all_years_rows() {
-    var query_object = get_years_range();
+function start_all_years_rows(year) {
+    var query_object = get_years_range(year);
 
     console.log("start_all_years_rows", query_object);
-
 
     $.ajax({
         dataType: "json",
@@ -1342,8 +1413,8 @@ function render_year_row(dsg, result) {
 }
 
 
-function start_year_graph(dsg) {
-    var query_object = get_year_range(dsg);
+function start_year_graph(year, dsg) {
+    var query_object = get_year_range(dsg, year);
 
     $.ajax({
         dataType: "json",
@@ -1356,7 +1427,7 @@ function start_year_graph(dsg) {
         data: JSON.stringify(query_object),
         success: function (data) {
             if (dsg.localeCompare("12months") == 0) {
-                start_year_graph("prev12months"); // Schedule fetch of prev year data
+                start_year_graph(year, "prev12months"); // Schedule fetch of prev year data
             }
             result = data.d;
             render_year_graph(dsg, result);
