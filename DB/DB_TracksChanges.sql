@@ -338,6 +338,23 @@ GO
 		END	
 GO
 
+--AssignedFromApp Module: 06/05/2022 ↓ Yogev
 
+CREATE TABLE App
+(
+	Id INT PRIMARY KEY IDENTITY(1,1),
+	Name VARCHAR(50) NOT NULL
+)
+GO
+
+INSERT INTO App (Name) VALUES ('Desktop'),('Mobile')
+GO
+
+ALTER TABLE Ride
+ADD AssignedFromAppId int,
+CONSTRAINT Ride_App FOREIGN KEY(AssignedFromAppId) REFERENCES App(Id);
+GO
+
+--AssignedFromApp Module: 06/05/2022 ↑ Yogev
 
 
