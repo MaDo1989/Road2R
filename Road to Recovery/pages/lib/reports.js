@@ -93,8 +93,8 @@ function on_report_click(event) {
 
 // How to refresh the table, per each report type  (Hooked into volunteer selection)
 var K_strategy = {
-    "rp_vl_ride_month": rp_vl_ride_month__refresh_preview,
-    "rp_vl_ride_year": rp_vl_ride_year__refresh_preview,
+    "rp_vl_ride_month": empty_func,
+    "rp_vl_ride_year": empty_func,
     "rp_amuta_vls_week": rp_amuta_vls_week__refresh_preview,
     "rp_amuta_vls_per_pat": rp_amuta_vls_per_pat__refresh_preview,
     "rp_amuta_vls_km": rp_amuta_vls_km__refresh_preview,
@@ -116,29 +116,41 @@ var K_fields_map = {
             id: "rp_vl_ride_month__name",
             type: "VOLUNTEER",
             template: 'div[name="template_VOLUNTEER"]',
-            post_clone: field_volunteers_post_clone
+            post_clone: function () { loadVolunteers(populate_volunteer_field_with_validation);}
         },
         {
             id: "rp_vl_ride_month__month",
             template: 'div[name="template_MONTH"]',
             type: "MONTH",
             post_clone: field_month_post_clone
+        },
+        {
+            id: "rp_vl_ride_month__generate",
+            template: 'div[name="template_GENERATE_REPORT"]',
+            type: "GENERATE_REPORT",
+            post_clone: rp_vl_ride_month_generate_post_clone
         }
+
     ],
     "rp_vl_ride_year": [
         {
             id: "rp_vl_ride_year__name",
             type: "VOLUNTEER",
             template: 'div[name="template_VOLUNTEER"]',
-            post_clone: field_volunteers_post_clone
+            post_clone: function () { loadVolunteers(populate_volunteer_field_with_validation); }
         },
         {
             id: "rp_vl_ride_year__year",
             type: "YEAR",
             template: 'div[name="template_YEAR"]',
             post_clone: rp_vl_ride_year__field_year_post_clone
+        },
+        {
+            id: "rp_vl_ride_year__generate",
+            template: 'div[name="template_GENERATE_REPORT"]',
+            type: "GENERATE_REPORT",
+            post_clone: rp_vl_ride_year_generate_post_clone
         }
-
     ],
     "rp_amuta_vls_week": [
         {
@@ -257,8 +269,6 @@ var K_fields_map = {
             type: "GENERATE_REPORT",
             post_clone: field_generate_report_post_clone
         }
-
-
     ]
 
 
@@ -681,8 +691,6 @@ function rp_amuta_vls_list_field_radio_post_clone(id) {
 function rp_vl_ride_year__field_year_post_clone(id) {
     var today = new Date();
     $('#select_year').val(today.getFullYear());
-    $("#select_year").change(rp_vl_ride_year__refresh_preview);
-
 }
 
 
@@ -712,6 +720,17 @@ function field_destinations_post_clone(id) {
 
 function field_generate_report_post_clone(id) {
     $("#generate_report_period").click(rp_center_patients_rides__refresh_preview);
+}
+
+function rp_vl_ride_month_generate_post_clone(id) {
+    $("#generate_report_period").click(rp_vl_ride_month__refresh_preview);
+    $("#generate_report_period").prop("disabled", true);
+}
+
+
+function rp_vl_ride_year_generate_post_clone(id) {
+    $("#generate_report_period").click(rp_vl_ride_year__refresh_preview);
+    $("#generate_report_period").prop("disabled", true);
 }
 
 
@@ -826,15 +845,14 @@ function refreshPreview() {
 
 // Checks if all fields are filled. If so refresh the report
 function rp_vl_ride_month__refresh_preview() {
-    var selected_date = Date.parse($("#select_month").val());
-    if (selected_date) {
-        var start_month_date = moment(selected_date);
-        var end_month_date = start_month_date.clone().add(1, 'months');
+    var selected_date = moment($("#select_month").val(), "MMMM-YYYY");
+    if (selected_date.isValid()) {
+        var end_month_date = moment(selected_date).add(1, 'months');
 
         var volunteerId = $("#select_driver").attr("itemID");
         if (volunteerId) {
             refreshTable(volunteerId,
-                start_month_date.format("YYYY-MM-DD"),
+                selected_date.format("YYYY-MM-DD"),
                 end_month_date.format("YYYY-MM-DD"));
         }
     }
@@ -926,15 +944,13 @@ function rp_amuta_vls_per_month__refresh_preview() {
 
 // Checks if all fields are filled. If so refresh the report
 function rp_pil_vl_ride_month__refresh_preview() {
-    var selected_date = Date.parse($("#select_month").val());
-    if (selected_date) {
-        var start_month_date = moment(selected_date);
-        var end_month_date = start_month_date.clone().add(1, 'months');
-
+    var selected_date = moment($("#select_month").val(), "MMMM-YYYY");
+    if (selected_date.isValid()) {
+        var end_month_date = moment(selected_date).add(1, 'months');
 
         refresh_pil_vl_ride_month_Table(
-                start_month_date.format("YYYY-MM-DD"),
-                end_month_date.format("YYYY-MM-DD"));
+            selected_date.format("YYYY-MM-DD"),
+            end_month_date.format("YYYY-MM-DD"));
     }
 }   
 
@@ -1959,13 +1975,12 @@ function rp_amuta_vls_list__commit_to_ni_db() {
 
 // Checks if all fields are filled. If so refresh the report
 function rp_center_daily_by_month__refresh_preview() {
-    var selected_date = Date.parse($("#select_month").val());
-    if (selected_date) {
-        var start_month_date = moment(selected_date);
-        var end_month_date = start_month_date.clone().add(1, 'months');
+    var selected_date = moment($("#select_month").val(), "MMMM-YYYY");
+    if (selected_date.isValid()) {
+        var end_month_date = moment(selected_date).add(1, 'months');
 
         rp_center_daily_by_month__refresh_Table(
-            start_month_date.format("YYYY-MM-DD"),
+            selected_date.format("YYYY-MM-DD"),
             end_month_date.format("YYYY-MM-DD"));
     }
 }   

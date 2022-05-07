@@ -715,10 +715,20 @@
                             <!-- Sixth row - Yearly - 1 Graph -->
                             <h2> &nbsp; &nbsp;מבט שנתי</h2>
                             <div class="col-sm-3">
-                                &nbsp;
+                                <div class="form-group">
+                                    <label class="col-sm-4">&nbsp;</label>
+                                    <label class="col-sm-2" style="padding: 0.5em 0px;">בחרו שנה:</label>
+                                    <div class="col-sm-4">
+                                        <select id="dsb_select_year" class="form-control">
+                                            <option value="2022" selected>2022</option>
+                                            <option value="2021">2021</option>
+                                            <option value="2020">2020</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-sm-6">
-                                <canvas id="dsb_hl_yearly_graph" width="600" height="450" style="padding-bottom: 20px"></canvas>
+                                <canvas id="dsb_hl_yearly_graph" width="700" height="420" style="padding-bottom: 20px"></canvas>
                             </div>
                             <div class="col-sm-3">
                                 &nbsp;
@@ -736,18 +746,18 @@
                             </div>
                             <div class="col-sm-1">
                                 <div class="row">חולים        <div class="dsb_hl_legend_header" style="background-color: rgb(153, 102, 255)"></div>   </div>
-                                <div class="row" id="dsb_hl_yearly_tbl_ytd_pats"> --            </div>
-                                <div class="row" id="dsb_hl_yearly_tbl_yoy_pats">--</div>
+                                <div class="row dsb_yearly_num" id="dsb_hl_yearly_tbl_ytd_pats"> --            </div>
+                                <div class="row dsb_yearly_num" id="dsb_hl_yearly_tbl_yoy_pats">--</div>
                             </div>
                             <div class="col-sm-1">
                                 <div class="row">הסעות      <div class="dsb_hl_legend_header" style="background-color: rgb(75, 192, 192)"></div>     </div>
-                                <div class="row" id="dsb_hl_yearly_tbl_ytd_rides"> --            </div>
-                                <div class="row" id="dsb_hl_yearly_tbl_yoy_rides">--</div>
+                                <div class="row dsb_yearly_num" id="dsb_hl_yearly_tbl_ytd_rides"> --            </div>
+                                <div class="row dsb_yearly_num" id="dsb_hl_yearly_tbl_yoy_rides">--</div>
                             </div>
                             <div class="col-sm-1">
                                 <div class="row">מתנדבים     <div class="dsb_hl_legend_header" style="background-color: rgb(255, 159, 64)"></div>       </div>
-                                <div class="row" id="dsb_hl_yearly_tbl_ytd_vols">  --           </div>
-                                <div class="row" id="dsb_hl_yearly_tbl_yoy_vols">--</div>
+                                <div class="row dsb_yearly_num" id="dsb_hl_yearly_tbl_ytd_vols">  --           </div>
+                                <div class="row dsb_yearly_num" id="dsb_hl_yearly_tbl_yoy_vols">--</div>
                             </div>
                         </div>
 
