@@ -1106,17 +1106,8 @@ INNER JOIN Volunteer ON BUFF.MainDriver=Volunteer.Id";
         RidePat helper_RidePat = new RidePat();
 
         DbService db = new DbService();
-        Location tmp = new Location();
-        Hashtable locations = tmp.getLocationsEnglishName();
-        DataTable driverTable = getDriverByID(volunteerId, db);
 
-        //TODO: re-implement getRides using sql-command
-        DataTable rideTable = getRides();
-
-        List<Escorted> el = new List<Escorted>();
-        DataTable escortTable = getEscorts();
-
-
+        //TODO: re-implement using sql-command
         DataTable pickupsTable = getPickupForDriver(volunteerId, start_date, end_date, db);
 
         List<RidesForVolunteer> result = new List<RidesForVolunteer>();
