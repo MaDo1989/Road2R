@@ -383,6 +383,7 @@
         let allReadyCountedRidePats = [];
         let candidate4IhaveSeen;
         let timer;
+
         const {
 
             validateMobileNumFullVersion,
@@ -393,6 +394,9 @@
             getHebrew_WeekDay
 
         } = GENERAL.USEFULL_FUNCTIONS;
+
+        const { ajaxCall } = GENERAL.FETCH_DATA;
+
 
         let tMorning, tAfternoon, tFuture, tTomorrow;
 
@@ -606,9 +610,38 @@
 
         }
 
+        function getDrivers() {
+
+            ajaxCall(
+                'GetDrivers',
+                JSON.stringify({ isActive: true, isDriving: true }),
+                getDrivers_SCB,
+                getDrivers_ECB
+            );
+
+        }
+        const getDrivers_SCB = (data) => {
+
+            const drivers = JSON.parse(data.d);
+            const driverNames = drivers.map(d => d.DisplayName);
+            console.log(driverNames);
+
+            $('#testAutoComplete').autocomplete({
+                source: driverNames
+            });
+
+        }
+
+        const getDrivers_ECB = (err) => {
+
+            alert('Issue in getDrivers ' + JSON.stringify(err));
+        }
+
         $(document).ready(function () {
 
+            $("#assignDriverModal").attr("w3-include-html", "assignDriverModal.html");
             wiringDataTables();
+            getDrivers();
             let { COPYWRITE } = GENERAL;
             $('#rights').html(COPYWRITE());
 
@@ -1281,8 +1314,6 @@
 
         const showFiltersModal = () => {
 
-            let { ajaxCall } = GENERAL.FETCH_DATA;
-
             ajaxCall(
                 'getAreas_AsLocationObj',
                 '',
@@ -1542,10 +1573,10 @@
 
                         if (arr_rides[i].Drivers.length > 0) {
 
-                            driverHTML = buildDriverHTML(arr_rides[i].Drivers[0]);;
+                            driverHTML = buildDriverHTML(arr_rides[i].Drivers[0]);
                         } else {
 
-                            driverHTML = 'אין!<br/>None!';
+                            driverHTML = buildDriverHTML_noDriverAssigned(arr_rides[i].RidePatNum);;
                         }
                         //#endregion adjust driver column
 
@@ -1975,8 +2006,8 @@
 
         const buildDriverHTML = (driver) => {
 
-            let driverInnerContent = '';
             let driverWrapper = '';
+            let driverInnerContent = '';
             const { Id, DisplayName, EnglishFN, EnglishLN, CellPhone } = driver;
 
             if (!isAssistant) {                         //hebrew
@@ -1995,6 +2026,16 @@
             driverWrapper += `<span class="driverCellPhone">${addSeperator2MobileNum(CellPhone, '-')}</span>`;
 
             return driverWrapper;
+        }
+
+        const buildDriverHTML_noDriverAssigned = (ridepatNum) => {
+
+            let driverHTML_noDriverAssigned = '';
+
+            driverHTML_noDriverAssigned = 'אין!<br/>None!';
+            driverHTML_noDriverAssigned += `<button onclick="assignVridepatNumToModalAttribute(${ridepatNum})" data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>הוסף נהג</button>`;
+
+            return driverHTML_noDriverAssigned;
         }
 
         const buildPatientHTML = (ridepat) => {
@@ -2172,6 +2213,11 @@
             }
         }
 
+        const assignVridepatNumToModalAttribute = (ridepatNum) => {
+            $('#assignDriverConfirm').attr('data-ridepatNum', ridepatNum);
+            $('#driver').val('');
+        }
+
     </script>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -2267,6 +2313,8 @@
                                             <option value="1800000">30 דקות</option>
                                             <option value="3600000">60 דקות</option>
                                         </select>
+                                        <input placeholder="הזן שם" id="testAutoComplete" name="driver">
+
                                     </div>
 
                                     <div class="col-sm-6 text-right">
@@ -2565,6 +2613,9 @@
     <script src="assets/js/jquery.nicescroll.js"></script>
     <script src="assets/js/jquery.scrollTo.min.js"></script>
     <script src="../plugins/switchery/switchery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    
 
     <!-- Datatables-->
     <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
@@ -2626,7 +2677,8 @@
 
 
 
-    <!-- ↓ filtersModal ↓ -->
+    <div class="modal fade" id="assignDriverModal" tabindex="-1" role="dialog" aria-labelledby="documentedRidesTitle" aria-hidden="true"></div>
+
     <div class="modal fade" id="filtersModal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content" id="overRideBS_modal-dialog">

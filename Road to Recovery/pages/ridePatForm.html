@@ -1922,7 +1922,6 @@
         }
 
         function generateDrivers() {
-            //var $drivers = $("#Driver");
 
             $.ajax({
                 dataType: "json",
@@ -1932,7 +1931,6 @@
                     xhr.setRequestHeader("Content-Encoding", "gzip");
                 },
                 type: "POST",
-                // async: false,
                 data: JSON.stringify({ isActive: true, isDriving: true }),
                 success: function (data) {
                     var arr_drivers = JSON.parse(data.d);

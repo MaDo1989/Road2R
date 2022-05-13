@@ -245,3 +245,7 @@ input:checked + .slider:before {
 .withIn24HoursDrive {
     background: orange;
 }
+
+.add-driver {
+    margin-top: 5px;
+}

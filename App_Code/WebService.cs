@@ -1211,7 +1211,7 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
-            throw new Exception("faile to assign");
+            throw new Exception("fail to assign");
         }
 
     }
