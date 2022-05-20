@@ -32,7 +32,6 @@
         let node2manipulate;
         let nodechilds;
         let lastModified_td;
-
         const ADD_DRIVER = 'add driver', REMOVE_DRIVER = 'remove driver';
 
         //function to reuse
@@ -396,8 +395,10 @@
         } = GENERAL.USEFULL_FUNCTIONS;
 
         const { ajaxCall } = GENERAL.FETCH_DATA;
-
+        const { APP_ID } = GENERAL;
         let drivers, driverNames;
+        let _assignDriverToRidepatNum;
+
 
 
         let tMorning, tAfternoon, tFuture, tTomorrow;
@@ -634,6 +635,43 @@
             return driversPromise;
         }
 
+        const assignDriverToRidePat = () => {
+            $('#wait').show();
+
+            const driverNameFromInput = $('#driver').val();
+
+            if (typeof driverNameFromInput === 'undefined' || !driverNameFromInput || driverNameFromInput.length === 0) {
+
+                $('#wait').hide();
+                return alert('יש לבחור נהג מהרשימה');
+            }
+
+            const driverIndex = driverNames.indexOf(driverNameFromInput);
+            const userSelected = drivers[driverIndex];
+
+            const request = {
+                ridePatId: _assignDriverToRidepatNum,
+                userId: userSelected.Id,
+                driverType: "primary",
+                assignedFromAppId: APP_ID
+            };
+
+            const dataString = JSON.stringify(request);
+
+
+
+            ajaxCall('AssignRideToRidePat', dataString, assignDriverToRidePat_SCB, assignDriverToRidePat_ECB);
+        }
+
+        const assignDriverToRidePat_SCB = (data) => {
+            $('#wait').hide();
+            $('#assignDriverModal').modal('hide');
+        }
+
+        const assignDriverToRidePat_ECB = (err) => {
+            $('#wait').hide();
+            alert('Issue in assignDriverToRidePat: ' + JSON.stringify(err));
+        }
 
 
         $(document).ready(function () {
@@ -2033,7 +2071,7 @@
             let driverHTML_noDriverAssigned = '';
 
             driverHTML_noDriverAssigned = 'אין!<br/>None!';
-            driverHTML_noDriverAssigned += `<buttond ata-ridepatNum="${ridepatNum}"  data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>שבץ נהג</button>`;
+            driverHTML_noDriverAssigned += `<buttond onclick="assignDriverToRidepatNum(${ridepatNum})"  data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>שבץ נהג</button>`;
 
             return driverHTML_noDriverAssigned;
         }
@@ -2161,6 +2199,10 @@
             return englishStatus;
         };
 
+        const assignDriverToRidepatNum = (ridePatNum) => {
+            _assignDriverToRidepatNum = ridePatNum;
+        }
+
         const add2IhaveSeenAllready = () => {
 
             $('.ContextMenu_dropdown').addClass('hidden');//hide floating button
@@ -2214,15 +2256,12 @@
         }
 
         const activateAutoComplteToModalsInput = async () => {
-            //   $('#assignDriverConfirm').attr('data-ridepatNum', ridepatNum);
             $('#driver').val('');
-
             if (typeof driverNames === 'undefined' || !driverNames) {
                 driverNames = await getDrivers();
             }
 
             $('#driver').autocomplete({ source: driverNames });
-
         }
 
     </script>
@@ -2320,8 +2359,6 @@
                                             <option value="1800000">30 דקות</option>
                                             <option value="3600000">60 דקות</option>
                                         </select>
-                                        <input placeholder="הזן שם" id="testAutoComplete" name="driver">
-
                                     </div>
 
                                     <div class="col-sm-6 text-right">
