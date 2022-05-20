@@ -181,7 +181,7 @@ input:checked + .slider:before {
         background: rgb(200,200,200);
     }
 
-.ContextMenu_dropdown{
+.ContextMenu_dropdown {
     color: white;
     background: rgb(200,200,200);
     padding: 5px 10px !important;
@@ -249,3 +249,12 @@ input:checked + .slider:before {
 .add-driver {
     margin-top: 5px;
 }
+
+.ui-autocomplete {
+    z-index: 5000 !important;
+    max-height: 150px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: fixed !important;
+}
+

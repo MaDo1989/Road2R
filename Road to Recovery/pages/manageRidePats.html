@@ -397,6 +397,8 @@
 
         const { ajaxCall } = GENERAL.FETCH_DATA;
 
+        let drivers, driverNames;
+
 
         let tMorning, tAfternoon, tFuture, tTomorrow;
 
@@ -612,36 +614,34 @@
 
         function getDrivers() {
 
-            ajaxCall(
-                'GetDrivers',
-                JSON.stringify({ isActive: true, isDriving: true }),
-                getDrivers_SCB,
-                getDrivers_ECB
-            );
+            const driversPromise = new Promise((resolve, reject) => {
 
-        }
-        const getDrivers_SCB = (data) => {
+                const getDrivers_SCB = (data) => {
+                    drivers = JSON.parse(data.d);
+                    driverNames = drivers.map(d => d.DisplayName);
 
-            const drivers = JSON.parse(data.d);
-            const driverNames = drivers.map(d => d.DisplayName);
-            console.log(driverNames);
+                    return resolve(driverNames);
+                }
 
-            $('#testAutoComplete').autocomplete({
-                source: driverNames
+                const getDrivers_ECB = (err) => {
+                    alert('Issue in getDrivers ' + JSON.stringify(err));
+
+                    return reject(err);
+                }
+                ajaxCall('GetDrivers', JSON.stringify({ isActive: true, isDriving: true }), getDrivers_SCB, getDrivers_ECB);
             });
 
+            return driversPromise;
         }
 
-        const getDrivers_ECB = (err) => {
 
-            alert('Issue in getDrivers ' + JSON.stringify(err));
-        }
 
         $(document).ready(function () {
 
             $("#assignDriverModal").attr("w3-include-html", "assignDriverModal.html");
+            $('#assignDriverModal').on('shown.bs.modal', activateAutoComplteToModalsInput); // triger cb function only after modal is shown
+
             wiringDataTables();
-            getDrivers();
             let { COPYWRITE } = GENERAL;
             $('#rights').html(COPYWRITE());
 
@@ -2033,7 +2033,7 @@
             let driverHTML_noDriverAssigned = '';
 
             driverHTML_noDriverAssigned = 'אין!<br/>None!';
-            driverHTML_noDriverAssigned += `<button onclick="assignVridepatNumToModalAttribute(${ridepatNum})" data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>הוסף נהג</button>`;
+            driverHTML_noDriverAssigned += `<buttond ata-ridepatNum="${ridepatNum}"  data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>שבץ נהג</button>`;
 
             return driverHTML_noDriverAssigned;
         }
@@ -2213,9 +2213,16 @@
             }
         }
 
-        const assignVridepatNumToModalAttribute = (ridepatNum) => {
-            $('#assignDriverConfirm').attr('data-ridepatNum', ridepatNum);
+        const activateAutoComplteToModalsInput = async () => {
+            //   $('#assignDriverConfirm').attr('data-ridepatNum', ridepatNum);
             $('#driver').val('');
+
+            if (typeof driverNames === 'undefined' || !driverNames) {
+                driverNames = await getDrivers();
+            }
+
+            $('#driver').autocomplete({ source: driverNames });
+
         }
 
     </script>
@@ -2615,7 +2622,7 @@
     <script src="../plugins/switchery/switchery.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    
+
 
     <!-- Datatables-->
     <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
