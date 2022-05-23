@@ -189,6 +189,7 @@ public class Location
         }
     }
 
+    public Region Region { get; set; }
     public Location(string _type, string _name, string _area, string _direction, Volunteer _responsible, string _status,
         string _remarks, string _managerName, string _managerLastName, string _managerPhones, string _managerPhones2)
     {
@@ -235,16 +236,22 @@ public class Location
     {
         #region DB functions
         
-        string query = "select * from Location";
-        if (active)
-        {
-            query += " where IsActive = '" + active + "' order by EnglishName";
-        }
-        else query += " order by englishName";
+        string query = "exec spGetAllLocation @isActive=" + active;
+        
+        //if (active)
+        //{
+        //    query += " where IsActive = '" + active + "' order by EnglishName";
+        //}
+        //else query += " order by englishName";
 
         List<Location> list = new List<Location>();
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
+
+        if (ds == null)
+        {
+            throw new Exception("failed to read list of locations");
+        }
 
         SqlCommand cmd2 = new SqlCommand();
         cmd2.CommandType = CommandType.Text;
@@ -262,19 +269,7 @@ public class Location
             l.IsActive =Convert.ToBoolean( dr["IsActive"].ToString());
             l.Remarks = dr["Remarks"].ToString();
             l.EnglishName = dr["EnglishName"].ToString();
-            //if (dr["DestinationManager"].ToString() != "")
-            //{
-            //    int managerId = int.Parse(dr["DestinationManager"].ToString());
-            //    cmdParams2[0] = cmd2.Parameters.AddWithValue("Id", managerId);
-            //    string query2 = "select * from DestinationManagers where Id=@Id";
-            //    DestinationManager m = new DestinationManager();
-            //    DbService db2 = new DbService();
-            //    DataSet ds2 = db2.GetDataSetByQuery(query2, true,cmd2.CommandType, cmdParams2);
-            //    DataRow dr2 = ds2.Tables[0].Rows[0];
-            //    l.ManagerName = dr2["FirstName"].ToString();
-            //    l.ManagerLastName = dr2["LastName"].ToString();
-            //    l.managerPhones = dr2["Phone"].ToString();
-            //}
+            l.Region = new Region(Convert.ToInt32(dr["RegionId"]), dr["RegionName"].ToString());
 
             list.Add(l);
         }
@@ -333,7 +328,28 @@ public class Location
         }
         return areas;
     }
-    
+
+    public List<Area> getAreasAsClass()
+    {
+        List<Area> areas = new List<Area>();
+        string query = "select * from Area order by AreaName";
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+
+        Area area;
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+            string hebrewName = dr["AreaName"].ToString();
+            string englishName = dr["AreaEnglishName"].ToString();
+            bool isRoute =  Convert.ToBoolean(dr["IsRoute"]);
+
+            area = new Area(hebrewName, englishName, isRoute);
+            areas.Add(area);
+        }
+        return areas;
+    }
+
+
     public List<Location> getAreas_AsLocationObj()
     {//in this method I (Yogev) use area like it was location
 
@@ -468,6 +484,8 @@ public class Location
             l.managerPhones = dr2["Phone"].ToString();
            
         }
+        l.Region = new Region(Convert.ToInt32(dr["RegionId"]));
+
         #endregion
 
         return l;
@@ -500,7 +518,7 @@ public class Location
         DbService db = new DbService();
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
-        SqlParameter[] cmdParams = new SqlParameter[9];
+        SqlParameter[] cmdParams = new SqlParameter[10];
         
         //getting the index for the destination manager
         DestinationManager m = new DestinationManager(v.ManagerName,v.ManagerLastName,v.ManagerPhones,v.ManagerPhones2);
@@ -516,6 +534,8 @@ public class Location
         cmdParams[6] = cmd.Parameters.AddWithValue("@DestinationManager", managerId);
         cmdParams[7] = cmd.Parameters.AddWithValue("@cityCityName", "אביחיל");
         cmdParams[8] = cmd.Parameters.AddWithValue("@EnglishName", EnglishName);
+        cmdParams[9] = cmd.Parameters.AddWithValue("@RegionId", Region.Id);
+
 
         string query = "";
         if (func == "edit")
@@ -524,6 +544,7 @@ public class Location
 
             query = "update Location set Type=@type, Name=@name,";
             query += "Area=@area, Adress=@adress, IsActive=@IsActive, Remarks=@remarks, ";
+            query += "RegionId=@RegionId,";
             query += "DestinationManager=@DestinationManager, CityCityName=@cityCityName,EnglishName=@EnglishName where Name=@name"; 
 
             res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
@@ -536,8 +557,8 @@ public class Location
         }
         else if (func == "new")
         {
-            query = "insert into Location (Type, Name, Area, Adress, IsActive, Remarks, DestinationManager, CityCityName,EnglishName)";
-            query += " values (@type,@name,@area,@adress,@IsActive,@remarks,@DestinationManager,@cityCityName,@EnglishName);SELECT SCOPE_IDENTITY();";
+            query = "insert into Location (Type, Name, Area, Adress, IsActive, Remarks, DestinationManager, CityCityName,EnglishName, RegionId)";
+            query += " values (@type,@name,@area,@adress,@IsActive,@remarks,@DestinationManager,@cityCityName,@EnglishName, @RegionId);SELECT SCOPE_IDENTITY();";
             db = new DbService();
             try
             {

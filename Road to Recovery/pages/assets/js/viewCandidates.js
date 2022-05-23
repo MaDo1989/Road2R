@@ -1,23 +1,107 @@
 ﻿checkCookie();
-let { convertDBDate2FrontEndDate, getHebrew_WeekDay } = GENERAL.USEFULL_FUNCTIONS;
+let { getHebrew_WeekDay, addSeperator2MobileNum } = GENERAL.USEFULL_FUNCTIONS;
 let { getRidePatNum4_viewCandidate } = GENERAL.RIDEPAT;
 let { ajaxCall } = GENERAL.FETCH_DATA;
-let thisRidePat;
+let allCandidatedFromDB;
 let { COPYWRITE } = GENERAL;
+let candidatesTable;
+let regularCandidated_clientVersion = [];
+let superCandidated_clientVersion = [];
+let ridePatNum;
+
+
 
 const wiringDataTables = () => {
     //manage button clicks on tables
 
-    //      EXAMPLE:
+    $('#datatable-candidates tbody').on('click', '#showDocumentedCallsBtn', function () {
 
-    //$('#datatable-morning tbody').on('click', '#candidatesBtn', function () {
-    //    candidatesButton(this);
-    //});
+        manipulateDocumentedCallsModal(this, candidatesTable);
+
+    });
+
+    $('#datatable-superDrivers tbody').on('click', '#showDocumentedCallsBtn', function () {
+
+        manipulateDocumentedCallsModal(this, superDriversTable);
+
+    });
+}
+
+const ConvertDBDate2UIDate = (fullTimeStempStr) => {
+    if (fullTimeStempStr === undefined) return;
+    let startTrim = fullTimeStempStr.indexOf('(') + 1;
+    let endTrim = fullTimeStempStr.indexOf(')');
+    let fullTimeStempNumber = fullTimeStempStr.substring(startTrim, endTrim);
+    let fullTimeStemp = new Date(parseInt(fullTimeStempNumber));
+
+    //Note: in getMOnth function 0=January, 1=February etc...
+
+    let dd = fullTimeStemp.getDate();
+
+    let mm = fullTimeStemp.getMonth() + 1;
+
+    let yyyy = fullTimeStemp.getFullYear();
+
+    return `${dd}.${mm}.${yyyy}`;
+}
+
+function hideCharacteristics() {
+    $("#characteristics").css("visibility", "hidden");
+}
+
+function showCharacteristics() {
+
+    let id = this.getAttribute('data-driverId');
+    let c = allCandidatedFromDB[id];
+    let boldArr = ["נסיעות בציר המדויק הזה", "הסעות ביום הזה", "הסעות בחלק הנדרש של היום"];
+    let txt = {
+        "נסיעות בציר המדויק הזה": c.AmmountOfPathMatch[4],
+        "נסיעות בציר ההפוך": c.AmmountOfPathMatch[3],
+        "נסיעות מאותה נקודה לאותו איזור": c.AmmountOfPathMatch[2],
+        "נסיעות בין אותם איזורים": c.AmmountOfPathMatch[1],
+        "נסיעות נוספות": c.AmmountOfPathMatch[0],
+        "הסעות ביום הזה": c.AmmountOfMatchByDay,
+        "הסעות בימים אחרים": c.AmmountOfDisMatchByDay,
+        "הסעות בחלק הנדרש של היום": c.AmmountOfMatchDayPart,
+        "הסעות בחלקו השני של היום": c.AmmountOfDisMatchDayPart
+    };
+
+    let str = "<h3> נתוני נסיעות בחצי שנה האחרונה </h3>";
+    str += "<h3>" + c.DisplayName + "</h3>";
+    for (k in txt) {
+        if (txt[k] != 0)
+            if (boldArr.indexOf(k) >= 0)
+                str += "<p class='boldC'>" + k + " : " + txt[k] + "</p>";
+            else
+                str += "<p>" + k + " : " + txt[k] + "</p>";
+    }
+    let position = $(this).position();
+
+    //$("#characteristics").css("left", position.left - 300);
+    //$("#characteristics").css("top", position.top - 310);
+    $("#characteristics").css("visibility", "visible");
+    $("#characteristics").html(str);
 
 }
 
 $(document).ready(() => {
-    fetchData4ThisRidepat();
+    $("#DocumentedCallsModal").attr("w3-include-html", "DocumentedCallsModal.html");
+
+    $("#characteristics").css("visibility", "hidden");
+
+    $(document).on("mouseover", ".c1", showCharacteristics);
+    $(document).on("mouseout", ".c1", hideCharacteristics);
+
+    candidatesTable = $('#datatable-candidates').DataTable({ data: [], destroy: true });
+    superDriversTable = $('#datatable-superDrivers').DataTable({ data: [], destroy: true });
+    //newDriversTable   = $('#datatable-newDrivers').DataTable({ data: [], destroy: true });
+
+    ridePatNum = JSON.parse(getRidePatNum4_viewCandidate());
+
+    getRidePat();
+    getCandidates();
+
+
     $('#rights').html(COPYWRITE());
 
     if (!JSON.parse(localStorage.getItem("isProductionDatabase"))) {
@@ -45,53 +129,324 @@ $(document).ready(() => {
     }
     includeHTML();//with out this there is no side bar!
 
+    wiringDataTables();
 
-    //#region ↓DATATABLES PROPERTIES↓|
+    jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+        "de_date-asc": function (a, b) {
+            /*a and b are a couple of dates to compare
+            return value will be:
+            0 if a=b
+            1 if a > b
+           -1 if a < b
+            */
+            let dateAsArr_a = $.trim(a).split('.');
+            let dateAsArr_b = $.trim(b).split('.');
 
+            let a_date = new Date(parseInt(dateAsArr_a[2]), parseInt(dateAsArr_a[1]), parseInt(dateAsArr_a[0]));
+            let b_date = new Date(parseInt(dateAsArr_b[2]), parseInt(dateAsArr_b[1]), parseInt(dateAsArr_b[0]));
 
-    /* 
-                 ============================
-                 || ↓DATATABLES PROPERTIES↓||
-                 ============================
-    */
-    candidatesTable = $('#datatable-candidates').DataTable(
-        {
-            "stateDuration": 60 * 60,
-            "columnDefs": []
+            a = a_date.getTime();
+            b = b_date.getTime();
+
+            return a === b ? 0 : a > b ? 1 : -1;
+            //var z = ((x < y) ? -1 : ((x > y) ? 1 : 0));
+            //return z;
         },
-        {
-            "paging": false
-        },
-        {
-            "visible": false,
-            "targets": [1]
-        },
-        {
-            "className": "dt-body-left",
-            "targets": [3]
+        "de_date-desc": function (a, b) {
+            /*a and b are a couple of dates to compare
+              return value will be:
+              0 if a=b
+             -1 if a > b
+              1 if a < b
+              */
+            let dateAsArr_a = $.trim(a).split('.');
+            let dateAsArr_b = $.trim(b).split('.');
+
+            let a_date = new Date(parseInt(dateAsArr_a[2]), parseInt(dateAsArr_a[1]), parseInt(dateAsArr_a[0]));
+            let b_date = new Date(parseInt(dateAsArr_b[2]), parseInt(dateAsArr_b[1]), parseInt(dateAsArr_b[0]));
+
+            a = a_date.getTime();
+            b = b_date.getTime();
+
+            return a === b ? 0 : a > b ? -1 : 1;
+            //var z = 0//((x < y) ? 1 : ((x > y) ? -1 : 0));
+            //return z;
         }
-    );
+    });
 
+});
+
+
+const deceideWhichTable2Show = () => {
+    $('#collapse1').addClass("in");
+    $('#collapsed1_aTag').removeClass('collapsed');
+
+    $('#collapsed2_aTag').addClass('collapsed');
+
+}
+
+const viewCharactaristics = () => {
+    window.open("viewC.html?ridePatNum=" + ridePatNum + "&dayInWeek=" + ridepatDate.getDay(), '_blank').focus();
+}
+
+const getRidePat = () => {
+    let ridePatObj = localStorage.getItem(`ridePatObj_${ridePatNum}`);
+    renderRidePatDetails(JSON.parse(ridePatObj));
+}
+
+const renderRidePatDetails = (ridepat) => {
+    ridepatDate = convertDBDate2FrontEndDate(ridepat.Date);
+    let isToday = isItToday(ridepatDate);
+    let isAfterNoon = ridepatDate.getMinutes() === 14;
+    
+
+    let ridePatDetails = `מ`;
+    ridePatDetails += ridepat.Origin.Name;
+    ridePatDetails += ' ';
+    ridePatDetails += `ל`;
+    ridePatDetails += ridepat.Destination.Name;
+    ridePatDetails += ' ';
+    ridePatDetails += isToday ? 'היום' : `ב` + getHebrew_WeekDay(ridepatDate.getDay());
+    ridePatDetails += ' ';
+    ridePatDetails += `${ridepatDate.getDate()}.${parseInt(ridepatDate.getMonth() + 1)}`;
+    ridePatDetails += ' ';
+    ridePatDetails += isAfterNoon ? `אחה"צ` : `בשעה  ${ridepatDate.toLocaleString('he-IL', { timeStyle: 'short' })}`;
+    ridePatDetails += ' ';
+    ridePatDetails += 'מקומות: ' + parseInt(ridepat.Escorts.length + 1);
+    //ridePatDetails += ridepatDate.Equipment.length > 0 && ridepatDate.Equipment.includes(''); 
+     
+    document.getElementById('RideCandidates_ph').innerHTML = ridePatDetails;
+}
+
+const isItToday = (d) => {
+
+    let now = new Date(Date.now());
+    let daysMatch = d.getDate() === now.getDate();
+    let monthMatch = d.getMonth() === now.getMonth();
+    let yearMatch = d.getFullYear() === now.getFullYear();
+
+    let result = daysMatch && monthMatch && yearMatch;
+
+    return result;
+}
+
+const getCandidates = () => {
+
+    // BENNY
+    let numOfCandidates = 10;
+    let newFlag = false;
+    let dayInWeek = ridepatDate.getDay();
+
+    $('#wait').show();
+    ajaxCall(
+        'GetCandidates',
+        JSON.stringify({ ridePatNum, numOfCandidates, newFlag, dayInWeek }),
+        getCandidates_SCB,
+        getCandidates_ECB
+    );
+}
+
+const getCandidates_SCB = (data) => {
+
+    $('#wait').hide();
+    deceideWhichTable2Show();
+
+    allCandidatedFromDB = JSON.parse(data.d);
+    fillTableWithData();
+
+}
+
+const getCandidates_ECB = (data) => {
+
+    $('#wait').hide();
+
+    console.log('%c ↓ R2R custom error ↓', 'background: red; color: white');
+    console.log(data);
+    console.log('%c ↑ R2R custom error ↑', 'background: red; color: white');
+}
+
+const fillTableWithData = () => {
+
+    let thisCandidate = {};
+    regularCandidated_clientVersion = [];
+    superCandidated_clientVersion = [];
+    newCandidated_clientVersion = [];
+
+    let date2display;
+    let btnStr;
+    for (let i in allCandidatedFromDB) {
+        btnStr = '';
+        date2display = convertDBDate2FrontEndDate(allCandidatedFromDB[i].LatestDocumentedCallDate).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+
+        let showDocumentedCallsBtn = '';
+        showDocumentedCallsBtn += `<div class='btnWrapper-left'><span id="badgeOf_${allCandidatedFromDB[i].Id}" class="badge badge-pill badge-default">${allCandidatedFromDB[i].NoOfDocumentedCalls}</span>`;
+        showDocumentedCallsBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedCallsBtn" title="שיחות מתועדות" data-backdrop="static" data-keyboard="false" data-toggle="modal" data-target="#DocumentedCallsModal"><i class="fa fa-phone" aria-hidden="true"></i></button></div>';
+
+        btnStr += showDocumentedCallsBtn;
+
+        thisCandidate = {
+            Id: i,
+            DisplayName: allCandidatedFromDB[i].DisplayName,
+            cellphone: addSeperator2MobileNum(allCandidatedFromDB[i].CellPhone, "-"),
+            city: allCandidatedFromDB[i].City,// + '<br />בדיקה',
+            daysSinceLastRide: allCandidatedFromDB[i].DaysSinceLastRide,
+            numOfRides_last2Months: allCandidatedFromDB[i].NumOfRides_last2Months,
+            daysUntilNextRide: allCandidatedFromDB[i].DaysUntilNextRide,
+            latestDocumentedCallDate: date2display,
+            seniorityInYears: allCandidatedFromDB[i].SeniorityInYears,
+            score: parseInt(allCandidatedFromDB[i].Score),
+            buttons: btnStr
+        }
+
+        switch (allCandidatedFromDB[i].DriverLevel) {
+
+            case 0:
+                newCandidated_clientVersion.push(thisCandidate);
+                break;
+            case 1:
+                regularCandidated_clientVersion.push(thisCandidate);
+                break;
+            case 2:
+                superCandidated_clientVersion.push(thisCandidate);
+                break;
+            default:
+                alert("illegal DriverType");
+                break;
+        }
+
+        //allCandidatedFromDB[i].IsSuperDriver ?
+        //    superCandidated_clientVersion.push(thisCandidate) :
+        //    regularCandidated_clientVersion.push(thisCandidate);
+
+        //#region ↓DATATABLES PROPERTIES↓|
+
+        /* 
+                     ============================
+                     || ↓DATATABLES PROPERTIES↓||
+                     ============================
+        */
+    }
+
+    candidatesTable = $('#datatable-candidates').DataTable({
+        data: regularCandidated_clientVersion,
+        rowId: 'Id',
+        pageLength: 10,
+        stateSave: true,
+        destroy: true,
+        "lengthChange": false, // for somereason this property must be string
+        stateDuration: 60 * 60,
+        autoWidth: false,
+        columns: [
+            //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
+            {
+                data: "DisplayName",
+                render: function (data, type, row, meta) {
+                    let did = "data-driverId='" + row.id + "'";
+                    return '<p class="c1" ' + did + '>' + data + ' </p>';
+                }
+            },                                                      //0
+            { data: "cellphone" },                                  //1
+            { data: "city" },                                       //2
+            { data: "daysSinceLastRide" },                          //3
+            { data: "numOfRides_last2Months" },                     //4
+            { data: "daysUntilNextRide" },                          //5
+            { data: "latestDocumentedCallDate" },                   //6
+            { data: "seniorityInYears" },                           //7
+            { data: "score" },                                      //8
+            { data: "buttons" }                                     //9
+        ],
+        columnDefs: [
+            { width: '20%', "targets": [0] },
+            { width: '10%', "targets": [1] },
+            { width: '15%', "targets": [2] },
+            { width: '10%', "targets": [3] },
+            { width: '5%', "targets": [4, 5, 7] },
+            { width: '4%', "targets": [8] },
+            { width: '10%', "targets": [6, 9] }
+        ]
+    });
 
     superDriversTable = $('#datatable-superDrivers').DataTable(
         {
-            "stateDuration": 60 * 60,
-            "columnDefs": []
-        },
-        {
-            "paging": false
-        },
-        {
-            "visible": false,
-            "targets": [1]
-        },
-        {
-            "className": "dt-body-left",
-            "targets": [3]
-        }
-    );
+            data: superCandidated_clientVersion,
+            rowId: 'Id',
+            pageLength: 10,
+            stateSave: true,
+            destroy: true,
+            "lengthChange": false, // for somereason this property must be string
+            stateDuration: 60 * 60,
+            autoWidth: false,
+            columns: [
+                //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
+                {
+                    data: "DisplayName",
+                    render: function (data, type, row, meta) {
+                        let did = "data-driverId='" + row.id + "'";
+                        return '<p class="c1" ' + did + '>' + data + ' </p>';
+                    }
+                },                                                      //0
+                { data: "cellphone" },                                  //1
+                { data: "city" },                                       //2
+                { data: "daysSinceLastRide" },                          //3
+                { data: "numOfRides_last2Months" },                     //4
+                { data: "daysUntilNextRide" },                          //5
+                { data: "latestDocumentedCallDate" },                   //6
+                { data: "seniorityInYears" },                           //7
+                { data: "score" },                                      //8
+                { data: "buttons" }                                     //9
 
+            ],
+            columnDefs: [
+                { width: '20%', "targets": [0] },
+                { width: '10%', "targets": [1] },
+                { width: '15%', "targets": [2] },
+                { width: '10%', "targets": [3] },
+                { width: '5%', "targets": [4, 5, 7] },
+                { width: '4%', "targets": [8] },
+                { width: '10%', "targets": [6, 9] }
+            ]
+        });
 
+    //newDriversTable = $('#datatable-newDrivers').DataTable(
+    //    {
+    //        data: newCandidated_clientVersion,
+    //        rowId: 'id',
+    //        pageLength: 10,
+    //        stateSave: true,
+    //        destroy: true,
+    //        "lengthChange": false, // for somereason this property must be string
+    //        stateDuration: 60 * 60,
+    //        autoWidth: false,
+    //        columns: [
+    //            //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
+    //            {
+    //                data: "DisplayName",
+    //                render: function (data, type, row, meta) {
+    //                    let did = "data-driverId='" + row.id + "'";
+    //                    return '<p class="c1" ' + did + '>' + data + ' </p>';
+    //                }
+    //            },                                                      //0
+    //            { data: "cellphone" },                                  //1
+    //            { data: "city" },                                       //2
+    //            { data: "daysSinceLastRide" },                          //3
+    //            { data: "numOfRides_last2Months" },                     //4
+    //            { data: "daysUntilNextRide" },                          //5
+    //            { data: "latestDocumentedCallDate" },                   //6
+    //            { data: "seniorityInYears" },                           //7
+    //            { data: "score" },                                      //8
+    //            { data: "buttons" }                                     //9
+
+    //        ],
+    //        columnDefs: [
+    //            { width: '20%', "targets": [0] },
+    //            { width: '10%', "targets": [1] },
+    //            { width: '15%', "targets": [2] },
+    //            { width: '10%', "targets": [3] },
+    //            { width: '5%', "targets": [4, 5, 7] },
+    //            { width: '4%', "targets": [8] },
+    //            { width: '10%', "targets": [6, 9] }
+    //        ]
+    //    });
 
     /*
                      ============================
@@ -101,90 +456,4 @@ $(document).ready(() => {
     //#endregion ↑DATATABLES PROPERTIES↑
 
 
-
-});
-
-
-
-
-const fetchData4ThisRidepat = () => {
-
-    let ridePatNum = JSON.parse(getRidePatNum4_viewCandidate());
-    ajaxCall(
-        'GetRidePat',
-        JSON.stringify({ ridePatNum }),
-        fetchData4ThisRidepat_SCB,
-        fetchData4ThisRidepat_ECB
-    );
 }
-
-const fetchData4ThisRidepat_SCB = (data) => {
-    thisRidePat = JSON.parse(data.d); //think if this variable should be global or local & pass throw this function below
-
-    //temp ↓
-    console.log(thisRidePat);
-    //temp ↑
-
-    useRidePatData();
-}
-
-const fetchData4ThisRidepat_ECB = (data) => {
-    console.log('%c ↓ R2R custom error ↓', 'background: red; color: white');
-    console.log(data);
-    console.log('%c ↑ R2R custom error ↑', 'background: red; color: white');
-}
-
-
-const useRidePatData = () => {
-
-    let date = convertDBDate2FrontEndDate(thisRidePat.Date);
-    let dd = date.getDate();
-    let mm = date.getMonth() + 1;
-
-    let now = new Date(Date.now());
-
-    let hours = date.getHours();
-    let minutes = date.getMinutes();
-
-    // general: מ<מוצא> ל<יעד>, <היום או יום <יום בשבוע>, <תאריך ללא שנה>> ב-<שעה> <בבוקר או רחה"צ>
-    // example:  מועמדים להסעה: מתרקומיא לשיבא, היום ב6:15 בבוקר
-    let ridePatCandidatesHeadLine = `מ${thisRidePat.Origin.Name} `;
-    ridePatCandidatesHeadLine += `ל${thisRidePat.Destination.Name} `;
-    if (dd === now.getDate() &&
-        mm === now.getMonth() + 1 &&
-        date.getFullYear() === now.getFullYear()
-    ) {
-        ridePatCandidatesHeadLine += 'היום ';
-    } else {
-        ridePatCandidatesHeadLine += `ב${getHebrew_WeekDay(date.getDay())}, ${dd}.${mm} ` ;
-    }
-
-    if (date.getMinutes() === 14) {
-        if (date.getHours() === 19 || date.getHours() === 20 || date.getHours() === 21 || date.getHours() === 22) {
-            ridePatCandidatesHeadLine += 'אחה"צ ';
-        }
-    } else {
-        ridePatCandidatesHeadLine += ` ב-${hours}:${minutes < 10 ? '0' + minutes : minutes} `;
-        ridePatCandidatesHeadLine += hours <= 11 ? 'בבוקר' : 'בצהריים'
-    }
-
-    document.getElementById('RideCandidates_ph').innerHTML = ridePatCandidatesHeadLine;
-    //here I stop and went to develop sort by regions
-
-}
-
-
-//function refreshTable() {
-//    //???
-
-//}
-
-
-
-
-//function manipulateTables() {
-
-//    tableMorning = document.getElementById("datatable-morning");
-//    tableAfternoon = document.getElementById("datatable-afternoon");
-
-//}

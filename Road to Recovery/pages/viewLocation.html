@@ -122,6 +122,7 @@
                                 Area: arr_Locations[i].Area,
                                 ManagerDetials: arr_Locations[i].ManagerName + " " + arr_Locations[i].ManagerLastName + ', ' + arr_Locations[i].ManagerPhones,
                                 Remarks: arr_Locations[i].Remarks,
+                                RegionName: arr_Locations[i].Region.Name,
                                 Buttons: btnStr
                             }
                         }
@@ -132,6 +133,7 @@
                                 Area: arr_Locations[i].Area,
                                 ManagerDetials: "",
                                 Remarks: arr_Locations[i].Remarks,
+                                RegionName: arr_Locations[i].Region.Name,
                                 Buttons: btnStr
                             }
                         }
@@ -151,7 +153,7 @@
                         ],
                         columnDefs: [
                             {
-                                targets: 5,
+                                targets: 6,
                                 className: 'dt-body-right'
                             }
                         ],
@@ -159,6 +161,7 @@
                             { data: "Type" },
                             { data: "Name" },
                             { data: "Area" },
+                            { data: "RegionName" },
                             { data: "ManagerDetials" },
                             { data: "Remarks" },
                             { data: "Buttons" },
@@ -364,6 +367,7 @@
                                             <th>סוג</th>
                                             <th>שם</th>
                                             <th>אזור</th>
+                                            <th>תת אזור</th>
                                             <th>איש קשר</th>
                                             <th>הערות</th>
                                             <th>פעולות</th>

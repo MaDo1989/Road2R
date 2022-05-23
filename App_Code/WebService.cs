@@ -12,6 +12,7 @@ using System.Configuration;
 using System.Collections;
 using System.Activities.Statements;
 using Microsoft.AspNet.SignalR;
+using Newtonsoft.Json.Linq;
 
 /// <summary>
 /// Summary description for WebService
@@ -134,9 +135,9 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            List<string> areas = new List<string>();
+            List<Area> areas = new List<Area>();
             Location l = new Location();
-            areas = l.getAreas();
+            areas = l.getAreasAsClass();
             return j.Serialize(areas);
         }
         catch (Exception e)
@@ -146,6 +147,22 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+    [WebMethod(EnableSession = true)]
+    public string GetRegions()
+    {
+        List<Region> regions;
+        Region regionManager = new Region();
+        try
+        {
+            regions = regionManager.GetAllRegions();
+            return j.Serialize(regions);
+        }
+        catch (Exception e)
+        {
+            Log.Error("Error in GetRegions", e);
+            throw new Exception("שגיאה בשליפת תתי אזורים");
+        }
+    }
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string getAreas_AsLocationObj()
@@ -227,14 +244,19 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+
+
     //Benny Candidates
     [WebMethod(EnableSession = true)]
-    public string getCandidates(int ridePatNum) {
+    public string GetCandidates(int ridePatNum,int numOfCandidates, bool newFlag, int dayInWeek) {
 
         try
         {
-            candidatesLogic cl = new candidatesLogic();
-            return j.Serialize(cl.getCandidates(ridePatNum));
+            CandidatesLogic cl = new CandidatesLogic();
+            if(newFlag)
+                return j.Serialize(cl.GetNewbiesCandidates(ridePatNum, numOfCandidates));
+            else
+                return j.Serialize(cl.GetCandidates(ridePatNum, numOfCandidates, dayInWeek));
         }
         catch (Exception ex)
         {
@@ -243,6 +265,8 @@ public class WebService : System.Web.Services.WebService
 
         }
     }
+
+    
     
 
     [WebMethod(EnableSession = true)]
@@ -557,6 +581,24 @@ public class WebService : System.Web.Services.WebService
             Log.Error("Error in GetVolunteerById", ex);
             throw new Exception("שגיאה בשליפת נתוני מתנדב");
 
+        }
+    }
+
+    [WebMethod(EnableSession = true)]
+    public string GetVolunteerByMobile(string cellphone)
+    {
+        try
+        {
+            Volunteer volunteer = new Volunteer();
+            volunteer = volunteer.GetVolunteerByMobile(cellphone);
+         
+            return j.Serialize(volunteer);
+        }
+        catch (Exception ex)
+        {
+
+            Log.Error("Error in GetVolunteerByCellphone", ex);
+            throw ex;
         }
     }
 
@@ -875,7 +917,6 @@ public class WebService : System.Web.Services.WebService
     //This method is used for שבץ אותי
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-
     public string GetRidePatView(int volunteerId, int maxDays)
     {
         try
@@ -1058,7 +1099,7 @@ public class WebService : System.Web.Services.WebService
         try
         {
             Volunteer v = new Volunteer();
-            v = v.getVolunteerByMobile(mobile);
+            v = v.GetVolunteerByMobile(mobile);
 
             return j.Serialize(v.DisplayName);
         }
@@ -1155,7 +1196,7 @@ public class WebService : System.Web.Services.WebService
     public string AssignRideToRidePatWithMobile(int ridePatId, string mobile, string fromDevice) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
     {
         Volunteer v = new Volunteer();
-        v = v.getVolunteerByMobile(mobile);
+        v = v.GetVolunteerByMobile(mobile);
 
 
         if (v.Id == 0)
@@ -1534,7 +1575,7 @@ public class WebService : System.Web.Services.WebService
         catch (Exception ex)
         {
             Log.Error("Error in getDestinationView", ex);
-            throw new Exception("שגיאה בשליפת נקודות איסוף והורדה");
+            throw new Exception("שגיאה בשליפת נקודות איסוף והורדה " + ex.Message);
         }
     }
 
@@ -1865,13 +1906,11 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
-    //public void setVolunteerYuval(Volunteer volunteer, string coorEmail, string coorName, string coorPhone, string instructions)
     public void setVolunteerYuval(Volunteer volunteer, List<Volunteer> coordinators, string instructions)
     {
         try
         {
             Volunteer v = volunteer;
-            //v.setVolunteerYuval(v, coorEmail, coorName, coorPhone, instructions);
             v.setVolunteerYuval(v, coordinators, instructions);
 
         }

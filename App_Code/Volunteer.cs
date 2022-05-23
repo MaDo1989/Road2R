@@ -94,6 +94,8 @@ public class Volunteer
     }
 
     public string MostCommonPath { get; set; }
+    public string MostCommonRegionalDestination { get; set; }
+    public string MostCommonRegionalOrigin { get; set; }
 
     public string RegId { get; set; }
 
@@ -755,19 +757,46 @@ public class Volunteer
 
     }
 
-    public Volunteer getVolunteerByMobile(string mobile)
+    public Volunteer GetVolunteerByCellphone_V2(string cellphone)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Volunteer GetVolunteerByMobile(string mobile)
     {
         Volunteer v = new Volunteer();
-        int Id = -1;
-        DbService db = new DbService();
-        string query = "select Id,DisplayName from VolunteerTypeView where CellPhone = '" + mobile + "'";
-        DataSet ds = db.GetDataSetByQuery(query);
+        DataSet ds = new DataSet();
+        dbs = new DbService();
+        string query = "exec spVolunteer_GetVolunteerByCellphone @cellphone= '" + mobile + "'";
+        try
+        {
+            ds = dbs.GetDataSetByQuery(query);
+            if (ds.Tables[0].Rows.Count == 0)
+            {
+                throw new Exception("volunteer not found");
+            }
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+        
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
             v.Id = int.Parse(dr["Id"].ToString());
             v.displayName = dr["DisplayName"].ToString();
+            v.IsActive = Convert.ToBoolean(dr["IsActive"]);
+            v.IsDriving = string.IsNullOrEmpty(dr["isDriving"].ToString()) ? false : Convert.ToBoolean(dr["isDriving"]);
         }
-        return v;
+
+        if (v.IsDriving.Value && v.IsActive)
+        {
+            return v;
+        }
+        else
+        {
+            throw new Exception("not active or not driving or both");
+        }
     }
 
     public Volunteer getVolunteerByMobile(string mobile, string regId, string device)
@@ -810,6 +839,13 @@ public class Volunteer
                 ac = true;
             }
             v.IsActive = ac;
+            bool isDriving = false;
+            if (dr["IsDriving"].ToString().ToLower() == "true")
+            {
+                isDriving = true;
+            }
+            v.IsDriving = isDriving;
+
             bool arabic = false;
             if (dr["KnowsArabic"].ToString().ToLower() == "true")
             {
@@ -1283,22 +1319,6 @@ public class Volunteer
         }
     }
 
-
-
-
-    //public string KnowsArabic
-    //{
-    //    get
-    //    {
-    //        return KnowsArabic;
-    //    }
-
-    //    set
-    //    {
-    //        KnowsArabic = value;
-    //    }
-    //}
-
     public Volunteer()
     {
         //
@@ -1306,80 +1326,21 @@ public class Volunteer
         //
     }
 
-    //public Volunteer(string _firstNameH, string __firstNameA, string _lastNameH, string _lastNameA, string _cellPhone, string _cellPhone2, string _homePhone,
-    //    string _city, string _address, string _email, string _birthdate, string _joindate, string _status, string _gender, string _KnowsArabic,
-    //    string _preferRoute1, string _preferRoute2, string _preferRoute3, string _day1, string _day2, string _day3,
-    //    string _hour1, string _hour2, string _hour3, string _typeVol)
-    //{
-    //    FirstNameH = _firstNameH;
-    //    FirstNameA = __firstNameA;
-    //    LastNameH = _lastNameH;
-    //    LastNameA = _lastNameA;
-    //    CellPhone = _cellPhone;
-    //    CellPhone2 = _cellPhone2;
-    //    HomePhone = _homePhone;
-    //    City = _city;
-    //    Address = _address;
-    //    Email = _email;
-    //    Birthdate = _birthdate;
-    //    JoinDate = _joindate;
-    //    Status = _status;
-    //    Gender = _gender;
-    //    //PreferRoute1 = _preferRoute1;
-    //    //PreferRoute2 = _preferRoute2;
-    //    //PreferRoute3 = _preferRoute3;
-    //    //Day1 = _day1;
-    //    //Hour1 = _hour1;
-    //    //Day2 = _day2;
-    //    //Hour2 = _hour2;
-    //    //Day3 = _day3;
-    //    //Hour3 = _hour3;
-    //    TypeVol = _typeVol;
-    //    KnowsArabic = _KnowsArabic;
-    //}
-
-    //public Volunteer(string _displayName, string _firstNameA, string _firstNameH, string _lastNameH, string _lastNameA,
-    //string _cellPhone, string _cellPhone2, string _homePhone, string _city, string _street, string _typeVol, string _email, string _preferDay1,
-    //string _preferHour1, string _preferDay2, string _preferHour2, string _preferDay3, string _preferHour3, string _preferRoute1, string _preferRoute2,
-    //string _preferRoute3, string _joinDate, string _statusVolunteer, string _KnowsArabic, string _birthdate, string _gender)
-    //{
-    //    DisplayName = _displayName;
-    //    FirstNameH = _firstNameH;
-    //    FirstNameA = _firstNameA;
-    //    LastNameH = _lastNameH;
-    //    LastNameA = _lastNameA;
-    //    CellPhone = _cellPhone;
-    //    CellPhone2 = _cellPhone2;
-    //    HomePhone = _homePhone;
-    //    City = _city;
-    //    Address = _street;
-    //    Email = _email;
-    //    Birthdate = _birthdate;
-    //    JoinDate = _joinDate;
-    //    Status = _statusVolunteer;
-    //    Gender = _gender;
-    //    //PreferRoute1 = _preferRoute1;
-    //    //PreferRoute2 = _preferRoute2;
-    //    //PreferRoute3 = _preferRoute3;
-    //    //Day1 = _preferDay1;
-    //    //Hour1 = _preferHour1;
-    //    //Day2 = _preferDay2;
-    //    //Hour2 = _preferHour2;
-    //    //Day3 = _preferDay3;
-    //    //Hour3 = _preferHour3;
-    //    TypeVol = _typeVol;
-    //    KnowsArabic = _KnowsArabic;
-    //}
-
+    public Volunteer(int id, string displayName, int noOfDocumentedCalls)
+    {
+        Id = id;
+        DisplayName = displayName;
+        NoOfDocumentedCalls = noOfDocumentedCalls;
+    }
+    public Volunteer(string _displayName)
+    {
+        DisplayName = _displayName;
+    }
     public Volunteer(string _firstNameH, string _lastNameH, string _cellPhone)
     {
         FirstNameH = _firstNameH;
         LastNameH = _lastNameH;
         CellPhone = _cellPhone;
-    }
-    public Volunteer(string _displayName)
-    {
-        DisplayName = _displayName;
     }
     public Volunteer(string _displayName, string _firstNameH, string _lastNameH, string _cellPhone)
     {
@@ -1426,7 +1387,9 @@ public class Volunteer
             v.NoOfDocumentedRides = Convert.ToInt32(dr["NoOfDocumentedRides"]);
             v.NumOfRides_last2Months = Convert.ToInt32(dr["NumOfRides_last2Months"]);
             v.MostCommonPath = dr["mostCommonPath"].ToString();
-                   
+            v.MostCommonRegionalDestination = dr["MostCommonRegionalDestination"].ToString();
+            v.MostCommonRegionalOrigin = dr["MostCommonRegionalOrigin"].ToString();
+
             //v.Day1 = dr["preferDay1"].ToString();
             //v.Hour1 = dr["preferHour1"].ToString();
             //v.Day2 = dr["preferDay2"].ToString();
@@ -2397,72 +2360,11 @@ public class Volunteer
             throw e;
         }
 
-        //try
-        //{
-        //    query = "insert into VolunteerGood_30_05_20 (UserName, CellPhone, FirstNameH, LastNameH, DisplayName, Gender, isActive, isAssistant, lastModified, JoinDate)";
-        //    query += " values (@UserName, @cell,@firstNameH,@lastNameH,@displayName,@gender,1,0,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
-
-        //    db = new DbService();
-        //    Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
-        //}
-        //catch (SqlException ex)
-        //{
-        //    //throw new Exception("error inserting to VolunteerGood_30_05_20 table");
-        //    try
-        //    {
-        //        query = "insert into VolunteerGood_30_05_20 (Id, UserName, CellPhone, FirstNameH, LastNameH, DisplayName, Gender, isActive, isAssistant, lastModified, JoinDate)";
-        //        query += " values ((select max(id) + 1 from VolunteerGood_30_05_20), @UserName, @cell,@firstNameH,@lastNameH,@displayName,@gender,1,0,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()));SELECT SCOPE_IDENTITY();";
-
-        //        db = new DbService();
-        //        db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams);
-        //    }
-        //    catch (SqlException ex2)
-        //    {
-        //        throw new Exception("error inserting to VolunteerGood_30_05_20 table " + ex2.Message);
-        //    }
-        //}
-        //catch (Exception e)
-        //{
-        //    throw e;
-        //}
 
         Email em = new Email();
         string messageText = "";
 
-        //Send email to coordinator - (coorEmail)
-        //if (coorEmail != "")
-        //{
-        //    messageText = "שלום " + coorName + "! <br/>";
-        //    if (v.Gender == "מתנדבת")
-        //    {
-        //        messageText += v.DisplayName + " - מתנדבת חדשה, הצטרפה אלינו. <br/>";
-        //        messageText += "הטלפון שלה: " + v.CellPhone + " <br/>";
-        //        messageText += "היא מצפה לשיחה איתך. <br/><br/>";
-        //    }
-        //    else
-        //    {
-        //        messageText += v.DisplayName + " - מתנדב חדש, הצטרף אלינו. <br/>";
-        //        messageText += "הטלפון שלו: " + v.CellPhone + " <br/>";
-        //        messageText += "הוא מצפה לשיחה איתך. <br/><br/>";
-        //    }
-        //    messageText += "בברכה, <br/>";
-        //    messageText += "יובל רוט <br/>";
-        //    em.sendMessageTo("New volunteer", coorEmail, messageText);
-        //}
-
-        //string longurl = ConfigurationManager.AppSettings["SMSserver"] + "&" + ConfigurationManager.AppSettings["SMSpass"];
-        //var uriBuilder = new UriBuilder(longurl);
-        //var SMSquery = HttpUtility.ParseQueryString(uriBuilder.Query);
-        //SMSquery["to"] = "972" + v.cellPhone.Substring(1, v.cellPhone.Length - 1);
-        //string SMSmessage = "להשלמת ההצטרפות לעמותת 'בדרך להחלמה' לחץ על הקישור הבא: http://roadtorecovery.org.il/test/Road%20to%20Recovery/pages/Welcome.html?vol=" + v.CellPhone + "&coor=" + coorPhone;
-        //SMSquery["text"] = SMSmessage;
-        //uriBuilder.Query = SMSquery.ToString();
-        //longurl = uriBuilder.ToString();
-
-        //WebRequest wr = WebRequest.Create(longurl);
-        //HttpWebResponse response = (HttpWebResponse)wr.GetResponse();
-        //Console.WriteLine(response.StatusDescription);
-
+      
         foreach (Volunteer coor in coordinators)
         {
 
@@ -2506,15 +2408,7 @@ public class Volunteer
 
         WebRequest wr = WebRequest.Create(longurl);
         HttpWebResponse response = (HttpWebResponse)wr.GetResponse();
-        Console.WriteLine(response.StatusDescription);
-
-
-        //if (instructions == "True")//Send email to instructor
-        //{
-        //    messageText = "המשתמש.ת " + v.DisplayName + " נרשם.ה למערכת.<br/>המשתמש.ת מעוניין.ת בהדרכה.<br/>טלפון נייד: " + v.CellPhone;
-        //    em.sendMessageTo("New volunteer", ConfigurationManager.AppSettings["instructorMail"], messageText); //Change to instructor's email
-        //}
-
+        string status = response.StatusDescription;
     }
 
     /// <summary>

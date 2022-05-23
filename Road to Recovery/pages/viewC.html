@@ -1,0 +1,202 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css">
+
+    <style type="text/css">
+
+        button {
+            margin-left: 10px;
+        }
+    </style>
+
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
+
+    <script src="lib/master.js"></script>
+
+    <script>
+
+        $(document).ready(function () {
+            $("#GetCandidatesBTN").click(drawResults);
+            console.log("ready");
+            $('#wait').show();
+            $('#GetCandidatesBTN').hide();
+            //$("#GetCandidatesBTN").click(fetchData4ThisRidepat);
+            ridePatNum = getParameterByName('ridePatNum');
+            dayInWeek = getParameterByName('dayInWeek');
+            //ridePatNum = JSON.parse(getRidePatNum4_viewCandidate());
+            fetchData4ThisRidepat(ridePatNum);
+
+            
+        })
+
+        const fetchData4ThisRidepat = (ridePatNum) => {
+
+            //let ridePatNum = parseInt($("#rideId").val());
+            //ridePatNum = JSON.parse(getRidePatNum4_viewCandidate());
+            let numOfCandidates = 100;
+
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/GetCandidates",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                async: false,
+                data: JSON.stringify({ ridePatNum: ridePatNum, numOfCandidates: numOfCandidates, newFlag : false, dayInWeek: dayInWeek}),
+                success: function (data) {
+                    $('#GetCandidatesBTN').show();
+                    candidates = JSON.parse(data.d);
+                    $('#wait').hide();
+                    populateResults();
+                    drawResults();
+                    
+                },
+                error: function (err) {
+                    alert("Error in loginUser: " + err.responseText);
+                }
+            });
+        }
+
+
+        function populateResults() {
+
+            vol = [];
+            for (k in candidates) {
+                // SKIP THE NEW ONES 
+                if (candidates[k].DriverLevel == 0)
+                    continue;
+                v = {
+                    id: k,
+                    name: candidates[k].DisplayName,
+                    score: parseInt(candidates[k].Score),
+                    driverLevel: candidates[k].DriverLevel,
+                    SameDayPart: candidates[k].AmmountOfMatchDayPart,
+                    DifferentDayPart: candidates[k].AmmountOfDisMatchDayPart,
+                    sameDay: candidates[k].AmmountOfMatchByDay,
+                    otherDays: candidates[k].AmmountOfDisMatchByDay,
+                    otherAreas: candidates[k].AmmountOfPathMatch[0],
+                    sameAreas: candidates[k].AmmountOfPathMatch[1],
+                    areaToPoint: candidates[k].AmmountOfPathMatch[2],
+                    oppsiteDirection: candidates[k].AmmountOfPathMatch[3],
+                    pointToPoint: candidates[k].AmmountOfPathMatch[4]
+                }
+
+                vol.push(v);
+                //console.log(v);
+            }
+        }
+
+
+        function drawResults() {
+
+
+            let driverLevel = $("#driverLevelDDL").val();
+
+            if (driverLevel == "super")
+                candidatesByType = vol.filter(v => v.driverLevel == 2);
+
+            else if (driverLevel == "regular")
+                candidatesByType = vol.filter(v => v.driverLevel == 1);
+
+            else if (driverLevel == "new")
+                 candidatesByType = vol.filter(v => v.driverLevel == 0);
+
+            else
+                candidatesByType = vol;
+
+
+            if ($.fn.DataTable.isDataTable('#candidatesTbl')) {
+                $('#candidatesTbl').DataTable().destroy();
+            }
+
+            tbl = $('#candidatesTbl').DataTable({
+                data: candidatesByType,
+                pageLength: 15,
+                columns: [
+                    { data: "id" },
+                    { data: "score" },
+                    { data: "name" },
+                    { data: "driverLevel" },
+                    { data: "SameDayPart" },
+                    { data: "DifferentDayPart" },
+                    { data: "sameDay" },
+                    { data: "otherDays" },
+                    { data: "otherAreas" },
+                    { data: "sameAreas" },
+                    { data: "areaToPoint" },
+                    { data: "oppsiteDirection" },
+                    { data: "pointToPoint" }
+                ]
+            });
+        }
+
+        function getParameterByName(name, url = window.location.href) {
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+
+    </script>
+</head>
+<body>
+
+    <div>
+        <!--<input type="number" id="rideId" />-->
+        <button id="GetCandidatesBTN">הצג מועמדים</button>
+        <select id="driverLevelDDL">
+            <option value="-1">הצג את כולם</option>
+            <option value="super">סופר מסיעים</option>
+            <option value="regular">מסיעים רגילים</option>
+            <!--<option value="new">מסיעים חדשים</option>-->
+
+
+        </select>
+    </div>
+
+    <table id="candidatesTbl" class="display nowrap" style="width:100%">
+        <thead>
+            <tr>
+                <th>מזהה</th>
+                <th>ציון</th>
+                <th>שם</th>
+                <th>סופר</th>
+                <th>אותו חלק של היום</th>
+                <th>החלק השני של היום</th>
+                <th>ביום הזה</th>
+                <th>בימים אחרים</th>
+                <th>באיזורים אחרים</th>
+                <th>בין אותם איזורים</th>
+                <th>נקודה לאיזור</th>
+                <th>בכיוון ההפוך</th>
+                <th>אותו המסלול</th>
+            </tr>
+        </thead>
+    </table>
+
+    <!--<div id="wait" style="display:none;width:69px;height:89px;position:absolute;top:50%;left:50%;padding:2px;">
+        <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
+    </div>-->
+
+    <div id="wait" style="width:69px;height:89px;position:absolute;top:50%;left:50%;padding:2px;z-index:1000">
+        <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
+    </div>
+
+</body>
+</html>

@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="en" dir="rtl">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -12,6 +13,7 @@
     <!--GENERAL object and additional functions-->
     <script src="lib/lz-string.js"></script>
     <script src="lib/master.js"></script>
+    <script src="lib/rideMessages.js"></script>
 
 
     <!-- #region REAL-TIME BY SIGNALR - FOR ANY COMPLAINTS WHATSOEVER YOU CAN TALK 2 YOGEV-->
@@ -128,7 +130,7 @@
                     row2manipulate.driver = buildDriverHTML(updated_ridePat.Drivers[0]);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
-                    row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
+                    //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
                     row2manipulate.remark = updated_ridePat.Remark;
 
                     tMorning.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
@@ -148,7 +150,7 @@
                     row2manipulate.driver = buildDriverHTML(updated_ridePat.Drivers[0]);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
-                    row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
+                    //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
                     row2manipulate.remark = updated_ridePat.Remark;
 
                     tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
@@ -169,7 +171,7 @@
                     row2manipulate.driver = buildDriverHTML(updated_ridePat.Drivers[0]);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
-                    row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
+                    //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
                     row2manipulate.remark = updated_ridePat.Remark;
 
                     tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
@@ -190,7 +192,7 @@
                     row2manipulate.driver = buildDriverHTML(updated_ridePat.Drivers[0]);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
-                    row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
+                    //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
                     row2manipulate.remark = updated_ridePat.Remark;
 
                     tFuture.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
@@ -387,7 +389,8 @@
             addSeperator2MobileNum,
             convertDBDate2FrontEndDate,
             getHoursGap,
-            convert2DBDateToInt
+            convert2DBDateToInt,
+            getHebrew_WeekDay
 
         } = GENERAL.USEFULL_FUNCTIONS;
 
@@ -458,6 +461,26 @@
 
             $('#datatable-future tbody').on('click', '.edit', function () {
                 editButton(this);
+            });
+            //#endregion
+
+
+            //#region copyMessage ridepat
+            $('#datatable-morning tbody').on('click', '.copyMessage', function () {
+                copyMessageButton(this, tMorning);
+            });
+
+            $('#datatable-afternoon tbody').on('click', '.copyMessage', function () {
+                copyMessageButton(this, tAfternoon);
+            });
+
+
+            $('#datatable-tomorrow tbody').on('click', '.copyMessage', function () {
+                copyMessageButton(this, tTomorrow);
+            });
+
+            $('#datatable-future tbody').on('click', '.copyMessage', function () {
+                copyMessageButton(this, tFuture);
             });
             //#endregion
 
@@ -564,21 +587,21 @@
             //#endregion
 
             //#region candidatesButton
-            //$('#datatable-morning tbody').on('click', '#candidatesBtn', function () {
-            //    candidatesButton(this);
-            //});
+            $('#datatable-morning tbody').on('click', '.candidatesBtn', function () {
+                candidatesButton(this);
+            });
 
-            //$('#datatable-afternoon tbody').on('click', '#candidatesBtn', function () {
-            //    candidatesButton(this);
-            //});
+            $('#datatable-afternoon tbody').on('click', '.candidatesBtn', function () {
+                candidatesButton(this);
+            });
 
-            //$('#datatable-future tbody').on('click', '#candidatesBtn', function () {
-            //    candidatesButton(this);
-            //});
+            $('#datatable-future tbody').on('click', '.candidatesBtn', function () {
+                candidatesButton(this);
+            });
 
-            //$('#datatable-tomorrow tbody').on('click', '#candidatesBtn', function () {
-            //    candidatesButton(this);
-            //});
+            $('#datatable-tomorrow tbody').on('click', '.candidatesBtn', function () {
+                candidatesButton(this);
+            });
             //#endregion
 
         }
@@ -872,7 +895,9 @@
                 refreshInterval = setInterval("refreshTable()", refreshTime);
             }
 
-            let allSortsSwitch = JSON.parse(localStorage.getItem('allSortsSwitch'));
+            let allSortsSwitch = true;
+            if (localStorage.getItem('allSortsSwitch') != null)
+                allSortsSwitch = JSON.parse(localStorage.getItem('allSortsSwitch'));
 
             if (allSortsSwitch) {
                 $('#allSortsSwitch').prop('checked', true);
@@ -1042,11 +1067,50 @@
 
         }
 
-        //const candidatesButton = (btn) => {
-        //    let ridePatNum = btn.id;
-        //    GENERAL.RIDEPAT.setRidePatNum4_viewCandidate(ridePatNum);
-        //    location.href = "viewCandidates.html";
-        //}
+        function copyMessageButton(copyMsgBtn, table) {
+
+            let ridePatNum = parseInt(copyMsgBtn.id);
+            let messageObject = showMessage(arr_rides, ridePatNum);
+            let textMessageToCopy = buildMessage(messageObject);
+            console.log(textMessageToCopy);
+
+            navigator.clipboard.writeText(textMessageToCopy)
+                .then(function () {
+                    swal({
+                        title: "ההודעה מוכנה בפעולת הדבק",
+                        timer: 1000,
+                        type: "success",
+                        showConfirmButton: false
+                    });
+                }, function () {
+                    swal({
+                        title: "העתקת ההודעה נכשלה",
+                        timer: 1000,
+                        type: "error",
+                        showConfirmButton: false
+                    });
+                });
+        }
+
+        const candidatesButton = (btn) => {
+            let ridePatNum = btn.id;
+            GENERAL.RIDEPAT.setRidePatNum4_viewCandidate(ridePatNum);
+
+            ridePatNum = parseInt(ridePatNum);
+            const thisridePatObj = arr_rides.find((r) => r.RidePatNum === ridePatNum);
+
+            localStorage.setItem(`ridePatObj_${ridePatNum}`, JSON.stringify(thisridePatObj));
+
+            window.open("viewCandidates.html", '_blank').focus();
+
+            /*
+            let a = document.createElement('a');
+
+            a.target = '_blank';
+            a.href = "viewCandidates.html";
+            a.click();
+            */
+        }
 
         function editButton(ridePat) {
             arr_details = { RidePatNum: ridePat.name, func: "edit" }; //ridePat.name=RidePatNum
@@ -1432,7 +1496,7 @@
                     xhr.setRequestHeader("Content-Encoding", "gzip");
                 },
                 type: "POST",
-                data: JSON.stringify({ volunteerId: volunteerId, maxDays: 30 }),
+                data: JSON.stringify({ volunteerId: volunteerId, maxDays: 7 }),
                 success: function (data) {
                     $('#wait').hide();
                     arr_rides = JSON.parse(data.d);
@@ -1443,6 +1507,8 @@
                     let thisRidePat = {};
                     let editBtn;
                     let deleteBtn;
+                    let messageToCopyBtn;
+                    let candidateBtn;
                     let btnStr = '';
                     //     let lastModified = convertDBDate2FrontEndDate(arr_rides[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     let numOfRealEscorts = 0; //not anonymous
@@ -1490,9 +1556,21 @@
                         //#endregion Status
 
                         //#region buttons
-                        editBtn = `<button type='button' class='edit btn btn-icon waves-effect waves-light btn-secondary btn-sm m-r-5 m-b-5' id='${arr_rides[i].RidePatNum}' name='${arr_rides[i].RidePatNum}' title='עריכה'><i class='ti-pencil'></i></button>`;
-                        deleteBtn = `<button type='button' class='remove btn btn-icon waves-effect waves-light btn-secondary btn-sm m-b-5'id='${arr_rides[i].RidePatNum}' name='${arr_rides[i].RidePatNum}' title='מחיקה'><i class='fa fa-remove'></i></button>`;
-                        btnStr = `<div class='btnsInSameLine'>${editBtn} ${deleteBtn}</div>`;
+                        editBtn = `<button type='button' class='edit                   btn btn-icon waves-effect waves-light btn-secondary'        id='${arr_rides[i].RidePatNum}' name='${arr_rides[i].RidePatNum}' title='עריכה'><i class='ti-pencil'></i></button>`;
+                        deleteBtn = `<button type='button' class='remove               btn btn-icon waves-effect waves-light btn-secondary'        id='${arr_rides[i].RidePatNum}' name='${arr_rides[i].RidePatNum}' title='מחיקה'><i class='fa fa-remove'></i></button>`;
+                        messageToCopyBtn = `<button type='button' class='copyMessage   btn btn-icon waves-effect waves-light btn-secondary'        id='${arr_rides[i].RidePatNum}' name='${arr_rides[i].RidePatNum}' title='העתקת הודעה'><i class='fa fa-envelope'></i></button>`;
+                        candidateBtn = `<button type='button' class='candidatesBtn btn btn-icon waves-effect waves-light btn-secondary'            id='${arr_rides[i].RidePatNum}' name='${arr_rides[i].RidePatNum}' title='מועמדים להסעה'><i class='fa fa-car'></i></button>`;
+
+                        candidateFeature = true;
+
+                        if (candidateFeature !== null) {
+
+                            btnStr = `<div class='btnsInSameLine'>${editBtn} ${deleteBtn} ${arr_rides[i].Drivers.length > 0 ? messageToCopyBtn : ''} ${arr_rides[i].Drivers.length > 0 ? '' : candidateBtn}</div>`;
+                        } else {
+                            btnStr = `<div class='btnsInSameLine'>${editBtn} ${deleteBtn} ${arr_rides[i].Drivers.length > 0 ? messageToCopyBtn : ''}</div>`;
+                        }
+
+
                         //#endregion buttons
 
                         thisRidePat = {
@@ -1504,7 +1582,7 @@
                             driver: driverHTML,
                             status: status2render,
                             lastModified: convertDBDate2FrontEndDate(arr_rides[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" }),
-                            englishOriginAndDestination: arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
+                            //englishOriginAndDestination: arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
                             remark: arr_rides[i].Remark,
                             isAnonymous: arr_rides[i].Pat.IsAnonymous === 'True',
                             buttons: btnStr,
@@ -1544,11 +1622,11 @@
 
                     tMorning = $('#datatable-morning').DataTable({
                         data: morningRidePats,
-                        //autoWidth: false,
                         rowId: 'ridePatNum',
                         pageLength: 100,
                         stateSave: true,
                         destroy: true,
+                        autoWidth: false,
                         columns: [
                             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
                             { data: "time" },                                //0
@@ -1558,15 +1636,14 @@
                             { data: "driver" },                              //4
                             { data: "status" },                              //5
                             { data: "lastModified" },                        //6
-                            { data: "englishOriginAndDestination" },         //7
-                            { data: "remark" },                              //8
-                            { data: "isAnonymous" },                         //9
-                            { data: "buttons" },                             //10
+                            { data: "remark" },                              //7
+                            { data: "isAnonymous" },                         //8
+                            { data: "buttons" },                             //9
                         ],
                         columnDefs: [
-                            { width: '9%', "targets": [0, 1, 2, 4, 5, 6, 8, 10] },
-                            { width: '6%', "targets": [7] },
-                            { width: '22%', "targets": [3] },
+                            { width: '5%', "targets": [0, 1, 2, 4, 5, 6] },
+                            { width: '15%', "targets": [3] },
+                            { width: '25%', "targets": [9] },
                             { targets: 0, type: 'de_time' },
                             {
                                 targets: [1, 2, 3, 4, 5, 6], createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {
@@ -1618,13 +1695,8 @@
                                 }
                             },
                             { targets: 6, className: 'last-modified_td' },
-                            { targets: 7, className: 'text-left-strong' },
-                            { "targets": [9], visible: false },
-
-
+                            { "targets": [8], visible: false },
                         ],
-                        autoWidth: false,
-
                     });
 
                     tAfternoon = $('#datatable-afternoon').DataTable({
@@ -1642,15 +1714,14 @@
                             { data: "driver" },                              //4
                             { data: "status" },                              //5
                             { data: "lastModified" },                        //6
-                            { data: "englishOriginAndDestination" },         //7
-                            { data: "remark" },                              //8
-                            { data: "isAnonymous" },                         //9
-                            { data: "buttons" },                             //10
+                            { data: "remark" },                              //7
+                            { data: "isAnonymous" },                         //8
+                            { data: "buttons" },                             //9
                         ],
                         columnDefs: [
-                            { width: '9%', "targets": [0, 1, 2, 4, 5, 6, 8, 10] },
-                            { width: '6%', "targets": [7] },
-                            { width: '22%', "targets": [3] },
+                            { width: '5%', "targets": [0, 1, 2, 4, 5, 6, 7] },
+                            { width: '15%', "targets": [3] },
+                            { width: '25%', "targets": [9] },
                             { targets: 0, type: 'de_time' },
                             { targets: [0], createdCell: (td) => { $(td).attr('id', 'rideTiming') } },
                             {
@@ -1731,8 +1802,7 @@
                                 }
                             },
                             { targets: 6, className: 'last-modified_td' },
-                            { targets: 7, className: 'text-left-strong' },
-                            { targets: [9], visible: false },
+                            { targets: [8], visible: false },
 
                         ],
                         autoWidth: false,
@@ -1755,16 +1825,18 @@
                             { data: "driver" },                              //5
                             { data: "status" },                              //6
                             { data: "lastModified" },                        //7
-                            { data: "englishOriginAndDestination" },         //8
-                            { data: "remark" },                              //9
-                            { data: "isAnonymous" },                         //10
-                            { data: "buttons" },                             //11
+                            { data: "remark" },                              //8
+                            { data: "isAnonymous" },                         //9
+                            { data: "buttons" },                             //10
                         ],
                         "columnDefs": [
                             { targets: 1, type: 'de_time' },
-                            { width: '9%', "targets": [0, 1, 2, 5, 6, 8, 9, 11] },
-                            { width: '22%', "targets": [4] },
-                            { width: '6%', "targets": [8] },
+                            { width: '4%', "targets": [0, 1] },
+                            { width: '6%', "targets": [2, 3] },
+                            { width: '10%', "targets": [4] },
+                            { width: '5%', "targets": [5, 6, 7, 8] },
+                            { width: '0%', "targets": [9] },
+                            { width: '25%', "targets": [10] },
                             {
                                 targets: 5, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //5 is driver column
 
@@ -1821,7 +1893,7 @@
                             },
                             { targets: 7, className: 'last-modified_td' },
                             { targets: 8, className: 'text-left-strong' },
-                            { targets: [10], visible: false },
+                            { targets: [9], visible: false },
 
                         ],
                         autoWidth: false,
@@ -1843,18 +1915,20 @@
                             { data: "driver" },                              //5
                             { data: "status" },                              //6
                             { data: "lastModified" },                        //7
-                            { data: "englishOriginAndDestination" },         //8
-                            { data: "remark" },                              //9
-                            { data: "isAnonymous" },                         //10
-                            { data: "buttons" },                             //11
+                            { data: "remark" },                              //8
+                            { data: "isAnonymous" },                         //9
+                            { data: "buttons" },                             //10
                         ],
                         pageLength: 100,
                         columnDefs: [
                             { targets: 0, type: 'de_date' },
                             { targets: 1, type: 'de_time' },
-                            { width: '9%', "targets": [0, 1, 2, 5, 6, 8, 9, 11] },
-                            { width: '22%', "targets": [4] },
-                            { width: '6%', "targets": [8] },
+                            { width: '4%', "targets": [0, 1] },
+                            { width: '6%', "targets": [2, 3] },
+                            { width: '10%', "targets": [4] },
+                            { width: '5%', "targets": [5, 6, 7, 8] },
+                            { width: '0%', "targets": [9] },
+                            { width: '25%', "targets": [10] },
                             { targets: 5, className: 'driver_td' },
                             {
                                 targets: 7, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {//lastModified column
@@ -1873,8 +1947,7 @@
                             },
                             { targets: 7, className: 'last-modified_td' },
                             { targets: 7, type: 'last_modifiedSort' },
-                            { targets: 8, className: 'text-left-strong' },
-                            { targets: [10], visible: false },
+                            { targets: [9], visible: false },
                         ],
                         autoWidth: false,
 
@@ -2131,7 +2204,9 @@
                         </div>
 
                         <div class="pull-right">
-                            <a href="passwordForm.html"> <span class="logo" id="userName"></span>&nbsp;<span style="color:#3BAFDA" class="logo" id="databaseType"></span></a>
+                            <a href="passwordForm.html">
+                                <span class="logo" id="userName"></span>&nbsp;<span style="color:#3BAFDA" class="logo" id="databaseType"></span>
+                            </a>
                         </div>
                     </div>
                     <!--/.nav-collapse -->
@@ -2159,7 +2234,8 @@
                         <div class="col-sm-2">
                             <div class="page-title-box">
                                 <h4 class="page-title">
-                                    ניהול ההסעות &nbsp&nbsp&nbsp<i data-toggle="tooltip" title="My Rides تنسيق السفريات الخاصة بي">
+                                    ניהול ההסעות &nbsp&nbsp&nbsp<i data-toggle="tooltip"
+                                                                   title="My Rides تنسيق السفريات الخاصة بي">
                                         <img src="../../Media/הסעות להיום.png" height="25" width="25" />
                                     </i>
                                 </h4>
@@ -2181,8 +2257,6 @@
                                     <div class="col-sm-6 text-left">
                                         <label for="refreshTime">בחירת קצב רענון:</label>
                                         <select id="refreshTime" name="refreshTime" class="input-sm">
-                                            <option value="60000">דקה</option>
-                                            <option value="120000">2 דקות</option>
                                             <option value="300000">5 דקות</option>
                                             <option value="600000">10 דקות</option>
                                             <option value="1800000">30 דקות</option>
@@ -2191,22 +2265,16 @@
                                     </div>
 
                                     <div class="col-sm-6 text-right">
-                                        <button data-toggle="tooltip"
-                                                id="openSortsControllers"
-                                                data-placement="top"
-                                                title="filters window"
-                                                onclick="showFiltersModal()"
+                                        <button data-toggle="tooltip" id="openSortsControllers" data-placement="top"
+                                                title="filters window" onclick="showFiltersModal()"
                                                 class="btn btn-success waves-effect w-md waves-light m-b-5">
                                             <span class="glyphicon glyphicon-filter m-r-5">
                                             </span>
                                             סינון אזורים
                                         </button>
 
-                                        <button data-placement="top"
-                                                data-toggle="tooltip"
-                                                title="New Ride جديد "
-                                                type="button"
-                                                id="createCustomer" onclick="newRidePatForm()"
+                                        <button data-placement="top" data-toggle="tooltip" title="New Ride جديد "
+                                                type="button" id="createCustomer" onclick="newRidePatForm()"
                                                 class="btn btn-success waves-effect w-md waves-light m-b-5">
                                             <span class="glyphicon glyphicon-plus-sign m-r-5"></span>
                                             חדש
@@ -2218,12 +2286,15 @@
                                 <div id="accordion" class="panel-group">
                                     <div onclick="assignTable2lastOne('datatable-morning')" class="panel panel-primary">
                                         <div class="panel-heading" id="col1">
-                                            <h4 data-toggle="tooltip" data-placement="top" title="Morning Rides  سفريات الصباح" class="panel-title">
-                                                <a id="collapsed1_aTag" href="#collapse1" data-parent="#accordion" data-toggle="collapse" class="dropdown active open collapsed">
+                                            <h4 data-toggle="tooltip" data-placement="top"
+                                                title="Morning Rides  سفريات الصباح" class="panel-title">
+                                                <a id="collapsed1_aTag" href="#collapse1" data-parent="#accordion"
+                                                   data-toggle="collapse" class="dropdown active open collapsed">
                                                     <span class="m-l-15">
                                                         נסיעות לבוקר
                                                         <span class="lastModified_counter">
-                                                            <span class="lastModified_Records" onclick="sortTable_LastModifiedFirst('datatable-morning')">
+                                                            <span class="lastModified_Records"
+                                                                  onclick="sortTable_LastModifiedFirst('datatable-morning')">
                                                                 רשומות שעודכנו לאחרונה:
                                                                 <span id="datatable-morning_lastModified_counter">0</span>
                                                             </span>
@@ -2234,20 +2305,34 @@
                                         </div>
                                         <div class="panel-collapse collapse" id="collapse1">
                                             <div class="panel-body">
-                                                <table id="datatable-morning" class="table table-striped table-bordered">
+                                                <table id="datatable-morning"
+                                                       class="table table-striped table-bordered">
                                                     <thead>
                                                         <tr>
                                                             <th class="middle" title="Time  الساعة">שעה</th>
                                                             <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
                                                             <th class="middle" title="Destination  نقطة الوصول">יעד</th>
-                                                            <th class="customWidth4column middle" title="Patient  المريض">החולה</th>
+                                                            <th class="customWidth4column middle"
+                                                                title="Patient  المريض">החולה</th>
                                                             <th class="middle" title="Driver  السائق">המסיע</th>
-                                                            <th class="middle" title="Status  حالة السفرية">סטטוס ההסעה</th>
-                                                            <th class="customWidth middle" title="Last modified">עודכן לאחרונה</th>
-                                                            <th class="customWidth middle" title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Org - Dest</th>
-                                                            <th class="customWidth  middle" title="Remarks  ملاحظات">הערות</th>
+                                                            <th class="middle" title="Status  حالة السفرية">
+                                                                סטטוס ההסעה
+                                                            </th>
+                                                            <th class="customWidth middle" title="Last modified">
+                                                                עודכן
+                                                                לאחרונה
+                                                            </th>
+                                                            <!--<th class="customWidth middle"
+                                                                title="نقطة الانطلاق - نقطة الوصول Origin - Destination">
+                                                                Org - Dest
+                                                            </th>-->
+                                                            <th class="customWidth  middle" title="Remarks  ملاحظات">
+                                                                הערות
+                                                            </th>
                                                             <th title="isAnonymous"></th> <!-- hidden to the user -->
-                                                            <th class="SmallcustomWidth  middle" title="Actions  اعمال">פעולות</th>
+                                                            <th class="SmallcustomWidth  middle" title="Actions  اعمال">
+                                                                פעולות
+                                                            </th>
                                                         </tr>
                                                     </thead>
                                                     <tbody></tbody>
@@ -2256,14 +2341,18 @@
                                         </div>
                                     </div>
 
-                                    <div onclick="assignTable2lastOne('datatable-afternoon')" class="panel panel-primary">
+                                    <div onclick="assignTable2lastOne('datatable-afternoon')"
+                                         class="panel panel-primary">
                                         <div class="panel-heading" id="col2">
-                                            <h4 data-toggle="tooltip" data-placement="top" title="Afternoon Rides  سفريات المساء" class="panel-title">
-                                                <a id="collapsed2_aTag" href="#collapse2" data-parent="#accordion" data-toggle="collapse" class="dropdown active open collapsed" />
+                                            <h4 data-toggle="tooltip" data-placement="top"
+                                                title="Afternoon Rides  سفريات المساء" class="panel-title">
+                                                <a id="collapsed2_aTag" href="#collapse2" data-parent="#accordion"
+                                                   data-toggle="collapse" class="dropdown active open collapsed" />
                                                 <span class="m-l-15">
                                                     נסיעות לאחה"צ
                                                     <span class="lastModified_counter">
-                                                        <span class="lastModified_Records" onclick="sortTable_LastModifiedFirst('datatable-afternoon')">
+                                                        <span class="lastModified_Records"
+                                                              onclick="sortTable_LastModifiedFirst('datatable-afternoon')">
                                                             רשומות שעודכנו לאחרונה:
                                                             <span id="datatable-afternoon_lastModified_counter">0</span>
                                                         </span>
@@ -2274,20 +2363,34 @@
                                         </div>
                                         <div class="panel-collapse collapse" id="collapse2">
                                             <div class="panel-body">
-                                                <table id="datatable-afternoon" class="table table-striped table-bordered">
+                                                <table id="datatable-afternoon"
+                                                       class="table table-striped table-bordered">
                                                     <thead>
                                                         <tr>
                                                             <th class="middle" title="Time  الساعة">שעה</th>
                                                             <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
                                                             <th class="middle" title="Destination  نقطة الوصول">יעד</th>
-                                                            <th class="customWidth4column middle" title="Patient  المريض">החולה</th>
+                                                            <th class="customWidth4column middle"
+                                                                title="Patient  المريض">החולה</th>
                                                             <th class="middle" title="Driver  السائق">המסיע</th>
-                                                            <th class="middle" title="Status  حالة السفرية">סטטוס ההסעה</th>
-                                                            <th class="customWidth middle" title="Last modified">עודכן לאחרונה</th>
-                                                            <th class="customWidth middle" title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Org - Dest</th>
-                                                            <th class="customWidth  middle" title="Remarks  ملاحظات">הערות</th>
+                                                            <th class="middle" title="Status  حالة السفرية">
+                                                                סטטוס ההסעה
+                                                            </th>
+                                                            <th class="customWidth middle" title="Last modified">
+                                                                עודכן
+                                                                לאחרונה
+                                                            </th>
+                                                            <!--<th class="customWidth middle"
+                                                                title="نقطة الانطلاق - نقطة الوصول Origin - Destination">
+                                                                Org - Dest
+                                                            </th>-->
+                                                            <th class="customWidth  middle" title="Remarks  ملاحظات">
+                                                                הערות
+                                                            </th>
                                                             <th title="isAnonymous"></th> <!-- hidden to the user -->
-                                                            <th class="SmallcustomWidth middle" title="Actions  اعمال">פעולות</th>
+                                                            <th class="SmallcustomWidth middle" title="Actions  اعمال">
+                                                                פעולות
+                                                            </th>
                                                         </tr>
                                                     </thead>
                                                     <tbody></tbody>
@@ -2296,14 +2399,18 @@
                                         </div>
                                     </div>
 
-                                    <div onclick="assignTable2lastOne('datatable-tomorrow')" class="panel panel-primary">
+                                    <div onclick="assignTable2lastOne('datatable-tomorrow')"
+                                         class="panel panel-primary">
                                         <div class="panel-heading" id="col4">
-                                            <h4 data-toggle="tooltip" data-placement="bottom" title="Tomorrow Rides" class="panel-title">
-                                                <a id="collapsed3_aTag" href="#collapse3" data-parent="#accordion" data-toggle="collapse" class="dropdown active open collapsed">
+                                            <h4 data-toggle="tooltip" data-placement="bottom" title="Tomorrow Rides"
+                                                class="panel-title">
+                                                <a id="collapsed3_aTag" href="#collapse3" data-parent="#accordion"
+                                                   data-toggle="collapse" class="dropdown active open collapsed">
                                                     <span class="m-l-15">
                                                         נסיעות למחר
                                                         <span class="lastModified_counter">
-                                                            <span class="lastModified_Records" onclick="sortTable_LastModifiedFirst('datatable-tomorrow')">
+                                                            <span class="lastModified_Records"
+                                                                  onclick="sortTable_LastModifiedFirst('datatable-tomorrow')">
                                                                 רשומות שעודכנו לאחרונה:
                                                                 <span id="datatable-tomorrow_lastModified_counter">0</span>
                                                             </span>
@@ -2314,21 +2421,35 @@
                                         </div>
                                         <div class="panel-collapse collapse" id="collapse3">
                                             <div class="panel-body">
-                                                <table id="datatable-tomorrow" class="table table-striped table-bordered hover">
+                                                <table id="datatable-tomorrow"
+                                                       class="table table-striped table-bordered hover">
                                                     <thead>
                                                         <tr>
                                                             <th class="middle" title="Date  الساعة">תאריך</th>
                                                             <th class="middle" title="Time  الساعة">שעה</th>
                                                             <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
                                                             <th class="middle" title="Destination  نقطة الوصول">יעד</th>
-                                                            <th class="customWidth4column middle" title="Patient  المريض">החולה</th>
+                                                            <th class="customWidth4column middle"
+                                                                title="Patient  المريض">החולה</th>
                                                             <th class="middle" title="Driver  السائق">המסיע</th>
-                                                            <th class="middle" title="Status  حالة السفرية">סטטוס ההסעה</th>
-                                                            <th class="customWidth middle" title="Last modified">עודכן לאחרונה</th>
-                                                            <th class="customWidth middle" title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Org - Dest</th>
-                                                            <th class="customWidth  middle" title="Remarks  ملاحظات">הערות</th>
+                                                            <th class="middle" title="Status  حالة السفرية">
+                                                                סטטוס ההסעה
+                                                            </th>
+                                                            <th class="customWidth middle" title="Last modified">
+                                                                עודכן
+                                                                לאחרונה
+                                                            </th>
+                                                            <!--<th class="customWidth middle"
+                                                                title="نقطة الانطلاق - نقطة الوصول Origin - Destination">
+                                                                Org - Dest
+                                                            </th>-->
+                                                            <th class="customWidth  middle" title="Remarks  ملاحظات">
+                                                                הערות
+                                                            </th>
                                                             <th title="isAnonymous"></th> <!-- hidden to the user -->
-                                                            <th class="SmallcustomWidth middle" title="Actions  اعمال">פעולות</th>
+                                                            <th class="SmallcustomWidth middle" title="Actions  اعمال">
+                                                                פעולות
+                                                            </th>
                                                         </tr>
                                                     </thead>
                                                     <tbody></tbody>
@@ -2339,13 +2460,16 @@
 
                                     <div onclick="assignTable2lastOne('datatable-future')" class="panel panel-primary">
                                         <div class="panel-heading" id="col3">
-                                            <h4 data-toggle="tooltip" data-placement="bottom" title="Future Rides  سفريات مستقبلية" class="panel-title">
-                                                <a id="collapsed4_aTag" href="#collapse4" data-parent="#accordion" data-toggle="collapse" class="dropdown active open collapsed">
+                                            <h4 data-toggle="tooltip" data-placement="bottom"
+                                                title="Future Rides  سفريات مستقبلية" class="panel-title">
+                                                <a id="collapsed4_aTag" href="#collapse4" data-parent="#accordion"
+                                                   data-toggle="collapse" class="dropdown active open collapsed">
                                                     <span class="m-l-15">
                                                         נסיעות עתידיות
                                                     </span>
                                                     <span class="lastModified_counter">
-                                                        <span class="lastModified_Records" onclick="sortTable_LastModifiedFirst('datatable-future')">
+                                                        <span class="lastModified_Records"
+                                                              onclick="sortTable_LastModifiedFirst('datatable-future')">
                                                             רשומות שעודכנו לאחרונה:
                                                             <span id="datatable-future_lastModified_counter">0</span>
                                                         </span>
@@ -2355,21 +2479,35 @@
                                         </div>
                                         <div class="panel-collapse collapse" id="collapse4">
                                             <div class="panel-body">
-                                                <table id="datatable-future" class="table table-striped table-bordered hover">
+                                                <table id="datatable-future"
+                                                       class="table table-striped table-bordered hover">
                                                     <thead>
                                                         <tr>
                                                             <th class="middle" title="Date  الساعة">תאריך</th>
                                                             <th class="middle" title="Time  الساعة">שעה</th>
                                                             <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
                                                             <th class="middle" title="Destination  نقطة الوصول">יעד</th>
-                                                            <th class="customWidth4column middle" title="Patient  المريض">החולה</th>
+                                                            <th class="customWidth4column middle"
+                                                                title="Patient  المريض">החולה</th>
                                                             <th class="middle" title="Driver  السائق">המסיע</th>
-                                                            <th class="middle" title="Status  حالة السفرية">סטטוס ההסעה</th>
-                                                            <th class="customWidth middle" title="Last modified">עודכן לאחרונה</th>
-                                                            <th class="customWidth middle" title="نقطة الانطلاق - نقطة الوصول Origin - Destination">Org - Dest</th>
-                                                            <th class="customWidth  middle" title="Remarks  ملاحظات">הערות</th>
+                                                            <th class="middle" title="Status  حالة السفرية">
+                                                                סטטוס ההסעה
+                                                            </th>
+                                                            <th class="customWidth middle" title="Last modified">
+                                                                עודכן
+                                                                לאחרונה
+                                                            </th>
+                                                            <!--<th class="customWidth middle"
+                                                                title="نقطة الانطلاق - نقطة الوصول Origin - Destination">
+                                                                Org - Dest
+                                                            </th>-->
+                                                            <th class="customWidth  middle" title="Remarks  ملاحظات">
+                                                                הערות
+                                                            </th>
                                                             <th title="isAnonymous"></th> <!-- hidden to the user -->
-                                                            <th class="SmallcustomWidth middle" title="Actions  اعمال">פעולות</th>
+                                                            <th class="SmallcustomWidth middle" title="Actions  اعمال">
+                                                                פעולות
+                                                            </th>
                                                         </tr>
                                                     </thead>
                                                     <tbody></tbody>
@@ -2391,7 +2529,9 @@
 
             <!-- end content -->
             <!-- FOOTER -->
-            <footer id="rights" data-toggle="tooltip" data-placement="top" title="© All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء" class="footer text-right">
+            <footer id="rights" data-toggle="tooltip" data-placement="top"
+                    title="© All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء"
+                    class="footer text-right">
             </footer>
             <!-- End FOOTER -->
 
@@ -2456,7 +2596,8 @@
         TableManageButtons.init();
     </script>
 
-    <div class="modal fade" id="messagesModal" tabindex="-1" role="dialog" aria-labelledby="messagesModalTitle" aria-hidden="true">
+    <div class="modal fade" id="messagesModal" tabindex="-1" role="dialog" aria-labelledby="messagesModalTitle"
+         aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -2490,7 +2631,10 @@
                 </div>
                 <div id="filtersModal_placeHolder" class="modal-body"></div>
                 <div class="text-right modal-footer">
-                    <button type="button" onclick="saveFilters()" class="btn btn-secondary" data-dismiss="modal">שמירה וסגירה</button>
+                    <button type="button" onclick="saveFilters()" class="btn btn-secondary" data-dismiss="modal">
+                        שמירה
+                        וסגירה
+                    </button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">ביטול</button>
                 </div>
             </div>
@@ -2501,4 +2645,5 @@
         <input onclick="add2IhaveSeenAllready()" class="dropbtn" type="button" value="כן" />
     </div>
 </body>
+
 </html>

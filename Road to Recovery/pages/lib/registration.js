@@ -10,7 +10,7 @@
     });
 
     $("#regForm").submit(function () {
-        GetUserNameByCellphone();
+        GetVolunteerByMobile();
         return false;
     });
 
@@ -57,30 +57,30 @@ function handleExisting() {
     $("#existsModal").modal();
 }
 
-function GetUserNameByCellphone() {
+function GetVolunteerByMobile() {
     var request = {
-        uName: $("#phoneTB").val()
+        cellphone: $("#phoneTB").val()
     };
     var dataString = JSON.stringify(request);
 
-    $.ajax({ // ajax call starts
-        url: 'WebService.asmx/GetUserNameByCellphone',   // server side web service method
-        data: dataString,                          // the parameters sent to the server
-        type: 'POST',                              // can be also GET
-        dataType: 'json',                          // expecting JSON datatype from the server
-        contentType: 'application/json; charset = utf-8', // sent to the server
-        success: getUnameSCB,                // data.d id the Variable data contains the data we get from serverside
-        error: registerDriverErrorCB
-    }); // end of ajax call
+    $.ajax({ 
+        url: 'WebService.asmx/GetVolunteerByMobile',  
+        data: dataString,                          
+        type: 'POST',                            
+        dataType: 'json',                          
+        contentType: 'application/json; charset = utf-8',
+        success: GetVolunteerByMobileSCB,                
+        error: GetVolunteerByMobileErrorCB
+    }); 
 
     return false;
 
 }
 
-function getUnameSCB(data) {
+function GetVolunteerByMobileSCB(data) {
     $('#regModal').modal('hide');
-    var name = JSON.parse(data.d);
-    var text = "הנהג " + name + " מעוניין להרשם להסעה";
+    var v = JSON.parse(data.d);
+    var text = "הנהג " + v.DisplayName + " מעוניין להרשם להסעה";
     $("#nameConfirmationModal").modal();
     $("#nameConfMsg").html(text);
 }
@@ -121,9 +121,23 @@ function registerDriverSuccessCB() {
 }
 
 function registerDriverErrorCB(err) {
-    if (err.responseJSON.Message == "user not found") {
+
+    alert(err);
+}
+
+function GetVolunteerByMobileErrorCB(err) {
+    if (err.responseJSON.Message === "volunteer not found") {
         swal({
             title: "מספר הנייד שהזנת אינו משויך למתנדב פעיל",
+            type: "warning",
+            showConfirmButton: true
+        });
+        return;
+    }
+
+    if (err.responseJSON.Message === "not active or not driving or both") {
+        swal({
+            title: "המתנדב אינו פעיל/אינו נוהג או שניהם",
             type: "warning",
             showConfirmButton: true
         });

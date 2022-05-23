@@ -196,7 +196,8 @@
         let patients_JSONArray = [];
         let { buildStringforEquipment,
             convertDBDate2FrontEndDate,
-            buildStringforDriverResponsibilityEquipment
+            buildStringforDriverResponsibilityEquipment,
+            compareFunc
         } = GENERAL.USEFULL_FUNCTIONS;
         let patients_Names = []
         let rideNumber = 0;
@@ -1304,17 +1305,18 @@
                     success: function (data) {
 
                         arr_locations = JSON.parse(data.d);
-                        arr_locations.sort();
+                        arr_locations.sort(compareFunc);
                         for (i in arr_locations) {
 
-                            $('<option>', { value: arr_locations[i].Name, text: arr_locations[i].EnglishName }).appendTo($select);
-                            $('<option>', { value: arr_locations[i].Name, text: arr_locations[i].EnglishName }).appendTo($select1);
+                            $('<option>', { value: arr_locations[i].Name, text: arr_locations[i].Name }).appendTo($select);
+                            $('<option>', { value: arr_locations[i].Name, text: arr_locations[i].Name }).appendTo($select1);
                         }
 
                         return resolve(1);
                     },
                     error: function (err) {
-                        alert("Error in generateLocation");
+                        alert("Error in generateLocation" + err.responseText);
+                        console.log(err);
                         return reject(0);
                     }
                 });
@@ -1419,9 +1421,9 @@
             }
             return true;
         }
- 
+
         function checkFutureDate(date) {
-  
+
             checkDate = Date.parse(date); //parameter datetime to compare with today
             if ($("#afterNoon").is(':checked')) { //22:14 is the default time that means afternoon אחה''צ
                 checkDate = Date.parse(new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59));
@@ -2056,7 +2058,7 @@
             });
 
             $('#deleteDriver').show();
- 
+
         }
 
         function signDriverErrorCB() {
