@@ -358,7 +358,7 @@ const fillTableWithData = () => {
             {
                 data: "DisplayName",
                 render: function (data, type, row, meta) {
-                    let did = "data-driverId='" + row.id + "'";
+                    let did = "data-driverId='" + row.Id + "'";
                     return '<p class="c1" ' + did + '>' + data + ' </p>';
                 }
             },                                                      //0
@@ -399,7 +399,7 @@ const fillTableWithData = () => {
                 {
                     data: "DisplayName",
                     render: function (data, type, row, meta) {
-                        let did = "data-driverId='" + row.id + "'";
+                        let did = "data-driverId='" + row.Id + "'";
                         return '<p class="c1" ' + did + '>' + data + ' </p>';
                     }
                 },                                                      //0
