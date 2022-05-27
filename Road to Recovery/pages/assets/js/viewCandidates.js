@@ -239,7 +239,7 @@ const isItToday = (d) => {
 const getCandidates = () => {
 
     // BENNY
-    let numOfCandidates = 10;
+    let numOfCandidates = 25;
     let newFlag = false;
     let dayInWeek = ridepatDate.getDay();
 
