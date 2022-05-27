@@ -1,5 +1,5 @@
 ﻿checkCookie();
-let { getHebrew_WeekDay, addSeperator2MobileNum } = GENERAL.USEFULL_FUNCTIONS;
+let { getHebrew_WeekDay, addSeperator2MobileNum, showMe } = GENERAL.USEFULL_FUNCTIONS;
 let { getRidePatNum4_viewCandidate } = GENERAL.RIDEPAT;
 let { ajaxCall } = GENERAL.FETCH_DATA;
 let allCandidatedFromDB;
@@ -15,6 +15,7 @@ let ridePatNum;
 const wiringDataTables = () => {
     //manage button clicks on tables
 
+    //#region showDocumentedCallsBtn
     $('#datatable-candidates tbody').on('click', '#showDocumentedCallsBtn', function () {
         manipulateDocumentedCallsModal(this, candidatesTable);
     });
@@ -22,8 +23,9 @@ const wiringDataTables = () => {
     $('#datatable-superDrivers tbody').on('click', '#showDocumentedCallsBtn', function () {
         manipulateDocumentedCallsModal(this, superDriversTable);
     });
+    //#endregion showDocumentedCallsBtn
 
-
+    //#region showDocumentedRidesBtn
     $('#datatable-candidates tbody').on('click', '#showDocumentedRidesBtn', function () {
         manipulateDocumentedRidesModal(this, candidatesTable);
     });
@@ -31,6 +33,30 @@ const wiringDataTables = () => {
     $('#datatable-superDrivers tbody').on('click', '#showDocumentedRidesBtn', function () {
         manipulateDocumentedRidesModal(this, superDriversTable);
     });
+    //#endregion showDocumentedRidesBtn
+
+    //#region showMe
+    /*
+    IMPORTANT NOTE
+    the event is mouseup in order to catch all scenarios.
+    */
+    $('#datatable-candidates tbody').on('mouseup', '.showMe', function () {
+        let targetObj = {};
+        targetObj.objName = $(this).attr("data-obj");
+        targetObj.displayName = this.text;
+
+        showMe(targetObj);
+    });
+
+    $('#datatable-superDrivers tbody').on('mouseup', '.showMe', function () {
+        let targetObj = {};
+        targetObj.objName = $(this).attr("data-obj");
+        targetObj.displayName = this.text;
+
+        showMe(targetObj);
+    });
+    //#endregion showMe
+
 }
 
 const ConvertDBDate2UIDate = (fullTimeStempStr) => {
@@ -271,6 +297,14 @@ const getCandidates_ECB = (data) => {
     console.log('%c ↑ R2R custom error ↑', 'background: red; color: white');
 }
 
+const buildCandidateHTML = ({ Id, DisplayName }) => {
+
+    let candidateHTML = `<a href="volunteerform.html" data-obj="volunteer" class="showMe clickable blueFont boldFont"`;
+    candidateHTML += `id='${Id}'>${DisplayName}</a>`;
+
+    return candidateHTML;
+}
+
 const fillTableWithData = () => {
 
     let thisCandidate = {};
@@ -282,6 +316,7 @@ const fillTableWithData = () => {
     let btnStr;
     let showDocumentedCallsBtn;
     let showDocumentedRidesBtn;
+    let candidateName2render;
 
 
     for (let i in allCandidatedFromDB) {
@@ -299,11 +334,13 @@ const fillTableWithData = () => {
         showDocumentedRidesBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedRidesBtn" title="תיעוד הסעות" data-toggle="modal" data-target="#documentedRidesModal"><i class="fa fa-car" aria-hidden="true"></i></button></div>';
 
         btnStr += showDocumentedRidesBtn;
-
         btnStr += '</div>';
+
+        candidateName2render = buildCandidateHTML(allCandidatedFromDB[i]);
+
         thisCandidate = {
             Id: i,
-            DisplayName: allCandidatedFromDB[i].DisplayName,
+            DisplayName: candidateName2render,
             cellphone: addSeperator2MobileNum(allCandidatedFromDB[i].CellPhone, "-"),
             city: allCandidatedFromDB[i].City,// + '<br />בדיקה',
             daysSinceLastRide: allCandidatedFromDB[i].DaysSinceLastRide,

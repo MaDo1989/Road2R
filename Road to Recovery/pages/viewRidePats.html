@@ -88,11 +88,11 @@
         let ridePatNums2MarkDeleted = [];
         let ridePatNums2MarkRecovered = [];
         let { convertDBDate2FrontEndDate } = GENERAL.USEFULL_FUNCTIONS;
-
+        let thisRidePatDate;
         $(document).ready(function () {
 
             includeHTML();
-            let { COPYWRITE } = GENERAL;;
+            let { COPYWRITE } = GENERAL;
             $('#rights').html(COPYWRITE());
 
             $('[data-toggle="tooltip"]').tooltip();
@@ -340,10 +340,12 @@
                 if (timeFilteredArr[i].Pat.DisplayName.includes("אנונימי")) {
                     timeFilteredArr[i].Pat.DisplayName = "חולה";
                 }
-                //Change date format
-                var temp = timeFilteredArr[i].Date.substring(timeFilteredArr[i].Date.indexOf("(") + 1);
-                temp = temp.substring(0, temp.indexOf(")"));
-                var date = new Date(parseInt(temp));
+                thisRidePatDate = convertDBDate2FrontEndDate(timeFilteredArr[i].Date);
+
+                ////Change date format
+                //var temp = timeFilteredArr[i].Date.substring(timeFilteredArr[i].Date.indexOf("(") + 1);
+                //temp = temp.substring(0, temp.indexOf(")"));
+                //var date = new Date(parseInt(temp));
 
                 if (timeFilteredArr[i].Drivers.length != 0) {
                     driverName = timeFilteredArr[i].Drivers[0].DisplayName;
@@ -352,30 +354,31 @@
                 originName = timeFilteredArr[i].Origin.Name;
                 patientName = timeFilteredArr[i].Pat.DisplayName;
 
-                if (date.getDate() < 10) {
-                    day = "0" + date.getDate();
-                } else day = date.getDate();
+                //if (date.getDate() < 10) {
+                //    day = "0" + date.getDate();
+                //} else day = date.getDate();
 
 
-                if (date.getMonth() + 1 < 10) {
-                    month = "0" + (date.getMonth() + 1);
-                } else month = date.getMonth() + 1;
+                //if (date.getMonth() + 1 < 10) {
+                //    month = "0" + (date.getMonth() + 1);
+                //} else month = date.getMonth() + 1;
 
-                if (date.getHours() < 10) {
-                    hours = "0" + date.getHours();
-                } else hours = date.getHours();
+                //if (date.getHours() < 10) {
+                //    hours = "0" + date.getHours();
+                //} else hours = date.getHours();
 
-                if (date.getMinutes() < 10) {
-                    minutes = "0" + date.getMinutes();
-                } else minutes = date.getMinutes();
+                //if (date.getMinutes() < 10) {
+                //    minutes = "0" + date.getMinutes();
+                //} else minutes = date.getMinutes();
 
 
-                date2 = day + "/" + month + "/" + date.getUTCFullYear() % 2000 + " " + hours + ":" + minutes;
+                //date2 = day + "/" + month + "/" + date.getUTCFullYear() % 2000 + " " + hours + ":" + minutes;
 
-                if (date.getHours() == 22 && date.getMinutes() == 14) { //22:14 is the default time to show afternoon אחה''צ
-                    date2 = day + "/" + month + "/" + date.getUTCFullYear() % 2000;
-                    date2 += " אחה\"צ";
-                }
+                //if (date.getHours() == 22 && date.getMinutes() == 14) { //22:14 is the default time to show afternoon אחה''צ
+                //    date2 = day + "/" + month + "/" + date.getUTCFullYear() % 2000;
+                //    date2 += " אחה\"צ";
+                //}
+
                 if (unassigned) {
                     // $("#activeRidePats").prop('checked', false);
                     if (timeFilteredArr[i].Status != "ממתינה לשיבוץ") continue;
@@ -465,9 +468,8 @@
                         PatDisplayName: timeFilteredArr[i].Pat.DisplayName,
                         OriginName: timeFilteredArr[i].Origin.Name,
                         DestinationName: timeFilteredArr[i].Destination.Name,
-                        Date: date2,
+                        Date: thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' }),
                         Drivers: timeFilteredArr[i].Status,
-
                         Origin_Dest: timeFilteredArr[i].Origin.EnglishName + " - " + timeFilteredArr[i].Destination.EnglishName,
                         Coordinator: timeFilteredArr[i].Coordinator.DisplayName,
                         Buttons: btnStr,
@@ -497,12 +499,10 @@
                         PatDisplayName: timeFilteredArr[i].Pat.DisplayName,
                         OriginName: timeFilteredArr[i].Origin.Name,
                         DestinationName: timeFilteredArr[i].Destination.Name,
-                        Date: date2,
+                        Date: thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' }),
                         Drivers: drivers,
                         Coordinator: timeFilteredArr[i].Coordinator.DisplayName,
-
                         Origin_Dest: timeFilteredArr[i].Origin.EnglishName + " - " + timeFilteredArr[i].Destination.EnglishName,
-
                         Buttons: buttons,
                         IsAnonymous: timeFilteredArr[i].Pat.IsAnonymous,
                         LastModified: convertDBDate2FrontEndDate(timeFilteredArr[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" })

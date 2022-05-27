@@ -287,7 +287,27 @@ var GENERAL = {
             let y = b.Name.trim();
 
             return x < y ? -1 : x > y ? 1 : 0;
-        }
+        },
+        showMe: ({ objName, displayName }) => {
+
+            const func = 'edit';
+            let arr_details;
+
+            switch (objName) {
+                case 'patient':
+                    arr_details = { displayName, func };
+                    GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
+
+                    break;
+                case 'volunteer':
+                    arr_details = { displayName, func };
+                    GENERAL.VOLUNTEERS.setVolunteersList(JSON.stringify(arr_details));
+
+                    break;
+            }
+
+        },
+
     },
 
     COPYWRITE: () => {

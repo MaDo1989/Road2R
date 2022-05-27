@@ -119,13 +119,6 @@ input:checked + .slider:before {
     width: 5vw;
 }
 
-.clickable:hover {
-    cursor: pointer;
-    color: mediumblue;
-    border-bottom: solid mediumblue 1px;
-    max-width: fit-content;
-    /*↑ works great in chrome*/
-}
 
 .driverName, .driverCellPhone {
     display: block;
@@ -135,13 +128,6 @@ input:checked + .slider:before {
     height: 2vh;
 }
 
-.blueFont {
-    color: rgb(40,96,145);
-}
-
-.boldFont {
-    font-weight: bold;
-}
 
 .block {
     display: block;

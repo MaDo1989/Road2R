@@ -382,6 +382,7 @@
         let allReadyCountedRidePats = [];
         let candidate4IhaveSeen;
         let timer;
+        let arr_rides;
 
         const {
 
@@ -390,7 +391,8 @@
             convertDBDate2FrontEndDate,
             getHoursGap,
             convert2DBDateToInt,
-            getHebrew_WeekDay
+            getHebrew_WeekDay,
+            showMe
 
         } = GENERAL.USEFULL_FUNCTIONS;
 
@@ -399,37 +401,7 @@
         let drivers, driverNames;
         let _assignDriverToRidepatNum;
 
-
-
         let tMorning, tAfternoon, tFuture, tTomorrow;
-
-        const showMe = ({ objId, objName }) => {
-
-            const func = 'edit';
-            let displayName;
-            let arr_details;
-
-            switch (objName) {
-                case 'patient':
-                    const ridePatWith_ThisPat = arr_rides.find(r => r.Pat.Id === parseInt(objId));
-                    displayName = ridePatWith_ThisPat.Pat.DisplayName;
-                    arr_details = { displayName, func };
-                    GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
-                    break;
-                case 'volunteer':
-                    const ridePatWith_ThisDriver = arr_rides.find((r) => {
-
-                        if (r.Drivers.length > 0) {
-                            return r.Drivers[0].Id === parseInt(objId);
-                        }
-                    });
-                    displayName = ridePatWith_ThisDriver.Drivers[0].DisplayName;
-                    arr_details = { displayName, func };
-                    GENERAL.VOLUNTEERS.setVolunteersList(JSON.stringify(arr_details));
-                    break;
-            }
-
-        }
 
         function wiringDataTables() {
             //manage button clicks on tables
@@ -498,17 +470,16 @@
              */
             $('#datatable-morning tbody').on('mouseup', '.showMe', function () {
                 let targetObj = {};
-                targetObj.objId = $(this).attr('id');
                 targetObj.objName = $(this).attr("data-obj");
+                targetObj.displayName = this.text;
 
                 showMe(targetObj);
-
             });
 
             $('#datatable-afternoon tbody').on('mouseup', '.showMe', function () {
                 let targetObj = {};
-                targetObj.objId = $(this).attr('id');
                 targetObj.objName = $(this).attr("data-obj");
+                targetObj.displayName = this.text;
 
                 showMe(targetObj);
             });
@@ -516,8 +487,8 @@
 
             $('#datatable-tomorrow tbody').on('mouseup', '.showMe', function () {
                 let targetObj = {};
-                targetObj.objId = $(this).attr('id');
                 targetObj.objName = $(this).attr("data-obj");
+                targetObj.displayName = this.text;
 
                 showMe(targetObj);
             });
@@ -525,8 +496,8 @@
             $('#datatable-future tbody').on('mouseup', '.showMe', function () {
 
                 let targetObj = {};
-                targetObj.objId = $(this).attr('id');
                 targetObj.objName = $(this).attr("data-obj");
+                targetObj.displayName = this.text;
 
                 showMe(targetObj);
 
