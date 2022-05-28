@@ -135,6 +135,8 @@ public class ReportService
     {
         public string PatientCount { get; set; }
         public string VolunteerCount { get; set; }
+        public string RidesCount { get; set; }
+        public string DemandsCount { get; set; }
         public string Month { get; set; }
     }
 
@@ -1184,15 +1186,23 @@ group by CONVERT(date, pickuptime) ";
     {
         DbService db = new DbService();
 
-        string query =
-@"select count(DISTINCT Id )as COUNT_PATS, count(DISTINCT MainDriver )as COUNT_DRIVERS,  MONTH(PickupTime) as MONTH_G
-FROM RPView r 
-where PickupTime >= @start_date
-and PickupTime <= @end_date
-and RideNum  is not null
-and MainDriver is not null
-GROUP BY  MONTH(PickupTime)                 
-ORDER  BY MONTH_G";
+        string query = @"SELECT  
+        MONTH(pickuptime) as MONTH_C, count(DISTINCT DisplayName) as COUNT_PAT, count(DisplayName) as COUNT_DEMAND, 
+        count(DISTINCT MainDriver) as COUNT_VOL, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDE
+        FROM (
+	           select MainDriver  , PickupTime, Origin, Destination, DisplayName, 
+	              ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) as row_num_C,
+	              CASE WHEN ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) = '1' THEN 1
+		              ELSE 0
+	              END AS Unique_Drive_C
+	              from RPView r 
+	              where pickuptime >= @start_date 
+	                AND pickuptime <= @end_date
+	                AND MainDriver is not null
+	                AND DisplayName not like N'אנונימי%'
+              ) s 
+        GROUP BY MONTH(pickuptime)
+        ORDER BY MONTH_C ASC";
 
         SqlCommand cmd = new SqlCommand(query);
         cmd.CommandType = CommandType.Text;
@@ -1207,9 +1217,11 @@ ORDER  BY MONTH_G";
         foreach (DataRow dr in dt.Rows)
         {
             CenterMonthlyByYearInfo obj = new CenterMonthlyByYearInfo();
-            obj.PatientCount = dr["COUNT_PATS"].ToString();
-            obj.VolunteerCount = dr["COUNT_DRIVERS"].ToString();
-            obj.Month = dr["MONTH_G"].ToString();
+            obj.PatientCount = dr["COUNT_PAT"].ToString();
+            obj.VolunteerCount = dr["COUNT_VOL"].ToString();
+            obj.RidesCount = dr["COUNT_UNIQUE_RIDE"].ToString();
+            obj.DemandsCount = dr["COUNT_DEMAND"].ToString();
+            obj.Month = dr["MONTH_C"].ToString();
             result.Add(obj);
         }
 

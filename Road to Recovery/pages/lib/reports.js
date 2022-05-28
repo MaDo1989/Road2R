@@ -2133,7 +2133,7 @@ function rp_center_monthly_by_year__refresh_table(start_date, end_date) {
                     { "orderData": [0], "type": "num", "targets": 0 }],
                 columns: [
                     {
-                        data: "People"
+                        data: "נתונים"
                     },
                     { data: "1", "defaultContent": ""  },
                     { data: "2", "defaultContent": ""  },
@@ -2166,17 +2166,23 @@ function rp_center_monthly_by_year__refresh_table(start_date, end_date) {
 }
 
 function rp_center_monthly_by_year__fix_records(records) {
-    let drivers = { "People": "מתנדבים", Total: 0 };
-    let patients = { "People": "חולים", Total: 0 };
-    
+    let drivers = { "נתונים": "מתנדבים", Total: 0 };
+    let patients = { "נתונים": "חולים", Total: 0 };
+    let rides = { "נתונים": "הסעות", Total: 0 };
+    let demands = { "נתונים": "דרישות", Total: 0 };
+
     for (a_rec of records) {
         patients[a_rec.Month] = a_rec.PatientCount;
         patients.Total += +a_rec.PatientCount;
         drivers[a_rec.Month] = a_rec.VolunteerCount;
         drivers.Total += +a_rec.VolunteerCount;
+        rides[a_rec.Month] = a_rec.RidesCount;
+        rides.Total += +a_rec.RidesCount;
+        demands[a_rec.Month] = a_rec.DemandsCount;
+        demands.Total += +a_rec.DemandsCount;
     }
 
-    return new Array(patients, drivers);
+    return new Array(patients, drivers, rides, demands);
 }
 
 
