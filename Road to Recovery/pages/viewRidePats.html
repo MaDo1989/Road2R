@@ -87,8 +87,10 @@
         let timeFilteredArr = [];
         let ridePatNums2MarkDeleted = [];
         let ridePatNums2MarkRecovered = [];
-        let { convertDBDate2FrontEndDate } = GENERAL.USEFULL_FUNCTIONS;
+        let { convertDBDate2FrontEndDate, datetimeCompateFunc } = GENERAL.USEFULL_FUNCTIONS;
         let thisRidePatDate;
+        const afterNoonMinutesMark = 14;
+
         $(document).ready(function () {
 
             includeHTML();
@@ -116,130 +118,18 @@
 
             jQuery.extend(jQuery.fn.dataTableExt.oSort, {
                 "de_datetime-asc": function (a, b) {
-                    var x, y;
-                    if (jQuery.trim(a) !== '') {
-                        var deDatea = jQuery.trim(a).split(' ');
-                        var deTimea = "";
-                        if (jQuery.trim(a).includes("אחה\"צ")) {
-                            deTimea = "22:14";
-                            deTimea = deTimea.split(':');
-                        }
-                        else deTimea = deDatea[1].split(':');
-                        var deDatea2 = deDatea[0].split('/');
-                        if (typeof deTimea[2] != 'undefined') {
-                            x = (deDatea2[2] + deDatea2[1] + deDatea2[0] + deTimea[0] + deTimea[1] + deTimea[2]) * 1;
-                        } else {
-                            x = (deDatea2[2] + deDatea2[1] + deDatea2[0] + deTimea[0] + deTimea[1]) * 1;
-                        }
-                    } else {
-                        x = -Infinity; // = l'an 1000 ...
-                    }
 
-                    if (jQuery.trim(b) !== '') {
-                        var deDateb = jQuery.trim(b).split(' ');
-                        var deTimeb = "";
-                        if (jQuery.trim(b).includes("אחה\"צ")) {
-                            deTimeb = "22:14";
-                            deTimeb = deTimeb.split(':');
-                        }
-                        else deTimeb = deDateb[1].split(':');
-                        deDateb = deDateb[0].split('/');
-                        if (typeof deTimeb[2] != 'undefined') {
-                            y = (deDateb[2] + deDateb[1] + deDateb[0] + deTimeb[0] + deTimeb[1] + deTimeb[2]) * 1;
-                        } else {
-                            y = (deDateb[2] + deDateb[1] + deDateb[0] + deTimeb[0] + deTimeb[1]) * 1;
-                        }
-                    } else {
-                        y = -Infinity;
-                    }
-                    var z = ((x < y) ? -1 : ((x > y) ? 1 : 0));
-                    return z;
+                    return datetimeCompateFunc(a, b, true);
                 },
-
                 "de_datetime-desc": function (a, b) {
-                    var x, y;
-                    if (jQuery.trim(a) !== '') {
-                        var deDatea = jQuery.trim(a).split(' ');
-                        var deTimea = "";
-                        if (jQuery.trim(a).includes("אחה\"צ")) {
-                            deTimea = "22:14";
-                            deTimea = deTimea.split(':');
-                        }
-                        else deTimea = deDatea[1].split(':');
-                        var deDatea2 = deDatea[0].split('/');
-                        if (typeof deTimea[2] != 'undefined') {
-                            x = (deDatea2[2] + deDatea2[1] + deDatea2[0] + deTimea[0] + deTimea[1] + deTimea[2]) * 1;
-                        } else {
-                            x = (deDatea2[2] + deDatea2[1] + deDatea2[0] + deTimea[0] + deTimea[1]) * 1;
-                        }
-                    } else {
-                        x = Infinity;
-                    }
 
-                    if (jQuery.trim(b) !== '') {
-                        var deDateb = jQuery.trim(b).split(' ');
-                        var deTimeb = "";
-                        if (jQuery.trim(b).includes("אחה\"צ")) {
-                            deTimeb = "22:14";
-                            deTimeb = deTimeb.split(':');
-                        }
-                        else deTimeb = deDateb[1].split(':');
-                        deDateb = deDateb[0].split('/');
-                        if (typeof deTimeb[2] != 'undefined') {
-                            y = (deDateb[2] + deDateb[1] + deDateb[0] + deTimeb[0] + deTimeb[1] + deTimeb[2]) * 1;
-                        } else {
-                            y = (deDateb[2] + deDateb[1] + deDateb[0] + deTimeb[0] + deTimeb[1]) * 1;
-                        }
-                    } else {
-                        y = -Infinity;
-                    }
-                    var z = ((x < y) ? 1 : ((x > y) ? -1 : 0));
-                    return z;
+                    return datetimeCompateFunc(a, b, false);
                 },
-
-                "de_date-asc": function (a, b) {
-                    var x, y;
-                    if (jQuery.trim(a) !== '') {
-                        var deDatea = jQuery.trim(a).split('.');
-                        x = (deDatea[2] + deDatea[1] + deDatea[0]) * 1;
-                    } else {
-                        x = Infinity; // = l'an 1000 ...
-                    }
-
-                    if (jQuery.trim(b) !== '') {
-                        var deDateb = jQuery.trim(b).split('.');
-                        y = (deDateb[2] + deDateb[1] + deDateb[0]) * 1;
-                    } else {
-                        y = -Infinity;
-                    }
-                    var z = ((x < y) ? -1 : ((x > y) ? 1 : 0));
-                    return z;
-                },
-
-                "de_date-desc": function (a, b) {
-                    var x, y;
-                    if (jQuery.trim(a) !== '') {
-                        var deDatea = jQuery.trim(a).split('/');
-                        x = (deDatea[2] + deDatea[1] + deDatea[0]) * 1;
-                    } else {
-                        x = -Infinity;
-                    }
-
-                    if (jQuery.trim(b) !== '') {
-                        var deDateb = jQuery.trim(b).split('/');
-                        y = (deDateb[2] + deDateb[1] + deDateb[0]) * 1;
-                    } else {
-                        y = Infinity;
-                    }
-                    var z = ((x < y) ? 1 : ((x > y) ? -1 : 0));
-                    return z;
-                }
             });
 
             getCoors();
             ImportDataByTimeFilters();
         });
-
 
         const ImportDataByTimeFilters = () => {
             let from = $('#from').val();
@@ -277,7 +167,6 @@
 
         }
 
-
         function getCoors() {
             $.ajax({
                 dataType: "json",
@@ -290,7 +179,6 @@
                 error: getCoorsErrorCB
             });
         }
-
 
         function getCoorsSuccessCB(data) {
             var arr_coor = JSON.parse(data.d);
@@ -306,11 +194,9 @@
 
         }
 
-
         function getCoorsErrorCB(e) {
             alert("Error in getCoors: " + e.responseText);
         }
-
 
         function refreshTable() {
             //this function doesnt changeing timeFilteredArr or fetching data from the back-end
@@ -341,6 +227,7 @@
                     timeFilteredArr[i].Pat.DisplayName = "חולה";
                 }
                 thisRidePatDate = convertDBDate2FrontEndDate(timeFilteredArr[i].Date);
+                thisRidePatDate = adjustDateFormat(thisRidePatDate);
 
                 ////Change date format
                 //var temp = timeFilteredArr[i].Date.substring(timeFilteredArr[i].Date.indexOf("(") + 1);
@@ -468,7 +355,7 @@
                         PatDisplayName: timeFilteredArr[i].Pat.DisplayName,
                         OriginName: timeFilteredArr[i].Origin.Name,
                         DestinationName: timeFilteredArr[i].Destination.Name,
-                        Date: thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' }),
+                        Date: thisRidePatDate,
                         Drivers: timeFilteredArr[i].Status,
                         Origin_Dest: timeFilteredArr[i].Origin.EnglishName + " - " + timeFilteredArr[i].Destination.EnglishName,
                         Coordinator: timeFilteredArr[i].Coordinator.DisplayName,
@@ -499,7 +386,7 @@
                         PatDisplayName: timeFilteredArr[i].Pat.DisplayName,
                         OriginName: timeFilteredArr[i].Origin.Name,
                         DestinationName: timeFilteredArr[i].Destination.Name,
-                        Date: thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' }),
+                        Date: thisRidePatDate,
                         Drivers: drivers,
                         Coordinator: timeFilteredArr[i].Coordinator.DisplayName,
                         Origin_Dest: timeFilteredArr[i].Origin.EnglishName + " - " + timeFilteredArr[i].Destination.EnglishName,
@@ -551,11 +438,26 @@
 
                      */
                 ],
-                "order": [[4, "desc"]] // sort by date
+                order: [[4, "desc"]]
 
             });
 
             buttonsEvents();
+        }
+
+        const adjustDateFormat = (date) => {
+
+            let dateFormat = null;
+
+            if (date.getMinutes() === afterNoonMinutesMark) {
+
+                dateFormat = date.toLocaleDateString('he-IL') + ', אחה"צ';
+            } else {
+
+                dateFormat = date.toLocaleString('he-IL', { dateStyle: 'short', timeStyle: 'short' })
+            }
+
+            return dateFormat;
         }
 
         const HeadCheckBoxChanged = () => {
@@ -735,7 +637,6 @@
 
 
         }
-
 
         function buttonsEvents() {
 
@@ -982,14 +883,12 @@
             }
         }
 
-
         function newRidePatForm() {
             ridePatNum = " ";
             arr_details = { ridePatNum: ridePatNum, func: "new" };
             GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
             location.href = "ridePatForm.html";
         }
-
 
         const deActivate_RemoveCandidates = () => {
 
@@ -1000,11 +899,11 @@
 
         }
 
-
         const hasReturnDrive = (ridePat) => {
 
             swal('haaa');
         }
+
     </script>
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -1265,7 +1164,8 @@
     <script src="../plugins/datatables/dataTables.bootstrap.js"></script>
     <script src="../plugins/datatables/dataTables.buttons.min.js"></script>
     <script src="../plugins/datatables/buttons.bootstrap.min.js"></script>
-    <script src="../plugins/datatables/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.6.1/jszip.min.js" integrity="sha512-qDzk+Wqv8uAmrIr0t9Hjo4qM3DjvwTWuuuG3w9H8JBKd1EMpMaUEKoHKYbX6yP+ilTloEADFKFwKMzOZLlgTEg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
     <script src="../plugins/datatables/pdfmake.min.js"></script>
     <script src="../plugins/datatables/vfs_fonts.js"></script>
     <script src="../plugins/datatables/buttons.html5.min.js"></script>
