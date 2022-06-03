@@ -374,7 +374,7 @@ AS
 BEGIN
     SET NOCOUNT ON
 	UPDATE RIDE
-	SET MainDriver = @RidePatNum
-	WHERE RideNum = @NewDriverId
+	SET MainDriver = @NewDriverId
+	WHERE RideNum = @RidePatNum 
 END
 GO
