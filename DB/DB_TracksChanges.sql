@@ -367,7 +367,7 @@ GO
 -- =============================================
 CREATE PROCEDURE spRide_UpdateDriver
 (
-		@RidePatNum INT,
+		@RideNum INT,
 		@NewDriverId INT
 )
 AS
@@ -375,6 +375,6 @@ BEGIN
     SET NOCOUNT ON
 	UPDATE RIDE
 	SET MainDriver = @NewDriverId
-	WHERE RideNum = @RidePatNum 
+	WHERE RideNum = @RideNum 
 END
 GO
