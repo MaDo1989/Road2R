@@ -34,7 +34,7 @@
         let lastModified_td;
         const ADD_DRIVER = 'add driver', REMOVE_DRIVER = 'remove driver';
 
-        //function to reuse
+        //functions to reuse
         const update_arr_rides = (updated_ridePat) => {
             const index = arr_rides.findIndex(r => r.RidePatNum === updated_ridePat.RidePatNum)
             arr_rides[index] = updated_ridePat;
@@ -126,7 +126,7 @@
                     row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
                     row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
                     row2manipulate.patient = buildPatientHTML(updated_ridePat);
-                    row2manipulate.driver = buildDriverHTML(updated_ridePat.Drivers[0]);
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
@@ -146,7 +146,7 @@
                     row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
                     row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
                     row2manipulate.patient = buildPatientHTML(updated_ridePat);
-                    row2manipulate.driver = buildDriverHTML(updated_ridePat.Drivers[0]);
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
@@ -167,7 +167,7 @@
                     row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
                     row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
                     row2manipulate.patient = buildPatientHTML(updated_ridePat);
-                    row2manipulate.driver = buildDriverHTML(updated_ridePat.Drivers[0]);
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
@@ -188,7 +188,7 @@
                     row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
                     row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
                     row2manipulate.patient = buildPatientHTML(updated_ridePat);
-                    row2manipulate.driver = buildDriverHTML(updated_ridePat.Drivers[0]);
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
@@ -234,7 +234,7 @@
 
                     row2manipulate = tMorning.row(`#${updated_ridePat.RidePatNum}`).data();
 
-                    row2manipulate.driver = 'אין!<br/>None!';;
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
 
@@ -248,7 +248,8 @@
 
                     row2manipulate = tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data();
 
-                    row2manipulate.driver = 'אין!<br/>None!';;
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum);
+
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
 
@@ -262,7 +263,7 @@
 
                     row2manipulate = tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data();
 
-                    row2manipulate.driver = 'אין!<br/>None!';;
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
 
@@ -276,7 +277,7 @@
 
                     row2manipulate = tFuture.row(`#${updated_ridePat.RidePatNum}`).data();
 
-                    row2manipulate.driver = 'אין!<br/>None!';;
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
 
@@ -295,19 +296,16 @@
                     tr_nodesAsArray = null;
                     break;
             }
+
             if (tr_nodesAsArray) {
 
                 tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
                 manipilateNodeStyle(tr_node2manipulate, updated_ridePat, REMOVE_DRIVER, false, tableName2manipulate);
             }
-
-
-
         }
     </script>
 
     <!-- #endregion REAL-TIME BY SIGNALR - FOR ANY COMPLAINTS WHATSOEVER YOU CAN TALK 2 YOGEV -->
-
     <!-- Sweet Alert css -->
     <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
     <link href="../plugins/switchery/switchery.min.css" rel="stylesheet" />
@@ -330,7 +328,8 @@
     <script src="assets/js/jquery.min.js"></script>
     <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.6.1/jszip.min.js" integrity="sha512-qDzk+Wqv8uAmrIr0t9Hjo4qM3DjvwTWuuuG3w9H8JBKd1EMpMaUEKoHKYbX6yP+ilTloEADFKFwKMzOZLlgTEg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.6.1/jszip.min.js" integrity="sha512-qDzk+Wqv8uAmrIr0t9Hjo4qM3DjvwTWuuuG3w9H8JBKd1EMpMaUEKoHKYbX6yP+ilTloEADFKFwKMzOZLlgTEg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
@@ -397,13 +396,13 @@
     <script src="lib/includeHTML.js"></script>
 
     <script>
-        /*
-         NOTICE THIS:
-         אחה"צ
-         calculation   wise: its value is 12:00 (like when we calaulate hours gap between the present and a given ridepat)
-         table sorting wise: its value is Infinity or negetive Infinity
-         */
-        checkCookie();
+/*
+NOTICE THIS:
+אחה"צ
+calculation   wise: its value is 12:00 (like when we calaulate hours gap between the present and a given ridepat)
+table sorting wise: its value is Infinity or negetive Infinity
+*/
+checkCookie();
         var destinationName = "";
         var originName = "";
         var driverName = "";
@@ -447,6 +446,8 @@
         const { APP_ID } = GENERAL;
         let drivers, driverNames;
         let _assignDriverToRidepatNum;
+        let _assignDriverToRideNum;
+        let _isDriverReplacement;
 
         let tMorning, tAfternoon, tFuture, tTomorrow;
 
@@ -489,7 +490,6 @@
                 editButton(this);
             });
             //#endregion
-
 
             //#region copyMessage ridepat
             $('#datatable-morning tbody').on('click', '.copyMessage', function () {
@@ -666,19 +666,31 @@
 
             const driverIndex = driverNames.indexOf(driverNameFromInput);
             const userSelected = drivers[driverIndex];
+            let request;
+            let dataString;
 
-            const request = {
-                ridePatId: _assignDriverToRidepatNum,
-                userId: userSelected.Id,
-                driverType: "primary",
-                assignedFromAppId: APP_ID
-            };
+            if (_isDriverReplacement) {
+                //update the ride record with the new driver.
+                request = {
+                    rideNum: _assignDriverToRideNum,
+                    newDriverId: userSelected.Id,
+                    assignedFromAppId: APP_ID
+                }
 
-            const dataString = JSON.stringify(request);
+                dataString = JSON.stringify(request);
+                ajaxCall('UpdateDriver', dataString, UpdateDriver_SCB, UpdateDriver_ECB);
+            } else {
 
+                request = {
+                    ridePatId: _assignDriverToRidepatNum,
+                    userId: userSelected.Id,
+                    driverType: "primary",
+                    assignedFromAppId: APP_ID
+                };
 
-
-            ajaxCall('AssignRideToRidePat', dataString, assignDriverToRidePat_SCB, assignDriverToRidePat_ECB);
+                dataString = JSON.stringify(request);
+                ajaxCall('AssignRideToRidePat', dataString, assignDriverToRidePat_SCB, assignDriverToRidePat_ECB);
+            }
         }
 
         const assignDriverToRidePat_SCB = (data) => {
@@ -691,6 +703,15 @@
             alert('Issue in assignDriverToRidePat: ' + JSON.stringify(err));
         }
 
+        const UpdateDriver_SCB = (data) => {
+            $('#wait').hide();
+            $('#assignDriverModal').modal('hide');
+        }
+
+        const UpdateDriver_ECB = (err) => {
+            $('#wait').hide();
+            alert('Issue in pdateDriver: ' + JSON.stringify(err));
+        }
 
         $(document).ready(function () {
 
@@ -1546,7 +1567,7 @@
             const hoursGap = getHoursGap(ridePatLastModified, now);
             return (hoursGap >= -2 && hoursGap <= 0);
         }
-        
+
         const getNext_X_DaysDateAsString = (days) => {
 
             if (typeof days != 'number') {
@@ -1644,10 +1665,10 @@
 
                         if (arr_rides[i].Drivers.length > 0) {
 
-                            driverHTML = buildDriverHTML(arr_rides[i].Drivers[0]);
+                            driverHTML = buildDriverHTML(arr_rides[i].RidePatNum, arr_rides[i].Drivers[0], arr_rides[i].RideNum);
                         } else {
 
-                            driverHTML = buildDriverHTML_noDriverAssigned(arr_rides[i].RidePatNum);;
+                            driverHTML = buildDriverHTML(arr_rides[i].RidePatNum);
                         }
                         //#endregion adjust driver column
 
@@ -2108,38 +2129,39 @@
             });
         }
 
-        const buildDriverHTML = (driver) => {
-
+        const buildDriverHTML = (ridePatNum, driver, rideNum) => {
             let driverWrapper = '';
-            let driverInnerContent = '';
-            const { Id, DisplayName, EnglishFN, EnglishLN, CellPhone } = driver;
+            let isDriverReplacement;
 
-            if (!isAssistant) {                         //hebrew
+            if (typeof driver !== 'undefined' && typeof rideNum !== 'undefined') {
 
-                driverInnerContent = DisplayName;
-            } else {                                    //english
+                isDriverReplacement = true;
+                let driverInnerContent = '';
+                const { Id, DisplayName, EnglishFN, EnglishLN, CellPhone } = driver;
 
-                driverInnerContent = EnglishFN.length + EnglishLN.length > 0 ?
-                    `${EnglishFN} ${EnglishLN}`
-                    :
-                    DisplayName
+                if (!isAssistant) {                         //hebrew
+
+                    driverInnerContent = DisplayName;
+                } else {                                    //english
+
+                    driverInnerContent = EnglishFN.length + EnglishLN.length > 0 ?
+                        `${EnglishFN} ${EnglishLN}`
+                        :
+                        DisplayName
+                }
+
+                driverWrapper = `<a href="volunteerform.html" data-obj="volunteer" class="showMe driverName clickable blueFont boldFont"`;
+                driverWrapper += `id='${Id}'>${driverInnerContent}</a>`;
+                driverWrapper += `<span class="driverCellPhone">${addSeperator2MobileNum(CellPhone, '-')}</span>`;
+                driverWrapper += `<buttond onclick="assignGlobalVariablesForUpdateDriver(${ridePatNum}, ${isDriverReplacement}, ${rideNum})" data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>עדכן נהג</button>`;
+            } else {
+
+                isDriverReplacement = false;
+                driverWrapper = 'אין!<br/>None!';
+                driverWrapper += `<buttond onclick="assignGlobalVariablesForUpdateDriver(${ridePatNum, isDriverReplacement})"  data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>שבץ נהג</button>`;
             }
 
-            driverWrapper = `<a href="volunteerform.html" data-obj="volunteer" class="showMe driverName clickable blueFont boldFont"`;
-            driverWrapper += `id='${Id}'>${driverInnerContent}</a>`;
-            driverWrapper += `<span class="driverCellPhone">${addSeperator2MobileNum(CellPhone, '-')}</span>`;
-
             return driverWrapper;
-        }
-
-        const buildDriverHTML_noDriverAssigned = (ridepatNum) => {
-
-            let driverHTML_noDriverAssigned = '';
-
-            driverHTML_noDriverAssigned = 'אין!<br/>None!';
-            driverHTML_noDriverAssigned += `<buttond onclick="assignDriverToRidepatNum(${ridepatNum})"  data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>שבץ נהג</button>`;
-
-            return driverHTML_noDriverAssigned;
         }
 
         const buildPatientHTML = (ridepat) => {
@@ -2265,8 +2287,10 @@
             return englishStatus;
         };
 
-        const assignDriverToRidepatNum = (ridePatNum) => {
+        const assignGlobalVariablesForUpdateDriver = (ridePatNum, isDriverReplacement, rideNum) => {
             _assignDriverToRidepatNum = ridePatNum;
+            _assignDriverToRideNum = rideNum
+            _isDriverReplacement = isDriverReplacement;
         }
 
         const add2IhaveSeenAllready = () => {

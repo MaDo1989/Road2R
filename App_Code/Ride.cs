@@ -164,6 +164,22 @@ public class Ride
         return db.ExecuteQuery(query, cmd.CommandType, cmdParams);
     }
 
+    public int UpdateDriver(int rideNum, int newDriverId)
+    {
+        string query = "EXEC spRide_UpdateDriver @RideNum=" + rideNum + ", @NewDriverId=" + newDriverId;
+        SqlCommand cmd = new SqlCommand();
+
+        try
+        {
+            dbs = new DbService();
+            return dbs.ExecuteQuery(query);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+
     //public List<R> GetRidesForNotify()
     //{
     //    List<Ride> lr = new List<Ride>();

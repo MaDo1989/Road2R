@@ -1006,6 +1006,20 @@ public class WebService : System.Web.Services.WebService
 
     }
 
+    [WebMethod(EnableSession = true)]
+    public void UpdateDriver(int rideNum, int newDriverId)
+    {
+        try
+        {
+            Ride r = new Ride();
+            r.UpdateDriver(rideNum, newDriverId);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in UpdateDriver", ex);
+            throw new Exception(":שגיאה בעדכון נהג להסעה זו " + rideNum);
+        }
+    }
 
 
     [WebMethod(EnableSession = true)]
