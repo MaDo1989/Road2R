@@ -358,3 +358,23 @@ GO
 --AssignedFromApp Module: 06/05/2022 ↑ Yogev
 
 
+-- =============================================
+-- Authors:     Yogev Strauber
+-- Create Date: 03/06/2022
+-- Description: 
+-- ALTER DATE:   ---
+-- ALTER REASON: ---
+-- =============================================
+CREATE PROCEDURE spRide_UpdateDriver
+(
+		@RidePatNum INT,
+		@NewDriverId INT
+)
+AS
+BEGIN
+    SET NOCOUNT ON
+	UPDATE RIDE
+	SET MainDriver = @RidePatNum
+	WHERE RideNum = @NewDriverId
+END
+GO
