@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" dir="rtl">
 
 <head>
@@ -450,6 +450,7 @@
         let _assignDriverToRidepatNum;
         let _assignDriverToRideNum;
         let _isDriverReplacement;
+        let _trToHighLight;
 
         let tMorning, tAfternoon, tFuture, tTomorrow;
 
@@ -697,23 +698,31 @@
             }
         }
 
+        const assignDriverToRidePatAbort = () => {
+            _trToHighLight.classList.remove('highlightRow');
+        }
+        
         const assignDriverToRidePat_SCB = (data) => {
             $('#wait').hide();
+            _trToHighLight.classList.remove('highlightRow');
             $('#assignDriverModal').modal('hide');
         }
 
         const assignDriverToRidePat_ECB = (err) => {
             $('#wait').hide();
+            _trToHighLight.classList.remove('highlightRow');
             alert('Issue in assignDriverToRidePat: ' + JSON.stringify(err));
         }
 
         const UpdateDriver_SCB = (data) => {
             $('#wait').hide();
+            _trToHighLight.classList.remove('highlightRow');
             $('#assignDriverModal').modal('hide');
         }
 
         const UpdateDriver_ECB = (err) => {
             $('#wait').hide();
+            _trToHighLight.classList.remove('highlightRow');
             alert('Issue in UpdateDriver: ' + JSON.stringify(err));
         }
 
@@ -2156,12 +2165,12 @@
                 driverWrapper = `<a href="volunteerform.html" data-obj="volunteer" class="showMe driverName clickable blueFont boldFont"`;
                 driverWrapper += `id='${Id}'>${driverInnerContent}</a>`;
                 driverWrapper += `<span class="driverCellPhone">${addSeperator2MobileNum(CellPhone, '-')}</span>`;
-                driverWrapper += `<buttond onclick="assignGlobalVariablesForUpdateDriver(${ridePatNum}, ${isDriverReplacement}, ${rideNum})" data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>עדכן נהג</button>`;
+                driverWrapper += `<buttond onclick="prepreparationAssignDriverModal(this, ${ridePatNum}, ${isDriverReplacement}, ${rideNum})" data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>עדכן נהג</button>`;
             } else {
 
                 isDriverReplacement = false;
                 driverWrapper = 'אין!<br/>None!';
-                driverWrapper += `<buttond onclick="assignGlobalVariablesForUpdateDriver(${ridePatNum}, ${isDriverReplacement})"  data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>שבץ נהג</button>`;
+                driverWrapper += `<buttond onclick="prepreparationAssignDriverModal(this, ${ridePatNum}, ${isDriverReplacement})"  data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>שבץ נהג</button>`;
             }
 
             return driverWrapper;
@@ -2290,10 +2299,19 @@
             return englishStatus;
         };
 
-        const assignGlobalVariablesForUpdateDriver = (ridePatNum, isDriverReplacement, rideNum) => {
+        function prepreparationAssignDriverModal(thisBtn, ridePatNum, isDriverReplacement, rideNum) {
             _assignDriverToRidepatNum = ridePatNum;
             _assignDriverToRideNum = rideNum
             _isDriverReplacement = isDriverReplacement;
+
+            _trToHighLight = thisBtn.closest('tr');
+            _trToHighLight.classList.add('highlightRow');
+
+            if (isDriverReplacement) {
+                $('#driverModalTitle').text('עדכון נהג');
+            } else {
+                $('#driverModalTitle').text('שיבוץ נהג');
+            }
         }
 
         const add2IhaveSeenAllready = () => {

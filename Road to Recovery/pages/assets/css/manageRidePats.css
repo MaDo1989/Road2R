@@ -244,3 +244,6 @@ input:checked + .slider:before {
     position: fixed !important;
 }
 
+.highlightRow {
+    background-color: rgb(198, 220, 255) !important;
+}
