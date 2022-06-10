@@ -396,13 +396,13 @@
     <script src="lib/includeHTML.js"></script>
 
     <script>
-/*
-NOTICE THIS:
-אחה"צ
-calculation   wise: its value is 12:00 (like when we calaulate hours gap between the present and a given ridepat)
-table sorting wise: its value is Infinity or negetive Infinity
-*/
-checkCookie();
+        /*
+        NOTICE THIS:
+        אחה"צ
+        calculation   wise: its value is 12:00 (like when we calaulate hours gap between the present and a given ridepat)
+        table sorting wise: its value is Infinity or negetive Infinity
+        */
+        checkCookie();
         var destinationName = "";
         var originName = "";
         var driverName = "";
@@ -444,6 +444,8 @@ checkCookie();
 
         const { ajaxCall } = GENERAL.FETCH_DATA;
         const { APP_ID } = GENERAL;
+
+        const controllersLayout = "<'row'<'col-sm-6'l><'col-sm-5'f><'col-sm-1'B>>";//https://datatables.net/reference/option/dom
         let drivers, driverNames;
         let _assignDriverToRidepatNum;
         let _assignDriverToRideNum;
@@ -1746,13 +1748,12 @@ checkCookie();
                     tMorning = $('#datatable-morning').DataTable({
                         data: morningRidePats,
                         rowId: 'ridePatNum',
-                        dom: 'Bfrtip',
+                        dom: controllersLayout,
                         buttons: [
                             {
                                 extend: 'excelHtml5',
                                 text: 'ייצוא לאקסל',
                                 title: `ניהול הסעות - בוקר ${getNext_X_DaysDateAsString(0)}`,
-
                             }
                         ],
                         pageLength: 100,
@@ -1835,7 +1836,7 @@ checkCookie();
 
                     tAfternoon = $('#datatable-afternoon').DataTable({
                         rowId: 'ridePatNum',
-                        dom: 'Bfrtip',
+                        dom: controllersLayout,
                         buttons: [
                             {
                                 extend: 'excelHtml5',
@@ -1953,7 +1954,7 @@ checkCookie();
 
                     tTomorrow = $('#datatable-tomorrow').DataTable({
                         rowId: 'ridePatNum',
-                        dom: 'Bfrtip',
+                        dom: controllersLayout,
                         buttons: [
                             {
                                 extend: 'excelHtml5',
@@ -2054,7 +2055,7 @@ checkCookie();
 
                     tFuture = $('#datatable-future').DataTable({
                         rowId: 'ridePatNum',
-                        dom: 'Bfrtip',
+                        dom: controllersLayout,
                         buttons: [
                             {
                                 extend: 'excelHtml5',
