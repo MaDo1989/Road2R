@@ -35,6 +35,8 @@ public class Ride
 
     string query;
     DbService dbs;
+    SqlCommand cmd;
+    RidePat ridepat;
     public List<Ride> GetRidesForNotifyfull()
     {
         string query = "select * from RideViewForNotify where statusRide=N'שובץ נהג' or statusRide=N'מלאה'";
@@ -164,15 +166,20 @@ public class Ride
         return db.ExecuteQuery(query, cmd.CommandType, cmdParams);
     }
 
-    public int UpdateDriver(int rideNum, int newDriverId)
+    public int UpdateDriver(int rideNum,int ridePatId, int newDriverId)
     {
-        string query = "EXEC spRide_UpdateDriver @RideNum=" + rideNum + ", @NewDriverId=" + newDriverId;
-        SqlCommand cmd = new SqlCommand();
+        query = "EXEC spRide_UpdateDriver @RideNum=" + rideNum + ", @NewDriverId=" + newDriverId;
+        cmd = new SqlCommand();
 
         try
         {
             dbs = new DbService();
-            return dbs.ExecuteQuery(query);
+            int result = dbs.ExecuteQuery(query);
+            ridepat = new RidePat();
+            ridepat = ridepat.GetRidePat(ridePatId);
+            BroadCast.BroadCast2Clients_driverHasAssigned2RidePat(ridepat);
+            
+            return result;
         }
         catch (Exception ex)
         {

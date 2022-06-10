@@ -1007,12 +1007,12 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
-    public void UpdateDriver(int rideNum, int newDriverId)
+    public void UpdateDriver(int rideNum, int ridePatId, int newDriverId)
     {
         try
         {
             Ride r = new Ride();
-            r.UpdateDriver(rideNum, newDriverId);
+            r.UpdateDriver(rideNum, ridePatId, newDriverId);
         }
         catch (Exception ex)
         {

@@ -1599,7 +1599,7 @@ public class RidePat
         RidePat rp = GetRidePat(ridePatId);
         RidePatNum = rp.RidePatNum;
 
-        BroadCast2Clients_driverHasAssigned2RidePat(rp);
+        BroadCast.BroadCast2Clients_driverHasAssigned2RidePat(rp);
 
         if (Date > timeRightNow)
         {
@@ -1645,7 +1645,7 @@ public class RidePat
             res = 911;
         }
         RidePat rp = GetRidePat(ridePatId);
-        BroadCast2Clients_driverHasRemovedFromRidePat(rp);
+        BroadCast.BroadCast2Clients_driverHasRemovedFromRidePat(rp);
 
         return res;
     }
@@ -2155,74 +2155,5 @@ finally
     {
         return strWithChopchick.Replace("'", "''");
     }
-
-    private void BroadCast2Clients_driverHasAssigned2RidePat(RidePat rp)
-    {
-        if ((rp.Date - DateTime.Now).Days <= 30)
-        {//case in this month → inform clients on manageRidPats.html
-            IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<RidePatHub>();
-            hubContext.Clients.All.driverHasAssigned2RidePat(rp);
-        }
-    }
-
-    private void BroadCast2Clients_driverHasRemovedFromRidePat(RidePat rp)
-    {
-        if ((rp.Date - DateTime.Now).Days <= 30)
-        {//case in this month → inform clients on manageRidPats.html
-            IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<RidePatHub>();
-            hubContext.Clients.All.driverHasRemovedFromRidePat(rp);
-        }
-    }
-
-    //Irrelevant
-    #region GetRidePatEscortView
-    //public List<RidePat> GetRidePatEscortView()
-    //{
-    //    string query = "select * from RidePatEscortView";
-    //    DbService db = new DbService();
-    //    DataSet ds = db.GetDataSetByQuery(query);
-    //    List<RidePat> rpl = new List<RidePat>();
-    //    bool exists;
-    //    foreach (DataRow dr in ds.Tables[0].Rows)
-    //    {
-    //        exists = false;
-    //        foreach (RidePat ride in rpl)
-    //        {
-    //            if (ride.RidePatNum == int.Parse(dr.ItemArray[0].ToString()) && dr.ItemArray[2].ToString() != "")
-    //            {
-    //                Escorted es = new Escorted();
-    //                es.DisplayName = dr.ItemArray[2].ToString();
-    //                ride.pat.EscortedList.Add(es);
-    //                exists = true;
-    //                break;
-    //            }
-    //        }
-    //        if (exists) continue;
-    //        RidePat rp = new RidePat();
-    //        rp.RidePatNum = int.Parse(dr.ItemArray[0].ToString());
-    //        rp.pat = new Patient();
-    //        rp.pat.DisplayName = dr.ItemArray[1].ToString();
-    //        rp.pat.EscortedList = new List<Escorted>();
-    //        if (dr.ItemArray[2].ToString() != "")
-    //        {
-    //            Escorted e = new Escorted();
-    //            e.DisplayName = dr.ItemArray[2].ToString();
-    //            rp.pat.EscortedList.Add(e);
-    //        }
-
-    //        Destination origin = new Destination();
-    //        origin.Name = dr.ItemArray[3].ToString();
-    //        rp.StartPlace = origin;
-    //        Destination dest = new Destination();
-    //        dest.Name = dr.ItemArray[4].ToString();
-    //        rp.Destination = dest;
-    //        rp.Area = dr.ItemArray[5].ToString();
-    //        rp.Shift = dr.ItemArray[6].ToString();
-    //        rp.Date = Convert.ToDateTime(dr.ItemArray[7].ToString());
-    //        rpl.Add(rp);
-    //    }
-
-    //    return rpl;
-    //}
-    #endregion
+   
 }

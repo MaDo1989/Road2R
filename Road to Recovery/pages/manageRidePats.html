@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" dir="rtl">
 
 <head>
@@ -668,12 +668,14 @@
 
             const driverIndex = driverNames.indexOf(driverNameFromInput);
             const userSelected = drivers[driverIndex];
+
             let request;
             let dataString;
 
             if (_isDriverReplacement) {
                 //update the ride record with the new driver.
                 request = {
+                    ridePatId: _assignDriverToRidepatNum,
                     rideNum: _assignDriverToRideNum,
                     newDriverId: userSelected.Id,
                     assignedFromAppId: APP_ID
@@ -712,7 +714,7 @@
 
         const UpdateDriver_ECB = (err) => {
             $('#wait').hide();
-            alert('Issue in pdateDriver: ' + JSON.stringify(err));
+            alert('Issue in UpdateDriver: ' + JSON.stringify(err));
         }
 
         $(document).ready(function () {
@@ -2159,7 +2161,7 @@
 
                 isDriverReplacement = false;
                 driverWrapper = 'אין!<br/>None!';
-                driverWrapper += `<buttond onclick="assignGlobalVariablesForUpdateDriver(${ridePatNum, isDriverReplacement})"  data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>שבץ נהג</button>`;
+                driverWrapper += `<buttond onclick="assignGlobalVariablesForUpdateDriver(${ridePatNum}, ${isDriverReplacement})"  data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>שבץ נהג</button>`;
             }
 
             return driverWrapper;
