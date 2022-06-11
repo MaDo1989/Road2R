@@ -113,7 +113,7 @@ public class ReportService
     {
         public string query { get; set; }
 
-        public SqlParameter[] sqlParameters { get; set;  }
+        public SqlParameter[] sqlParameters { get; set; }
     }
 
     public class VolunteersInPeriod
@@ -264,7 +264,7 @@ AND RidePat.pickuptime >= '2020-1-01'
 
         List<SliceVolunteersPerMonthInfo> result = new List<SliceVolunteersPerMonthInfo>();
 
-        if (ds != null && ds.Tables.Count > 0 )
+        if (ds != null && ds.Tables.Count > 0)
         {
             DataTable dt = ds.Tables[0];
             foreach (DataRow dr in dt.Rows)
@@ -604,7 +604,7 @@ GROUP BY inner_select.DisplayName
 
         return result;
     }
-    
+
     internal List<MetricMonthlyInfo> GetReportMonthlyDigestMetrics(string start_date, string end_date)
     {
         string query =
@@ -819,7 +819,7 @@ GROUP BY inner_select.DisplayName
 
             if (only_with_rides.Equals("True"))
             {
-               result += " and rp.pickuptime >= @start_date";
+                result += " and rp.pickuptime >= @start_date";
             }
         }
 
@@ -827,9 +827,9 @@ GROUP BY inner_select.DisplayName
 
     }
 
-        // The interface to execute statements on DbService differes than the one to Query
-        // It should sometimes return also an array of parameters
-        internal INSERT_TO_NI_SQL_Objects GetQueryTextForINSERT_NIVolunteerList(string start_date, string only_with_rides)
+    // The interface to execute statements on DbService differes than the one to Query
+    // It should sometimes return also an array of parameters
+    internal INSERT_TO_NI_SQL_Objects GetQueryTextForINSERT_NIVolunteerList(string start_date, string only_with_rides)
     {
         string insert_header = @"INSERT into DeliveredNIReport   (DriverId, ReportDate) 
                                 SELECT  DISTINCT v.Id, CAST(GETDATE() AS Date) ";
@@ -854,7 +854,7 @@ GROUP BY inner_select.DisplayName
     }
 
 
-        internal SqlCommand BuildSqlCommandForNIVolunteerList(string start_date, string only_with_rides)
+    internal SqlCommand BuildSqlCommandForNIVolunteerList(string start_date, string only_with_rides)
     {
         SqlCommand cmd;
 
@@ -881,7 +881,7 @@ GROUP BY inner_select.DisplayName
 
         // This service is not to be used by everybody, check if user is entitled for it
         List<string> permissions = this.GetCurrentUserEntitlements(cell_phone);
-        if ( !permissions.Contains("Record_NI_report"))
+        if (!permissions.Contains("Record_NI_report"))
         {
             return result;   // Empty results - TODO: 404
         }
@@ -903,10 +903,10 @@ GROUP BY inner_select.DisplayName
             obj.CellPhone = dr["CellPhone"].ToString();
             obj.Address = dr["Address"].ToString();
             obj.CityCityName = dr["CityCityName"].ToString();
-            if ( dr.IsNull("JoinDate") )
+            if (dr.IsNull("JoinDate"))
             {
                 obj.JoinDate = DateTime.Now.ToString("dd/MM/yyyy");
-            } 
+            }
             else
             {
                 obj.JoinDate = ((DateTime)dr["JoinDate"]).ToString("dd/MM/yyyy");
@@ -1212,6 +1212,9 @@ group by CONVERT(date, pickuptime) ";
         DataSet ds = db.GetDataSetBySqlCommand(cmd);
         DataTable dt = ds.Tables[0];
 
+        // Now call another query so we know how many multi-segment rides we had
+        IDictionary<string, int>   multiSegMonthDB = secondary_query_GetMultiSegmentRidesMonthly(start_date, end_date);
+
         List<CenterMonthlyByYearInfo> result = new List<CenterMonthlyByYearInfo>();
 
         foreach (DataRow dr in dt.Rows)
@@ -1222,10 +1225,64 @@ group by CONVERT(date, pickuptime) ";
             obj.RidesCount = dr["COUNT_UNIQUE_RIDE"].ToString();
             obj.DemandsCount = dr["COUNT_DEMAND"].ToString();
             obj.Month = dr["MONTH_C"].ToString();
+
+            if (multiSegMonthDB.ContainsKey(obj.Month))
+            {
+                // substract the number of multi-seg rides
+                int orig_count = helper_unsafe_ParseIntger(obj.DemandsCount);
+                int new_value = orig_count - multiSegMonthDB[obj.Month];
+                if (new_value > 0) { // sanity check, I did not see this actually happening
+                    obj.DemandsCount = new_value.ToString();
+                }
+
+            }
             result.Add(obj);
         }
 
         return result;
+    }
+
+
+    /* Purpose: calculate how many cases we have of a patient being driven over 2 times a day, e.g.
+     *  Barrier --> Some-handover-location -> Hospital  -->  Barrier
+     *  e.g.  אייל -- גן שמואל -- רמב"ם -- אייל*/
+    internal IDictionary<string, int> secondary_query_GetMultiSegmentRidesMonthly(string start_date, string end_date)
+    {
+        DbService db = new DbService();
+
+        string query = @"select  
+            MONTH(DATE_C) as MONTH_C, count(* ) AS COUNT_MULTI_SEG
+            FROM (
+                Select FORMAT (PickupTime, 'yyyy-MM-dd') AS DATE_C, DisplayName, COUNT(*) AS COUNT_C
+                from RPView r
+                where MainDriver  is Not NULL
+                and PickupTime > @start_date
+                and PickupTime<@end_date
+                AND DisplayName not like N'אנונימי%'
+                GROUP BY FORMAT (PickupTime, 'yyyy-MM-dd'), DisplayName
+            ) S
+            where  COUNT_C > 2
+            GROUP BY MONTH(DATE_C)
+            ORDER BY MONTH_C ASC
+            ";
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+
+
+        IDictionary<string, int> monthDB = new Dictionary<string, int>();
+        DataTable dt = ds.Tables[0];
+        foreach (DataRow dr in dt.Rows)
+        {
+            int count = helper_unsafe_ParseIntger(dr["COUNT_MULTI_SEG"].ToString());
+            monthDB.Add(dr["MONTH_C"].ToString(), count);
+        }
+
+
+        return monthDB;
     }
 
 
@@ -1243,7 +1300,7 @@ group by CONVERT(date, pickuptime) ";
 
         if (volunteer.Equals("*"))
         {
-            condition +=  " AND MainDriver is not null";
+            condition += " AND MainDriver is not null";
         }
         else
         {
@@ -1270,8 +1327,8 @@ group by CONVERT(date, pickuptime) ";
         return cmd;
     }
 
-        internal List<CenterPatientsRidesInfo> GetReportCenterPatientsRides(string volunteer, string start_date, string end_date,
-        string origin, string destination)
+    internal List<CenterPatientsRidesInfo> GetReportCenterPatientsRides(string volunteer, string start_date, string end_date,
+    string origin, string destination)
     {
         DbService db = new DbService();
         SqlCommand cmd = build_command_ReportCenterPatientsRides(volunteer, start_date, end_date, origin, destination);
@@ -1341,6 +1398,19 @@ string origin, string destination)
         return result;
     }
 
+    private int helper_unsafe_ParseIntger(string s)
+    {
+        int result = 0;
+        try
+        {
+            result = int.Parse(s);
+        }
+        catch (Exception)
+        {
+
+        }
+        return result;
+    }
 
 
     //@@ TODO:  See notes on this method name in reports.js
