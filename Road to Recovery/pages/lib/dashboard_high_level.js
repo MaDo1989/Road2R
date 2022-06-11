@@ -11,12 +11,12 @@ window.ConfigFlags = {
 window.DebugFlags = {
     is_debugging_dsb: true,
     full_loading: false,
-    all_graphs: true,
+    all_graphs: false,
     load_rows: true,
 };
 
 // Set this (and tweak DebugFlags) to get only specific web-requests done
-// window.ConfigFlags = window.DebugFlags; 
+window.ConfigFlags = window.DebugFlags;   // @@
 
 // a mapping of event names to the next code that should be called
 // used to avoid flooding the server with dozens of queries at startup.
@@ -139,6 +139,7 @@ function start_current_daily_totals(query_object) {
             $("#dsb_hl_daily_rides_total").text(result.Rides);
             $("#dsb_hl_daily_patients_total").text(result.Patients);
             $("#dsb_hl_daily_volunteers_total").text(result.Volunteers);
+            $("#dsb_hl_daily_demands_total").text(result.Demands);
         },
         error: function (err) {
         }

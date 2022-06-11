@@ -155,6 +155,7 @@ public class ReportService
         public string Rides { get; set; }
         public string Patients { get; set; }
         public string Volunteers { get; set; }
+        public string Demands { get; set; }
     }
 
     public class CenterPatientsRidesInfo
@@ -590,6 +591,7 @@ GROUP BY inner_select.DisplayName
         DataSet ds = db.GetDataSetBySqlCommand(cmd);
         DataTable dt = ds.Tables[0];
 
+        bool add_demands = query.Contains("COUNT_DEMAND");
         List<MetricMonthlyInfo> result = new List<MetricMonthlyInfo>();
 
         foreach (DataRow dr in dt.Rows)
@@ -599,6 +601,10 @@ GROUP BY inner_select.DisplayName
             obj.Rides = dr["COUNT_UNIQUE_RIDES"].ToString();
             obj.Patients = dr["COUNT_PAT"].ToString();
             obj.Volunteers = dr["COUNT_VOL"].ToString();
+            if ( add_demands)
+            {
+                obj.Demands = dr["COUNT_DEMAND"].ToString();
+            }
             result.Add(obj);
         }
 
@@ -680,7 +686,8 @@ GROUP BY inner_select.DisplayName
     {
         // Gets info also on rides without an allocted driver
         string query =
-             @"SELECT  1 AS SPAN_C, count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, count(DISTINCT MainDriver) as COUNT_VOL
+             @"SELECT  1 AS SPAN_C, count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, 
+                    count(DISTINCT MainDriver) as COUNT_VOL, count(DisplayName) as COUNT_DEMAND
                 FROM (
 	                Select  MainDriver  , PickupTime, Origin, Destination, DisplayName, 
                     CASE WHEN ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) = '1' THEN 1
