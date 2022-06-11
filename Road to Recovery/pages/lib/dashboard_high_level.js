@@ -16,7 +16,7 @@ window.DebugFlags = {
 };
 
 // Set this (and tweak DebugFlags) to get only specific web-requests done
-window.ConfigFlags = window.DebugFlags;   // @@
+// window.ConfigFlags = window.DebugFlags;  
 
 // a mapping of event names to the next code that should be called
 // used to avoid flooding the server with dozens of queries at startup.
@@ -66,14 +66,14 @@ function dashboard_hl_init() {
     }
     else {
         // For fast debugging
-        start_daily_cards();
+        // start_daily_cards();
         // start_weekly_cards();
         // start_monthly_cards_this_month();
-        //start_all_months_rows(moment());
+        // start_all_months_rows(moment());
 
         // start_month_graph(moment(), get_month_card("curr_and_prev"));
 
-        // start_all_years_rows(new Date().getFullYear()); 
+        start_all_years_rows(new Date().getFullYear()); 
     }
 }
 
@@ -228,7 +228,7 @@ function start_weekly_cards() {
     else {
         // For debugging 
         // start_week_all_graphs(moment());
-        start_all_weeks_rows(moment());
+        start_all_weeks_rows(moment('2022-03-07'));
         //start_one_week_new_volunteers(get_week_card("curr"), moment());
 
     }
@@ -458,6 +458,8 @@ function render_on_week_row(dsg, entry) {
     $(label_id).text(entry.Rides);
     label_id = "#dsb_hl_weekly_tbl_" + dsg + "_vols";
     $(label_id).text(entry.Volunteers);
+    label_id = "#dsb_hl_weekly_tbl_" + dsg + "_demands";
+    $(label_id).text(entry.Demands);
 }
 
 function update_day_rows_names() {
@@ -839,6 +841,8 @@ function render_one_month_row(dsg, entry) {
     $(label_id).text(entry.Rides);
     label_id = "#dsb_hl_monthly_tbl_" + dsg + "_vols";
     $(label_id).text(entry.Volunteers);
+    label_id = "#dsb_hl_monthly_tbl_" + dsg + "_demands";
+    $(label_id).text(entry.Demands);
 }
 
 function update_month_rows_names(month, dsg) {
@@ -1377,8 +1381,6 @@ function get_years_range(year) {
 function start_all_years_rows(year) {
     var query_object = get_years_range(year);
 
-    console.log("start_all_years_rows", query_object);
-
     $.ajax({
         dataType: "json",
         url: "ReportsWebService.asmx/GetReportWithPeriodDigestMetrics",
@@ -1411,6 +1413,8 @@ function render_year_row(dsg, result) {
     $(label_id).text(result.Rides);
     label_id = "#dsb_hl_yearly_tbl_" + dsg + "_vols";
     $(label_id).text(result.Volunteers);
+    label_id = "#dsb_hl_yearly_tbl_" + dsg + "_demands";
+    $(label_id).text(result.Demands);
 }
 
 

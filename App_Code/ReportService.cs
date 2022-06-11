@@ -591,7 +591,7 @@ GROUP BY inner_select.DisplayName
         DataSet ds = db.GetDataSetBySqlCommand(cmd);
         DataTable dt = ds.Tables[0];
 
-        bool add_demands = query.Contains("COUNT_DEMAND");
+        bool with_demands = query.Contains("COUNT_DEMAND_RAW");
         List<MetricMonthlyInfo> result = new List<MetricMonthlyInfo>();
 
         foreach (DataRow dr in dt.Rows)
@@ -601,9 +601,11 @@ GROUP BY inner_select.DisplayName
             obj.Rides = dr["COUNT_UNIQUE_RIDES"].ToString();
             obj.Patients = dr["COUNT_PAT"].ToString();
             obj.Volunteers = dr["COUNT_VOL"].ToString();
-            if ( add_demands)
+            if (with_demands)
             {
-                obj.Demands = dr["COUNT_DEMAND"].ToString();
+                int raw_count = helper_unsafe_ParseIntger(dr["COUNT_DEMAND_RAW"].ToString());
+                int actual_count = raw_count - helper_unsafe_ParseIntger(dr["MULTI_SEG_TO_SUBSTRACT_C"].ToString());
+                obj.Demands = actual_count.ToString(); 
             }
             result.Add(obj);
         }
@@ -611,24 +613,7 @@ GROUP BY inner_select.DisplayName
         return result;
     }
 
-    internal List<MetricMonthlyInfo> GetReportMonthlyDigestMetrics(string start_date, string end_date)
-    {
-        string query =
-             @"SELECT 1 AS SPAN_C, count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
-                FROM  (
-	                select MainDriver  , PickupTime, Origin, Destination, DisplayName, 
-	                CASE WHEN ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) = '1' THEN 1
-		                ELSE 0
-	                END AS Unique_Drive_C
-	                from RPView r 
-	                where pickuptime >= @start_date 
-	                AND pickuptime <= @end_date
-	                AND MainDriver is not null
-                )  s";
-
-        return GetReportRangeDigestMetrics(start_date, end_date, "NA", "NA", query);
-    }
-
+    
 
     // pickuptime >= @start_date      AND pickuptime <= @end_date
 
@@ -644,6 +629,8 @@ GROUP BY inner_select.DisplayName
         }
     }
 
+    // Note: This is used in rows for Week/Month & Year in Dashboard.
+    // Recheck all three spans after changing
     internal List<MetricMonthlyInfo> GetReportWithPeriodDigestMetrics(string start_date, string end_date, string prev_start, string prev_end, string span)
     {
         string span_column;
@@ -667,12 +654,16 @@ GROUP BY inner_select.DisplayName
         string pickup_time_condition = buildTimeCondition("PickupTime", prev_start);
 
 
-        string query = string.Format(@"SELECT {0} AS SPAN_C, count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
+        string query = string.Format(@"SELECT {0} AS SPAN_C, count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, 
+                count(DISTINCT MainDriver) as COUNT_VOL, count(DisplayName) as COUNT_DEMAND_RAW, SUM(MULTI_SEG_TO_SUBSTRACT) AS MULTI_SEG_TO_SUBSTRACT_C
                 FROM  (
 	                select MainDriver  , PickupTime, Origin, Destination, DisplayName, 
 	                CASE WHEN ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) = '1' THEN 1
 		                ELSE 0
-	                END AS Unique_Drive_C
+	                END AS Unique_Drive_C,
+					CASE WHEN ROW_NUMBER() OVER (PARTITION by FORMAT (PickupTime , 'yyyy-MM-dd'), DisplayName  ORDER BY PickupTime Asc)  = '3' THEN 1
+						ELSE 0
+					END AS MULTI_SEG_TO_SUBSTRACT 
 	                from RPView r 
 	                where {1} AND MainDriver is not null
                 )  s
@@ -682,17 +673,21 @@ GROUP BY inner_select.DisplayName
         return GetReportRangeDigestMetrics(start_date, end_date, prev_start, prev_end, query);
     }
 
+    // Called from dashboard daily rows:   start_current_daily_totals() */
     internal List<MetricMonthlyInfo> GetReportDailyDigestMetrics(string start_date, string end_date)
     {
         // Gets info also on rides without an allocted driver
         string query =
              @"SELECT  1 AS SPAN_C, count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, 
-                    count(DISTINCT MainDriver) as COUNT_VOL, count(DisplayName) as COUNT_DEMAND
+                    count(DISTINCT MainDriver) as COUNT_VOL, count(DisplayName) as COUNT_DEMAND_RAW, SUM(MULTI_SEG_TO_SUBSTRACT) AS MULTI_SEG_TO_SUBSTRACT_C
                 FROM (
 	                Select  MainDriver  , PickupTime, Origin, Destination, DisplayName, 
                     CASE WHEN ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) = '1' THEN 1
 	                    ELSE 0
-                    END AS Unique_Drive_C
+                    END AS Unique_Drive_C,
+					CASE WHEN ROW_NUMBER() OVER (PARTITION by FORMAT (PickupTime , 'yyyy-MM-dd'), DisplayName  ORDER BY PickupTime Asc)  = '3' THEN 1
+						ELSE 0
+					END AS MULTI_SEG_TO_SUBSTRACT 
                     FROM RPView 
                     WHERE  Status != N'נמחקה'
                     AND RPView.pickuptime > @start_date
@@ -1194,14 +1189,18 @@ group by CONVERT(date, pickuptime) ";
         DbService db = new DbService();
 
         string query = @"SELECT  
-        MONTH(pickuptime) as MONTH_C, count(DISTINCT DisplayName) as COUNT_PAT, count(DisplayName) as COUNT_DEMAND, 
-        count(DISTINCT MainDriver) as COUNT_VOL, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDE
+        MONTH(pickuptime) as MONTH_C, count(DISTINCT DisplayName) as COUNT_PAT,
+        count(DISTINCT MainDriver) as COUNT_VOL, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDE,
+        count(DisplayName) as COUNT_DEMAND_RAW, SUM(MULTI_SEG_TO_SUBSTRACT) AS MULTI_SEG_TO_SUBSTRACT_C
         FROM (
 	           select MainDriver  , PickupTime, Origin, Destination, DisplayName, 
 	              ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) as row_num_C,
 	              CASE WHEN ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) = '1' THEN 1
 		              ELSE 0
-	              END AS Unique_Drive_C
+	              END AS Unique_Drive_C,
+  				  CASE WHEN ROW_NUMBER() OVER (PARTITION by FORMAT (PickupTime , 'yyyy-MM-dd'), DisplayName  ORDER BY PickupTime Asc)  = '3' THEN 1
+					ELSE 0
+				  END AS MULTI_SEG_TO_SUBSTRACT 
 	              from RPView r 
 	              where pickuptime >= @start_date 
 	                AND pickuptime <= @end_date
@@ -1219,8 +1218,8 @@ group by CONVERT(date, pickuptime) ";
         DataSet ds = db.GetDataSetBySqlCommand(cmd);
         DataTable dt = ds.Tables[0];
 
-        // Now call another query so we know how many multi-segment rides we had
-        IDictionary<string, int>   multiSegMonthDB = secondary_query_GetMultiSegmentRidesMonthly(start_date, end_date);
+        //  call another query so we know how many multi-segment rides we had
+        //  IDictionary<string, int>   multiSegMonthDB = secondary_query_GetMultiSegmentRidesMonthly(start_date, end_date);
 
         List<CenterMonthlyByYearInfo> result = new List<CenterMonthlyByYearInfo>();
 
@@ -1230,19 +1229,12 @@ group by CONVERT(date, pickuptime) ";
             obj.PatientCount = dr["COUNT_PAT"].ToString();
             obj.VolunteerCount = dr["COUNT_VOL"].ToString();
             obj.RidesCount = dr["COUNT_UNIQUE_RIDE"].ToString();
-            obj.DemandsCount = dr["COUNT_DEMAND"].ToString();
             obj.Month = dr["MONTH_C"].ToString();
 
-            if (multiSegMonthDB.ContainsKey(obj.Month))
-            {
-                // substract the number of multi-seg rides
-                int orig_count = helper_unsafe_ParseIntger(obj.DemandsCount);
-                int new_value = orig_count - multiSegMonthDB[obj.Month];
-                if (new_value > 0) { // sanity check, I did not see this actually happening
-                    obj.DemandsCount = new_value.ToString();
-                }
-
-            }
+            // substract the number of multi-seg rides
+            int orig_count = helper_unsafe_ParseIntger(dr["COUNT_DEMAND_RAW"].ToString());
+            int new_value = orig_count - helper_unsafe_ParseIntger(dr["MULTI_SEG_TO_SUBSTRACT_C"].ToString());
+            obj.DemandsCount = new_value.ToString();
             result.Add(obj);
         }
 
@@ -1252,7 +1244,9 @@ group by CONVERT(date, pickuptime) ";
 
     /* Purpose: calculate how many cases we have of a patient being driven over 2 times a day, e.g.
      *  Barrier --> Some-handover-location -> Hospital  -->  Barrier
-     *  e.g.  אייל -- גן שמואל -- רמב"ם -- אייל*/
+     *  e.g.  אייל -- גן שמואל -- רמב"ם -- אייל 
+     *  Currently not being used, as we are testing MULTI_SEG_TO_SUBSTRACT_C approach.
+     */
     internal IDictionary<string, int> secondary_query_GetMultiSegmentRidesMonthly(string start_date, string end_date)
     {
         DbService db = new DbService();
