@@ -1601,19 +1601,6 @@ public class RidePat
 
         BroadCast.BroadCast2Clients_driverHasAssigned2RidePat(rp);
 
-        if (Date > timeRightNow)
-        {
-            try
-            {
-                m.driverAddedToRide(RidePatNum, rp.Drivers[0]);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("A2 " + ex.Message);
-            }
-
-        }
-
         return RideId;
     }
     public int LeaveRidePat(int ridePatId, int rideId, int driverId)
