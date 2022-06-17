@@ -1530,26 +1530,16 @@ public class RidePat
             throw new Exception("הנסיעה אליה נרשמתם כבר מלאה");
         }
 
-
         if (dr["RideNum"].ToString() != "") //Ride aleady exists
         {
             RideId = int.Parse(dr["RideNum"].ToString());
-
 
             if (dr["MainDriver"].ToString() == "") //No main driver is assigned to this ride
             {
                 if (driverType == "primary")
                     query = "update Ride set MainDriver=" + userId + ", AssignedFromAppId=" + assignedFromAppId + " where RideNum=" + RideId;
             }
-            //A main driver IS assigned to this ride
-            //else //if (dr["MainDriver"].ToString() != userId.ToString()) //Check that the current user is not already assigned as primary to this ride
-            //{
-            //    if (driverType == "primary") throw new Exception("לנסיעה זו כבר שובץ נהג ראשי. באפשרותכם להירשם אליה כגיבוי"); //The driver asked to be assigned as primary and there already is a primary
-
-            //    if (dr["secondaryDriver"].ToString() != "") throw new Exception("הנסיעה אליה נרשמתם כבר מלאה"); //The driver asked to be assigned as secondary and there already is a secondary
-
-            //    query = "update Ride set secondaryDriver=" + userId + " where RideNum=" + RideId; //Assign a secondary driver to this ride
-            //}
+           
             DbService db4 = new DbService();
             int res = db4.ExecuteQuery(query);
             if (res <= 0) return -1;
@@ -1574,31 +1564,7 @@ public class RidePat
             if (res <= 0) return -1;
         }
 
-        Message m = new Message();
-        Volunteer v = new Volunteer();
-        TimeSpan hourDiff = Date - timeRightNow;
-
-        if (hourDiff.TotalHours <= 12 && (Date > timeRightNow))
-        {
-            bool primary = false;
-            if (driverType == "primary")
-            {
-                primary = true;
-            }
-            try
-            {
-                m.driverSignUpToCloseRide(ridePatId, v.getVolunteerByID(userId), primary);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("A1 " + ex.Message);
-            }
-        }
-
-
         RidePat rp = GetRidePat(ridePatId);
-        RidePatNum = rp.RidePatNum;
-
         BroadCast.BroadCast2Clients_driverHasAssigned2RidePat(rp);
 
         return RideId;
