@@ -1,8 +1,14 @@
-﻿<div class="modal-dialog" role="document">
+﻿<style>
+    .center {
+        display: grid;
+        place-items: center;
+    }
+</style>
+<div class="modal-dialog center" role="document">
     <div class="modal-content modal-sm">
         <div class="modal-header">
             <button id="overRideBS_modal_4changeClose_x" type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
+                <span aria-hidden="true" onclick="assignDriverToRidePatAbort()" >&times;</span>
             </button>
             <h2 class="modal-title" id="driverModalTitle"></h2>
         </div>
@@ -15,3 +21,4 @@
         </div>
     </div>
 </div>
+
