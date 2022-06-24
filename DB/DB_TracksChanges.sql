@@ -441,9 +441,10 @@ BEGIN
 
 			UPDATE RidePat SET RideId=@CreatedRideId WHERE RidePatNum=@ridePatId
 
-			SELECT 0 AS IsError, @Success AS Message, * FROM RPView WHERE RidePatNum=@ridePatId
+			SELECT 0 AS IsError, @Success AS Message, @CreatedRideId AS RideId
 
 		END
 END
 GO
+
 
