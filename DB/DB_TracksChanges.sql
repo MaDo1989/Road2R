@@ -385,13 +385,11 @@ GO
 -- ALTER DATE:   ---
 -- ALTER REASON: ---
 -- =============================================
-CREATE OR ALTER PROCEDURE spRideAndRidePat_AssignDriver
+CREATE OR ALTER PROCEDURE [dbo].[spRideAndRidePat_AssignDriver]
 (
-	@ridePatId int,
-	@rideId int,
-	@driverId int,
-	@assignedFromAppId int
-
+	@ridePatId INT,
+	@driverId INT,
+	@assignedFromAppId INT
 )
 AS
 BEGIN
@@ -402,9 +400,10 @@ BEGIN
 		@AllReadyAssigned NVARCHAR(75)				= N'הנסיעה אליה נרשמת כבר מלאה',
 		@NotExistsRidePat NVARCHAR(75)				= N'נסיעה זו בוטלה, תודה על הרצון לעזור',
 		@DriverIsNotActiveNorDriving NVARCHAR(75)	= N'הנהג אינו פעיל/ אינו נוהג או שניהם',
-		@Origin NVARCHAR(255)						= (SELECT Origin FROM RidePat WHERE RidePatNum=@ridePatId),
+		@Origin NVARCHAR(255)						= (SELECT Origin      FROM RidePat WHERE RidePatNum=@ridePatId),
 		@Destination NVARCHAR(255)					= (SELECT Destination FROM RidePat WHERE RidePatNum=@ridePatId),
-		@Date datetime								= (SELECT PickupTime FROM RidePat WHERE RidePatNum=@ridePatId),
+		@Date DATETIME								= (SELECT PickupTime  FROM RidePat WHERE RidePatNum=@ridePatId),
+		@rideId INT									= (SELECT RideId      FROM RidePat WHERE RidePatNum=@ridePatId),
 		@CreatedRideId INT							= NULL
 
 
@@ -426,7 +425,7 @@ BEGIN
 		RETURN;
 		END
 
-	IF EXISTS (SELECT 1 FROM Ride where RideNum=@rideId)
+	IF EXISTS (SELECT 1 FROM Ride WHERE RideNum=@rideId)
 		BEGIN
 				UPDATE Ride SET MainDriver=@driverId, AssignedFromAppId = @assignedFromAppId WHERE RideNum=@rideId
 				SELECT 0 AS IsError, @Success AS Message, @rideId AS RideId
@@ -441,8 +440,9 @@ BEGIN
 			SET @CreatedRideId = (SELECT SCOPE_IDENTITY());
 
 			UPDATE RidePat SET RideId=@CreatedRideId WHERE RidePatNum=@ridePatId
-			
-			SELECT 0 AS IsError, @Success AS Message, @CreatedRideId AS RideId
+
+			SELECT 0 AS IsError, @Success AS Message, * FROM RPView WHERE RidePatNum=@ridePatId
+
 		END
 END
 GO
