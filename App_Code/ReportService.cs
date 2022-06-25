@@ -167,6 +167,16 @@ public class ReportService
         public string Destination { get; set; }
     }
 
+    public class CenterTomorrowsRides
+    {
+        public string Patient { get; set; }
+        public string DriverID { get; set; }
+        public string Pickuptime { get; set; }
+        public string EscortCount { get; set; }
+        public string Origin { get; set; }
+        public string Destination { get; set; }
+    }
+
     private DataTable getDriverByID(int driverID, DbService db)
     {
         string query = "select Id,DisplayName,CellPhone from Volunteer where Id = @ID";
@@ -1410,6 +1420,55 @@ string origin, string destination)
         {
 
         }
+        return result;
+    }
+
+    internal List<ReportService.CenterTomorrowsRides> GetReportCenterTomorrowsRides(string start_date, string end_date)
+    {
+        DbService db = new DbService();
+
+        // Create Temporary Table, counting escorts per Ride
+        string query = 
+            @"select RidePatNum, COUNT(*) AS COUNT_C INTO #ESCORTS_PER_RIDE
+                from RidePatEscortView
+                GROUP BY RidePatNum ";
+        db.GetDataSetByQuery(query,false);  // do not close the connection.
+
+        // Find the records, using LEFT joins to get English names of Orig/Dest
+        // Also use the temporary table to count escorts per ride
+        query =
+             @"select Pickuptime, MainDriver, r.EnglishName, l1.EnglishName as ORIGIN_C, l2.EnglishName AS DEST_C, escorts.COUNT_C AS ESCORTS_C
+                from RPView r 
+                LEFT JOIN Location l1  ON r.Origin = l1.Name 
+                LEFT JOIN Location l2  ON r.Destination = l2.Name 
+                LEFT JOIN #ESCORTS_PER_RIDE escorts ON escorts.RidePatNum = r.RidePatNum 
+                WHERE MainDriver is not null
+                AND pickuptime > @start_date
+                AND pickuptime < @end_date
+                ORDER BY PickupTime ASC";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        List<ReportService.CenterTomorrowsRides> result = new List<ReportService.CenterTomorrowsRides>();
+        foreach (DataRow dr in dt.Rows)
+        {
+            CenterTomorrowsRides obj = new CenterTomorrowsRides();
+            obj.Patient = dr["EnglishName"].ToString();
+            obj.Origin = dr["ORIGIN_C"].ToString();
+            obj.Destination = dr["DEST_C"].ToString();
+            obj.EscortCount = dr["ESCORTS_C"].ToString();
+            obj.Pickuptime = dr["Pickuptime"].ToString();
+            obj.DriverID = dr["MainDriver"].ToString();
+            result.Add(obj);
+        }
+
+        db.CloseConnection(); // force freeing teh temporary table
         return result;
     }
 

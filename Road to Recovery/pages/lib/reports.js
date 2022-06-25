@@ -106,6 +106,7 @@ var K_strategy = {
     "rp_center_daily_by_month": rp_center_daily_by_month__refresh_preview,
     "rp_center_monthly_by_year": rp_center_monthly_by_year__refresh_preview,
     "rp_center_patients_rides": empty_func,
+    "rp_center_tomorrows_rides": empty_func,
 }
 
 
@@ -267,9 +268,18 @@ var K_fields_map = {
             id: "rp_patients_rides__generate",
             template: 'div[name="template_GENERATE_REPORT"]',
             type: "GENERATE_REPORT",
-            post_clone: field_generate_report_post_clone
+            post_clone: rp_center_patients_rides_genreport_post_clone
         }
-    ]
+    ],
+    "rp_center_tomorrows_rides": [
+        {
+            id: "rp_center_tomorrows_rides_generate",
+            template: 'div[name="template_GENERATE_REPORT"]',
+            type: "GENERATE_REPORT",
+            post_clone: rp_center_tomorrows_rides_genreport_post_clone
+        }
+    ],
+
 
 
     
@@ -718,8 +728,12 @@ function field_destinations_post_clone(id) {
     
 }
 
-function field_generate_report_post_clone(id) {
+function rp_center_patients_rides_genreport_post_clone(id) {
     $("#generate_report_period").click(rp_center_patients_rides__refresh_preview);
+}
+
+function rp_center_tomorrows_rides_genreport_post_clone(id) {
+    $("#generate_report_period").click(rp_center_tomorrows_rides__refresh_preview);
 }
 
 function rp_vl_ride_month_generate_post_clone(id) {
@@ -2362,6 +2376,37 @@ function rp_center_patients_rides__refresh_Table(volunteerId, start_date, end_da
     });
 
 }
+
+
+// Checks if all fields are filled. If so refresh the report
+function rp_center_tomorrows_rides__refresh_preview() {
+    let start_moment = moment("2022-02-06");
+    end_moment = moment(start_moment);
+    end_moment.add(1, 'days');
+
+    let query_object = {
+        start_date: start_moment.format("YYYY-MM-DD"),
+        end_date: end_moment.format("YYYY-MM-DD")
+    };
+
+    console.log(query_object);
+
+    $.ajax({
+        dataType: "json",
+        url: "ReportsWebService.asmx/GetReportCenterTomorrowsRides",
+        contentType: "application/json; charset=utf-8",
+        type: "POST",
+        data: JSON.stringify(query_object),
+        success: function (data) {
+            console.log(data);
+        },
+        error: function (err) {
+            $('#wait').hide();
+        }
+    });
+
+}
+
 
 function rp_center_patients_rides__query_patients_count(query_object) {
     $.ajax({
