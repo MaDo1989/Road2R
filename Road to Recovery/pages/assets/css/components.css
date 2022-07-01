@@ -1960,6 +1960,10 @@ table.dataTable td.focus {
     color: rgb(40,96,145);
 }
 
+.redFont{
+    color: red;
+}
+
 .boldFont {
     font-weight: bold;
 }

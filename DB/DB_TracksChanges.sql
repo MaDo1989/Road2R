@@ -447,4 +447,19 @@ BEGIN
 END
 GO
 
-
+-- =============================================
+-- Author:      Yogev Strauber
+-- Description: View which combine number of tables
+-- ALTER DATE:  01/07/2022
+-- ALTER REASON: add details on driver
+-- =============================================
+CREATE OR ALTER VIEW [dbo].[RPView]
+AS
+SELECT    dbo.Patient.DisplayName, dbo.Patient.Id, dbo.Patient.CellPhone, dbo.Patient.IsAnonymous, dbo.RidePat.RidePatNum, dbo.RidePat.Origin, dbo.RidePat.Destination, dbo.RidePat.PickupTime, V.DisplayName AS Coordinator, 
+                         dbo.RidePat.Status, dbo.RidePat.Area, dbo.RidePat.Shift, dbo.Ride.RideNum, dbo.Ride.Origin AS RideOrigin, dbo.Ride.Destination AS RideDestination, dbo.Ride.Date, dbo.Ride.MainDriver, dbo.Ride.secondaryDriver, 
+                         dbo.RidePat.Remark, dbo.RidePat.OnlyEscort, dbo.Patient.EnglishName, dbo.RidePat.lastModified, driver.NoOfDocumentedRides
+FROM            dbo.Patient INNER JOIN 
+                         dbo.RidePat ON dbo.Patient.DisplayName = dbo.RidePat.Patient LEFT OUTER JOIN
+                         dbo.Ride ON dbo.RidePat.RideId = dbo.Ride.RideNum LEFT JOIN Volunteer V on RidePat.CoordinatorID = V.Id
+						 LEFT JOIN Volunteer driver on driver.Id = dbo.Ride.MainDriver
+GO

@@ -809,8 +809,10 @@ public class RidePat
                 mainDriver.Id = int.Parse(dr["MainDriver"].ToString());
                 mainDriver = mainDriver.getVolunteerByID(mainDriver.Id);
                 mainDriver.RegId = mainDriver.GetVolunteerRegById(mainDriver.Id);
+                int numberOfRides = 0;
+                int.TryParse(dr["NoOfDocumentedRides"].ToString(), out numberOfRides);
+                mainDriver.NoOfDocumentedRides = numberOfRides;
                 mainDriver.DriverType = "Primary";
-
                 rp.Drivers.Add(mainDriver);
             }
 
@@ -902,7 +904,7 @@ public class RidePat
         //SqlParameter[] cmdparams= new SqlParameter[1];
         cmd.CommandType = CommandType.Text;
         //cmdparams[0] = cmd.Parameters.AddWithValue("id", id);
-        string query = "select Id, DisplayName, CellPhone, EnglishFN, EnglishLN from Volunteer";
+        string query = "select Id, DisplayName, CellPhone, EnglishFN, EnglishLN, NoOfDocumentedRides from Volunteer";
         DataSet ds = db.GetDataSetByQuery(query);
         DataTable dt = ds.Tables[0];
         return dt;
@@ -1072,7 +1074,11 @@ public class RidePat
                             String.IsNullOrEmpty(Convert.ToString(driverRow[0]["EnglishLN"])) ?
                             "" :
                             Convert.ToString(driverRow[0]["EnglishLN"]);
-
+                        
+                        int numberOfRides = 0;
+                        int.TryParse(driverRow[0]["NoOfDocumentedRides"].ToString(), out numberOfRides);
+                        primary.NoOfDocumentedRides = numberOfRides;
+                        
                         rp.Drivers.Add(primary);
                     }
 
@@ -1530,7 +1536,7 @@ public class RidePat
 
             RidePat rp = GetRidePat(ridePatId);
             BroadCast.BroadCast2Clients_driverHasAssigned2RidePat(rp);
-            
+
         }
         catch (Exception e)
         {

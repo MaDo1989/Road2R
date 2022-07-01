@@ -445,6 +445,8 @@
         const { ajaxCall } = GENERAL.FETCH_DATA;
         const { APP_ID } = GENERAL;
 
+        const newVolunteerText = `מתנדב חדש`;
+
         const controllersLayout = "<'row top'<'col-sm-6'l><'col-sm-5'f><'col-sm-1'B>>rt<'bottom'p>";//https://datatables.net/reference/option/dom
         let drivers, driverNames;
         let _assignDriverToRidepatNum;
@@ -701,7 +703,7 @@
         const assignDriverToRidePatAbort = () => {
             _trToHighLight.classList.remove('highlightRow');
         }
-        
+
         const assignDriverToRidePat_SCB = (data) => {
             $('#wait').hide();
             _trToHighLight.classList.remove('highlightRow');
@@ -2149,7 +2151,8 @@
 
                 isDriverReplacement = true;
                 let driverInnerContent = '';
-                const { Id, DisplayName, EnglishFN, EnglishLN, CellPhone } = driver;
+                const { Id, DisplayName, EnglishFN, EnglishLN, CellPhone, NoOfDocumentedRides } = driver;
+                let isCountAsNewVolunteer = NoOfDocumentedRides <= 3;
 
                 if (!isAssistant) {                         //hebrew
 
@@ -2162,7 +2165,8 @@
                         DisplayName
                 }
 
-                driverWrapper = `<a href="volunteerform.html" data-obj="volunteer" class="showMe driverName clickable blueFont boldFont"`;
+                driverWrapper = isCountAsNewVolunteer ? `<span class='redFont boldFont'>${newVolunteerText}</span>` : ``;
+                driverWrapper += `<a href="volunteerform.html" data-obj="volunteer" class="showMe driverName clickable blueFont boldFont"`;
                 driverWrapper += `id='${Id}'>${driverInnerContent}</a>`;
                 driverWrapper += `<span class="driverCellPhone">${addSeperator2MobileNum(CellPhone, '-')}</span>`;
                 driverWrapper += `<buttond onclick="prepreparationAssignDriverModal(this, ${ridePatNum}, ${isDriverReplacement}, ${rideNum})" data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>עדכן נהג</button>`;
