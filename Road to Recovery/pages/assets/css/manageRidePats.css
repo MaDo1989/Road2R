@@ -119,13 +119,6 @@ input:checked + .slider:before {
     width: 5vw;
 }
 
-.clickable:hover {
-    cursor: pointer;
-    color: mediumblue;
-    border-bottom: solid mediumblue 1px;
-    max-width: fit-content;
-    /*↑ works great in chrome*/
-}
 
 .driverName, .driverCellPhone {
     display: block;
@@ -135,13 +128,6 @@ input:checked + .slider:before {
     height: 2vh;
 }
 
-.blueFont {
-    color: rgb(40,96,145);
-}
-
-.boldFont {
-    font-weight: bold;
-}
 
 .block {
     display: block;
@@ -181,7 +167,7 @@ input:checked + .slider:before {
         background: rgb(200,200,200);
     }
 
-.ContextMenu_dropdown{
+.ContextMenu_dropdown {
     color: white;
     background: rgb(200,200,200);
     padding: 5px 10px !important;
@@ -244,4 +230,20 @@ input:checked + .slider:before {
 
 .withIn24HoursDrive {
     background: orange;
+}
+
+.add-driver {
+    margin-top: 5px;
+}
+
+.ui-autocomplete {
+    z-index: 5000 !important;
+    max-height: 150px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: fixed !important;
+}
+
+.highlightRow {
+    background-color: rgb(198, 220, 255) !important;
 }

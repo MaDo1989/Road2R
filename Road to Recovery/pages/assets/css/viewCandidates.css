@@ -149,3 +149,8 @@ textarea:disabled:hover {
 .badge {
     width: 30px;
 }
+
+.btnsInSameLine {
+    display: flex;
+    justify-content: space-between;
+}

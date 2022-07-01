@@ -1,4 +1,4 @@
-﻿
+﻿const afterNoon = `אחה"צ`;
 var GENERAL = {
 
     USER: {
@@ -115,7 +115,7 @@ var GENERAL = {
                 dataType: "json",
                 url: `WebService.asmx/${funcNameInWebService}`,
                 contentType: "application/json; charset=utf-8",
-                type: "POST",                                  /*WE ALWAYS USE POST*/
+                type: "POST",
                 data: data,
                 success: successCB,
                 error: errorCB
@@ -287,10 +287,85 @@ var GENERAL = {
             let y = b.Name.trim();
 
             return x < y ? -1 : x > y ? 1 : 0;
-        }
+        },
+
+        showMe: ({ objName, displayName }) => {
+
+            const func = 'edit';
+            let arr_details;
+
+            switch (objName) {
+                case 'patient':
+                    arr_details = { displayName, func };
+                    GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
+
+                    break;
+                case 'volunteer':
+                    arr_details = { displayName, func };
+                    GENERAL.VOLUNTEERS.setVolunteersList(JSON.stringify(arr_details));
+
+                    break;
+            }
+
+        },
+        /**
+        * a and b are a pair of dateTime to compare these two general example:
+        * dd.mm.yyy, hh:mm OR dd.mm.yyy, אחה"צ 
+        * אחה"צ is calculated as 23:59 
+        * Returns an int 
+        * Ascending: → 0 if a=b, 1 if a > b, -1 if a < b
+        * Descending: → 0 if a=b,-1 if a > b,  1 if a > b
+        */
+        datetimeCompateFunc: (a, b, isAscending) => {
+
+            let dateAndTimeArrayof_a = $.trim(a).split(', ');
+            let dateAndTimeArrayof_b = $.trim(b).split(', ');
+
+
+            let ddmmyyyArr_a = dateAndTimeArrayof_a[0].split('.');
+            let ddmmyyyArr_b = dateAndTimeArrayof_b[0].split('.');
+
+            let dd_a = parseInt(ddmmyyyArr_a[0]);
+            let mm_a = parseInt(ddmmyyyArr_a[1]);
+            let yyyy_a = parseInt(ddmmyyyArr_a[2]);
+
+            let dd_b = parseInt(ddmmyyyArr_b[0]);
+            let mm_b = parseInt(ddmmyyyArr_b[1]);
+            let yyyy_b = parseInt(ddmmyyyArr_b[2]);
+
+
+            let time_a = dateAndTimeArrayof_a[1].split(':');
+            let time_b = dateAndTimeArrayof_b[1].split(':');
+
+            let hh_a = time_a[0] === afterNoon ? 23 : parseInt(time_a[0]);
+            let minutes_a = time_a[0] === afterNoon ? 59 : parseInt(time_a[1]);
+
+            let hh_b = time_b[0] === afterNoon ? 23 : parseInt(time_b[0]);
+            let minutes_b = time_b[0] === afterNoon ? 59 : parseInt(time_b[1]);
+
+            //new Date(year, monthIndex, day, hours, minutes)
+            let a_dateAndTime = new Date(yyyy_a, mm_a - 1, dd_a, hh_a, minutes_a);
+            let b_dateAndTime = new Date(yyyy_b, mm_b - 1, dd_b, hh_b, minutes_b);
+
+            a = a_dateAndTime.getTime();
+            b = b_dateAndTime.getTime();
+
+            let result;
+            if (isAscending) {
+
+                result = a === b ? 0 : a > b ? 1 : -1;
+            } else {//Descending
+
+                result = a === b ? 0 : a > b ? -1 : 1;
+            }
+            return result;
+        },
+
     },
 
     COPYWRITE: () => {
         return "2022 - 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה";
-    }
+    },
+
+    APP_ID: 1,
 };

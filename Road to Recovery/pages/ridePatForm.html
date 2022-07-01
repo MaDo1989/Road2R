@@ -199,6 +199,8 @@
             buildStringforDriverResponsibilityEquipment,
             compareFunc
         } = GENERAL.USEFULL_FUNCTIONS;
+        const { APP_ID } = GENERAL;
+
         let patients_Names = []
         let rideNumber = 0;
         let x_wasClicked = false;
@@ -1920,7 +1922,6 @@
         }
 
         function generateDrivers() {
-            //var $drivers = $("#Driver");
 
             $.ajax({
                 dataType: "json",
@@ -1930,7 +1931,6 @@
                     xhr.setRequestHeader("Content-Encoding", "gzip");
                 },
                 type: "POST",
-                // async: false,
                 data: JSON.stringify({ isActive: true, isDriving: true }),
                 success: function (data) {
                     var arr_drivers = JSON.parse(data.d);
@@ -1977,33 +1977,32 @@
                 };
                 localStorage.removeItem("ridePatId");
             }
+            request.assignedFromAppId = APP_ID;
             var dataString = JSON.stringify(request);
             if (currentDriverId == -1) {
                 currentDriverId = userSelected;
                 $('#wait').show();
 
                 if (checkNumberOfRides == 1) {
-                    $.ajax({ // ajax call starts
-                        url: 'WebService.asmx/AssignRideToRidePat',   // server side web service method
-                        data: dataString,                          // the parameters sent to the server
-                        type: 'POST',                              // can be also GET
-                        dataType: 'json',                          // expecting JSON datatype from the server
-                        contentType: 'application/json; charset = utf-8', // sent to the server
-                        success: signDriverSuccessCB,                // data.d id the Variable data contains the data we get from serverside
+                    $.ajax({ 
+                        url: 'WebService.asmx/AssignRideToRidePat',   
+                        data: dataString,                          
+                        type: 'POST',                             
+                        contentType: 'application/json; charset = utf-8', 
+                        success: signDriverSuccessCB,                
                         error: signDriverErrorCB
-                    }) // end of ajax call
+                    }) 
                 }
                 else {
-                    console.log(dataString)
-                    $.ajax({ // ajax call starts
-                        url: 'WebService.asmx/AssignMultiRideToRidePat',   // server side web service method
-                        data: dataString,                          // the parameters sent to the server
-                        type: 'POST',                              // can be also GET
-                        dataType: 'json',                          // expecting JSON datatype from the server
-                        contentType: 'application/json; charset = utf-8', // sent to the server
-                        success: signDriverSuccessCB,                // data.d id the Variable data contains the data we get from serverside
+                    $.ajax({ 
+                        url: 'WebService.asmx/AssignMultiRideToRidePat',  
+                        data: dataString,                         
+                        type: 'POST',                             
+                        dataType: 'json',                         
+                        contentType: 'application/json; charset = utf-8', 
+                        success: signDriverSuccessCB,               
                         error: signDriverErrorCB
-                    }) // end of ajax call
+                    }) 
                 }
 
 
@@ -2061,9 +2060,10 @@
 
         }
 
-        function signDriverErrorCB() {
+        function signDriverErrorCB(err) {
             $('#wait').hide();
-            alert("Error signing driver");
+            alert("Error signing driver ");
+            console.log(err.responseJSON.Message);
 
         }
 
