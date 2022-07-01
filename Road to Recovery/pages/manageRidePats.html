@@ -32,10 +32,9 @@
         let node2manipulate;
         let nodechilds;
         let lastModified_td;
-
         const ADD_DRIVER = 'add driver', REMOVE_DRIVER = 'remove driver';
 
-        //function to reuse
+        //functions to reuse
         const update_arr_rides = (updated_ridePat) => {
             const index = arr_rides.findIndex(r => r.RidePatNum === updated_ridePat.RidePatNum)
             arr_rides[index] = updated_ridePat;
@@ -127,7 +126,7 @@
                     row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
                     row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
                     row2manipulate.patient = buildPatientHTML(updated_ridePat);
-                    row2manipulate.driver = buildDriverHTML(updated_ridePat.Drivers[0]);
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
@@ -147,7 +146,7 @@
                     row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
                     row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
                     row2manipulate.patient = buildPatientHTML(updated_ridePat);
-                    row2manipulate.driver = buildDriverHTML(updated_ridePat.Drivers[0]);
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
@@ -168,7 +167,7 @@
                     row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
                     row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
                     row2manipulate.patient = buildPatientHTML(updated_ridePat);
-                    row2manipulate.driver = buildDriverHTML(updated_ridePat.Drivers[0]);
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
@@ -189,7 +188,7 @@
                     row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
                     row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
                     row2manipulate.patient = buildPatientHTML(updated_ridePat);
-                    row2manipulate.driver = buildDriverHTML(updated_ridePat.Drivers[0]);
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
@@ -235,7 +234,7 @@
 
                     row2manipulate = tMorning.row(`#${updated_ridePat.RidePatNum}`).data();
 
-                    row2manipulate.driver = 'אין!<br/>None!';;
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
 
@@ -249,7 +248,8 @@
 
                     row2manipulate = tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data();
 
-                    row2manipulate.driver = 'אין!<br/>None!';;
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum);
+
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
 
@@ -263,7 +263,7 @@
 
                     row2manipulate = tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data();
 
-                    row2manipulate.driver = 'אין!<br/>None!';;
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
 
@@ -277,7 +277,7 @@
 
                     row2manipulate = tFuture.row(`#${updated_ridePat.RidePatNum}`).data();
 
-                    row2manipulate.driver = 'אין!<br/>None!';;
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
 
@@ -296,28 +296,18 @@
                     tr_nodesAsArray = null;
                     break;
             }
+
             if (tr_nodesAsArray) {
 
                 tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
                 manipilateNodeStyle(tr_node2manipulate, updated_ridePat, REMOVE_DRIVER, false, tableName2manipulate);
             }
-
-
-
         }
     </script>
 
     <!-- #endregion REAL-TIME BY SIGNALR - FOR ANY COMPLAINTS WHATSOEVER YOU CAN TALK 2 YOGEV -->
-    <!-- DataTables -->
-    <link href="../plugins/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
-    <link href="../plugins/datatables/buttons.bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link href="../plugins/datatables/fixedHeader.bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link href="../plugins/datatables/responsive.bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link href="../plugins/datatables/scroller.bootstrap.min.css" rel="stylesheet" type="text/css" />
-
     <!-- Sweet Alert css -->
     <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
-
     <link href="../plugins/switchery/switchery.min.css" rel="stylesheet" />
     <link href="assets/css/bootstrap-rtl.min.css" rel="stylesheet" type="text/css">
     <link href="assets/css/core.css" rel="stylesheet" type="text/css">
@@ -332,31 +322,86 @@
     <script src="assets/js/modernizr.min.js"></script>
 
 
+    <!-- Data Table export to excel module -->
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
 
     <script src="assets/js/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.6.1/jszip.min.js" integrity="sha512-qDzk+Wqv8uAmrIr0t9Hjo4qM3DjvwTWuuuG3w9H8JBKd1EMpMaUEKoHKYbX6yP+ilTloEADFKFwKMzOZLlgTEg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
 
-    <script src="dataTables.js"></script>
-    <script src="moment.js"></script>
-    <script src="datetime-moment.js"></script>
-    <script src="./moment.js"></script>
-
-
+    <!--<script src="datetime-moment.js"></script>-->
+    <!--<script src="./moment.js"></script>-->
     <!-- Select2 css+js -->
-    <link href="assets/css/select2.css" rel="stylesheet" />
-    <script src="assets/js/select2.min.js"></script>
-    <!--<script src="lib/moment.js"></script>-->
-    <!--<script src="../plugins/moment/moment.js"></script>-->
+    <!--<link href="assets/css/select2.css" rel="stylesheet" />
+    <script src="assets/js/select2.min.js"></script>-->
+    <!-- jQuery  -->
+    <script src="assets/js/bootstrap-rtl.min.js"></script>
+    <script src="assets/js/detect.js"></script>
+    <script src="assets/js/fastclick.js"></script>
+    <script src="assets/js/jquery.slimscroll.js"></script>
+    <script src="assets/js/jquery.blockUI.js"></script>
+    <script src="assets/js/waves.js"></script>
+    <script src="assets/js/wow.min.js"></script>
+    <script src="assets/js/jquery.nicescroll.js"></script>
+    <script src="assets/js/jquery.scrollTo.min.js"></script>
+    <script src="../plugins/switchery/switchery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="assets/js/jquery.core.js"></script>
+    <script src="assets/js/jquery.app.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
-    <script src="lib/sorting.js"></script>
+    <!-- DataTables -->
+    <link href="../plugins/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/buttons.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/fixedHeader.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/responsive.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/scroller.bootstrap.min.css" rel="stylesheet" type="text/css" />
+
+    <!-- Datatables-->
+    <!--<script src="moment.js"></script>-->
+    <script src="dataTables.js"></script>
+    <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="../plugins/datatables/dataTables.bootstrap.js"></script>
+    <script src="../plugins/datatables/dataTables.buttons.min.js"></script>
+    <script src="../plugins/datatables/buttons.bootstrap.min.js"></script>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.0/jszip.min.js"
+            integrity="sha512-xcHCGC5tQ0SHlRX8Anbz6oy/OullASJkEhb4gjkneVpGE3/QGYejf14CUO5n5q5paiHfRFTa9HKgByxzidw2Bw=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>-->
+    <!--<script src="../plugins/datatables/pdfmake.min.js"></script>-->
+    <script src="../plugins/datatables/vfs_fonts.js"></script>
+    <script src="../plugins/datatables/buttons.html5.min.js"></script>
+    <script src="../plugins/datatables/buttons.print.min.js"></script>
+    <script src="../plugins/datatables/dataTables.fixedHeader.min.js"></script>
+    <script src="../plugins/datatables/dataTables.keyTable.min.js"></script>
+    <script src="../plugins/datatables/dataTables.responsive.min.js"></script>
+    <script src="../plugins/datatables/responsive.bootstrap.min.js"></script>
+    <script src="../plugins/datatables/dataTables.scroller.min.js"></script>
+
+
+    <!-- Datatable init js -->
+    <script src="assets/pages/datatables.init.js"></script>
+
+    <!-- Sweet Alert js -->
+    <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
+    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+
+
+
+    <!--<script src="lib/sorting.js"></script>-->
     <script src="lib/includeHTML.js"></script>
 
     <script>
         /*
-         NOTICE THIS:
-         אחה"צ
-         calculation   wise: its value is 12:00 (like when we calaulate hours gap between the present and a given ridepat)
-         table sorting wise: its value is Infinity or negetive Infinity
-         */
+        NOTICE THIS:
+        אחה"צ
+        calculation   wise: its value is 12:00 (like when we calaulate hours gap between the present and a given ridepat)
+        table sorting wise: its value is Infinity or negetive Infinity
+        */
         checkCookie();
         var destinationName = "";
         var originName = "";
@@ -383,6 +428,8 @@
         let allReadyCountedRidePats = [];
         let candidate4IhaveSeen;
         let timer;
+        let arr_rides;
+
         const {
 
             validateMobileNumFullVersion,
@@ -390,39 +437,24 @@
             convertDBDate2FrontEndDate,
             getHoursGap,
             convert2DBDateToInt,
-            getHebrew_WeekDay
+            getHebrew_WeekDay,
+            showMe
 
         } = GENERAL.USEFULL_FUNCTIONS;
 
+        const { ajaxCall } = GENERAL.FETCH_DATA;
+        const { APP_ID } = GENERAL;
+
+        const newVolunteerText = `מתנדב חדש`;
+
+        const controllersLayout = "<'row top'<'col-sm-6'l><'col-sm-5'f><'col-sm-1'B>>rt<'bottom'p>";//https://datatables.net/reference/option/dom
+        let drivers, driverNames;
+        let _assignDriverToRidepatNum;
+        let _assignDriverToRideNum;
+        let _isDriverReplacement;
+        let _trToHighLight;
+
         let tMorning, tAfternoon, tFuture, tTomorrow;
-
-        const showMe = ({ objId, objName }) => {
-
-            const func = 'edit';
-            let displayName;
-            let arr_details;
-
-            switch (objName) {
-                case 'patient':
-                    const ridePatWith_ThisPat = arr_rides.find(r => r.Pat.Id === parseInt(objId));
-                    displayName = ridePatWith_ThisPat.Pat.DisplayName;
-                    arr_details = { displayName, func };
-                    GENERAL.PATIENTS.setPatientsList(JSON.stringify(arr_details));
-                    break;
-                case 'volunteer':
-                    const ridePatWith_ThisDriver = arr_rides.find((r) => {
-
-                        if (r.Drivers.length > 0) {
-                            return r.Drivers[0].Id === parseInt(objId);
-                        }
-                    });
-                    displayName = ridePatWith_ThisDriver.Drivers[0].DisplayName;
-                    arr_details = { displayName, func };
-                    GENERAL.VOLUNTEERS.setVolunteersList(JSON.stringify(arr_details));
-                    break;
-            }
-
-        }
 
         function wiringDataTables() {
             //manage button clicks on tables
@@ -464,7 +496,6 @@
             });
             //#endregion
 
-
             //#region copyMessage ridepat
             $('#datatable-morning tbody').on('click', '.copyMessage', function () {
                 copyMessageButton(this, tMorning);
@@ -491,17 +522,16 @@
              */
             $('#datatable-morning tbody').on('mouseup', '.showMe', function () {
                 let targetObj = {};
-                targetObj.objId = $(this).attr('id');
                 targetObj.objName = $(this).attr("data-obj");
+                targetObj.displayName = this.text;
 
                 showMe(targetObj);
-
             });
 
             $('#datatable-afternoon tbody').on('mouseup', '.showMe', function () {
                 let targetObj = {};
-                targetObj.objId = $(this).attr('id');
                 targetObj.objName = $(this).attr("data-obj");
+                targetObj.displayName = this.text;
 
                 showMe(targetObj);
             });
@@ -509,8 +539,8 @@
 
             $('#datatable-tomorrow tbody').on('mouseup', '.showMe', function () {
                 let targetObj = {};
-                targetObj.objId = $(this).attr('id');
                 targetObj.objName = $(this).attr("data-obj");
+                targetObj.displayName = this.text;
 
                 showMe(targetObj);
             });
@@ -518,8 +548,8 @@
             $('#datatable-future tbody').on('mouseup', '.showMe', function () {
 
                 let targetObj = {};
-                targetObj.objId = $(this).attr('id');
                 targetObj.objName = $(this).attr("data-obj");
+                targetObj.displayName = this.text;
 
                 showMe(targetObj);
 
@@ -606,7 +636,102 @@
 
         }
 
+        function getDrivers() {
+
+            const driversPromise = new Promise((resolve, reject) => {
+
+                const getDrivers_SCB = (data) => {
+                    drivers = JSON.parse(data.d);
+                    driverNames = drivers.map(d => d.DisplayName);
+
+                    return resolve(driverNames);
+                }
+
+                const getDrivers_ECB = (err) => {
+                    alert('Issue in getDrivers ' + JSON.stringify(err));
+
+                    return reject(err);
+                }
+                ajaxCall('GetDrivers', JSON.stringify({ isActive: true, isDriving: true }), getDrivers_SCB, getDrivers_ECB);
+            });
+
+            return driversPromise;
+        }
+
+        const assignDriverToRidePat = () => {
+            $('#wait').show();
+
+            const driverNameFromInput = $('#driver').val();
+
+            if (typeof driverNameFromInput === 'undefined' || !driverNameFromInput || driverNameFromInput.length === 0) {
+
+                $('#wait').hide();
+                return alert('יש לבחור נהג מהרשימה');
+            }
+
+            const driverIndex = driverNames.indexOf(driverNameFromInput);
+            const userSelected = drivers[driverIndex];
+
+            let request;
+            let dataString;
+
+            if (_isDriverReplacement) {
+                //update the ride record with the new driver.
+                request = {
+                    ridePatId: _assignDriverToRidepatNum,
+                    rideNum: _assignDriverToRideNum,
+                    newDriverId: userSelected.Id,
+                    assignedFromAppId: APP_ID
+                }
+
+                dataString = JSON.stringify(request);
+                ajaxCall('UpdateDriver', dataString, UpdateDriver_SCB, UpdateDriver_ECB);
+            } else {
+
+                request = {
+                    ridePatId: _assignDriverToRidepatNum,
+                    userId: userSelected.Id,
+                    driverType: "primary",
+                    assignedFromAppId: APP_ID
+                };
+
+                dataString = JSON.stringify(request);
+                ajaxCall('AssignRideToRidePat', dataString, assignDriverToRidePat_SCB, assignDriverToRidePat_ECB);
+            }
+        }
+
+        const assignDriverToRidePatAbort = () => {
+            _trToHighLight.classList.remove('highlightRow');
+        }
+
+        const assignDriverToRidePat_SCB = (data) => {
+            $('#wait').hide();
+            _trToHighLight.classList.remove('highlightRow');
+            $('#assignDriverModal').modal('hide');
+        }
+
+        const assignDriverToRidePat_ECB = (err) => {
+            $('#wait').hide();
+            _trToHighLight.classList.remove('highlightRow');
+            alert('Issue in assignDriverToRidePat: ' + JSON.stringify(err));
+        }
+
+        const UpdateDriver_SCB = (data) => {
+            $('#wait').hide();
+            _trToHighLight.classList.remove('highlightRow');
+            $('#assignDriverModal').modal('hide');
+        }
+
+        const UpdateDriver_ECB = (err) => {
+            $('#wait').hide();
+            _trToHighLight.classList.remove('highlightRow');
+            alert('Issue in UpdateDriver: ' + JSON.stringify(err));
+        }
+
         $(document).ready(function () {
+
+            $("#assignDriverModal").attr("w3-include-html", "assignDriverModal.html");
+            $('#assignDriverModal').on('shown.bs.modal', activateAutoComplteToModalsInput); // triger cb function only after modal is shown
 
             wiringDataTables();
             let { COPYWRITE } = GENERAL;
@@ -1281,8 +1406,6 @@
 
         const showFiltersModal = () => {
 
-            let { ajaxCall } = GENERAL.FETCH_DATA;
-
             ajaxCall(
                 'getAreas_AsLocationObj',
                 '',
@@ -1460,6 +1583,21 @@
             return (hoursGap >= -2 && hoursGap <= 0);
         }
 
+        const getNext_X_DaysDateAsString = (days) => {
+
+            if (typeof days != 'number') {
+                return;
+            }
+
+            let today = new Date();
+            let futureIntRepresentation = today.setDate(today.getDate() + days);
+            let futureDate = new Date(futureIntRepresentation);
+            let finalOutPut = futureDate.toLocaleString('he-IL', { dateStyle: "short" });
+
+            return finalOutPut;
+        }
+
+
         function refreshTable() {
             $('#wait').show();
 
@@ -1542,10 +1680,10 @@
 
                         if (arr_rides[i].Drivers.length > 0) {
 
-                            driverHTML = buildDriverHTML(arr_rides[i].Drivers[0]);;
+                            driverHTML = buildDriverHTML(arr_rides[i].RidePatNum, arr_rides[i].Drivers[0], arr_rides[i].RideNum);
                         } else {
 
-                            driverHTML = 'אין!<br/>None!';
+                            driverHTML = buildDriverHTML(arr_rides[i].RidePatNum);
                         }
                         //#endregion adjust driver column
 
@@ -1623,6 +1761,14 @@
                     tMorning = $('#datatable-morning').DataTable({
                         data: morningRidePats,
                         rowId: 'ridePatNum',
+                        dom: controllersLayout,
+                        buttons: [
+                            {
+                                extend: 'excelHtml5',
+                                text: 'ייצוא לאקסל',
+                                title: `ניהול הסעות - בוקר ${getNext_X_DaysDateAsString(0)}`,
+                            }
+                        ],
                         pageLength: 100,
                         stateSave: true,
                         destroy: true,
@@ -1696,11 +1842,21 @@
                             },
                             { targets: 6, className: 'last-modified_td' },
                             { "targets": [8], visible: false },
+                            { targets: [9], orderable: false }
+
                         ],
                     });
 
                     tAfternoon = $('#datatable-afternoon').DataTable({
                         rowId: 'ridePatNum',
+                        dom: controllersLayout,
+                        buttons: [
+                            {
+                                extend: 'excelHtml5',
+                                text: 'ייצוא לאקסל',
+                                title: `ניהול הסעות -  אחה"צ ${getNext_X_DaysDateAsString(0)}`,
+                            }
+                        ],
                         pageLength: 100,
                         data: afterNoonRidePats,
                         stateSave: true,
@@ -1803,7 +1959,7 @@
                             },
                             { targets: 6, className: 'last-modified_td' },
                             { targets: [8], visible: false },
-
+                            { targets: [9], orderable: false }
                         ],
                         autoWidth: false,
 
@@ -1811,6 +1967,14 @@
 
                     tTomorrow = $('#datatable-tomorrow').DataTable({
                         rowId: 'ridePatNum',
+                        dom: controllersLayout,
+                        buttons: [
+                            {
+                                extend: 'excelHtml5',
+                                text: 'ייצוא לאקסל',
+                                title: `ניהול הסעות למחר ${getNext_X_DaysDateAsString(1)}`,
+                            }
+                        ],
                         data: tomorrowRidePats,
                         stateSave: true,
                         destroy: true,
@@ -1894,14 +2058,24 @@
                             { targets: 7, className: 'last-modified_td' },
                             { targets: 8, className: 'text-left-strong' },
                             { targets: [9], visible: false },
+                            { targets: [10], orderable: false }
 
                         ],
                         autoWidth: false,
+
 
                     });
 
                     tFuture = $('#datatable-future').DataTable({
                         rowId: 'ridePatNum',
+                        dom: controllersLayout,
+                        buttons: [
+                            {
+                                extend: 'excelHtml5',
+                                text: 'ייצוא לאקסל',
+                                title: `ניהול הסעות עתידיות ${getNext_X_DaysDateAsString(2)} - ${getNext_X_DaysDateAsString(7)}`,
+                            }
+                        ],
                         data: futureRidePats,
                         stateSave: true,
                         destroy: true,
@@ -1948,6 +2122,7 @@
                             { targets: 7, className: 'last-modified_td' },
                             { targets: 7, type: 'last_modifiedSort' },
                             { targets: [9], visible: false },
+                            { targets: [10], orderable: false }
                         ],
                         autoWidth: false,
 
@@ -1968,26 +2143,39 @@
             });
         }
 
-        const buildDriverHTML = (driver) => {
-
-            let driverInnerContent = '';
+        const buildDriverHTML = (ridePatNum, driver, rideNum) => {
             let driverWrapper = '';
-            const { Id, DisplayName, EnglishFN, EnglishLN, CellPhone } = driver;
+            let isDriverReplacement;
 
-            if (!isAssistant) {                         //hebrew
+            if (typeof driver !== 'undefined' && typeof rideNum !== 'undefined') {
 
-                driverInnerContent = DisplayName;
-            } else {                                    //english
+                isDriverReplacement = true;
+                let driverInnerContent = '';
+                const { Id, DisplayName, EnglishFN, EnglishLN, CellPhone, NoOfDocumentedRides } = driver;
+                let isCountAsNewVolunteer = NoOfDocumentedRides <= 3;
 
-                driverInnerContent = EnglishFN.length + EnglishLN.length > 0 ?
-                    `${EnglishFN} ${EnglishLN}`
-                    :
-                    DisplayName
+                if (!isAssistant) {                         //hebrew
+
+                    driverInnerContent = DisplayName;
+                } else {                                    //english
+
+                    driverInnerContent = EnglishFN.length + EnglishLN.length > 0 ?
+                        `${EnglishFN} ${EnglishLN}`
+                        :
+                        DisplayName
+                }
+
+                driverWrapper = isCountAsNewVolunteer ? `<span class='redFont boldFont'>${newVolunteerText}</span>` : ``;
+                driverWrapper += `<a href="volunteerform.html" data-obj="volunteer" class="showMe driverName clickable blueFont boldFont"`;
+                driverWrapper += `id='${Id}'>${driverInnerContent}</a>`;
+                driverWrapper += `<span class="driverCellPhone">${addSeperator2MobileNum(CellPhone, '-')}</span>`;
+                driverWrapper += `<buttond onclick="prepreparationAssignDriverModal(this, ${ridePatNum}, ${isDriverReplacement}, ${rideNum})" data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>עדכן נהג</button>`;
+            } else {
+
+                isDriverReplacement = false;
+                driverWrapper = 'אין!<br/>None!';
+                driverWrapper += `<buttond onclick="prepreparationAssignDriverModal(this, ${ridePatNum}, ${isDriverReplacement})"  data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>שבץ נהג</button>`;
             }
-
-            driverWrapper = `<a href="volunteerform.html" data-obj="volunteer" class="showMe driverName clickable blueFont boldFont"`;
-            driverWrapper += `id='${Id}'>${driverInnerContent}</a>`;
-            driverWrapper += `<span class="driverCellPhone">${addSeperator2MobileNum(CellPhone, '-')}</span>`;
 
             return driverWrapper;
         }
@@ -2115,6 +2303,21 @@
             return englishStatus;
         };
 
+        function prepreparationAssignDriverModal(thisBtn, ridePatNum, isDriverReplacement, rideNum) {
+            _assignDriverToRidepatNum = ridePatNum;
+            _assignDriverToRideNum = rideNum
+            _isDriverReplacement = isDriverReplacement;
+
+            _trToHighLight = thisBtn.closest('tr');
+            _trToHighLight.classList.add('highlightRow');
+
+            if (isDriverReplacement) {
+                $('#driverModalTitle').text('עדכון נהג');
+            } else {
+                $('#driverModalTitle').text('שיבוץ נהג');
+            }
+        }
+
         const add2IhaveSeenAllready = () => {
 
             $('.ContextMenu_dropdown').addClass('hidden');//hide floating button
@@ -2165,6 +2368,15 @@
                     tFuture.order([7, 'desc']).draw();
                     break;
             }
+        }
+
+        const activateAutoComplteToModalsInput = async () => {
+            $('#driver').val('');
+            if (typeof driverNames === 'undefined' || !driverNames) {
+                driverNames = await getDrivers();
+            }
+
+            $('#driver').autocomplete({ source: driverNames });
         }
 
     </script>
@@ -2549,52 +2761,8 @@
         var resizefunc = [];
     </script>
 
-    <!-- jQuery  -->
-    <script src="assets/js/bootstrap-rtl.min.js"></script>
-    <script src="assets/js/detect.js"></script>
-    <script src="assets/js/fastclick.js"></script>
-    <script src="assets/js/jquery.slimscroll.js"></script>
-    <script src="assets/js/jquery.blockUI.js"></script>
-    <script src="assets/js/waves.js"></script>
-    <script src="assets/js/wow.min.js"></script>
-    <script src="assets/js/jquery.nicescroll.js"></script>
-    <script src="assets/js/jquery.scrollTo.min.js"></script>
-    <script src="../plugins/switchery/switchery.min.js"></script>
-
-    <!-- Datatables-->
-    <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
-    <script src="../plugins/datatables/dataTables.bootstrap.js"></script>
-    <script src="../plugins/datatables/dataTables.buttons.min.js"></script>
-    <script src="../plugins/datatables/buttons.bootstrap.min.js"></script>
-    <script src="../plugins/datatables/jszip.min.js"></script>
-    <script src="../plugins/datatables/pdfmake.min.js"></script>
-    <script src="../plugins/datatables/vfs_fonts.js"></script>
-    <script src="../plugins/datatables/buttons.html5.min.js"></script>
-    <script src="../plugins/datatables/buttons.print.min.js"></script>
-    <script src="../plugins/datatables/dataTables.fixedHeader.min.js"></script>
-    <script src="../plugins/datatables/dataTables.keyTable.min.js"></script>
-    <script src="../plugins/datatables/dataTables.responsive.min.js"></script>
-    <script src="../plugins/datatables/responsive.bootstrap.min.js"></script>
-    <script src="../plugins/datatables/dataTables.scroller.min.js"></script>
-
-    <!-- Datatable init js -->
-    <script src="assets/pages/datatables.init.js"></script>
-
-    <!-- Sweet Alert js -->
-    <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
-    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
-
-    <script src="assets/js/jquery.core.js"></script>
+    <!-- side menu toggle functiolity is from here -->
     <script src="assets/js/jquery.app.js"></script>
-    <!--<script src="cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
-    <script src="cdn.datatables.net/plug-ins/1.10.19/sorting/datetime-moment.js"></script>-->
-    <!--<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>-->
-    <!--<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
-    <script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
-    <script src="//cdn.datatables.net/plug-ins/1.10.12/sorting/datetime-moment.js"></script>-->
-    <script type="text/javascript">
-        TableManageButtons.init();
-    </script>
 
     <div class="modal fade" id="messagesModal" tabindex="-1" role="dialog" aria-labelledby="messagesModalTitle"
          aria-hidden="true">
@@ -2621,7 +2789,8 @@
 
 
 
-    <!-- ↓ filtersModal ↓ -->
+    <div class="modal fade" id="assignDriverModal" role="dialog" aria-labelledby="documentedRidesTitle" aria-hidden="true"></div>
+
     <div class="modal fade" id="filtersModal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content" id="overRideBS_modal-dialog">

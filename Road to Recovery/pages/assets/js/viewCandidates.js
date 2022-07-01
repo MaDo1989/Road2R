@@ -1,10 +1,11 @@
 ﻿checkCookie();
-let { getHebrew_WeekDay, addSeperator2MobileNum } = GENERAL.USEFULL_FUNCTIONS;
+let { getHebrew_WeekDay, addSeperator2MobileNum, showMe } = GENERAL.USEFULL_FUNCTIONS;
 let { getRidePatNum4_viewCandidate } = GENERAL.RIDEPAT;
 let { ajaxCall } = GENERAL.FETCH_DATA;
 let allCandidatedFromDB;
 let { COPYWRITE } = GENERAL;
 let candidatesTable;
+let superDriversTable;
 let regularCandidated_clientVersion = [];
 let superCandidated_clientVersion = [];
 let ridePatNum;
@@ -14,6 +15,7 @@ let ridePatNum;
 const wiringDataTables = () => {
     //manage button clicks on tables
 
+    //#region showDocumentedCallsBtn
     $('#datatable-candidates tbody').on('click', '#showDocumentedCallsBtn', function () {
         manipulateDocumentedCallsModal(this, candidatesTable);
     });
@@ -21,8 +23,9 @@ const wiringDataTables = () => {
     $('#datatable-superDrivers tbody').on('click', '#showDocumentedCallsBtn', function () {
         manipulateDocumentedCallsModal(this, superDriversTable);
     });
+    //#endregion showDocumentedCallsBtn
 
-
+    //#region showDocumentedRidesBtn
     $('#datatable-candidates tbody').on('click', '#showDocumentedRidesBtn', function () {
         manipulateDocumentedRidesModal(this, candidatesTable);
     });
@@ -30,6 +33,30 @@ const wiringDataTables = () => {
     $('#datatable-superDrivers tbody').on('click', '#showDocumentedRidesBtn', function () {
         manipulateDocumentedRidesModal(this, superDriversTable);
     });
+    //#endregion showDocumentedRidesBtn
+
+    //#region showMe
+    /*
+    IMPORTANT NOTE
+    the event is mouseup in order to catch all scenarios.
+    */
+    $('#datatable-candidates tbody').on('mouseup', '.showMe', function () {
+        let targetObj = {};
+        targetObj.objName = $(this).attr("data-obj");
+        targetObj.displayName = this.text;
+
+        showMe(targetObj);
+    });
+
+    $('#datatable-superDrivers tbody').on('mouseup', '.showMe', function () {
+        let targetObj = {};
+        targetObj.objName = $(this).attr("data-obj");
+        targetObj.displayName = this.text;
+
+        showMe(targetObj);
+    });
+    //#endregion showMe
+
 }
 
 const ConvertDBDate2UIDate = (fullTimeStempStr) => {
@@ -100,7 +127,6 @@ $(document).ready(() => {
 
     candidatesTable = $('#datatable-candidates').DataTable({ data: [], destroy: true });
     superDriversTable = $('#datatable-superDrivers').DataTable({ data: [], destroy: true });
-    //newDriversTable   = $('#datatable-newDrivers').DataTable({ data: [], destroy: true });
 
     ridePatNum = JSON.parse(getRidePatNum4_viewCandidate());
 
@@ -220,7 +246,7 @@ const renderRidePatDetails = (ridepat) => {
     ridePatDetails += ' ';
     ridePatDetails += 'מקומות: ' + parseInt(ridepat.Escorts.length + 1);
     //ridePatDetails += ridepatDate.Equipment.length > 0 && ridepatDate.Equipment.includes(''); 
-     
+
     document.getElementById('RideCandidates_ph').innerHTML = ridePatDetails;
 }
 
@@ -239,7 +265,7 @@ const isItToday = (d) => {
 const getCandidates = () => {
 
     // BENNY
-    let numOfCandidates = 10;
+    let numOfCandidates = 25;
     let newFlag = false;
     let dayInWeek = ridepatDate.getDay();
 
@@ -271,6 +297,14 @@ const getCandidates_ECB = (data) => {
     console.log('%c ↑ R2R custom error ↑', 'background: red; color: white');
 }
 
+const buildCandidateHTML = ({ Id, DisplayName }) => {
+
+    let candidateHTML = `<a href="volunteerform.html" data-obj="volunteer" class="showMe clickable blueFont boldFont"`;
+    candidateHTML += `id='${Id}'>${DisplayName}</a>`;
+
+    return candidateHTML;
+}
+
 const fillTableWithData = () => {
 
     let thisCandidate = {};
@@ -282,13 +316,14 @@ const fillTableWithData = () => {
     let btnStr;
     let showDocumentedCallsBtn;
     let showDocumentedRidesBtn;
+    let candidateName2render;
 
 
     for (let i in allCandidatedFromDB) {
         btnStr = `<div class='btnsInSameLine'>`;
         date2display = convertDBDate2FrontEndDate(allCandidatedFromDB[i].LatestDocumentedCallDate).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
 
-        showDocumentedCallsBtn= '';
+        showDocumentedCallsBtn = '';
         showDocumentedCallsBtn += `<div class='btnWrapper-left'><span id="badgeOf_${allCandidatedFromDB[i].Id}" class="badge badge-pill badge-default">${allCandidatedFromDB[i].NoOfDocumentedCalls}</span>`;
         showDocumentedCallsBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedCallsBtn" title="שיחות מתועדות" data-backdrop="static" data-keyboard="false" data-toggle="modal" data-target="#DocumentedCallsModal"><i class="fa fa-phone" aria-hidden="true"></i></button></div>';
 
@@ -299,11 +334,13 @@ const fillTableWithData = () => {
         showDocumentedRidesBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedRidesBtn" title="תיעוד הסעות" data-toggle="modal" data-target="#documentedRidesModal"><i class="fa fa-car" aria-hidden="true"></i></button></div>';
 
         btnStr += showDocumentedRidesBtn;
-
         btnStr += '</div>';
+
+        candidateName2render = buildCandidateHTML(allCandidatedFromDB[i]);
+
         thisCandidate = {
             Id: i,
-            DisplayName: allCandidatedFromDB[i].DisplayName,
+            DisplayName: candidateName2render,
             cellphone: addSeperator2MobileNum(allCandidatedFromDB[i].CellPhone, "-"),
             city: allCandidatedFromDB[i].City,// + '<br />בדיקה',
             daysSinceLastRide: allCandidatedFromDB[i].DaysSinceLastRide,
@@ -358,7 +395,7 @@ const fillTableWithData = () => {
             {
                 data: "DisplayName",
                 render: function (data, type, row, meta) {
-                    let did = "data-driverId='" + row.id + "'";
+                    let did = "data-driverId='" + row.Id + "'";
                     return '<p class="c1" ' + did + '>' + data + ' </p>';
                 }
             },                                                      //0
@@ -379,7 +416,8 @@ const fillTableWithData = () => {
             { width: '10%', "targets": [3] },
             { width: '5%', "targets": [4, 5, 7] },
             { width: '4%', "targets": [8] },
-            { width: '10%', "targets": [6, 9] }
+            { width: '10%', "targets": [6, 9] },
+            { targets: [9], orderable: false }
         ]
     });
 
@@ -398,7 +436,7 @@ const fillTableWithData = () => {
                 {
                     data: "DisplayName",
                     render: function (data, type, row, meta) {
-                        let did = "data-driverId='" + row.id + "'";
+                        let did = "data-driverId='" + row.Id + "'";
                         return '<p class="c1" ' + did + '>' + data + ' </p>';
                     }
                 },                                                      //0
@@ -420,50 +458,10 @@ const fillTableWithData = () => {
                 { width: '10%', "targets": [3] },
                 { width: '5%', "targets": [4, 5, 7] },
                 { width: '4%', "targets": [8] },
-                { width: '10%', "targets": [6, 9] }
+                { width: '10%', "targets": [6, 9] },
+                { targets: [9], orderable: false }
             ]
         });
-
-    //newDriversTable = $('#datatable-newDrivers').DataTable(
-    //    {
-    //        data: newCandidated_clientVersion,
-    //        rowId: 'id',
-    //        pageLength: 10,
-    //        stateSave: true,
-    //        destroy: true,
-    //        "lengthChange": false, // for somereason this property must be string
-    //        stateDuration: 60 * 60,
-    //        autoWidth: false,
-    //        columns: [
-    //            //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
-    //            {
-    //                data: "DisplayName",
-    //                render: function (data, type, row, meta) {
-    //                    let did = "data-driverId='" + row.id + "'";
-    //                    return '<p class="c1" ' + did + '>' + data + ' </p>';
-    //                }
-    //            },                                                      //0
-    //            { data: "cellphone" },                                  //1
-    //            { data: "city" },                                       //2
-    //            { data: "daysSinceLastRide" },                          //3
-    //            { data: "numOfRides_last2Months" },                     //4
-    //            { data: "daysUntilNextRide" },                          //5
-    //            { data: "latestDocumentedCallDate" },                   //6
-    //            { data: "seniorityInYears" },                           //7
-    //            { data: "score" },                                      //8
-    //            { data: "buttons" }                                     //9
-
-    //        ],
-    //        columnDefs: [
-    //            { width: '20%', "targets": [0] },
-    //            { width: '10%', "targets": [1] },
-    //            { width: '15%', "targets": [2] },
-    //            { width: '10%', "targets": [3] },
-    //            { width: '5%', "targets": [4, 5, 7] },
-    //            { width: '4%', "targets": [8] },
-    //            { width: '10%', "targets": [6, 9] }
-    //        ]
-    //    });
 
     /*
                      ============================

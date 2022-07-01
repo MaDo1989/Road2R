@@ -1,4 +1,6 @@
-﻿function wireModals() {
+﻿const { APP_ID } = GENERAL;
+
+function wireModals() {
     $(document).on("click", ".regBTN", function () {
         selectedRide = allRides[$(this).attr("id")];
         verifyAvailability(selectedRide.RidePatNum);
@@ -90,7 +92,7 @@ function registerDriver() {
     var request = {
         ridePatId: selectedRide.RidePatNum,
         mobile: $("#phoneTB").val(),
-        fromDevice: "web"
+        assignedFromAppId: APP_ID
     };
 
     var dataString = JSON.stringify(request);

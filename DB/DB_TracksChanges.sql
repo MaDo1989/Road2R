@@ -6,22 +6,14 @@
 /*---------------------------------------------------------*/
 /*---------------------------------------------------------*/
 
-
-
-
-
-
-
-
-
-
 -- =============================================
 -- Authors:     Dr. Benny Bornfeld & Yogev Strauber
 -- Create Date: 17/02/2022
 -- Description: RETURNS TABLE OF CANDIDATE TO A GIVEN RIDEPAT WITH VARIOUS SCORES TO EACH CANDIDATE
 -- ALTER DATE: 29/04/2022
+-- ALTER REASON: Add NoOfDocumentedRides
 -- =============================================
-	ALTER PROCEDURE [dbo].[spGetCandidatesForRidePat]
+CREATE OR ALTER PROCEDURE [dbo].[spGetCandidatesForRidePat]
 	(
 		@RidePatNum INT,
 		@NumOfDaysToThePast INT,					@NUmOfDaysToTheFuture INT,
@@ -181,8 +173,9 @@ GO
 -- Create Date: 11/03/2022
 -- Description: RETURNS TABLE OF CANDIDATE TO A GIVEN RIDEPAT WITH VARIOUS SCORES TO EACH NEWBIE CANDIDATE
 -- ALTER DATE: 29/04/2022
+-- ALTER REASON: Add NoOfDocumentedRides
 -- =============================================
-	ALTER PROCEDURE [dbo].[spGetNoobsCandidatesForRidePat]
+CREATE OR ALTER PROCEDURE [dbo].[spGetNoobsCandidatesForRidePat]
 	(
 		@RidePatNum INT,
 		@NumOfDaysToThePast INT,					@NUmOfDaysToTheFuture INT,
@@ -345,6 +338,128 @@ GO
 		END	
 GO
 
+--AssignedFromApp Module: 06/05/2022 ↓ Yogev
+
+CREATE TABLE App
+(
+	Id INT PRIMARY KEY IDENTITY(1,1),
+	Name VARCHAR(50) NOT NULL
+)
+GO
+
+INSERT INTO App (Name) VALUES ('Desktop'),('Mobile')
+GO
+
+ALTER TABLE Ride
+ADD AssignedFromAppId int,
+CONSTRAINT Ride_App FOREIGN KEY(AssignedFromAppId) REFERENCES App(Id);
+GO
+
+--AssignedFromApp Module: 06/05/2022 ↑ Yogev
 
 
+-- =============================================
+-- Authors:     Yogev Strauber
+-- Create Date: 03/06/2022
+-- Description: 
+-- ALTER DATE:   ---
+-- ALTER REASON: ---
+-- =============================================
+CREATE OR ALTER PROCEDURE spRide_UpdateDriver
+(
+		@RideNum INT,
+		@NewDriverId INT
+)
+AS
+BEGIN
+    SET NOCOUNT ON
+	UPDATE RIDE
+	SET MainDriver = @NewDriverId
+	WHERE RideNum = @RideNum 
+END
+GO
 
+-- =============================================
+-- Author:      Yogev Strauber
+-- Description: Assign Driver To Ride And Wire Ride To RidePat
+-- ALTER DATE:   ---
+-- ALTER REASON: ---
+-- =============================================
+CREATE OR ALTER PROCEDURE [dbo].[spRideAndRidePat_AssignDriver]
+(
+	@ridePatId INT,
+	@driverId INT,
+	@assignedFromAppId INT
+)
+AS
+BEGIN
+
+    SET NOCOUNT ON
+	DECLARE 
+		@Success NVARCHAR(75)						= N'הנסיעה עודכנה בהצלחה',
+		@AllReadyAssigned NVARCHAR(75)				= N'הנסיעה אליה נרשמת כבר מלאה',
+		@NotExistsRidePat NVARCHAR(75)				= N'נסיעה זו בוטלה, תודה על הרצון לעזור',
+		@DriverIsNotActiveNorDriving NVARCHAR(75)	= N'הנהג אינו פעיל/ אינו נוהג או שניהם',
+		@Origin NVARCHAR(255)						= (SELECT Origin      FROM RidePat WHERE RidePatNum=@ridePatId),
+		@Destination NVARCHAR(255)					= (SELECT Destination FROM RidePat WHERE RidePatNum=@ridePatId),
+		@Date DATETIME								= (SELECT PickupTime  FROM RidePat WHERE RidePatNum=@ridePatId),
+		@rideId INT									= (SELECT RideId      FROM RidePat WHERE RidePatNum=@ridePatId),
+		@CreatedRideId INT							= NULL
+
+
+	IF NOT EXISTS (SELECT 1	FROM RidePat WHERE RidePatNum=@ridePatId)
+	BEGIN
+		SELECT 1 AS IsError, @NotExistsRidePat AS Message
+		RETURN;
+	END
+
+	IF (SELECT MainDriver FROM RPView WHERE RidePatNum=@ridePatId) IS NOT NULL 
+	BEGIN
+		SELECT 1 AS IsError, @AllReadyAssigned AS Message
+		RETURN;
+	END
+
+	IF NOT EXISTS (SELECT 1 FROM Volunteer WHERE Id=@driverId AND IsActive=1 AND isDriving=1)
+		BEGIN
+		SELECT 1 AS IsError, @DriverIsNotActiveNorDriving AS Message
+		RETURN;
+		END
+
+	IF EXISTS (SELECT 1 FROM Ride WHERE RideNum=@rideId)
+		BEGIN
+				UPDATE Ride SET MainDriver=@driverId, AssignedFromAppId = @assignedFromAppId WHERE RideNum=@rideId
+				SELECT 0 AS IsError, @Success AS Message, @rideId AS RideId
+		END
+	ELSE
+		BEGIN
+			SET DATEFORMAT dmy;
+
+			INSERT INTO Ride (Origin,Destination,Date,MainDriver, AssignedFromAppId) 
+			VALUES (@origin,@Destination,@date,@driverId, @assignedFromAppId) 
+
+			SET @CreatedRideId = (SELECT SCOPE_IDENTITY());
+
+			UPDATE RidePat SET RideId=@CreatedRideId WHERE RidePatNum=@ridePatId
+
+			SELECT 0 AS IsError, @Success AS Message, @CreatedRideId AS RideId
+
+		END
+END
+GO
+
+-- =============================================
+-- Author:      Yogev Strauber
+-- Description: View which combine number of tables
+-- ALTER DATE:  01/07/2022
+-- ALTER REASON: add details on driver
+-- =============================================
+CREATE OR ALTER VIEW [dbo].[RPView]
+AS
+SELECT    dbo.Patient.DisplayName, dbo.Patient.Id, dbo.Patient.CellPhone, dbo.Patient.IsAnonymous, dbo.RidePat.RidePatNum, dbo.RidePat.Origin, dbo.RidePat.Destination, dbo.RidePat.PickupTime, V.DisplayName AS Coordinator, 
+                         dbo.RidePat.Status, dbo.RidePat.Area, dbo.RidePat.Shift, dbo.Ride.RideNum, dbo.Ride.Origin AS RideOrigin, dbo.Ride.Destination AS RideDestination, dbo.Ride.Date, dbo.Ride.MainDriver, dbo.Ride.secondaryDriver, 
+                         dbo.RidePat.Remark, dbo.RidePat.OnlyEscort, dbo.Patient.EnglishName, dbo.RidePat.lastModified, driver.NoOfDocumentedRides
+FROM            dbo.Patient INNER JOIN 
+                         dbo.RidePat ON dbo.Patient.DisplayName = dbo.RidePat.Patient LEFT OUTER JOIN
+                         dbo.Ride ON dbo.RidePat.RideId = dbo.Ride.RideNum LEFT JOIN Volunteer V on RidePat.CoordinatorID = V.Id
+						 LEFT JOIN Volunteer driver on driver.Id = dbo.Ride.MainDriver
+GO

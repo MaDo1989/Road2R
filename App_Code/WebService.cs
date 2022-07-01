@@ -248,13 +248,13 @@ public class WebService : System.Web.Services.WebService
 
     //Benny Candidates
     [WebMethod(EnableSession = true)]
-    public string GetCandidates(int ridePatNum,int numOfCandidates, bool newFlag, int dayInWeek) 
+    public string GetCandidates(int ridePatNum, int numOfCandidates, bool newFlag, int dayInWeek)
     {
 
         try
         {
             CandidatesLogic cl = new CandidatesLogic();
-            if(newFlag)
+            if (newFlag)
                 return j.Serialize(cl.GetNewbiesCandidates(ridePatNum, numOfCandidates));
             else
                 return j.Serialize(cl.GetCandidates(ridePatNum, numOfCandidates, dayInWeek));
@@ -267,8 +267,8 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
-    
-    
+
+
 
     [WebMethod(EnableSession = true)]
     public string getVolunteerPrefs(int Id)
@@ -592,7 +592,7 @@ public class WebService : System.Web.Services.WebService
         {
             Volunteer volunteer = new Volunteer();
             volunteer = volunteer.GetVolunteerByMobile(cellphone);
-         
+
             return j.Serialize(volunteer);
         }
         catch (Exception ex)
@@ -1006,6 +1006,20 @@ public class WebService : System.Web.Services.WebService
 
     }
 
+    [WebMethod(EnableSession = true)]
+    public void UpdateDriver(int rideNum, int ridePatId, int newDriverId)
+    {
+        try
+        {
+            Ride r = new Ride();
+            r.UpdateDriver(rideNum, ridePatId, newDriverId);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in UpdateDriver", ex);
+            throw new Exception(":שגיאה בעדכון נהג להסעה זו " + rideNum);
+        }
+    }
 
 
     [WebMethod(EnableSession = true)]
@@ -1194,7 +1208,7 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string AssignRideToRidePatWithMobile(int ridePatId, string mobile, string fromDevice) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
+    public string AssignRideToRidePatWithMobile(int ridePatId, string mobile, int assignedFromAppId) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
     {
         Volunteer v = new Volunteer();
         v = v.GetVolunteerByMobile(mobile);
@@ -1206,12 +1220,12 @@ public class WebService : System.Web.Services.WebService
         {
             Session["loggedInName"] = v.DisplayName;
             RidePat rp = new RidePat();
-            int res = rp.AssignRideToRidePat(ridePatId, v.Id, "primary");
+            int res = rp.AssignRideToRidePat(ridePatId, v.Id, "primary", assignedFromAppId);
             return j.Serialize(res);
         }
         catch (Exception ex)
         {
-            throw new Exception("faile to assign");
+            throw new Exception("fail to assign");
         }
 
     }
@@ -1219,7 +1233,7 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string AssignRideToRidePat(int ridePatId, int userId, string driverType) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
+    public string AssignRideToRidePat(int ridePatId, int userId, string driverType, int assignedFromAppId) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
     {
         Volunteer v = new Volunteer();
         v = v.getVolunteerByID(userId);
@@ -1228,7 +1242,7 @@ public class WebService : System.Web.Services.WebService
         try
         {
             RidePat rp = new RidePat();
-            int res = rp.AssignRideToRidePat(ridePatId, userId, driverType);
+            int res = rp.AssignRideToRidePat(ridePatId, userId, driverType, assignedFromAppId);
             return j.Serialize(res);
         }
         catch (Exception ex)
@@ -2064,7 +2078,7 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string AssignMultiRideToRidePat(int ridePatId, int userId, string driverType, int numberOfRides, string repeatRide) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
+    public string AssignMultiRideToRidePat(int ridePatId, int userId, string driverType, int numberOfRides, int assignedFromAppId) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
     {
         Volunteer v = new Volunteer();
         v = v.getVolunteerByID(userId);
@@ -2074,7 +2088,7 @@ public class WebService : System.Web.Services.WebService
         {
             int firstRide = ridePatId - numberOfRides + 1;
             RidePat rp = new RidePat();
-            int res = rp.AssignMultiRideToRidePat(firstRide, userId, driverType, numberOfRides, repeatRide);
+            int res = rp.AssignMultiRideToRidePat(firstRide, userId, driverType, numberOfRides, assignedFromAppId);
             return j.Serialize(res);
         }
         catch (Exception ex)
@@ -2190,7 +2204,7 @@ public class WebService : System.Web.Services.WebService
     }
     #endregion
 
- 
+
 
 
 
