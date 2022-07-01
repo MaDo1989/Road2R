@@ -142,32 +142,22 @@
                                 </div>
                             </div>
                         </div>
-
-
-
-
-
-                        <!--<div class="row m-l-10 m-r-10">
+                        <div class="row m-l-10 m-r-10">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label">רכז&nbsp;</label>
+                                    <label class="col-sm-4 control-label">מקום מגורים&nbsp;</label>
                                     <div class="col-sm-6">
-                                        <select id="coorSelect" name="coorSelect" class="form-control req">
-                                            <option>בחר.י</option>
-                                        </select>
+                                        <input id="address" dir="ltr" name="address" type="text" class="form-control req">
                                     </div>
                                 </div>
                             </div>
-                        </div>-->
+                        </div>
 
                         <div class="row m-l-10 m-r-10">
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label class="col-sm-4 control-label">רכז&nbsp;<!--<span class="required">*</span>--></label>
                                     <div class="col-sm-6 checkboxlist">
-                                        <!--<select id="coorCheckbox" name="coorCheckbox" class="form-control">
-                                            <option>בחר.י</option>
-                                        </select>-->
                                     </div>
                                 </div>
                             </div>
@@ -179,19 +169,21 @@
 
 
                         <!--<div class="row m-l-10 m-r-10">
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label class="col-sm-4 control-label">מעוניינ.ת בהדרכה?&nbsp;--><!--<span class="required">*</span>--><!--</label>
-                                    <div class="col-sm-6" id="needInstructions">
-                                        <select id="instructions" name="instructions" class="form-control req">
-                                            <option>בחר.י</option>
-                                            <option>כן</option>
-                                            <option>לא</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>-->
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-4 control-label">מעוניינ.ת בהדרכה?&nbsp;-->
+                        <!--<span class="required">*</span>-->
+                        <!--</label>
+                <div class="col-sm-6" id="needInstructions">
+                    <select id="instructions" name="instructions" class="form-control req">
+                        <option>בחר.י</option>
+                        <option>כן</option>
+                        <option>לא</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>-->
 
                         <hr /><br />
                         <div class="row m-l-10 m-r-10">
@@ -282,6 +274,8 @@
                     var firstNameH = $("#volunteerFirstName").val();
                     var lastNameH = $("#volunteerLastName").val();
                     var displayName = firstNameH + " " + lastNameH;
+                    let address = $('#address').val();
+
                     if ($("#gender").val() == "זכר") {
                         var gender = "מתנדב";
                     }
@@ -319,7 +313,7 @@
                    
                     var volunteer = {
                         FirstNameH: firstNameH, LastNameH: lastNameH, DisplayName: displayName, Gender: gender,
-                        CellPhone: cellPhone
+                        CellPhone: cellPhone, Address: address
                     }
                     console.log(volunteer);
 
