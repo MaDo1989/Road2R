@@ -2373,13 +2373,112 @@ function rp_center_patients_rides__refresh_Table(volunteerId, start_date, end_da
             $('#wait').hide();
         }
 
-    });
+    } );
 
 }
 
 
+/*
+Destination: "Augusta Victoria"
+DriverID: "23120"
+EscortCount: "1"
+Origin: "Reihan"
+Patient: "Maryam Hassan Yosef Amro"
+Pickuptime: "06/02/2022 03:00:00"
+
+
+Origin	Dest	pickuptim	pat1	pat1_escorts	pat2	pat2_escorts
+
+ */
+
+function tomorrows_rides_process_data(records) {
+    let groupByDict = {};
+    records.forEach(function (obj) {
+        key = obj.Destination + "," + obj.Origin + "," + obj.DriverID + "," + obj.Pickuptime;
+        if ( ! (key in groupByDict) ) {
+            groupByDict[key] = new Array();
+        }
+        groupByDict[key].push(obj);
+    } );
+
+    let table = new Array();
+
+    for (let key in groupByDict) {
+        let rides = groupByDict[key];
+        let entry = {
+            "Origin": rides[0].Origin,
+            "Destination": rides[0].Destination,
+            "Pickuptime": rides[0].Pickuptime,
+            "pat1_name": rides[0].Patient,
+            "pat1_escorts": rides[0].EscortCount,
+            "pat2_name": "",
+            "pat2_escorts": ""
+        }
+        if (rides.length > 1) {
+            entry["pat2_name"] = rides[1].Patient;
+            entry["pat2_escorts"] = rides[1].EscortCount;
+        }
+        if (rides.length > 2) {
+            entry["pat3_name"] = rides[2].Patient;
+            entry["pat3_escorts"] = rides[2].EscortCount;
+        }
+        table.push(entry);
+    }
+    return table;
+}
+
+function tomorrows_rides_get_as_text(table) {
+    // Sort by Origin, Destination, Pickuptime, Patient
+    table.sort(function (lhs, rhs) {
+        return lhs.Origin.localeCompare(rhs.Origin)
+            || lhs.Destination.localeCompare(rhs.Destination)
+            || lhs.Pickuptime.localeCompare(rhs.Pickuptime)
+            || lhs.pat1_name.localeCompare(rhs.pat1_name);
+    });
+
+    result = new Array();
+    for (let idx = 0; idx < table.length; ++idx) {
+        let curr = table[idx];
+        let prev = idx > 0 ? table[idx - 1] : null;
+        if (!prev || curr.Origin.localeCompare(prev.Origin) != 0) {
+            result.push(curr.Origin);
+            result.push("  " + curr.Origin + " to " + curr.Destination);
+            result.push("    At " + curr.Pickuptime);
+        }
+        else if (!prev || curr.Destination.localeCompare(prev.Destination) != 0) {
+            result.push("  " + curr.Origin + " to " + curr.Destination);
+            result.push("    At " + curr.Pickuptime);
+        } else  if (!prev || curr.Pickuptime.localeCompare(prev.Pickuptime) != 0) {
+            result.push("    At " + curr.Pickuptime);
+        }
+
+        let pat_str = curr.pat1_name + "(" + (1 + +curr.pat1_escorts) + ")";
+        if (curr.pat2_name) {
+            pat_str = pat_str + " + " + curr.pat2_name + "(" + (1 + +curr.pat2_escorts) + ")";
+        }
+        result.push("        " + pat_str);
+    }
+
+    return result.join("\n");
+}
+
+
+function download_text_file(text, file_name) {
+    let txtContent = "data:text/txt;charset=utf-8," + text;
+    let encodedUri = encodeURI(txtContent);
+    let link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", file_name);
+    document.body.appendChild(link); // Required for FF
+
+    link.click(); // This will download the data file 
+}
+
 // Checks if all fields are filled. If so refresh the report
 function rp_center_tomorrows_rides__refresh_preview() {
+    hide_all_tables();
+    $('#wait').show();
+
     let start_moment = moment("2022-02-06");
     end_moment = moment(start_moment);
     end_moment.add(1, 'days');
@@ -2398,7 +2497,39 @@ function rp_center_tomorrows_rides__refresh_preview() {
         type: "POST",
         data: JSON.stringify(query_object),
         success: function (data) {
-            console.log(data);
+            $('#wait').hide();
+            let table = tomorrows_rides_process_data(data.d);
+            let text_export = tomorrows_rides_get_as_text(table);
+            console.log(text_export);
+            download_text_file(text_export, "Tomorrows_report.txt");
+
+            $('#div_table_center_tomorrows_rides').show();
+            tbl = $('#table_center_tomorrows_rides').DataTable({
+                pageLength: 100,
+                bLengthChange: false,
+                data: table,
+                destroy: true,
+                "language": {
+                    "search": "חיפוש:"
+                },
+                columnDefs: [
+                    { "orderData": [0,1,2,3],  "targets": 0 }],
+                columns: [
+                    { data: "Origin" },
+                    { data: "Destination" },
+                    { data: "Pickuptime" },
+                    { data: "pat1_name" },
+                    { data: "pat1_escorts" },
+                    { data: "pat2_name" },
+                    { data: "pat2_escorts" },
+                ],
+                dom: 'Bfrtip',
+
+                buttons: [
+                    K_DataTable_CSV_EXPORT
+                ]
+            });
+
         },
         error: function (err) {
             $('#wait').hide();
