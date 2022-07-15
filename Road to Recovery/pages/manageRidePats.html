@@ -663,10 +663,10 @@
 
             const driverNameFromInput = $('#driver').val();
 
-            if (typeof driverNameFromInput === 'undefined' || !driverNameFromInput || driverNameFromInput.length === 0) {
+            if (typeof driverNameFromInput === 'undefined' || !driverNameFromInput || driverNameFromInput.length === 0 || !driverNames.includes(driverNameFromInput)) {
 
                 $('#wait').hide();
-                return alert('יש לבחור נהג מהרשימה');
+                return alert('יש לבחור נהג מתוך הרשימה');
             }
 
             const driverIndex = driverNames.indexOf(driverNameFromInput);
@@ -2789,7 +2789,7 @@
 
 
 
-    <div class="modal fade" id="assignDriverModal" role="dialog" aria-labelledby="documentedRidesTitle" aria-hidden="true"></div>
+    <div class="modal fade" id="assignDriverModal" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="documentedRidesTitle" aria-hidden="true"></div>
 
     <div class="modal fade" id="filtersModal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog" role="document">
