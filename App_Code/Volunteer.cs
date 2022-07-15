@@ -2362,11 +2362,10 @@ public class Volunteer
             throw e;
         }
 
-
+        #region Disable Send mail to new volunteer --no longer work --not suported feature
+        /*
         Email em = new Email();
         string messageText = "";
-
-      
         foreach (Volunteer coor in coordinators)
         {
 
@@ -2391,7 +2390,9 @@ public class Volunteer
                 em.sendMessageTo("New volunteer", coor.Email, messageText);
             }
         }
-
+      */
+        #endregion
+      
         string longurl = ConfigurationManager.AppSettings["SMSserver"] + "&" + ConfigurationManager.AppSettings["SMSpass"];
         var uriBuilder = new UriBuilder(longurl);
         var SMSquery = HttpUtility.ParseQueryString(uriBuilder.Query);
