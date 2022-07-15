@@ -2331,7 +2331,7 @@ public class Volunteer
         cmdParams[5] = cmd.Parameters.AddWithValue("@UserName", v.CellPhone);
         cmdParams[6] = cmd.Parameters.AddWithValue("@volType", "מתנדב");
         cmdParams[7] = cmd.Parameters.AddWithValue("@isDriving", 1);
-        cmdParams[8] = cmd.Parameters.AddWithValue("@address", v.Address);
+        cmdParams[8] = cmd.Parameters.AddWithValue("@cityName", v.City);
 
 
 
@@ -2339,8 +2339,8 @@ public class Volunteer
 
         try
         {
-            query = "insert into Volunteer (UserName, CellPhone, FirstNameH, LastNameH, Gender, isActive, isAssistant, lastModified, JoinDate, isDriving, Address)";
-            query += "values (@UserName,@cell,@firstNameH,@lastNameH,@gender,1,0,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()), 1, @address);SELECT SCOPE_IDENTITY();";
+            query = "insert into Volunteer (UserName, CellPhone, FirstNameH, LastNameH, Gender, isActive, isAssistant, lastModified, JoinDate, isDriving, CityCityName)";
+            query += "values (@UserName,@cell,@firstNameH,@lastNameH,@gender,1,0,DATEADD(hour, 2, SYSDATETIME()),DATEADD(hour, 2, SYSDATETIME()), 1, @cityName);SELECT SCOPE_IDENTITY();";
 
             db = new DbService();
             Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());

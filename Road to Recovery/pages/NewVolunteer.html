@@ -147,7 +147,7 @@
                                 <div class="form-group">
                                     <label class="col-sm-4 control-label">מקום מגורים&nbsp;</label>
                                     <div class="col-sm-6">
-                                        <input id="address" dir="ltr" name="address" type="text" class="form-control req">
+                                        <input type="text" placeholder="הזן שם ובחר מתוך הרשימה" id="city" name="city" autocomplete="off" class="form-control">
                                     </div>
                                 </div>
                             </div>
@@ -216,6 +216,8 @@
         
         coor = [];
         coorEmails = [];
+        let citiesNames = [];
+        const { ajaxCall } = GENERAL.FETCH_DATA;
 
         function generateCoorList() {
             $.ajax({
@@ -263,7 +265,7 @@
             $('.req').on('keyup change', function () {
                 enableSave();
             });
-
+            getCities();
             var errorClass = 'invalid';
             var errorElement = 'em';
             var $serviceForm = $('#volunteerForm').validate({
@@ -274,7 +276,7 @@
                     var firstNameH = $("#volunteerFirstName").val();
                     var lastNameH = $("#volunteerLastName").val();
                     var displayName = firstNameH + " " + lastNameH;
-                    let address = $('#address').val();
+                    let city = $('#city').val();
 
                     if ($("#gender").val() == "זכר") {
                         var gender = "מתנדב";
@@ -313,7 +315,7 @@
                    
                     var volunteer = {
                         FirstNameH: firstNameH, LastNameH: lastNameH, DisplayName: displayName, Gender: gender,
-                        CellPhone: cellPhone, Address: address
+                        CellPhone: cellPhone, City: city
                     }
                     console.log(volunteer);
 
@@ -372,6 +374,8 @@
             var firstNameHebrewValid = true;
             var lastNameHebrewValid = true;
             var phoneValid = true;
+            let cityValid = true;
+
 
             $("#volunteerFirstName").val($("#volunteerFirstName").val().trim())
             firstNameHebrew = $("#volunteerFirstName").val();
@@ -411,10 +415,44 @@
                 phoneValid = false;
             }           
 
-            if (!firstNameHebrewValid || !lastNameHebrewValid || !phoneValid) {
+            let cityFromInput = $('#city').val();
+            if (typeof cityFromInput === 'undefined' || !cityFromInput || cityFromInput.length === 0 || !citiesNames.includes(cityFromInput)) {
+
+                swal(
+                    "שים לב!",
+                    "יש לבחור מקום מגורים מתוך הרשימה",
+                    "warning"
+                );
+                cityValid = false;
+            }
+
+            if (!firstNameHebrewValid || !lastNameHebrewValid || !phoneValid || !cityValid) {
                 return false;
             } else return true;
         }
+
+        function getCities() {
+            ajaxCall(
+                'getCities',
+                '',
+                getCities_SCB,
+                getCities_ECB
+            )
+        }
+
+        function getCities_SCB(data) {
+
+            const listOfCities = JSON.parse(data.d);
+
+            citiesNames = listOfCities.map(d => d.CityName);
+
+            $('#city').autocomplete({ source: citiesNames });
+        }
+
+        function getCities_ECB(err) {
+            console.log(err);
+        }
+
     </script>
     <!-- jQuery  -->
     <script src="assets/js/bootstrap-rtl.min.js"></script>

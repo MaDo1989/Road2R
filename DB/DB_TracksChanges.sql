@@ -463,3 +463,17 @@ FROM            dbo.Patient INNER JOIN
                          dbo.Ride ON dbo.RidePat.RideId = dbo.Ride.RideNum LEFT JOIN Volunteer V on RidePat.CoordinatorID = V.Id
 						 LEFT JOIN Volunteer driver on driver.Id = dbo.Ride.MainDriver
 GO
+
+-- =============================================
+-- Author:      Yogev Strauber
+-- Create Date: 15/07/2022
+-- Description: Get All Cities From City Table 
+-- =============================================
+CREATE PROCEDURE spCity_GetAllCities
+AS
+BEGIN
+    SET NOCOUNT ON
+	SELECT * FROM City
+END
+GO
+
