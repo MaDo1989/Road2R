@@ -45,6 +45,9 @@ public class City
         }
     }
 
+    public string Zone { get; set; }
+    public string Area { get; set; }
+
     public City()
     {
         //
