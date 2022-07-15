@@ -73,7 +73,7 @@
     </style>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
-        
+
 
     </script>
 </head>
@@ -86,7 +86,7 @@
                     <img class="text-right" src="../../Media/R2R Logo.png" />
                     <br />
                     <br />
-                    
+
                 </div>
             </div>
         </div>
@@ -147,7 +147,7 @@
                                 <div class="form-group">
                                     <label class="col-sm-4 control-label">מקום מגורים&nbsp;</label>
                                     <div class="col-sm-6">
-                                        <input id="address" dir="ltr" name="address" type="text" class="form-control req">
+                                        <input type="text" placeholder="הזן שם ובחר מתוך הרשימה" id="city" name="city" autocomplete="off" class="form-control">
                                     </div>
                                 </div>
                             </div>
@@ -169,21 +169,21 @@
 
 
                         <!--<div class="row m-l-10 m-r-10">
-        <div class="col-sm-6">
-            <div class="form-group">
-                <label class="col-sm-4 control-label">מעוניינ.ת בהדרכה?&nbsp;-->
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">מעוניינ.ת בהדרכה?&nbsp;-->
                         <!--<span class="required">*</span>-->
                         <!--</label>
-                <div class="col-sm-6" id="needInstructions">
-                    <select id="instructions" name="instructions" class="form-control req">
-                        <option>בחר.י</option>
-                        <option>כן</option>
-                        <option>לא</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>-->
+                                    <div class="col-sm-6" id="needInstructions">
+                                        <select id="instructions" name="instructions" class="form-control req">
+                                            <option>בחר.י</option>
+                                            <option>כן</option>
+                                            <option>לא</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>-->
 
                         <hr /><br />
                         <div class="row m-l-10 m-r-10">
@@ -213,9 +213,11 @@
     </script>
     <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
     <script>
-        
+
         coor = [];
         coorEmails = [];
+        let citiesNames = [];
+        const { ajaxCall } = GENERAL.FETCH_DATA;
 
         function generateCoorList() {
             $.ajax({
@@ -230,7 +232,7 @@
         }
 
         function generateCoorListSuccessCB(data) {
-            var arr_coor = JSON.parse(data.d);  
+            var arr_coor = JSON.parse(data.d);
             console.log(arr_coor)
             for (i in arr_coor) {
                 coor.push(arr_coor[i].DisplayName);
@@ -263,7 +265,7 @@
             $('.req').on('keyup change', function () {
                 enableSave();
             });
-
+            getCities();
             var errorClass = 'invalid';
             var errorElement = 'em';
             var $serviceForm = $('#volunteerForm').validate({
@@ -274,7 +276,7 @@
                     var firstNameH = $("#volunteerFirstName").val();
                     var lastNameH = $("#volunteerLastName").val();
                     var displayName = firstNameH + " " + lastNameH;
-                    let address = $('#address').val();
+                    let city = $('#city').val();
 
                     if ($("#gender").val() == "זכר") {
                         var gender = "מתנדב";
@@ -290,7 +292,7 @@
                     }
                     else if ($("#instructions").val() == "לא") {
                         var instructions = false;
-                    }                   
+                    }
 
                     //var coordinatorEmail = $("#coorSelect").val();
                     //var coordinatorName = $('#coorSelect option:selected').text();
@@ -310,10 +312,10 @@
                         coordinators.push(coordinator)
                     });
 
-                   
+
                     var volunteer = {
                         FirstNameH: firstNameH, LastNameH: lastNameH, DisplayName: displayName, Gender: gender,
-                        CellPhone: cellPhone, Address: address
+                        CellPhone: cellPhone, City: city
                     }
                     console.log(volunteer);
 
@@ -324,7 +326,7 @@
                         type: "POST",
                         async: false,
                         //data: JSON.stringify({ volunteer: volunteer, coorEmail: coordinatorEmail, coorName: coordinatorName, coorPhone: coordinatorPhone, instructions: instructions }),
-                        data: JSON.stringify({ volunteer: volunteer, coordinators: coordinators, instructions: false }), //: instructions  
+                        data: JSON.stringify({ volunteer: volunteer, coordinators: coordinators, instructions: false }), //: instructions
                         success: function (data) {
                             swal({
                                 title: "הפרטים נשמרו\nתודה רבה",
@@ -338,7 +340,7 @@
                             console.log(err);
                             if (err.responseJSON.Message == "duplicate key") {
                                 swal("לא ניתן להוסיף מתנדב.ת עם מספר טלפון זה - המספר כבר מוגדר במערכת");
-                            }else swal("שגיאה בעריכת הנתונים");
+                            } else swal("שגיאה בעריכת הנתונים");
                         }
                     });
                     return false;
@@ -372,6 +374,8 @@
             var firstNameHebrewValid = true;
             var lastNameHebrewValid = true;
             var phoneValid = true;
+            let cityValid = true;
+
 
             $("#volunteerFirstName").val($("#volunteerFirstName").val().trim())
             firstNameHebrew = $("#volunteerFirstName").val();
@@ -395,7 +399,7 @@
                     "warning"
                 );
                 lastNameHebrewValid = false;
-            }           
+            }
             $("#phone1").val($("#phone1").val().trim());
             var Phone = $("#phone1").val();
             Phone = Phone.replace(/ /g, '');
@@ -409,12 +413,46 @@
                     "warning"
                 );
                 phoneValid = false;
-            }           
+            }
 
-            if (!firstNameHebrewValid || !lastNameHebrewValid || !phoneValid) {
+            let cityFromInput = $('#city').val();
+            if (cityFromInput.length > 0 && !citiesNames.includes(cityFromInput)) {
+
+                swal(
+                    "שים לב!",
+                    "יש לבחור מקום מגורים מתוך הרשימה",
+                    "warning"
+                );
+                cityValid = false;
+            }
+
+            if (!firstNameHebrewValid || !lastNameHebrewValid || !phoneValid || !cityValid) {
                 return false;
             } else return true;
         }
+
+        function getCities() {
+            ajaxCall(
+                'getCities',
+                '',
+                getCities_SCB,
+                getCities_ECB
+            )
+        }
+
+        function getCities_SCB(data) {
+
+            const listOfCities = JSON.parse(data.d);
+
+            citiesNames = listOfCities.map(d => d.CityName);
+
+            $('#city').autocomplete({ source: citiesNames });
+        }
+
+        function getCities_ECB(err) {
+            console.log(err);
+        }
+
     </script>
     <!-- jQuery  -->
     <script src="assets/js/bootstrap-rtl.min.js"></script>

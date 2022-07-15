@@ -95,12 +95,13 @@ public class RideSlimExt : RideSlim
         }
     }
 
-    public Object GetRidePatView(int daysAhead) {
+    public Object GetRidePatView(int daysAhead)
+    {
 
         // get the basic ride data
         DbService db = new DbService();
         Dictionary<int, RideSlimExt> dic = new Dictionary<int, RideSlimExt>();
-      
+
         //List<RideSlimExt> rides = new List<RideSlimExt>();
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.StoredProcedure;
@@ -133,7 +134,7 @@ public class RideSlimExt : RideSlim
             RideSlimExt rse = new RideSlimExt(PatientName, "", 0, Origin, Destination, PickUpTime, Id, CellPhone);
             rse.Area = dr["area"].ToString();
             rse.OnlyEscort = Convert.ToBoolean(dr["onlyEscort"]);
-            dic.Add(Id,rse );
+            dic.Add(Id, rse);
         }
 
         dr.Close();
@@ -144,21 +145,24 @@ public class RideSlimExt : RideSlim
         while (dr.Read())
         {
             int ridepatnum = Convert.ToInt32(dr["ridepatnum"]);
-            dic[ridepatnum].escorts = new List<EscoretSlim>();
+            if (dic[ridepatnum].escorts == null)
+            {
+                dic[ridepatnum].escorts = new List<EscoretSlim>();
+            }
             string displayName = dr["DisplayName"].ToString();
             bool isAnonymous = true;
-            if (dr["IsAnonymous"] == System.DBNull.Value) 
+            if (dr["IsAnonymous"] == System.DBNull.Value)
                 isAnonymous = false;
             else
                 isAnonymous = Convert.ToBoolean(dr["IsAnonymous"]);
-        
-            if(isAnonymous != true && !displayName.Contains("אנונימי") && !displayName.Contains("Anonymus"))
+
+            if (isAnonymous != true && !displayName.Contains("אנונימי") && !displayName.Contains("Anonymus"))
             {
                 string cellphone = dr["CellPhone"].ToString();
-                dic[ridepatnum].escorts.Add(new EscoretSlim(displayName, cellphone,0));
+                dic[ridepatnum].escorts.Add(new EscoretSlim(displayName, cellphone, 0));
             }
             else
-                dic[ridepatnum].escorts.Add(new EscoretSlim("אנונימי", "",0));
+                dic[ridepatnum].escorts.Add(new EscoretSlim("אנונימי", "", 0));
         }
         dr.Close();
 
@@ -169,8 +173,10 @@ public class RideSlimExt : RideSlim
         {
             string patient = dr["patient"].ToString();
             string equipment = dr["Name"].ToString();
-            foreach (KeyValuePair<int,RideSlimExt> kv in dic) {
-                if (kv.Value.PatientName == patient) {
+            foreach (KeyValuePair<int, RideSlimExt> kv in dic)
+            {
+                if (kv.Value.PatientName == patient)
+                {
                     if (kv.Value.equipment == null)
                         kv.Value.equipment = new List<string>();
                     kv.Value.equipment.Add(equipment);
@@ -189,17 +195,19 @@ public class RideSlimExt : RideSlim
 
     }
 
-    private Object RideSlimExtToObject(List<RideSlimExt> RideList) {
+    private Object RideSlimExtToObject(List<RideSlimExt> RideList)
+    {
 
         List<Object> listObjs = new List<Object>();
         int escortCounter = 0;
 
-        foreach (RideSlimExt r in RideList) {
+        foreach (RideSlimExt r in RideList)
+        {
             try
             {
                 List<Object> escorts = new List<Object>();
                 List<Object> equipment = new List<object>();
-                if(r.Escorts != null)
+                if (r.Escorts != null)
                     foreach (EscoretSlim e in r.Escorts)
                     {
                         bool isAnonymous = false;
@@ -243,7 +251,8 @@ public class RideSlimExt : RideSlim
                     OnlyEscorts = r.OnlyEscort
                 });
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 throw ex;
             }
 
@@ -355,7 +364,7 @@ public class RideSlimExt : RideSlim
             {
                 PatientName = "אנונימי";
             }
-                
+
             CellPhone = dr["CellPhone"].ToString();
             RideSlimExt rse = new RideSlimExt(PatientName, "", 0, Origin, Destination, PickUpTime, Id, CellPhone);
             rse.Area = dr["area"].ToString();
@@ -375,7 +384,7 @@ public class RideSlimExt : RideSlim
             dic[ridepatnum].escorts = new List<EscoretSlim>();
             string displayName = dr["DisplayName"].ToString();
             bool isAnonymous = true;
-            
+
             if (dr["IsAnonymous"] == System.DBNull.Value)
                 isAnonymous = false;
             else
@@ -384,10 +393,10 @@ public class RideSlimExt : RideSlim
             if (isAnonymous != true && !displayName.Contains("אנונימי") && !displayName.Contains("Anonymus"))
             {
                 string cellphone = dr["CellPhone"].ToString();
-                dic[ridepatnum].escorts.Add(new EscoretSlim(displayName, cellphone,0));
+                dic[ridepatnum].escorts.Add(new EscoretSlim(displayName, cellphone, 0));
             }
             else
-                dic[ridepatnum].escorts.Add(new EscoretSlim("אנונימי", "",0));
+                dic[ridepatnum].escorts.Add(new EscoretSlim("אנונימי", "", 0));
         }
         dr.Close();
 
@@ -480,14 +489,16 @@ public class RideSlimExt : RideSlim
                 if (isAnonymous != true && !displayName.Contains("אנונימי") && !displayName.Contains("Anonymus"))
                 {
                     string cellphone = dr["CellPhone"].ToString();
-                    dic[ridepatnum].escorts.Add(new EscoretSlim(displayName, cellphone,0));
+                    dic[ridepatnum].escorts.Add(new EscoretSlim(displayName, cellphone, 0));
                 }
                 else
-                    dic[ridepatnum].escorts.Add(new EscoretSlim("אנונימי", "",0));
+                    dic[ridepatnum].escorts.Add(new EscoretSlim("אנונימי", "", 0));
 
             }
-            catch (Exception ex) {
-                throw ex;            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
         dr.Close();
 
