@@ -316,7 +316,7 @@ const fillTableWithData = () => {
     let btnStr;
     let showDocumentedCallsBtn;
     let showDocumentedRidesBtn;
-    let candidateName2render;
+    let linkableNameToRender;
 
 
     for (let i in allCandidatedFromDB) {
@@ -336,11 +336,12 @@ const fillTableWithData = () => {
         btnStr += showDocumentedRidesBtn;
         btnStr += '</div>';
 
-        candidateName2render = buildCandidateHTML(allCandidatedFromDB[i]);
+        linkableNameToRender = buildCandidateHTML(allCandidatedFromDB[i]);
 
         thisCandidate = {
             Id: i,
-            DisplayName: candidateName2render,
+            LinkableDisplayName: linkableNameToRender,
+            DisplayName: allCandidatedFromDB[i].DisplayName,
             cellphone: addSeperator2MobileNum(allCandidatedFromDB[i].CellPhone, "-"),
             city: allCandidatedFromDB[i].City,// + '<br />בדיקה',
             daysSinceLastRide: allCandidatedFromDB[i].DaysSinceLastRide,
@@ -393,7 +394,7 @@ const fillTableWithData = () => {
         columns: [
             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
             {
-                data: "DisplayName",
+                data: "LinkableDisplayName",
                 render: function (data, type, row, meta) {
                     let did = "data-driverId='" + row.Id + "'";
                     return '<p class="c1" ' + did + '>' + data + ' </p>';
@@ -434,7 +435,7 @@ const fillTableWithData = () => {
             columns: [
                 //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
                 {
-                    data: "DisplayName",
+                    data: "LinkableDisplayName",
                     render: function (data, type, row, meta) {
                         let did = "data-driverId='" + row.Id + "'";
                         return '<p class="c1" ' + did + '>' + data + ' </p>';
