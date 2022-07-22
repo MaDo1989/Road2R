@@ -212,6 +212,8 @@
 
                 tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
                 manipilateNodeStyle(tr_node2manipulate, updated_ridePat, ADD_DRIVER);
+
+
             }
         }
 
@@ -446,6 +448,7 @@
         const { APP_ID } = GENERAL;
 
         const newVolunteerText = `מתנדב חדש`;
+        const noDriver = { hebrew: 'אין', english: 'None!' };
 
         const controllersLayout = "<'row top'<'col-sm-6'l><'col-sm-5'f><'col-sm-1'B>>rt<'bottom'p>";//https://datatables.net/reference/option/dom
         let drivers, driverNames;
@@ -455,6 +458,7 @@
         let _trToHighLight;
 
         let tMorning, tAfternoon, tFuture, tTomorrow;
+
 
         function wiringDataTables() {
             //manage button clicks on tables
@@ -768,6 +772,7 @@
                 window.location.href = "notAvailable.html";
             }
             isAssistant = JSON.parse(GENERAL.USER.getIsAssistant());
+
             var assistantName = "";
             if (isAssistant) {
                 $("#menuType").attr("w3-include-html", "HelperMenu.html");
@@ -1703,9 +1708,9 @@
 
                         if (candidateFeature !== null) {
 
-                            btnStr = `<div class='btnsInSameLine'>${editBtn} ${deleteBtn} ${arr_rides[i].Drivers.length > 0 ? messageToCopyBtn : ''} ${arr_rides[i].Drivers.length > 0 ? '' : candidateBtn}</div>`;
+                            btnStr = `<div class='elementsInSameLine'>${editBtn} ${deleteBtn} ${arr_rides[i].Drivers.length > 0 ? messageToCopyBtn : ''} ${arr_rides[i].Drivers.length > 0 ? '' : candidateBtn}</div>`;
                         } else {
-                            btnStr = `<div class='btnsInSameLine'>${editBtn} ${deleteBtn} ${arr_rides[i].Drivers.length > 0 ? messageToCopyBtn : ''}</div>`;
+                            btnStr = `<div class='elementsInSameLine'>${editBtn} ${deleteBtn} ${arr_rides[i].Drivers.length > 0 ? messageToCopyBtn : ''}</div>`;
                         }
 
 
@@ -1723,6 +1728,7 @@
                             //englishOriginAndDestination: arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
                             remark: arr_rides[i].Remark,
                             isAnonymous: arr_rides[i].Pat.IsAnonymous === 'True',
+                            hasDriver: arr_rides[i].Drivers.length > 0,
                             buttons: btnStr,
                         }
 
@@ -1801,7 +1807,7 @@
                                         case 4: //driver column
 
                                             $(cell).addClass('driver_td');
-                                            if (cellData.indexOf('אין!') !== -1) {
+                                            if (!rowData.hasDriver) {
                                                 const suitableClass = classManager.getSuitableClassS_4thisTime("datatable-morning");
                                                 $(cell).addClass(suitableClass);
                                             }
@@ -1906,7 +1912,7 @@
                                         case 4: //driver
                                             //this code is identical to the one in datatable-tomorrow when can need to change to 1 function
                                             $(cell).addClass('driver_td');
-                                            if (cellData.indexOf('אין!') !== -1) {
+                                            if (!rowData.hasDriver) {
 
                                                 let ridePatTime_td;
                                                 if (rowData['time'] === 'אחה"צ') {
@@ -2005,7 +2011,7 @@
                                 targets: 5, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //5 is driver column
 
                                     cell.className += ' driver_td';
-                                    if (cellData.indexOf('אין!') !== -1) {
+                                    if (!rowData.hasDriver) {
 
                                         let ridePatTime_td;
                                         if (rowData['time'] === 'אחה"צ') {
@@ -2165,16 +2171,20 @@
                         DisplayName
                 }
 
-                driverWrapper = isCountAsNewVolunteer ? `<span class='redFont boldFont'>${newVolunteerText}</span>` : ``;
+                driverWrapper = isCountAsNewVolunteer ? `<span class='purpleFont boldFont'>${newVolunteerText}</span>` : ``;
                 driverWrapper += `<a href="volunteerform.html" data-obj="volunteer" class="showMe driverName clickable blueFont boldFont"`;
                 driverWrapper += `id='${Id}'>${driverInnerContent}</a>`;
                 driverWrapper += `<span class="driverCellPhone">${addSeperator2MobileNum(CellPhone, '-')}</span>`;
-                driverWrapper += `<buttond onclick="prepreparationAssignDriverModal(this, ${ridePatNum}, ${isDriverReplacement}, ${rideNum})" data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>עדכן נהג</button>`;
+                driverWrapper += `<button onclick="prepreparationAssignDriverModal(this, ${ridePatNum}, ${isDriverReplacement}, ${rideNum})" data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>עדכון נהג</button></div>`;
             } else {
 
                 isDriverReplacement = false;
-                driverWrapper = 'אין!<br/>None!';
-                driverWrapper += `<buttond onclick="prepreparationAssignDriverModal(this, ${ridePatNum}, ${isDriverReplacement})"  data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>שבץ נהג</button>`;
+                driverWrapper = `<div class='elementsInSameLine'>`;
+                let nodriverSpan = '<span class="verticalAllign">';
+                nodriverSpan += isAssistant ? noDriver.english : noDriver.hebrew;
+                nodriverSpan  += '</span>';
+                driverWrapper += nodriverSpan;
+                driverWrapper += `<buttond onclick="prepreparationAssignDriverModal(this, ${ridePatNum}, ${isDriverReplacement})"  data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>שיבוץ נהג</button></div>`;
             }
 
             return driverWrapper;

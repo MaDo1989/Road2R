@@ -320,7 +320,7 @@ const fillTableWithData = () => {
 
 
     for (let i in allCandidatedFromDB) {
-        btnStr = `<div class='btnsInSameLine'>`;
+        btnStr = `<div class='elementsInSameLine'>`;
         date2display = convertDBDate2FrontEndDate(allCandidatedFromDB[i].LatestDocumentedCallDate).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
 
         showDocumentedCallsBtn = '';
