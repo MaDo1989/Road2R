@@ -2396,8 +2396,8 @@ public class Volunteer
         var uriBuilder = new UriBuilder(longurl);
         var SMSquery = HttpUtility.ParseQueryString(uriBuilder.Query);
         SMSquery["to"] = "972" + v.cellPhone.Substring(1, v.cellPhone.Length - 1);
-        string SMSmessage = "להשלמת ההצטרפות לעמותת 'בדרך להחלמה' לחץ על הקישור הבא: http://roadtorecovery.org.il/prod/Road%20to%20Recovery/pages/Welcome.html?vol=" + v.CellPhone;
-        //string SMSmessage = "להשלמת ההצטרפות לעמותת 'בדרך להחלמה' לחץ על הקישור הבא: http://roadtorecovery.org.il/test/Road%20to%20Recovery/pages/Welcome.html?vol=" + v.CellPhone;
+        string SMSmessage = "להשלמת ההצטרפות לעמותת 'בדרך להחלמה' לחץ על הקישור הבא: https://roadtorecovery.org.il/prod/Road%20to%20Recovery/pages/Welcome.html?vol=" + v.CellPhone;
+        //string SMSmessage = "להשלמת ההצטרפות לעמותת 'בדרך להחלמה' לחץ על הקישור הבא: https://roadtorecovery.org.il/test/Road%20to%20Recovery/pages/Welcome.html?vol=" + v.CellPhone;
 
         foreach (Volunteer coor in coordinators)
         {
@@ -2408,6 +2408,7 @@ public class Volunteer
         uriBuilder.Query = SMSquery.ToString();
         longurl = uriBuilder.ToString();
 
+        ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
         WebRequest wr = WebRequest.Create(longurl);
         HttpWebResponse response = (HttpWebResponse)wr.GetResponse();
         string status = response.StatusDescription;
