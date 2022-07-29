@@ -381,7 +381,11 @@ public class RideSlimExt : RideSlim
         while (dr.Read())
         {
             int ridepatnum = Convert.ToInt32(dr["ridepatnum"]);
-            dic[ridepatnum].escorts = new List<EscoretSlim>();
+            if (dic[ridepatnum].escorts == null)
+            {
+                dic[ridepatnum].escorts = new List<EscoretSlim>();
+            }
+
             string displayName = dr["DisplayName"].ToString();
             bool isAnonymous = true;
 
@@ -478,7 +482,11 @@ public class RideSlimExt : RideSlim
             try
             {
                 int ridepatnum = Convert.ToInt32(dr["ridepatnum"]);
-                dic[ridepatnum].escorts = new List<EscoretSlim>();
+                if (dic[ridepatnum].escorts == null)
+                {
+                    dic[ridepatnum].escorts = new List<EscoretSlim>();
+                }
+
                 string displayName = dr["DisplayName"].ToString();
                 bool isAnonymous = true;
                 if (dr["IsAnonymous"] == System.DBNull.Value)
