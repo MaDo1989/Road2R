@@ -117,7 +117,7 @@ var K_fields_map = {
             id: "rp_vl_ride_month__name",
             type: "VOLUNTEER",
             template: 'div[name="template_VOLUNTEER"]',
-            post_clone: function () { loadVolunteers(populate_volunteer_field_with_validation);}
+            post_clone: function () { loadVolunteers(populate_volunteer_field_with_validation); }
         },
         {
             id: "rp_vl_ride_month__month",
@@ -273,14 +273,19 @@ var K_fields_map = {
     ],
     "rp_center_tomorrows_rides": [
         {
+            id: "rp_center_tomorrows_rides__date",
+            template: 'div[name="template_DATE_SELECT"]',
+            type: "DATE",
+            post_clone: rp_center_tomorrows_rides_date_post_clone
+        },
+        {
             id: "rp_center_tomorrows_rides_generate",
             template: 'div[name="template_GENERATE_REPORT"]',
             type: "GENERATE_REPORT",
             post_clone: rp_center_tomorrows_rides_genreport_post_clone
-        }
+        },
+
     ],
-
-
 
     
  }
@@ -735,6 +740,25 @@ function rp_center_patients_rides_genreport_post_clone(id) {
 function rp_center_tomorrows_rides_genreport_post_clone(id) {
     $("#generate_report_period").click(rp_center_tomorrows_rides__refresh_preview);
 }
+
+function rp_center_tomorrows_rides_on_date_change() {
+    let selected_day = moment($("#select_date").val(), K_DateFormat_Moment);
+    // Update report title in UI.
+    $("#report_title").html("מרכז תיאום - הסעות של מחר   " + selected_day.format("DD-MM-YYYY"));
+}
+
+function rp_center_tomorrows_rides_date_post_clone() {
+    var dt = $('#select_date').datepicker({
+        format: K_DateFormat_DatePicker,
+        autoclose: true
+    });
+    let the_date = new Date();
+    the_date.setDate(the_date.getDate() + 1); // tomorrow's - date
+    dt.datepicker('setDate', the_date);
+    dt.on("changeDate", rp_center_tomorrows_rides_on_date_change);
+    rp_center_tomorrows_rides_on_date_change(); // force title update
+}
+
 
 function rp_vl_ride_month_generate_post_clone(id) {
     $("#generate_report_period").click(rp_vl_ride_month__refresh_preview);
@@ -2377,6 +2401,10 @@ function rp_center_patients_rides__refresh_Table(volunteerId, start_date, end_da
 
 }
 
+function tomorrows_rides_clean_pickup_time(orig_str) {
+    let m = moment(orig_str, "DD/MM/YYYY hh:mm:ss")
+    return m.format("H:mm");
+}
 
 /*
 Destination: "Augusta Victoria"
@@ -2386,12 +2414,12 @@ Origin: "Reihan"
 Patient: "Maryam Hassan Yosef Amro"
 Pickuptime: "06/02/2022 03:00:00"
 
-
 Origin	Dest	pickuptim	pat1	pat1_escorts	pat2	pat2_escorts
 
  */
 
 function tomorrows_rides_process_data(records) {
+    
     let groupByDict = {};
     records.forEach(function (obj) {
         key = obj.Destination + "," + obj.Origin + "," + obj.DriverID + "," + obj.Pickuptime;
@@ -2408,7 +2436,7 @@ function tomorrows_rides_process_data(records) {
         let entry = {
             "Origin": rides[0].Origin,
             "Destination": rides[0].Destination,
-            "Pickuptime": rides[0].Pickuptime,
+            "Pickuptime": tomorrows_rides_clean_pickup_time(rides[0].Pickuptime),
             "pat1_name": rides[0].Patient,
             "pat1_escorts": rides[0].EscortCount,
             "pat2_name": "",
@@ -2427,7 +2455,7 @@ function tomorrows_rides_process_data(records) {
     return table;
 }
 
-function tomorrows_rides_get_as_text(table) {
+function tomorrows_rides_get_as_text(table, header) {
     // Sort by Origin, Destination, Pickuptime, Patient
     table.sort(function (lhs, rhs) {
         return lhs.Origin.localeCompare(rhs.Origin)
@@ -2437,6 +2465,7 @@ function tomorrows_rides_get_as_text(table) {
     });
 
     result = new Array();
+    result.push(header);
     for (let idx = 0; idx < table.length; ++idx) {
         let curr = table[idx];
         let prev = idx > 0 ? table[idx - 1] : null;
@@ -2479,7 +2508,8 @@ function rp_center_tomorrows_rides__refresh_preview() {
     hide_all_tables();
     $('#wait').show();
 
-    let start_moment = moment("2022-02-06");
+    let start_moment = moment($("#select_date").val(), K_DateFormat_Moment);
+    // let start_moment = moment("2022-02-06");
     end_moment = moment(start_moment);
     end_moment.add(1, 'days');
 
@@ -2488,7 +2518,7 @@ function rp_center_tomorrows_rides__refresh_preview() {
         end_date: end_moment.format("YYYY-MM-DD")
     };
 
-    console.log(query_object);
+    let readable_date = start_moment.format("DD-MMM-YYYY");
 
     $.ajax({
         dataType: "json",
@@ -2499,9 +2529,9 @@ function rp_center_tomorrows_rides__refresh_preview() {
         success: function (data) {
             $('#wait').hide();
             let table = tomorrows_rides_process_data(data.d);
-            let text_export = tomorrows_rides_get_as_text(table);
-            console.log(text_export);
-            download_text_file(text_export, "Tomorrows_report.txt");
+            let text_export = tomorrows_rides_get_as_text(table, "Tomorrows rides - " + readable_date);
+            // console.log(text_export);
+            download_text_file(text_export, "Tomorrows_report__" + readable_date + ".txt");
 
             $('#div_table_center_tomorrows_rides').show();
             tbl = $('#table_center_tomorrows_rides').DataTable({
