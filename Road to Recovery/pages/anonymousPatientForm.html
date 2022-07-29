@@ -97,6 +97,7 @@
         $.jgrid.defaults.styleUI = 'Bootstrap';
         //global var for checking patients.
         var patients = [];
+        const { compareFunc } = GENERAL.USEFULL_FUNCTIONS;
 
         $(document).ready(function () {
             
@@ -163,13 +164,13 @@
                 data: JSON.stringify({ active: true }),
                 success: function (data) {
                     var arr_locations = JSON.parse(data.d);
-                    arr_locations.sort();
+                    arr_locations.sort(compareFunc);
                     $('<option>', { value: "", text: "בחר " }).appendTo($("#barrier"));
                     $('<option>', { value: "", text: "בחר " }).appendTo($("#hospital"));
 
                     for (i in arr_locations) {
-                        $('<option>', { value: arr_locations[i].Name, text: arr_locations[i].EnglishName }).appendTo($("#barrier"));
-                        $('<option>', { value: arr_locations[i].Name, text: arr_locations[i].EnglishName }).appendTo($("#hospital"));
+                        $('<option>', { value: arr_locations[i].Name, text: arr_locations[i].Name }).appendTo($("#barrier"));
+                        $('<option>', { value: arr_locations[i].Name, text: arr_locations[i].Name }).appendTo($("#hospital"));
                     }
                 },
                 error: function (err) { alert("Error in getDestinationView: " + err.responseText); }
@@ -394,7 +395,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            
+
                                         </div>
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
@@ -496,8 +497,9 @@
             </div>
             <!-- end content -->
             <!-- FOOTER -->
-            <footer class="footer text-right">
-                2020 - 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה
+            <footer id="rights" data-toggle="tooltip" data-placement="top"
+                    title="© All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء"
+                    class="footer text-right">
             </footer>
             <!-- End FOOTER -->
         </div>
@@ -516,6 +518,9 @@
     <script>
         $(document).ready(function () {
             // DO NOT REMOVE : GLOBAL FUNCTIONS!
+            const { COPYWRITE } = GENERAL;
+            $('#rights').html(COPYWRITE());
+
             var errorClass = 'invalid';
             var errorElement = 'em';
             var $serviceForm = $('#customerForm').validate({
