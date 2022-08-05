@@ -204,8 +204,9 @@
     </div>
     <!-- end container -->
     <!-- FOOTER -->
-    <footer class="footer text-right">
-        2020 - 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה
+    <footer id="rights" data-toggle="tooltip" data-placement="top"
+            title="© All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء"
+            class="footer text-right">
     </footer>
     <!-- End FOOTER -->
     <script>
@@ -262,12 +263,16 @@
             $.jgrid.defaults.styleUI = 'Bootstrap';
             generateCoorList();
 
+            const { COPYWRITE } = GENERAL;
+            $('#rights').html(COPYWRITE());
+
             $('.req').on('keyup change', function () {
                 enableSave();
             });
             getCities();
             var errorClass = 'invalid';
             var errorElement = 'em';
+
             var $serviceForm = $('#volunteerForm').validate({
                 submitHandler: function (form, event) {
                     event.preventDefault();

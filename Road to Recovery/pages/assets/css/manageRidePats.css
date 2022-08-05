@@ -256,3 +256,8 @@ input:checked + .slider:before {
 .purpleFont {
     color: rgb(178, 0, 255);
 }
+
+.select-box {
+    width: 5vw;
+    height: 28px;
+}
