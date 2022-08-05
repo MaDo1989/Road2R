@@ -447,7 +447,7 @@
         const { APP_ID } = GENERAL;
 
         const newVolunteerText = `מתנדב חדש`;
-        const noDriver = { hebrew: 'אין', english: 'None!' };
+     //   const noDriver = { hebrew: 'אין', english: 'None!' };
 
         const controllersLayout = "<'row top'<'col-sm-6'l><'col-sm-5'f><'col-sm-1'B>>rt<'bottom'p>";//https://datatables.net/reference/option/dom
         const controllersLayoutForFutureTable = "<'row top'<'col-sm-2'l><'#future-table-time-interval-container.col-sm-4'><'col-sm-5'f><'col-sm-1'B>>rt<'bottom'p>";
@@ -2226,10 +2226,10 @@
 
                 isDriverReplacement = false;
                 driverWrapper = `<div class='elementsInSameLine'>`;
-                let nodriverSpan = '<span class="verticalAllign">';
-                nodriverSpan += isAssistant ? noDriver.english : noDriver.hebrew;
-                nodriverSpan += '</span>';
-                driverWrapper += nodriverSpan;
+                //let nodriverSpan = '<span class="verticalAllign">';
+                //nodriverSpan += isAssistant ? noDriver.english : noDriver.hebrew;
+                //nodriverSpan += '</span>';
+                //driverWrapper += nodriverSpan;
                 driverWrapper += `<buttond onclick="prepreparationAssignDriverModal(this, ${ridePatNum}, ${isDriverReplacement})"  data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>שיבוץ נהג</button></div>`;
             }
 
