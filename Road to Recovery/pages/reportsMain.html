@@ -195,7 +195,7 @@
 
 
             
-            $("#dsb_hl").click(dashboard_hl_init);
+            // $("#dsb_hl").click(dashboard_hl_init);
 
             // fast-load dashboard:
             // dashboard_hl_init();
@@ -317,7 +317,7 @@
                                         <li><a class="report_link_cls" id="rp_pil_vls_per_month">הסעות מתנדבים בפילוח חודשי </a></li>
                                         <li><a class="report_link_cls" id="rp_pil_vl_ride_month">מתנדבים מסיעים בחתך חודשי </a></li>
                                         <li><a class="report_link_cls" id="rp_pil_vl_ride_recent_period">הסעות בתקופה האחרונה </a></li>
-                                        <li><a class="report_link_cls" id="dsb_hl">Dashboard</a></li>
+                                        <li><a class="report_link_cls" href="reportsMain.html?dashboard=true"  target="r2r_dashboard" id="open_dsb_in_new_win">Dashboard</a></li>
                                     </ul>
                                 </li>
                                 <li id="rp_special_list" style="display:none">
@@ -565,27 +565,27 @@
                         </div>
 
                         <div class="col-sm-2" id="dsb_hl_daily_rides">
-                            <h3>הסעות</h3><p />
+                            <h3   data-toggle="tooltip" title="הסעה = תנועת רכב אחד, ממוצא ליעד, של חולה אחד או יותר." data-html="true"   >הסעות</h3><p />
                             <p id="dsb_hl_daily_rides_total" class="dsb_daily_num">--</p>
                             <strong class="lead">ל - <span id="dsb_hl_daily_rides_attention" class="dsb_daily_num"> -- </span> אין עדיין נהג</strong>
                         </div>
 
                         <div class="col-sm-2" id="dsb_hl_daily_patients">
-                            <h3>חולים</h3><p />
+                            <h3 data-toggle="tooltip" title="לא כולל מלווים"  >חולים</h3><p />
                             <p id="dsb_hl_daily_patients_total" class="dsb_daily_num">--</p>
                             <p>ל - <span id="dsb_hl_daily_patients_attention" class="dsb_daily_num"> -- </span> אין עדיין הסעה</p>
                         </div>
 
 
                         <div class="col-sm-2" id="dsb_hl_daily_volunteers">
-                            <h3>מתנדבים</h3><p />
+                            <h3 data-toggle="tooltip" title="מתנדב יכול לבצע מספר הסעות באותו יום."  >מתנדבים</h3><p />
                             <p id="dsb_hl_daily_volunteers_total" class="dsb_daily_num">--</p>
                             <p> <span id="dsb_hl_daily_volunteers_attention" class="dsb_daily_num"> -- </span> חדשים</p>
                         </div>
 
 
                         <div class="col-sm-2" id="dsb_hl_daily_demands">
-                            <h3>דרישות</h3><p />
+                            <h3  data-toggle="tooltip" title="דרישה = נסיעה של חולה אחד, ממחסום לבית-חולים, או בחזרה." data-html="true"  >דרישות</h3><p />
                             <p id="dsb_hl_daily_demands_total" class="dsb_daily_num">--</p>
                             <p> <span class="dsb_daily_num"> &nbsp; </span> &nbsp; </p>
                         </div>

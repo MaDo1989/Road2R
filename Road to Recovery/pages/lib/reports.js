@@ -28,8 +28,8 @@ function init_reports_page() {
     includeHTML();
     set_banner_debug_data();
     process_permissions();
-
     init_components();
+    display_dashboard_if_needed();
 }
 
 
@@ -76,6 +76,15 @@ function init_components() {
             return parseInt(value, 10) < parseInt($otherElement.val(), 10);
         });
 }
+
+function display_dashboard_if_needed() {
+    let p = new URLSearchParams(window.location.search);
+    let is_dash = p.get('dashboard');
+    if (is_dash && is_dash.localeCompare("true") == 0) {
+        dashboard_hl_init();
+    }
+}
+
 
 // Handle a click event on one of the reports in the Reports-Tree
 function on_report_click(event) {
