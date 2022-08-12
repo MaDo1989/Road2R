@@ -55,8 +55,15 @@
             return tableName2manipulate;
         }
 
-        const fixDate_WhichComeFromOpenConnection = (date2fix) => {
-            return new Date(new Date(date2fix) - new Date().getTimezoneOffset() * 60000);
+        const fixDate_WhichComeFromOpenConnection = (date2fix, getDate = true) => {
+
+            const ticks = new Date(date2fix) - new Date().getTimezoneOffset() * 60000;
+
+            if (getDate) {
+                return new Date(ticks);
+            }
+            
+            return ticks;
         }
 
         const manipilateNodeStyle = (tr_node2manipulate, updated_ridePat, functionlity, isFutureTable = false, tableName = "") => {
@@ -130,6 +137,7 @@
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
                     row2manipulate.remark = updated_ridePat.Remark;
+                    row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                     tMorning.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
                     increaseCounter('datatable-morning', updated_ridePat.RidePatNum);
@@ -150,6 +158,7 @@
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
                     row2manipulate.remark = updated_ridePat.Remark;
+                    row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                     tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
                     increaseCounter('datatable-afternoon', updated_ridePat.RidePatNum);
@@ -171,6 +180,7 @@
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
                     row2manipulate.remark = updated_ridePat.Remark;
+                    row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                     tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
                     increaseCounter('datatable-tomorrow', updated_ridePat.RidePatNum);
@@ -192,6 +202,7 @@
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
                     row2manipulate.remark = updated_ridePat.Remark;
+                    row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                     tFuture.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
                     increaseCounter('datatable-future', updated_ridePat.RidePatNum);
@@ -238,6 +249,7 @@
                     row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                    row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                     tMorning.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
                     increaseCounter('datatable-morning', updated_ridePat.RidePatNum);
@@ -253,6 +265,7 @@
 
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                    row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                     tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
                     increaseCounter('datatable-afternoon', updated_ridePat.RidePatNum);
@@ -267,6 +280,7 @@
                     row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                    row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                     tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
                     increaseCounter('datatable-tomorrow', updated_ridePat.RidePatNum);
@@ -281,6 +295,7 @@
                     row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                    row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                     tFuture.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
                     increaseCounter('datatable-future', updated_ridePat.RidePatNum);
@@ -447,10 +462,10 @@
         const { APP_ID } = GENERAL;
 
         const newVolunteerText = `מתנדב חדש`;
-     //   const noDriver = { hebrew: 'אין', english: 'None!' };
+        //   const noDriver = { hebrew: 'אין', english: 'None!' };
 
-        const controllersLayout = "<'row top'<'col-sm-6'l><'col-sm-5'f><'col-sm-1'B>>rt<'bottom'p>";//https://datatables.net/reference/option/dom
-        const controllersLayoutForFutureTable = "<'row top'<'col-sm-2'l><'#future-table-time-interval-container.col-sm-4'><'col-sm-5'f><'col-sm-1'B>>rt<'bottom'p>";
+        const controllersLayout = "<'row top'<'col-sm-6'l><'col-sm-5'f><'col-sm-1'B>>rt<'bottom'pi>";//https://datatables.net/reference/option/dom
+        const controllersLayoutForFutureTable = "<'row top'<'col-sm-2'l><'#future-table-time-interval-container.col-sm-4'><'col-sm-5'f><'col-sm-1'B>>rt<'bottom'pi>";
         let drivers, driverNames;
         let _assignDriverToRidepatNum;
         let _assignDriverToRideNum;
@@ -735,7 +750,7 @@
         $(document).ready(function () {
 
             $("#assignDriverModal").attr("w3-include-html", "assignDriverModal.html");
-            $('#assignDriverModal').on('shown.bs.modal', activateAutoComplteToModalsInput); // triger cb function only after modal is shown
+            $('#assignDriverModal').on('shown.bs.modal', bsModalHasShown); // triger cb function only after modal is shown
 
             wiringDataTables();
             const { COPYWRITE } = GENERAL;
@@ -1201,6 +1216,13 @@
 
             let ridePatNum = parseInt(copyMsgBtn.id);
             let messageObject = showMessage(arr_rides, ridePatNum);
+
+            if (!messageObject.date.includes('Date')) {
+
+                const dateTicks = fixDate_WhichComeFromOpenConnection(messageObject.date, false);
+                messageObject.date = repaireDateForMeesageModule(dateTicks);
+            }
+
             let textMessageToCopy = buildMessage(messageObject);
             console.log(textMessageToCopy);
 
@@ -1212,7 +1234,7 @@
                         type: "success",
                         showConfirmButton: false
                     });
-                }, function () {
+                }, function (err) {
                     swal({
                         title: "העתקת ההודעה נכשלה",
                         timer: 1000,
@@ -1220,6 +1242,12 @@
                         showConfirmButton: false
                     });
                 });
+        }
+
+        const repaireDateForMeesageModule = (ticks) => {
+            let rawDate = `/Date(${ticks})/`;
+
+            return rawDate;
         }
 
         const candidatesButton = (btn) => {
@@ -1699,21 +1727,7 @@
                         //#endregion Status
 
                         //#region buttons
-                        editBtn = `<button type='button' class='edit                   btn btn-icon waves-effect waves-light btn-secondary'        id='${arr_rides[i].RidePatNum}' name='${arr_rides[i].RidePatNum}' title='עריכה'><i class='ti-pencil'></i></button>`;
-                        deleteBtn = `<button type='button' class='remove               btn btn-icon waves-effect waves-light btn-secondary'        id='${arr_rides[i].RidePatNum}' name='${arr_rides[i].RidePatNum}' title='מחיקה'><i class='fa fa-remove'></i></button>`;
-                        messageToCopyBtn = `<button type='button' class='copyMessage   btn btn-icon waves-effect waves-light btn-secondary'        id='${arr_rides[i].RidePatNum}' name='${arr_rides[i].RidePatNum}' title='העתקת הודעה'><i class='fa fa-envelope'></i></button>`;
-                        candidateBtn = `<button type='button' class='candidatesBtn btn btn-icon waves-effect waves-light btn-secondary'            id='${arr_rides[i].RidePatNum}' name='${arr_rides[i].RidePatNum}' title='מועמדים להסעה'><i class='fa fa-car'></i></button>`;
-
-                        candidateFeature = true;
-
-                        if (candidateFeature !== null) {
-
-                            btnStr = `<div class='elementsInSameLine'>${editBtn} ${deleteBtn} ${arr_rides[i].Drivers.length > 0 ? messageToCopyBtn : ''} ${arr_rides[i].Drivers.length > 0 ? '' : candidateBtn}</div>`;
-                        } else {
-                            btnStr = `<div class='elementsInSameLine'>${editBtn} ${deleteBtn} ${arr_rides[i].Drivers.length > 0 ? messageToCopyBtn : ''}</div>`;
-                        }
-
-
+                        btnStr = buildAcionsButtonsHTML(arr_rides[i].RidePatNum, arr_rides[i].Drivers)
                         //#endregion buttons
 
                         thisRidePat = {
@@ -2188,7 +2202,7 @@
                     timeInterval = 7;
                     break;
                 default:
-                        timeInterval = 7;
+                    timeInterval = 7;
                     break
             }
 
@@ -2359,6 +2373,18 @@
             return englishStatus;
         };
 
+        const buildAcionsButtonsHTML = (ridePatNum, drivers) => {
+
+            const editBtn           = `<button type='button' class='edit                   btn btn-icon waves-effect waves-light btn-secondary' id='${ridePatNum}'  name='${ridePatNum}' title='עריכה'>         <i class='ti-pencil'></i></button>`;
+            const deleteBtn         = `<button type='button' class='remove               btn btn-icon waves-effect waves-light btn-secondary'   id='${ridePatNum}'  name='${ridePatNum}' title='מחיקה'>         <i class='fa fa-remove'></i></button>`;
+            const messageToCopyBtn  = `<button type='button' class='copyMessage   btn btn-icon waves-effect waves-light btn-secondary'          id='${ridePatNum}'  name='${ridePatNum}' title='העתקת הודעה'>   <i class='fa fa-envelope'></i></button>`;
+            const candidateBtn      = `<button type='button' class='candidatesBtn btn btn-icon waves-effect waves-light btn-secondary'          id='${ridePatNum}'  name='${ridePatNum}' title='מועמדים להסעה'> <i class='fa fa-car'></i></button>`;
+
+            let buttonsWrapper = `<div class='elementsInSameLine'>${editBtn} ${deleteBtn} ${drivers.length > 0 ? messageToCopyBtn : candidateBtn}</div>`;
+
+            return buttonsWrapper;
+        }
+
         function prepreparationAssignDriverModal(thisBtn, ridePatNum, isDriverReplacement, rideNum) {
             _assignDriverToRidepatNum = ridePatNum;
             _assignDriverToRideNum = rideNum
@@ -2426,6 +2452,11 @@
             }
         }
 
+        const bsModalHasShown = async () => {
+            await activateAutoComplteToModalsInput();
+            focusOnElement('driver');
+        }
+
         const activateAutoComplteToModalsInput = async () => {
             $('#driver').val('');
             if (typeof driverNames === 'undefined' || !driverNames) {
@@ -2435,6 +2466,22 @@
             $('#driver').autocomplete({ source: driverNames });
         }
 
+        const focusOnElement = (id) => {
+            $(`#${id}`).focus();
+        }
+
+        const updateActionsButtons = (actionsButtonsAsString, ridepatNum) => {
+
+            //1. convert actionsButtonsAsString to html / jquery
+            let actionsButtonsAsHTML = actionsButtonsAsString;
+
+            //2. catch the button to replace
+
+            //3. replace it
+
+            //4. return new actionsButtonsAsString
+
+        }
     </script>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
