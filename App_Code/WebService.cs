@@ -262,7 +262,7 @@ public class WebService : System.Web.Services.WebService
         catch (Exception ex)
         {
             Log.Error("Error in getCandidates", ex);
-            throw new Exception("שגיאה בקבלת מועמדים לנסיעות");
+            throw new Exception("שגיאה בקבלת מועמדים לנסיעות: " + ex.Message);
 
         }
     }
