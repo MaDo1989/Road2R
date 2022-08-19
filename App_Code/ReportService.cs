@@ -133,8 +133,8 @@ public class ReportService
 
     public class CenterMonthlyByYearInfo
     {
-        public string Count { get; set; }
-        public string Type { get; set; }
+        public string PatientCount { get; set; }
+        public string VolunteerCount { get; set; }
         public string Month { get; set; }
     }
 
@@ -162,8 +162,6 @@ public class ReportService
         public string Count { get; set; }
         public string Origin { get; set; }
         public string Destination { get; set; }
-        public string Hospital { get; set; }
-        public string Barrier { get; set; }
     }
 
     private DataTable getDriverByID(int driverID, DbService db)
@@ -399,6 +397,12 @@ GROUP BY inner_select.DisplayName
         return GetDistinctListOfField("Barrier", "Patient");
     }
 
+    internal List<string> GetReportLocations()
+    {
+        return GetDistinctListOfField("name", "Location");
+    }
+
+
     private DataTable getEscorts()
     {
         DbService db = new DbService();
@@ -454,8 +458,8 @@ GROUP BY inner_select.DisplayName
              @"select  count (DISTINCT MainDriver)  AS COUNT_VOL
             from RPView
             where MainDriver is not null
-            and pickuptime > @start_date
-            and pickuptime < @end_date
+            and pickuptime >= @start_date
+            and pickuptime <= @end_date
             AND not MainDriver in (
 	            select distinct MainDriver
 	            from RPView
@@ -567,7 +571,7 @@ GROUP BY inner_select.DisplayName
         return result;
     }
 
-    internal MetricMonthlyInfo GetReportRangeDigestMetrics(string start_date, string end_date, string query)
+    internal List<MetricMonthlyInfo> GetReportRangeDigestMetrics(string start_date, string end_date, string prev_start, string prev_end, string query)
     {
         DbService db = new DbService();
 
@@ -575,24 +579,34 @@ GROUP BY inner_select.DisplayName
         cmd.CommandType = CommandType.Text;
         cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
         cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+        if (!prev_start.Equals("NA"))
+        {
+            cmd.Parameters.Add("@prev_start", SqlDbType.Date).Value = prev_start;
+            cmd.Parameters.Add("@prev_end", SqlDbType.Date).Value = prev_end;
+        }
 
         DataSet ds = db.GetDataSetBySqlCommand(cmd);
         DataTable dt = ds.Tables[0];
 
-        MetricMonthlyInfo result = new MetricMonthlyInfo();
+        List<MetricMonthlyInfo> result = new List<MetricMonthlyInfo>();
 
-        DataRow dr = dt.Rows[0];
-        result.Rides = dr["COUNT_RIDES"].ToString();
-        result.Patients = dr["COUNT_PAT"].ToString();
-        result.Volunteers = dr["COUNT_VOL"].ToString();
+        foreach (DataRow dr in dt.Rows)
+        {
+            MetricMonthlyInfo obj = new MetricMonthlyInfo();
+            obj.Day = dr["SPAN_C"].ToString();
+            obj.Rides = dr["COUNT_UNIQUE_RIDES"].ToString();
+            obj.Patients = dr["COUNT_PAT"].ToString();
+            obj.Volunteers = dr["COUNT_VOL"].ToString();
+            result.Add(obj);
+        }
 
         return result;
     }
     
-    internal MetricMonthlyInfo GetReportMonthlyDigestMetrics(string start_date, string end_date)
+    internal List<MetricMonthlyInfo> GetReportMonthlyDigestMetrics(string start_date, string end_date)
     {
         string query =
-             @"SELECT count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
+             @"SELECT 1 AS SPAN_C, count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
                 FROM  (
 	                select MainDriver  , PickupTime, Origin, Destination, DisplayName, 
 	                CASE WHEN ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) = '1' THEN 1
@@ -604,33 +618,105 @@ GROUP BY inner_select.DisplayName
 	                AND MainDriver is not null
                 )  s";
 
-        return GetReportRangeDigestMetrics(start_date, end_date, query);
+        return GetReportRangeDigestMetrics(start_date, end_date, "NA", "NA", query);
     }
 
-    internal MetricMonthlyInfo GetReportDailyDigestMetrics(string start_date, string end_date)
+
+    // pickuptime >= @start_date      AND pickuptime <= @end_date
+
+    internal string buildTimeCondition(string field_name, string prev_start)
+    {
+        if (prev_start.Equals("NA"))
+        {
+            return string.Format("{0} >= @start_date  AND {0} <= @end_date", field_name);
+        }
+        else
+        {
+            return string.Format("( ({0} >= @start_date  AND {0} <= @end_date) OR ( {0} >= @prev_start  AND {0} <= @prev_end) )", field_name);
+        }
+    }
+
+    internal List<MetricMonthlyInfo> GetReportWithPeriodDigestMetrics(string start_date, string end_date, string prev_start, string prev_end, string span)
+    {
+        string span_column;
+        if (span.Equals("WEEK"))
+        {
+            span_column = "CONCAT (YEAR(PickupTime), '-', DATEPART(week, PickupTime) )";  // YYYY-WKNUM
+        }
+        else if (span.Equals("MONTH"))
+        {
+            span_column = "CONVERT(nvarchar(7), PickupTime, 23)";  // YYYY-MM
+        }
+        else if (span.Equals("YEAR"))
+        {
+            span_column = "YEAR(PickupTime)";
+        }
+        else
+        {
+            return null;
+        }
+
+        string pickup_time_condition = buildTimeCondition("PickupTime", prev_start);
+
+
+        string query = string.Format(@"SELECT {0} AS SPAN_C, count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
+                FROM  (
+	                select MainDriver  , PickupTime, Origin, Destination, DisplayName, 
+	                CASE WHEN ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) = '1' THEN 1
+		                ELSE 0
+	                END AS Unique_Drive_C
+	                from RPView r 
+	                where {1} AND MainDriver is not null
+                )  s
+                GROUP BY {0} ORDER BY {0} ASC",
+                span_column, pickup_time_condition);
+
+        return GetReportRangeDigestMetrics(start_date, end_date, prev_start, prev_end, query);
+    }
+
+    internal List<MetricMonthlyInfo> GetReportDailyDigestMetrics(string start_date, string end_date)
     {
         // Gets info also on rides without an allocted driver
         string query =
-             @"SELECT count(DISTINCT DisplayName) as COUNT_PAT,  count(*) as COUNT_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
-               FROM RPView 
-               WHERE RPView.pickuptime > @start_date
-               AND RPView.pickuptime < @end_date";
+             @"SELECT  1 AS SPAN_C, count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, count(DISTINCT MainDriver) as COUNT_VOL
+                FROM (
+	                Select  MainDriver  , PickupTime, Origin, Destination, DisplayName, 
+                    CASE WHEN ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) = '1' THEN 1
+	                    ELSE 0
+                    END AS Unique_Drive_C
+                    FROM RPView 
+                    WHERE  Status != N'נמחקה'
+                    AND RPView.pickuptime > @start_date
+                    AND RPView.pickuptime < @end_date
+                    ) s";
 
-        return GetReportRangeDigestMetrics(start_date, end_date, query);
+        return GetReportRangeDigestMetrics(start_date, end_date, "NA", "NA", query);
     }
 
-    internal List<ReportService.MetricMonthlyInfo> GetReportMonthlyGraphMetrics(string start_date, string end_date)
+
+    // Returns the day info as MM-dd string
+    // Function Name is incorrect, is used by Month Graph as well.
+    // This allows optimizations - all 3 weeks spans in one call, 2 months in one call etc..
+    internal List<ReportService.MetricMonthlyInfo> GetReportWeeklyGraphMetrics(string start_date, string end_date)
     {
         DbService db = new DbService();
 
         string query =
-             @"SELECT  DAY(pickuptime) as DAY_C ,  count(DISTINCT DisplayName) as COUNT_PAT,  count(*) as COUNT_RIDES, count(DISTINCT MainDriver) as COUNT_VOL     
-               FROM RPView 
-               WHERE MainDriver is not null
-               AND RPView.pickuptime > @start_date
-               AND RPView.pickuptime < @end_date
-               GROUP BY DAY(pickuptime)
-               ORDER BY DAY_C ASC";
+             @"SELECT FORMAT (PickupTime, 'yyyy-MM-dd') as DAY_C ,  count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, count(DISTINCT MainDriver) as COUNT_VOL
+                FROM (
+	                Select  MainDriver  , PickupTime, Origin, Destination, DisplayName, 
+                    CASE 
+                        WHEN ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) = '1' THEN 1
+	                    ELSE 0
+                    END AS Unique_Drive_C
+                    FROM RPView 
+                    WHERE MainDriver is not null
+                    AND RPView.pickuptime > @start_date
+                    AND RPView.pickuptime < @end_date
+                ) s 
+            GROUP BY FORMAT (PickupTime, 'yyyy-MM-dd')
+            ORDER BY DAY_C ASC					
+            ";
 
         SqlCommand cmd = new SqlCommand(query);
         cmd.CommandType = CommandType.Text;
@@ -646,7 +732,7 @@ GROUP BY inner_select.DisplayName
         {
             MetricMonthlyInfo obj = new MetricMonthlyInfo();
             obj.Day = dr["DAY_C"].ToString();
-            obj.Rides = dr["COUNT_RIDES"].ToString();
+            obj.Rides = dr["COUNT_UNIQUE_RIDES"].ToString();
             obj.Patients = dr["COUNT_PAT"].ToString();
             obj.Volunteers = dr["COUNT_VOL"].ToString();
             result.Add(obj);
@@ -656,17 +742,17 @@ GROUP BY inner_select.DisplayName
 
     }
 
-    
+
     internal List<VolunteersPerMonthInfo> GetReportVolunteerPerMonth(string start_date)
     {
         DbService db = new DbService();
 
         string query =
-             @"SELECT count(DISTINCT MainDriver )as COUNT_G, YEAR(date) as YEAR_G, MONTH(date) as MONTH_G
-                FROM Ride 
-                where date >= @start_date
-                and date <= CURRENT_TIMESTAMP
-                GROUP BY YEAR(Date), MONTH(Date) 
+             @"SELECT count(DISTINCT MainDriver )as COUNT_G, YEAR(PickupTime) as YEAR_G, MONTH(PickupTime) as MONTH_G
+                FROM RPView r  
+                where PickupTime >= @start_date
+                and PickupTime <= CURRENT_TIMESTAMP
+                GROUP BY YEAR(PickupTime), MONTH(PickupTime) 
                 ORDER  BY YEAR_G, MONTH_G ASC";
 
         SqlCommand cmd = new SqlCommand(query);
@@ -1020,17 +1106,8 @@ INNER JOIN Volunteer ON BUFF.MainDriver=Volunteer.Id";
         RidePat helper_RidePat = new RidePat();
 
         DbService db = new DbService();
-        Location tmp = new Location();
-        Hashtable locations = tmp.getLocationsEnglishName();
-        DataTable driverTable = getDriverByID(volunteerId, db);
 
-        //TODO: re-implement getRides using sql-command
-        DataTable rideTable = getRides();
-
-        List<Escorted> el = new List<Escorted>();
-        DataTable escortTable = getEscorts();
-
-
+        //TODO: re-implement using sql-command
         DataTable pickupsTable = getPickupForDriver(volunteerId, start_date, end_date, db);
 
         List<RidesForVolunteer> result = new List<RidesForVolunteer>();
@@ -1108,19 +1185,14 @@ group by CONVERT(date, pickuptime) ";
         DbService db = new DbService();
 
         string query =
-@"select count(DISTINCT Id )as COUNT_G, 'PATIENT' as TYPE_G, MONTH(PickupTime) as MONTH_G
+@"select count(DISTINCT Id )as COUNT_PATS, count(DISTINCT MainDriver )as COUNT_DRIVERS,  MONTH(PickupTime) as MONTH_G
 FROM RPView r 
 where PickupTime >= @start_date
 and PickupTime <= @end_date
 and RideNum  is not null
-GROUP BY  MONTH(PickupTime) 
-UNION
-SELECT count(DISTINCT MainDriver )as COUNT_G, 'DRIVER' as TYPE_G, MONTH(date) as MONTH_G
-FROM Ride 
-where date >= @start_date
-and date <= @end_date
-GROUP BY  MONTH(Date) 
-ORDER  BY MONTH_G, TYPE_G ASC";
+and MainDriver is not null
+GROUP BY  MONTH(PickupTime)                 
+ORDER  BY MONTH_G";
 
         SqlCommand cmd = new SqlCommand(query);
         cmd.CommandType = CommandType.Text;
@@ -1135,8 +1207,8 @@ ORDER  BY MONTH_G, TYPE_G ASC";
         foreach (DataRow dr in dt.Rows)
         {
             CenterMonthlyByYearInfo obj = new CenterMonthlyByYearInfo();
-            obj.Count = dr["COUNT_G"].ToString();
-            obj.Type = dr["TYPE_G"].ToString();
+            obj.PatientCount = dr["COUNT_PATS"].ToString();
+            obj.VolunteerCount = dr["COUNT_DRIVERS"].ToString();
             obj.Month = dr["MONTH_G"].ToString();
             result.Add(obj);
         }
@@ -1145,41 +1217,34 @@ ORDER  BY MONTH_G, TYPE_G ASC";
     }
 
 
-    internal List<CenterPatientsRidesInfo> GetReportCenterPatientsRides(string volunteer, string start_date, string end_date,
-        string hospital, string barrier)
+    internal string build_condition_ReportCenterPatientsRides(string volunteer, string origin, string destination)
     {
-        DbService db = new DbService();
         string condition = "";
-        if ( !hospital.Equals("*") ) {
-            condition = "AND p.Hospital = @Hospital";
-        }
-        if (!barrier.Equals("*"))
+        if (!origin.Equals("*"))
         {
-            condition = condition + " AND p.Barrier = @Barrier";
+            condition = "AND Origin = @Origin";
+        }
+        if (!destination.Equals("*"))
+        {
+            condition += " AND Destination = @Destination";
         }
 
         if (volunteer.Equals("*"))
         {
-            condition = condition + " AND MainDriver is not null";
+            condition +=  " AND MainDriver is not null";
         }
         else
         {
-            condition = condition + " AND maindriver=@volunteerID";
+            condition += " AND maindriver=@volunteerID";
         }
+        return condition;
+    }
 
-        string query =
-        @"select
-        FORMAT (PickupTime, 'MM-yy') As MONTH_C ,Origin , Destination, p.Hospital, p.Barrier, Volunteer.DisplayName, COUNT(*) AS COUNT_C
-        from RPView rp 
-        INNER JOIN Patient p on rp.Id = p.Id
-        INNER JOIN Volunteer  ON rp.MainDriver=Volunteer.Id
-        where pickuptime > @start_date
-        AND pickuptime < @end_date " + 
-        condition  +
-        @" GROUP BY FORMAT (PickupTime, 'MM-yy'), Origin , Destination, p.Hospital, p.Barrier, Volunteer.DisplayName
-        order by MONTH_C ASC";
 
-        SqlCommand cmd = new SqlCommand(query);
+    internal SqlCommand build_command_ReportCenterPatientsRides(string volunteer, string start_date, string end_date,
+        string origin, string destination)
+    {
+        SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
         if (!volunteer.Equals("*"))
         {
@@ -1187,8 +1252,37 @@ ORDER  BY MONTH_G, TYPE_G ASC";
         }
         cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
         cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
-        cmd.Parameters.Add("@hospital", SqlDbType.NVarChar).Value = hospital;
-        cmd.Parameters.Add("@barrier", SqlDbType.NVarChar).Value = barrier;
+        cmd.Parameters.Add("@origin", SqlDbType.NVarChar).Value = origin;
+        cmd.Parameters.Add("@destination", SqlDbType.NVarChar).Value = destination;
+
+        return cmd;
+    }
+
+        internal List<CenterPatientsRidesInfo> GetReportCenterPatientsRides(string volunteer, string start_date, string end_date,
+        string origin, string destination)
+    {
+        DbService db = new DbService();
+        SqlCommand cmd = build_command_ReportCenterPatientsRides(volunteer, start_date, end_date, origin, destination);
+
+        string condition = build_condition_ReportCenterPatientsRides(volunteer, origin, destination);
+
+        string query =
+        @"select
+            FORMAT (PICKUP_TIME_C, 'MM-yy') AS MONTH_C, Origin , Destination, DISPLAY_NAME_C, count(*) AS COUNT_C
+            from 
+            (  select rp.PickupTime AS PICKUP_TIME_C, Origin , Destination,  Volunteer.DisplayName AS DISPLAY_NAME_C
+	            FROM RPView rp 
+	            INNER JOIN Patient p on rp.Id = p.Id
+	            INNER JOIN Volunteer  ON rp.MainDriver=Volunteer.Id
+	            where pickuptime > @start_date
+                AND pickuptime < @end_date " +
+                condition +
+                @" GROUP BY rp.PickupTime, Origin , Destination, Volunteer.DisplayName
+            ) s
+            GROUP BY FORMAT (PICKUP_TIME_C, 'MM-yy'),  Origin , Destination, DISPLAY_NAME_C
+            order by MONTH_C ASC";
+
+        cmd.CommandText = query;
 
         DataSet ds = db.GetDataSetBySqlCommand(cmd);
         DataTable dt = ds.Tables[0];
@@ -1198,16 +1292,40 @@ ORDER  BY MONTH_G, TYPE_G ASC";
         foreach (DataRow dr in dt.Rows)
         {
             CenterPatientsRidesInfo obj = new CenterPatientsRidesInfo();
-            obj.Volunteer = dr["DisplayName"].ToString();
+            obj.Volunteer = dr["DISPLAY_NAME_C"].ToString();
             obj.Month = dr["MONTH_C"].ToString();
             obj.Origin = dr["Origin"].ToString();
             obj.Destination = dr["Destination"].ToString();
-            obj.Hospital = dr["Hospital"].ToString();
-            obj.Barrier = dr["Barrier"].ToString();
             obj.Count = dr["COUNT_C"].ToString();
             result.Add(obj);
         }
 
+        return result;
+    }
+
+
+    internal string GetReportCenterPatientsRidesCount(string volunteer, string start_date, string end_date,
+string origin, string destination)
+    {
+        DbService db = new DbService();
+        SqlCommand cmd = build_command_ReportCenterPatientsRides(volunteer, start_date, end_date, origin, destination);
+
+        string condition = build_condition_ReportCenterPatientsRides(volunteer, origin, destination);
+
+        string query =
+        @"select count(rp.Id) , count(DISTINCT rp.Id) AS PAT_COUNT
+          from RPView rp
+	      INNER JOIN Patient p on rp.Id = p.Id
+	      where pickuptime > @start_date
+	      AND pickuptime < @end_date  
+          " + condition;
+
+        cmd.CommandText = query;
+
+        DataSet ds = db.GetDataSetBySqlCommand(cmd);
+        DataTable dt = ds.Tables[0];
+
+        string result = dt.Rows[0]["PAT_COUNT"].ToString();
         return result;
     }
 
