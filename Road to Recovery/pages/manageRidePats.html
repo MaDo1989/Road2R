@@ -62,7 +62,7 @@
             if (getDate) {
                 return new Date(ticks);
             }
-            
+
             return ticks;
         }
 
@@ -471,6 +471,7 @@
         let _assignDriverToRideNum;
         let _isDriverReplacement;
         let _trToHighLight;
+        let _driverId;
 
         let tMorning, tAfternoon, tFuture, tTomorrow;
 
@@ -745,6 +746,47 @@
             $('#wait').hide();
             _trToHighLight.classList.remove('highlightRow');
             alert('Issue in UpdateDriver: ' + JSON.stringify(err));
+        }
+
+        const deleteDriverFromRide = () => {
+
+            swal({
+                title: "האם אתה בטוח שאתה רוצה למחוק את הנהג מההסעה?",
+                type: "warning",
+                text: 'מה פה?',
+                showCancelButton: true,
+                cancelButtonText: "בטל",
+                confirmButtonClass: 'btn-warning',
+                confirmButtonText: "מחיקה",
+                closeOnConfirm: true
+            }, function (userResponse) {
+                if (userResponse) {
+                    $('#wait').show();
+
+                    const request = {
+                        ridePatId: _assignDriverToRidepatNum,
+                        rideId: _assignDriverToRideNum,
+                        driverId: _driverId
+                    }
+                    const dataString = JSON.stringify(request);
+                    ajaxCall('LeaveRidePat', dataString, deleteRideSuccessCB, deleteRideErrorCB);
+                }
+
+            });
+
+
+
+
+        }
+
+        const deleteRideSuccessCB = (data) => {
+            $('#wait').hide();
+            console.log(JSON.parse(data.d));
+
+        }
+        const deleteRideErrorCB = (err) => {
+            $('#wait').hide();
+            console.log(err);
         }
 
         $(document).ready(function () {
@@ -2235,7 +2277,8 @@
                 driverWrapper += `<a href="volunteerform.html" data-obj="volunteer" class="showMe driverName clickable blueFont boldFont"`;
                 driverWrapper += `id='${Id}'>${driverInnerContent}</a>`;
                 driverWrapper += `<span class="driverCellPhone">${addSeperator2MobileNum(CellPhone, '-')}</span>`;
-                driverWrapper += `<button onclick="prepreparationAssignDriverModal(this, ${ridePatNum}, ${isDriverReplacement}, ${rideNum})" data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>עדכון נהג</button></div>`;
+                driverWrapper += `<button onclick="prepreparationAssignDriverModal(this, ${ridePatNum}, ${isDriverReplacement}, ${rideNum}, ${Id})" data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>עדכון נהג</button>`;
+                driverWrapper += '</div>';
             } else {
 
                 isDriverReplacement = false;
@@ -2375,20 +2418,21 @@
 
         const buildAcionsButtonsHTML = (ridePatNum, drivers) => {
 
-            const editBtn           = `<button type='button' class='edit                   btn btn-icon waves-effect waves-light btn-secondary' id='${ridePatNum}'  name='${ridePatNum}' title='עריכה'>         <i class='ti-pencil'></i></button>`;
-            const deleteBtn         = `<button type='button' class='remove               btn btn-icon waves-effect waves-light btn-secondary'   id='${ridePatNum}'  name='${ridePatNum}' title='מחיקה'>         <i class='fa fa-remove'></i></button>`;
-            const messageToCopyBtn  = `<button type='button' class='copyMessage   btn btn-icon waves-effect waves-light btn-secondary'          id='${ridePatNum}'  name='${ridePatNum}' title='העתקת הודעה'>   <i class='fa fa-envelope'></i></button>`;
-            const candidateBtn      = `<button type='button' class='candidatesBtn btn btn-icon waves-effect waves-light btn-secondary'          id='${ridePatNum}'  name='${ridePatNum}' title='מועמדים להסעה'> <i class='fa fa-car'></i></button>`;
+            const editBtn = `<button type='button' class='edit                   btn btn-icon waves-effect waves-light btn-secondary' id='${ridePatNum}'  name='${ridePatNum}' title='עריכה'>         <i class='ti-pencil'></i></button>`;
+            const deleteBtn = `<button type='button' class='remove               btn btn-icon waves-effect waves-light btn-secondary'   id='${ridePatNum}'  name='${ridePatNum}' title='מחיקה'>         <i class='fa fa-remove'></i></button>`;
+            const messageToCopyBtn = `<button type='button' class='copyMessage   btn btn-icon waves-effect waves-light btn-secondary'          id='${ridePatNum}'  name='${ridePatNum}' title='העתקת הודעה'>   <i class='fa fa-envelope'></i></button>`;
+            const candidateBtn = `<button type='button' class='candidatesBtn btn btn-icon waves-effect waves-light btn-secondary'          id='${ridePatNum}'  name='${ridePatNum}' title='מועמדים להסעה'> <i class='fa fa-car'></i></button>`;
 
             let buttonsWrapper = `<div class='elementsInSameLine'>${editBtn} ${deleteBtn} ${drivers.length > 0 ? messageToCopyBtn : candidateBtn}</div>`;
 
             return buttonsWrapper;
         }
 
-        function prepreparationAssignDriverModal(thisBtn, ridePatNum, isDriverReplacement, rideNum) {
+        function prepreparationAssignDriverModal(thisBtn, ridePatNum, isDriverReplacement, rideNum, driverId) {
             _assignDriverToRidepatNum = ridePatNum;
             _assignDriverToRideNum = rideNum
             _isDriverReplacement = isDriverReplacement;
+            _driverId = driverId
 
             _trToHighLight = thisBtn.closest('tr');
             _trToHighLight.classList.add('highlightRow');
@@ -2399,6 +2443,7 @@
                 $('#driverModalTitle').text('שיבוץ נהג');
             }
         }
+
 
         const add2IhaveSeenAllready = () => {
 
