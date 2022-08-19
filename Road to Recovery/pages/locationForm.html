@@ -90,6 +90,29 @@
         const { ajaxCall } = GENERAL.FETCH_DATA;
         let regions;
 
+
+        //Latitude from 29.55805 to 33.20733 and longitude from 34.57149 to 35.57212.
+        const coordsRange = {
+            minLat: 29.55805,
+            maxLat: 33.20733,
+            minLng: 34.57149,
+            maxLng: 35.57212
+        }
+
+        function validateCoordRange(lat, lng) {
+            let cr = coordsRange;
+            lat = parseFloat(lat);
+            lng = parseFloat(lng);
+
+            if (lat < cr.minLat || lat > cr.maxLat || lng < cr.minLng || lng > cr.maxLng) {
+                alert("lat, lng out of range in Israel");
+                return false;
+            }
+            return true;
+            
+                
+        }
+
         function loadPage() {
             var userName = GENERAL.USER.getUserDisplayName();
             $("#userName").html(userName);
@@ -155,6 +178,8 @@
                     }
                     $("#ManagerName").val(location.ManagerName);
                     $("#ManagerLastName").val(location.ManagerLastName);
+                    $("#latId").val(location.Lat);
+                    $("#lngId").val(location.Lng);
                 },
                 error: function (err) { alert("Error in getLocation: " + err.responseText); }
             });
@@ -368,6 +393,33 @@
                                             </div>
 
                                         </div>
+
+                                        <!-- BENNY 18-8-2022-->
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">latitude  (קו רוחב)&nbsp;<span class="required">*</span></label>
+                                                    <div class="col-sm-6">
+                                                        <input id="latId" name="latName" type="text" class="form-control" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row m-l-10 m-r-10">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">longitued (קו אורך)&nbsp;<span class="required">*</span></label>
+                                                    <div class="col-sm-6">
+                                                        <input id="lngId" name="lngName" type="text" class="form-control" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- END BENNY 18-8-2022-->
+
+
+
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
@@ -377,8 +429,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-
-
                                         </div>
 
                                         <div class="row m-l-10 m-r-10">
@@ -507,10 +557,15 @@
                     region.Id = $("#sub-area").val();
                     region.Name = $("#sub-area option:selected").text();
 
+                    let lat = $("#latId").val();
+                    let lng = $("#lngId").val();
+
+
                     newLocation = {
                         Type: type, Name: locationName, Area: area, Direction: "", Responsible: null,
                         Status: active, Remarks: remark, ManagerName: managerFirstName,
-                        ManagerLastName: managerLastName, ManagerPhones: cellPhone, EnglishName: engishName, Region: region
+                        ManagerLastName: managerLastName, ManagerPhones: cellPhone, EnglishName: engishName, Region: region,
+                        Lat: lat,Lng: lng
                     };
                     $.ajax({
                         dataType: "json",
@@ -616,9 +671,15 @@
 
             }
 
-            if (!area || !type || !phoneCheck) {
+
+            let lat = $("#latId").val();
+            let lng = $("#lngId").val();
+            let coords = validateCoordRange(lat, lng);
+
+            if (!area || !type || !phoneCheck || !coords) {
                 return false;
             } else return true;
+
         }
     </script>
 

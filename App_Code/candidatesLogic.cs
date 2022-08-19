@@ -127,6 +127,7 @@ public class CandidatesLogic
                 ammountOfPathMatch.Add(Convert.ToInt32(sdr["AmmountOfPathMatchScoreOfType_3"]));
                 ammountOfPathMatch.Add(Convert.ToInt32(sdr["AmmountOfPathMatchScoreOfType_4"]));
 
+
                 candidate = new Candidate(
                     Convert.ToInt32(sdr["Id"]),
                     Convert.ToString(sdr["DisplayName"]),

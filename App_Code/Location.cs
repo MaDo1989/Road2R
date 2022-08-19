@@ -30,6 +30,8 @@ public class Location
     string managerLastName;//שם משפחה מנהל יעד
     string managerPhones;//טלפון מנהל יעד
     string managerPhones2;//טלפון מנהל יעד
+    double lat;
+    double lng;
 
     public bool IsActive { get; set; }
 
@@ -190,8 +192,35 @@ public class Location
     }
 
     public Region Region { get; set; }
+
+    public double Lat
+    {
+        get
+        {
+            return lat;
+        }
+
+        set
+        {
+            lat = value;
+        }
+    }
+
+    public double Lng
+    {
+        get
+        {
+            return lng;
+        }
+
+        set
+        {
+            lng = value;
+        }
+    }
+
     public Location(string _type, string _name, string _area, string _direction, Volunteer _responsible, string _status,
-        string _remarks, string _managerName, string _managerLastName, string _managerPhones, string _managerPhones2)
+        string _remarks, string _managerName, string _managerLastName, string _managerPhones, string _managerPhones2, double _lat, double _lng)
     {
         Type = _type;
         Name = _name;
@@ -204,7 +233,8 @@ public class Location
         ManagerLastName = _managerLastName;
         ManagerPhones = _managerPhones;
         ManagerPhones2 = _managerPhones2;
-
+        Lat = _lat;
+        Lng = _lng;
     }
 
     public Location(string _name)
@@ -270,6 +300,10 @@ public class Location
             l.Remarks = dr["Remarks"].ToString();
             l.EnglishName = dr["EnglishName"].ToString();
             l.Region = new Region(Convert.ToInt32(dr["RegionId"]), dr["RegionName"].ToString());
+            if (dr["lat"] != DBNull.Value)
+                l.Lat = Convert.ToDouble(dr["lat"]);
+            if (dr["lng"] != DBNull.Value)
+                l.Lng = Convert.ToDouble(dr["lng"]);
 
             list.Add(l);
         }
@@ -466,6 +500,11 @@ public class Location
         l.IsActive = bool.Parse(dr["IsActive"].ToString());
         l.Remarks = dr["Remarks"].ToString();
         l.EnglishName = dr["EnglishName"].ToString();
+        if (dr["lat"] != DBNull.Value)
+            l.Lat = Convert.ToDouble(dr["lat"]);
+        if (dr["lng"] != DBNull.Value)
+            l.Lng = Convert.ToDouble(dr["lng"]);
+
         if (dr["DestinationManager"].ToString() != "")
         {
             int managerId = int.Parse(dr["DestinationManager"].ToString());
@@ -518,7 +557,7 @@ public class Location
         DbService db = new DbService();
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
-        SqlParameter[] cmdParams = new SqlParameter[10];
+        SqlParameter[] cmdParams = new SqlParameter[12];
         
         //getting the index for the destination manager
         DestinationManager m = new DestinationManager(v.ManagerName,v.ManagerLastName,v.ManagerPhones,v.ManagerPhones2);
@@ -535,6 +574,11 @@ public class Location
         cmdParams[7] = cmd.Parameters.AddWithValue("@cityCityName", "אביחיל");
         cmdParams[8] = cmd.Parameters.AddWithValue("@EnglishName", EnglishName);
         cmdParams[9] = cmd.Parameters.AddWithValue("@RegionId", Region.Id);
+        cmdParams[10] = cmd.Parameters.AddWithValue("@Lat", v.Lat);
+        cmdParams[11] = cmd.Parameters.AddWithValue("@Lng", v.Lng);
+
+
+
 
 
         string query = "";
@@ -545,7 +589,9 @@ public class Location
             query = "update Location set Type=@type, Name=@name,";
             query += "Area=@area, Adress=@adress, IsActive=@IsActive, Remarks=@remarks, ";
             query += "RegionId=@RegionId,";
-            query += "DestinationManager=@DestinationManager, CityCityName=@cityCityName,EnglishName=@EnglishName where Name=@name"; 
+            query += "DestinationManager=@DestinationManager, CityCityName=@cityCityName,EnglishName=@EnglishName, ";
+            query += "Lat=@Lat, Lng=@Lng ";
+            query += "where Name=@name"; 
 
             res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
 
@@ -557,8 +603,8 @@ public class Location
         }
         else if (func == "new")
         {
-            query = "insert into Location (Type, Name, Area, Adress, IsActive, Remarks, DestinationManager, CityCityName,EnglishName, RegionId)";
-            query += " values (@type,@name,@area,@adress,@IsActive,@remarks,@DestinationManager,@cityCityName,@EnglishName, @RegionId);SELECT SCOPE_IDENTITY();";
+            query = "insert into Location (Type, Name, Area, Adress, IsActive, Remarks, DestinationManager, CityCityName,EnglishName, RegionId, Lat, Lng)";
+            query += " values (@type,@name,@area,@adress,@IsActive,@remarks,@DestinationManager,@cityCityName,@EnglishName, @RegionId, @Lat, @Lng);SELECT SCOPE_IDENTITY();";
             db = new DbService();
             try
             {
