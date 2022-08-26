@@ -420,6 +420,7 @@ public class Volunteer
             hour3 = value;
         }
     }
+    public bool IsNewDriver { get; set; }
     public int setVolunteerPrefs(int id, List<string> PrefLocation, List<string> PrefArea, List<string> PrefTime, int AvailableSeats)
     {
         string query = "";

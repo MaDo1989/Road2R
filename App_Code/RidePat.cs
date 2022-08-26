@@ -813,6 +813,12 @@ public class RidePat
                 int.TryParse(dr["NoOfDocumentedRides"].ToString(), out numberOfRides);
                 mainDriver.NoOfDocumentedRides = numberOfRides;
                 mainDriver.DriverType = "Primary";
+                
+                if (dr["IsNewDriver"].ToString() != "")
+                {
+                    mainDriver.IsNewDriver = dr["IsNewDriver"].ToString() == "1";
+                }
+
                 rp.Drivers.Add(mainDriver);
             }
 
@@ -910,6 +916,18 @@ public class RidePat
         return dt;
     }
 
+    private DataTable GetDriver_V2()
+    {
+        DbService db = new DbService();
+        SqlCommand cmd = new SqlCommand();
+        cmd.CommandType = CommandType.Text;
+        string query = "EXEC spVolunteer_GetDrivers @isActive=1, @isDriving=1";
+        DataSet ds = db.GetDataSetByQuery(query);
+        DataTable dt = ds.Tables[0];
+
+        return dt;
+    }
+
     private DataTable getRideStatus()
     {
         DbService db = new DbService();
@@ -969,7 +987,7 @@ public class RidePat
 
         Location tmp = new Location();
         Hashtable locations = tmp.getLocationsEnglishName();
-        DataTable driverTable = getDriver();
+        DataTable driverTable = GetDriver_V2();
         DataTable equipmentTable = getEquipment();
         DataTable rideTable = getRides();
         DataTable escortTable = getEscorts();
@@ -1074,11 +1092,13 @@ public class RidePat
                             String.IsNullOrEmpty(Convert.ToString(driverRow[0]["EnglishLN"])) ?
                             "" :
                             Convert.ToString(driverRow[0]["EnglishLN"]);
-                        
+
                         int numberOfRides = 0;
                         int.TryParse(driverRow[0]["NoOfDocumentedRides"].ToString(), out numberOfRides);
                         primary.NoOfDocumentedRides = numberOfRides;
-                        
+
+                        primary.IsNewDriver = driverRow[0]["IsNewDriver"].ToString() == "1";
+
                         rp.Drivers.Add(primary);
                     }
 

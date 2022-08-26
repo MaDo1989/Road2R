@@ -6,6 +6,60 @@
 /*---------------------------------------------------------*/
 /*---------------------------------------------------------*/
 
+-- =============================================
+-- Author:      Yogev Strauber
+-- Description: View which combine number of tables
+-- ALTER DATE:  26/08/2022
+-- ALTER REASON: add details on driver
+-- =============================================
+ALTER VIEW [dbo].[RPView]
+AS
+SELECT    dbo.Patient.DisplayName, dbo.Patient.Id, dbo.Patient.CellPhone, dbo.Patient.IsAnonymous, dbo.RidePat.RidePatNum, dbo.RidePat.Origin, dbo.RidePat.Destination, dbo.RidePat.PickupTime, V.DisplayName AS Coordinator, 
+                         dbo.RidePat.Status, dbo.RidePat.Area, dbo.RidePat.Shift, dbo.Ride.RideNum, dbo.Ride.Origin AS RideOrigin, dbo.Ride.Destination AS RideDestination, dbo.Ride.Date, dbo.Ride.MainDriver, dbo.Ride.secondaryDriver, 
+                         dbo.RidePat.Remark, dbo.RidePat.OnlyEscort, dbo.Patient.EnglishName, dbo.RidePat.lastModified, driver.NoOfDocumentedRides,
+						 	CASE 
+							WHEN (SELECT COUNT(*) FROM Ride WHERE MainDriver=driver.Id  AND Date <= GETDATE()) <= 3 THEN 1
+							ELSE 0
+						END
+						AS IsNewDriver
+FROM            dbo.Patient INNER JOIN 
+                         dbo.RidePat ON dbo.Patient.DisplayName = dbo.RidePat.Patient LEFT OUTER JOIN
+                         dbo.Ride ON dbo.RidePat.RideId = dbo.Ride.RideNum LEFT JOIN Volunteer V on RidePat.CoordinatorID = V.Id
+						 LEFT JOIN Volunteer driver on driver.Id = dbo.Ride.MainDriver
+GO
+
+
+-- =============================================
+-- Author:      Yogev Strauber
+-- Create Date  : 
+-- Description  : Get drivers who isDriving & isActive
+-- Alter Date   : 26/08/2022
+-- Alter Reason : Add IsNewDriver
+-- =============================================
+CREATE OR ALTER PROCEDURE spVolunteer_GetDrivers
+@isActive BIT,  
+@isDriving BIT 
+AS 
+BEGIN
+SET NOCOUNT ON;
+
+SELECT
+Id, DisplayName, CellPhone, EnglishFN, EnglishLN, NoOfDocumentedRides,
+	
+	CASE 
+		WHEN (SELECT COUNT(*) FROM Ride WHERE MainDriver=Id AND Date <= GETDATE()) <= 3 THEN 1
+		ELSE 0
+	END
+	AS IsNewDriver
+
+FROM VOLUNTEER
+WHERE isDriving=@isDriving    and    isActive=@isActive 
+END
+
+
+
+
+
 /* ↓ AssignedFromAppId Altering ↓ */
 
 --1.
