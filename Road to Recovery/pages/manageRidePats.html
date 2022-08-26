@@ -753,7 +753,7 @@
             swal({
                 title: "האם אתה בטוח שאתה רוצה למחוק את הנהג מההסעה?",
                 type: "warning",
-                text: 'מה פה?',
+                text: 'בלחיצה על מחיקה הנהג יוסר מהסעה זו',
                 showCancelButton: true,
                 cancelButtonText: "בטל",
                 confirmButtonClass: 'btn-warning',
@@ -780,13 +780,18 @@
         }
 
         const deleteRideSuccessCB = (data) => {
-            $('#wait').hide();
-            console.log(JSON.parse(data.d));
 
-        }
-        const deleteRideErrorCB = (err) => {
             $('#wait').hide();
-            console.log(err);
+            $('#assignDriverModal').modal('hide');
+            assignDriverToRidePatAbort();
+        }
+
+        const deleteRideErrorCB = (err) => {
+
+            $('#wait').hide();
+            $('#assignDriverModal').modal('hide');
+            assignDriverToRidePatAbort();
+            alert(err);
         }
 
         $(document).ready(function () {
@@ -2259,8 +2264,7 @@
 
                 isDriverReplacement = true;
                 let driverInnerContent = '';
-                const { Id, DisplayName, EnglishFN, EnglishLN, CellPhone, NoOfDocumentedRides } = driver;
-                let isCountAsNewVolunteer = NoOfDocumentedRides <= 3;
+                const { Id, DisplayName, EnglishFN, EnglishLN, CellPhone, NoOfDocumentedRides, IsNewDriver } = driver;
 
                 if (!isAssistant) {                         //hebrew
 
@@ -2273,7 +2277,7 @@
                         DisplayName
                 }
 
-                driverWrapper = isCountAsNewVolunteer ? `<span class='purpleFont boldFont'>${newVolunteerText}</span>` : ``;
+                driverWrapper = IsNewDriver ? `<span class='purpleFont boldFont'>${newVolunteerText}</span>` : ``;
                 driverWrapper += `<a href="volunteerform.html" data-obj="volunteer" class="showMe driverName clickable blueFont boldFont"`;
                 driverWrapper += `id='${Id}'>${driverInnerContent}</a>`;
                 driverWrapper += `<span class="driverCellPhone">${addSeperator2MobileNum(CellPhone, '-')}</span>`;
@@ -2437,6 +2441,12 @@
             _trToHighLight = thisBtn.closest('tr');
             _trToHighLight.classList.add('highlightRow');
 
+            if (typeof driverId === 'undefined' || !driverId || driverId === null) {
+                $('#removeDriverBtn').prop("disabled", true);
+            } else {
+                $('#removeDriverBtn').prop("disabled", false);
+            }
+
             if (isDriverReplacement) {
                 $('#driverModalTitle').text('עדכון נהג');
             } else {
@@ -2499,11 +2509,19 @@
 
         const bsModalHasShown = async () => {
             await activateAutoComplteToModalsInput();
+
+            const thisRideDriver = drivers.find(d => d.Id === _driverId);
+            if (typeof thisRideDriver === 'undefined' || !thisRideDriver) {
+                $('#driver').val('');
+            } else {
+                $('#driver').val(thisRideDriver.DisplayName);
+            }
+
             focusOnElement('driver');
         }
 
         const activateAutoComplteToModalsInput = async () => {
-            $('#driver').val('');
+
             if (typeof driverNames === 'undefined' || !driverNames) {
                 driverNames = await getDrivers();
             }
