@@ -467,7 +467,7 @@
         const controllersLayout = "<'row top'<'col-sm-6'l><'col-sm-5'f><'col-sm-1'B>>rt<'bottom'pi>";//https://datatables.net/reference/option/dom
         const controllersLayoutForFutureTable = "<'row top'<'col-sm-2'l><'#future-table-time-interval-container.col-sm-4'><'col-sm-5'f><'col-sm-1'B>>rt<'bottom'pi>";
         let drivers, driverNames;
-        let _assignDriverToRidepatNum;
+        let _ridepatToManipulate;
         let _assignDriverToRideNum;
         let _isDriverReplacement;
         let _trToHighLight;
@@ -698,7 +698,7 @@
             if (_isDriverReplacement) {
                 //update the ride record with the new driver.
                 request = {
-                    ridePatId: _assignDriverToRidepatNum,
+                    ridePatId: _ridepatToManipulate,
                     rideNum: _assignDriverToRideNum,
                     newDriverId: userSelected.Id,
                     assignedFromAppId: APP_ID
@@ -709,7 +709,7 @@
             } else {
 
                 request = {
-                    ridePatId: _assignDriverToRidepatNum,
+                    ridePatId: _ridepatToManipulate,
                     userId: userSelected.Id,
                     driverType: "primary",
                     assignedFromAppId: APP_ID
@@ -721,18 +721,33 @@
         }
 
         const assignDriverToRidePatAbort = () => {
-            _trToHighLight.classList.remove('highlightRow');
+            removeClass('highlightRow');
+        }
+
+        const editTimeToRidePat = () => {
+            //  $('#wait').show().hide();
+            $('#wait').hide();
+            removeClass('highlightRow');
+            $('#editTimeModal').modal('hide');
+        }
+
+        const editTimeAbort = () => {
+            removeClass('highlightRow');
+        }
+
+        const removeClass = (className) => {
+            _trToHighLight.classList.remove(className);
         }
 
         const assignDriverToRidePat_SCB = (data) => {
             $('#wait').hide();
-            _trToHighLight.classList.remove('highlightRow');
+            removeClass('highlightRow');
             $('#assignDriverModal').modal('hide');
         }
 
         const assignDriverToRidePat_ECB = (err) => {
             $('#wait').hide();
-            _trToHighLight.classList.remove('highlightRow');
+            assignDriverToRidePat('highlightRow');
             alert('Issue in assignDriverToRidePat: ' + JSON.stringify(err));
         }
 
@@ -764,7 +779,7 @@
                     $('#wait').show();
 
                     const request = {
-                        ridePatId: _assignDriverToRidepatNum,
+                        ridePatId: _ridepatToManipulate,
                         rideId: _assignDriverToRideNum,
                         driverId: _driverId
                     }
@@ -798,6 +813,10 @@
 
             $("#assignDriverModal").attr("w3-include-html", "assignDriverModal.html");
             $('#assignDriverModal').on('shown.bs.modal', bsModalHasShown); // triger cb function only after modal is shown
+
+
+            $("#editTimeModal").attr("w3-include-html", "editTimeModal.html");
+            // $('#assignDriverModal').on('shown.bs.modal', bsModalHasShown); // triger cb function only after modal is shown
 
             wiringDataTables();
             const { COPYWRITE } = GENERAL;
@@ -865,6 +884,9 @@
                    -1 if a < b
                     */
 
+                    a = $(a)[0].querySelector('.time').innerHTML;
+                    b = $(b)[0].querySelector('.time').innerHTML;
+
                     let datetime_a = $.trim(a).split(':');
                     let datetime_b = $.trim(b).split(':');
 
@@ -900,6 +922,9 @@
                      -1 if a > b
                       1 if a < b
                       */
+                    a = $(a)[0].querySelector('.time').innerHTML;
+                    b = $(b)[0].querySelector('.time').innerHTML;
+
                     let datetime_a = $.trim(a).split(':');
                     let datetime_b = $.trim(b).split(':');
 
@@ -1735,6 +1760,7 @@
                     let patientHTML;
                     let driverHTML;
                     let status2render;
+                    let timeHTML;
 
 
                     for (let i = 0; i < arr_rides.length; i++) {
@@ -1746,8 +1772,8 @@
                                 }
                             }
                         }
-
                         thisRidePatDate = convertDBDate2FrontEndDate(arr_rides[i].Date);
+                        timeHTML = buildTimeHTML(thisRidePatDate, arr_rides[i].RidePatNum);
                         numOfEscorts = arr_rides[i].Escorts.length;
 
                         //#region adjust patient column
@@ -1779,7 +1805,7 @@
 
                         thisRidePat = {
                             ridePatNum: arr_rides[i].RidePatNum,
-                            time: thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' }),
+                            time: timeHTML,
                             origin: isAssistant ? arr_rides[i].Origin.EnglishName : arr_rides[i].Origin.Name,
                             destination: isAssistant ? arr_rides[i].Destination.EnglishName : arr_rides[i].Destination.Name,
                             patient: patientHTML,
@@ -2423,23 +2449,44 @@
         const buildAcionsButtonsHTML = (ridePatNum, drivers) => {
 
             const editBtn = `<button type='button' class='edit                   btn btn-icon waves-effect waves-light btn-secondary' id='${ridePatNum}'  name='${ridePatNum}' title='עריכה'>         <i class='ti-pencil'></i></button>`;
-            const deleteBtn = `<button type='button' class='remove               btn btn-icon waves-effect waves-light btn-secondary'   id='${ridePatNum}'  name='${ridePatNum}' title='מחיקה'>         <i class='fa fa-remove'></i></button>`;
-            const messageToCopyBtn = `<button type='button' class='copyMessage   btn btn-icon waves-effect waves-light btn-secondary'          id='${ridePatNum}'  name='${ridePatNum}' title='העתקת הודעה'>   <i class='fa fa-envelope'></i></button>`;
-            const candidateBtn = `<button type='button' class='candidatesBtn btn btn-icon waves-effect waves-light btn-secondary'          id='${ridePatNum}'  name='${ridePatNum}' title='מועמדים להסעה'> <i class='fa fa-car'></i></button>`;
+            const deleteBtn = `<button type='button' class='remove               btn btn-icon waves-effect waves-light btn-secondary' id='${ridePatNum}'  name='${ridePatNum}' title='מחיקה'>         <i class='fa fa-remove'></i></button>`;
+            const messageToCopyBtn = `<button type='button' class='copyMessage   btn btn-icon waves-effect waves-light btn-secondary' id='${ridePatNum}'  name='${ridePatNum}' title='העתקת הודעה'>   <i class='fa fa-envelope'></i></button>`;
+            const candidateBtn = `<button type='button' class='candidatesBtn btn btn-icon waves-effect waves-light btn-secondary'     id='${ridePatNum}'  name='${ridePatNum}' title='מועמדים להסעה'> <i class='fa fa-car'></i></button>`;
 
             let buttonsWrapper = `<div class='elementsInSameLine'>${editBtn} ${deleteBtn} ${drivers.length > 0 ? messageToCopyBtn : candidateBtn}</div>`;
 
             return buttonsWrapper;
         }
 
+        const buildTimeHTML = (thisRidePatDate, ridePatNum) => {
+
+            let timeWrapper = `<div class="elementsInSameLine">`;
+
+            let time = '<span class="time">';
+            time += thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' });
+            time += '</span>';
+
+            timeWrapper += time;
+
+
+
+
+            const editBtn = `<button type='button' data-toggle="modal" data-target="#editTimeModal" onclick="prepreparationEditTimeModal(this, ${ridePatNum})" class='btn btn-icon waves-effect waves-light btn-secondary' id=''  name='' title='עריכה'><i class='ti-pencil'></i></button>`;
+            timeWrapper += editBtn;
+
+
+
+            timeWrapper += `</div>`;
+
+            return timeWrapper;
+        }
+
         function prepreparationAssignDriverModal(thisBtn, ridePatNum, isDriverReplacement, rideNum, driverId) {
-            _assignDriverToRidepatNum = ridePatNum;
+            _ridepatToManipulate = ridePatNum;
             _assignDriverToRideNum = rideNum
             _isDriverReplacement = isDriverReplacement;
             _driverId = driverId
-
-            _trToHighLight = thisBtn.closest('tr');
-            _trToHighLight.classList.add('highlightRow');
+            highLightRow(thisBtn);
 
             if (typeof driverId === 'undefined' || !driverId || driverId === null) {
                 $('#removeDriverBtn').prop("disabled", true);
@@ -2454,6 +2501,20 @@
             }
         }
 
+        function prepreparationEditTimeModal(thisBtn, ridepatNum) {
+
+            // console.log($("#hour").val());
+
+            _ridepatToManipulate = ridepatNum
+            highLightRow(thisBtn);
+            $('#editTimeModalTitle').text('עדכון שעת הסעה');
+
+        }
+
+        function highLightRow(thisBtn) {
+            _trToHighLight = thisBtn.closest('tr');
+            _trToHighLight.classList.add('highlightRow');
+        }
 
         const add2IhaveSeenAllready = () => {
 
@@ -2533,18 +2594,6 @@
             $(`#${id}`).focus();
         }
 
-        const updateActionsButtons = (actionsButtonsAsString, ridepatNum) => {
-
-            //1. convert actionsButtonsAsString to html / jquery
-            let actionsButtonsAsHTML = actionsButtonsAsString;
-
-            //2. catch the button to replace
-
-            //3. replace it
-
-            //4. return new actionsButtonsAsString
-
-        }
     </script>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -2956,6 +3005,7 @@
 
 
     <div class="modal fade" id="assignDriverModal" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="documentedRidesTitle" aria-hidden="true"></div>
+    <div class="modal fade" id="editTimeModal" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="editTimeTitle" aria-hidden="true"></div>
 
     <div class="modal fade" id="filtersModal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog" role="document">
