@@ -15,6 +15,19 @@
  * 
  */
 
+
+window.ReportConfigFlags = {
+    download_text_file: true,
+};
+
+let ReportDebugFlags = {
+    download_text_file: false,
+}
+
+// Set this (and tweak ReportDebugFlags) to get only specific web-requests done
+// window.ReportConfigFlags = ReportDebugFlags;
+
+
 // Current startegy for refreshing the table, set per report type
 var S_refresh_preview = null;
 
@@ -2412,6 +2425,9 @@ function rp_center_patients_rides__refresh_Table(volunteerId, start_date, end_da
 
 function tomorrows_rides_clean_pickup_time(orig_str) {
     let m = moment(orig_str, "DD/MM/YYYY hh:mm:ss")
+    if (m.minutes() == 14 && m.hours() > 18) {
+        return "afternoon"  //   אחה"צ
+    }
     return m.format("H:mm");
 }
 
@@ -2428,7 +2444,7 @@ Origin	Dest	pickuptim	pat1	pat1_escorts	pat2	pat2_escorts
  */
 
 function tomorrows_rides_process_data(records) {
-    
+
     let groupByDict = {};
     records.forEach(function (obj) {
         key = obj.Destination + "," + obj.Origin + "," + obj.DriverID + "," + obj.Pickuptime;
@@ -2461,6 +2477,10 @@ function tomorrows_rides_process_data(records) {
         }
         table.push(entry);
     }
+
+    console.log("input size = ", records.length);
+    console.log("output size = ", table.length);
+
     return table;
 }
 
@@ -2539,8 +2559,10 @@ function rp_center_tomorrows_rides__refresh_preview() {
             $('#wait').hide();
             let table = tomorrows_rides_process_data(data.d);
             let text_export = tomorrows_rides_get_as_text(table, "Tomorrows rides - " + readable_date);
-            // console.log(text_export);
-            download_text_file(text_export, "Tomorrows_report__" + readable_date + ".txt");
+            if (window.ReportConfigFlags.download_text_file) 
+                download_text_file(text_export, "Tomorrows_report__" + readable_date + ".txt");
+            else
+                console.log(text_export);
 
             $('#div_table_center_tomorrows_rides').show();
             tbl = $('#table_center_tomorrows_rides').DataTable({
@@ -2608,6 +2630,7 @@ function hide_all_tables() {
     $("#div_table_center_daily_by_month").hide();
     $("#div_table_rp_center_monthly_by_year").hide();
     $("#div_table_center_patients_rides").hide();
+    $("#div_table_center_tomorrows_rides").hide();
  }
 
 
