@@ -3,6 +3,7 @@
         display: grid;
         place-items: center;
     }
+
     #hour, #minute {
         width: 3vw;
         height: 4vh;
@@ -20,12 +21,16 @@
         </div>
         <div class="modal-body">
             <div id="selecthour">
-                <select id="hour"><option>שעות</option></select>&nbsp;:
-                <select id="minute"><option>דקות</option></select>
-
+                <select id="minutes">
+                    <option disabled selected>דקות</option>
+                </select>
+                &nbsp;:
+                <select id="hours">
+                    <option disabled selected>שעות</option>
+                </select>
                 <br />  <br />
 
-                <input type="checkbox" id="afterNoon" onchange="checkAfternoon()" />
+                <input type="checkbox" id="editTimeAfterNoonCB" onchange="checkeditTimeAfterNoonCB()" />
                 <label data-toggle="tooltip" title="or afternoon">או אחה"צ</label>
             </div>
             <div class="text-right modal-footer">

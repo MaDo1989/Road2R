@@ -2502,13 +2502,67 @@
         }
 
         function prepreparationEditTimeModal(thisBtn, ridepatNum) {
-
-            // console.log($("#hour").val());
-
             _ridepatToManipulate = ridepatNum
             highLightRow(thisBtn);
-            $('#editTimeModalTitle').text('עדכון שעת הסעה');
 
+
+
+            $('#editTimeModalTitle').text('עדכון שעת הסעה');
+            const minutesArr = [0, 15, 30, 45];
+
+            let $hoursSelect = $("#hours");
+            let $minutesSelect = $("#minutes");
+            let doubleDigitsValue = '';
+            for (let i = 0; i < 46; i++) {
+
+                if (i < 24) {
+
+                    doubleDigitsValue = createDoubleDigit(i);
+                    $('<option>', { value: doubleDigitsValue, text: doubleDigitsValue }).appendTo($hoursSelect);
+                    if (minutesArr.includes(i)) {
+                        $('<option>', { value: doubleDigitsValue, text: doubleDigitsValue }).appendTo($minutesSelect);
+                    }
+                } else if (minutesArr.includes(i)) {
+                    doubleDigitsValue = createDoubleDigit(i);
+                    $('<option>', { value: doubleDigitsValue, text: doubleDigitsValue }).appendTo($minutesSelect);
+                }
+            }
+
+
+            const ridepatObject = arr_rides.find(r => r.RidePatNum === ridepatNum);
+            const ridePatTime = convertDBDate2FrontEndDate(ridepatObject.Date);
+
+            let hoursAsDoubleDigits = createDoubleDigit(ridePatTime.getHours());
+            let minutesAsDoubleDigits = createDoubleDigit(ridePatTime.getMinutes());
+            let isAfterNoon = parseInt(minutesAsDoubleDigits) === 14;
+
+            if (!isAfterNoon) {
+                $hoursSelect.val(hoursAsDoubleDigits);
+                $minutesSelect.val(minutesAsDoubleDigits);
+            } else {
+                retrieveDDLToInitial('#hours');
+                retrieveDDLToInitial('#minutes');
+                $('#editTimeAfterNoonCB').attr('checked', true);
+                checkeditTimeAfterNoonCB();
+            }
+        }
+
+        const checkeditTimeAfterNoonCB = () => {
+            var afterNoonIsChecked = $("#editTimeAfterNoonCB").is(':checked');
+
+            $('#hours').attr('disabled', afterNoonIsChecked);
+            $('#minutes').attr('disabled', afterNoonIsChecked);
+        }
+
+        const retrieveDDLToInitial = (id) => {
+            $(id).get(0).selectedIndex = 0;
+        }
+
+        const createDoubleDigit = (value) => {
+
+            let result = value < 10 ? '0' + value : value;
+
+            return result;
         }
 
         function highLightRow(thisBtn) {
