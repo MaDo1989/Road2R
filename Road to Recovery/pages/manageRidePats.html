@@ -724,7 +724,38 @@
             removeClass('highlightRow');
         }
 
-        const editTimeToRidePat = () => {
+        const updateRidePatTime = () => {
+
+            let hours, minutes = null;
+            const isAfterNoon = $("#editTimeAfterNoonCB").is(':checked');
+
+            if (isAfterNoon) {
+                hours = 22;
+                minutes = 14;
+            } else {
+                hours = $("#hours").val();;
+                minutes = $("#minutes").val();;
+            }
+            console.log(_ridepatToManipulate);
+            console.log(`${hours}:${minutes}`);
+
+            /*
+             * 
+             *                     var hours = $("#hour").val();
+                    var minutes = $("#minute").val();
+             * 
+              var Hour = parseInt(hours);
+                    var Minute = parseInt(minutes);
+                    hourForPush = hours + ":" + minutes;
+                    if ($("#afterNoon").is(':checked')) { //22:14 is the default time that means afternoon אחה''צ
+                        Hour = 22;
+                        Minute = 14;
+                        hourForPush = "אחה\"צ"
+                    }
+                    var date = new Date(Year, Month, Day, Hour, Minute).toUTCString();
+             */
+
+
             //  $('#wait').show().hide();
             $('#wait').hide();
             removeClass('highlightRow');
