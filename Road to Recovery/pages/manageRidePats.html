@@ -319,6 +319,125 @@
                 manipilateNodeStyle(tr_node2manipulate, updated_ridePat, REMOVE_DRIVER, false, tableName2manipulate);
             }
         }
+
+        notification.client.ridePatpdated = function (updated_ridePat) {
+            /*   *********************
+                 * !!! IMPORTANT !!! *
+                 ********↓↓↓**********/
+            //update the specific ride in arr_rides:
+            update_arr_rides(updated_ridePat);
+            /*  *********↑↑↑*********
+                * !!! IMPORTANT !!! *
+                *********************/
+
+            tableName2manipulate = getTableName2Manipulate(updated_ridePat.RidePatNum);
+            thisRidePatDate = fixDate_WhichComeFromOpenConnection(updated_ridePat.Date);
+            thisRidePatLastModified = fixDate_WhichComeFromOpenConnection(updated_ridePat.LastModified);
+
+
+            switch (tableName2manipulate) {
+
+                case 'datatable-morning':
+
+                    row2manipulate = tMorning.row(`#${updated_ridePat.RidePatNum}`).data();
+
+                    row2manipulate.time = thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' });
+                    row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
+                    row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
+                    row2manipulate.patient = buildPatientHTML(updated_ridePat);
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
+                    row2manipulate.status = buildStatusString(updated_ridePat.Status);
+                    row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                    //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
+                    row2manipulate.remark = updated_ridePat.Remark;
+                    row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
+
+                    tMorning.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                    increaseCounter('datatable-morning', updated_ridePat.RidePatNum);
+
+                    tr_nodesAsArray = Array.from(tMorning.rows().nodes());
+                    break;
+
+                case 'datatable-afternoon':
+
+                    row2manipulate = tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data();
+
+                    row2manipulate.time = thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' });
+                    row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
+                    row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
+                    row2manipulate.patient = buildPatientHTML(updated_ridePat);
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
+                    row2manipulate.status = buildStatusString(updated_ridePat.Status);
+                    row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                    //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
+                    row2manipulate.remark = updated_ridePat.Remark;
+                    row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
+
+                    tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                    increaseCounter('datatable-afternoon', updated_ridePat.RidePatNum);
+
+                    tr_nodesAsArray = Array.from(tAfternoon.rows().nodes());
+                    break;
+
+                case 'datatable-tomorrow':
+
+                    row2manipulate = tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data();
+
+                    row2manipulate.date = thisRidePatDate.toLocaleDateString('he-IL');
+                    row2manipulate.time = thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' });
+                    row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
+                    row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
+                    row2manipulate.patient = buildPatientHTML(updated_ridePat);
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
+                    row2manipulate.status = buildStatusString(updated_ridePat.Status);
+                    row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                    //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
+                    row2manipulate.remark = updated_ridePat.Remark;
+                    row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
+
+                    tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                    increaseCounter('datatable-tomorrow', updated_ridePat.RidePatNum);
+
+                    tr_nodesAsArray = Array.from(tTomorrow.rows().nodes());
+                    break;
+
+                case 'datatable-future':
+
+                    row2manipulate = tFuture.row(`#${updated_ridePat.RidePatNum}`).data();
+
+                    row2manipulate.date = thisRidePatDate.toLocaleDateString('he-IL');
+                    row2manipulate.time = thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' });
+                    row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
+                    row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
+                    row2manipulate.patient = buildPatientHTML(updated_ridePat);
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
+                    row2manipulate.status = buildStatusString(updated_ridePat.Status);
+                    row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                    //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
+                    row2manipulate.remark = updated_ridePat.Remark;
+                    row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
+
+                    tFuture.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                    increaseCounter('datatable-future', updated_ridePat.RidePatNum);
+
+                    tr_nodesAsArray = Array.from(tFuture.rows().nodes());
+                    tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
+                    manipilateNodeStyle(tr_node2manipulate, updated_ridePat, ADD_DRIVER, true);
+                    tr_nodesAsArray = null;
+                    break;
+
+                default:
+                    console.log('system recognized a tempt of the server to post real-time data but failed to found the rellevant row to redraw');
+                    tr_nodesAsArray = null;
+                    break;
+            }
+            if (tr_nodesAsArray) {
+
+                tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
+                manipilateNodeStyle(tr_node2manipulate, updated_ridePat, ADD_DRIVER);
+            }
+        }
+
     </script>
 
     <!-- #endregion REAL-TIME BY SIGNALR - FOR ANY COMPLAINTS WHATSOEVER YOU CAN TALK 2 YOGEV -->
@@ -726,6 +845,7 @@
 
         const updateRidePatTime = () => {
 
+            $('#wait').show();
             let hours, minutes = null;
             const isAfterNoon = $("#editTimeAfterNoonCB").is(':checked');
 
@@ -736,30 +856,34 @@
                 hours = $("#hours").val();;
                 minutes = $("#minutes").val();;
             }
-            console.log(_ridepatToManipulate);
-            console.log(`${hours}:${minutes}`);
 
-            /*
-             * 
-             *                     var hours = $("#hour").val();
-                    var minutes = $("#minute").val();
-             * 
-              var Hour = parseInt(hours);
-                    var Minute = parseInt(minutes);
-                    hourForPush = hours + ":" + minutes;
-                    if ($("#afterNoon").is(':checked')) { //22:14 is the default time that means afternoon אחה''צ
-                        Hour = 22;
-                        Minute = 14;
-                        hourForPush = "אחה\"צ"
-                    }
-                    var date = new Date(Year, Month, Day, Hour, Minute).toUTCString();
-             */
+            let ridepatToManipulate = arr_rides.find(r => r.RidePatNum === _ridepatToManipulate);
+            let dateToManipulate = convertDBDate2FrontEndDate(ridepatToManipulate.Date);
+            dateToManipulate.setHours(hours, minutes);
 
+            let data = {
+                ridePatId: _ridepatToManipulate,
+                dateTime: dateToManipulate
+            }; 
 
-            //  $('#wait').show().hide();
-            $('#wait').hide();
-            removeClass('highlightRow');
-            $('#editTimeModal').modal('hide');
+            const updateRidePatTime_SCB = (data) => {
+
+                $('#wait').hide();
+                removeClass('highlightRow');
+                $('#editTimeModal').modal('hide');
+                //.....................??
+            }
+
+            const updateRidePatTime_ECB = (err) => {
+
+                $('#wait').hide();
+                removeClass('highlightRow');
+                $('#editTimeModal').modal('hide');
+                alert(err);
+            }
+
+            ajaxCall('UpdateRidePatTime', JSON.stringify(data), updateRidePatTime_SCB, updateRidePatTime_ECB);
+
         }
 
         const editTimeAbort = () => {

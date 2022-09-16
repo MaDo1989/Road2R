@@ -813,7 +813,7 @@ public class RidePat
                 int.TryParse(dr["NoOfDocumentedRides"].ToString(), out numberOfRides);
                 mainDriver.NoOfDocumentedRides = numberOfRides;
                 mainDriver.DriverType = "Primary";
-                
+
                 if (dr["IsNewDriver"].ToString() != "")
                 {
                     mainDriver.IsNewDriver = dr["IsNewDriver"].ToString() == "1";
@@ -1742,6 +1742,35 @@ public class RidePat
 
         return res;
 
+    }
+
+    public void UpdateRidePatTime(int ridePatId, DateTime dateTime)
+    {
+        RidePat updatedRidePat = null;
+        try
+        {
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.CommandText = "spRidePatAndRide_UpdateDateAndTime";
+            cmd.Parameters.AddWithValue("@ridePatId", ridePatId);
+            cmd.Parameters.AddWithValue("@editedTime", dateTime);
+            dbs = new DbService();
+            sdr = dbs.GetDataReaderSP(cmd);
+            updatedRidePat = new RidePat();
+            updatedRidePat = GetRidePat(ridePatId);
+            BroadCast.BroadCast2Clients_ridePatpdated(updatedRidePat);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+        finally
+        {
+            if (sdr != null)
+            {
+                sdr.Close();
+            }
+        }
     }
 
     public RidePat getReturnRidePat(RidePat ridePat, bool isAnonymous)

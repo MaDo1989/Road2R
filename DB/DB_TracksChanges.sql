@@ -139,6 +139,40 @@ BEGIN
 
 		END
 END
-
+GO
 
 /* ↑ AssignedFromAppId Altering ↑ */
+
+
+-- =============================================
+-- Author:      Yogev Strauber
+-- Create Date: 16/09/2022
+-- Description: update ride and ridepat date&time
+-- =============================================
+CREATE PROCEDURE spRidePatAndRide_UpdateDateAndTime
+(
+	@editedTime DATETIME,
+	@ridePatId INT
+)
+AS
+BEGIN
+
+BEGIN TRAN UpdateRideAndRidePatTime
+
+DECLARE @rideId int = (SELECT RideId FROM RidePat WHERE RidePatNum=@ridePatId)
+
+UPDATE RidePat
+SET PickupTime = @editedTime
+where RidePatNum=@ridePatId
+
+IF EXISTS (SELECT 1 FROM Ride where RideNum=@rideId)
+BEGIN
+	UPDATE Ride
+	SET Date = @editedTime
+	where RideNum=@rideId
+END
+
+COMMIT TRAN UpdateRideAndRidePatTime
+
+END
+GO
