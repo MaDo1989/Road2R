@@ -2172,38 +2172,38 @@ public class Volunteer
             throw new Exception();
         }
 
-        //Email em = new Email();
-        //string messageText = "";
-        //string newsLetterMail = ConfigurationManager.AppSettings["newsLetterMail"];
-        //string wantsNewsLetter = "";
-        //if (v.NewsLetter == true)
-        //{
-        //    wantsNewsLetter = "כן";
-        //}
-        //else
-        //{
-        //    wantsNewsLetter = "לא";
+        Email em = new Email();
+        string messageText = "";
+        string newsLetterMail = ConfigurationManager.AppSettings["newsLetterMail"];
+        string wantsNewsLetter = "";
+        if (v.NewsLetter == true)
+        {
+            wantsNewsLetter = "כן";
+        }
+        else
+        {
+            wantsNewsLetter = "לא";
 
-        //}
+        }
 
 
-        //messageText = "<table width='100%' border='0' cellspacing='0' cellpadding='0'><tr><td align='right'>";
-        //messageText += "שלום <br/>";
-        //if (v.Gender == "מתנדבת")
-        //{
-        //    messageText += "המתנדבת " + v.DisplayName + " עדכנה את פרטיה והיא " + wantsNewsLetter + " מעוניינת לקבל את העדכון השבועי.<br/>";
-        //    messageText += "כתובת המייל שלה: " + v.Email + " <br/><br/>";
+        messageText = "<table width='100%' border='0' cellspacing='0' cellpadding='0'><tr><td align='right'>";
+        messageText += "שלום <br/>";
+        if (v.Gender == "מתנדבת")
+        {
+            messageText += "המתנדבת " + v.DisplayName + " עדכנה את פרטיה והיא " + wantsNewsLetter + " מעוניינת לקבל את העדכון השבועי.<br/>";
+            messageText += "כתובת המייל שלה: " + v.Email + " <br/><br/>";
 
-        //}
-        //else
-        //{
-        //    messageText += "המתנדב " + v.DisplayName + " עדכן את פרטיו והוא " + wantsNewsLetter + " מעוניין לקבל את העדכון השבועי.<br/>";
-        //    messageText += "כתובת המייל שלו: " + v.Email + " <br/><br/>";
-        //}
+        }
+        else
+        {
+            messageText += "המתנדב " + v.DisplayName + " עדכן את פרטיו והוא " + wantsNewsLetter + " מעוניין לקבל את העדכון השבועי.<br/>";
+            messageText += "כתובת המייל שלו: " + v.Email + " <br/><br/>";
+        }
 
-        //messageText += "</td></tr></table>";
+        messageText += "</td></tr></table>";
 
-        //em.sendMessageTo("New volunteer", newsLetterMail, messageText); //doesnt works while using local host! 
+        em.sendMessageTo("New volunteer", newsLetterMail, messageText);
 
 
     }
