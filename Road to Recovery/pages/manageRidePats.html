@@ -128,7 +128,7 @@
 
                     row2manipulate = tMorning.row(`#${updated_ridePat.RidePatNum}`).data();
 
-                    row2manipulate.time = thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' });
+                    row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
                     row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
                     row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
                     row2manipulate.patient = buildPatientHTML(updated_ridePat);
@@ -149,7 +149,7 @@
 
                     row2manipulate = tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data();
 
-                    row2manipulate.time = thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' });
+                    row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
                     row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
                     row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
                     row2manipulate.patient = buildPatientHTML(updated_ridePat);
@@ -171,7 +171,7 @@
                     row2manipulate = tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data();
 
                     row2manipulate.date = thisRidePatDate.toLocaleDateString('he-IL');
-                    row2manipulate.time = thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' });
+                    row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
                     row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
                     row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
                     row2manipulate.patient = buildPatientHTML(updated_ridePat);
@@ -193,7 +193,7 @@
                     row2manipulate = tFuture.row(`#${updated_ridePat.RidePatNum}`).data();
 
                     row2manipulate.date = thisRidePatDate.toLocaleDateString('he-IL');
-                    row2manipulate.time = thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' });
+                    row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
                     row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
                     row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
                     row2manipulate.patient = buildPatientHTML(updated_ridePat);
@@ -341,14 +341,13 @@
 
                     row2manipulate = tMorning.row(`#${updated_ridePat.RidePatNum}`).data();
 
-                    row2manipulate.time = thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' });
+                    row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
                     row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
                     row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
                     row2manipulate.patient = buildPatientHTML(updated_ridePat);
                     row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
-                    //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
                     row2manipulate.remark = updated_ridePat.Remark;
                     row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
@@ -362,14 +361,13 @@
 
                     row2manipulate = tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data();
 
-                    row2manipulate.time = thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' });
+                    row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
                     row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
                     row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
                     row2manipulate.patient = buildPatientHTML(updated_ridePat);
                     row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
-                    //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
                     row2manipulate.remark = updated_ridePat.Remark;
                     row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
@@ -384,14 +382,13 @@
                     row2manipulate = tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data();
 
                     row2manipulate.date = thisRidePatDate.toLocaleDateString('he-IL');
-                    row2manipulate.time = thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' });
+                    row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
                     row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
                     row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
                     row2manipulate.patient = buildPatientHTML(updated_ridePat);
                     row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
-                    //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
                     row2manipulate.remark = updated_ridePat.Remark;
                     row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
@@ -406,14 +403,13 @@
                     row2manipulate = tFuture.row(`#${updated_ridePat.RidePatNum}`).data();
 
                     row2manipulate.date = thisRidePatDate.toLocaleDateString('he-IL');
-                    row2manipulate.time = thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' });
+                    row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
                     row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
                     row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
                     row2manipulate.patient = buildPatientHTML(updated_ridePat);
                     row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
                     row2manipulate.status = buildStatusString(updated_ridePat.Status);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
-                    //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
                     row2manipulate.remark = updated_ridePat.Remark;
                     row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
@@ -856,6 +852,13 @@
                 hours = $("#hours").val();;
                 minutes = $("#minutes").val();;
             }
+            if (
+                isNaN(hours) || isNaN(minutes) ||
+                hours === null || minutes === null
+            ) {
+                $('#wait').hide();
+                return alert('נא לבחור שעה מהרשימות הנגללות או אחה"צ');
+            }
 
             let ridepatToManipulate = arr_rides.find(r => r.RidePatNum === _ridepatToManipulate);
             let dateToManipulate = convertDBDate2FrontEndDate(ridepatToManipulate.Date);
@@ -864,14 +867,13 @@
             let data = {
                 ridePatId: _ridepatToManipulate,
                 dateTime: dateToManipulate
-            }; 
+            };
 
-            const updateRidePatTime_SCB = (data) => {
+            const updateRidePatTime_SCB = () => {
 
                 $('#wait').hide();
                 removeClass('highlightRow');
                 $('#editTimeModal').modal('hide');
-                //.....................??
             }
 
             const updateRidePatTime_ECB = (err) => {
@@ -971,7 +973,7 @@
 
 
             $("#editTimeModal").attr("w3-include-html", "editTimeModal.html");
-            // $('#assignDriverModal').on('shown.bs.modal', bsModalHasShown); // triger cb function only after modal is shown
+            //$('#editTimeModal').on('shown.bs.modal', editTimeModal_bsModalHasShown);
 
             wiringDataTables();
             const { COPYWRITE } = GENERAL;
@@ -2620,17 +2622,10 @@
             let time = '<span class="time">';
             time += thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' });
             time += '</span>';
-
             timeWrapper += time;
-
-
-
 
             const editBtn = `<button type='button' data-toggle="modal" data-target="#editTimeModal" onclick="prepreparationEditTimeModal(this, ${ridePatNum})" class='btn btn-icon waves-effect waves-light btn-secondary' id=''  name='' title='עריכה'><i class='ti-pencil'></i></button>`;
             timeWrapper += editBtn;
-
-
-
             timeWrapper += `</div>`;
 
             return timeWrapper;
@@ -2694,16 +2689,21 @@
             if (!isAfterNoon) {
                 $hoursSelect.val(hoursAsDoubleDigits);
                 $minutesSelect.val(minutesAsDoubleDigits);
+                $('#editTimeAfterNoonCB').attr('checked', false);
+                checkeditTimeAfterNoonCB(false);
             } else {
                 retrieveDDLToInitial('#hours');
                 retrieveDDLToInitial('#minutes');
                 $('#editTimeAfterNoonCB').attr('checked', true);
-                checkeditTimeAfterNoonCB();
+                checkeditTimeAfterNoonCB(true);
+                //try to fix bug with help of this example:
+                //$('#assignDriverModal').on('shown.bs.modal', bsModalHasShown); // triger cb function only after modal is shown
+
             }
         }
 
-        const checkeditTimeAfterNoonCB = () => {
-            var afterNoonIsChecked = $("#editTimeAfterNoonCB").is(':checked');
+        const checkeditTimeAfterNoonCB = (afterNoonIsChecked) => {
+
 
             $('#hours').attr('disabled', afterNoonIsChecked);
             $('#minutes').attr('disabled', afterNoonIsChecked);
@@ -2775,6 +2775,10 @@
                     tFuture.order([7, 'desc']).draw();
                     break;
             }
+        }
+
+        const editTimeModal_bsModalHasShown = () => {
+            
         }
 
         const bsModalHasShown = async () => {
