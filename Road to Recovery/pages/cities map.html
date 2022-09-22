@@ -1,0 +1,356 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <style>
+        #map {
+            height: 100%;
+        }
+
+        /* Optional: Makes the sample page fill the window. */
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous"></script>
+
+    <script src="lib/map.js"></script>
+    <script>
+
+        markers = [];
+        markerImages = {
+            "מחסום": "../images/orange_MarkerB.png",
+            "בית חולים": "../images/paleblue_MarkerH.png",
+            "כללית": "../images/yellow_MarkerG.png",
+            "נקודת אמצע": "../images/blue_MarkerM.png",
+            "עיר": "../images/purple_MarkerV.png",
+        }
+
+        $(document).ready(
+            function () {
+                localStorage.clear();
+                $("#locations").change(locationSelected);
+                if (localStorage["citiesLS"] != null) {
+                    cities = JSON.parse(localStorage["citiesLS"]);
+                    return;
+                }
+
+                //$.ajax({
+                //    dataType: "json",
+                //    url: "WebService.asmx/getCitiesLatLng",
+                //    contentType: "application/json; charset=utf-8",
+                //    type: "POST",
+                //    async: false,
+                //    data: "",
+                //    success: function (data) {
+                //        cities = JSON.parse(data.d);
+                //        localStorage["citiesLS"] = JSON.stringify(cities);
+                //        console.log(cities);
+                //    },
+                //    error: function (err) {
+                //        alert("Error in writeLocations: " + err.responseText);
+                //    }
+                //});
+            }
+        )
+
+        function locationSelected() {
+            let name = this.value;
+            let type = markers[name].type;
+            var icon = {
+                url: markerImages[type], // url
+                scaledSize: new google.maps.Size(40, 68), // scaled size
+                origin: new google.maps.Point(0, 0), // origin
+                anchor: new google.maps.Point(0, 0) // anchor
+            };
+            markers[name].setAnimation(google.maps.Animation.DROP);
+            markers[name].setIcon(icon);
+            //markers[name].setIcon('images/paleblue_MarkerHL.png');
+        }
+
+
+        function getCities() {
+            if (localStorage["citiesLS"] != null) {
+                cities = JSON.parse(localStorage["citiesLS"]);
+                buildList(cities);
+                placeMarkers(cities);
+                return;
+            }
+
+            let url = "WebService.asmx/getCities";
+
+            if ($('#volOnlyCB')[0].checked)
+                url = "WebService.asmx/getVolCities";
+
+               $.ajax({
+                dataType: "json",
+                url: url,
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                async: false,
+                data: "",
+                success: function (data) {
+                    cities = {};
+                    let c = JSON.parse(data.d);
+                    for (var i = 0; i < c.length; i++) {
+                        if (c[i].CityName != "")
+                            cities[c[i].CityName] = {
+                                Lat: c[i].Lat,
+                                Lng: c[i].Lng,
+                                Name: c[i].CityName
+                            }
+                    }
+                    localStorage["citiesLS"] = JSON.stringify(cities);
+                    //setLocationsOnMap(locations);
+                    buildList(cities);
+                    placeMarkers(cities);
+                },
+                error: function (err) {
+                    alert("Error in getCities: " + err.responseText);
+                }
+            });
+        }
+
+
+        function placeMarkers(locations) {
+           
+            for (k in locations) {
+                let lat = locations[k].Lat;
+                let lng = locations[k].Lng;
+                if (lat != -1) {
+                    var marker = new google.maps.Marker({
+                        map: map,
+                        position: {
+                            lat: lat,
+                            lng: lng
+                        },
+                        title: k + ", " + locations[k].Name,
+                        //label: {
+                        //    text: "3",
+                        //    color: "red",
+                        //    fontSize: "30px",
+                        //    origin: new google.maps.Point(30, 9)
+                        //},
+                        icon: markerImages[locations[k].Type]
+                        //icon: image
+                    });
+                    marker.type = locations[k].Type;
+                    markers[k] = marker;
+                }
+            }
+        }
+
+        function deleteAllMarkers() {
+            for (k in markers) {
+                markers[k].setMap(null);
+            }
+        }     
+            
+        //function placeStuff() {
+        //    var homeAddress1 = "עין שריד, רחוב עיט 6";
+        //    var homeAddress2 = "רוטשילד 22 תל אביב";
+        //    var barricadeAddress1 = "מחסום תרקומיא";
+        //    var hospitalAddress = "בית החולים תל השומר";
+
+        //    codeAddress(homeAddress1, "../images/home.png");
+        //    codeAddress(homeAddress2, "../images/home.png");
+        //    codeAddress(hospitalAddress, "../images/hospital-icon.png");
+        //    codeAddress(barricadeAddress1, "../images/barricade.png");
+        //    var origins = [homeAddress1, homeAddress2, hospitalAddress];
+        //    var destinations = [barricadeAddress1];
+
+        //    var distance_text = calculateDistance(origins, destinations);
+        //}
+
+        function codeAddress(address, image) {
+            geocoder.geocode({ 'address': address }, function (results, status) {
+                if (status == 'OK') {
+                    map.setCenter(results[0].geometry.location);
+                    var marker = new google.maps.Marker({
+                        map: map,
+                        position: results[0].geometry.location,
+                        title: address,
+                        icon: image
+                    });
+                } else {
+                    console.log('Geocode was not successful for the following reason: ' + status + ", " + address);
+                }
+            });
+        }
+
+        function buildList(locations) {
+            str = "";
+            for (k in locations) {
+                str += "<option value='" + k +"'>";
+            }
+
+            $("#locationslist").html(str);
+        }
+
+        function buildRegionList(locations) {
+
+            let unique = []
+            for (l in locations)
+                if (unique[locations[l].Region.Name] == null)
+                    unique[locations[l].Region.Name] = true;
+
+
+            let str = "";
+            for (k in unique) {
+                str += "<option value='" + k + "'>";
+            }
+
+
+            $("#regionsList").html(str);
+        }
+
+
+        function getRides() {
+
+            let rides = [];
+            rides.push({ from: "חשמונאים", to: "שיבא", patient: "מוחמד אבו מחמוד", time: "9:00 AM" });
+            //rides.push({ from: "נעלין", to: "איכילוב", patient: "פטמה אום מחמוד" });
+            let volunteers = getPotentialVolunteers();
+            drawOnMap(rides[0], volunteers);
+        }
+
+        function drawOnMap(ride, volunteers) {
+            deleteAllMarkers();
+
+            // draw the starting point
+            let from = ride.from;
+            let to = ride.to;
+            let fromMarker = drawPoint(locations[from], from);
+            drawPoint(locations[to], to);
+            let contentString = "<div>"
+                + "<p>" + ride.patient + "</p>"
+                + "<p>" + ride.time + "</p>"
+                + "</div>";
+
+            const infowindow = new google.maps.InfoWindow({
+                content: contentString,
+            });
+
+            infowindow.open({
+                anchor: fromMarker,
+                map,
+                shouldFocus: false,
+            });
+
+            locArr = drawVolunteers(volunteers);
+            for (var i = 0; i < locArr.length; i++) {
+                homeCoord = {
+                    Latitude: locArr[i].position.lat(),
+                    Longitude: locArr[i].position.lng()
+                }
+                let home2from = calcDistance(homeCoord, locations[from].Coord);
+                let from2to = calcDistance(locations[from].Coord, locations[to].Coord);
+                let to2home = calcDistance(locations[to].Coord, homeCoord);
+                let totalDist = parseInt((home2from + from2to + to2home)/1000);
+                let contentString = "<div>"
+                    + "<p>" + totalDist + "</p>"
+                    + "</div>";
+
+                const infowindow = new google.maps.InfoWindow({
+                    content: contentString,
+                });
+
+                infowindow.open({
+                    anchor: locArr[i],
+                    map,
+                    shouldFocus: false,
+                });
+                console.log("totalDist: " + totalDist);
+            }
+
+        }
+
+        function drawPoint(loc,name) {
+            let lat = loc.Coord.Latitude;
+            let lng = loc.Coord.Longitude;
+            var marker = new google.maps.Marker({
+                map: map,
+                position: {
+                    lat: lat,
+                    lng: lng
+                },
+                title: name,
+                icon: markerImages[loc.Type]
+            });
+            return marker;
+
+        }
+
+        function drawVolunteers(volunteers) {
+            locArr = [];
+            for (var i = 0; i < volunteers.length; i++) {
+                let loc = {
+                    name: volunteers[i].name,
+                    Type: "מתנדב",
+                    Coord: {
+                        Latitude : cities[volunteers[i].address].Latitude,
+                        Longitude: cities[volunteers[i].address].Longitude
+                    }
+                }
+                //locArr.push(loc);
+                let marker = drawPoint(loc, volunteers[i].name);
+                locArr.push(marker);
+            }
+            return locArr;
+        }
+
+        function getPotentialVolunteers() {
+            let volunteers = [];
+            volunteers.push({ name: "אבי בן אביהו", address: "אבן יהודה" });
+            volunteers.push({ name: "צבי בן שפן", address: "אבן יהודה" });
+            volunteers.push({ name: "דני שועלי", address: "חיפה" });
+            volunteers.push({ name: "רותי שמשוני", address: "אשדוד" });
+            return volunteers;
+
+
+        }
+
+        function calcDistance(coord1, coord2) {
+            var c1 = new google.maps.LatLng(coord1.Latitude, coord1.Longitude);
+            var c2 = new google.maps.LatLng(coord2.Latitude, coord2.Longitude);
+            return google.maps.geometry.spherical.computeDistanceBetween(c1, c2);
+                   google.maps.geometry.spherical.computeDistanceBetween
+        }
+
+
+
+    </script>
+
+
+
+</head>
+
+<body>
+
+    Show only places where our volunteers live<input type="checkbox" id="volOnlyCB" checked/>
+    <button onclick="getCities()"> Get the cities </button>
+    <button onclick="getRides()"> Get the rides </button>
+    <!--<button onclick="writeLocations()"> Write the locations into the database</button>-->
+    <input list="locationslist" name="location" id="locations">
+    <datalist id="locationslist"></datalist>
+
+    <input list="regionsList" name="regions" id="regions">
+    <datalist id="regionsList"></datalist>
+    
+
+    <div id="map"></div>
+    <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBlFaOoxU9wOcacAduASYeAEVXldufDmr4&callback=initMap&libraries=geometry&v=weekly" async></script>
+
+</body>
+
+</html>
