@@ -11,8 +11,8 @@ public class BroadCast
 {
     public static void BroadCast2Clients_driverHasAssigned2RidePat(RidePat rp)
     {
-        if ((rp.Date - DateTime.Now).Days <= 30)
-        {//case in this month → inform clients on manageRidPats.html
+        if (ShouldClientsBeUpdated(rp.Date, 30))
+        {
             IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<RidePatHub>();
             hubContext.Clients.All.driverHasAssigned2RidePat(rp);
         }
@@ -20,11 +20,26 @@ public class BroadCast
 
     public static void BroadCast2Clients_driverHasRemovedFromRidePat(RidePat rp)
     {
-        if ((rp.Date - DateTime.Now).Days <= 30)
-        {//case in this month → inform clients on manageRidPats.html
+        if (ShouldClientsBeUpdated(rp.Date, 30))
+        {
             IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<RidePatHub>();
             hubContext.Clients.All.driverHasRemovedFromRidePat(rp);
         }
     }
 
+    public static void BroadCast2Clients_ridePatpdated(RidePat rp)
+    {
+        if (ShouldClientsBeUpdated(rp.Date, 30))
+        {
+            IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<RidePatHub>();
+            hubContext.Clients.All.ridePatpdated(rp);
+        }
+    }
+
+    private static bool ShouldClientsBeUpdated(DateTime rpDate, int maxNumOfDays)
+    {
+        bool shouldClientsBeUpdated =  (rpDate - DateTime.Now).Days <= maxNumOfDays;
+
+        return shouldClientsBeUpdated;
+    }
 }
