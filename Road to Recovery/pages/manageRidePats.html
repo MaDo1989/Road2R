@@ -2689,12 +2689,10 @@
             if (!isAfterNoon) {
                 $hoursSelect.val(hoursAsDoubleDigits);
                 $minutesSelect.val(minutesAsDoubleDigits);
-                $('#editTimeAfterNoonCB').attr('checked', false);
                 checkeditTimeAfterNoonCB(false);
             } else {
                 retrieveDDLToInitial('#hours');
                 retrieveDDLToInitial('#minutes');
-                $('#editTimeAfterNoonCB').attr('checked', true);
                 checkeditTimeAfterNoonCB(true);
                 //try to fix bug with help of this example:
                 //$('#assignDriverModal').on('shown.bs.modal', bsModalHasShown); // triger cb function only after modal is shown
@@ -2704,9 +2702,9 @@
 
         const checkeditTimeAfterNoonCB = (afterNoonIsChecked) => {
 
-
-            $('#hours').attr('disabled', afterNoonIsChecked);
-            $('#minutes').attr('disabled', afterNoonIsChecked);
+            $('#editTimeAfterNoonCB').prop('checked', afterNoonIsChecked);
+            $('#hours').prop('disabled', afterNoonIsChecked);
+            $('#minutes').prop('disabled', afterNoonIsChecked);
         }
 
         const retrieveDDLToInitial = (id) => {
