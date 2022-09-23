@@ -166,9 +166,9 @@ public class Ride
         return db.ExecuteQuery(query, cmd.CommandType, cmdParams);
     }
 
-    public int UpdateDriver(int rideNum,int ridePatId, int newDriverId)
+    public int UpdateDriver(int rideNum,int ridePatId, int newDriverId, int assignedFromAppId)
     {
-        query = "EXEC spRide_UpdateDriver @RideNum=" + rideNum + ", @NewDriverId=" + newDriverId;
+        query = "EXEC spRide_UpdateDriver @RideNum=" + rideNum + ", @NewDriverId=" + newDriverId + ", @AssignedFromAppId=" + assignedFromAppId;
         cmd = new SqlCommand();
 
         try

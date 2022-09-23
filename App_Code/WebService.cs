@@ -349,9 +349,6 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-
-
-
     //This method is used for שבץ אותי
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -736,9 +733,9 @@ public class WebService : System.Web.Services.WebService
     {
         try
         {
-            Escorted p = new Escorted();
-            p = escorted;
-            p.setEscorted(func);
+            //Escorted p = new Escorted();
+            // p = escorted;
+            escorted.setEscorted(func);
         }
         catch (Exception ex)
         {
@@ -1007,12 +1004,12 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
-    public void UpdateDriver(int rideNum, int ridePatId, int newDriverId)
+    public void UpdateDriver(int rideNum, int ridePatId, int newDriverId, int assignedFromAppId)
     {
         try
         {
             Ride r = new Ride();
-            r.UpdateDriver(rideNum, ridePatId, newDriverId);
+            r.UpdateDriver(rideNum, ridePatId, newDriverId, assignedFromAppId);
         }
         catch (Exception ex)
         {
@@ -1835,8 +1832,25 @@ public class WebService : System.Web.Services.WebService
             Log.Error("Error in getCities", ex);
             throw new Exception("שגיאה בשליפת ערים");
         }
-
     }
+
+    [WebMethod(EnableSession = true)]
+    public string getUnmappedCities()
+    {
+        try
+        {
+            City c = new City();
+            List<City> citiesList = c.getUnmappedCitiesList();
+            return j.Serialize(citiesList);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in getUnmappedCitiesList", ex);
+            throw new Exception("שגיאה בשליפת ערים getUnmappedCitiesList");
+        }
+    }
+
+
 
     [WebMethod(EnableSession = true)]
     public int backupToPrimaryNotification(int ridePatId)
@@ -2105,6 +2119,22 @@ public class WebService : System.Web.Services.WebService
 
     }
 
+    [WebMethod(EnableSession = true)]
+    public void UpdateRidePatTime(int ridePatId, DateTime dateTime)
+    {
+        try
+        {
+            RidePat rp = new RidePat();
+            rp.UpdateRidePatTime(ridePatId, dateTime);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in UpdateRidePatTime", ex);
+            throw new Exception(ex.Message);
+        }
+    }
+
+
     #region DocumentedCall Module
 
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -2205,15 +2235,68 @@ public class WebService : System.Web.Services.WebService
     #endregion
 
 
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string readLocationsNamesByType(string locationType)
+    {
+
+        JavaScriptSerializer j = new JavaScriptSerializer();
+
+        try
+        {
+            List<string> locations = Location.readLocationsNamesByType(locationType);
+
+            return j.Serialize(locations);
+        }
+        catch (Exception e)
+        {
+            throw new Exception("שגיאה בשליפת נקודות");
+        }
+
+    }
 
 
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
 
+    public string writeGoogleLocations(List<Location> googleLocations)
+    {
 
+        Location l = new Location();
+        int numUpdated = l.write(googleLocations);
 
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        return j.Serialize(numUpdated);
+    }
 
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string writeGoogleCities(List<City> googleCities)
+    {
 
+        City gc = new City();
+        int numUpdated = gc.write(googleCities);
 
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        return j.Serialize(numUpdated);
+    }
 
+    // return only cities where we have volunteers
+    [WebMethod(EnableSession = true)]
+    public string getVolCities()
+    {
+        try
+        {
+            City c = new City();
+            List<City> citiesList = c.getVolCitiesList();
+            return j.Serialize(citiesList);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in getVolCitiesList", ex);
+            throw new Exception("getVolCitiesList error");
+        }
+    }
 
 
 

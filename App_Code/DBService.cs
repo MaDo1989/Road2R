@@ -315,4 +315,87 @@ public class DbService: IDisposable
     //Yogev ↑
 
 
+    public int writeGoogleLocations(List<Location> locations)
+    {
+
+        int row_affected = 0;
+
+        try
+        {
+            if (con.State == ConnectionState.Closed)
+            {
+                con.Open();
+            }
+
+
+
+            foreach (Location gl in locations)
+            {
+
+                using (SqlCommand cmd = new SqlCommand("spUpdateGoogleLocation", con))
+                {
+                    cmd.Parameters.AddWithValue("@name", gl.Name);
+                    cmd.Parameters.AddWithValue("@lat", gl.Lat);
+                    cmd.Parameters.AddWithValue("@lng", gl.Lng);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    row_affected += cmd.ExecuteNonQuery();
+                }
+            }
+
+            return row_affected;
+
+        }
+
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+        finally
+        {
+            con.Close();
+        }
+
+    }
+
+    public int writeGoogleCities(List<City> cities)
+    {
+
+        int row_affected = 0;
+
+        try
+        {
+            if (con.State == ConnectionState.Closed)
+            {
+                con.Open();
+            }
+
+            foreach (City c in cities)
+            {
+
+                using (SqlCommand cmd = new SqlCommand("spUpdateGoogleCity", con))
+                {
+
+                    cmd.Parameters.AddWithValue("@name", c.CityName);
+                    cmd.Parameters.AddWithValue("@lat", c.Lat);
+                    cmd.Parameters.AddWithValue("@lng", c.Lng);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    row_affected += cmd.ExecuteNonQuery();
+                }
+            }
+
+            return row_affected;
+
+        }
+
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+        finally
+        {
+            con.Close();
+        }
+
+    }
+
 }

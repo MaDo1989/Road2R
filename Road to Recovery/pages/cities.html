@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+
+    <style>
+
+        #updateDBDiv {
+            visibility:hidden;
+        }
+
+        #container > div {
+            margin-top:50px;
+        }
+
+    </style>
+
+    <title></title>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous"></script>
+    <script src="cities.js"></script>
+
+</head>
+<body>
+
+    <div id="container">
+
+        <!--<div>
+            <input type="text" id="cityNameTB" title="enter city" />
+            <button id="resolveBTN">Resolve</button>
+        </div>-->
+
+        <div>
+            <p>Read all the cities from the database</p>
+            <select id="rewrite">
+                <option value="false">get only cities without coordinates</option>
+                <option value="true">get all cities</option>
+            </select>
+            <button id="readCitiesBTN"> Get Cities from the DB </button>
+            <div id="ph"></div>
+        </div>
+
+        <div id="updateDBDiv">
+            <p>using google geocoder, it will get the coordinates and names and update the server</p>
+            <input type="number" id="timeInterval" title="enter interval in miliseconds" min="1100" value="1100" />
+
+            <button id="updateBTN">Update the database</button>
+            <p id="counter"></p>
+            <p id="updateMessage"></p>
+        </div>
+
+
+        <div>
+            <p>Errors:</p>
+            <div id="errors"></div>
+        </div>
+
+    </div>
+
+
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBlFaOoxU9wOcacAduASYeAEVXldufDmr4"
+            defer></script>
+
+</body>
+</html>

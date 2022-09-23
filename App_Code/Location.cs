@@ -530,6 +530,7 @@ public class Location
         return l;
     }
 
+
     public Hashtable getLocationsEnglishName()
     {
        
@@ -622,6 +623,31 @@ public class Location
         }
         #endregion
 
+    }
+
+
+    static public List<string> readLocationsNamesByType(string locType)
+    {
+        {
+            DbService db = new DbService();
+
+            string where = "";
+
+            if (locType != "הכל")
+                where = " where [type] = N'" + locType + "'";
+
+
+            string select = "SELECT name FROM location " + where;
+            DataSet ds = db.GetDataSetByQuery(select);
+            List<string> locations = ds.Tables[0].Rows.OfType<DataRow>().Select(dr => dr.Field<string>("Name")).ToList();
+            return locations;
+        }
+    }
+
+    public int write(List<Location> gl)
+    {
+        DbService dbs = new DbService();
+        return dbs.writeGoogleLocations(gl);
     }
 
 }

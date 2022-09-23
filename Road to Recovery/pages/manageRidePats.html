@@ -62,7 +62,7 @@
             if (getDate) {
                 return new Date(ticks);
             }
-            
+
             return ticks;
         }
 
@@ -128,7 +128,7 @@
 
                     row2manipulate = tMorning.row(`#${updated_ridePat.RidePatNum}`).data();
 
-                    row2manipulate.time = thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' });
+                    row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
                     row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
                     row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
                     row2manipulate.patient = buildPatientHTML(updated_ridePat);
@@ -149,7 +149,7 @@
 
                     row2manipulate = tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data();
 
-                    row2manipulate.time = thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' });
+                    row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
                     row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
                     row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
                     row2manipulate.patient = buildPatientHTML(updated_ridePat);
@@ -171,7 +171,7 @@
                     row2manipulate = tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data();
 
                     row2manipulate.date = thisRidePatDate.toLocaleDateString('he-IL');
-                    row2manipulate.time = thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' });
+                    row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
                     row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
                     row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
                     row2manipulate.patient = buildPatientHTML(updated_ridePat);
@@ -193,7 +193,7 @@
                     row2manipulate = tFuture.row(`#${updated_ridePat.RidePatNum}`).data();
 
                     row2manipulate.date = thisRidePatDate.toLocaleDateString('he-IL');
-                    row2manipulate.time = thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' });
+                    row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
                     row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
                     row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
                     row2manipulate.patient = buildPatientHTML(updated_ridePat);
@@ -319,6 +319,121 @@
                 manipilateNodeStyle(tr_node2manipulate, updated_ridePat, REMOVE_DRIVER, false, tableName2manipulate);
             }
         }
+
+        notification.client.ridePatpdated = function (updated_ridePat) {
+            /*   *********************
+                 * !!! IMPORTANT !!! *
+                 ********↓↓↓**********/
+            //update the specific ride in arr_rides:
+            update_arr_rides(updated_ridePat);
+            /*  *********↑↑↑*********
+                * !!! IMPORTANT !!! *
+                *********************/
+
+            tableName2manipulate = getTableName2Manipulate(updated_ridePat.RidePatNum);
+            thisRidePatDate = fixDate_WhichComeFromOpenConnection(updated_ridePat.Date);
+            thisRidePatLastModified = fixDate_WhichComeFromOpenConnection(updated_ridePat.LastModified);
+
+
+            switch (tableName2manipulate) {
+
+                case 'datatable-morning':
+
+                    row2manipulate = tMorning.row(`#${updated_ridePat.RidePatNum}`).data();
+
+                    row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
+                    row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
+                    row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
+                    row2manipulate.patient = buildPatientHTML(updated_ridePat);
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
+                    row2manipulate.status = buildStatusString(updated_ridePat.Status);
+                    row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                    row2manipulate.remark = updated_ridePat.Remark;
+                    row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
+
+                    tMorning.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                    increaseCounter('datatable-morning', updated_ridePat.RidePatNum);
+
+                    tr_nodesAsArray = Array.from(tMorning.rows().nodes());
+                    break;
+
+                case 'datatable-afternoon':
+
+                    row2manipulate = tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data();
+
+                    row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
+                    row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
+                    row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
+                    row2manipulate.patient = buildPatientHTML(updated_ridePat);
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
+                    row2manipulate.status = buildStatusString(updated_ridePat.Status);
+                    row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                    row2manipulate.remark = updated_ridePat.Remark;
+                    row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
+
+                    tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                    increaseCounter('datatable-afternoon', updated_ridePat.RidePatNum);
+
+                    tr_nodesAsArray = Array.from(tAfternoon.rows().nodes());
+                    break;
+
+                case 'datatable-tomorrow':
+
+                    row2manipulate = tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data();
+
+                    row2manipulate.date = thisRidePatDate.toLocaleDateString('he-IL');
+                    row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
+                    row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
+                    row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
+                    row2manipulate.patient = buildPatientHTML(updated_ridePat);
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
+                    row2manipulate.status = buildStatusString(updated_ridePat.Status);
+                    row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                    row2manipulate.remark = updated_ridePat.Remark;
+                    row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
+
+                    tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                    increaseCounter('datatable-tomorrow', updated_ridePat.RidePatNum);
+
+                    tr_nodesAsArray = Array.from(tTomorrow.rows().nodes());
+                    break;
+
+                case 'datatable-future':
+
+                    row2manipulate = tFuture.row(`#${updated_ridePat.RidePatNum}`).data();
+
+                    row2manipulate.date = thisRidePatDate.toLocaleDateString('he-IL');
+                    row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
+                    row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
+                    row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
+                    row2manipulate.patient = buildPatientHTML(updated_ridePat);
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
+                    row2manipulate.status = buildStatusString(updated_ridePat.Status);
+                    row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                    row2manipulate.remark = updated_ridePat.Remark;
+                    row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
+
+                    tFuture.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                    increaseCounter('datatable-future', updated_ridePat.RidePatNum);
+
+                    tr_nodesAsArray = Array.from(tFuture.rows().nodes());
+                    tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
+                    manipilateNodeStyle(tr_node2manipulate, updated_ridePat, ADD_DRIVER, true);
+                    tr_nodesAsArray = null;
+                    break;
+
+                default:
+                    console.log('system recognized a tempt of the server to post real-time data but failed to found the rellevant row to redraw');
+                    tr_nodesAsArray = null;
+                    break;
+            }
+            if (tr_nodesAsArray) {
+
+                tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
+                manipilateNodeStyle(tr_node2manipulate, updated_ridePat, ADD_DRIVER);
+            }
+        }
+
     </script>
 
     <!-- #endregion REAL-TIME BY SIGNALR - FOR ANY COMPLAINTS WHATSOEVER YOU CAN TALK 2 YOGEV -->
@@ -467,10 +582,11 @@
         const controllersLayout = "<'row top'<'col-sm-6'l><'col-sm-5'f><'col-sm-1'B>>rt<'bottom'pi>";//https://datatables.net/reference/option/dom
         const controllersLayoutForFutureTable = "<'row top'<'col-sm-2'l><'#future-table-time-interval-container.col-sm-4'><'col-sm-5'f><'col-sm-1'B>>rt<'bottom'pi>";
         let drivers, driverNames;
-        let _assignDriverToRidepatNum;
+        let _ridepatToManipulate;
         let _assignDriverToRideNum;
         let _isDriverReplacement;
         let _trToHighLight;
+        let _driverId;
 
         let tMorning, tAfternoon, tFuture, tTomorrow;
 
@@ -697,7 +813,7 @@
             if (_isDriverReplacement) {
                 //update the ride record with the new driver.
                 request = {
-                    ridePatId: _assignDriverToRidepatNum,
+                    ridePatId: _ridepatToManipulate,
                     rideNum: _assignDriverToRideNum,
                     newDriverId: userSelected.Id,
                     assignedFromAppId: APP_ID
@@ -708,7 +824,7 @@
             } else {
 
                 request = {
-                    ridePatId: _assignDriverToRidepatNum,
+                    ridePatId: _ridepatToManipulate,
                     userId: userSelected.Id,
                     driverType: "primary",
                     assignedFromAppId: APP_ID
@@ -720,18 +836,75 @@
         }
 
         const assignDriverToRidePatAbort = () => {
-            _trToHighLight.classList.remove('highlightRow');
+            removeClass('highlightRow');
+        }
+
+        const updateRidePatTime = () => {
+
+            $('#wait').show();
+            let hours, minutes = null;
+            const isAfterNoon = $("#editTimeAfterNoonCB").is(':checked');
+
+            if (isAfterNoon) {
+                hours = 22;
+                minutes = 14;
+            } else {
+                hours = $("#hours").val();;
+                minutes = $("#minutes").val();;
+            }
+            if (
+                isNaN(hours) || isNaN(minutes) ||
+                hours === null || minutes === null
+            ) {
+                $('#wait').hide();
+                return alert('נא לבחור שעה מהרשימות הנגללות או אחה"צ');
+            }
+
+            let ridepatToManipulate = arr_rides.find(r => r.RidePatNum === _ridepatToManipulate);
+            let dateToManipulate = convertDBDate2FrontEndDate(ridepatToManipulate.Date);
+            dateToManipulate.setHours(hours, minutes);
+
+            let data = {
+                ridePatId: _ridepatToManipulate,
+                dateTime: dateToManipulate
+            };
+
+            const updateRidePatTime_SCB = () => {
+
+                $('#wait').hide();
+                removeClass('highlightRow');
+                $('#editTimeModal').modal('hide');
+            }
+
+            const updateRidePatTime_ECB = (err) => {
+
+                $('#wait').hide();
+                removeClass('highlightRow');
+                $('#editTimeModal').modal('hide');
+                alert(err);
+            }
+
+            ajaxCall('UpdateRidePatTime', JSON.stringify(data), updateRidePatTime_SCB, updateRidePatTime_ECB);
+
+        }
+
+        const editTimeAbort = () => {
+            removeClass('highlightRow');
+        }
+
+        const removeClass = (className) => {
+            _trToHighLight.classList.remove(className);
         }
 
         const assignDriverToRidePat_SCB = (data) => {
             $('#wait').hide();
-            _trToHighLight.classList.remove('highlightRow');
+            removeClass('highlightRow');
             $('#assignDriverModal').modal('hide');
         }
 
         const assignDriverToRidePat_ECB = (err) => {
             $('#wait').hide();
-            _trToHighLight.classList.remove('highlightRow');
+            assignDriverToRidePat('highlightRow');
             alert('Issue in assignDriverToRidePat: ' + JSON.stringify(err));
         }
 
@@ -747,10 +920,60 @@
             alert('Issue in UpdateDriver: ' + JSON.stringify(err));
         }
 
+        const deleteDriverFromRide = () => {
+
+            swal({
+                title: "האם אתה בטוח שאתה רוצה למחוק את הנהג מההסעה?",
+                type: "warning",
+                text: 'בלחיצה על מחיקה הנהג יוסר מהסעה זו',
+                showCancelButton: true,
+                cancelButtonText: "בטל",
+                confirmButtonClass: 'btn-warning',
+                confirmButtonText: "מחיקה",
+                closeOnConfirm: true
+            }, function (userResponse) {
+                if (userResponse) {
+                    $('#wait').show();
+
+                    const request = {
+                        ridePatId: _ridepatToManipulate,
+                        rideId: _assignDriverToRideNum,
+                        driverId: _driverId
+                    }
+                    const dataString = JSON.stringify(request);
+                    ajaxCall('LeaveRidePat', dataString, deleteRideSuccessCB, deleteRideErrorCB);
+                }
+
+            });
+
+
+
+
+        }
+
+        const deleteRideSuccessCB = (data) => {
+
+            $('#wait').hide();
+            $('#assignDriverModal').modal('hide');
+            assignDriverToRidePatAbort();
+        }
+
+        const deleteRideErrorCB = (err) => {
+
+            $('#wait').hide();
+            $('#assignDriverModal').modal('hide');
+            assignDriverToRidePatAbort();
+            alert(err);
+        }
+
         $(document).ready(function () {
 
             $("#assignDriverModal").attr("w3-include-html", "assignDriverModal.html");
             $('#assignDriverModal').on('shown.bs.modal', bsModalHasShown); // triger cb function only after modal is shown
+
+
+            $("#editTimeModal").attr("w3-include-html", "editTimeModal.html");
+            //$('#editTimeModal').on('shown.bs.modal', editTimeModal_bsModalHasShown);
 
             wiringDataTables();
             const { COPYWRITE } = GENERAL;
@@ -818,6 +1041,9 @@
                    -1 if a < b
                     */
 
+                    a = $(a)[0].querySelector('.time').innerHTML;
+                    b = $(b)[0].querySelector('.time').innerHTML;
+
                     let datetime_a = $.trim(a).split(':');
                     let datetime_b = $.trim(b).split(':');
 
@@ -853,6 +1079,9 @@
                      -1 if a > b
                       1 if a < b
                       */
+                    a = $(a)[0].querySelector('.time').innerHTML;
+                    b = $(b)[0].querySelector('.time').innerHTML;
+
                     let datetime_a = $.trim(a).split(':');
                     let datetime_b = $.trim(b).split(':');
 
@@ -1688,6 +1917,7 @@
                     let patientHTML;
                     let driverHTML;
                     let status2render;
+                    let timeHTML;
 
 
                     for (let i = 0; i < arr_rides.length; i++) {
@@ -1699,8 +1929,8 @@
                                 }
                             }
                         }
-
                         thisRidePatDate = convertDBDate2FrontEndDate(arr_rides[i].Date);
+                        timeHTML = buildTimeHTML(thisRidePatDate, arr_rides[i].RidePatNum);
                         numOfEscorts = arr_rides[i].Escorts.length;
 
                         //#region adjust patient column
@@ -1732,7 +1962,7 @@
 
                         thisRidePat = {
                             ridePatNum: arr_rides[i].RidePatNum,
-                            time: thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' }),
+                            time: timeHTML,
                             origin: isAssistant ? arr_rides[i].Origin.EnglishName : arr_rides[i].Origin.Name,
                             destination: isAssistant ? arr_rides[i].Destination.EnglishName : arr_rides[i].Destination.Name,
                             patient: patientHTML,
@@ -2217,8 +2447,7 @@
 
                 isDriverReplacement = true;
                 let driverInnerContent = '';
-                const { Id, DisplayName, EnglishFN, EnglishLN, CellPhone, NoOfDocumentedRides } = driver;
-                let isCountAsNewVolunteer = NoOfDocumentedRides <= 3;
+                const { Id, DisplayName, EnglishFN, EnglishLN, CellPhone, NoOfDocumentedRides, IsNewDriver } = driver;
 
                 if (!isAssistant) {                         //hebrew
 
@@ -2231,11 +2460,12 @@
                         DisplayName
                 }
 
-                driverWrapper = isCountAsNewVolunteer ? `<span class='purpleFont boldFont'>${newVolunteerText}</span>` : ``;
+                driverWrapper = IsNewDriver ? `<span class='purpleFont boldFont'>${newVolunteerText}</span>` : ``;
                 driverWrapper += `<a href="volunteerform.html" data-obj="volunteer" class="showMe driverName clickable blueFont boldFont"`;
                 driverWrapper += `id='${Id}'>${driverInnerContent}</a>`;
                 driverWrapper += `<span class="driverCellPhone">${addSeperator2MobileNum(CellPhone, '-')}</span>`;
-                driverWrapper += `<button onclick="prepreparationAssignDriverModal(this, ${ridePatNum}, ${isDriverReplacement}, ${rideNum})" data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>עדכון נהג</button></div>`;
+                driverWrapper += `<button onclick="prepreparationAssignDriverModal(this, ${ridePatNum}, ${isDriverReplacement}, ${rideNum}, ${Id})" data-toggle="modal" data-target="#assignDriverModal" class='btn add-driver'>עדכון נהג</button>`;
+                driverWrapper += '</div>';
             } else {
 
                 isDriverReplacement = false;
@@ -2375,29 +2605,122 @@
 
         const buildAcionsButtonsHTML = (ridePatNum, drivers) => {
 
-            const editBtn           = `<button type='button' class='edit                   btn btn-icon waves-effect waves-light btn-secondary' id='${ridePatNum}'  name='${ridePatNum}' title='עריכה'>         <i class='ti-pencil'></i></button>`;
-            const deleteBtn         = `<button type='button' class='remove               btn btn-icon waves-effect waves-light btn-secondary'   id='${ridePatNum}'  name='${ridePatNum}' title='מחיקה'>         <i class='fa fa-remove'></i></button>`;
-            const messageToCopyBtn  = `<button type='button' class='copyMessage   btn btn-icon waves-effect waves-light btn-secondary'          id='${ridePatNum}'  name='${ridePatNum}' title='העתקת הודעה'>   <i class='fa fa-envelope'></i></button>`;
-            const candidateBtn      = `<button type='button' class='candidatesBtn btn btn-icon waves-effect waves-light btn-secondary'          id='${ridePatNum}'  name='${ridePatNum}' title='מועמדים להסעה'> <i class='fa fa-car'></i></button>`;
+            const editBtn = `<button type='button' class='edit                   btn btn-icon waves-effect waves-light btn-secondary' id='${ridePatNum}'  name='${ridePatNum}' title='עריכה'>         <i class='ti-pencil'></i></button>`;
+            const deleteBtn = `<button type='button' class='remove               btn btn-icon waves-effect waves-light btn-secondary' id='${ridePatNum}'  name='${ridePatNum}' title='מחיקה'>         <i class='fa fa-remove'></i></button>`;
+            const messageToCopyBtn = `<button type='button' class='copyMessage   btn btn-icon waves-effect waves-light btn-secondary' id='${ridePatNum}'  name='${ridePatNum}' title='העתקת הודעה'>   <i class='fa fa-envelope'></i></button>`;
+            const candidateBtn = `<button type='button' class='candidatesBtn btn btn-icon waves-effect waves-light btn-secondary'     id='${ridePatNum}'  name='${ridePatNum}' title='מועמדים להסעה'> <i class='fa fa-car'></i></button>`;
 
             let buttonsWrapper = `<div class='elementsInSameLine'>${editBtn} ${deleteBtn} ${drivers.length > 0 ? messageToCopyBtn : candidateBtn}</div>`;
 
             return buttonsWrapper;
         }
 
-        function prepreparationAssignDriverModal(thisBtn, ridePatNum, isDriverReplacement, rideNum) {
-            _assignDriverToRidepatNum = ridePatNum;
+        const buildTimeHTML = (thisRidePatDate, ridePatNum) => {
+
+            let timeWrapper = `<div class="elementsInSameLine">`;
+
+            let time = '<span class="time">';
+            time += thisRidePatDate.getMinutes() === 14 ? 'אחה"צ' : thisRidePatDate.toLocaleTimeString('he-IL', { timeStyle: 'short' });
+            time += '</span>';
+            timeWrapper += time;
+
+            const editBtn = `<button type='button' data-toggle="modal" data-target="#editTimeModal" onclick="prepreparationEditTimeModal(this, ${ridePatNum})" class='btn btn-icon waves-effect waves-light btn-secondary' id=''  name='' title='עריכה'><i class='ti-pencil'></i></button>`;
+            timeWrapper += editBtn;
+            timeWrapper += `</div>`;
+
+            return timeWrapper;
+        }
+
+        function prepreparationAssignDriverModal(thisBtn, ridePatNum, isDriverReplacement, rideNum, driverId) {
+            _ridepatToManipulate = ridePatNum;
             _assignDriverToRideNum = rideNum
             _isDriverReplacement = isDriverReplacement;
+            _driverId = driverId
+            highLightRow(thisBtn);
 
-            _trToHighLight = thisBtn.closest('tr');
-            _trToHighLight.classList.add('highlightRow');
+            if (typeof driverId === 'undefined' || !driverId || driverId === null) {
+                $('#removeDriverBtn').prop("disabled", true);
+            } else {
+                $('#removeDriverBtn').prop("disabled", false);
+            }
 
             if (isDriverReplacement) {
                 $('#driverModalTitle').text('עדכון נהג');
             } else {
                 $('#driverModalTitle').text('שיבוץ נהג');
             }
+        }
+
+        function prepreparationEditTimeModal(thisBtn, ridepatNum) {
+            _ridepatToManipulate = ridepatNum
+            highLightRow(thisBtn);
+
+
+
+            $('#editTimeModalTitle').text('עדכון שעת הסעה');
+            const minutesArr = [0, 15, 30, 45];
+
+            let $hoursSelect = $("#hours");
+            let $minutesSelect = $("#minutes");
+            let doubleDigitsValue = '';
+            for (let i = 0; i < 46; i++) {
+
+                if (i < 24) {
+
+                    doubleDigitsValue = createDoubleDigit(i);
+                    $('<option>', { value: doubleDigitsValue, text: doubleDigitsValue }).appendTo($hoursSelect);
+                    if (minutesArr.includes(i)) {
+                        $('<option>', { value: doubleDigitsValue, text: doubleDigitsValue }).appendTo($minutesSelect);
+                    }
+                } else if (minutesArr.includes(i)) {
+                    doubleDigitsValue = createDoubleDigit(i);
+                    $('<option>', { value: doubleDigitsValue, text: doubleDigitsValue }).appendTo($minutesSelect);
+                }
+            }
+
+
+            const ridepatObject = arr_rides.find(r => r.RidePatNum === ridepatNum);
+            const ridePatTime = convertDBDate2FrontEndDate(ridepatObject.Date);
+
+            let hoursAsDoubleDigits = createDoubleDigit(ridePatTime.getHours());
+            let minutesAsDoubleDigits = createDoubleDigit(ridePatTime.getMinutes());
+            let isAfterNoon = parseInt(minutesAsDoubleDigits) === 14;
+
+            if (!isAfterNoon) {
+                $hoursSelect.val(hoursAsDoubleDigits);
+                $minutesSelect.val(minutesAsDoubleDigits);
+                checkeditTimeAfterNoonCB(false);
+            } else {
+                retrieveDDLToInitial('#hours');
+                retrieveDDLToInitial('#minutes');
+                checkeditTimeAfterNoonCB(true);
+                //try to fix bug with help of this example:
+                //$('#assignDriverModal').on('shown.bs.modal', bsModalHasShown); // triger cb function only after modal is shown
+
+            }
+        }
+
+        const checkeditTimeAfterNoonCB = (afterNoonIsChecked) => {
+
+            $('#editTimeAfterNoonCB').prop('checked', afterNoonIsChecked);
+            $('#hours').prop('disabled', afterNoonIsChecked);
+            $('#minutes').prop('disabled', afterNoonIsChecked);
+        }
+
+        const retrieveDDLToInitial = (id) => {
+            $(id).get(0).selectedIndex = 0;
+        }
+
+        const createDoubleDigit = (value) => {
+
+            let result = value < 10 ? '0' + value : value;
+
+            return result;
+        }
+
+        function highLightRow(thisBtn) {
+            _trToHighLight = thisBtn.closest('tr');
+            _trToHighLight.classList.add('highlightRow');
         }
 
         const add2IhaveSeenAllready = () => {
@@ -2452,13 +2775,25 @@
             }
         }
 
+        const editTimeModal_bsModalHasShown = () => {
+            
+        }
+
         const bsModalHasShown = async () => {
             await activateAutoComplteToModalsInput();
+
+            const thisRideDriver = drivers.find(d => d.Id === _driverId);
+            if (typeof thisRideDriver === 'undefined' || !thisRideDriver) {
+                $('#driver').val('');
+            } else {
+                $('#driver').val(thisRideDriver.DisplayName);
+            }
+
             focusOnElement('driver');
         }
 
         const activateAutoComplteToModalsInput = async () => {
-            $('#driver').val('');
+
             if (typeof driverNames === 'undefined' || !driverNames) {
                 driverNames = await getDrivers();
             }
@@ -2470,18 +2805,6 @@
             $(`#${id}`).focus();
         }
 
-        const updateActionsButtons = (actionsButtonsAsString, ridepatNum) => {
-
-            //1. convert actionsButtonsAsString to html / jquery
-            let actionsButtonsAsHTML = actionsButtonsAsString;
-
-            //2. catch the button to replace
-
-            //3. replace it
-
-            //4. return new actionsButtonsAsString
-
-        }
     </script>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -2893,6 +3216,7 @@
 
 
     <div class="modal fade" id="assignDriverModal" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="documentedRidesTitle" aria-hidden="true"></div>
+    <div class="modal fade" id="editTimeModal" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="editTimeTitle" aria-hidden="true"></div>
 
     <div class="modal fade" id="filtersModal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog" role="document">

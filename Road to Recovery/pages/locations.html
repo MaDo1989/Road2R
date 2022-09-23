@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+
+    <style>
+
+        #updateDBDiv {
+            visibility:hidden;
+        }
+
+        #container > div {
+            margin-top:50px;
+        }
+
+    </style>
+
+    <title></title>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous"></script>
+    <script src="locations.js"></script>
+
+</head>
+<body>
+
+    <h1></h1>
+
+    <div id="container">
+        <h1>Locations</h1>
+
+        <!--<div>
+        <input type="text" id="cityNameTB" title="enter city" />
+        <button id="resolveBTN">Resolve</button>
+    </div>-->
+
+        <div>
+            <p>Read all the locations from the database</p>
+            <button id="readLocationsBTN"> Get locations from the DB </button>
+            <select id="locationTypeDDL">
+                <option value="הכל">הכל</option>
+                <option value="בית חולים">בית חולים</option>
+                <option value="מחסום">מחסום</option>
+                <option value="כללית">כללית</option>
+                <option value="נקודת אמצע">נקודת אמצע</option>
+            </select>
+            <select id="countryDDL">
+                <option value="IL">Israel</option>
+                <!--<option value="PS">Palestine</option>-->
+            </select>
+            <div id="ph"></div>
+        </div>
+
+        <div id="updateDBDiv">
+            <p>using google geocoder, it will get the coordinates and names and update the server</p>
+            <input type="number" id="timeInterval" title="enter interval in miliseconds" min="1100" value="1100" />
+            <button id="updateBTN">Update the database</button>
+            <p id="counter"></p>
+            <p id="updateMessage"></p>
+        </div>
+
+
+        <div>
+            <p>Errors:</p>
+            <div id="errors"></div>
+        </div>
+
+    </div>
+
+
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBlFaOoxU9wOcacAduASYeAEVXldufDmr4"
+            defer></script>
+</body>
+</html>
