@@ -162,7 +162,7 @@ BEGIN TRAN UpdateRideAndRidePatTime
 DECLARE @rideId int = (SELECT RideId FROM RidePat WHERE RidePatNum=@ridePatId)
 
 UPDATE RidePat
-SET PickupTime = @editedTime
+SET PickupTime = @editedTime, lastModified = GETDATE()
 where RidePatNum=@ridePatId
 
 IF EXISTS (SELECT 1 FROM Ride where RideNum=@rideId)
