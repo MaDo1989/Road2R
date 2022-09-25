@@ -168,7 +168,7 @@ where RidePatNum=@ridePatId
 IF EXISTS (SELECT 1 FROM Ride where RideNum=@rideId)
 BEGIN
 	UPDATE Ride
-	SET Date = @editedTime
+	SET Date = @editedTime, lastModified = GETDATE()
 	where RideNum=@rideId
 END
 
