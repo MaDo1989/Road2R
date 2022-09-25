@@ -166,7 +166,7 @@ var GENERAL = {
                 return new Date(GENERAL.USEFULL_FUNCTIONS.convert2DBDateToInt(fullTimeStempStr));
             } else if (GENERAL.USEFULL_FUNCTIONS.isFromOpenConnection(fullTimeStempStr)) {
 
-                return fixDate_WhichComeFromOpenConnection(fullTimeStempStr);
+                return GENERAL.USEFULL_FUNCTIONS.fixDate_WhichComeFromOpenConnection(fullTimeStempStr);
             } else {
 
                 return new Date(fullTimeStempStr);
