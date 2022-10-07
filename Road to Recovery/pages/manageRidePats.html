@@ -37,7 +37,8 @@
             MORNING: 'datatable-morning',
             AFTERNOON: 'datatable-afternoon',
             TOMORROW: 'datatable-tomorrow',
-            FUTURE: 'datatable-future'
+            FUTURE: 'datatable-future',
+            NOT_RELEVANT: 'not-relevant'
         }
 
         //functions to reuse
@@ -67,6 +68,7 @@
             let tableName = '';
 
             if (ridepatDate.toLocaleDateString() === new Date().toLocaleDateString()) {//<---- today
+
                 if (ridepatDate.getHours() < 12) {
 
                     tableName = tableNames.MORNING;
@@ -75,6 +77,9 @@
                     tableName = tableNames.AFTERNOON;
                 }
 
+            } else {
+
+                tableName = tableNames.NOT_RELEVANT;
             }
 
             return tableName;
@@ -133,6 +138,7 @@
 
         const notification = $.connection.ridePatHub;
         $.connection.hub.start().done();
+
         notification.client.driverHasAssigned2RidePat = function (updated_ridePat) {
 
             /*   *********************
@@ -347,7 +353,7 @@
             }
         }
 
-        notification.client.ridePatpdated = function (updated_ridePat) {
+        notification.client.ridePatUpdated = function (updated_ridePat) {
             /*   *********************
                  * !!! IMPORTANT !!! *
                  ********↓↓↓**********/
@@ -363,116 +369,117 @@
             tableNameRidePatShouldBeRender = getTableNameToBeRenderedIn(thisRidePatDate);
 
 
-            if (tableName2manipulate !== tableNameRidePatShouldBeRender) {
+            if (tableName2manipulate !== tableNameRidePatShouldBeRender && tableNameRidePatShouldBeRender !== tableNames.NOT_RELEVANT) {
 
                 shiftRidePatToSuitableTable(tableName2manipulate, tableNameRidePatShouldBeRender, updated_ridePat);
+            } else {
+
+                switch (tableName2manipulate) {
+
+                    case tableNames.MORNING:
+
+                        row2manipulate = tMorning.row(`#${updated_ridePat.RidePatNum}`).data();
+
+                        row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
+                        row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
+                        row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
+                        row2manipulate.patient = buildPatientHTML(updated_ridePat);
+                        row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
+                        row2manipulate.status = buildStatusString(updated_ridePat.Status);
+                        row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                        row2manipulate.remark = updated_ridePat.Remark;
+                        row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
+
+                        tMorning.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                        increaseCounter('datatable-morning', updated_ridePat.RidePatNum);
+
+                        tr_nodesAsArray = Array.from(tMorning.rows().nodes());
+                        break;
+
+                    case tableNames.AFTERNOON:
+
+                        row2manipulate = tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data();
+
+                        row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
+                        row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
+                        row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
+                        row2manipulate.patient = buildPatientHTML(updated_ridePat);
+                        row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
+                        row2manipulate.status = buildStatusString(updated_ridePat.Status);
+                        row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                        row2manipulate.remark = updated_ridePat.Remark;
+                        row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
+
+                        tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                        increaseCounter('datatable-afternoon', updated_ridePat.RidePatNum);
+
+                        tr_nodesAsArray = Array.from(tAfternoon.rows().nodes());
+                        break;
+
+                    case tableNames.TOMORROW:
+
+                        row2manipulate = tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data();
+
+                        row2manipulate.date = thisRidePatDate.toLocaleDateString('he-IL');
+                        row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
+                        row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
+                        row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
+                        row2manipulate.patient = buildPatientHTML(updated_ridePat);
+                        row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
+                        row2manipulate.status = buildStatusString(updated_ridePat.Status);
+                        row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                        row2manipulate.remark = updated_ridePat.Remark;
+                        row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
+
+                        tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                        increaseCounter('datatable-tomorrow', updated_ridePat.RidePatNum);
+
+                        tr_nodesAsArray = Array.from(tTomorrow.rows().nodes());
+                        break;
+
+                    case tableNames.FUTURE:
+
+                        row2manipulate = tFuture.row(`#${updated_ridePat.RidePatNum}`).data();
+
+                        row2manipulate.date = thisRidePatDate.toLocaleDateString('he-IL');
+                        row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
+                        row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
+                        row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
+                        row2manipulate.patient = buildPatientHTML(updated_ridePat);
+                        row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
+                        row2manipulate.status = buildStatusString(updated_ridePat.Status);
+                        row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                        row2manipulate.remark = updated_ridePat.Remark;
+                        row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
+
+                        tFuture.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                        increaseCounter('datatable-future', updated_ridePat.RidePatNum);
+
+                        tr_nodesAsArray = Array.from(tFuture.rows().nodes());
+                        tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
+                        manipilateNodeStyle(tr_node2manipulate, updated_ridePat, ADD_DRIVER, true);
+                        tr_nodesAsArray = null;
+                        break;
+
+                    default:
+                        console.log('system recognized a tempt of the server to post real-time data but failed to found the rellevant row to redraw');
+                        tr_nodesAsArray = null;
+                        break;
+                }
             }
 
-            switch (tableName2manipulate) {
-
-                case tableNames.MORNING:
-
-                    row2manipulate = tMorning.row(`#${updated_ridePat.RidePatNum}`).data();
-
-                    row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
-                    row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
-                    row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
-                    row2manipulate.patient = buildPatientHTML(updated_ridePat);
-                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
-                    row2manipulate.status = buildStatusString(updated_ridePat.Status);
-                    row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
-                    row2manipulate.remark = updated_ridePat.Remark;
-                    row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
-
-                    tMorning.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                    increaseCounter('datatable-morning', updated_ridePat.RidePatNum);
-
-                    tr_nodesAsArray = Array.from(tMorning.rows().nodes());
-                    break;
-
-                case tableNames.AFTERNOON:
-
-                    row2manipulate = tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data();
-
-                    row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
-                    row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
-                    row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
-                    row2manipulate.patient = buildPatientHTML(updated_ridePat);
-                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
-                    row2manipulate.status = buildStatusString(updated_ridePat.Status);
-                    row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
-                    row2manipulate.remark = updated_ridePat.Remark;
-                    row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
-
-                    tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                    increaseCounter('datatable-afternoon', updated_ridePat.RidePatNum);
-
-                    tr_nodesAsArray = Array.from(tAfternoon.rows().nodes());
-                    break;
-
-                case tableNames.TOMORROW:
-
-                    row2manipulate = tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data();
-
-                    row2manipulate.date = thisRidePatDate.toLocaleDateString('he-IL');
-                    row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
-                    row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
-                    row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
-                    row2manipulate.patient = buildPatientHTML(updated_ridePat);
-                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
-                    row2manipulate.status = buildStatusString(updated_ridePat.Status);
-                    row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
-                    row2manipulate.remark = updated_ridePat.Remark;
-                    row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
-
-                    tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                    increaseCounter('datatable-tomorrow', updated_ridePat.RidePatNum);
-
-                    tr_nodesAsArray = Array.from(tTomorrow.rows().nodes());
-                    break;
-
-                case tableNames.FUTURE:
-
-                    row2manipulate = tFuture.row(`#${updated_ridePat.RidePatNum}`).data();
-
-                    row2manipulate.date = thisRidePatDate.toLocaleDateString('he-IL');
-                    row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
-                    row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
-                    row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
-                    row2manipulate.patient = buildPatientHTML(updated_ridePat);
-                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
-                    row2manipulate.status = buildStatusString(updated_ridePat.Status);
-                    row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
-                    row2manipulate.remark = updated_ridePat.Remark;
-                    row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
-
-                    tFuture.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                    increaseCounter('datatable-future', updated_ridePat.RidePatNum);
-
-                    tr_nodesAsArray = Array.from(tFuture.rows().nodes());
-                    tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
-                    manipilateNodeStyle(tr_node2manipulate, updated_ridePat, ADD_DRIVER, true);
-                    tr_nodesAsArray = null;
-                    break;
-
-                default:
-                    console.log('system recognized a tempt of the server to post real-time data but failed to found the rellevant row to redraw');
-                    tr_nodesAsArray = null;
-                    break;
-            }
-
-
-            if (tr_nodesAsArray) {
-
-                tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
-                manipilateNodeStyle(tr_node2manipulate, updated_ridePat, ADD_DRIVER);
-            }
         }
 
 
         const shiftRidePatToSuitableTable = (tableNameRidePatIsNowIn, tableNameRidePatShouldBeRender, updated_ridePat) => {
 
-            removeRidePatFromOldTable(tableNameRidePatIsNowIn);
+            removeRidePatFromOldTable(tableNameRidePatIsNowIn, updated_ridePat);
+
+            rePaintRidePatToNewTable(tableNameRidePatShouldBeRender, updated_ridePat);
+        }
+
+        const removeRidePatFromOldTable = (tableNameRidePatIsNowIn, updated_ridePat) => {
+
             switch (tableNameRidePatIsNowIn) {
                 case tableNames.MORNING:
 
@@ -482,57 +489,69 @@
 
                 case tableNames.AFTERNOON:
 
-                    row2manipulate = tMorning.row(`#${updated_ridePat.RidePatNum}`).data();
-                    tMorning.row(row2manipulate).remove().draw();
+                    row2manipulate = tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data();
+                    tAfternoon.row(row2manipulate).remove().draw();
                     break;
-
-                case tableNames.TOMORROW:
-
-                    row2manipulate = tMorning.row(`#${updated_ridePat.RidePatNum}`).data();
-                    tMorning.row(row2manipulate).remove().draw();
-                    break;
-
-                case tableNames.FUTURE:
-
-                    row2manipulate = tMorning.row(`#${updated_ridePat.RidePatNum}`).data();
-                    tMorning.row(row2manipulate).remove().draw();
-                    break;
-
             }
 
-
-            //redraw in right table
         }
 
-        const removeRidePatFromOldTable = (tableName) => {
-            switch (tableNameRidePatIsNowIn) {
+        const rePaintRidePatToNewTable = (tableNameRidePatShouldBeRender, updated_ridePat) => {
+
+            let ridePat2Draw = {};
+            ridePat2Draw.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
+            ridePat2Draw.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
+            ridePat2Draw.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
+            ridePat2Draw.patient = buildPatientHTML(updated_ridePat);
+            ridePat2Draw.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
+            ridePat2Draw.status = buildStatusString(updated_ridePat.Status);
+            ridePat2Draw.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+            ridePat2Draw.remark = updated_ridePat.Remark;
+            ridePat2Draw.isAnonymous = updated_ridePat.Pat.IsAnonymous;
+            ridePat2Draw.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
+
+            switch (tableNameRidePatShouldBeRender) {
+
                 case tableNames.MORNING:
 
-                    row2manipulate = tMorning.row(`#${updated_ridePat.RidePatNum}`).data();
-                    tMorning.row(row2manipulate).remove().draw();
+                    tMorning.row.add(
+                        {
+                            ridePatNum: updated_ridePat.RidePatNum,
+                            time: ridePat2Draw.time,
+                            origin: ridePat2Draw.origin,
+                            destination: ridePat2Draw.destination,
+                            patient: ridePat2Draw.patient,
+                            driver: ridePat2Draw.driver,
+                            status: ridePat2Draw.status,
+                            lastModified: ridePat2Draw.lastModified,
+                            remark: ridePat2Draw.remark,
+                            isAnonymous: ridePat2Draw.isAnonymous,
+                            buttons: ridePat2Draw.buttons
+                        }
+                    ).draw(false);
                     break;
 
                 case tableNames.AFTERNOON:
 
-                    row2manipulate = tMorning.row(`#${updated_ridePat.RidePatNum}`).data();
-                    tMorning.row(row2manipulate).remove().draw();
+                    tAfternoon.row.add(
+                        {
+                            ridePatNum: updated_ridePat.RidePatNum,
+                            time: ridePat2Draw.time,
+                            origin: ridePat2Draw.origin,
+                            destination: ridePat2Draw.destination,
+                            patient: ridePat2Draw.patient,
+                            driver: ridePat2Draw.driver,
+                            status: ridePat2Draw.status,
+                            lastModified: ridePat2Draw.lastModified,
+                            remark: ridePat2Draw.remark,
+                            isAnonymous: ridePat2Draw.isAnonymous,
+                            buttons: ridePat2Draw.buttons
+                        }
+                    ).draw(false);
                     break;
-
-                case tableNames.TOMORROW:
-
-                    row2manipulate = tMorning.row(`#${updated_ridePat.RidePatNum}`).data();
-                    tMorning.row(row2manipulate).remove().draw();
-                    break;
-
-                case tableNames.FUTURE:
-
-                    row2manipulate = tMorning.row(`#${updated_ridePat.RidePatNum}`).data();
-                    tMorning.row(row2manipulate).remove().draw();
-                    break;
-
             }
-
         }
+
     </script>
 
     <!-- #endregion REAL-TIME BY SIGNALR - FOR ANY COMPLAINTS WHATSOEVER YOU CAN TALK 2 YOGEV -->

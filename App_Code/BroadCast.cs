@@ -27,12 +27,12 @@ public class BroadCast
         }
     }
 
-    public static void BroadCast2Clients_ridePatpdated(RidePat rp)
+    public static void BroadCast2Clients_ridePatUpdated(RidePat rp)
     {
         if (ShouldClientsBeUpdated(rp.Date, 30))
         {
             IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<RidePatHub>();
-            hubContext.Clients.All.ridePatpdated(rp);
+            hubContext.Clients.All.ridePatUpdated(rp);
         }
     }
 

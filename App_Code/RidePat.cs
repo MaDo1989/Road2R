@@ -1772,7 +1772,7 @@ public class RidePat
             sdr = dbs.GetDataReaderSP(cmd);
             updatedRidePat = new RidePat();
             updatedRidePat = GetRidePat(ridePatId);
-            BroadCast.BroadCast2Clients_ridePatpdated(updatedRidePat);
+            BroadCast.BroadCast2Clients_ridePatUpdated(updatedRidePat);
         }
         catch (Exception)
         {
