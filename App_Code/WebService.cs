@@ -349,9 +349,6 @@ public class WebService : System.Web.Services.WebService
 
     }
 
-
-
-
     //This method is used for שבץ אותי
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -1007,12 +1004,12 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
-    public void UpdateDriver(int rideNum, int ridePatId, int newDriverId)
+    public void UpdateDriver(int rideNum, int ridePatId, int newDriverId, int assignedFromAppId)
     {
         try
         {
             Ride r = new Ride();
-            r.UpdateDriver(rideNum, ridePatId, newDriverId);
+            r.UpdateDriver(rideNum, ridePatId, newDriverId, assignedFromAppId);
         }
         catch (Exception ex)
         {
@@ -2121,6 +2118,22 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
+
+    [WebMethod(EnableSession = true)]
+    public void UpdateRidePatTime(int ridePatId, DateTime dateTime)
+    {
+        try
+        {
+            RidePat rp = new RidePat();
+            rp.UpdateRidePatTime(ridePatId, dateTime);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in UpdateRidePatTime", ex);
+            throw new Exception(ex.Message);
+        }
+    }
+
 
     #region DocumentedCall Module
 

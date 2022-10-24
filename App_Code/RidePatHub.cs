@@ -23,4 +23,9 @@ public class RidePatHub : Hub
     {
         Clients.All.driverHasRemovedFromRidePat(rp);
     }
+
+    public void BroadCast_ridePatpdated(RidePat rp)
+    {
+        Clients.All.ridePatpdated(rp);
+    }
 }
