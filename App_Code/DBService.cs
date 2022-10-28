@@ -10,7 +10,7 @@ using log4net;
 /// <summary>
 /// Summary description for DbService
 /// </summary>
-public class DbService: IDisposable
+public class DbService : IDisposable
 {
     SqlTransaction tran;
     SqlCommand cmd;
@@ -43,7 +43,7 @@ public class DbService: IDisposable
     {
         try
         {
-            
+
             if (con.State == ConnectionState.Closed)
             {
                 con.Open();
@@ -130,7 +130,7 @@ public class DbService: IDisposable
 
     public SqlDataReader GetDataReader(SqlCommand command)
     {
-        
+
         SqlDataReader dr = null;
 
         try
@@ -223,6 +223,11 @@ public class DbService: IDisposable
         {
             //Write exception to log
             throw e;
+        }
+        finally
+        {
+            SqlConnection.ClearPool(con);
+            CloseConnection();
         }
 
     }
