@@ -1168,21 +1168,21 @@ public class RidePat
                         e.Id = int.Parse(row["Id"].ToString());
                         e.DisplayName = row["DisplayName"].ToString();
                         e.CellPhone = row["CellPhone"].ToString();
-
                         // Benny's Fix 22/9/2022
                         //e.IsAnonymous = String.IsNullOrEmpty(row["IsAnonymous"].ToString()) ? false : true;
                         if (String.IsNullOrEmpty(row["IsAnonymous"].ToString()))
                         {
                             e.IsAnonymous = false;
                         }
-                        else {
-                            if(row["IsAnonymous"].ToString() == "1")
+                        else
+                        {
+                            if (row["IsAnonymous"].ToString() == "1")
                                 e.IsAnonymous = true;
                             else
                                 e.IsAnonymous = false;
                         }
                         // End Benny's fix
-
+                        
                         rp.Escorts.Add(e);
                         rp.pat.EscortedList.Add(e);
 
