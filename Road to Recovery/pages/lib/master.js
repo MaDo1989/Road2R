@@ -162,10 +162,32 @@ var GENERAL = {
             if (typeof fullTimeStempStr === 'undefined' || !fullTimeStempStr) return "";
 
             if (fullTimeStempStr.includes('Date')) {
+
                 return new Date(GENERAL.USEFULL_FUNCTIONS.convert2DBDateToInt(fullTimeStempStr));
+            } else if (GENERAL.USEFULL_FUNCTIONS.isFromOpenConnection(fullTimeStempStr)) {
+
+                return GENERAL.USEFULL_FUNCTIONS.fixDate_WhichComeFromOpenConnection(fullTimeStempStr);
             } else {
+
                 return new Date(fullTimeStempStr);
             }
+        },
+
+        fixDate_WhichComeFromOpenConnection: (date2fix, getDate = true) => {
+
+            const ticks = new Date(date2fix) - new Date().getTimezoneOffset() * 60000;
+
+            if (getDate) {
+                return new Date(ticks);
+            }
+
+            return ticks;
+        },
+
+        isFromOpenConnection: (date) => {
+            let isFromOpenCon = date.includes('T');
+
+            return isFromOpenCon;
         },
 
         getHebrew_WeekDay: (day) => {
