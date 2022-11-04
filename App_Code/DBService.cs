@@ -224,6 +224,11 @@ public class DbService: IDisposable
             //Write exception to log
             throw e;
         }
+        finally
+        {
+            SqlConnection.ClearPool(con);
+            con.Close();
+        }
 
     }
 

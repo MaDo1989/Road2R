@@ -1445,6 +1445,7 @@ string origin, string destination)
                 WHERE MainDriver is not null
                 AND pickuptime > @start_date
                 AND pickuptime < @end_date
+                and IsAnonymous is NULL
                 ORDER BY PickupTime ASC";
 
         SqlCommand cmd = new SqlCommand(query);
