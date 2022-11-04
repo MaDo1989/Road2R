@@ -1090,6 +1090,44 @@ function prepare_one_month_span_data(server_data, year_and_month_prefix) {
     return prepared_data;
 }
 
+
+/*
+ * 
+ *  label: 'הסעות',
+                    data: prepared_data.rides,
+                    borderColor: CHART_COLORS.green,
+                    backgroundColor: CHART_COLORS.green,
+                    label: 'חולים',
+                    data: prepared_data.patients,
+                    borderColor: CHART_COLORS.purple,
+                    backgroundColor: CHART_COLORS.purple,
+                    label: 'מתנדבים',
+                    data: prepared_data.volunteers,
+                    borderColor: CHART_COLORS.orange,
+                    backgroundColor: CHART_COLORS.orange,
+ */
+function NOV22_group_data(in_data) {
+    let period_len = in_data.labels.length;
+
+    let new_labels = Array.from({ length: 3 }, () => in_data.labels).flat();
+    let values = new Array();
+    let bgColors = new Array()
+    values.push(in_data.patients);
+    bgColors.push(new Array(period_len).fill(CHART_COLORS.purple));
+    values.push(in_data.rides);
+    bgColors.push(new Array(period_len).fill(CHART_COLORS.green));
+    values.push(in_data.volunteers);
+    bgColors.push(new Array(period_len).fill(CHART_COLORS.orange));
+
+    let result = {
+        labels: new_labels,
+        values: values.flat(),
+        bgColors: bgColors.flat()
+    };
+
+    return result;
+ }
+
 // The data returned from server  may contain more info that this month needs (due to reduce-server-query optimization)
 // So we use the range and only take a slice of the data, identified using 'year_and_month_prefix'
 function render_months_graph_data(card_def, query_object, server_data, element_id) {
@@ -1126,6 +1164,48 @@ function render_one_month_graph(card_def, prepared_data, element_id)
         create_month_week_graph(prepared_data, element_id);
     }
 }
+
+
+// The data returned from server  may contain more info that this month needs (due to reduce-server-query optimization)
+// So we use the range and only take a slice of the data, identified using 'year_and_month_prefix'
+function NOV22_render_months_graph_data(card_def, query_object, server_data, element_id) {
+
+    if (card_def.designator.localeCompare("curr_and_prev") == 0) {
+        // We can render also the 'curr' month using the given data
+        let t = moment(query_object.start_date, "YYYY-MM-DD");
+        t.add(1, 'months');
+        let year_and_month_prefix = t.format("YYYY-MM-");
+        console.log("render_months_graph_data", query_object, "==>", year_and_month_prefix);
+        let prepared_data = prepare_one_month_span_data(server_data, year_and_month_prefix);
+        NOV22_render_one_month_graph(card_def, prepared_data, element_id);
+    }
+
+    let year_and_month_prefix = query_object.start_date.substring(0, 8);  // YYYY-MM-
+    console.log("render_months_graph_data", query_object, "==>", year_and_month_prefix);
+    let prepared_data = prepare_one_month_span_data(server_data, year_and_month_prefix);
+    NOV22_render_one_month_graph(card_def, prepared_data, element_id);
+
+}
+
+function NOV22_render_one_month_graph(card_def, prepared_data, element_id) {
+    var myChart = find_chart_by_id(element_id);
+
+    if (myChart) {
+        // window.myd = myChart;
+        let is_hidden = !$(card_def.checkbox).is(':checked');
+        add_to_month_week_graph(myChart, prepared_data, card_def, is_hidden);
+    }
+    else {
+        // make sure labels end with 31
+        window.dbg = prepared_data;
+        NOV22_create_month_week_graph(prepared_data, element_id);
+
+        let grouped_data = NOV22_group_data(prepared_data);
+        window.dbg2 = grouped_data;
+        NOV22_create_month_week_grouped_graph(grouped_data, element_id + "_grouped");
+    }
+}
+
 
 const r2rHTMLLegend = {
     id: 'r2rHTMLLegend',
@@ -1242,6 +1322,109 @@ function create_month_week_graph(prepared_data, graph_id)
         plugins: [ChartJScustomTitle]
     });
 }
+
+
+function NOV22_create_month_week_graph(prepared_data, graph_id) {
+    // We use version 2.1.4 of chart.js
+    //FUTURE  Chart.pluginService.register(r2rHTMLLegend);
+
+    var ctx = document.getElementById(graph_id).getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: prepared_data.labels,
+            datasets: [
+                {
+                    label: 'הסעות',
+                    data: prepared_data.rides,
+                    fill: false,
+                    borderColor: CHART_COLORS.green,
+                    backgroundColor: CHART_COLORS.green,
+                    borderWidth: 1
+                },
+                {
+                    label: 'חולים',
+                    data: prepared_data.patients,
+                    fill: false,
+                    borderColor: CHART_COLORS.purple,
+                    backgroundColor: CHART_COLORS.purple,
+                    borderWidth: 1
+                },
+                {
+                    label: 'מתנדבים',
+                    data: prepared_data.volunteers,
+                    fill: false,
+                    borderColor: CHART_COLORS.orange,
+                    backgroundColor: CHART_COLORS.orange,
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                customTitle: {
+                    display: true,
+                    text: 'מספר האנשים / הסעות',
+                    color: 'black'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                }
+            }
+        },
+        plugins: [ChartJScustomTitle]
+    });
+}
+
+// New diagram, where we show teh change of each aram over the time span, 
+function NOV22_create_month_week_grouped_graph(prepared_data, graph_id) {
+    // We use version 2.1.4 of chart.js
+    //FUTURE  Chart.pluginService.register(r2rHTMLLegend);
+
+    var ctx = document.getElementById(graph_id).getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: prepared_data.labels,
+            datasets: [
+                {
+                    label: 'הסעות',
+                    data: prepared_data.values,
+                    fill: false,
+                    borderColor: prepared_data.bgColors,
+                    backgroundColor: prepared_data.bgColors,
+                    borderWidth: 1
+                },
+            ]
+        },
+        options: {
+            responsive: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                customTitle: {
+                    display: true,
+                    text: 'מספר האנשים / הסעות',
+                    color: 'black'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                }
+            }
+        },
+        plugins: [ChartJScustomTitle]
+    });
+}
+
 
 
 function add_to_month_week_graph(myChart, prepared_data, card_def, is_hidden) {

@@ -1,0 +1,193 @@
+﻿<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="KSMoving">
+    <meta name="author" content="Coderthemes">
+
+    <link rel="shortcut icon" href="assets/images/favicon_1.ico">
+
+    <title>TEST REPORTS</title>
+
+    <!--
+    כמה הסעות עשה מתנדב נתון בתקופת זמן נתונה.
+    -->
+    <!-- DataTables -->
+    <link href="../plugins/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/buttons.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/fixedHeader.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/responsive.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/scroller.bootstrap.min.css" rel="stylesheet" type="text/css" />
+
+    <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
+
+    <link href="../plugins/switchery/switchery.min.css" rel="stylesheet" />
+    <link href="assets/css/bootstrap-rtl.min.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/core.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/icons.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/components.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/pages.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/menu.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/responsive.css" rel="stylesheet" type="text/css">
+
+    <script src="assets/js/CookiesFunctions.js"></script>
+
+    <script src="assets/js/modernizr.min.js"></script>
+
+    <!--GENERAL object and additional functions-->
+    <script src="lib/lz-string.js"></script>
+    <script src="lib/master.js"></script>
+
+    <script src="lib/reports.js"></script>
+    <script src="lib/dashboard_high_level.js"></script>
+
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="../plugins/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="../plugins/chart.js/ver_3_6_0/chart_v360.min.js"></script>
+
+    <script src="dataTables.js"></script>
+    <script src="moment.js"></script>
+    <script src="datetime-moment.js">
+
+
+
+    <!-- Select2 css+js -->
+                <link href="assets/css/select2.css" rel="stylesheet" />
+                <script src="assets/js/select2.min.js"></script>
+    <!--<script src="lib/sorting.js"></script>-->
+    <script src="lib/includeHTML.js"></script>
+    <!--<script src="https://cdn.datatables.net/plug-ins/1.10.19/sorting/date-de.js"></script>-->
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <script>
+
+        var input = {
+            "d": [
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-01", "Rides": "4", "Patients": "3", "Volunteers": "3", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-02", "Rides": "55", "Patients": "50", "Volunteers": "43", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-03", "Rides": "39", "Patients": "35", "Volunteers": "29", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-04", "Rides": "47", "Patients": "49", "Volunteers": "42", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-05", "Rides": "36", "Patients": "35", "Volunteers": "31", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-06", "Rides": "53", "Patients": "64", "Volunteers": "44", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-07", "Rides": "6", "Patients": "4", "Volunteers": "6", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-08", "Rides": "2", "Patients": "1", "Volunteers": "1", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-09", "Rides": "50", "Patients": "54", "Volunteers": "41", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-10", "Rides": "38", "Patients": "38", "Volunteers": "34", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-11", "Rides": "46", "Patients": "45", "Volunteers": "34", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-12", "Rides": "29", "Patients": "31", "Volunteers": "23", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-13", "Rides": "46", "Patients": "46", "Volunteers": "36", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-14", "Rides": "4", "Patients": "5", "Volunteers": "4", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-15", "Rides": "2", "Patients": "1", "Volunteers": "1", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-16", "Rides": "51", "Patients": "53", "Volunteers": "44", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-17", "Rides": "32", "Patients": "28", "Volunteers": "28", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-18", "Rides": "51", "Patients": "50", "Volunteers": "45", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-19", "Rides": "33", "Patients": "33", "Volunteers": "28", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-20", "Rides": "42", "Patients": "38", "Volunteers": "32", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-21", "Rides": "4", "Patients": "4", "Volunteers": "4", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-22", "Rides": "1", "Patients": "1", "Volunteers": "1", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-23", "Rides": "56", "Patients": "52", "Volunteers": "45", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-24", "Rides": "30", "Patients": "26", "Volunteers": "24", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-25", "Rides": "50", "Patients": "54", "Volunteers": "45", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-26", "Rides": "28", "Patients": "27", "Volunteers": "24", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-27", "Rides": "28", "Patients": "26", "Volunteers": "21", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-28", "Rides": "3", "Patients": "3", "Volunteers": "3", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-29", "Rides": "2", "Patients": "1", "Volunteers": "1", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-30", "Rides": "65", "Patients": "62", "Volunteers": "53", "Demands": null },
+                { "__type": "ReportService+MetricMonthlyInfo", "Day": "2022-01-31", "Rides": "33", "Patients": "31", "Volunteers": "24", "Demands": null }]
+        };
+
+        function test_web() {
+
+            let query_object = {
+                start_date: "2022-01-01",
+                end_date: "2022-02-01",
+                prev_start: "NA",
+                prev_end: "NA",
+                span: "MONTH"
+            }
+            $.ajax({
+                dataType: "json",
+                url: "ReportsWebService.asmx/GetReportWeeklyGraphMetrics",
+                contentType: "application/json; charset=utf-8",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-Encoding", "gzip");
+                },
+                type: "POST",
+                data: JSON.stringify(query_object),
+                success: function (data) {
+                    result = data.d;
+                    render_months_graph_data(month_card_definitions[0], query_object, result, "dsb_hl_monthly_graph");
+
+                },
+                error: function (err) {
+                }
+
+
+            });
+        }
+
+
+            function test() {
+                let query_object = {
+                    start_date: "2022-01-01",
+                    end_date: "2022-02-01",
+                    prev_start: "NA",
+                    prev_end: "NA",
+                    span: "MONTH"
+                }
+                let result = input.d;
+                render_months_graph_data(month_card_definitions[0], query_object, result, "dsb_hl_monthly_graph");
+
+                NOV22_render_months_graph_data(month_card_definitions[0], query_object, result, "NOV22_dsb_hl_monthly_graph");
+
+            }
+
+    </script>
+    </head>
+<body class="fixed-left">
+    Shalom Shalom
+
+    <input type="button" value=" GO" onclick="test();" />
+    <div class="row">
+        <!-- Fourth row - Monthly - 1 Graph -->
+        <h2> &nbsp; &nbsp;מבט חודשי</h2>
+        <div class="col-sm-3">
+            &nbsp;
+        </div>
+        <div class="col-sm-6">
+            <canvas id="dsb_hl_monthly_graph" width="700" height="420" style="padding-bottom: 20px"></canvas>
+        </div>
+        <div class="col-sm-3">
+            &nbsp;
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-3">
+            &nbsp;
+        </div>
+        <div class="col-sm-6">
+            <canvas id="NOV22_dsb_hl_monthly_graph" width="700" height="420" style="padding-bottom: 20px"></canvas>
+        </div>
+        <div class="col-sm-3">
+            &nbsp;
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-3">
+            &nbsp;
+        </div>
+        <div class="col-sm-6">
+            <canvas id="NOV22_dsb_hl_monthly_graph_grouped" width="700" height="420" style="padding-bottom: 20px"></canvas>
+        </div>
+        <div class="col-sm-3">
+            &nbsp;
+        </div>
+    </div>
+
+
+</body>
+</html>
