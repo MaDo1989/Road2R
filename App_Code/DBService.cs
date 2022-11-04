@@ -6,6 +6,8 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
 using log4net;
+using System.Diagnostics;
+
 
 /// <summary>
 /// Summary description for DbService
@@ -14,7 +16,10 @@ public class DbService : IDisposable
 {
     SqlTransaction tran;
     SqlCommand cmd;
-    SqlConnection con;
+    public SqlConnection con;
+    public static List<string> stackTraces = new List<string>();
+    static int counter = 0;
+    StackTrace stackTrace;
 
     SqlDataAdapter adp;
     public DbService()
@@ -29,6 +34,16 @@ public class DbService : IDisposable
         {
 
             throw ex;
+        }
+        finally
+        {
+            stackTrace = new StackTrace();
+            string result = stackTrace.ToString();
+            int indexOfSystem = result.IndexOf("System"); 
+            result = result.Substring(0, indexOfSystem);
+
+            stackTraces.Add((counter++).ToString() + ") " + result + " at datetime: " + DateTime.Now);
+            stackTraces.Add("========================================================ENTER");
         }
     }
     public void CloseConnection()
