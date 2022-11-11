@@ -7,8 +7,6 @@ using System.Data.SqlClient;
 using System.Configuration;
 using log4net;
 using System.Diagnostics;
-using System.Data.Entity;
-using Grpc.Core;
 
 /// <summary>
 /// Summary description for DbService
