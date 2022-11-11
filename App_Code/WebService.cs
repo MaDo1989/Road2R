@@ -2298,8 +2298,46 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+    [WebMethod(EnableSession = true)]
+    public void TestConnections(int n)
+    {
+        DbService[] db = new DbService[n];
+        for (int i = 0; i < n; i++)
+        {
+            db[i] = new DbService();
+            db[i].con.Open();
+            System.Threading.Thread.Sleep(50);
+        }
+    }
 
 
+    [WebMethod(EnableSession = true)]
+    public string GetTraces()
+    {
+        List<string> result = DbService.stackTraces;
+        JavaScriptSerializer j = new JavaScriptSerializer();
+
+        return j.Serialize(result);
+    }
+
+    [WebMethod(EnableSession = true)]
+    public string ClearStackTraces()
+    {
+        DbService.stackTraces = new List<string>();
+        List<string> result = DbService.stackTraces;
+        JavaScriptSerializer j = new JavaScriptSerializer();
+
+        return j.Serialize(result);
+    }
+
+    //[WebMethod(EnableSession = true)]
+    //public string ClearSqlConnectionPool()
+    //{
+    //    DbService dbs = new DbService();
+    //    dbs.ClearSqlConnectionPool();
+
+    //    return "finish";
+    //}
 }
 
 
