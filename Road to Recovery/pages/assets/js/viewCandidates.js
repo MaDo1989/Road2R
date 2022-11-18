@@ -1,5 +1,5 @@
 ﻿checkCookie();
-let { getHebrew_WeekDay, addSeperator2MobileNum, showMe } = GENERAL.USEFULL_FUNCTIONS;
+let { getHebrew_WeekDay, addSeperator2MobileNum, showMe, convertDBDate2FrontEndDate } = GENERAL.USEFULL_FUNCTIONS;
 let { getRidePatNum4_viewCandidate } = GENERAL.RIDEPAT;
 let { ajaxCall } = GENERAL.FETCH_DATA;
 let allCandidatedFromDB;
@@ -9,7 +9,6 @@ let superDriversTable;
 let regularCandidated_clientVersion = [];
 let superCandidated_clientVersion = [];
 let ridePatNum;
-
 
 
 const wiringDataTables = () => {

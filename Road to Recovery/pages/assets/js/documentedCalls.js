@@ -1,6 +1,5 @@
 let thisVolunteerId;
 let documentedCallsTable;
-let { convertDBDate2FrontEndDate } = GENERAL.USEFULL_FUNCTIONS;
 
 
 const preDefinedContents = [

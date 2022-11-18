@@ -2321,6 +2321,17 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
+    public int GetTracesSizeInChars()
+    {
+        List<string> result = DbService.stackTraces;
+        JavaScriptSerializer j = new JavaScriptSerializer();
+        int res = j.Serialize(result).Length;
+
+        return res;
+    }
+
+
+    [WebMethod(EnableSession = true)]
     public string ClearStackTraces()
     {
         DbService.stackTraces = new List<string>();
@@ -2330,14 +2341,14 @@ public class WebService : System.Web.Services.WebService
         return j.Serialize(result);
     }
 
-    //[WebMethod(EnableSession = true)]
-    //public string ClearSqlConnectionPool()
-    //{
-    //    DbService dbs = new DbService();
-    //    dbs.ClearSqlConnectionPool();
+    [WebMethod(EnableSession = true)]
+    public string ClearSqlConnectionPool()
+    {
+        DbService dbs = new DbService();
+        dbs.ClearSqlConnectionPool();
 
-    //    return "finish";
-    //}
+        return "finish";
+    }
 }
 
 
