@@ -7,8 +7,7 @@ using System.Data.SqlClient;
 using System.Configuration;
 using log4net;
 using System.Diagnostics;
-using System.Data.Entity;
-using Grpc.Core;
+
 
 /// <summary>
 /// Summary description for DbService
@@ -421,15 +420,9 @@ public class DbService : IDisposable
 
     public void ClearSqlConnectionPool()
     {
-        //if (con != null)
-        //{
-        //    SqlConnection.ClearPool(con);
-        //    CloseConnection();
-        //    SqlConnection.ClearAllPools();
-        //}
-        //else
-        //{
-        //    throw new Exception("con is null");
-        //}
+        if (con != null)
+        {
+            con.Dispose();
+        }
     }
 }
