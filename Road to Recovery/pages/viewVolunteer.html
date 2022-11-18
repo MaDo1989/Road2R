@@ -51,7 +51,7 @@
 
         var cleanPhoneNumber;
         var msgTable;
-
+        let { convertDBDate2FrontEndDate } = GENERAL.USEFULL_FUNCTIONS;
 
         checkCookie();
         var allVolunteersFromDb = [];
@@ -94,6 +94,12 @@
                     1 if a > b
                    -1 if a < b
                     */
+                    if (a === '') {
+                        a = '1.1.1900';
+                    }
+                    if (b === '') {
+                        b = '1.1.1900';
+                    }
                     let dateAsArr_a = $.trim(a).split('.');
                     let dateAsArr_b = $.trim(b).split('.');
 
@@ -102,10 +108,9 @@
 
                     a = a_date.getTime();
                     b = b_date.getTime();
+                    let result = a === b ? 0 : a > b ? 1 : -1;
 
-                    return a === b ? 0 : a > b ? 1 : -1;
-                    //var z = ((x < y) ? -1 : ((x > y) ? 1 : 0));
-                    //return z;
+                    return result;
                 },
                 "de_date-desc": function (a, b) {
                     /*a and b are a couple of dates to compare
@@ -114,6 +119,12 @@
                      -1 if a > b
                       1 if a < b
                       */
+                    if (a === '') {
+                        a = '1.1.1900';
+                    }
+                    if (b === '') {
+                        b = '1.1.1900';
+                    }
                     let dateAsArr_a = $.trim(a).split('.');
                     let dateAsArr_b = $.trim(b).split('.');
 
@@ -122,10 +133,9 @@
 
                     a = a_date.getTime();
                     b = b_date.getTime();
+                    let result = a === b ? 0 : a > b ? -1 : 1;
 
-                    return a === b ? 0 : a > b ? -1 : 1;
-                    //var z = 0//((x < y) ? 1 : ((x > y) ? -1 : 0));
-                    //return z;
+                    return result;
                 }
             });
 
@@ -219,7 +229,11 @@
                             arr_volunteers[i].LastModified = `${dd}.${mm}.${yyyy} ${time}`;
                         }
 
-                    //    btnStr += " " + deleteBtn;
+                        //    btnStr += " " + deleteBtn;
+
+                        let joinDate = convertDBDate2FrontEndDate(arr_volunteers[i].JoinDate);
+                        joinDate = joinDate.toLocaleString('he-IL', { dateStyle: 'short' });
+
                         var Volunteer = {
                             Id: arr_volunteers[i].Id,
                             DisplayName: arr_volunteers[i].DisplayName,
@@ -233,7 +247,8 @@
                             EnglishName: arr_volunteers[i].EnglishName,
                             NumOfRides_last2Months: arr_volunteers[i].NumOfRides_last2Months,
                             MostCommonPath: arr_volunteers[i].MostCommonPath,
-                            MostCoomonRegionalPath: mostCommonRegionalPath
+                            // MostCoomonRegionalPath: mostCommonRegionalPath,
+                            JoinDate: joinDate,
                         }
                         allVolunteersFromDb.push(Volunteer);
                     }
@@ -258,6 +273,7 @@
                                 className: 'text-left-strong'
                             },
                             { "targets": [10], "orderable": false },
+                            { targets: 9, type: 'de_date' },
 
 
                         ],
@@ -265,13 +281,13 @@
                             { data: "DisplayName", width: "5%" },              //0
                             { data: "TypeVol", width: "4%" },                  //1
                             { data: "CellPhone", width: "4%" },                //2
-                            { data: "EnglishName", width: "7%" },             //3
+                            { data: "EnglishName", width: "7%" },              //3
                             { data: "City", width: "4%" },                     //4
                             { data: "Remarks", width: "14%" },                 //5
                             { data: "LastModified", width: "8%" },             //6
                             { data: "NumOfRides_last2Months", width: "4%" },   //7
                             { data: "MostCommonPath", width: "8%" },           //8
-                            { data: "MostCoomonRegionalPath", width: "8%" },   //9
+                            { data: "JoinDate", width: "8%" },                 //9
                             { data: "Buttons", width: "22%" },                 //10
                         ],
                     });
@@ -461,7 +477,7 @@
             GENERAL.VOLUNTEERS.setVolunteersList(JSON.stringify(arr_details));
             location.href = "volunteerForm.html";
         }
-       
+
     </script>
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -596,7 +612,7 @@
                                             <th>עודכן לאחרונה</th>
                                             <th>מס' הסעות בחודשיים אחרונים</th>
                                             <th>מסלול שכיח: נקודה לנקודה</th>
-                                            <th>מסלול שכיח: אזור לאזור</th>
+                                            <th>תאריך הצטרפות</th>
                                             <th>פעולות</th>
                                         </tr>
                                     </thead>
@@ -720,7 +736,7 @@
         </div>
     </div>
     <!-- ↑ Message Modal ↑ -->
-   
+
     <div class="modal fade" id="documentedRidesModal" tabindex="-1" role="dialog" aria-labelledby="documentedRidesTitle" aria-hidden="true"></div>
     <div class="modal fade" id="DocumentedCallsModal" tabindex="-1" role="dialog" aria-labelledby="DocumentedCallsTitle" aria-hidden="true"></div>
 </body>
