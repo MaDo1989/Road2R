@@ -2314,7 +2314,8 @@ public class WebService : System.Web.Services.WebService
     [WebMethod(EnableSession = true)]
     public string GetTraces()
     {
-        List<string> result = DbService.stackTraces;
+        DbService dbsNoConnection = new DbService(true);
+        List<string> result = dbsNoConnection.GetStackTraces();
         JavaScriptSerializer j = new JavaScriptSerializer();
 
         return j.Serialize(result);
@@ -2323,7 +2324,8 @@ public class WebService : System.Web.Services.WebService
     [WebMethod(EnableSession = true)]
     public int GetTracesSizeInChars()
     {
-        List<string> result = DbService.stackTraces;
+        DbService dbsNoConnection = new DbService(true);
+        List<string> result = dbsNoConnection.GetStackTraces();
         JavaScriptSerializer j = new JavaScriptSerializer();
         int res = j.Serialize(result).Length;
 
@@ -2334,8 +2336,8 @@ public class WebService : System.Web.Services.WebService
     [WebMethod(EnableSession = true)]
     public string ClearStackTraces()
     {
-        DbService.stackTraces = new List<string>();
-        List<string> result = DbService.stackTraces;
+        DbService dbsNoConnection = new DbService(true);
+        string result = dbsNoConnection.ClearStackTracesFile();
         JavaScriptSerializer j = new JavaScriptSerializer();
 
         return j.Serialize(result);
