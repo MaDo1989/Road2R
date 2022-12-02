@@ -67,7 +67,6 @@
 
     <!--City Autocomplete-->
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="/resources/demos/style.css">
     <style>
         .ui-autocomplete {
             max-height: 100px;
@@ -277,7 +276,7 @@
         function generateCitiesErrorCB(e) {
             alert("Error in generateCities: " + e.responseText);
         }
-        
+
         function generateLocation() {
             var $select = $("#hospital");
             var $select1 = $("#barrier");
@@ -1517,25 +1516,22 @@
 
             var name = true;
 
-
-            //if (!isAssistant) {
-            //    if (firstName === "") {
-            //        swal(
-            //            "שגיאה\nخطأ",
-            //            "Enter patient first name",
-            //            "warning"
-            //        );
-            //        name = false;
-            //    }
-            //    if (lastName === "") {
-            //        swal(
-            //            "שגיאה\nخطأ",
-            //            "Enter patient last name",
-            //            "warning"
-            //        );
-            //        name = false;
-            //    }
-            //}
+            if (firstName === "") {
+                swal(
+                    "שגיאה\nخطأ",
+                    "השם הפרטי הוא חובה",
+                    "warning"
+                );
+                name = false;
+            }
+            if (firstName[0] === ' ') {
+                swal(
+                    "שגיאה\nخطأ",
+                    "השם הפרטי לא יכול להתחיל ברווח",
+                    "warning"
+                );
+                name = false;
+            }
             if (!englishName) {
                 swal(
                     "שגיאה\nخطأ",
