@@ -1912,9 +1912,10 @@ public class Volunteer
 
     }
 
-    public void SetVolunteerIsActive(string displayName, bool isActive)
+    public IsSuccessAndReason SetVolunteerIsActive(string displayName, bool isActive)
     {
         dbs = new DbService();
+        IsSuccessAndReason result = new IsSuccessAndReason();
         try
         {
             cmd = new SqlCommand();
@@ -1928,22 +1929,24 @@ public class Volunteer
 
             if (sdr.Read())
             {
-                bool isSuccesfullOperation;
-                bool.TryParse(sdr["IsSuccesfullOperation"].ToString(), out isSuccesfullOperation);
-
+                string IsSuccesfullOperationResult = sdr["IsSuccesfullOperation"].ToString();
+                bool isSuccesfullOperation = IsSuccesfullOperationResult == "1";
+                result.IsSuccess = isSuccesfullOperation;
+                
                 if (!isSuccesfullOperation)
                 {
-                    bool volunteerWithFutureRidesIncludedToday;
-                    bool.TryParse(sdr["IsSuccesfullOperation"].ToString(), out volunteerWithFutureRidesIncludedToday);
+                    string volunteerWithFutureRidesIncludedTodayResult = sdr["VolunteerWithFutureRidesIncludedToday"].ToString();
+                    bool volunteerWithFutureRidesIncludedToday = volunteerWithFutureRidesIncludedTodayResult == "1";
                     if (volunteerWithFutureRidesIncludedToday)
                     {
-                        throw new Exception("למתנדב הזה יש הסעות בעתיד (כולל היום) ולכן לא ניתן למחוק אותו");
+                        result.Reason = "למתנדב זה יש הסעות עתידיות (החישוב כולל היום)";
                     }
                 }
             }
 
+            return result;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             throw;
         }

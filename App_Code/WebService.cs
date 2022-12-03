@@ -1351,19 +1351,19 @@ public class WebService : System.Web.Services.WebService
 
     #region volunteers functions
     [WebMethod(EnableSession = true)]
-    public bool SetVolunteerIsActive(string displayName, string active)
+    public string SetVolunteerIsActive(string displayName, string active)
     {
-        bool succes = false;
         try
         {
             Volunteer v = new Volunteer();
-            v.SetVolunteerIsActive(displayName, active == "true");
+            IsSuccessAndReason result = v.SetVolunteerIsActive(displayName, active == "true");
 
-            return succes;
+            return j.Serialize(result);
+
         }
         catch (Exception ex)
         {
-            Log.Error("Error in deactivateVolunteer", ex);
+            Log.Error("Error in SetVolunteerIsActive", ex);
             throw new Exception(" שגיאה בעת עדכון סטטוס מתנדב" + ex.Message);
         }
     }
