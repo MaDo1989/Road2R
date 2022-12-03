@@ -461,7 +461,7 @@
 
             $.ajax({
                 dataType: "json",
-                url: "WebService.asmx/deactivateVolunteer",
+                url: "WebService.asmx/SetVolunteerIsActive",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
                 data: JSON.stringify({ displayName: displayName, active: active }),

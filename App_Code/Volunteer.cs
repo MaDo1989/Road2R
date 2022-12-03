@@ -71,6 +71,8 @@ public class Volunteer
     bool? igulLetova;
     string role;
     protected DbService dbs;
+    SqlCommand cmd;
+    SqlDataReader sdr;
 
 
     //Delete after volunteer details project will end (written on 05/06/2020 by Alon):
@@ -781,7 +783,7 @@ public class Volunteer
         {
             throw ex;
         }
-        
+
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
             v.Id = int.Parse(dr["Id"].ToString());
@@ -1359,7 +1361,7 @@ public class Volunteer
         #region DB functions
 
         //this procdure has change due to Amir's request
-            //if active is false then fetch all (active and non active)
+        //if active is false then fetch all (active and non active)
         string query = "exec spVolunteerTypeView_GetVolunteersList @isActive=" + active;
 
 
@@ -1756,7 +1758,7 @@ public class Volunteer
         cmdParams[7] = cmd.Parameters.AddWithValue("@gender", v.Gender);
         //cmdParams[8] = cmd.Parameters.AddWithValue("@phone", v.HomePhone);
         cmdParams[8] = cmd.Parameters.AddWithValue("@IsActive", v.IsActive);
-        
+
         if (String.IsNullOrEmpty(v.JoinDate.ToString()))
         {
             cmdParams[9] = cmd.Parameters.AddWithValue("@jDate", DBNull.Value);
@@ -1910,11 +1912,49 @@ public class Volunteer
 
     }
 
+    public void SetVolunteerIsActive(string displayName, bool isActive)
+    {
+        dbs = new DbService();
+        try
+        {
+            cmd = new SqlCommand();
+            dbs = new DbService();
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.CommandText = "spVolunteer_ToggleActiveness";
+            cmd.Parameters.AddWithValue("@displayName", displayName);
+            cmd.Parameters.AddWithValue("@isActive", isActive);
 
+            sdr = dbs.GetDataReaderSP(cmd);
+
+            if (sdr.Read())
+            {
+                bool isSuccesfullOperation;
+                bool.TryParse(sdr["IsSuccesfullOperation"].ToString(), out isSuccesfullOperation);
+
+                if (!isSuccesfullOperation)
+                {
+                    bool volunteerWithFutureRidesIncludedToday;
+                    bool.TryParse(sdr["IsSuccesfullOperation"].ToString(), out volunteerWithFutureRidesIncludedToday);
+                    if (volunteerWithFutureRidesIncludedToday)
+                    {
+                        throw new Exception("למתנדב הזה יש הסעות בעתיד (כולל היום) ולכן לא ניתן למחוק אותו");
+                    }
+                }
+            }
+
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+        finally
+        {
+            dbs.CloseConnection();
+        }
+    }
 
     public void deactivateCustomer(string active)
     {
-        DbService db = new DbService();
         ChangeLastUpdateBy(0, DisplayName);
 
         SqlCommand cmd = new SqlCommand();
