@@ -1351,6 +1351,24 @@ public class WebService : System.Web.Services.WebService
 
     #region volunteers functions
     [WebMethod(EnableSession = true)]
+    public string SetVolunteerIsActive(string displayName, string active)
+    {
+        try
+        {
+            Volunteer v = new Volunteer();
+            IsSuccessAndReason result = v.SetVolunteerIsActive(displayName, active == "true");
+
+            return j.Serialize(result);
+
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in SetVolunteerIsActive", ex);
+            throw new Exception(" שגיאה בעת עדכון סטטוס מתנדב" + ex.Message);
+        }
+    }
+
+    [WebMethod(EnableSession = true)]
     public void deactivateVolunteer(string displayName, string active)
     {
         try
@@ -2314,7 +2332,10 @@ public class WebService : System.Web.Services.WebService
     [WebMethod(EnableSession = true)]
     public string GetTraces()
     {
-        List<string> result = DbService.stackTraces;
+
+        DbService dbsNoConnection = new DbService(true);
+        List<string> result = dbsNoConnection.GetStackTraces();
+
         JavaScriptSerializer j = new JavaScriptSerializer();
 
         return j.Serialize(result);
@@ -2323,7 +2344,8 @@ public class WebService : System.Web.Services.WebService
     [WebMethod(EnableSession = true)]
     public int GetTracesSizeInChars()
     {
-        List<string> result = DbService.stackTraces;
+        DbService dbsNoConnection = new DbService(true);
+        List<string> result = dbsNoConnection.GetStackTraces();
         JavaScriptSerializer j = new JavaScriptSerializer();
         int res = j.Serialize(result).Length;
 
@@ -2334,8 +2356,8 @@ public class WebService : System.Web.Services.WebService
     [WebMethod(EnableSession = true)]
     public string ClearStackTraces()
     {
-        DbService.stackTraces = new List<string>();
-        List<string> result = DbService.stackTraces;
+        DbService dbsNoConnection = new DbService(true);
+        string result = dbsNoConnection.ClearStackTracesFile();
         JavaScriptSerializer j = new JavaScriptSerializer();
 
         return j.Serialize(result);

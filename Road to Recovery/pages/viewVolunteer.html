@@ -229,7 +229,7 @@
                             arr_volunteers[i].LastModified = `${dd}.${mm}.${yyyy} ${time}`;
                         }
 
-                        //    btnStr += " " + deleteBtn;
+                        btnStr += " " + deleteBtn;
 
                         let joinDate = convertDBDate2FrontEndDate(arr_volunteers[i].JoinDate);
                         joinDate = joinDate.toLocaleString('he-IL', { dateStyle: 'short' });
@@ -357,12 +357,6 @@
                     closeOnConfirm: false
                 }, function () {
                     deactivateVolunteer(data.DisplayName, 'false');
-                    swal({
-                        title: "המתנדב הפך ללא פעיל",
-                        timer: 1000,
-                        type: "success",
-                        showConfirmButton: false
-                    });
                     setTimeout(function () { refreshTable() }, 1001);
                 });
             });
@@ -461,11 +455,30 @@
 
             $.ajax({
                 dataType: "json",
-                url: "WebService.asmx/deactivateVolunteer",
+                url: "WebService.asmx/SetVolunteerIsActive",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
                 data: JSON.stringify({ displayName: displayName, active: active }),
-                success: function (data) { },
+                success: function (data) {
+
+                    const response = JSON.parse(data.d);
+
+                    if (response.IsSuccess) {
+                        swal({
+                            title: "המתנדב הפך ללא פעיל",
+                            timer: 1000,
+                            type: "success",
+                            showConfirmButton: false
+                        });
+                    } else {
+                        swal({
+                            title: "הפעולה לא בוצעה " + response.Reason,
+                            type: "warning",
+                        });
+                    }
+
+                    $('#wait').hide();
+                },
                 error: function (err) { alert("Error in deactivateVolunteer: " + err.responseText); }
             });
 
