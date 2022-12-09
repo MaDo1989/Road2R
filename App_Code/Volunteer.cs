@@ -1743,176 +1743,189 @@ public class Volunteer
 
     public void setVolunteer(Volunteer v, string func)
     {
-        int res = 0;
-        DbService db = new DbService();
-        SqlCommand cmd = new SqlCommand();
-        cmd.CommandType = CommandType.Text;
-        SqlParameter[] cmdParams = new SqlParameter[25];
-        cmdParams[0] = cmd.Parameters.AddWithValue("@address", v.Address);
-        cmdParams[1] = cmd.Parameters.AddWithValue("@cell", v.CellPhone);
-        cmdParams[2] = cmd.Parameters.AddWithValue("@cell2", v.CellPhone2);
-        cmdParams[3] = cmd.Parameters.AddWithValue("@city", v.City);
-        cmdParams[4] = cmd.Parameters.AddWithValue("@email", v.Email);
-        cmdParams[5] = cmd.Parameters.AddWithValue("@firstNameA", v.FirstNameA);
-        cmdParams[6] = cmd.Parameters.AddWithValue("@firstNameH", v.FirstNameH);
-        cmdParams[7] = cmd.Parameters.AddWithValue("@gender", v.Gender);
-        //cmdParams[8] = cmd.Parameters.AddWithValue("@phone", v.HomePhone);
-        cmdParams[8] = cmd.Parameters.AddWithValue("@IsActive", v.IsActive);
-
-        if (String.IsNullOrEmpty(v.JoinDate.ToString()))
+        try
         {
-            cmdParams[9] = cmd.Parameters.AddWithValue("@jDate", DBNull.Value);
-        }
-        else
-        {
-            cmdParams[9] = cmd.Parameters.AddWithValue("@jDate", v.JoinDate);
-        }
-        cmdParams[10] = cmd.Parameters.AddWithValue("@knowsArabic", v.KnowsArabic);
-        cmdParams[11] = cmd.Parameters.AddWithValue("@lastNameA", v.LastNameA);
-        cmdParams[12] = cmd.Parameters.AddWithValue("@lastNameH", v.LastNameH);
-        cmdParams[13] = cmd.Parameters.AddWithValue("@volType", v.TypeVol);
-        cmdParams[14] = cmd.Parameters.AddWithValue("@remarks", v.Remarks);
-        cmdParams[15] = cmd.Parameters.AddWithValue("@displayName", v.DisplayName);
-        cmdParams[16] = cmd.Parameters.AddWithValue("@UserName", v.CellPhone);
+            int res = 0;
+            DbService db = new DbService();
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandType = CommandType.Text;
+            SqlParameter[] cmdParams = new SqlParameter[25];
+            cmdParams[0] = cmd.Parameters.AddWithValue("@address", v.Address);
+            cmdParams[1] = cmd.Parameters.AddWithValue("@cell", v.CellPhone);
+            cmdParams[2] = cmd.Parameters.AddWithValue("@cell2", v.CellPhone2);
+            cmdParams[3] = cmd.Parameters.AddWithValue("@city", v.City);
+            cmdParams[4] = cmd.Parameters.AddWithValue("@email", v.Email);
+            cmdParams[5] = cmd.Parameters.AddWithValue("@firstNameA", v.FirstNameA);
+            cmdParams[6] = cmd.Parameters.AddWithValue("@firstNameH", v.FirstNameH);
+            cmdParams[7] = cmd.Parameters.AddWithValue("@gender", v.Gender);
+            //cmdParams[8] = cmd.Parameters.AddWithValue("@phone", v.HomePhone);
+            cmdParams[8] = cmd.Parameters.AddWithValue("@IsActive", v.IsActive);
 
-        cmdParams[18] = cmd.Parameters.AddWithValue("@isAssistant", v.IsAssistant);
-        cmdParams[19] = cmd.Parameters.AddWithValue("@volunteerIdentity", v.VolunteerIdentity);
-
-        cmdParams[20] = cmd.Parameters.AddWithValue("@englishFN", v.EnglishFN);
-        cmdParams[21] = cmd.Parameters.AddWithValue("@englishLN", v.EnglishLN);
-        cmdParams[22] = cmd.Parameters.AddWithValue("@birthDate", v.BirthDate);
-        cmdParams[23] = cmd.Parameters.AddWithValue("@isDriving", v.IsDriving);
-        if (v.Role == null)
-            v.Role = "ללא תפקיד";
-        cmdParams[24] = cmd.Parameters.AddWithValue("@role", v.Role);
-        //cmdParams[24] = cmd.Parameters.AddWithValue("@howCanHelp", v.HowCanHelp);
-        //cmdParams[25] = cmd.Parameters.AddWithValue("@feedback", v.Feedback);
-        //cmdParams[24] = cmd.Parameters.AddWithValue("@newsLetter", v.NewsLetter);
-
-
-
-        string newName = v.FirstNameH + " " + v.LastNameH;
-        newName = newName.Replace("'", "''");
-        //cmdParams[1] = cmd.Parameters.AddWithValue("@bDay", v.BirthDate);
-        //, HomePhone=@phone
-        string query = "";
-        if (func == "edit")
-        {
-            ChangeLastUpdateBy(0, v.DisplayName);
-            string displayQuery = "";
-            User u = new User();
-            string newDisplayName = v.FirstNameH + " " + v.LastNameH;
-            string existingDisplayName = u.getUserNameByCellphone(v.OldCellPhone);
-
-            if (existingDisplayName != newDisplayName && u.CheckIfDisplayNameExists(newDisplayName))
+            if (String.IsNullOrEmpty(v.JoinDate.ToString()))
             {
-                displayQuery = "DisplayName = N'" + newDisplayName + "_" + v.CellPhone + "',";
-            }
-            else if (existingDisplayName != newDisplayName)
-            {
-                displayQuery = "DisplayName = N'" + newDisplayName + "',";
-            }
-
-
-
-            string EnglishNewDisplayName = v.EnglishFN + " " + v.EnglishLN;
-            string existingEnglishDisplayName = u.getUserEnglishNameByCellphone(v.OldCellPhone);
-            if (EnglishNewDisplayName != existingEnglishDisplayName && u.CheckIfEnglishDisplayNameExists(EnglishNewDisplayName))
-            {
-
-                cmdParams[17] = cmd.Parameters.AddWithValue("@englishName", EnglishNewDisplayName + "_" + v.CellPhone);
+                cmdParams[9] = cmd.Parameters.AddWithValue("@jDate", DBNull.Value);
             }
             else
             {
-                cmdParams[17] = cmd.Parameters.AddWithValue("@englishName", v.EnglishName);
+                cmdParams[9] = cmd.Parameters.AddWithValue("@jDate", v.JoinDate);
+            }
+            cmdParams[10] = cmd.Parameters.AddWithValue("@knowsArabic", v.KnowsArabic);
+            cmdParams[11] = cmd.Parameters.AddWithValue("@lastNameA", v.LastNameA);
+            cmdParams[12] = cmd.Parameters.AddWithValue("@lastNameH", v.LastNameH);
+            cmdParams[13] = cmd.Parameters.AddWithValue("@volType", v.TypeVol);
+            cmdParams[14] = cmd.Parameters.AddWithValue("@remarks", v.Remarks);
+            cmdParams[15] = cmd.Parameters.AddWithValue("@displayName", v.DisplayName);
+            cmdParams[16] = cmd.Parameters.AddWithValue("@UserName", v.CellPhone);
 
-            }
+            cmdParams[18] = cmd.Parameters.AddWithValue("@isAssistant", v.IsAssistant);
+            cmdParams[19] = cmd.Parameters.AddWithValue("@volunteerIdentity", v.VolunteerIdentity);
 
-            string password = ConfigurationManager.AppSettings["password"];
-            if (v.TypeVol == "רכז" || v.TypeVol == "מנהל" || v.IsAssistant)
-            {
-                query = "update Volunteer set Address=@address, CellPhone=@cell,";
-                query += "CellPhone2=@cell2, CityCityName=@city, Email=@email, FirstNameA=@firstNameA, FirstNameH=@firstNameH, VolunteerIdentity=@volunteerIdentity, ";
-                query += "Gender=@gender, IsActive=@IsActive, JoinDate=@jDate, KnowsArabic=@knowsArabic, LastNameA=@lastNameA, ";
-                query += "EnglishFN=@englishFN, EnglishLN=@englishLN, BirthDate=@birthDate, IsDriving=@isDriving, ";
-                query += displayQuery;
-                query += "LastNameH=@lastNameH,UserName=@UserName,Password='" + password + "', Remarks=@remarks,EnglishName=@englishName,isAssistant=@isAssistant,RoleInR2R=@role,lastModified=DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@displayName"; //, BirthDate=@bDay
-
-            }
-            else
-            {
-                query = "update Volunteer set Address=@address, CellPhone=@cell,";
-                query += "CellPhone2=@cell2, CityCityName=@city, Email=@email, FirstNameA=@firstNameA, FirstNameH=@firstNameH, VolunteerIdentity=@volunteerIdentity, ";
-                query += "Gender=@gender, IsActive=@IsActive, JoinDate=@jDate, KnowsArabic=@knowsArabic, LastNameA=@lastNameA, ";
-                query += "EnglishFN=@englishFN, EnglishLN=@englishLN, BirthDate=@birthDate, IsDriving=@isDriving, ";
-                query += displayQuery;
-                query += "LastNameH=@lastNameH, Remarks=@remarks,EnglishName=@englishName,isAssistant=@isAssistant,RoleInR2R=@role,lastModified=DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@displayName"; //, BirthDate=@bDay
-            }
-            res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
-
-            if (res == 0)
-            {
-                throw new Exception();
-            }
-            db = new DbService();
-            try
-            {
-                query = "select Id from Volunteer where DisplayName=N'" + newName + "'";
-                Id = int.Parse(db.GetObjectScalarByQuery(query).ToString());
-            }
-            catch (Exception)
-            {
-                query = "select Id from Volunteer where DisplayName=N'" + v.DisplayName + "'";
-                Id = int.Parse(db.GetObjectScalarByQuery(query).ToString());
-            }
+            cmdParams[20] = cmd.Parameters.AddWithValue("@englishFN", v.EnglishFN);
+            cmdParams[21] = cmd.Parameters.AddWithValue("@englishLN", v.EnglishLN);
+            cmdParams[22] = cmd.Parameters.AddWithValue("@birthDate", v.BirthDate);
+            cmdParams[23] = cmd.Parameters.AddWithValue("@isDriving", v.IsDriving);
 
 
-            db = new DbService();
-            query = "update VolunType_Volunteer set VolunTypeType=@volType where VolunteerId=" + Id;
-            res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
-            if (res == 0)
+            if (v.Role == null)
+                v.Role = "ללא תפקיד";
+            cmdParams[24] = cmd.Parameters.AddWithValue("@role", v.Role);
+            //cmdParams[24] = cmd.Parameters.AddWithValue("@howCanHelp", v.HowCanHelp);
+            //cmdParams[25] = cmd.Parameters.AddWithValue("@feedback", v.Feedback);
+            //cmdParams[24] = cmd.Parameters.AddWithValue("@newsLetter", v.NewsLetter);
+
+
+
+            string newName = v.FirstNameH + " " + v.LastNameH;
+            newName = newName.Replace("'", "''");
+            //cmdParams[1] = cmd.Parameters.AddWithValue("@bDay", v.BirthDate);
+            //, HomePhone=@phone
+            string query = "";
+            if (func == "edit")
             {
-                throw new Exception();
-            }
-        }
-        else if (func == "new")
-        {
-            cmdParams[17] = cmd.Parameters.AddWithValue("@englishName", v.EnglishName);
-            try
-            {
+                ChangeLastUpdateBy(0, v.DisplayName);
+                IsSuccessAndReason isSuccessIsDrivingToggleModel = SetVolunteerIsActive(v.DisplayName, v.IsDriving);
+                if (!isSuccessIsDrivingToggleModel.IsSuccess)
+                {
+                    throw new Exception(isSuccessIsDrivingToggleModel.Reason);
+                }
+                string displayQuery = "";
+                User u = new User();
+                string newDisplayName = v.FirstNameH + " " + v.LastNameH;
+                string existingDisplayName = u.getUserNameByCellphone(v.OldCellPhone);
+
+                if (existingDisplayName != newDisplayName && u.CheckIfDisplayNameExists(newDisplayName))
+                {
+                    displayQuery = "DisplayName = N'" + newDisplayName + "_" + v.CellPhone + "',";
+                }
+                else if (existingDisplayName != newDisplayName)
+                {
+                    displayQuery = "DisplayName = N'" + newDisplayName + "',";
+                }
+
+
+
+                string EnglishNewDisplayName = v.EnglishFN + " " + v.EnglishLN;
+                string existingEnglishDisplayName = u.getUserEnglishNameByCellphone(v.OldCellPhone);
+                if (EnglishNewDisplayName != existingEnglishDisplayName && u.CheckIfEnglishDisplayNameExists(EnglishNewDisplayName))
+                {
+
+                    cmdParams[17] = cmd.Parameters.AddWithValue("@englishName", EnglishNewDisplayName + "_" + v.CellPhone);
+                }
+                else
+                {
+                    cmdParams[17] = cmd.Parameters.AddWithValue("@englishName", v.EnglishName);
+
+                }
+
+                string password = ConfigurationManager.AppSettings["password"];
                 if (v.TypeVol == "רכז" || v.TypeVol == "מנהל" || v.IsAssistant)
                 {
-                    string password = ConfigurationManager.AppSettings["password"];
-                    query = "insert into Volunteer (Address, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks,EnglishName,isAssistant,UserName,Password,lastModified,EnglishFN, EnglishLN, BirthDate, IsDriving)";
-                    query += " values (@address,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks,@englishName,@isAssistant,@UserName,'" + password + "',DATEADD(hour, 2, SYSDATETIME()),@englishFN, @englishLN, @birthDate, @isDriving);SELECT SCOPE_IDENTITY();";
+                    query = "update Volunteer set Address=@address, CellPhone=@cell,";
+                    query += "CellPhone2=@cell2, CityCityName=@city, Email=@email, FirstNameA=@firstNameA, FirstNameH=@firstNameH, VolunteerIdentity=@volunteerIdentity, ";
+                    query += "Gender=@gender, IsActive=@IsActive, JoinDate=@jDate, KnowsArabic=@knowsArabic, LastNameA=@lastNameA, ";
+                    query += "EnglishFN=@englishFN, EnglishLN=@englishLN, BirthDate=@birthDate, IsDriving=@isDriving, ";
+                    query += displayQuery;
+                    query += "LastNameH=@lastNameH,UserName=@UserName,Password='" + password + "', Remarks=@remarks,EnglishName=@englishName,isAssistant=@isAssistant,RoleInR2R=@role,lastModified=DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@displayName"; //, BirthDate=@bDay
 
                 }
                 else
                 {
-                    query = "insert into Volunteer (Address, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks,EnglishName,isAssistant,lastModified,EnglishFN, EnglishLN, BirthDate, IsDriving)";
-                    query += " values (@address,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks,@englishName,@isAssistant,DATEADD(hour, 2, SYSDATETIME()),@englishFN, @englishLN, @birthDate, @isDriving);SELECT SCOPE_IDENTITY();";
+                    query = "update Volunteer set Address=@address, CellPhone=@cell,";
+                    query += "CellPhone2=@cell2, CityCityName=@city, Email=@email, FirstNameA=@firstNameA, FirstNameH=@firstNameH, VolunteerIdentity=@volunteerIdentity, ";
+                    query += "Gender=@gender, IsActive=@IsActive, JoinDate=@jDate, KnowsArabic=@knowsArabic, LastNameA=@lastNameA, ";
+                    query += "EnglishFN=@englishFN, EnglishLN=@englishLN, BirthDate=@birthDate, ";// IsDriving=@isDriving,
+                    query += displayQuery;
+                    query += "LastNameH=@lastNameH, Remarks=@remarks,EnglishName=@englishName,isAssistant=@isAssistant,RoleInR2R=@role,lastModified=DATEADD(hour, 2, SYSDATETIME()) where DisplayName=@displayName"; //, BirthDate=@bDay
+                }
+                res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+
+                if (res == 0)
+                {
+                    throw new Exception();
                 }
                 db = new DbService();
-                Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
+                try
+                {
+                    query = "select Id from Volunteer where DisplayName=N'" + newName + "'";
+                    Id = int.Parse(db.GetObjectScalarByQuery(query).ToString());
+                }
+                catch (Exception)
+                {
+                    query = "select Id from Volunteer where DisplayName=N'" + v.DisplayName + "'";
+                    Id = int.Parse(db.GetObjectScalarByQuery(query).ToString());
+                }
 
-                query = "insert into VolunType_Volunteer (VolunTypeType,VolunteerId) values (@volType," + Id + ")";
+
                 db = new DbService();
-                db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+                query = "update VolunType_Volunteer set VolunTypeType=@volType where VolunteerId=" + Id;
+                res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+                if (res == 0)
+                {
+                    throw new Exception();
+                }
             }
-            catch (SqlException ex)
+            else if (func == "new")
             {
-                throw new Exception("phone already exists");
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
+                cmdParams[17] = cmd.Parameters.AddWithValue("@englishName", v.EnglishName);
+                try
+                {
+                    if (v.TypeVol == "רכז" || v.TypeVol == "מנהל" || v.IsAssistant)
+                    {
+                        string password = ConfigurationManager.AppSettings["password"];
+                        query = "insert into Volunteer (Address, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks,EnglishName,isAssistant,UserName,Password,lastModified,EnglishFN, EnglishLN, BirthDate, IsDriving)";
+                        query += " values (@address,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks,@englishName,@isAssistant,@UserName,'" + password + "',DATEADD(hour, 2, SYSDATETIME()),@englishFN, @englishLN, @birthDate, @isDriving);SELECT SCOPE_IDENTITY();";
 
+                    }
+                    else
+                    {
+                        query = "insert into Volunteer (Address, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks,EnglishName,isAssistant,lastModified,EnglishFN, EnglishLN, BirthDate, IsDriving)";
+                        query += " values (@address,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks,@englishName,@isAssistant,DATEADD(hour, 2, SYSDATETIME()),@englishFN, @englishLN, @birthDate, @isDriving);SELECT SCOPE_IDENTITY();";
+                    }
+                    db = new DbService();
+                    Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
+
+                    query = "insert into VolunType_Volunteer (VolunTypeType,VolunteerId) values (@volType," + Id + ")";
+                    db = new DbService();
+                    db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+                }
+                catch (SqlException ex)
+                {
+                    throw new Exception("phone already exists");
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+
+            }
         }
-
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 
-    public IsSuccessAndReason SetVolunteerIsActive(string displayName, bool isActive)
+    public IsSuccessAndReason SetVolunteerIsActive(string displayName, bool? isActive)
     {
         dbs = new DbService();
         IsSuccessAndReason result = new IsSuccessAndReason();
@@ -1923,6 +1936,7 @@ public class Volunteer
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.CommandText = "spVolunteer_ToggleActiveness";
             cmd.Parameters.AddWithValue("@displayName", displayName);
+            isActive = isActive ?? false;//if null then = false;
             cmd.Parameters.AddWithValue("@isActive", isActive);
 
             sdr = dbs.GetDataReaderSP(cmd);
@@ -1932,7 +1946,7 @@ public class Volunteer
                 string IsSuccesfullOperationResult = sdr["IsSuccesfullOperation"].ToString();
                 bool isSuccesfullOperation = IsSuccesfullOperationResult == "1";
                 result.IsSuccess = isSuccesfullOperation;
-                
+
                 if (!isSuccesfullOperation)
                 {
                     string volunteerWithFutureRidesIncludedTodayResult = sdr["VolunteerWithFutureRidesIncludedToday"].ToString();
