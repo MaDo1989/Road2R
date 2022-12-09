@@ -1406,7 +1406,7 @@ public class WebService : System.Web.Services.WebService
         catch (Exception ex)
         {
             Log.Error("Error in setVolunteer", ex);
-            throw new Exception("שגיאה ביצירת מתנדב חדש");
+            throw new Exception("שגיאה ביצירת/עריכת מתנדב " + ex.Message);
         }
 
     }
