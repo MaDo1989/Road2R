@@ -16,6 +16,7 @@ using WhatsAppApi;
 /// </summary>
 public class Volunteer
 {
+    public string NearestBigCity { get; set; }
     string device;
     bool isAssistant;//האם עוזר?
     string englishName;//שם באנגלית
@@ -1393,7 +1394,7 @@ public class Volunteer
             v.MostCommonPath = dr["mostCommonPath"].ToString();
             v.MostCommonRegionalDestination = dr["MostCommonRegionalDestination"].ToString();
             v.MostCommonRegionalOrigin = dr["MostCommonRegionalOrigin"].ToString();
-
+            v.NearestBigCity = "ערך זמני";//BENNY FILL HERE
             //v.Day1 = dr["preferDay1"].ToString();
             //v.Hour1 = dr["preferHour1"].ToString();
             //v.Day2 = dr["preferDay2"].ToString();
