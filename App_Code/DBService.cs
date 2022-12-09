@@ -9,6 +9,7 @@ using log4net;
 using System.Diagnostics;
 using System.IO;
 
+
 /// <summary>
 /// Summary description for DbService
 /// </summary>
@@ -20,12 +21,13 @@ public class DbService : IDisposable
     public List<string> stackTraces;
     static int counter = 1;
     StackTrace stackTrace;
-    string stackTracesfilePath = @"C:\StackTrace_Track\StackTraces.txt";
+    static string path = @"\log\StackTraces.txt";
+    string stackTracesfilePath = HttpContext.Current.Server.MapPath(path);
 
     SqlDataAdapter adp;
     public DbService(bool noConnectopnInstance)
     {
-       
+
     }
     public DbService()
     {
@@ -42,7 +44,14 @@ public class DbService : IDisposable
         }
         finally
         {
-            LogToTextFile();
+            try
+            {
+                LogToTextFile();
+            }
+            catch (Exception)
+            {
+                //the catch is empty in order not to crash the system!
+            }
         }
     }
 
