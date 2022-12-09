@@ -443,9 +443,10 @@
                     $('#wait').hide();
 
                     var patient = JSON.parse(data.d);
-                    console.log(patient);
+                   
                     if (patient.DisplayName === null) {
-                        uploadData($("#patientFirstName").val())
+                        //uploadData($("#patientFirstName").val()) --very bad idea
+                        alert("לחולה הנל אין שם מלא ולא ניתן לערוך/לשמור אותו");
                     }
                     else {
                         GENERAL.PATIENTS.setPatientsList(JSON.stringify(patient));
