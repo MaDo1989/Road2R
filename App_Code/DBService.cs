@@ -21,8 +21,8 @@ public class DbService : IDisposable
     public List<string> stackTraces;
     static int counter = 1;
     StackTrace stackTrace;
-    static string path = @"\log\StackTraces.txt";
-    string stackTracesfilePath = HttpContext.Current.Server.MapPath(path);
+    static string path = "\\log\\StackTraces.txt";
+    string stackTracesfilePath = HttpContext.Current.Server.MapPath("~") + path;
 
     SqlDataAdapter adp;
     public DbService(bool noConnectopnInstance)
