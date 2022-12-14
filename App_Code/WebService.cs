@@ -1401,14 +1401,12 @@ public class WebService : System.Web.Services.WebService
         {
             Volunteer v = volunteer;
             v.setVolunteer(v, func);
-
         }
         catch (Exception ex)
         {
             Log.Error("Error in setVolunteer", ex);
             throw new Exception("שגיאה ביצירת/עריכת מתנדב " + ex.Message);
         }
-
     }
 
     [WebMethod(EnableSession = true)]
