@@ -6,11 +6,6 @@
 /*---------------------------------------------------------*/
 /*---------------------------------------------------------*/
 
-/****** Object:  StoredProcedure [dbo].[spVolunteer_deactivation]    Script Date: 12/3/2022 7:27:08 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
 -- =============================================
 -- Author:      Yogev Strauber
 -- Create Date: 03/12/2022 @night
@@ -61,5 +56,59 @@ BEGIN
 
 			SELECT
 				1 AS IsSuccesfullOperation
+END
+END
+
+-- =============================================
+-- Author:      Yogev Strauber
+-- Create Date: 14/12/2022 @night
+-- Description: Active Or Deactivate Volunteer's isDriving
+-- Returns IsSuccesfullOperation bit, and optional VolunteerWithFutureRidesIncludedToday
+-- when try to deactivate volunteer
+-- =============================================
+CREATE    PROCEDURE [dbo].[spVolunteer_ToggleIsDrive]
+(
+   @displayName NVARCHAR(255),
+   @isDriving BIT
+		)
+AS
+BEGIN
+
+    SET NOCOUNT ON;
+	DECLARE @volunteerId INT = (SELECT Id from volunteer where Displayname=@displayName)
+
+	IF(@isDriving) = 0
+	BEGIN
+		IF(
+			SELECT COUNT(*) FROM RIDE 
+			WHERE MAINDRIVER=@volunteerId
+			AND  CONVERT(VARCHAR, GETDATE(), 110) <= CONVERT(VARCHAR, Date, 110) 
+		   ) = 0
+			BEGIN
+				UPDATE Volunteer 
+				SET IsActive=@isDriving, 
+				lastModified=DATEADD(hour, 2, SYSDATETIME())
+				WHERE Id=@volunteerId
+			SELECT 
+				1 AS IsSuccesfullOperation,
+				0 AS VolunteerWithFutureRidesIncludedToday
+			END
+		ELSE
+			BEGIN
+			SELECT
+				0 AS IsSuccesfullOperation,
+				1 AS VolunteerWithFutureRidesIncludedToday
+			END
+	END
+	ELSE
+	BEGIN 
+			UPDATE Volunteer 
+			SET isDriving=@isDriving, 
+			lastModified=DATEADD(hour, 2, SYSDATETIME())
+			WHERE Id=@volunteerId
+
+			SELECT
+				1 AS IsSuccesfullOperation
+
 END
 END
