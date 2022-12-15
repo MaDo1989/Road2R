@@ -2369,6 +2369,13 @@ public class WebService : System.Web.Services.WebService
 
         return "finish";
     }
+
+    [WebMethod(EnableSession = true)]
+    public void mapNearestCities() {
+
+        City c = new City();
+        c.writeNearestMainCities();
+    }
 }
 
 
