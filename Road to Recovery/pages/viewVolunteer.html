@@ -205,12 +205,6 @@
                         showDocumentedRidesBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedRidesBtn" title="תיעוד הסעות" data-toggle="modal" data-target="#documentedRidesModal"><i class="fa fa-car" aria-hidden="true"></i></button></div>';
                         btnStr += showDocumentedRidesBtn;
 
-                        let mostCommonRegionalPath = '';
-
-                        if (arr_volunteers[i].MostCommonRegionalOrigin.length > 0 && arr_volunteers[i].MostCommonRegionalDestination.length > 0) {
-
-                            mostCommonRegionalPath = arr_volunteers[i].MostCommonRegionalOrigin + '-' + arr_volunteers[i].MostCommonRegionalDestination;
-                        }
 
                         let showDocumentedCallsBtn = '';
                         showDocumentedCallsBtn += `<div class='btnWrapper-left'><span id="badgeOf_${arr_volunteers[i].Id}" class="badge badge-pill badge-default">${arr_volunteers[i].NoOfDocumentedCalls}</span>`;

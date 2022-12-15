@@ -1392,8 +1392,6 @@ public class Volunteer
             v.NoOfDocumentedRides = Convert.ToInt32(dr["NoOfDocumentedRides"]);
             v.NumOfRides_last2Months = Convert.ToInt32(dr["NumOfRides_last2Months"]);
             v.MostCommonPath = dr["mostCommonPath"].ToString();
-            v.MostCommonRegionalDestination = dr["MostCommonRegionalDestination"].ToString();
-            v.MostCommonRegionalOrigin = dr["MostCommonRegionalOrigin"].ToString();
             v.NearestBigCity = "ערך זמני";//BENNY FILL HERE
             //v.Day1 = dr["preferDay1"].ToString();
             //v.Hour1 = dr["preferHour1"].ToString();
