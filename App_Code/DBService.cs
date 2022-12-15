@@ -425,4 +425,44 @@ public class DbService : IDisposable
             con.Dispose();
         }
     }
+
+
+    public int updateNearestCity(List<City> cities)
+    {
+
+        int row_affected = 0;
+
+        try
+        {
+            if (con.State == ConnectionState.Closed)
+            {
+                con.Open();
+            }
+
+            foreach (City c in cities)
+            {
+
+                using (SqlCommand cmd = new SqlCommand("spUpdateNearestMainCity", con))
+                {
+                    cmd.Parameters.AddWithValue("@cityName", c.CityName);
+                    cmd.Parameters.AddWithValue("@mainCity", c.NearestMainCity);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    row_affected += cmd.ExecuteNonQuery();
+                }
+            }
+
+            return row_affected;
+
+        }
+
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+        finally
+        {
+            con.Close();
+        }
+
+    }
 }
