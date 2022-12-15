@@ -7,6 +7,7 @@ using System.Data.SqlClient;
 using System.Configuration;
 using log4net;
 using System.Diagnostics;
+using System.IO;
 
 
 /// <summary>
@@ -17,11 +18,17 @@ public class DbService : IDisposable
     SqlTransaction tran;
     SqlCommand cmd;
     public SqlConnection con;
-    public static List<string> stackTraces = new List<string>();
+    public List<string> stackTraces;
     static int counter = 1;
     StackTrace stackTrace;
+    static string path = "\\log\\StackTraces.txt";
+    string stackTracesfilePath = HttpContext.Current.Server.MapPath("~") + path;
 
     SqlDataAdapter adp;
+    public DbService(bool noConnectopnInstance)
+    {
+
+    }
     public DbService()
     {
         try
@@ -37,14 +44,58 @@ public class DbService : IDisposable
         }
         finally
         {
-            stackTrace = new StackTrace();
-            string result = stackTrace.ToString();
-            int indexOfSystem = result.IndexOf("System");
-            result = result.Substring(0, indexOfSystem);
-
-            stackTraces.Add((counter++).ToString() + ") " + result + " at datetime: " + DateTime.Now);
-            stackTraces.Add("========================================================ENTER");
+            try
+            {
+                LogToTextFile();
+            }
+            catch (Exception)
+            {
+                //the catch is empty in order not to crash the system!
+            }
         }
+    }
+
+    private void LogToTextFile()
+    {
+        stackTrace = new StackTrace();
+        string result = stackTrace.ToString();
+        int indexOfSystem = result.IndexOf("System");
+        result = result.Substring(0, indexOfSystem);
+        stackTraces = GetStackTraces();
+        stackTraces.Add(counter++.ToString() + ") " + DateTime.Now + " " + result + " at datetime: " + Environment.NewLine);
+
+        File.WriteAllLines(stackTracesfilePath, stackTraces);
+    }
+
+    public List<string> GetStackTraces()
+    {
+        List<string> stackTraces;
+        if (File.Exists(stackTracesfilePath))
+        {
+            stackTraces = File.ReadAllLines(stackTracesfilePath).ToList();
+        }
+        else
+        {
+            stackTraces = new List<string>();
+        }
+
+        return stackTraces;
+    }
+
+    public string ClearStackTracesFile()
+    {
+        string result = "";
+        if (File.Exists(stackTracesfilePath))
+        {
+            File.Delete(stackTracesfilePath);
+            result = "stack trace initialized";
+        }
+        else
+        {
+            result = "There is no file found to initialize";
+        }
+
+        return "stack trace initialized";
     }
     public void CloseConnection()
     {

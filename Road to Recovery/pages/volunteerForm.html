@@ -1004,23 +1004,16 @@
                             setTimeout(function () { returnVolunteers() }, 1001);
                         },
                         error: function (err) {
+                            let errResponseJSON = err.responseJSON;
+                            let errorMessage = errResponseJSON.Message
 
-                            swal("שגיאה בהוספת מתנדב חדש, בדוק אם מספר הטלפון קיים כבר");
-
-                            //if (err.responseText.indexOf("phone already exists") != -1) {
-                            //    swal(
-                            //        {
-                            //            title: "משתמש עם מספר טלפון זה כבר קיים במערכת",
-                            //            type: "info",
-                            //            timer: 3000,
-                            //            showConfirmButton: false
-                            //        });
-                            //}
-
+                            swal({
+                                title: "הפעולה לא בוצעה, " + errorMessage,
+                                type: "warning",
+                            });
                         }
 
                     });
-                    //END OF Insert Product Code
 
                     return false;
                 },
