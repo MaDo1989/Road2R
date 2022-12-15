@@ -25,6 +25,9 @@ update City set ismain = 1 where CityName = N'רחובות'
 update City set ismain = 1 where CityName = N'תל אביב - יפו'
 
 
+update City set mainCity = CityName where isMain = 1
+
+
 -- =============================================
 -- Author:      Benny Bornfeld
 -- Create Date: 09/12/2022
@@ -91,4 +94,29 @@ BEGIN
 END
 GO
 
+-- =======================================================
+-- Create Stored Procedure Template for Azure SQL Database
+-- =======================================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Benny B>
+-- Create Date: <15-12-2022>
+-- Description: <Gets only cities where there are volunteers >
+-- =============================================
+CREATE PROCEDURE spGetVolunteerCities
+
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+    SET NOCOUNT ON
+
+    -- Insert statements for procedure here
+select cityname, mainCity from city where cityname in (select citycityname from volunteer) 
+
+END
+GO
 

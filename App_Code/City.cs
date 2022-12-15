@@ -233,9 +233,47 @@ public class City
         {
             throw ex;
         }
-
+        finally {
+            if (dbs.con != null)
+                dbs.con.Close();
+        }
         return cities;
     }
+
+
+
+
+    public Dictionary<string, string> getNearbyCities() {
+
+        Dictionary<string, string> dic = new Dictionary<string, string>();
+        cmd = new SqlCommand();
+        dbs = new DbService();
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.CommandText = "spGetVolunteerCities";
+
+        try
+        {
+            dbs = new DbService();
+            sdr = dbs.GetDataReaderSP(cmd);
+            while (sdr.Read())
+            {
+                City city = new City();
+                city.CityName = Convert.ToString(sdr["CityName"]);
+                city.nearestMainCity = Convert.ToString(sdr["mainCity"]);
+                dic.Add(city.CityName, city.nearestMainCity);
+            }
+            return dic;
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+        finally {
+            if (dbs.con != null)
+                dbs.con.Close();
+        }
+    }
+
 
     public int write(List<City> cities)
     {
