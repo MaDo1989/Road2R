@@ -11,7 +11,7 @@ $(document).ready(function () {
 
 
 function update() {
-    index = 0;
+    index = 1;
     let timeInterval = parseInt($("#timeInterval").val());
     geocoder = new google.maps.Geocoder();
     codeAddress();
@@ -26,11 +26,9 @@ function readCities() {
     //scb(names);
 
 
-    let mode = $("#rewrite").val();
-    let url = "WebService.asmx/getUnmappedCities";
-    if (mode === "true") {
-        url = "WebService.asmx/getCities";
-    }
+    mode = $("#rewrite").val();
+    let url = "WebService.asmx/getCities";
+
 
 
     $.ajax({
@@ -50,7 +48,18 @@ function readCities() {
 
 
 function scb(data) {
-    cities = JSON.parse(data.d);
+    Allcities = JSON.parse(data.d);
+    cities = [];
+    if (mode === "true") {
+        for (var i = 0; i < Allcities.length; i++) {
+            if (Allcities[i].Lat === 0 && Allcities[i].Lng === 0)
+                cities.push(Allcities[i]);
+        }
+    }
+    else
+        cities = Allcities;
+
+
     //names = ["גלעד"];
     $("#updateDBDiv").css("visibility", "visible");
     $("#ph").html(`got ${cities.length} cities`);
