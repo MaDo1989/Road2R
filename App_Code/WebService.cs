@@ -1501,7 +1501,7 @@ public class WebService : System.Web.Services.WebService
             HttpResponse response = GzipMe();
 
             Volunteer c = new Volunteer();
-            List<Volunteer> volunteersList = c.getVolunteersList(active);
+            List<Volunteer> volunteersList = c.getVolunteersList_V2_WebOnly(active);
             return j.Serialize(volunteersList);
         }
         catch (Exception ex)

@@ -82,7 +82,7 @@ public class Volunteer
     string answeredPrevQues;
     string galitRemarks;
     //Delete until here and dont forget the properties
-
+    public DateTime DateTime_LastModified { get; set; }
     public List<RideStatus> Statusim { get; set; }
     public int NoOfDocumentedCalls { get; set; }
     public int NoOfDocumentedRides { get; set; }
@@ -1373,7 +1373,7 @@ public class Volunteer
         // get the nearby Cities
         City city = new City();
         Dictionary<string, string> nearByCities = city.getNearbyCities();
-
+        List<Volunteer> volunteersWithCityWhichDoesntExistsIn_nearByCities = new List<Volunteer>();
 
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
@@ -1397,7 +1397,16 @@ public class Volunteer
             v.NoOfDocumentedRides = Convert.ToInt32(dr["NoOfDocumentedRides"]);
             v.NumOfRides_last2Months = Convert.ToInt32(dr["NumOfRides_last2Months"]);
             v.MostCommonPath = dr["mostCommonPath"].ToString();
-            v.NearestBigCity = nearByCities[v.City];//BENNY FILL HERE
+
+            if (nearByCities.Keys.Contains(v.city))
+            {
+                v.NearestBigCity = nearByCities[v.City];//BENNY FILL HERE
+            }
+            else
+            {
+                volunteersWithCityWhichDoesntExistsIn_nearByCities.Add(v);
+            }
+            
             //v.Day1 = dr["preferDay1"].ToString();
             //v.Hour1 = dr["preferHour1"].ToString();
             //v.Day2 = dr["preferDay2"].ToString();
@@ -1441,6 +1450,88 @@ public class Volunteer
 
         return list;
     }
+
+    public List<Volunteer> getVolunteersList_V2_WebOnly(bool active)
+    {
+        #region DB functions
+        string query = "exec spVolunteerTypeView_GetVolunteersList @isActive=" + active;
+
+
+        List<Volunteer> list = new List<Volunteer>();
+        DbService db = new DbService();
+        DataSet ds = db.GetDataSetByQuery(query);
+
+        // get the nearby Cities
+        City city = new City();
+        Dictionary<string, string> nearByCities = city.getNearbyCities();
+
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+            Volunteer v = new Volunteer();
+            v.Id = int.Parse(dr["Id"].ToString());
+            v.DisplayName = dr["DisplayName"].ToString();
+            v.FirstNameA = dr["FirstNameA"].ToString();
+            v.FirstNameH = dr["FirstNameH"].ToString();
+            v.LastNameH = dr["LastNameH"].ToString();
+            v.LastNameA = dr["LastNameA"].ToString();
+            v.CellPhone = dr["CellPhone"].ToString();
+            v.CellPhone2 = dr["CellPhone2"].ToString();
+            v.HomePhone = dr["HomePhone"].ToString();
+            v.Remarks = dr["Remarks"].ToString();
+            v.City = dr["CityCityName"].ToString();
+            v.Address = dr["Address"].ToString();
+            v.TypeVol = dr["VolunTypeType"].ToString();
+            v.Email = dr["Email"].ToString();
+            v.Device = dr["device"].ToString();
+            v.NoOfDocumentedCalls = Convert.ToInt32(dr["NoOfDocumentedCalls"]);
+            v.NoOfDocumentedRides = Convert.ToInt32(dr["NoOfDocumentedRides"]);
+            v.NumOfRides_last2Months = Convert.ToInt32(dr["NumOfRides_last2Months"]);
+            v.MostCommonPath = dr["mostCommonPath"].ToString();
+
+            if (nearByCities.Keys.Contains(v.city))
+            {
+                v.NearestBigCity = nearByCities[v.City];
+            }
+
+
+            string date = dr["JoinDate"].ToString();
+            bool isAssistant = Convert.ToBoolean(dr["isAssistant"].ToString());
+            if (date == "")
+            {
+
+            }
+            else v.JoinDate = Convert.ToDateTime(dr["JoinDate"].ToString());
+            bool ac = false;
+            if (dr["IsActive"].ToString().ToLower() == "true")
+            {
+                ac = true;
+            }
+            v.IsActive = ac;
+            bool arabic = false;
+            if (dr["KnowsArabic"].ToString().ToLower() == "true")
+            {
+                arabic = true;
+            }
+            v.KnowsArabic = arabic;
+            v.Gender = dr["Gender"].ToString();
+            v.RegId = dr["pnRegId"].ToString();
+
+            v.EnglishName = dr["englishName"].ToString();
+            DateTime lastmodified;
+            DateTime.TryParse(dr["lastModified"].ToString(),out lastmodified);
+            v.DateTime_LastModified = lastmodified;
+
+            if (dr["isDriving"].ToString() != "")
+            {
+                v.IsDriving = Convert.ToBoolean(dr["isDriving"].ToString());
+            }
+            list.Add(v);
+        }
+        #endregion
+
+        return list;
+    }
+
 
     public Volunteer getVolunteer()
     {
@@ -1811,7 +1902,7 @@ public class Volunteer
                 {
                     throw new Exception(isSuccessIsDrivingToggleModel.Reason);
                 }
-              
+
                 string displayQuery = "";
                 User u = new User();
                 string newDisplayName = v.FirstNameH + " " + v.LastNameH;

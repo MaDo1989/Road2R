@@ -338,7 +338,7 @@ var GENERAL = {
         * Ascending: → 0 if a=b, 1 if a > b, -1 if a < b
         * Descending: → 0 if a=b,-1 if a > b,  1 if a > b
         */
-        datetimeCompateFunc: (a, b, isAscending) => {
+        datetimeCompareFunc: (a, b, isAscending) => {
 
             let dateAndTimeArrayof_a = $.trim(a).split(', ');
             let dateAndTimeArrayof_b = $.trim(b).split(', ');
@@ -382,6 +382,40 @@ var GENERAL = {
             }
             return result;
         },
+        dateCompareFunc: (a, b, isAscending) => {
+            let ddmmyyyArr_a = $.trim(a).split('.');
+            let ddmmyyyArr_b = $.trim(b).split('.');
+
+            let dd_a = parseInt(ddmmyyyArr_a[0]);
+            let mm_a = parseInt(ddmmyyyArr_a[1]);
+            let yyyy_a = parseInt(ddmmyyyArr_a[2]);
+
+            let dd_b = parseInt(ddmmyyyArr_b[0]);
+            let mm_b = parseInt(ddmmyyyArr_b[1]);
+            let yyyy_b = parseInt(ddmmyyyArr_b[2]);
+
+
+            let a_date = new Date(yyyy_a, mm_a + 1, dd_a);
+            let b_date = new Date(yyyy_b, mm_b + 1, dd_b);
+
+            a = a_date.getTime();
+            b = b_date.getTime();
+            let result;
+            if (isAscending) {
+
+                a = isNaN(a) ? Infinity : a; 
+                b = isNaN(b) ? Infinity : b; 
+
+                result = a === b ? 0 : a > b ? 1 : -1;
+            } else {//Descending
+
+                a = isNaN(a) ? -Infinity : a;
+                b = isNaN(b) ? -Infinity : b; 
+
+                result = a === b ? 0 : a > b ? -1 : 1;
+            }
+            return result;
+        }
 
     },
 
