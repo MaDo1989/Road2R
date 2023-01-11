@@ -687,7 +687,9 @@
             getHoursGap,
             convert2DBDateToInt,
             getHebrew_WeekDay,
-            showMe
+            showMe, 
+            dateCompareFunc,
+            datetimeCompareFunc
 
         } = GENERAL.USEFULL_FUNCTIONS;
 
@@ -1164,7 +1166,6 @@
 
                     let datetime_a = $.trim(a).split(':');
                     let datetime_b = $.trim(b).split(':');
-
                     let hh_a = parseInt(datetime_a[0]);
                     let mm_a = parseInt(datetime_a[1]);
 
@@ -1229,151 +1230,24 @@
 
                 "de_date-asc": (a, b) => {
 
-                    /*a and b are a couple of dates to compare
-                   return value will be:
-                   0 if a=b
-                   1 if a > b
-                  -1 if a < b
-                   */
-
-                    let ddmmyyyArr_a = $.trim(a).split('.');
-                    let ddmmyyyArr_b = $.trim(b).split('.');
-
-                    let dd_a = parseInt(ddmmyyyArr_a[0]);
-                    let mm_a = parseInt(ddmmyyyArr_a[1]);
-                    let yyyy_a = parseInt(ddmmyyyArr_a[2]);
-
-                    let dd_b = parseInt(ddmmyyyArr_b[0]);
-                    let mm_b = parseInt(ddmmyyyArr_b[1]);
-                    let yyyy_b = parseInt(ddmmyyyArr_b[2]);
-
-
-                    let a_date = new Date(yyyy_a, mm_a + 1, dd_a);
-                    let b_date = new Date(yyyy_b, mm_b + 1, dd_b);
-
-                    a = a_date.getTime();
-                    b = b_date.getTime();
-
-                    return a === b ? 0 : a > b ? 1 : -1;
+                    return dateCompareFunc(a, b, true);
 
                 },
 
                 "de_date-desc": (a, b) => {
 
-                    /*a and b are a couple of dates to compare
-                   return value will be:
-                   0 if a=b
-                  -1 if a > b
-                   1 if a < b
-                   */
-
-                    let ddmmyyyArr_a = $.trim(a).split('.');
-                    let ddmmyyyArr_b = $.trim(b).split('.');
-
-                    let dd_a = parseInt(ddmmyyyArr_a[0]);
-                    let mm_a = parseInt(ddmmyyyArr_a[1]);
-                    let yyyy_a = parseInt(ddmmyyyArr_a[2]);
-
-                    let dd_b = parseInt(ddmmyyyArr_b[0]);
-                    let mm_b = parseInt(ddmmyyyArr_b[1]);
-                    let yyyy_b = parseInt(ddmmyyyArr_b[2]);
-
-                    //let now = new Date();
-
-                    let a_date = new Date(yyyy_a, mm_a + 1, dd_a);
-                    let b_date = new Date(yyyy_b, mm_b + 1, dd_b);
-
-                    a = a_date.getTime();
-                    b = b_date.getTime();
-
-                    return a === b ? 0 : a > b ? -1 : 1;
+                    return dateCompareFunc(a, b, false);
                 },
 
                 "last_modifiedSort-asc": (a, b) => {
-                    /*
-                     a and b are a couple of dates to compare
-                     return value will be:
-                     0 if a=b
-                     1 if a > b
-                     -1 if a < b
-                    */
 
-                    let dateAndTimeArrayof_a = $.trim(a).split(', ');
-                    let dateAndTimeArrayof_b = $.trim(b).split(', ');
-
-
-                    let ddmmyyyArr_a = dateAndTimeArrayof_a[0].split('.');
-                    let ddmmyyyArr_b = dateAndTimeArrayof_b[0].split('.');
-
-                    let dd_a = parseInt(ddmmyyyArr_a[0]);
-                    let mm_a = parseInt(ddmmyyyArr_a[1]);
-                    let yyyy_a = parseInt(ddmmyyyArr_a[2]);
-
-                    let dd_b = parseInt(ddmmyyyArr_b[0]);
-                    let mm_b = parseInt(ddmmyyyArr_b[1]);
-                    let yyyy_b = parseInt(ddmmyyyArr_b[2]);
-
-
-                    let time_a = dateAndTimeArrayof_a[1].split(':');
-                    let time_b = dateAndTimeArrayof_b[1].split(':');
-
-                    let hh_a = parseInt(time_a[0]);
-                    let minutes_a = parseInt(time_a[1]);
-
-                    let hh_b = parseInt(time_b[0]);
-                    let minutes_b = parseInt(time_b[1]);
-
-                    //new Date(year, monthIndex, day, hours, minutes)
-                    let a_dateAndTime = new Date(yyyy_a, mm_a - 1, dd_a, hh_a, minutes_a);
-                    let b_dateAndTime = new Date(yyyy_b, mm_b - 1, dd_b, hh_b, minutes_b);
-
-                    a = a_dateAndTime.getTime();
-                    b = b_dateAndTime.getTime();
-                    return a === b ? 0 : a > b ? 1 : -1;
+                    return datetimeCompareFunc(a, b, true);
 
                 },
 
                 "last_modifiedSort-desc": (a, b) => {
-                    /*
-                     a and b are a couple of dates to compare
-                     return value will be:
-                     0 if a=b
-                    -1 if a > b
-                     1 if a < b
-                    */
 
-                    let dateAndTimeArrayof_a = $.trim(a).split(', ');
-                    let dateAndTimeArrayof_b = $.trim(b).split(', ');
-
-
-                    let ddmmyyyArr_a = dateAndTimeArrayof_a[0].split('.');
-                    let ddmmyyyArr_b = dateAndTimeArrayof_b[0].split('.');
-
-                    let dd_a = parseInt(ddmmyyyArr_a[0]);
-                    let mm_a = parseInt(ddmmyyyArr_a[1]);
-                    let yyyy_a = parseInt(ddmmyyyArr_a[2]);
-
-                    let dd_b = parseInt(ddmmyyyArr_b[0]);
-                    let mm_b = parseInt(ddmmyyyArr_b[1]);
-                    let yyyy_b = parseInt(ddmmyyyArr_b[2]);
-
-
-                    let time_a = dateAndTimeArrayof_a[1].split(':');
-                    let time_b = dateAndTimeArrayof_b[1].split(':');
-
-                    let hh_a = parseInt(time_a[0]);
-                    let minutes_a = parseInt(time_a[1]);
-
-                    let hh_b = parseInt(time_b[0]);
-                    let minutes_b = parseInt(time_b[1]);
-
-                    //new Date(year, monthIndex, day, hours, minutes)
-                    let a_dateAndTime = new Date(yyyy_a, mm_a - 1, dd_a, hh_a, minutes_a);
-                    let b_dateAndTime = new Date(yyyy_b, mm_b - 1, dd_b, hh_b, minutes_b);
-
-                    a = a_dateAndTime.getTime();
-                    b = b_dateAndTime.getTime();
-                    return a === b ? 0 : a > b ? -1 : 1;
+                    return datetimeCompareFunc(a, b, false);
 
                 },
 
@@ -2209,6 +2083,7 @@
                                 }
                             },
                             { targets: 6, className: 'last-modified_td' },
+                            { targets: 6, type: 'last_modifiedSort' },
                             { "targets": [8], visible: false },
                             { targets: [9], orderable: false }
 
@@ -2326,6 +2201,7 @@
                                 }
                             },
                             { targets: 6, className: 'last-modified_td' },
+                            { targets: 6, type: 'last_modifiedSort' },
                             { targets: [8], visible: false },
                             { targets: [9], orderable: false }
                         ],
@@ -2424,6 +2300,7 @@
                                 }
                             },
                             { targets: 7, className: 'last-modified_td' },
+                            { targets: 7, type: 'last_modifiedSort' },
                             { targets: 8, className: 'text-left-strong' },
                             { targets: [9], visible: false },
                             { targets: [10], orderable: false }
@@ -2468,6 +2345,7 @@
                         columnDefs: [
                             { targets: 0, type: 'de_date' },
                             { targets: 1, type: 'de_time' },
+                            { targets: 7, type: 'last_modifiedSort' },
                             { width: '4%', "targets": [0, 1] },
                             { width: '6%', "targets": [2, 3] },
                             { width: '10%', "targets": [4] },

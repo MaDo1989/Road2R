@@ -382,6 +382,7 @@ var GENERAL = {
             }
             return result;
         },
+
         dateCompareFunc: (a, b, isAscending) => {
             let ddmmyyyArr_a = $.trim(a).split('.');
             let ddmmyyyArr_b = $.trim(b).split('.');
@@ -424,4 +425,4 @@ var GENERAL = {
     },
 
     APP_ID: 1,
-};
+}

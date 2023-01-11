@@ -1373,7 +1373,6 @@ public class Volunteer
         // get the nearby Cities
         City city = new City();
         Dictionary<string, string> nearByCities = city.getNearbyCities();
-        List<Volunteer> volunteersWithCityWhichDoesntExistsIn_nearByCities = new List<Volunteer>();
 
         foreach (DataRow dr in ds.Tables[0].Rows)
         {
@@ -1401,10 +1400,6 @@ public class Volunteer
             if (nearByCities.Keys.Contains(v.city))
             {
                 v.NearestBigCity = nearByCities[v.City];//BENNY FILL HERE
-            }
-            else
-            {
-                volunteersWithCityWhichDoesntExistsIn_nearByCities.Add(v);
             }
             
             //v.Day1 = dr["preferDay1"].ToString();
