@@ -244,6 +244,7 @@ public class User
     public string getIdByUserName(string displayName)
     {
         #region DB functions
+        displayName = displayName.Replace("'", "''");
         string query = "select Id from Volunteer where DisplayName =N'" + displayName + "'";
 
         DbService db = new DbService();
