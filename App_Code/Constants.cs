@@ -21,4 +21,35 @@ public static class Constants
         public static readonly int AmountOfRidesInNewDriverTimeWindow = 3;
         public static readonly int NewDriverTimeWindow = 90;
     }
+
+    public class TimeUnits
+    {
+        public static readonly double DaysInAyear = 365.242199;
+    }
+
+    public class Enums
+    {
+        public enum Gender
+        {
+            Empty = -1,
+            Female = 0,
+            Male = 1
+        }
+
+        public enum PatientStatus
+        {
+            Empty = -1,
+            TreatmentInProcess = 0,
+            TreatmentEnded = 1
+        }
+    }
+
+    public class Strings
+    {
+        public const string Male = "חולֶה";
+        public const string Female = "חולָה";
+        public const string Finished = "סיים";
+        public const string NotFinished = "לא סיים";
+
+    }
 }

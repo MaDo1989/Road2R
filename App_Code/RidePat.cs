@@ -220,7 +220,6 @@ public class RidePat
             lastModified = value;
         }
     }
-
     public RidePat()
     {
         //
@@ -1147,6 +1146,14 @@ public class RidePat
                     rp.pat.EnglishName = dr["EnglishName"].ToString();
                     rp.pat.CellPhone = dr["CellPhone"].ToString();
                     rp.pat.IsAnonymous = dr["IsAnonymous"].ToString();
+                    string gender = dr["Gender"].ToString();
+                    rp.Pat.GenderAsEnum = Convertions.ConvertStringToGender(gender);
+                    DateTime? dateOfBirth = String.IsNullOrEmpty(dr["BirthDate"].ToString()) ? null : (DateTime?)Convert.ToDateTime(dr["BirthDate"].ToString());
+                    rp.Pat.Age = Calculations.CalculateAge(dateOfBirth);
+                    rp.Pat.RidePatPatientStatus = new RidePatPatientStatus();
+                    string patientStatus = dr["PatientStatus"].ToString();
+                    rp.Pat.RidePatPatientStatus.Status = Convertions.ConvertStringToPatientStatus(patientStatus);
+                    rp.Pat.RidePatPatientStatus.EditTimeStamp = String.IsNullOrEmpty(dr["EditTimeStamp"].ToString()) ? null : (DateTime?)Convert.ToDateTime(dr["EditTimeStamp"].ToString());
 
                     rp.pat.Id = int.Parse(dr["Id"].ToString());
                     rp.pat.Equipment = new List<string>();

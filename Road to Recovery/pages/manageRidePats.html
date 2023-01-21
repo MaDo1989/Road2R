@@ -137,6 +137,7 @@
         }
 
         const notification = $.connection.ridePatHub;
+
         $.connection.hub.start().done();
 
         notification.client.driverHasAssigned2RidePat = function (updated_ridePat) {
@@ -470,7 +471,6 @@
 
         }
 
-
         const shiftRidePatToSuitableTable = (tableNameRidePatIsNowIn, tableNameRidePatShouldBeRender, updated_ridePat) => {
 
             removeRidePatFromOldTable(tableNameRidePatIsNowIn, updated_ridePat);
@@ -687,11 +687,14 @@
             getHoursGap,
             convert2DBDateToInt,
             getHebrew_WeekDay,
-            showMe, 
+            showMe,
             dateCompareFunc,
-            datetimeCompareFunc
+            datetimeCompareFunc,
+            AdjustAge
 
         } = GENERAL.USEFULL_FUNCTIONS;
+
+        const { GetPatientGender, GetPatientStatus } = GENERAL.PATIENTS;
 
         const { ajaxCall } = GENERAL.FETCH_DATA;
         const { APP_ID } = GENERAL;
@@ -959,6 +962,10 @@
             removeClass('highlightRow');
         }
 
+        const editPatientStatusAbort = () => {
+            removeClass('highlightRow');
+        }
+
         const updateRidePatTime = () => {
 
             $('#wait').show();
@@ -1093,7 +1100,7 @@
 
 
             $("#editTimeModal").attr("w3-include-html", "editTimeModal.html");
-            //$('#editTimeModal').on('shown.bs.modal', editTimeModal_bsModalHasShown);
+            $("#editPatientStatusModal").attr("w3-include-html", "editPatientStatusModal.html");
 
             wiringDataTables();
             const { COPYWRITE } = GENERAL;
@@ -1910,6 +1917,8 @@
                     let driverHTML;
                     let status2render;
                     let timeHTML;
+                    let patientGender = null;
+                    let patientAge = null;
 
 
                     for (let i = 0; i < arr_rides.length; i++) {
@@ -1927,7 +1936,6 @@
 
                         //#region adjust patient column
                         patientHTML = buildPatientHTML(arr_rides[i]);
-
                         //#endregion
 
                         //#region adjust driver column
@@ -1943,10 +1951,13 @@
                         //#endregion adjust driver column
 
                         //#region Status
-
-                        status2render = buildStatusString(arr_rides[i].Status);
-
+                        status2render = buildStatusString(arr_rides[i].Pat.RidePatPatientStatus, arr_rides[i].RidePatNum);
                         //#endregion Status
+
+                        //#region patient age
+                        patientAge = AdjustAge(arr_rides[i].Pat.Age);
+                        //#endregion
+
 
                         //#region buttons
                         btnStr = buildAcionsButtonsHTML(arr_rides[i].RidePatNum, arr_rides[i].Drivers)
@@ -1958,10 +1969,10 @@
                             origin: isAssistant ? arr_rides[i].Origin.EnglishName : arr_rides[i].Origin.Name,
                             destination: isAssistant ? arr_rides[i].Destination.EnglishName : arr_rides[i].Destination.Name,
                             patient: patientHTML,
+                            patientAge: patientAge,
                             driver: driverHTML,
                             status: status2render,
                             lastModified: convertDBDate2FrontEndDate(arr_rides[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" }),
-                            //englishOriginAndDestination: arr_rides[i].Origin.EnglishName + " - " + arr_rides[i].Destination.EnglishName,
                             remark: arr_rides[i].Remark,
                             isAnonymous: arr_rides[i].Pat.IsAnonymous === 'True',
                             hasDriver: arr_rides[i].Drivers.length > 0,
@@ -2021,26 +2032,27 @@
                             { data: "origin" },                              //1
                             { data: "destination" },                         //2
                             { data: "patient" },                             //3
-                            { data: "driver" },                              //4
-                            { data: "status" },                              //5
-                            { data: "lastModified" },                        //6
-                            { data: "remark" },                              //7
-                            { data: "isAnonymous" },                         //8
-                            { data: "buttons" },                             //9
+                            { data: "patientAge" },                          //4
+                            { data: "driver" },                              //5
+                            { data: "status" },                              //6
+                            { data: "lastModified" },                        //7
+                            { data: "remark" },                              //8
+                            { data: "isAnonymous" },                         //9
+                            { data: "buttons" },                             //10
                         ],
                         columnDefs: [
-                            { width: '5%', "targets": [0, 1, 2, 4, 5, 6] },
+                            { width: '5%', "targets": [0, 1, 2, 4, 5, 6, 7] },
                             { width: '15%', "targets": [3] },
                             { width: '25%', "targets": [9] },
                             { targets: 0, type: 'de_time' },
                             {
-                                targets: [1, 2, 3, 4, 5, 6], createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {
+                                targets: [1, 2, 3, 5, 6, 7], createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {
                                     if (isAssistant) {
                                         cell.className += ' ltr';
                                     }
 
                                     switch (colIndex) {
-                                        case 4: //driver column
+                                        case 5: //driver column
 
                                             $(cell).addClass('driver_td');
                                             if (!rowData.hasDriver) {
@@ -2049,7 +2061,7 @@
                                             }
                                             break;
 
-                                        case 5://status column
+                                        case 6://status column
                                             if (
                                                 cellData.indexOf("הגענו ליעד") !== -1 ||
                                                 cellData.indexOf("Reached destination") !== -1
@@ -2064,7 +2076,7 @@
                                                 }
                                             }
                                             break;
-                                        case 6://lastModified column
+                                        case 7://lastModified column
 
                                             const thisRidePatNum = rowData.ridePatNum;
                                             const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatNum);
@@ -2082,10 +2094,10 @@
 
                                 }
                             },
-                            { targets: 6, className: 'last-modified_td' },
-                            { targets: 6, type: 'last_modifiedSort' },
-                            { "targets": [8], visible: false },
-                            { targets: [9], orderable: false }
+                            { targets: 7, className: 'last-modified_td' },
+                            { targets: 7, type: 'last_modifiedSort' },
+                            { "targets": [9], visible: false },
+                            { targets: [10], orderable: false }
 
                         ],
                     });
@@ -2110,21 +2122,22 @@
                             { data: "origin" },                              //1
                             { data: "destination" },                         //2
                             { data: "patient" },                             //3
-                            { data: "driver" },                              //4
-                            { data: "status" },                              //5
-                            { data: "lastModified" },                        //6
-                            { data: "remark" },                              //7
-                            { data: "isAnonymous" },                         //8
-                            { data: "buttons" },                             //9
+                            { data: "patientAge" },                          //4
+                            { data: "driver" },                              //5
+                            { data: "status" },                              //6
+                            { data: "lastModified" },                        //7
+                            { data: "remark" },                              //8
+                            { data: "isAnonymous" },                         //9
+                            { data: "buttons" },                             //10
                         ],
                         columnDefs: [
-                            { width: '5%', "targets": [0, 1, 2, 4, 5, 6, 7] },
+                            { width: '5%', "targets": [0, 1, 2, 4, 5, 6, 7, 8] },
                             { width: '15%', "targets": [3] },
-                            { width: '25%', "targets": [9] },
+                            { width: '25%', "targets": [10] },
                             { targets: 0, type: 'de_time' },
                             { targets: [0], createdCell: (td) => { $(td).attr('id', 'rideTiming') } },
                             {
-                                targets: [1, 2, 3, 4, 5, 6], createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {
+                                targets: [1, 2, 3, 5, 6, 7], createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {
                                     if (isAssistant) {
                                         cell.className += ' ltr';
                                     }
@@ -2146,7 +2159,7 @@
                                             createdCell: (td) => { $(td).attr('id', 'DestinationName') }
                                             break;
 
-                                        case 4: //driver
+                                        case 5: //driver
                                             //this code is identical to the one in datatable-tomorrow when can need to change to 1 function
                                             $(cell).addClass('driver_td');
                                             if (!rowData.hasDriver) {
@@ -2169,7 +2182,7 @@
                                             }
                                             break;
 
-                                        case 5://status
+                                        case 6://status
                                             if (cellData.indexOf("הגענו ליעד") !== -1 ||
                                                 cellData.indexOf("Reached destination") !== -1) {
 
@@ -2182,7 +2195,7 @@
                                                 }
                                             }
                                             break;
-                                        case 6://lastModified column
+                                        case 7://lastModified column
 
                                             const thisRidePatNum = rowData.ridePatNum;
                                             const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatNum);
@@ -2200,10 +2213,10 @@
 
                                 }
                             },
-                            { targets: 6, className: 'last-modified_td' },
-                            { targets: 6, type: 'last_modifiedSort' },
-                            { targets: [8], visible: false },
-                            { targets: [9], orderable: false }
+                            { targets: 7, className: 'last-modified_td' },
+                            { targets: 7, type: 'last_modifiedSort' },
+                            { targets: [9], visible: false },
+                            { targets: [10], orderable: false }
                         ],
                         autoWidth: false,
 
@@ -2230,21 +2243,22 @@
                             { data: "origin" },                              //2
                             { data: "destination" },                         //3
                             { data: "patient" },                             //4
-                            { data: "driver" },                              //5
-                            { data: "status" },                              //6
-                            { data: "lastModified" },                        //7
-                            { data: "remark" },                              //8
-                            { data: "isAnonymous" },                         //9
-                            { data: "buttons" },                             //10
+                            { data: "patientAge" },                          //5
+                            { data: "driver" },                              //6
+                            { data: "status" },                              //7
+                            { data: "lastModified" },                        //8
+                            { data: "remark" },                              //9
+                            { data: "isAnonymous" },                         //10
+                            { data: "buttons" },                             //11
                         ],
                         "columnDefs": [
                             { targets: 1, type: 'de_time' },
                             { width: '4%', "targets": [0, 1] },
                             { width: '6%', "targets": [2, 3] },
-                            { width: '10%', "targets": [4] },
-                            { width: '5%', "targets": [5, 6, 7, 8] },
-                            { width: '0%', "targets": [9] },
-                            { width: '25%', "targets": [10] },
+                            { width: '10%', "targets": [5] },
+                            { width: '5%', "targets": [6, 7, 8, 9] },
+                            { width: '0%', "targets": [10] },
+                            { width: '25%', "targets": [11] },
                             {
                                 targets: 5, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //5 is driver column
 
@@ -2270,7 +2284,7 @@
                                 }
                             },
                             {
-                                targets: 6, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //6 is status column
+                                targets: 7, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //6 is status column
                                     if (cellData.indexOf("הגענו ליעד") !== -1 ||
                                         cellData.indexOf("Reached destination") !== -1) {
 
@@ -2285,7 +2299,7 @@
                                 }
                             },
                             {
-                                targets: 7, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {//lastModified column
+                                targets: 8, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {//lastModified column
 
                                     const thisRidePatNum = rowData.ridePatNum;
                                     const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatNum);
@@ -2299,11 +2313,11 @@
                                     }
                                 }
                             },
-                            { targets: 7, className: 'last-modified_td' },
-                            { targets: 7, type: 'last_modifiedSort' },
-                            { targets: 8, className: 'text-left-strong' },
-                            { targets: [9], visible: false },
-                            { targets: [10], orderable: false }
+                            { targets: 8, className: 'last-modified_td' },
+                            { targets: 8, type: 'last_modifiedSort' },
+                            { targets: 9, className: 'text-left-strong' },
+                            { targets: [10], visible: false },
+                            { targets: [11], orderable: false }
 
                         ],
                         autoWidth: false,
@@ -2334,12 +2348,13 @@
                             { data: "origin" },                              //2
                             { data: "destination" },                         //3
                             { data: "patient" },                             //4
-                            { data: "driver" },                              //5
-                            { data: "status" },                              //6
-                            { data: "lastModified" },                        //7
-                            { data: "remark" },                              //8
-                            { data: "isAnonymous" },                         //9
-                            { data: "buttons" },                             //10
+                            { data: "patientAge" },                          //5
+                            { data: "driver" },                              //6
+                            { data: "status" },                              //7
+                            { data: "lastModified" },                        //8
+                            { data: "remark" },                              //9
+                            { data: "isAnonymous" },                         //10
+                            { data: "buttons" },                             //11
                         ],
                         pageLength: 100,
                         columnDefs: [
@@ -2349,9 +2364,9 @@
                             { width: '4%', "targets": [0, 1] },
                             { width: '6%', "targets": [2, 3] },
                             { width: '10%', "targets": [4] },
-                            { width: '5%', "targets": [5, 6, 7, 8] },
-                            { width: '0%', "targets": [9] },
-                            { width: '25%', "targets": [10] },
+                            { width: '5%', "targets": [5, 6, 7, 8, 9] },
+                            { width: '0%', "targets": [10] },
+                            { width: '25%', "targets": [11] },
                             { targets: 5, className: 'driver_td' },
                             {
                                 targets: 7, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {//lastModified column
@@ -2368,10 +2383,10 @@
                                     }
                                 }
                             },
-                            { targets: 7, className: 'last-modified_td' },
-                            { targets: 7, type: 'last_modifiedSort' },
-                            { targets: [9], visible: false },
-                            { targets: [10], orderable: false }
+                            { targets: 8, className: 'last-modified_td' },
+                            { targets: 8, type: 'last_modifiedSort' },
+                            { targets: [10], visible: false },
+                            { targets: [11], orderable: false }
                         ],
                         autoWidth: false,
 
@@ -2485,7 +2500,7 @@
                 '<span class="numOfPassengers">single passenger</span>';
             let escortsPhone2render = "";
             let equipmentsAndnumOfPassengers = "";
-
+            let gender = GetPatientGender(ridepat.Pat.GenderAsEnum, isAssistant)
             if (validateMobileNumFullVersion(ridepat.Pat.CellPhone)) {
                 patientPhone2render = `<span class="patientPhone2render">${addSeperator2MobileNum(
                     ridepat.Pat.CellPhone,
@@ -2547,7 +2562,7 @@
             }
 
             let patientAddons =
-                equipmentsAndnumOfPassengers + patientPhone2render + escortsPhone2render;
+                equipmentsAndnumOfPassengers + patientPhone2render + escortsPhone2render + gender;
             let patientName2render = "";
             let patient_English_Name2render = "";
 
@@ -2559,45 +2574,39 @@
                 patient_English_Name2render = `<a href="patientform.html" data-obj="patient" class='showMe blueFont clickable boldFont' id='${ridepat.Pat.Id}'>${ridepat.Pat.EnglishName}</a>`;
             }
 
-            return isAssistant
-                ? patient_English_Name2render + patientAddons
-                : patientName2render + patientAddons;
-        };
 
-        const buildStatusString = (status) => {
-            if (!isAssistant) return status;
+            let result = null;
+            if (isAssistant) {
 
-            switch (status) {
-                case "שובץ נהג":
-                    englishStatus = "Driver registered";
-                    break;
+                result = patient_English_Name2render;
+            } else {
 
-                case "יצאתי לדרך":
-                    englishStatus = "On my way";
-                    break;
-
-                case "הגעתי לנקודת האיסוף":
-                    englishStatus = "At the pickup point";
-                    break;
-
-                case '"הגענו ליעד':
-                    englishStatus = "Reached destination";
-                    break;
-
-                case "אני אאחר":
-                    englishStatus = "I'll be late";
-                    break;
-
-                case "עיכוב במחסום":
-                    englishStatus = "Delay at the border";
-                    break;
-                default:
-                    englishStatus = "Waiting for a driver";
-                    break;
+                result = patientName2render
             }
 
-            return englishStatus;
+            result = result.concat(' ' + patientAddons);
+
+            return result;
         };
+
+        const buildStatusString = (statusObj, ridePatNum) => {
+
+            let statusWrapper = `<div class="elementsInSameLine">`;
+
+            const status = GetPatientStatus(statusObj.Status, isAssistant);
+            const EditTimeStamp = convertDBDate2FrontEndDate(statusObj.EditTimeStamp);
+            const editBtn = `<button type='button' data-toggle="modal" data-target="#editPatientStatusModal" onclick="prepreparationEditPatientStatusModal(this, ${ridePatNum})" class='btn btn-icon waves-effect waves-light btn-secondary' title='עריכה'><i class='ti-pencil'></i></button>`;
+
+            statusHTML = `${status} ${EditTimeStamp}`;
+
+
+            statusWrapper += statusHTML;
+            statusWrapper += editBtn;
+
+            statusWrapper += `</div>`;
+
+            return statusWrapper;
+        }
 
         const buildAcionsButtonsHTML = (ridePatNum, drivers) => {
 
@@ -2620,7 +2629,7 @@
             time += '</span>';
             timeWrapper += time;
 
-            const editBtn = `<button type='button' data-toggle="modal" data-target="#editTimeModal" onclick="prepreparationEditTimeModal(this, ${ridePatNum})" class='btn btn-icon waves-effect waves-light btn-secondary' id=''  name='' title='עריכה'><i class='ti-pencil'></i></button>`;
+            const editBtn = `<button type='button' data-toggle="modal" data-target="#editTimeModal" onclick="prepreparationEditTimeModal(this, ${ridePatNum})" class='btn btn-icon waves-effect waves-light btn-secondary' title='עריכה'><i class='ti-pencil'></i></button>`;
             timeWrapper += editBtn;
             timeWrapper += `</div>`;
 
@@ -2651,13 +2660,36 @@
             _ridepatToManipulate = ridepatNum
             highLightRow(thisBtn);
 
-
-
             $('#editTimeModalTitle').text('עדכון שעת הסעה');
-            const minutesArr = [0, 15, 30, 45];
+            BuildTimeDDLs('hours', 'minutes');
 
-            let $hoursSelect = $("#hours");
-            let $minutesSelect = $("#minutes");
+            const ridepatObject = arr_rides.find(r => r.RidePatNum === ridepatNum);
+            const ridePatTime = convertDBDate2FrontEndDate(ridepatObject.Date);
+
+            let hoursAsDoubleDigits = createDoubleDigit(ridePatTime.getHours());
+            let minutesAsDoubleDigits = createDoubleDigit(ridePatTime.getMinutes());
+            let isAfterNoon = parseInt(minutesAsDoubleDigits) === 14;
+            let $hoursSelect = $('#hours');
+            let $minutesSelect = $('#minutes');
+
+            if (!isAfterNoon) {
+
+                $hoursSelect.val(hoursAsDoubleDigits);
+                $minutesSelect.val(minutesAsDoubleDigits);
+                checkeditTimeAfterNoonCB(false);
+            } else {
+
+                retrieveDDLToInitial('#hours');
+                retrieveDDLToInitial('#minutes');
+                checkeditTimeAfterNoonCB(true);
+            }
+        }
+
+        const BuildTimeDDLs = (hoursId, minutesId) => {
+
+            const minutesArr = [0, 15, 30, 45];
+            let $hoursSelect = $(`#${hoursId}`);
+            let $minutesSelect = $(`#${minutesId}`);
             let doubleDigitsValue = '';
             for (let i = 0; i < 46; i++) {
 
@@ -2674,26 +2706,36 @@
                 }
             }
 
+        }
+
+        function prepreparationEditPatientStatusModal(thisBtn, ridepatNum, EditTimeStamp, status) {
+            _ridepatToManipulate = ridepatNum
+            highLightRow(thisBtn);
+
+            $('#editPatientStatusModalTitle').text('עדכון סטטוס חולה');
+            BuildTimeDDLs("editPatientStatusModalHours", "editPatientStatusModalMinutes");
+            let $hoursSelect = $('#editPatientStatusModalHours');
+            let $minutesSelect = $('#editPatientStatusModalMinutes');
 
             const ridepatObject = arr_rides.find(r => r.RidePatNum === ridepatNum);
-            const ridePatTime = convertDBDate2FrontEndDate(ridepatObject.Date);
+            const ridePatPatientStatus = ridepatObject.Pat.RidePatPatientStatus.Status;
+            let editTimeStamp = ridepatObject.Pat.RidePatPatientStatus.EditTimeStamp;
+            if (editTimeStamp !== null) {
 
-            let hoursAsDoubleDigits = createDoubleDigit(ridePatTime.getHours());
-            let minutesAsDoubleDigits = createDoubleDigit(ridePatTime.getMinutes());
-            let isAfterNoon = parseInt(minutesAsDoubleDigits) === 14;
+                editTimeStamp = convertDBDate2FrontEndDate(editTimeStamp);
+                let hoursAsDoubleDigits = createDoubleDigit(editTimeStamp.getHours());
+                let minutesAsDoubleDigits = createDoubleDigit(editTimeStamp.getMinutes());
 
-            if (!isAfterNoon) {
                 $hoursSelect.val(hoursAsDoubleDigits);
                 $minutesSelect.val(minutesAsDoubleDigits);
-                checkeditTimeAfterNoonCB(false);
-            } else {
-                retrieveDDLToInitial('#hours');
-                retrieveDDLToInitial('#minutes');
-                checkeditTimeAfterNoonCB(true);
-                //try to fix bug with help of this example:
-                //$('#assignDriverModal').on('shown.bs.modal', bsModalHasShown); // triger cb function only after modal is shown
-
             }
+
+
+            //retrieveDDLToInitial('#hours');
+              //retrieveDDLToInitial('#minutes');
+               // checkeditTimeAfterNoonCB(true);
+
+
         }
 
         const checkeditTimeAfterNoonCB = (afterNoonIsChecked) => {
@@ -2948,18 +2990,15 @@
                                                             <th class="middle" title="Destination  نقطة الوصول">יעד</th>
                                                             <th class="customWidth4column middle"
                                                                 title="Patient  المريض">החולה</th>
+                                                            <th class="middle" title="Patient's Name">גיל החולה</th>
                                                             <th class="middle" title="Driver  السائق">המסיע</th>
                                                             <th class="middle" title="Status  حالة السفرية">
-                                                                סטטוס ההסעה
+                                                                סטטוס החולה
                                                             </th>
                                                             <th class="customWidth middle" title="Last modified">
                                                                 עודכן
                                                                 לאחרונה
                                                             </th>
-                                                            <!--<th class="customWidth middle"
-                                                                title="نقطة الانطلاق - نقطة الوصول Origin - Destination">
-                                                                Org - Dest
-                                                            </th>-->
                                                             <th class="customWidth  middle" title="Remarks  ملاحظات">
                                                                 הערות
                                                             </th>
@@ -3006,18 +3045,15 @@
                                                             <th class="middle" title="Destination  نقطة الوصول">יעד</th>
                                                             <th class="customWidth4column middle"
                                                                 title="Patient  المريض">החולה</th>
+                                                            <th class="middle" title="Patient's Name">גיל החולה</th>
                                                             <th class="middle" title="Driver  السائق">המסיע</th>
                                                             <th class="middle" title="Status  حالة السفرية">
-                                                                סטטוס ההסעה
+                                                                סטטוס החולה
                                                             </th>
                                                             <th class="customWidth middle" title="Last modified">
                                                                 עודכן
                                                                 לאחרונה
                                                             </th>
-                                                            <!--<th class="customWidth middle"
-                                                                title="نقطة الانطلاق - نقطة الوصول Origin - Destination">
-                                                                Org - Dest
-                                                            </th>-->
                                                             <th class="customWidth  middle" title="Remarks  ملاحظات">
                                                                 הערות
                                                             </th>
@@ -3065,18 +3101,15 @@
                                                             <th class="middle" title="Destination  نقطة الوصول">יעד</th>
                                                             <th class="customWidth4column middle"
                                                                 title="Patient  المريض">החולה</th>
+                                                            <th class="middle" title="Patient's Name">גיל החולה</th>
                                                             <th class="middle" title="Driver  السائق">המסיע</th>
                                                             <th class="middle" title="Status  حالة السفرية">
-                                                                סטטוס ההסעה
+                                                                סטטוס החולה
                                                             </th>
                                                             <th class="customWidth middle" title="Last modified">
                                                                 עודכן
                                                                 לאחרונה
                                                             </th>
-                                                            <!--<th class="customWidth middle"
-                                                                title="نقطة الانطلاق - نقطة الوصول Origin - Destination">
-                                                                Org - Dest
-                                                            </th>-->
                                                             <th class="customWidth  middle" title="Remarks  ملاحظات">
                                                                 הערות
                                                             </th>
@@ -3123,6 +3156,8 @@
                                                             <th class="middle" title="Destination  نقطة الوصول">יעד</th>
                                                             <th class="customWidth4column middle"
                                                                 title="Patient  المريض">החולה</th>
+                                                            <th class="middle" title="Patient's Name">גיל החולה</th>
+
                                                             <th class="middle" title="Driver  السائق">המסיע</th>
                                                             <th class="middle" title="Status  حالة السفرية">
                                                                 סטטוס ההסעה
@@ -3131,10 +3166,6 @@
                                                                 עודכן
                                                                 לאחרונה
                                                             </th>
-                                                            <!--<th class="customWidth middle"
-                                                                title="نقطة الانطلاق - نقطة الوصول Origin - Destination">
-                                                                Org - Dest
-                                                            </th>-->
                                                             <th class="customWidth  middle" title="Remarks  ملاحظات">
                                                                 הערות
                                                             </th>
@@ -3213,6 +3244,7 @@
 
     <div class="modal fade" id="assignDriverModal" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="documentedRidesTitle" aria-hidden="true"></div>
     <div class="modal fade" id="editTimeModal" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="editTimeTitle" aria-hidden="true"></div>
+    <div class="modal fade" id="editPatientStatusModal" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="editPatientStatusTitle" aria-hidden="true"></div>
 
     <div class="modal fade" id="filtersModal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog" role="document">

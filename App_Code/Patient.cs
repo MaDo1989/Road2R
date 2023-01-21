@@ -43,6 +43,8 @@ public class Patient
     List<string> equipment;
     DbService dbs;
 
+    public double? Age { get; set; }
+    public Constants.Enums.Gender GenderAsEnum { get; set; }
     public bool IsActive { get; set; }
 
     public string pnRegId { get; set; }
@@ -65,6 +67,8 @@ public class Patient
             displayName = value;
         }
     }
+    public RidePatPatientStatus RidePatPatientStatus { get; set; }
+
 
     public List<string> getEquipmentForPatient(string patient)
     {
@@ -941,6 +945,7 @@ public class Patient
                 p.Barrier = p.Barrier.getLocation(); //get the full discription of a location
                 p.Hospital = p.Hospital.getLocation(); //get the full discription of a location
                 p.Gender = sdr["Gender"].ToString();
+                p.GenderAsEnum = Convertions.ConvertStringToGender(p.Gender);
                 p.Remarks = sdr["Remarks"].ToString();
                 p.EnglishName = sdr["EnglishName"].ToString();
                 p.IsAnonymous = String.IsNullOrEmpty(sdr["IsAnonymous"].ToString()) ? "" : sdr["IsAnonymous"].ToString();
