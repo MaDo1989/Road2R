@@ -32,9 +32,42 @@ FROM            dbo.Patient INNER JOIN
                          dbo.Ride ON dbo.RidePat.RideId = dbo.Ride.RideNum LEFT JOIN Volunteer V on RidePat.CoordinatorID = V.Id
 						 LEFT JOIN Volunteer driver on driver.Id = dbo.Ride.MainDriver
 						 LEFT JOIN RidePatPatientStatus RPPS ON RidePat.RidePatNum = RPPS.RidePatNum
-
 GO
 
+
+-- =============================================
+-- Author:      Yogev Strauber
+-- Create Date: 03/02/2023
+-- Description: Toggle Patient in a RidePat Status
+-- =============================================
+CREATE OR ALTER PROCEDURE spRidePatPatientStatus_TogglePatientStatus
+(
+	@PatientId INT,
+	@RidePatNum INT,
+	@PatientStatus nvarchar(55),
+	@EditTimeStamp datetime
+)
+AS
+BEGIN
+    SET NOCOUNT ON
+	
+	IF NOT EXISTS (SELECT 1 FROM RidePatPatientStatus WHERE RidePatNum=@RidePatNum)
+		BEGIN
+			INSERT INTO RidePatPatientStatus (PatientId, RidePatNum, PatientStatus, EditTimeStamp)
+			VALUES (@PatientId, @RidePatNum, @PatientStatus, @EditTimeStamp);
+		END
+	ELSE
+		BEGIN
+			UPDATE RidePatPatientStatus
+			SET PatientStatus = @PatientStatus, EditTimeStamp=@EditTimeStamp
+			WHERE RidePatNum=@RidePatNum
+		END
+
+		UPDATE RidePat
+		SET LastModified=GETDATE()
+		WHERE RidePatNum=@RidePatNum
+END
+GO
 
 --Patient Status ↑
 

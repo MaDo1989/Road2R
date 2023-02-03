@@ -386,7 +386,7 @@
                         row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
                         row2manipulate.patient = buildPatientHTML(updated_ridePat);
                         row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
-                        row2manipulate.status = buildStatusString(updated_ridePat.Status);
+                        row2manipulate.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
                         row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                         row2manipulate.remark = updated_ridePat.Remark;
                         row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
@@ -406,7 +406,7 @@
                         row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
                         row2manipulate.patient = buildPatientHTML(updated_ridePat);
                         row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
-                        row2manipulate.status = buildStatusString(updated_ridePat.Status);
+                        row2manipulate.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
                         row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                         row2manipulate.remark = updated_ridePat.Remark;
                         row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
@@ -427,7 +427,7 @@
                         row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
                         row2manipulate.patient = buildPatientHTML(updated_ridePat);
                         row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
-                        row2manipulate.status = buildStatusString(updated_ridePat.Status);
+                        row2manipulate.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
                         row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                         row2manipulate.remark = updated_ridePat.Remark;
                         row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
@@ -448,7 +448,7 @@
                         row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
                         row2manipulate.patient = buildPatientHTML(updated_ridePat);
                         row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
-                        row2manipulate.status = buildStatusString(updated_ridePat.Status);
+                        row2manipulate.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
                         row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                         row2manipulate.remark = updated_ridePat.Remark;
                         row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
@@ -966,6 +966,57 @@
             removeClass('highlightRow');
         }
 
+        const updateRidePatPatientStatus = () => {
+            $('#wait').show();
+            const hours = $("#editPatientStatusModalHours").val();
+            const minutes = $("#editPatientStatusModalMinutes").val();
+            const isTreatmentFinished = !$("#editPatientStatusNotFinishedCB").is(':checked');
+
+            if (
+                isNaN(hours) || isNaN(minutes) ||
+                hours === null || minutes === null
+            ) {
+                $('#wait').hide();
+                return alert('נא לבחור שעה מהרשימות הנגללות או לבטל את הפעולה');
+            }
+
+            let ridepatToManipulate = arr_rides.find(r => r.RidePatNum === _ridepatToManipulate);
+            const now = new Date();
+
+            const editTimeStamp = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
+
+            ridepatToManipulate.Pat.RidePatPatientStatus.Status = isTreatmentFinished;
+            ridepatToManipulate.Pat.RidePatPatientStatus.EditTimeStamp = editTimeStamp;
+            update_arr_rides(ridepatToManipulate);
+
+            const data = {
+                patientId: ridepatToManipulate.Pat.Id,
+                ridePatId: ridepatToManipulate.RidePatNum,
+                patientStatus: isTreatmentFinished ? "Finished" :"Not Finished",
+                editTimeStamp: editTimeStamp
+            }
+
+            const updatePatientStatus_SCB = () => {
+
+                $('#wait').hide();
+                removeClass('highlightRow');
+                $('#editPatientStatusModal').modal('hide');
+            }
+
+            const updatePatientStatus_ECB = (err) => {
+
+                $('#wait').hide();
+                removeClass('highlightRow');
+                $('#editPatientStatusModal').modal('hide');
+                console.log(err);
+                alert(err);
+            }
+
+            ajaxCall('UpdatePatientStatus', JSON.stringify(data), updatePatientStatus_SCB, updatePatientStatus_ECB);
+
+
+        }
+
         const updateRidePatTime = () => {
 
             $('#wait').show();
@@ -976,8 +1027,8 @@
                 hours = 22;
                 minutes = 14;
             } else {
-                hours = $("#hours").val();;
-                minutes = $("#minutes").val();;
+                hours = $("#hours").val();
+                minutes = $("#minutes").val();
             }
             if (
                 isNaN(hours) || isNaN(minutes) ||
@@ -2597,9 +2648,7 @@
             const EditTimeStamp = convertDBDate2FrontEndDate(statusObj.EditTimeStamp);
             const editBtn = `<button type='button' data-toggle="modal" data-target="#editPatientStatusModal" onclick="prepreparationEditPatientStatusModal(this, ${ridePatNum})" class='btn btn-icon waves-effect waves-light btn-secondary' title='עריכה'><i class='ti-pencil'></i></button>`;
 
-            statusHTML = `${status} ${EditTimeStamp}`;
-
-
+            statusHTML = `<span>${status}</span>`;
             statusWrapper += statusHTML;
             statusWrapper += editBtn;
 
@@ -2720,6 +2769,7 @@
             const ridepatObject = arr_rides.find(r => r.RidePatNum === ridepatNum);
             const ridePatPatientStatus = ridepatObject.Pat.RidePatPatientStatus.Status;
             let editTimeStamp = ridepatObject.Pat.RidePatPatientStatus.EditTimeStamp;
+
             if (editTimeStamp !== null) {
 
                 editTimeStamp = convertDBDate2FrontEndDate(editTimeStamp);
@@ -2728,14 +2778,20 @@
 
                 $hoursSelect.val(hoursAsDoubleDigits);
                 $minutesSelect.val(minutesAsDoubleDigits);
+            } else {
+
+                retrieveDDLToInitial('#editPatientStatusModalMinutes');
+                retrieveDDLToInitial('#editPatientStatusModalHours');
+                checkeditTimeNotFinishedCB(true);
             }
 
+        }
 
-            //retrieveDDLToInitial('#hours');
-              //retrieveDDLToInitial('#minutes');
-               // checkeditTimeAfterNoonCB(true);
+        const checkeditTimeNotFinishedCB = (NotFinishedIsChecked) => {
 
-
+            $('#editPatientStatusNotFinishedCB').prop('checked', NotFinishedIsChecked);
+            $('#editPatientStatusModalHours').prop('disabled', NotFinishedIsChecked);
+            $('#editPatientStatusModalMinutes').prop('disabled', NotFinishedIsChecked);
         }
 
         const checkeditTimeAfterNoonCB = (afterNoonIsChecked) => {

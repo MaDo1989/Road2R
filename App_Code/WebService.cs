@@ -2376,6 +2376,21 @@ public class WebService : System.Web.Services.WebService
         City c = new City();
         c.writeNearestMainCities();
     }
+
+    [WebMethod(EnableSession = true)]
+    public void UpdatePatientStatus(int patientId, int ridePatId, string patientStatus, DateTime? editTimeStamp)
+    {
+        try
+        {
+            RidePat rp = new RidePat();
+            rp.UpdatePatientStatus(patientId, ridePatId, patientStatus, editTimeStamp);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in UpdatePatientStatus", ex);
+            throw new Exception(ex.Message);
+        }
+    }
 }
 
 

@@ -25,16 +25,16 @@
                     <option disabled selected>דקות</option>
                 </select>
                 &nbsp;:
-                <select id="editPatientStatusModalHours">
+                <select id="editPatientStatusModalHours">PatientStatus
                     <option disabled selected>שעות</option>
                 </select>
                 <br />  <br />
 
                 <label data-toggle="tooltip" title="afternoon">לא סיים</label>
-                <input type="checkbox" id="editPatientStatusAfterNoonCB" onchange="checkeditPatientStatusAfterNoonCB(this.checked)" />
+                <input type="checkbox" id="editPatientStatusNotFinishedCB" onchange="checkeditTimeNotFinishedCB(this.checked)" />
             </div>
             <div class="text-right modal-footer">
-                <button type="button" onclick="updateRidePatTime()" id="assignDriverConfirm" class="btn btn-secondary">אישור</button>
+                <button type="button" onclick="updateRidePatPatientStatus()" id="assignDriverConfirm" class="btn btn-secondary">אישור</button>
                 <button type="button" class="btn btn-secondary" onclick="editPatientStatusAbort()" data-dismiss="modal">ביטול</button>
             </div>
         </div>

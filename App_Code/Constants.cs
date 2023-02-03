@@ -39,8 +39,8 @@ public static class Constants
         public enum PatientStatus
         {
             Empty = -1,
-            TreatmentInProcess = 0,
-            TreatmentEnded = 1
+            NotFinished = 0,
+            FinishedFinished = 1
         }
     }
 
@@ -48,8 +48,8 @@ public static class Constants
     {
         public const string Male = "חולֶה";
         public const string Female = "חולָה";
-        public const string Finished = "סיים";
-        public const string NotFinished = "לא סיים";
+        public const string Finished = "Finished";
+        public const string NotFinished = "Not Finished";
 
     }
 }
