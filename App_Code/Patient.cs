@@ -43,6 +43,8 @@ public class Patient
     List<string> equipment;
     DbService dbs;
 
+    public double? Age { get; set; }
+    public Constants.Enums.Gender GenderAsEnum { get; set; }
     public bool IsActive { get; set; }
 
     public string pnRegId { get; set; }
@@ -65,6 +67,8 @@ public class Patient
             displayName = value;
         }
     }
+    public RidePatPatientStatus RidePatPatientStatus { get; set; }
+
 
     public List<string> getEquipmentForPatient(string patient)
     {
@@ -502,7 +506,7 @@ public class Patient
                 patient.DisplayName = String.IsNullOrEmpty(sdr["DisplayName"].ToString()) ? "" : Convert.ToString(sdr["DisplayName"]);
                 patient.EnglishName = String.IsNullOrEmpty(sdr["EnglishName"].ToString()) ? "" : Convert.ToString(sdr["EnglishName"]);
                 patient.IsAnonymous = String.IsNullOrEmpty(sdr["IsAnonymous"].ToString()) ? "False" : Convert.ToString(sdr["IsAnonymous"]);
-              
+
                 patients.Add(patient);
             }
             return patients;
@@ -910,9 +914,19 @@ public class Patient
         return list;
     }
 
-    public Patient GetPatientById(int id)
+    public Patient GetPatientById(int id, int ridePatNum = -1)
     {
-        string query = "SELECT * FROM Patient WHERE ID=" + id;
+        string query;
+        if (ridePatNum != -1)
+        {
+            query = "SELECT P.*, RPPS.RidePatNum as RidePatPatientStatus_RidePatNum, RPPS.PatientStatus, RPPS.EditTimeStamp FROM Patient P ";
+            query += "LEFT JOIN RidePatPatientStatus RPPS ON P.Id = RPPS.PatientId AND RPPS.RidePatNum=" + ridePatNum + " WHERE P.Id=" + id;
+        }
+        else
+        {
+            query = "SELECT * FROM Patient where Id=" + id;
+        }
+
 
         try
         {
@@ -941,9 +955,23 @@ public class Patient
                 p.Barrier = p.Barrier.getLocation(); //get the full discription of a location
                 p.Hospital = p.Hospital.getLocation(); //get the full discription of a location
                 p.Gender = sdr["Gender"].ToString();
+                p.GenderAsEnum = Convertions.ConvertStringToGender(p.Gender);
                 p.Remarks = sdr["Remarks"].ToString();
                 p.EnglishName = sdr["EnglishName"].ToString();
                 p.IsAnonymous = String.IsNullOrEmpty(sdr["IsAnonymous"].ToString()) ? "" : sdr["IsAnonymous"].ToString();
+
+                int ridePatPatientStatus_RidePatNum;
+                bool isExistsRidePatPatientStatus = int.TryParse(sdr["RidePatPatientStatus_RidePatNum"].ToString(), out ridePatPatientStatus_RidePatNum);
+                if (isExistsRidePatPatientStatus)
+                {
+                    string patientStatus = sdr["PatientStatus"].ToString();
+                    p.RidePatPatientStatus = new RidePatPatientStatus();
+                    
+                    p.RidePatPatientStatus.Status = Convertions.ConvertStringToPatientStatus(patientStatus);
+                    p.RidePatPatientStatus.EditTimeStamp = String.IsNullOrEmpty(sdr["EditTimeStamp"].ToString()) ? null : (DateTime?)Convert.ToDateTime(sdr["EditTimeStamp"].ToString());
+
+                }
+
                 if (sdr["PatientIdentity"].ToString() == "")
                 {
                     p.PatientIdentity = 0;

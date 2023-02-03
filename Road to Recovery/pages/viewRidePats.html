@@ -87,7 +87,7 @@
         let timeFilteredArr = [];
         let ridePatNums2MarkDeleted = [];
         let ridePatNums2MarkRecovered = [];
-        let { convertDBDate2FrontEndDate, datetimeCompateFunc } = GENERAL.USEFULL_FUNCTIONS;
+        let { convertDBDate2FrontEndDate, datetimeCompareFunc } = GENERAL.USEFULL_FUNCTIONS;
         let thisRidePatDate;
         const afterNoonMinutesMark = 14;
 
@@ -119,11 +119,11 @@
             jQuery.extend(jQuery.fn.dataTableExt.oSort, {
                 "de_datetime-asc": function (a, b) {
 
-                    return datetimeCompateFunc(a, b, true);
+                    return datetimeCompareFunc(a, b, true);
                 },
                 "de_datetime-desc": function (a, b) {
 
-                    return datetimeCompateFunc(a, b, false);
+                    return datetimeCompareFunc(a, b, false);
                 },
             });
 

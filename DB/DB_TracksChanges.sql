@@ -6,176 +6,69 @@
 /*---------------------------------------------------------*/
 /*---------------------------------------------------------*/
 
+--Patient Status ↓
+CREATE TABLE RidePatPatientStatus (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    PatientId INT FOREIGN KEY REFERENCES Patient(Id),
+    RidePatNum INT FOREIGN KEY REFERENCES RidePat(RidePatNum),
+    PatientStatus NVARCHAR(55),
+    EditTimeStamp DATETIME
+);
+GO
 
-
-
-
+ALTER VIEW [dbo].[RPView]
+AS
+SELECT    dbo.Patient.DisplayName, dbo.Patient.Id, dbo.Patient.CellPhone, dbo.Patient.IsAnonymous, dbo.Patient.BirthDate, dbo.Patient.Gender, dbo.RidePat.RidePatNum, dbo.RidePat.Origin, dbo.RidePat.Destination, dbo.RidePat.PickupTime, V.DisplayName AS Coordinator, 
+                         dbo.RidePat.Status, dbo.RidePat.Area, dbo.RidePat.Shift, dbo.Ride.RideNum, dbo.Ride.Origin AS RideOrigin, dbo.Ride.Destination AS RideDestination, dbo.Ride.Date, dbo.Ride.MainDriver, dbo.Ride.secondaryDriver, 
+                         dbo.RidePat.Remark, dbo.RidePat.OnlyEscort, dbo.Patient.EnglishName, dbo.RidePat.lastModified, driver.NoOfDocumentedRides,
+						 RPPS.PatientStatus, RPPS.EditTimeStamp,
+							CASE 
+							WHEN (SELECT COUNT(*) FROM Ride WHERE MainDriver=driver.Id  AND Date <= GETDATE()) <= 3 THEN 1
+							ELSE 0
+						END
+						AS IsNewDriver
+FROM            dbo.Patient INNER JOIN 
+                         dbo.RidePat ON dbo.Patient.DisplayName = dbo.RidePat.Patient LEFT OUTER JOIN
+                         dbo.Ride ON dbo.RidePat.RideId = dbo.Ride.RideNum LEFT JOIN Volunteer V on RidePat.CoordinatorID = V.Id
+						 LEFT JOIN Volunteer driver on driver.Id = dbo.Ride.MainDriver
+						 LEFT JOIN RidePatPatientStatus RPPS ON RidePat.RidePatNum = RPPS.RidePatNum
+GO
 
 
 -- =============================================
 -- Author:      Yogev Strauber
--- Create Date: 03/12/2022 @night
--- Description: Active Or Deactivate Volunteer Base on isActive Parameter
--- Returns IsSuccesfulOperation bit, and optional VolunteerWithFutureRidesIncludedToday
--- when try to deactivate volunteer
+-- Create Date: 03/02/2023
+-- Description: Toggle Patient in a RidePat Status
 -- =============================================
-CREATE OR ALTER   PROCEDURE [dbo].[spVolunteer_ToggleActiveness]
+CREATE OR ALTER PROCEDURE spRidePatPatientStatus_TogglePatientStatus
 (
-   @displayName NVARCHAR(255),
-   @isActive BIT
-		)
+	@PatientId INT,
+	@RidePatNum INT,
+	@PatientStatus nvarchar(55),
+	@EditTimeStamp datetime
+)
 AS
 BEGIN
-
-    SET NOCOUNT ON;
-	DECLARE @volunteerId INT = (SELECT Id from volunteer where Displayname=@displayName)
-
-	IF(@isActive) = 0
-	BEGIN
-		IF(
-			SELECT COUNT(*) FROM RIDE 
-			WHERE MAINDRIVER=14430
-			AND  CONVERT(VARCHAR, GETDATE(), 110) <= CONVERT(VARCHAR, Date, 110) 
-		   ) = 0
-			BEGIN
-				UPDATE Volunteer 
-				SET IsActive=@isActive, 
-				lastModified=DATEADD(hour, 2, SYSDATETIME())
-				WHERE Id=@volunteerId
-			SELECT 
-				1 AS IsSuccesfulOperation,
-				0 AS VolunteerWithFutureRidesIncludedToday
-			END
-		ELSE
-			BEGIN
-			SELECT
-				0 AS IsSuccesfulOperation,
-				1 AS VolunteerWithFutureRidesIncludedToday
-			END
-	END
+    SET NOCOUNT ON
+	
+	IF NOT EXISTS (SELECT 1 FROM RidePatPatientStatus WHERE RidePatNum=@RidePatNum)
+		BEGIN
+			INSERT INTO RidePatPatientStatus (PatientId, RidePatNum, PatientStatus, EditTimeStamp)
+			VALUES (@PatientId, @RidePatNum, @PatientStatus, @EditTimeStamp);
+		END
 	ELSE
-	BEGIN 
-			UPDATE Volunteer 
-			SET IsActive=@isActive, 
-			lastModified=DATEADD(hour, 2, SYSDATETIME())
-			WHERE Id=@volunteerId
+		BEGIN
+			UPDATE RidePatPatientStatus
+			SET PatientStatus = @PatientStatus, EditTimeStamp=@EditTimeStamp
+			WHERE RidePatNum=@RidePatNum
+		END
 
-			SELECT
-				1 AS IsSuccesfullOperation
-END
-END
-GO
-
--- =============================================
--- Author:      Yogev Strauber
--- Create Date: 14/12/2022 @night
--- Description: Active Or Deactivate Volunteer's isDriving
--- Returns IsSuccesfullOperation bit, and optional VolunteerWithFutureRidesIncludedToday
--- when try to deactivate volunteer
--- =============================================
-CREATE    PROCEDURE [dbo].[spVolunteer_ToggleIsDrive]
-(
-   @displayName NVARCHAR(255),
-   @isDriving BIT
-		)
-AS
-BEGIN
-
-    SET NOCOUNT ON;
-	DECLARE @volunteerId INT = (SELECT Id from volunteer where Displayname=@displayName)
-
-	IF(@isDriving) = 0
-	BEGIN
-		IF(
-			SELECT COUNT(*) FROM RIDE 
-			WHERE MAINDRIVER=@volunteerId
-			AND  CONVERT(VARCHAR, GETDATE(), 110) <= CONVERT(VARCHAR, Date, 110) 
-		   ) = 0
-			BEGIN
-				UPDATE Volunteer 
-				SET IsActive=@isDriving, 
-				lastModified=DATEADD(hour, 2, SYSDATETIME())
-				WHERE Id=@volunteerId
-			SELECT 
-				1 AS IsSuccesfullOperation,
-				0 AS VolunteerWithFutureRidesIncludedToday
-			END
-		ELSE
-			BEGIN
-			SELECT
-				0 AS IsSuccesfullOperation,
-				1 AS VolunteerWithFutureRidesIncludedToday
-			END
-	END
-	ELSE
-	BEGIN 
-			UPDATE Volunteer 
-			SET isDriving=@isDriving, 
-			lastModified=DATEADD(hour, 2, SYSDATETIME())
-			WHERE Id=@volunteerId
-
-			SELECT
-				1 AS IsSuccesfullOperation
-
-END
+		UPDATE RidePat
+		SET LastModified=GETDATE()
+		WHERE RidePatNum=@RidePatNum
 END
 GO
 
--- Remove calculation of most common regional path
-ALTER procedure [dbo].[spVolunteerTypeView_GetVolunteersList]
+--Patient Status ↑
 
-@IsActive bit
-as
-begin
-select r.MainDriver, r.Origin, r.Destination into #tempNotDeletedOnly from  ridepat rp
-inner join ride r
-on r.RideNum=rp.RideId
 
-if (@IsActive = 0)
-	begin
-				select *, (select count(*)
-					from ridepat rp inner join ride r
-					on rp.rideid=r.ridenum
-					where r.maindriver = vtv.Id
-					and pickuptime between DATEADD(Month, -2, GETDATE()) and  GETDATE()) as NumOfRides_last2Months
-					,
-					(
-				select origin + '-'+destination from
-													(
-														select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
-														where t.MainDriver = id
-														group by maindriver, origin, destination
-														order by numberOfTimesDrove desc
-														) t
-					) mostCommonPath
-		from VolunteerTypeView vtv
-		where IsActive = @IsActive or IsActive = 1
-		order by firstNameH
-
-	end
-else
-	begin
-	select *, (select count(*)
-					from ridepat rp inner join ride r
-					on rp.rideid=r.ridenum
-					where r.maindriver = vtv.Id
-					and pickuptime between DATEADD(Month, -2, GETDATE()) and  GETDATE()) as NumOfRides_last2Months
-					,
-					(
-				select origin + '-'+destination from
-													(
-														select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
-														where t.MainDriver = id
-														group by maindriver, origin, destination
-														order by numberOfTimesDrove desc
-														) t
-					) mostCommonPath
-		from VolunteerTypeView vtv
-		where IsActive = @IsActive
-		order by firstNameH
-	end
-
-	drop table #tempNotDeletedOnly 
-
-end
-GO

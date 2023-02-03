@@ -1501,7 +1501,7 @@ public class WebService : System.Web.Services.WebService
             HttpResponse response = GzipMe();
 
             Volunteer c = new Volunteer();
-            List<Volunteer> volunteersList = c.getVolunteersList(active);
+            List<Volunteer> volunteersList = c.getVolunteersList_V2_WebOnly(active);
             return j.Serialize(volunteersList);
         }
         catch (Exception ex)
@@ -2375,6 +2375,21 @@ public class WebService : System.Web.Services.WebService
 
         City c = new City();
         c.writeNearestMainCities();
+    }
+
+    [WebMethod(EnableSession = true)]
+    public void UpdatePatientStatus(int patientId, int ridePatId, string patientStatus, DateTime? editTimeStamp)
+    {
+        try
+        {
+            RidePat rp = new RidePat();
+            rp.UpdatePatientStatus(patientId, ridePatId, patientStatus, editTimeStamp);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in UpdatePatientStatus", ex);
+            throw new Exception(ex.Message);
+        }
     }
 }
 
