@@ -1,0 +1,42 @@
+﻿<style>
+    .center {
+        display: grid;
+        place-items: center;
+    }
+
+    #hour, #minute {
+        width: 3vw;
+        height: 4vh;
+        border-color: #000
+    }
+</style>
+
+<div class="modal-dialog center" role="document">
+    <div class="modal-content modal-sm">
+        <div class="modal-header">
+            <button id="overRideBS_modal_4changeClose_x" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true" onclick="editPatientStatusAbort()">&times;</span>
+            </button>
+            <h2 class="modal-title" id="editPatientStatusModalTitle"></h2>
+        </div>
+        <div class="modal-body">
+            <div id="selecthour">
+                <select id="editPatientStatusModalMinutes">
+                    <option disabled selected>דקות</option>
+                </select>
+                &nbsp;:
+                <select id="editPatientStatusModalHours">PatientStatus
+                    <option disabled selected>שעות</option>
+                </select>
+                <br />  <br />
+
+                <label data-toggle="tooltip" title="afternoon">לא סיים</label>
+                <input type="checkbox" id="editPatientStatusNotFinishedCB" onchange="checkeditTimeNotFinishedCB(this.checked)" />
+            </div>
+            <div class="text-right modal-footer">
+                <button type="button" onclick="updateRidePatPatientStatus()" id="assignDriverConfirm" class="btn btn-secondary">אישור</button>
+                <button type="button" class="btn btn-secondary" onclick="editPatientStatusAbort()" data-dismiss="modal">ביטול</button>
+            </div>
+        </div>
+    </div>
+</div>

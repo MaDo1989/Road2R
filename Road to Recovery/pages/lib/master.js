@@ -107,6 +107,63 @@ var GENERAL = {
         setPatients: function (Patients) { //this will set all the exist Patients into local storage
             localStorage.Patients = LZString.compress(Patients);
         },
+        GetPatientGender: function (enumNumber, isAssistant) {
+
+            let genderAsString = '';
+            if (!isAssistant) {
+
+                switch (enumNumber) {
+                    case 0:
+                        genderAsString = "נקבה";
+                        break;
+                    case 1:
+                        genderAsString = "זכר";
+                        break;
+                }
+            } else {
+                switch (enumNumber) {
+                    case 0:
+                        genderAsString = "Female";
+                        break;
+                    case 1:
+                        genderAsString = "Male";
+                        break;
+                }
+            }
+
+            return genderAsString;
+        },
+        GetPatientStatus: function (enumNumber, isAssistant) {
+            let statusAsString = '';
+            if (!isAssistant) {
+                switch (enumNumber) {
+                    case 0:
+                        statusAsString = "לא סיים";
+                        break;
+                    case 1:
+                        statusAsString = "סיים";
+                        break;
+                    default:
+                        statusAsString = "לא סיים";
+                        break;
+                }
+            } else {
+                switch (enumNumber) {
+                    case 0:
+                        statusAsString = "Not Finished";
+                        break;
+                    case 1:
+                        statusAsString = "Finished";
+                        break;
+                    default:
+                        statusAsString = "Not Finished";
+                        break;
+                }
+            }
+
+            return statusAsString;
+        },
+
     },
 
     FETCH_DATA: {
@@ -157,19 +214,19 @@ var GENERAL = {
           * Gets a string of /Date(1608581640000).
           * Returns a Date obj → new Date(1608581640000)
          */
-        convertDBDate2FrontEndDate: (fullTimeStempStr) => { // fullTimeStempStr = this form → "/Date(1608581640000)/" OR '2022-04-02T03:00:00'
+        convertDBDate2FrontEndDate: (fullTimeStampStr) => { // fullTimeStempStr = this form → "/Date(1608581640000)/" OR '2022-04-02T03:00:00'
 
-            if (typeof fullTimeStempStr === 'undefined' || !fullTimeStempStr) return "";
+            if (typeof fullTimeStampStr === 'undefined' || !fullTimeStampStr) return "";
 
-            if (fullTimeStempStr.includes('Date')) {
+            if (fullTimeStampStr.includes('Date')) {
 
-                return new Date(GENERAL.USEFULL_FUNCTIONS.convert2DBDateToInt(fullTimeStempStr));
-            } else if (GENERAL.USEFULL_FUNCTIONS.isFromOpenConnection(fullTimeStempStr)) {
+                return new Date(GENERAL.USEFULL_FUNCTIONS.convert2DBDateToInt(fullTimeStampStr));
+            } else if (GENERAL.USEFULL_FUNCTIONS.isFromOpenConnection(fullTimeStampStr)) {
 
-                return GENERAL.USEFULL_FUNCTIONS.fixDate_WhichComeFromOpenConnection(fullTimeStempStr);
+                return GENERAL.USEFULL_FUNCTIONS.fixDate_WhichComeFromOpenConnection(fullTimeStampStr);
             } else {
 
-                return new Date(fullTimeStempStr);
+                return new Date(fullTimeStampStr);
             }
         },
 
@@ -338,7 +395,7 @@ var GENERAL = {
         * Ascending: → 0 if a=b, 1 if a > b, -1 if a < b
         * Descending: → 0 if a=b,-1 if a > b,  1 if a > b
         */
-        datetimeCompateFunc: (a, b, isAscending) => {
+        datetimeCompareFunc: (a, b, isAscending) => {
 
             let dateAndTimeArrayof_a = $.trim(a).split(', ');
             let dateAndTimeArrayof_b = $.trim(b).split(', ');
@@ -383,6 +440,47 @@ var GENERAL = {
             return result;
         },
 
+        dateCompareFunc: (a, b, isAscending) => {
+            let ddmmyyyArr_a = $.trim(a).split('.');
+            let ddmmyyyArr_b = $.trim(b).split('.');
+
+            let dd_a = parseInt(ddmmyyyArr_a[0]);
+            let mm_a = parseInt(ddmmyyyArr_a[1]);
+            let yyyy_a = parseInt(ddmmyyyArr_a[2]);
+
+            let dd_b = parseInt(ddmmyyyArr_b[0]);
+            let mm_b = parseInt(ddmmyyyArr_b[1]);
+            let yyyy_b = parseInt(ddmmyyyArr_b[2]);
+
+
+            let a_date = new Date(yyyy_a, mm_a + 1, dd_a);
+            let b_date = new Date(yyyy_b, mm_b + 1, dd_b);
+
+            a = a_date.getTime();
+            b = b_date.getTime();
+            let result;
+            if (isAscending) {
+
+                a = isNaN(a) ? Infinity : a;
+                b = isNaN(b) ? Infinity : b;
+
+                result = a === b ? 0 : a > b ? 1 : -1;
+            } else {//Descending
+
+                a = isNaN(a) ? -Infinity : a;
+                b = isNaN(b) ? -Infinity : b;
+
+                result = a === b ? 0 : a > b ? -1 : 1;
+            }
+            return result;
+        },
+
+        AdjustAge: function (age) {
+
+            let roundedAge = Math.round(age * 10) / 10;
+
+            return roundedAge;
+        }
     },
 
     COPYWRITE: () => {
@@ -390,4 +488,4 @@ var GENERAL = {
     },
 
     APP_ID: 1,
-};
+}

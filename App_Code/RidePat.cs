@@ -220,7 +220,6 @@ public class RidePat
             lastModified = value;
         }
     }
-
     public RidePat()
     {
         //
@@ -801,7 +800,7 @@ public class RidePat
             }
             else rp.RideNum = -1;
             rp.OnlyEscort = Convert.ToBoolean(dr["OnlyEscort"].ToString());
-            rp.Pat = rp.Pat.GetPatientById(Convert.ToInt32(dr["Id"]));
+            rp.Pat = rp.Pat.GetPatientById(Convert.ToInt32(dr["Id"]), ridePatNum);
             rp.Drivers = new List<Volunteer>();
             if (dr["MainDriver"].ToString() != "")
             {
@@ -1147,6 +1146,14 @@ public class RidePat
                     rp.pat.EnglishName = dr["EnglishName"].ToString();
                     rp.pat.CellPhone = dr["CellPhone"].ToString();
                     rp.pat.IsAnonymous = dr["IsAnonymous"].ToString();
+                    string gender = dr["Gender"].ToString();
+                    rp.Pat.GenderAsEnum = Convertions.ConvertStringToGender(gender);
+                    DateTime? dateOfBirth = String.IsNullOrEmpty(dr["BirthDate"].ToString()) ? null : (DateTime?)Convert.ToDateTime(dr["BirthDate"].ToString());
+                    rp.Pat.Age = Calculations.CalculateAge(dateOfBirth);
+                    rp.Pat.RidePatPatientStatus = new RidePatPatientStatus();
+                    string patientStatus = dr["PatientStatus"].ToString();
+                    rp.Pat.RidePatPatientStatus.Status = Convertions.ConvertStringToPatientStatus(patientStatus);
+                    rp.Pat.RidePatPatientStatus.EditTimeStamp = String.IsNullOrEmpty(dr["EditTimeStamp"].ToString()) ? null : (DateTime?)Convert.ToDateTime(dr["EditTimeStamp"].ToString());
 
                     rp.pat.Id = int.Parse(dr["Id"].ToString());
                     rp.pat.Equipment = new List<string>();
@@ -1182,7 +1189,7 @@ public class RidePat
                                 e.IsAnonymous = false;
                         }
                         // End Benny's fix
-                        
+
                         rp.Escorts.Add(e);
                         rp.pat.EscortedList.Add(e);
 
@@ -2116,6 +2123,43 @@ finally
 
         return RideId;
 
+    }
+
+    public void UpdatePatientStatus(int patientId, int ridePatId, string patientStatus, DateTime? editTimeStamp)
+    {
+        try
+        {
+            string sqlDate = "NULL";
+
+            if (editTimeStamp.HasValue)
+            {
+                sqlDate = editTimeStamp.Value.Year + "-" + editTimeStamp.Value.Month + "-" + editTimeStamp.Value.Day;
+                sqlDate += " " + editTimeStamp.Value.Hour + ":" + editTimeStamp.Value.Minute;
+            }
+
+            string query = "EXEC spRidePatPatientStatus_TogglePatientStatus @PatientId=" + patientId + ", @RidePatNum=" + ridePatId;
+            query += ", @PatientStatus='" + patientStatus + "', @EditTimeStamp='" + sqlDate + "'";
+
+            try
+            {
+                dbs = new DbService();
+                dbs.ExecuteQuery(query);
+                RidePat updatedRidePat = GetRidePat(ridePatId);
+                BroadCast.BroadCast2Clients_ridePatUpdated(updatedRidePat);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            finally
+            {
+                dbs.CloseConnection();
+            }
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
     }
 
     /// <summary>

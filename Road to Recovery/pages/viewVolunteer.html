@@ -51,7 +51,7 @@
 
         var cleanPhoneNumber;
         var msgTable;
-        let { convertDBDate2FrontEndDate } = GENERAL.USEFULL_FUNCTIONS;
+        let { convertDBDate2FrontEndDate, datetimeCompareFunc, dateCompareFunc} = GENERAL.USEFULL_FUNCTIONS;
 
         checkCookie();
         var allVolunteersFromDb = [];
@@ -88,54 +88,19 @@
             refreshTable();
             jQuery.extend(jQuery.fn.dataTableExt.oSort, {
                 "de_date-asc": function (a, b) {
-                    /*a and b are a couple of dates to compare
-                    return value will be:
-                    0 if a=b
-                    1 if a > b
-                   -1 if a < b
-                    */
-                    if (a === '') {
-                        a = '1.1.1900';
-                    }
-                    if (b === '') {
-                        b = '1.1.1900';
-                    }
-                    let dateAsArr_a = $.trim(a).split('.');
-                    let dateAsArr_b = $.trim(b).split('.');
 
-                    let a_date = new Date(parseInt(dateAsArr_a[2]), parseInt(dateAsArr_a[1]), parseInt(dateAsArr_a[0]));
-                    let b_date = new Date(parseInt(dateAsArr_b[2]), parseInt(dateAsArr_b[1]), parseInt(dateAsArr_b[0]));
-
-                    a = a_date.getTime();
-                    b = b_date.getTime();
-                    let result = a === b ? 0 : a > b ? 1 : -1;
-
-                    return result;
+                    return dateCompareFunc(a, b, true);
                 },
                 "de_date-desc": function (a, b) {
-                    /*a and b are a couple of dates to compare
-                      return value will be:
-                      0 if a=b
-                     -1 if a > b
-                      1 if a < b
-                      */
-                    if (a === '') {
-                        a = '1.1.1900';
-                    }
-                    if (b === '') {
-                        b = '1.1.1900';
-                    }
-                    let dateAsArr_a = $.trim(a).split('.');
-                    let dateAsArr_b = $.trim(b).split('.');
 
-                    let a_date = new Date(parseInt(dateAsArr_a[2]), parseInt(dateAsArr_a[1]), parseInt(dateAsArr_a[0]));
-                    let b_date = new Date(parseInt(dateAsArr_b[2]), parseInt(dateAsArr_b[1]), parseInt(dateAsArr_b[0]));
+                    return dateCompareFunc(a, b, false);
+                },
+                "de_datetime-asc": function (a, b) {
 
-                    a = a_date.getTime();
-                    b = b_date.getTime();
-                    let result = a === b ? 0 : a > b ? -1 : 1;
+                    return datetimeCompareFunc(a, b, true);
+                }, "de_datetime-desc": function (a, b) {
 
-                    return result;
+                    return datetimeCompareFunc(a, b, false);
                 }
             });
 
@@ -213,17 +178,21 @@
                         btnStr += showDocumentedCallsBtn;
 
 
-                        if (arr_volunteers[i].LastModified !== "") {
-                            let fullTimeStemp = arr_volunteers[i].LastModified;
-                            let dd = parseInt(fullTimeStemp.slice(0, 2)); //parseInt removing the zero prefixes
-                            let mm = parseInt(fullTimeStemp.slice(3, 5)); //parseInt removing the zero prefixes
-                            let yyyy = fullTimeStemp.slice(6, 10);
-                            let time = fullTimeStemp.slice(-8);
+                        //if (arr_volunteers[i].LastModified !== "") {
+                        //    let fullTimeStemp = arr_volunteers[i].LastModified;
+                        //    let dd = parseInt(fullTimeStemp.slice(0, 2)); //parseInt removing the zero prefixes
+                        //    let mm = parseInt(fullTimeStemp.slice(3, 5)); //parseInt removing the zero prefixes
+                        //    let yyyy = fullTimeStemp.slice(6, 10);
+                        //    let time = fullTimeStemp.slice(-8);
 
-                            arr_volunteers[i].LastModified = `${dd}.${mm}.${yyyy} ${time}`;
-                        }
+                        //    arr_volunteers[i].LastModified = `${dd}.${mm}.${yyyy} ${time}`;
+                        //}
 
                         btnStr += " " + deleteBtn;
+
+                        let lastModified = convertDBDate2FrontEndDate(arr_volunteers[i].DateTime_LastModified);
+                        lastModified = lastModified.toLocaleString('he-IL', { dateStyle: 'short', timeStyle: 'short' });
+
 
                         let joinDate = convertDBDate2FrontEndDate(arr_volunteers[i].JoinDate);
                         joinDate = joinDate.toLocaleString('he-IL', { dateStyle: 'short' });
@@ -237,7 +206,7 @@
                             City: arr_volunteers[i].City,
                             Remarks: arr_volunteers[i].Remarks,
                             Buttons: btnStr,
-                            LastModified: arr_volunteers[i].LastModified,
+                            LastModified: lastModified,
                             EnglishName: arr_volunteers[i].EnglishName,
                             NumOfRides_last2Months: arr_volunteers[i].NumOfRides_last2Months,
                             MostCommonPath: arr_volunteers[i].MostCommonPath,
@@ -267,7 +236,8 @@
                                 className: 'text-left-strong'
                             },
                             { "targets": [11], "orderable": false },
-                            { targets: 9, type: 'de_date' },
+                            { targets: 7, type: 'de_datetime'},
+                            { targets: 10, type: 'de_date' },
 
 
                         ],
@@ -279,10 +249,10 @@
                             { data: "City", width: "4%" },                     //4
                             { data: "NearestBigCity", width: "4%" },            //5
                             { data: "Remarks", width: "14%" },                 //6
-                            { data: "LastModified", width: "8%" },             //7
+                            { data: "LastModified", width: "10%" },             //7
                             { data: "NumOfRides_last2Months", width: "4%" },   //8
-                            { data: "MostCommonPath", width: "8%" },           //9
-                            { data: "JoinDate", width: "8%" },                 //10
+                            { data: "MostCommonPath", width: "7%" },           //9
+                            { data: "JoinDate", width: "7%" },                 //10
                             { data: "Buttons", width: "15%" },                 //11
                         ],
                     });
