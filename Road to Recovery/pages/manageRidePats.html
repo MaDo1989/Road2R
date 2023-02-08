@@ -405,6 +405,8 @@
                         increaseCounter(tableNames.MORNING, updated_ridePat.RidePatNum);
 
                         if (patientStatusUpdated) {
+                            tr_nodesAsArray = Array.from(tMorning.rows().nodes());
+                            tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
                             manipilateNodeStyle(tr_node2manipulate, updated_ridePat, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED, false, tableNames.MORNING);
                         }
 
@@ -429,6 +431,8 @@
                         increaseCounter(tableNames.AFTERNOON, updated_ridePat.RidePatNum);
 
                         if (patientStatusUpdated) {
+                            tr_nodesAsArray = Array.from(tAfternoon.rows().nodes());
+                            tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
                             manipilateNodeStyle(tr_node2manipulate, updated_ridePat, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED, false, tableNames.AFTERNOON);
                         }
 
@@ -454,6 +458,8 @@
                         increaseCounter(tableNames.TOMORROW, updated_ridePat.RidePatNum);
 
                         if (patientStatusUpdated) {
+                            tr_nodesAsArray = Array.from(tTomorrow.rows().nodes());
+                            tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
                             manipilateNodeStyle(tr_node2manipulate, updated_ridePat, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED, false, tableNames.TOMORROW);
                         }
 
@@ -484,8 +490,11 @@
                         manipilateNodeStyle(tr_node2manipulate, updated_ridePat, ADD_DRIVER, true);
 
                         if (patientStatusUpdated) {
-                            manipilateNodeStyle(tr_node2manipulate, updated_ridePat, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED, true);
+                            tr_nodesAsArray = Array.from(tFuture.rows().nodes());
+                            tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
+                            manipilateNodeStyle(tr_node2manipulate, updated_ridePat, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED, false, tableNames.TOMORROW);
                         }
+
 
                         tr_nodesAsArray = null;
                         break;
