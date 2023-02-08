@@ -148,6 +148,7 @@ input:checked + .slider:before {
 .elementsInSameLine {
     display: flex;
     justify-content: space-between;
+    /* flex-direction: column; */
 }
 
 .verticalAllign {
@@ -253,6 +254,11 @@ input:checked + .slider:before {
     background-color: rgb(198, 220, 255) !important;
 }
 
+
+.highlightRow-after-patientStatusModal {
+    background-color: rgba(158, 245, 244, 1) !important;
+}
+
 .purpleFont {
     color: rgb(178, 0, 255);
 }
@@ -260,4 +266,13 @@ input:checked + .slider:before {
 .select-box {
     width: 5vw;
     height: 28px;
+}
+
+.timeUnderStatus {
+    margin-left: auto;
+    margin-right: 0;
+}
+
+.column {
+    flex-direction: column;
 }

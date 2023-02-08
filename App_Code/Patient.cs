@@ -43,7 +43,7 @@ public class Patient
     List<string> equipment;
     DbService dbs;
 
-    public double? Age { get; set; }
+    public int? Age { get; set; }
     public Constants.Enums.Gender GenderAsEnum { get; set; }
     public bool IsActive { get; set; }
 
@@ -961,7 +961,9 @@ public class Patient
                 p.IsAnonymous = String.IsNullOrEmpty(sdr["IsAnonymous"].ToString()) ? "" : sdr["IsAnonymous"].ToString();
 
                 int ridePatPatientStatus_RidePatNum;
-                bool isExistsRidePatPatientStatus = int.TryParse(sdr["RidePatPatientStatus_RidePatNum"].ToString(), out ridePatPatientStatus_RidePatNum);
+                bool isExistsRidePatPatientStatus = false;
+                if (HasColumn(sdr, "RidePatPatientStatus_RidePatNum"))
+                     isExistsRidePatPatientStatus = int.TryParse(sdr["RidePatPatientStatus_RidePatNum"].ToString(), out ridePatPatientStatus_RidePatNum);
                 if (isExistsRidePatPatientStatus)
                 {
                     string patientStatus = sdr["PatientStatus"].ToString();
@@ -971,7 +973,6 @@ public class Patient
                     p.RidePatPatientStatus.EditTimeStamp = String.IsNullOrEmpty(sdr["EditTimeStamp"].ToString()) ? null : (DateTime?)Convert.ToDateTime(sdr["EditTimeStamp"].ToString());
 
                 }
-
                 if (sdr["PatientIdentity"].ToString() == "")
                 {
                     p.PatientIdentity = 0;
@@ -1342,6 +1343,16 @@ public class Patient
             throw new Exception(ex.Message);
         }
 
+    }
+
+    public static bool HasColumn(SqlDataReader Reader, string ColumnName)
+    {
+        foreach (DataRow row in Reader.GetSchemaTable().Rows)
+        {
+            if (row["ColumnName"].ToString() == ColumnName)
+                return true;
+        } //Still here? Column not found. 
+        return false;
     }
 
 }
