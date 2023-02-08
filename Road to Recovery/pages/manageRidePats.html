@@ -378,7 +378,11 @@
 
             const currentRidePat_EditTimeStamp = convertDBDate2FrontEndDate(ridePatBeforeUpdate.Pat.RidePatPatientStatus.EditTimeStamp);
             const updatedRidePat_EditTimeStamp = fixDate_WhichComeFromOpenConnection(updated_ridePat.Pat.RidePatPatientStatus.EditTimeStamp);
-            const patientStatusUpdated = updatedRidePat_EditTimeStamp.getTime() !== currentRidePat_EditTimeStamp.getTime();
+            let patientStatusUpdated = true;
+
+            if (currentRidePat_EditTimeStamp !== '') {
+                patientStatusUpdated = updatedRidePat_EditTimeStamp.getTime() !== currentRidePat_EditTimeStamp.getTime();
+            }
 
             if (tableName2manipulate !== tableNameRidePatShouldBeRender && tableNameRidePatShouldBeRender !== tableNames.NOT_RELEVANT) {
 
@@ -613,7 +617,13 @@
     <script src="assets/js/jquery.min.js"></script>
     <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+<<<<<<< Updated upstream
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.6.1/jszip.min.js" integrity="sha512-qDzk+Wqv8uAmrIr0t9Hjo4qM3DjvwTWuuuG3w9H8JBKd1EMpMaUEKoHKYbX6yP+ilTloEADFKFwKMzOZLlgTEg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+=======
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.6.1/jszip.min.js"
+            integrity="sha512-qDzk+Wqv8uAmrIr0t9Hjo4qM3DjvwTWuuuG3w9H8JBKd1EMpMaUEKoHKYbX6yP+ilTloEADFKFwKMzOZLlgTEg=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+>>>>>>> Stashed changes
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
@@ -3005,7 +3015,12 @@
 
                         <div class="pull-right">
                             <a href="passwordForm.html">
+<<<<<<< Updated upstream
                                 <span class="logo" id="userName"></span>&nbsp;<span style="color:#3BAFDA" class="logo" id="databaseType"></span>
+=======
+                                <span class="logo" id="userName"></span>&nbsp;<span style="color:#3BAFDA" class="logo"
+                                                                                    id="databaseType"></span>
+>>>>>>> Stashed changes
                             </a>
                         </div>
                     </div>
@@ -3366,9 +3381,18 @@
 
 
 
+<<<<<<< Updated upstream
     <div class="modal fade" id="assignDriverModal" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="documentedRidesTitle" aria-hidden="true"></div>
     <div class="modal fade" id="editTimeModal" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="editTimeTitle" aria-hidden="true"></div>
     <div class="modal fade" id="editPatientStatusModal" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="editPatientStatusTitle" aria-hidden="true"></div>
+=======
+    <div class="modal fade" id="assignDriverModal" role="dialog" data-keyboard="false" data-backdrop="static"
+         aria-labelledby="documentedRidesTitle" aria-hidden="true"></div>
+    <div class="modal fade" id="editTimeModal" role="dialog" data-keyboard="false" data-backdrop="static"
+         aria-labelledby="editTimeTitle" aria-hidden="true"></div>
+    <div class="modal fade" id="editPatientStatusModal" role="dialog" data-keyboard="false" data-backdrop="static"
+         aria-labelledby="editPatientStatusTitle" aria-hidden="true"></div>
+>>>>>>> Stashed changes
 
     <div class="modal fade" id="filtersModal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog" role="document">
