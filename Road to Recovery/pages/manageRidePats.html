@@ -378,7 +378,7 @@
 
             const currentRidePat_EditTimeStamp = convertDBDate2FrontEndDate(ridePatBeforeUpdate.Pat.RidePatPatientStatus.EditTimeStamp);
             const updatedRidePat_EditTimeStamp = fixDate_WhichComeFromOpenConnection(updated_ridePat.Pat.RidePatPatientStatus.EditTimeStamp);
-            const patientStatusUpdated = currentRidePat_EditTimeStamp !== updatedRidePat_EditTimeStamp;
+            const patientStatusUpdated = updatedRidePat_EditTimeStamp.getTime() !== currentRidePat_EditTimeStamp.getTime();
 
             if (tableName2manipulate !== tableNameRidePatShouldBeRender && tableNameRidePatShouldBeRender !== tableNames.NOT_RELEVANT) {
 
