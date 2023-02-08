@@ -1,4 +1,10 @@
 ﻿const afterNoon = `אחה"צ`;
+const maleInHebrew = "זכר";
+const femaleInHebrew = "נקבה";
+const male = "Male";
+const female = "Female";
+
+
 var GENERAL = {
 
     USER: {
@@ -114,10 +120,10 @@ var GENERAL = {
 
                 switch (enumNumber) {
                     case 0:
-                        genderAsString = "נקבה";
+                        genderAsString = femaleInHebrew;
                         break;
                     case 1:
-                        genderAsString = "זכר";
+                        genderAsString = maleInHebrew;
                         break;
                 }
             } else {
@@ -218,7 +224,7 @@ var GENERAL = {
 
             if (typeof fullTimeStampStr === 'undefined' || !fullTimeStampStr) return "";
 
-            if (fullTimeStampStr.includes('Date')) {
+            if (fullTimeStampStr.toString().includes('Date')) {
 
                 return new Date(GENERAL.USEFULL_FUNCTIONS.convert2DBDateToInt(fullTimeStampStr));
             } else if (GENERAL.USEFULL_FUNCTIONS.isFromOpenConnection(fullTimeStampStr)) {
@@ -242,7 +248,7 @@ var GENERAL = {
         },
 
         isFromOpenConnection: (date) => {
-            let isFromOpenCon = date.includes('T');
+            let isFromOpenCon = date.toString().includes('T');
 
             return isFromOpenCon;
         },
@@ -474,13 +480,7 @@ var GENERAL = {
             }
             return result;
         },
-
-        AdjustAge: function (age) {
-
-            let roundedAge = Math.round(age * 10) / 10;
-
-            return roundedAge;
-        }
+        
     },
 
     COPYWRITE: () => {

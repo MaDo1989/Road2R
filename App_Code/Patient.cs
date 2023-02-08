@@ -43,7 +43,7 @@ public class Patient
     List<string> equipment;
     DbService dbs;
 
-    public double? Age { get; set; }
+    public int? Age { get; set; }
     public Constants.Enums.Gender GenderAsEnum { get; set; }
     public bool IsActive { get; set; }
 

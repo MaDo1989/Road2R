@@ -24,7 +24,7 @@ public static class Constants
 
     public class TimeUnits
     {
-        public static readonly double DaysInAyear = 365.242199;
+        public static readonly int DaysInAyear = 365;
     }
 
     public class Enums

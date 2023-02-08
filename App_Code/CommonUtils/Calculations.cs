@@ -8,15 +8,14 @@ using System.Web;
 /// </summary>
 public static class Calculations
 {
-    public static double? CalculateAge(DateTime? dateOfBirth)
+    public static int? CalculateAge(DateTime? dateOfBirth)
     {
-        double? age = null;
+        int? age = null;
         DateTime now = DateTime.Now;
         if (dateOfBirth.HasValue)
         {
             DateTime currentDate = DateTime.Now;
-            TimeSpan elapsedTime = currentDate - dateOfBirth.Value;
-            age = elapsedTime.TotalDays / Constants.TimeUnits.DaysInAyear;
+            age = currentDate.Year - dateOfBirth.Value.Year;
         }
 
         return age;
