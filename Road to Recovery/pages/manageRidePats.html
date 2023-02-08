@@ -32,7 +32,8 @@
         let node2manipulate;
         let nodechilds;
         let lastModified_td;
-        const ADD_DRIVER = 'add driver', REMOVE_DRIVER = 'remove driver';
+        let ridePatBeforeUpdate;
+        const ADD_DRIVER = 'add driver', REMOVE_DRIVER = 'remove driver', RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED = 'ridepat_patient_status_edittime_changed';
         const tableNames = {
             MORNING: 'datatable-morning',
             AFTERNOON: 'datatable-afternoon',
@@ -43,7 +44,8 @@
 
         //functions to reuse
         const update_arr_rides = (updated_ridePat) => {
-            const index = arr_rides.findIndex(r => r.RidePatNum === updated_ridePat.RidePatNum)
+            const index = arr_rides.findIndex(r => r.RidePatNum === updated_ridePat.RidePatNum);
+            ridePatBeforeUpdate = arr_rides[index];
             arr_rides[index] = updated_ridePat;
         }
 
@@ -133,6 +135,10 @@
                     $(driver_td).addClass(suitableClass);
                     break;
 
+                case RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED:
+                    $(tr_node2manipulate).addClass('highlightRow-after-patientStatusModal');
+
+                    break;
             }
         }
 
@@ -355,6 +361,7 @@
         }
 
         notification.client.ridePatUpdated = function (updated_ridePat) {
+
             /*   *********************
                  * !!! IMPORTANT !!! *
                  ********↓↓↓**********/
@@ -369,6 +376,9 @@
             thisRidePatLastModified = fixDate_WhichComeFromOpenConnection(updated_ridePat.LastModified);
             tableNameRidePatShouldBeRender = getTableNameToBeRenderedIn(thisRidePatDate);
 
+            const currentRidePat_EditTimeStamp = convertDBDate2FrontEndDate(ridePatBeforeUpdate.Pat.RidePatPatientStatus.EditTimeStamp);
+            const updatedRidePat_EditTimeStamp = fixDate_WhichComeFromOpenConnection(updated_ridePat.Pat.RidePatPatientStatus.EditTimeStamp);
+            const patientStatusUpdated = currentRidePat_EditTimeStamp !== updatedRidePat_EditTimeStamp;
 
             if (tableName2manipulate !== tableNameRidePatShouldBeRender && tableNameRidePatShouldBeRender !== tableNames.NOT_RELEVANT) {
 
@@ -392,7 +402,11 @@
                         row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                         tMorning.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                        increaseCounter('datatable-morning', updated_ridePat.RidePatNum);
+                        increaseCounter(tableNames.MORNING, updated_ridePat.RidePatNum);
+
+                        if (patientStatusUpdated) {
+                            manipilateNodeStyle(tr_node2manipulate, updated_ridePat, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED, false, tableNames.MORNING);
+                        }
 
                         tr_nodesAsArray = Array.from(tMorning.rows().nodes());
                         break;
@@ -412,7 +426,11 @@
                         row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                         tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                        increaseCounter('datatable-afternoon', updated_ridePat.RidePatNum);
+                        increaseCounter(tableNames.AFTERNOON, updated_ridePat.RidePatNum);
+
+                        if (patientStatusUpdated) {
+                            manipilateNodeStyle(tr_node2manipulate, updated_ridePat, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED, false, tableNames.AFTERNOON);
+                        }
 
                         tr_nodesAsArray = Array.from(tAfternoon.rows().nodes());
                         break;
@@ -433,9 +451,14 @@
                         row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                         tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                        increaseCounter('datatable-tomorrow', updated_ridePat.RidePatNum);
+                        increaseCounter(tableNames.TOMORROW, updated_ridePat.RidePatNum);
+
+                        if (patientStatusUpdated) {
+                            manipilateNodeStyle(tr_node2manipulate, updated_ridePat, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED, false, tableNames.TOMORROW);
+                        }
 
                         tr_nodesAsArray = Array.from(tTomorrow.rows().nodes());
+
                         break;
 
                     case tableNames.FUTURE:
@@ -454,11 +477,16 @@
                         row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                         tFuture.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                        increaseCounter('datatable-future', updated_ridePat.RidePatNum);
+                        increaseCounter(tableNames.FUTURE, updated_ridePat.RidePatNum);
 
                         tr_nodesAsArray = Array.from(tFuture.rows().nodes());
                         tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
                         manipilateNodeStyle(tr_node2manipulate, updated_ridePat, ADD_DRIVER, true);
+
+                        if (patientStatusUpdated) {
+                            manipilateNodeStyle(tr_node2manipulate, updated_ridePat, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED, true);
+                        }
+
                         tr_nodesAsArray = null;
                         break;
 
@@ -468,7 +496,6 @@
                         break;
                 }
             }
-
         }
 
         const shiftRidePatToSuitableTable = (tableNameRidePatIsNowIn, tableNameRidePatShouldBeRender, updated_ridePat) => {
@@ -692,7 +719,6 @@
             showMe,
             dateCompareFunc,
             datetimeCompareFunc,
-            AdjustAge
 
         } = GENERAL.USEFULL_FUNCTIONS;
 
@@ -965,7 +991,7 @@
         }
 
         const editPatientStatusAbort = () => {
-            removeClass('highlightRow');
+            removeClass('highlightRow-after-patientStatusModal');
         }
 
         const updateRidePatPatientStatus = () => {
@@ -1001,14 +1027,12 @@
             const updatePatientStatus_SCB = () => {
 
                 $('#wait').hide();
-                removeClass('highlightRow');
                 $('#editPatientStatusModal').modal('hide');
             }
 
             const updatePatientStatus_ECB = (err) => {
 
                 $('#wait').hide();
-                removeClass('highlightRow');
                 $('#editPatientStatusModal').modal('hide');
                 console.log(err);
                 alert(err);
@@ -2008,7 +2032,7 @@
                         //#endregion Status
 
                         //#region patient age
-                        patientAge = AdjustAge(arr_rides[i].Pat.Age);
+                        patientAge = buildPatientAgeHTML(arr_rides[i].Pat);
                         //#endregion
 
 
@@ -2460,6 +2484,31 @@
             });
         }
 
+        const buildPatientAgeHTML = (patient) => {
+
+            let age = '';
+
+            if (patient.IsAnonymous !== 'True') {
+                let gender = GetPatientGender(patient.GenderAsEnum, isAssistant)
+                age = '<span>'
+
+                if (!isAssistant) {
+
+                    age += gender === maleInHebrew ? 'בן ' : 'בת ';
+                }
+                else {
+
+                    age += gender === male ? 'his age ' : 'hers age ';
+                }
+
+                age += patient.Age;
+                age += '</span>';
+            }
+
+
+            return age;
+        }
+
         const buildHtmlSelectTimeInterval = () => {
 
             const container = document.querySelector('#future-table-time-interval-container');
@@ -2647,11 +2696,16 @@
             let statusWrapper = `<div class="elementsInSameLine">`;
 
             const status = GetPatientStatus(statusObj.Status, isAssistant);
-            const EditTimeStamp = convertDBDate2FrontEndDate(statusObj.EditTimeStamp);
+            const editTimeStamp = convertDBDate2FrontEndDate(statusObj.EditTimeStamp);
             const editBtn = `<button type='button' data-toggle="modal" data-target="#editPatientStatusModal" onclick="prepreparationEditPatientStatusModal(this, ${ridePatNum})" class='btn btn-icon waves-effect waves-light btn-secondary' title='עריכה'><i class='ti-pencil'></i></button>`;
 
             statusHTML = `<span>${status}</span>`;
+
+            statusWrapper += '<div class="column">';
             statusWrapper += statusHTML;
+            statusWrapper += editTimeStamp ? '<div class="timeUnderStatus">' + editTimeStamp.toLocaleTimeString('he-IL', { timeStyle: 'short' }) + '</div>' : '';
+            statusWrapper += `</div>`;
+
             statusWrapper += editBtn;
 
             statusWrapper += `</div>`;
@@ -2761,7 +2815,7 @@
 
         function prepreparationEditPatientStatusModal(thisBtn, ridepatNum, EditTimeStamp, status) {
             _ridepatToManipulate = ridepatNum
-            highLightRow(thisBtn);
+            highLightRowSpecifcCSSClass(thisBtn, 'highlightRow-after-patientStatusModal');
 
             $('#editPatientStatusModalTitle').text('עדכון סטטוס חולה');
             BuildTimeDDLs("editPatientStatusModalHours", "editPatientStatusModalMinutes");
@@ -2817,6 +2871,11 @@
         function highLightRow(thisBtn) {
             _trToHighLight = thisBtn.closest('tr');
             _trToHighLight.classList.add('highlightRow');
+        }
+
+        function highLightRowSpecifcCSSClass(thisBtn, className) {
+            _trToHighLight = thisBtn.closest('tr');
+            _trToHighLight.classList.add(className);
         }
 
         const add2IhaveSeenAllready = () => {
