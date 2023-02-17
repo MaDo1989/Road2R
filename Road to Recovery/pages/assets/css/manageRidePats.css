@@ -212,7 +212,7 @@ input:checked + .slider:before {
 
 .driverAssign2AnonymousRide {
     /* ↓ yellowish*/
-    background: #FFEF8F;
+    background: #FFEF8F !important;
 }
 
 .reached2destination {

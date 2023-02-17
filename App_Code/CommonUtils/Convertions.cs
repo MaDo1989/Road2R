@@ -37,7 +37,7 @@ public static class Convertions
         switch (patientStatus)
         {
             case Constants.Strings.Finished:
-                result = Constants.Enums.PatientStatus.FinishedFinished;
+                result = Constants.Enums.PatientStatus.Finished;
                 break;
 
             case Constants.Strings.NotFinished:

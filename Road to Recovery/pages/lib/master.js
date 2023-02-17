@@ -3,6 +3,12 @@ const maleInHebrew = "זכר";
 const femaleInHebrew = "נקבה";
 const male = "Male";
 const female = "Female";
+const afternoonIndicator = 14;
+const patientStatus = {
+    Empty: -1,
+    NotFinished: 0,
+    Finished: 1
+};
 
 
 var GENERAL = {
@@ -480,7 +486,12 @@ var GENERAL = {
             }
             return result;
         },
-        
+
+        isDate: (obj) => {
+
+            let result = obj instanceof Date && !isNaN(obj);
+            return result;
+        }
     },
 
     COPYWRITE: () => {
