@@ -959,20 +959,29 @@ public class Patient
                 p.Remarks = sdr["Remarks"].ToString();
                 p.EnglishName = sdr["EnglishName"].ToString();
                 p.IsAnonymous = String.IsNullOrEmpty(sdr["IsAnonymous"].ToString()) ? "" : sdr["IsAnonymous"].ToString();
-
+                DateTime? dateOfBirth = String.IsNullOrEmpty(sdr["BirthDate"].ToString()) ? null : (DateTime?)Convert.ToDateTime(sdr["BirthDate"].ToString());
+                p.Age = Calculations.CalculateAge(dateOfBirth);
                 int ridePatPatientStatus_RidePatNum;
                 bool isExistsRidePatPatientStatus = false;
+                p.RidePatPatientStatus = new RidePatPatientStatus();
+
                 if (HasColumn(sdr, "RidePatPatientStatus_RidePatNum"))
-                     isExistsRidePatPatientStatus = int.TryParse(sdr["RidePatPatientStatus_RidePatNum"].ToString(), out ridePatPatientStatus_RidePatNum);
+                {
+                    isExistsRidePatPatientStatus = int.TryParse(sdr["RidePatPatientStatus_RidePatNum"].ToString(), out ridePatPatientStatus_RidePatNum);
+                }
+                string patientStatus = "";
                 if (isExistsRidePatPatientStatus)
                 {
-                    string patientStatus = sdr["PatientStatus"].ToString();
-                    p.RidePatPatientStatus = new RidePatPatientStatus();
-                    
-                    p.RidePatPatientStatus.Status = Convertions.ConvertStringToPatientStatus(patientStatus);
-                    p.RidePatPatientStatus.EditTimeStamp = String.IsNullOrEmpty(sdr["EditTimeStamp"].ToString()) ? null : (DateTime?)Convert.ToDateTime(sdr["EditTimeStamp"].ToString());
-
+                    patientStatus = sdr["PatientStatus"].ToString();
                 }
+                p.RidePatPatientStatus.Status = Convertions.ConvertStringToPatientStatus(patientStatus);
+                
+                p.RidePatPatientStatus.EditTimeStamp = null;
+                if (HasColumn(sdr, "EditTimeStamp"))
+                {
+                    p.RidePatPatientStatus.EditTimeStamp = String.IsNullOrEmpty(sdr["EditTimeStamp"].ToString()) ? null : (DateTime?)Convert.ToDateTime(sdr["EditTimeStamp"].ToString());
+                }
+                
                 if (sdr["PatientIdentity"].ToString() == "")
                 {
                     p.PatientIdentity = 0;
