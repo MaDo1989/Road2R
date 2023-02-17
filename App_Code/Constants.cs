@@ -40,7 +40,7 @@ public static class Constants
         {
             Empty = -1,
             NotFinished = 0,
-            FinishedFinished = 1
+            Finished = 1
         }
     }
 
