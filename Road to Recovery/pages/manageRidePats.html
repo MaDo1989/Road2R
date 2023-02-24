@@ -137,7 +137,7 @@
                     let hh, mm;
                     const rideDate = fixDate_WhichComeFromOpenConnection(updated_ridePat.Date);
 
-                    if (rideDate.getMinutes() === 14) {//afternoon
+                    if (rideDate.getMinutes() === afternoonIndicator) {
                         hh = 12, mm = 0;
                     } else {
                         hh = rideDate.getHours(), mm = rideDate.getMinutes();
@@ -375,7 +375,6 @@
                         tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
                         manipilateNodeStyle(tr_node2manipulate, updated_ridePat, ADD_DRIVER, true);
 
-                        tr_nodesAsArray = null;
                         break;
 
                     default:
@@ -389,12 +388,25 @@
 
                     updatedRidePat_status = updated_ridePat.Pat.RidePatPatientStatus.Status;
                     treatmentFinished = updatedRidePat_status === patientStatus.Finished;
+                    isAfterNoonRide = thisRidePatDate.getMinutes() === afternoonIndicator;
                     driverIsAssigned = updated_ridePat.Drivers.length > 0;
 
-                    if (!driverIsAssigned && treatmentFinished) {
-                        manipilateNodeStyle(tr_node2manipulate, updated_ridePat, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED);
-                    }
+                    if (treatmentFinished) {
 
+                        if (!driverIsAssigned) {
+
+                            manipilateNodeStyle(tr_node2manipulate, updated_ridePat, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED);
+                        } else if (driverIsAssigned && isAfterNoonRide) {
+
+                            manipilateNodeStyle(tr_node2manipulate, updated_ridePat, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED);
+                        } else {
+
+                            $(tr_node2manipulate).removeClass('highlightRow-after-patientStatusModal');
+                        }
+                    } else {
+
+                        $(tr_node2manipulate).removeClass('highlightRow-after-patientStatusModal');
+                    }
                 }
             }
         }
@@ -502,7 +514,7 @@
                     tr_nodesAsArray = Array.from(tFuture.rows().nodes());
                     tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
                     manipilateNodeStyle(tr_node2manipulate, updated_ridePat, ADD_DRIVER, true);
-                    tr_nodesAsArray = null;
+                    // tr_nodesAsArray = null;
                     break;
 
                 default:
@@ -600,7 +612,7 @@
                     tr_nodesAsArray = Array.from(tFuture.rows().nodes());
                     tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
                     manipilateNodeStyle(tr_node2manipulate, updated_ridePat, REMOVE_DRIVER, true, tableName2manipulate);
-                    tr_nodesAsArray = null;
+                    //tr_nodesAsArray = null;
                     break;
 
                 default:
@@ -614,6 +626,18 @@
 
                 tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
                 manipilateNodeStyle(tr_node2manipulate, updated_ridePat, REMOVE_DRIVER, false, tableName2manipulate);
+
+                updatedRidePat_status = updated_ridePat.Pat.RidePatPatientStatus.Status;
+                treatmentFinished = updatedRidePat_status === patientStatus.Finished;
+
+                if (treatmentFinished) {
+
+                    manipilateNodeStyle(tr_node2manipulate, updated_ridePat, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED);
+                } else {
+
+                    $(tr_node2manipulate).removeClass('highlightRow-after-patientStatusModal');
+                }
+
             }
         }
 
@@ -2806,6 +2830,8 @@
             if (statusObj.Status === patientStatus.Finished) {
 
                 statusWrapper += editTimeStamp ? '<div class="timeUnderStatus">' + editTimeStamp.toLocaleTimeString('he-IL', { timeStyle: 'short' }) + '</div>' : '';
+            } else {
+
             }
 
             statusWrapper += `</div>`;
