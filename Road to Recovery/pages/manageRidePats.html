@@ -743,13 +743,13 @@
     <script src="lib/includeHTML.js"></script>
 
     <script>
-        /*
-        NOTICE THIS:
-        אחה"צ
-        calculation   wise: its value is 12:00 (like when we calaulate hours gap between the present and a given ridepat)
-        table sorting wise: its value is Infinity or negetive Infinity
-        */
-        checkCookie();
+    /*
+    NOTICE THIS:
+    אחה"צ
+    calculation   wise: its value is 12:00 (like when we calaulate hours gap between the present and a given ridepat)
+    table sorting wise: its value is Infinity or negetive Infinity
+    */
+    checkCookie();
         var destinationName = "";
         var originName = "";
         var driverName = "";
@@ -788,7 +788,8 @@
             showMe,
             dateCompareFunc,
             datetimeCompareFunc,
-            isDate
+            isDate,
+            IsNullOrUndefined
 
         } = GENERAL.USEFULL_FUNCTIONS;
 
@@ -2618,6 +2619,10 @@
         const buildPatientAgeHTML = (patient) => {
 
             let age = '';
+
+            if (IsNullOrUndefined(patient.Age)) {
+                return '';
+            }
 
             if (patient.IsAnonymous !== 'True') {
                 let gender = GetPatientGender(patient.GenderAsEnum, isAssistant)
