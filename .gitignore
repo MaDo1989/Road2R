@@ -17,3 +17,6 @@ log/MyTestAppender.log
 App_Data/PublishProfiles/r2rapp - Web Deploy.pubxml
 log/StackTraces.txt
 App_Data/PublishProfiles/r2rapp - Web Deploy.pubxml
+App_Data/PublishProfiles/r2rapp - Web Deploy.pubxml
+*.pubxml
+*.publishproj

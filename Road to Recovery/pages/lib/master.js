@@ -491,6 +491,12 @@ var GENERAL = {
 
             let result = obj instanceof Date && !isNaN(obj);
             return result;
+        },
+
+        IsNullOrUndefined: (obj) => {
+
+            let result = obj === null || obj === undefined;
+            return result;
         }
     },
 
