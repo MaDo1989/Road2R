@@ -532,7 +532,11 @@
                 treatmentFinished = updatedRidePat_status === patientStatus.Finished;
 
                 if (isAfterNoonRide && treatmentFinished) {
+
                     manipilateNodeStyle(tr_node2manipulate, updated_ridePat, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED);
+                } else if (treatmentFinished && !isAfterNoonRide) {
+
+                    $(tr_node2manipulate).removeClass('highlightRow-after-patientStatusModal');
                 }
             }
         }
@@ -2190,7 +2194,8 @@
                             { data: "buttons" },                             //10
                         ],
                         columnDefs: [
-                            { width: '5%', "targets": [0, 1, 2, 4, 5, 6, 7] },
+                            { width: '5%', "targets": [0, 1, 2, 5, 6, 7] },
+                            { width: '2%', "targets": [4] },
                             { width: '15%', "targets": [3] },
                             { width: '25%', "targets": [9] },
                             { targets: 0, type: 'de_time' },
@@ -2287,7 +2292,8 @@
                             { data: "buttons" },                             //10
                         ],
                         columnDefs: [
-                            { width: '5%', "targets": [0, 1, 2, 4, 5, 6, 7, 8] },
+                            { width: '5%', "targets": [0, 1, 2, 5, 6, 7, 8] },
+                            { width: '2%', "targets": [4] },
                             { width: '15%', "targets": [3] },
                             { width: '25%', "targets": [10] },
                             { targets: 0, type: 'de_time' },
@@ -2417,7 +2423,8 @@
                             { targets: 1, type: 'de_time' },
                             { width: '4%', "targets": [0, 1] },
                             { width: '6%', "targets": [2, 3] },
-                            { width: '10%', "targets": [5] },
+                            { width: '15%', "targets": [4] },
+                            { width: '2%', "targets": [5] },
                             { width: '5%', "targets": [6, 7, 8, 9] },
                             { width: '0%', "targets": [10] },
                             { width: '25%', "targets": [11] },
@@ -2532,7 +2539,8 @@
                             { width: '4%', "targets": [0, 1] },
                             { width: '6%', "targets": [2, 3] },
                             { width: '10%', "targets": [4] },
-                            { width: '5%', "targets": [5, 6, 7, 8, 9] },
+                            { width: '2%', "targets": [5] },
+                            { width: '5%', "targets": [6, 7, 8, 9] },
                             { width: '0%', "targets": [10] },
                             { width: '25%', "targets": [11] },
                             { targets: 5, className: 'driver_td' },
@@ -3239,7 +3247,7 @@
                                                             <th class="middle" title="Destination  نقطة الوصول">יעד</th>
                                                             <th class="customWidth4column middle"
                                                                 title="Patient  المريض">החולה</th>
-                                                            <th class="middle" title="Patient's Name">גיל החולה</th>
+                                                            <th class="middle" title="Patient's Name">גיל</th>
                                                             <th class="middle" title="Driver  السائق">המסיע</th>
                                                             <th class="middle" title="Status  حالة السفرية">
                                                                 סטטוס החולה
@@ -3294,7 +3302,7 @@
                                                             <th class="middle" title="Destination  نقطة الوصول">יעד</th>
                                                             <th class="customWidth4column middle"
                                                                 title="Patient  المريض">החולה</th>
-                                                            <th class="middle" title="Patient's Name">גיל החולה</th>
+                                                            <th class="middle" title="Patient's Name">גיל</th>
                                                             <th class="middle" title="Driver  السائق">המסיע</th>
                                                             <th class="middle" title="Status  حالة السفرية">
                                                                 סטטוס החולה
@@ -3350,7 +3358,7 @@
                                                             <th class="middle" title="Destination  نقطة الوصول">יעד</th>
                                                             <th class="customWidth4column middle"
                                                                 title="Patient  المريض">החולה</th>
-                                                            <th class="middle" title="Patient's Name">גיל החולה</th>
+                                                            <th class="middle" title="Patient's Name">גיל</th>
                                                             <th class="middle" title="Driver  السائق">המסיע</th>
                                                             <th class="middle" title="Status  حالة السفرية">
                                                                 סטטוס החולה
@@ -3405,7 +3413,7 @@
                                                             <th class="middle" title="Destination  نقطة الوصول">יעד</th>
                                                             <th class="customWidth4column middle"
                                                                 title="Patient  المريض">החולה</th>
-                                                            <th class="middle" title="Patient's Name">גיל החולה</th>
+                                                            <th class="middle" title="Patient's Name">גיל</th>
 
                                                             <th class="middle" title="Driver  السائق">המסיע</th>
                                                             <th class="middle" title="Status  حالة السفرية">
