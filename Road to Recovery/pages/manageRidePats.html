@@ -1062,11 +1062,13 @@
         }
 
         const editPatientStatusAbort = () => {
-            removeClass('highlightRow-after-patientStatusModal');
+            removeClass('highlightRow');
         }
 
         const updateRidePatPatientStatus = () => {
+
             $('#wait').show();
+            removeClass('highlightRow');
             const hours = $("#editPatientStatusModalHours").val();
             const minutes = $("#editPatientStatusModalMinutes").val();
             const isTreatmentFinished = !$("#editPatientStatusNotFinishedCB").is(':checked');
@@ -2958,7 +2960,7 @@
 
         function prepreparationEditPatientStatusModal(thisBtn, ridepatNum, EditTimeStamp, status) {
             _ridepatToManipulate = ridepatNum
-            highLightRowSpecifcCSSClass(thisBtn, 'highlightRow-after-patientStatusModal');
+            highLightRowSpecifcCSSClass(thisBtn, 'highlightRow');
 
             $('#editPatientStatusModalTitle').text('עדכון סטטוס חולה');
             BuildTimeDDLs("editPatientStatusModalHours", "editPatientStatusModalMinutes");
