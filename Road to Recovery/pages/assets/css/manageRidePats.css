@@ -271,9 +271,12 @@ input:checked + .slider:before {
 .timeUnderStatus {
     margin-left: auto;
     margin-right: 0;
-    font-weight: bold;
 }
 
 .column {
     flex-direction: column;
+}
+
+.time {
+    font-weight: bold;
 }
