@@ -699,7 +699,7 @@ function rp_amuta_vls_per_km_field_year_post_clone(id) {
 
 function rp_amuta_vls_list_field_radio_post_clone(id) {
     var today = new Date();
-    $('#select_date_later').val("2022-01-01");
+    $('#select_date_later').val("2023-01-01");
     $("#select_date_later").change(rp_amuta_vls_list__refresh_preview);
 
     $("#ck_only_with_rides").change(rp_amuta_vls_list__refresh_preview);
