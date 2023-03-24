@@ -104,6 +104,10 @@
             lat = parseFloat(lat);
             lng = parseFloat(lng);
 
+            if (lat === 0 && lng === 0) {
+                return true;
+            }
+
             if (lat < cr.minLat || lat > cr.maxLat || lng < cr.minLng || lng > cr.maxLng) {
                 alert("lat, lng out of range in Israel");
                 return false;
