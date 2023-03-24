@@ -71,4 +71,27 @@ GO
 
 --Patient Status ↑
 
+-- Start Update RidePat Remark
+-- =============================================
+-- Author: Yogev Strauber
+-- Create Date: 17.03.2023
+-- Description: Gets ridepatnum + remark description and updates it accordingly (set new lasymodified value to this record)
+-- =============================================
 
+CREATE PROCEDURE spRidePat_UpdateRemark
+(
+	@ridePatNum int,
+	@newRemark nvarchar(255)
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from interfering with SELECT statements.
+    SET NOCOUNT ON
+
+	UPDATE RidePat
+	SET Remark=@newRemark
+	WHERE RidePatNum=@ridePatNum
+END
+GO
+
+-- End Update RidePat Remark

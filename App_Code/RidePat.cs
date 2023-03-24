@@ -2162,6 +2162,23 @@ finally
         }
     }
 
+    public void UpdateRidePatRemark(int ridePatId, string newRemark)
+    {
+        try
+        {
+            newRemark = FixApostrophe(newRemark);
+            string query = "exec spRidePat_UpdateRemark @ridePatNum=" + ridePatId + ", @newRemark = N'" + newRemark + "'";
+            dbs = new DbService();
+            dbs.ExecuteQuery(query);
+            RidePat rp = GetRidePat(ridePatId);
+            BroadCast.BroadCast2Clients_ridePatUpdated(rp);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
     /// <summary>
     /// ChangeCoordinatoor is a private method for changing the coordinator NAME! in the ridepat table
     /// this functionality is for track who was the last coordinator who change any field in a record of 

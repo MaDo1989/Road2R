@@ -743,13 +743,13 @@
     <script src="lib/includeHTML.js"></script>
 
     <script>
-    /*
-    NOTICE THIS:
-    אחה"צ
-    calculation   wise: its value is 12:00 (like when we calaulate hours gap between the present and a given ridepat)
-    table sorting wise: its value is Infinity or negetive Infinity
-    */
-    checkCookie();
+        /*
+        NOTICE THIS:
+        אחה"צ
+        calculation   wise: its value is 12:00 (like when we calaulate hours gap between the present and a given ridepat)
+        table sorting wise: its value is Infinity or negetive Infinity
+        */
+        checkCookie();
         var destinationName = "";
         var originName = "";
         var driverName = "";
@@ -2621,22 +2621,41 @@
         const buildPatientAgeHTML = (patient) => {
 
             let age = '';
+            const boy = 'בן ', girl = 'בת ';
+            const gender = GetPatientGender(patient.GenderAsEnum, isAssistant)
+            const isMaleHebrew = gender === maleInHebrew;
+            const isMaleEnglish = gender === male;
 
-            if (IsNullOrUndefined(patient.Age)) {
+            if (gender.length === 0 && IsNullOrUndefined(patient.Age)) {
                 return '';
             }
 
+            if (IsNullOrUndefined(patient.Age)) {
+
+                let result = '';
+
+                if (!isAssistant) {
+
+                    result = isMaleHebrew ? boy : girl;
+                } else {
+
+                    result = isMaleEnglish ? male : female;
+                }
+
+                return result;
+            }
+
             if (patient.IsAnonymous !== 'True') {
-                let gender = GetPatientGender(patient.GenderAsEnum, isAssistant)
+                const isGenderEmpty = gender === '';
                 age = '<span>'
 
                 if (!isAssistant) {
 
-                    age += gender === maleInHebrew ? 'בן ' : 'בת ';
+                    age += isMaleHebrew ? boy : gender === femaleInHebrew ? girl : '';
                 }
                 else {
 
-                    age += gender === male ? 'his age ' : 'hers age ';
+                    age += isMaleEnglish ? 'his age ' : gender === female ? 'her age ' : '';
                 }
 
                 age += patient.Age;

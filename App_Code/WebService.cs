@@ -2391,6 +2391,21 @@ public class WebService : System.Web.Services.WebService
             throw new Exception(ex.Message);
         }
     }
+    
+    [WebMethod(EnableSession = true)]
+    public void UpdateRidePatRemark(int ridePatId, string newRemark)
+    {
+        try
+        {
+            RidePat rp = new RidePat();
+            rp.UpdateRidePatRemark(ridePatId, newRemark);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in UpdateRidePatRemark", ex);
+            throw new Exception(ex.Message);
+        }
+    }
 }
 
 
