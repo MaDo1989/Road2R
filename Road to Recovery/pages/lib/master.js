@@ -131,6 +131,8 @@ var GENERAL = {
                     case 1:
                         genderAsString = maleInHebrew;
                         break;
+                    case -1:
+                        genderAsString = '';
                 }
             } else {
                 switch (enumNumber) {
@@ -140,6 +142,8 @@ var GENERAL = {
                     case 1:
                         genderAsString = "Male";
                         break;
+                    case -1:
+                        genderAsString = '';
                 }
             }
 
