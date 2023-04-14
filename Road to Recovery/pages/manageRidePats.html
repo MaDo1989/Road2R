@@ -1251,6 +1251,9 @@
 
             $("#editTimeModal").attr("w3-include-html", "editTimeModal.html");
             $("#editPatientStatusModal").attr("w3-include-html", "editPatientStatusModal.html");
+            $("#editRemarkModal").attr("w3-include-html", "editRemarkModal.html");
+
+            
 
             wiringDataTables();
             const { COPYWRITE } = GENERAL;
@@ -2070,6 +2073,7 @@
                     let patientGender = null;
                     let patientAge = null;
                     let isPatientStatusShouldPaintRow = false;
+                    let remarkHTML = '';
 
 
                     for (let i = 0; i < arr_rides.length; i++) {
@@ -2105,6 +2109,10 @@
                         status2render = buildStatusString(arr_rides[i].Pat.RidePatPatientStatus, arr_rides[i].RidePatNum);
                         //#endregion Status
 
+                        //#region remarkHTML
+                        remarkHTML = buildRemarkHTML(arr_rides[i].Remark, arr_rides[i].RidePatNum);
+                        //#endregion remarkHTML
+
                         //#region patient age
                         patientAge = buildPatientAgeHTML(arr_rides[i].Pat);
                         //#endregion
@@ -2128,7 +2136,7 @@
                             driver: driverHTML,
                             status: status2render,
                             lastModified: convertDBDate2FrontEndDate(arr_rides[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" }),
-                            remark: arr_rides[i].Remark,
+                            remark: remarkHTML,
                             isAnonymous: arr_rides[i].Pat.IsAnonymous === 'True',
                             hasDriver: arr_rides[i].Drivers.length > 0,
                             buttons: btnStr,
@@ -2877,6 +2885,20 @@
             return statusWrapper;
         }
 
+        const buildRemarkHTML = (remark, ridePatNum) => {
+
+            let wrapper = '<div class="elementsInSameLine">';
+            //onclick="prepreparationEdit_####(this, ${ridePatNum})"
+            const editBtn = `<button type='button' data-toggle="modal" data-target="#editRemarkModal" class='fix-flex-scretch btn btn-icon waves-effect waves-light btn-secondary' title='עריכה'><i class='ti-pencil'></i></button>`;
+
+            wrapper += editBtn;
+            wrapper += `<div class="justify-text">${remark}</div>`;
+
+            wrapper += '</div>';
+
+            return wrapper;
+        }
+
         const buildAcionsButtonsHTML = (ridePatNum, drivers) => {
 
             const editBtn = `<button type='button' class='edit                   btn btn-icon waves-effect waves-light btn-secondary' id='${ridePatNum}'  name='${ridePatNum}' title='עריכה'>         <i class='ti-pencil'></i></button>`;
@@ -3528,12 +3550,8 @@
     <div class="modal fade" id="assignDriverModal" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="documentedRidesTitle" aria-hidden="true"></div>
     <div class="modal fade" id="editTimeModal" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="editTimeTitle" aria-hidden="true"></div>
     <div class="modal fade" id="editPatientStatusModal" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="editPatientStatusTitle" aria-hidden="true"></div>
-    <div class="modal fade" id="assignDriverModal" role="dialog" data-keyboard="false" data-backdrop="static"
-         aria-labelledby="documentedRidesTitle" aria-hidden="true"></div>
-    <div class="modal fade" id="editTimeModal" role="dialog" data-keyboard="false" data-backdrop="static"
-         aria-labelledby="editTimeTitle" aria-hidden="true"></div>
-    <div class="modal fade" id="editPatientStatusModal" role="dialog" data-keyboard="false" data-backdrop="static"
-         aria-labelledby="editPatientStatusTitle" aria-hidden="true"></div>
+    <div class="modal fade" id="editRemarkModal" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="" aria-hidden="true"></div>
+
 
     <div class="modal fade" id="filtersModal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog" role="document">
