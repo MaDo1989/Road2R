@@ -191,7 +191,7 @@
             ridePat2Draw.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
             ridePat2Draw.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
             ridePat2Draw.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
-            ridePat2Draw.remark = updated_ridePat.Remark;
+            ridePat2Draw.remark = buildRemarkHTML(updated_ridePat.Remark, updated_ridePat.RidePatNum);
             ridePat2Draw.isAnonymous = updated_ridePat.Pat.IsAnonymous;
             ridePat2Draw.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
@@ -302,7 +302,7 @@
                         row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
                         row2manipulate.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
                         row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
-                        row2manipulate.remark = updated_ridePat.Remark;
+                        row2manipulate.remark = buildRemarkHTML(updated_ridePat.Remark, updated_ridePat.RidePatNum);
                         row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                         tMorning.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
@@ -322,7 +322,7 @@
                         row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
                         row2manipulate.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
                         row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
-                        row2manipulate.remark = updated_ridePat.Remark;
+                        row2manipulate.remark = buildRemarkHTML(updated_ridePat.Remark, updated_ridePat.RidePatNum);;
                         row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                         tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
@@ -343,7 +343,7 @@
                         row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
                         row2manipulate.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
                         row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
-                        row2manipulate.remark = updated_ridePat.Remark;
+                        row2manipulate.remark = buildRemarkHTML(updated_ridePat.Remark, updated_ridePat.RidePatNum);;
                         row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                         tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
@@ -365,7 +365,7 @@
                         row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
                         row2manipulate.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
                         row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
-                        row2manipulate.remark = updated_ridePat.Remark;
+                        row2manipulate.remark = buildRemarkHTML(updated_ridePat.Remark, updated_ridePat.RidePatNum);;
                         row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                         tFuture.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
@@ -440,7 +440,7 @@
                     row2manipulate.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
-                    row2manipulate.remark = updated_ridePat.Remark;
+                    row2manipulate.remark = buildRemarkHTML(updated_ridePat.Remark, updated_ridePat.RidePatNum);;
                     row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                     tMorning.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
@@ -461,7 +461,7 @@
                     row2manipulate.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
-                    row2manipulate.remark = updated_ridePat.Remark;
+                    row2manipulate.remark = buildRemarkHTML(updated_ridePat.Remark, updated_ridePat.RidePatNum);;
                     row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                     tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
@@ -483,7 +483,7 @@
                     row2manipulate.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
-                    row2manipulate.remark = updated_ridePat.Remark;
+                    row2manipulate.remark = buildRemarkHTML(updated_ridePat.Remark, updated_ridePat.RidePatNum);;
                     row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                     tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
@@ -505,7 +505,7 @@
                     row2manipulate.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
-                    row2manipulate.remark = updated_ridePat.Remark;
+                    row2manipulate.remark = buildRemarkHTML(updated_ridePat.Remark, updated_ridePat.RidePatNum);;
                     row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                     tFuture.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
@@ -1165,7 +1165,41 @@
 
         }
 
+        const updateRemark = () => {
+
+            $('#wait').show();
+            let ridepatToManipulate = arr_rides.find(r => r.RidePatNum === _ridepatToManipulate);
+            const newRemark = $('#editRemarkTextEditor').val();
+
+            let data = {
+                ridePatId: _ridepatToManipulate,
+                newRemark
+            };
+
+            const updateRemark_SCB = () => {
+
+                $('#wait').hide();
+                removeClass('highlightRow');
+                $('#editRemarkModal').modal('hide');
+            }
+
+            const updateRemark_ECB = (err) => {
+
+                $('#wait').hide();
+                removeClass('highlightRow');
+                $('#editRemarkModal').modal('hide');
+                alert(err);
+            }
+
+            ajaxCall('UpdateRidePatRemark', JSON.stringify(data), updateRemark_SCB, updateRemark_ECB);
+
+        }
+
         const editTimeAbort = () => {
+            removeClass('highlightRow');
+        }
+
+        const editRemarkAbort = () => {
             removeClass('highlightRow');
         }
 
@@ -1251,6 +1285,9 @@
 
             $("#editTimeModal").attr("w3-include-html", "editTimeModal.html");
             $("#editPatientStatusModal").attr("w3-include-html", "editPatientStatusModal.html");
+            $("#editRemarkModal").attr("w3-include-html", "editRemarkModal.html");
+
+            
 
             wiringDataTables();
             const { COPYWRITE } = GENERAL;
@@ -2070,6 +2107,7 @@
                     let patientGender = null;
                     let patientAge = null;
                     let isPatientStatusShouldPaintRow = false;
+                    let remarkHTML = '';
 
 
                     for (let i = 0; i < arr_rides.length; i++) {
@@ -2105,6 +2143,10 @@
                         status2render = buildStatusString(arr_rides[i].Pat.RidePatPatientStatus, arr_rides[i].RidePatNum);
                         //#endregion Status
 
+                        //#region remarkHTML
+                        remarkHTML = buildRemarkHTML(arr_rides[i].Remark, arr_rides[i].RidePatNum);
+                        //#endregion remarkHTML
+
                         //#region patient age
                         patientAge = buildPatientAgeHTML(arr_rides[i].Pat);
                         //#endregion
@@ -2128,7 +2170,7 @@
                             driver: driverHTML,
                             status: status2render,
                             lastModified: convertDBDate2FrontEndDate(arr_rides[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" }),
-                            remark: arr_rides[i].Remark,
+                            remark: remarkHTML,
                             isAnonymous: arr_rides[i].Pat.IsAnonymous === 'True',
                             hasDriver: arr_rides[i].Drivers.length > 0,
                             buttons: btnStr,
@@ -2877,6 +2919,20 @@
             return statusWrapper;
         }
 
+        const buildRemarkHTML = (remark, ridePatNum) => {
+
+            let wrapper = '<div class="elementsInSameLine">';
+            
+            const editBtn = `<button type='button' data-toggle="modal" onclick="prepreparationEditRemark(this, ${ridePatNum})" data-target="#editRemarkModal" class='fix-flex-scretch btn btn-icon waves-effect waves-light btn-secondary' title='עריכה'><i class='ti-pencil'></i></button>`;
+
+            wrapper += editBtn;
+            wrapper += `<div class="justify-text">${remark}</div>`;
+
+            wrapper += '</div>';
+
+            return wrapper;
+        }
+
         const buildAcionsButtonsHTML = (ridePatNum, drivers) => {
 
             const editBtn = `<button type='button' class='edit                   btn btn-icon waves-effect waves-light btn-secondary' id='${ridePatNum}'  name='${ridePatNum}' title='עריכה'>         <i class='ti-pencil'></i></button>`;
@@ -3004,7 +3060,16 @@
                 retrieveDDLToInitial('#editPatientStatusModalHours');
                 checkeditTimeNotFinishedCB(true);
             }
+        }
 
+        function prepreparationEditRemark(thisBtn, ridepatNum) {
+            _ridepatToManipulate = ridepatNum
+            highLightRow(thisBtn);
+
+            const ridepatObject = arr_rides.find(r => r.RidePatNum === ridepatNum);
+            const remarkToRender = ridepatObject.Remark;
+
+            $('#editRemarkTextEditor').val(remarkToRender);
         }
 
         const checkeditTimeNotFinishedCB = (NotFinishedIsChecked) => {
@@ -3528,12 +3593,8 @@
     <div class="modal fade" id="assignDriverModal" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="documentedRidesTitle" aria-hidden="true"></div>
     <div class="modal fade" id="editTimeModal" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="editTimeTitle" aria-hidden="true"></div>
     <div class="modal fade" id="editPatientStatusModal" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="editPatientStatusTitle" aria-hidden="true"></div>
-    <div class="modal fade" id="assignDriverModal" role="dialog" data-keyboard="false" data-backdrop="static"
-         aria-labelledby="documentedRidesTitle" aria-hidden="true"></div>
-    <div class="modal fade" id="editTimeModal" role="dialog" data-keyboard="false" data-backdrop="static"
-         aria-labelledby="editTimeTitle" aria-hidden="true"></div>
-    <div class="modal fade" id="editPatientStatusModal" role="dialog" data-keyboard="false" data-backdrop="static"
-         aria-labelledby="editPatientStatusTitle" aria-hidden="true"></div>
+    <div class="modal fade" id="editRemarkModal" role="dialog" data-keyboard="false" data-backdrop="static" aria-labelledby="" aria-hidden="true"></div>
+
 
     <div class="modal fade" id="filtersModal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
         <div class="modal-dialog" role="document">
