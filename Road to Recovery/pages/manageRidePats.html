@@ -191,7 +191,7 @@
             ridePat2Draw.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
             ridePat2Draw.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
             ridePat2Draw.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
-            ridePat2Draw.remark = updated_ridePat.Remark;
+            ridePat2Draw.remark = buildRemarkHTML(updated_ridePat.Remark, updated_ridePat.RidePatNum);
             ridePat2Draw.isAnonymous = updated_ridePat.Pat.IsAnonymous;
             ridePat2Draw.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
@@ -302,7 +302,7 @@
                         row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
                         row2manipulate.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
                         row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
-                        row2manipulate.remark = updated_ridePat.Remark;
+                        row2manipulate.remark = buildRemarkHTML(updated_ridePat.Remark, updated_ridePat.RidePatNum);
                         row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                         tMorning.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
@@ -322,7 +322,7 @@
                         row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
                         row2manipulate.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
                         row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
-                        row2manipulate.remark = updated_ridePat.Remark;
+                        row2manipulate.remark = buildRemarkHTML(updated_ridePat.Remark, updated_ridePat.RidePatNum);;
                         row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                         tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
@@ -343,7 +343,7 @@
                         row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
                         row2manipulate.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
                         row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
-                        row2manipulate.remark = updated_ridePat.Remark;
+                        row2manipulate.remark = buildRemarkHTML(updated_ridePat.Remark, updated_ridePat.RidePatNum);;
                         row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                         tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
@@ -365,7 +365,7 @@
                         row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
                         row2manipulate.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
                         row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
-                        row2manipulate.remark = updated_ridePat.Remark;
+                        row2manipulate.remark = buildRemarkHTML(updated_ridePat.Remark, updated_ridePat.RidePatNum);;
                         row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                         tFuture.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
@@ -440,7 +440,7 @@
                     row2manipulate.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
-                    row2manipulate.remark = updated_ridePat.Remark;
+                    row2manipulate.remark = buildRemarkHTML(updated_ridePat.Remark, updated_ridePat.RidePatNum);;
                     row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                     tMorning.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
@@ -461,7 +461,7 @@
                     row2manipulate.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
-                    row2manipulate.remark = updated_ridePat.Remark;
+                    row2manipulate.remark = buildRemarkHTML(updated_ridePat.Remark, updated_ridePat.RidePatNum);;
                     row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                     tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
@@ -483,7 +483,7 @@
                     row2manipulate.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
-                    row2manipulate.remark = updated_ridePat.Remark;
+                    row2manipulate.remark = buildRemarkHTML(updated_ridePat.Remark, updated_ridePat.RidePatNum);;
                     row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                     tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
@@ -505,7 +505,7 @@
                     row2manipulate.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
-                    row2manipulate.remark = updated_ridePat.Remark;
+                    row2manipulate.remark = buildRemarkHTML(updated_ridePat.Remark, updated_ridePat.RidePatNum);;
                     row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                     tFuture.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
@@ -1165,7 +1165,41 @@
 
         }
 
+        const updateRemark = () => {
+
+            $('#wait').show();
+            let ridepatToManipulate = arr_rides.find(r => r.RidePatNum === _ridepatToManipulate);
+            const newRemark = $('#editRemarkTextEditor').val();
+
+            let data = {
+                ridePatId: _ridepatToManipulate,
+                newRemark
+            };
+
+            const updateRemark_SCB = () => {
+
+                $('#wait').hide();
+                removeClass('highlightRow');
+                $('#editRemarkModal').modal('hide');
+            }
+
+            const updateRemark_ECB = (err) => {
+
+                $('#wait').hide();
+                removeClass('highlightRow');
+                $('#editRemarkModal').modal('hide');
+                alert(err);
+            }
+
+            ajaxCall('UpdateRidePatRemark', JSON.stringify(data), updateRemark_SCB, updateRemark_ECB);
+
+        }
+
         const editTimeAbort = () => {
+            removeClass('highlightRow');
+        }
+
+        const editRemarkAbort = () => {
             removeClass('highlightRow');
         }
 
@@ -2888,8 +2922,8 @@
         const buildRemarkHTML = (remark, ridePatNum) => {
 
             let wrapper = '<div class="elementsInSameLine">';
-            //onclick="prepreparationEdit_####(this, ${ridePatNum})"
-            const editBtn = `<button type='button' data-toggle="modal" data-target="#editRemarkModal" class='fix-flex-scretch btn btn-icon waves-effect waves-light btn-secondary' title='עריכה'><i class='ti-pencil'></i></button>`;
+            
+            const editBtn = `<button type='button' data-toggle="modal" onclick="prepreparationEditRemark(this, ${ridePatNum})" data-target="#editRemarkModal" class='fix-flex-scretch btn btn-icon waves-effect waves-light btn-secondary' title='עריכה'><i class='ti-pencil'></i></button>`;
 
             wrapper += editBtn;
             wrapper += `<div class="justify-text">${remark}</div>`;
@@ -3026,7 +3060,16 @@
                 retrieveDDLToInitial('#editPatientStatusModalHours');
                 checkeditTimeNotFinishedCB(true);
             }
+        }
 
+        function prepreparationEditRemark(thisBtn, ridepatNum) {
+            _ridepatToManipulate = ridepatNum
+            highLightRow(thisBtn);
+
+            const ridepatObject = arr_rides.find(r => r.RidePatNum === ridepatNum);
+            const remarkToRender = ridepatObject.Remark;
+
+            $('#editRemarkTextEditor').val(remarkToRender);
         }
 
         const checkeditTimeNotFinishedCB = (NotFinishedIsChecked) => {
