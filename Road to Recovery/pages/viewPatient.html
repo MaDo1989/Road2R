@@ -35,6 +35,7 @@
     <script src="lib/includeHTML.js"></script>
     <script>
         var cleanPhoneNumber;
+        let createRidepatBtn = '';
 
         checkCookie();
         var allPatientsFromDB = [];
@@ -151,12 +152,14 @@
                         equip = equip.substring(0, equip.length - 2);
                         if (arr_patients[i].Equipment.length == 0) equip = "אין";
                         var btnStr = "";
+
                         //כפתור צפייה כרגע מוסתר
                         //var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button>";
+
                         var editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button>";
-
-                        btnStr += /*showBtn + " " +*/ editBtn;
-
+                        createRidepatBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='createNewRide' title='יצירת הסעה'><i class='ti-car'></i></button>";
+                        btnStr += /*showBtn + " " +*/ `${createRidepatBtn} ${editBtn}`;
+                        
                         if (arr_patients[i].IsActive == false) {
                             btnStr = "";
                             var reactiveBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo' ></i></button>";
@@ -378,6 +381,25 @@
 
             });
 
+            $('#datatable-buttons tbody').on('click', '#createNewRide', function () {
+
+
+                const data = tbl.row($(this).parents('tr')).data();
+                localStorage.setItem("PatientNameForRide", JSON.stringify(data.DisplayName));
+
+                let ridepats = JSON.parse(GENERAL.RIDEPAT.getRidePatList());
+                ridepats = JSON.stringify({ ...ridepats, func: 'new' });
+                GENERAL.RIDEPAT.setRidePatList(ridepats);
+                location.href = "ridePatForm.html";
+
+                //const data = tbl.row($(this).parents('tr')).data();
+                //localStorage.setItem("PatientNameForRide", JSON.stringify(data.DisplayName));
+
+                //let ridepats = JSON.parse(GENERAL.RIDEPAT.getRidePatList());
+                //ridepats = JSON.stringify({ ...ridepats, func: 'new' });
+                //GENERAL.RIDEPAT.setRidePatList(ridepats);
+                //location.href = "ridePatForm.html";
+            });
 
 
             pastePhone.onpaste = cleanPhoneNumber;
