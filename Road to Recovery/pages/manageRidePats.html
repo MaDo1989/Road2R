@@ -40,7 +40,8 @@
         const tableNames = {
             MORNING: 'datatable-morning',
             AFTERNOON: 'datatable-afternoon',
-            TOMORROW: 'datatable-tomorrow',
+            TOMORROW_MORNING: 'datatable-tomorrow-morning',
+            TOMORROW_AFTERNOON: 'datatable-tomorrow-afternoon',
             FUTURE: 'datatable-future',
             NOT_RELEVANT: 'not-relevant'
         }
@@ -67,8 +68,10 @@
                 tableName2manipulate = tableNames.MORNING;
             } else if (typeof tAfternoon.row(`#${ridePatNum}`).data() !== 'undefined') {
                 tableName2manipulate = tableNames.AFTERNOON;
-            } else if (typeof tTomorrow.row(`#${ridePatNum}`).data() !== 'undefined') {
-                tableName2manipulate = tableNames.TOMORROW;
+            } else if (typeof tTomorrowMorning.row(`#${ridePatNum}`).data() !== 'undefined') {
+                tableName2manipulate = tableNames.TOMORROW_MORNING;
+            } else if (typeof tTomorrowAfternoon.row(`#${ridePatNum}`).data() !== 'undefined') {
+                tableName2manipulate = tableNames.TOMORROW_AFTERNOON;
             } else if (typeof tFuture.row(`#${ridePatNum}`).data() !== 'undefined') {
                 tableName2manipulate = tableNames.FUTURE;
             } else {
@@ -331,9 +334,9 @@
                         tr_nodesAsArray = Array.from(tAfternoon.rows().nodes());
                         break;
 
-                    case tableNames.TOMORROW:
+                    case tableNames.TOMORROW_MORNING:
 
-                        row2manipulate = tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data();
+                        row2manipulate = tTomorrowMorning.row(`#${updated_ridePat.RidePatNum}`).data();
 
                         row2manipulate.date = thisRidePatDate.toLocaleDateString('he-IL');
                         row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
@@ -346,12 +349,35 @@
                         row2manipulate.remark = buildRemarkHTML(updated_ridePat.Remark, updated_ridePat.RidePatNum);;
                         row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
-                        tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                        increaseCounter(tableNames.TOMORROW, updated_ridePat.RidePatNum);
+                        tTomorrowMorning.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                        increaseCounter(tableNames.TOMORROW_MORNING, updated_ridePat.RidePatNum);
 
-                        tr_nodesAsArray = Array.from(tTomorrow.rows().nodes());
+                        tr_nodesAsArray = Array.from(tTomorrowMorning.rows().nodes());
 
                         break;
+
+                    case tableNames.TOMORROW_AFTERNOON:
+
+                        row2manipulate = tTomorrowAfternoon.row(`#${updated_ridePat.RidePatNum}`).data();
+
+                        row2manipulate.date = thisRidePatDate.toLocaleDateString('he-IL');
+                        row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
+                        row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
+                        row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
+                        row2manipulate.patient = buildPatientHTML(updated_ridePat);
+                        row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
+                        row2manipulate.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
+                        row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                        row2manipulate.remark = buildRemarkHTML(updated_ridePat.Remark, updated_ridePat.RidePatNum);;
+                        row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
+
+                        tTomorrowAfternoon.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                        increaseCounter(tableNames.TOMORROW_AFTERNOON, updated_ridePat.RidePatNum);
+
+                        tr_nodesAsArray = Array.from(tTomorrowMorning.rows().nodes());
+
+                        break;
+
 
                     case tableNames.FUTURE:
 
@@ -444,7 +470,7 @@
                     row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                     tMorning.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                    increaseCounter('datatable-morning', updated_ridePat.RidePatNum);
+                    increaseCounter(tableNames.MORNING, updated_ridePat.RidePatNum);
 
                     tr_nodesAsArray = Array.from(tMorning.rows().nodes());
                     break;
@@ -465,14 +491,14 @@
                     row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                     tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                    increaseCounter('datatable-afternoon', updated_ridePat.RidePatNum);
+                    increaseCounter(tableNames.AFTERNOON, updated_ridePat.RidePatNum);
 
                     tr_nodesAsArray = Array.from(tAfternoon.rows().nodes());
                     break;
 
-                case tableNames.TOMORROW:
+                case tableNames.TOMORROW_MORNING:
 
-                    row2manipulate = tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data();
+                    row2manipulate = tTomorrowMorning.row(`#${updated_ridePat.RidePatNum}`).data();
 
                     row2manipulate.date = thisRidePatDate.toLocaleDateString('he-IL');
                     row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
@@ -486,10 +512,32 @@
                     row2manipulate.remark = buildRemarkHTML(updated_ridePat.Remark, updated_ridePat.RidePatNum);;
                     row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
-                    tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                    increaseCounter('datatable-tomorrow', updated_ridePat.RidePatNum);
+                    tTomorrowMorning.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                    increaseCounter(tableNames.TOMORROW_MORNING, updated_ridePat.RidePatNum);
 
-                    tr_nodesAsArray = Array.from(tTomorrow.rows().nodes());
+                    tr_nodesAsArray = Array.from(tTomorrowMorning.rows().nodes());
+                    break;
+
+                case tableNames.TOMORROW_AFTERNOON:
+
+                    row2manipulate = tTomorrowAfternoon.row(`#${updated_ridePat.RidePatNum}`).data();
+
+                    row2manipulate.date = thisRidePatDate.toLocaleDateString('he-IL');
+                    row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
+                    row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
+                    row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
+                    row2manipulate.patient = buildPatientHTML(updated_ridePat);
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
+                    row2manipulate.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
+                    row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                    //row2manipulate.englishOriginAndDestination = updated_ridePat.Origin.EnglishName + " - " + updated_ridePat.Destination.EnglishName;
+                    row2manipulate.remark = buildRemarkHTML(updated_ridePat.Remark, updated_ridePat.RidePatNum);;
+                    row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
+
+                    tTomorrowAfternoon.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                    increaseCounter(tableNames.TOMORROW_AFTERNOON, updated_ridePat.RidePatNum);
+
+                    tr_nodesAsArray = Array.from(tTomorrowMorning.rows().nodes());
                     break;
 
                 case tableNames.FUTURE:
@@ -509,7 +557,7 @@
                     row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                     tFuture.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                    increaseCounter('datatable-future', updated_ridePat.RidePatNum);
+                    increaseCounter(tableNames.FUTURE, updated_ridePat.RidePatNum);
 
                     tr_nodesAsArray = Array.from(tFuture.rows().nodes());
                     tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
@@ -566,7 +614,7 @@
                     row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                     tMorning.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                    increaseCounter('datatable-morning', updated_ridePat.RidePatNum);
+                    increaseCounter(tableNames.MORNING, updated_ridePat.RidePatNum);
 
                     tr_nodesAsArray = Array.from(tMorning.rows().nodes());
                     break;
@@ -581,25 +629,42 @@
                     row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                     tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                    increaseCounter('datatable-afternoon', updated_ridePat.RidePatNum);
+                    increaseCounter(tableNames.AFTERNOON, updated_ridePat.RidePatNum);
 
                     tr_nodesAsArray = Array.from(tAfternoon.rows().nodes());
                     break;
 
-                case tableNames.TOMORROW:
+                case tableNames.TOMORROW_MORNING:
 
-                    row2manipulate = tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data();
+                    row2manipulate = tTomorrowMorning.row(`#${updated_ridePat.RidePatNum}`).data();
 
                     row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum);
                     row2manipulate.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
                     row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                     row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
-                    tTomorrow.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                    increaseCounter('datatable-tomorrow', updated_ridePat.RidePatNum);
+                    tTomorrowMorning.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                    increaseCounter(tableNames.TOMORROW_MORNING, updated_ridePat.RidePatNum);
 
-                    tr_nodesAsArray = Array.from(tTomorrow.rows().nodes());
+                    tr_nodesAsArray = Array.from(tTomorrowMorning.rows().nodes());
                     break;
+
+                case tableNames.TOMORROW_AFTERNOON:
+
+                    row2manipulate = tTomorrowAfternoon.row(`#${updated_ridePat.RidePatNum}`).data();
+
+                    row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum);
+                    row2manipulate.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
+                    row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                    row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
+
+                    tTomorrowAfternoon.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
+                    increaseCounter(tableNames.TOMORROW_AFTERNOON, updated_ridePat.RidePatNum);
+
+                    tr_nodesAsArray = Array.from(tTomorrowMorning.rows().nodes());
+                    break;
+
+
 
                 case tableNames.FUTURE:
 
@@ -611,7 +676,7 @@
                     row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
 
                     tFuture.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                    increaseCounter('datatable-future', updated_ridePat.RidePatNum);
+                    increaseCounter(tableNames.FUTURE, updated_ridePat.RidePatNum);
 
                     tr_nodesAsArray = Array.from(tFuture.rows().nodes());
                     tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
@@ -810,64 +875,77 @@
         let _trToHighLight;
         let _driverId;
 
-        let tMorning, tAfternoon, tFuture, tTomorrow;
+        let tMorning, tAfternoon, tTomorrowMorning, tTomorrowAfternoon, tFuture;
 
 
         function wiringDataTables() {
             //manage button clicks on tables
 
             //#region remove ridepat
-            $('#datatable-morning tbody').on('click', '.remove', function () {
+            $(`#${tableNames.MORNING} tbody`).on('click', '.remove', function () {
                 confirmDelete(this, tMorning);
             });
 
-            $('#datatable-afternoon tbody').on('click', '.remove', function () {
+            $(`#${tableNames.AFTERNOON} tbody`).on('click', '.remove', function () {
                 confirmDelete(this, tAfternoon);
             });
 
-            $('#datatable-tomorrow tbody').on('click', '.remove', function () {
-                confirmDelete(this, tTomorrow);
+            $(`#${tableNames.TOMORROW_MORNING} tbody`).on('click', '.remove', function () {
+                confirmDelete(this, tTomorrowMorning);
             });
 
-            $('#datatable-future tbody').on('click', '.remove', function () {
+            $(`#${tableNames.TOMORROW_AFTERNOON} tbody`).on('click', '.remove', function () {
+                confirmDelete(this, tTomorrowMorning);
+            });
+
+            $(`#${tableNames.FUTURE} tbody`).on('click', '.remove', function () {
                 confirmDelete(this, tFuture);
             });
             //#endregion
 
             //#region edit ridepat
-            $('#datatable-morning tbody').on('click', '.edit', function () {
+            $(`#${tableNames.MORNING} tbody`).on('click', '.edit', function () {
                 editButton(this);
             });
 
-            $('#datatable-afternoon tbody').on('click', '.edit', function () {
+            $(`#${tableNames.AFTERNOON} tbody`).on('click', '.edit', function () {
                 editButton(this);
             });
 
 
-            $('#datatable-tomorrow tbody').on('click', '.edit', function () {
+            $(`#${tableNames.TOMORROW_MORNING} tbody`).on('click', '.edit', function () {
                 editButton(this);
             });
 
-            $('#datatable-future tbody').on('click', '.edit', function () {
+
+            $(`#${tableNames.TOMORROW_AFTERNOON} tbody`).on('click', '.edit', function () {
+                editButton(this);
+            });
+
+            $(`#${tableNames.FUTURE} tbody`).on('click', '.edit', function () {
                 editButton(this);
             });
             //#endregion
 
             //#region copyMessage ridepat
-            $('#datatable-morning tbody').on('click', '.copyMessage', function () {
+            $(`#${tableNames.MORNING} tbody`).on('click', '.copyMessage', function () {
                 copyMessageButton(this, tMorning);
             });
 
-            $('#datatable-afternoon tbody').on('click', '.copyMessage', function () {
+            $(`#${tableNames.AFTERNOON} tbody`).on('click', '.copyMessage', function () {
                 copyMessageButton(this, tAfternoon);
             });
 
 
-            $('#datatable-tomorrow tbody').on('click', '.copyMessage', function () {
-                copyMessageButton(this, tTomorrow);
+            $(`#${tableNames.TOMORROW_MORNING} tbody`).on('click', '.copyMessage', function () {
+                copyMessageButton(this, tTomorrowMorning);
             });
 
-            $('#datatable-future tbody').on('click', '.copyMessage', function () {
+            $(`#${tableNames.TOMORROW_AFTERNOON} tbody`).on('click', '.copyMessage', function () {
+                copyMessageButton(this, tTomorrowAfternoon);
+            });
+
+            $(`#${tableNames.FUTURE} tbody`).on('click', '.copyMessage', function () {
                 copyMessageButton(this, tFuture);
             });
             //#endregion
@@ -877,7 +955,7 @@
              IMPORTANT NOTE
              the event is mouseup in order to catch all scenarios.
              */
-            $('#datatable-morning tbody').on('mouseup', '.showMe', function () {
+            $(`#${tableNames.MORNING} tbody`).on('mouseup', '.showMe', function () {
                 let targetObj = {};
                 targetObj.objName = $(this).attr("data-obj");
                 targetObj.displayName = this.text;
@@ -885,7 +963,7 @@
                 showMe(targetObj);
             });
 
-            $('#datatable-afternoon tbody').on('mouseup', '.showMe', function () {
+            $(`#${tableNames.AFTERNOON} tbody`).on('mouseup', '.showMe', function () {
                 let targetObj = {};
                 targetObj.objName = $(this).attr("data-obj");
                 targetObj.displayName = this.text;
@@ -893,8 +971,7 @@
                 showMe(targetObj);
             });
 
-
-            $('#datatable-tomorrow tbody').on('mouseup', '.showMe', function () {
+            $(`#${tableNames.TOMORROW_MORNING} tbody`).on('mouseup', '.showMe', function () {
                 let targetObj = {};
                 targetObj.objName = $(this).attr("data-obj");
                 targetObj.displayName = this.text;
@@ -902,7 +979,17 @@
                 showMe(targetObj);
             });
 
-            $('#datatable-future tbody').on('mouseup', '.showMe', function () {
+            $(`#${tableNames.TOMORROW_AFTERNOON} tbody`).on('mouseup', '.showMe', function () {
+
+                let targetObj = {};
+                targetObj.objName = $(this).attr("data-obj");
+                targetObj.displayName = this.text;
+
+                showMe(targetObj);
+
+            });
+
+            $(`#${tableNames.FUTURE} tbody`).on('mouseup', '.showMe', function () {
 
                 let targetObj = {};
                 targetObj.objName = $(this).attr("data-obj");
@@ -914,7 +1001,7 @@
             //#endregion
 
             //#region ContextMenu_dropdown
-            $('#datatable-morning tbody').on('mousedown', '.within2HoursSinceChange', function (e) {
+            $(`#${tableNames.MORNING} tbody`).on('mousedown', '.within2HoursSinceChange', function (e) {
 
                 timer = setTimeout(function () {
 
@@ -928,7 +1015,7 @@
                 $('.ContextMenu_dropdown').addClass('hidden');
             });
 
-            $('#datatable-afternoon tbody').on('mousedown', '.within2HoursSinceChange', function (e) {
+            $(`#${tableNames.AFTERNOON} tbody`).on('mousedown', '.within2HoursSinceChange', function (e) {
 
                 timer = setTimeout(function () {
 
@@ -942,7 +1029,7 @@
                 $('.ContextMenu_dropdown').addClass('hidden');
             });
 
-            $('#datatable-tomorrow tbody').on('mousedown', '.within2HoursSinceChange', function (e) {
+            $(`#${tableNames.TOMORROW_MORNING} tbody`).on('mousedown', '.within2HoursSinceChange', function (e) {
 
                 timer = setTimeout(function () {
 
@@ -956,7 +1043,22 @@
                 $('.ContextMenu_dropdown').addClass('hidden');
             });
 
-            $('#datatable-future tbody').on('mousedown', '.within2HoursSinceChange', function (e) {
+            $(`#${tableNames.TOMORROW_AFTERNOON} tbody`).on('mousedown', '.within2HoursSinceChange', function (e) {
+
+                timer = setTimeout(function () {
+
+                    candidate4IhaveSeen = e.target.parentElement.id;
+                    $('.ContextMenu_dropdown').removeClass('hidden');
+                    $(".ContextMenu_dropdown").css({ position: "absolute", top: e.pageY, left: e.pageX });
+                }, 500);
+            }).on("mouseup mouseleave", function () {
+                clearTimeout(timer);
+            }).on("click", function () {//click on the td...
+                $('.ContextMenu_dropdown').addClass('hidden');
+            });
+
+
+            $(`#${tableNames.FUTURE} tbody`).on('mousedown', '.within2HoursSinceChange', function (e) {
 
                 timer = setTimeout(function () {
 
@@ -974,19 +1076,23 @@
             //#endregion
 
             //#region candidatesButton
-            $('#datatable-morning tbody').on('click', '.candidatesBtn', function () {
+            $(`#${tableNames.MORNING} tbody`).on('click', '.candidatesBtn', function () {
                 candidatesButton(this);
             });
 
-            $('#datatable-afternoon tbody').on('click', '.candidatesBtn', function () {
+            $(`#${tableNames.AFTERNOON} tbody`).on('click', '.candidatesBtn', function () {
                 candidatesButton(this);
             });
 
-            $('#datatable-future tbody').on('click', '.candidatesBtn', function () {
+            $(`#${tableNames.TOMORROW_MORNING} tbody`).on('click', '.candidatesBtn', function () {
                 candidatesButton(this);
             });
 
-            $('#datatable-tomorrow tbody').on('click', '.candidatesBtn', function () {
+            $(`#${tableNames.TOMORROW_AFTERNOON} tbody`).on('click', '.candidatesBtn', function () {
+                candidatesButton(this);
+            });
+
+            $(`#${tableNames.FUTURE} tbody`).on('click', '.candidatesBtn', function () {
                 candidatesButton(this);
             });
             //#endregion
@@ -1287,7 +1393,7 @@
             $("#editPatientStatusModal").attr("w3-include-html", "editPatientStatusModal.html");
             $("#editRemarkModal").attr("w3-include-html", "editRemarkModal.html");
 
-            
+
 
             wiringDataTables();
             const { COPYWRITE } = GENERAL;
@@ -1482,32 +1588,38 @@
             /*
              #collapse1 = datatable-morning
              #collapse2 = datatable-afternoon
-             #collapse3 = datatable-tomorrow
-             #collapse4 = datatable-future
+             #collapse3 = datatable-tomorrow-morning
+             #collapse4 = ddatatable-tomorrow-afternoon
+             #collapse5 = datatable-future
              */
 
             let table2open = localStorage.getItem('lastTableWas') ? localStorage.getItem('lastTableWas') : '';
 
             switch (table2open) {
 
-                case 'datatable-morning':
+                case tableNames.MORNING:
                     $('#collapse1').addClass("in");
                     $('#collapsed1_aTag').removeClass('collapsed');
                     break;
 
-                case 'datatable-afternoon':
+                case tableNames.AFTERNOON:
                     $('#collapse2').addClass("in");
                     $('#collapsed2_aTag').removeClass('collapsed');
                     break;
 
-                case 'datatable-tomorrow':
+                case tableNames.TOMORROW_MORNING:
                     $('#collapse3').addClass("in");
                     $('#collapsed3_aTag').removeClass('collapsed');
                     break;
 
-                case 'datatable-future':
+                case tableNames.TOMORROW_AFTERNOON:
                     $('#collapse4').addClass("in");
-                    $('#collapsed4_aTag').removeClass('collapsed');
+                    $('#collapse4_aTag').removeClass('collapsed');
+                    break;
+
+                case tableNames.FUTURE:
+                    $('#collapse5').addClass("in");
+                    $('#collapse5_aTag').removeClass('collapsed');
                     break;
 
                 default:
@@ -1820,16 +1932,19 @@
                 deleteBtn = document.getElementById(`${RidePat.RidePatNum}`);
 
                 switch ($(deleteBtn).parents("table:first")[0].id) {
-                    case 'datatable-morning':
+                    case tableNames.MORNING:
                         thisTable = tMorning;
                         break;
-                    case 'datatable-afternoon':
+                    case tableNames.AFTERNOON:
                         thisTable = tAfternoon;
                         break;
-                    case 'datatable-tomorrow':
-                        thisTable = tTomorrow
+                    case tableNames.TOMORROW_MORNING:
+                        thisTable = tTomorrowMorning
                         break;
-                    case 'datatable-future':
+                    case tableNames.TOMORROW_AFTERNOON:
+                        thisTable = tTomorrowAfternoon
+                        break;
+                    case tableNames.FUTURE:
                         thisTable = tFuture;
                         break;
                 }
@@ -1982,7 +2097,7 @@
                     case "datatable-afternoon":
                         suitableClass = classManager.calculateSuitableClass_24HoursRange(hh, mm);
                         break;
-                    case "datatable-tomorrow":
+                    case "datatable-tomorrow-morning":
                         suitableClass = classManager.calculateSuitableClass_24HoursRange(
                             hh,
                             mm,
@@ -2066,7 +2181,7 @@
 
                 tAfternoon = $('#datatable-afternoon').DataTable({ data: [], destroy: true });
 
-                tTomorrow = $('#datatable-tomorrow').DataTable({ data: [], destroy: true });
+                tTomorrowMorning = $('#datatable-tomorrow-morning').DataTable({ data: [], destroy: true });
 
                 tFuture = $('#datatable-future').DataTable({ data: [], destroy: true });
                 return;
@@ -2285,7 +2400,7 @@
 
                                             if (isWithin2HoursSinceChange(thisRidePatLastModified) && !isSeenAllReady) {
                                                 cell.classList.add('within2HoursSinceChange');
-                                                increaseCounter('datatable-morning', thisRidePatNum);
+                                                increaseCounter(tableNames.MORNING, thisRidePatNum);
                                             }
                                             break;
 
@@ -2367,7 +2482,7 @@
                                             break;
 
                                         case 5: //driver
-                                            //this code is identical to the one in datatable-tomorrow when can need to change to 1 function
+                                            //this code is identical to the one in datatable-tomorrow-morning when can need to change to 1 function
                                             $(cell).addClass('driver_td');
                                             if (!rowData.hasDriver) {
 
@@ -2412,7 +2527,7 @@
 
                                             if (isWithin2HoursSinceChange(thisRidePatLastModified) && !isSeenAllReady) {
                                                 cell.classList.add('within2HoursSinceChange');
-                                                increaseCounter('datatable-afternoon', thisRidePatNum);
+                                                increaseCounter(tableNames.AFTERNOON, thisRidePatNum);
                                             }
                                             break;
 
@@ -2435,7 +2550,7 @@
                         },
                     });
 
-                    tTomorrow = $('#datatable-tomorrow').DataTable({
+                    tTomorrowMorning = $('#datatable-tomorrow-morning').DataTable({
                         rowId: 'ridePatNum',
                         dom: controllersLayout,
                         buttons: [
@@ -2491,7 +2606,7 @@
                                         const hh = parseInt(ridePatTime_td[0]);
                                         const mm = parseInt(ridePatTime_td[1]);
 
-                                        const suitableClass = classManager.getSuitableClassS_4thisTime("datatable-tomorrow", hh, mm);
+                                        const suitableClass = classManager.getSuitableClassS_4thisTime("datatable-tomorrow-morning", hh, mm);
                                         $(cell).addClass(suitableClass);
 
                                     }
@@ -2523,7 +2638,7 @@
 
                                     if (isWithin2HoursSinceChange(thisRidePatLastModified) && !isSeenAllReady) {
                                         cell.classList.add('within2HoursSinceChange');
-                                        increaseCounter('datatable-tomorrow', thisRidePatNum);
+                                        increaseCounter(tableNames.TOMORROW_MORNING, thisRidePatNum);
                                     }
                                 }
                             },
@@ -2600,7 +2715,7 @@
 
                                     if (isWithin2HoursSinceChange(thisRidePatLastModified) && !isSeenAllReady) {
                                         cell.classList.add('within2HoursSinceChange');
-                                        increaseCounter('datatable-future', thisRidePatNum);
+                                        increaseCounter(tableNames.FUTURE, thisRidePatNum);
                                     }
                                 }
                             },
@@ -2922,7 +3037,7 @@
         const buildRemarkHTML = (remark, ridePatNum) => {
 
             let wrapper = '<div class="elementsInSameLine">';
-            
+
             const editBtn = `<button type='button' data-toggle="modal" onclick="prepreparationEditRemark(this, ${ridePatNum})" data-target="#editRemarkModal" class='fix-flex-scretch btn btn-icon waves-effect waves-light btn-secondary' title='עריכה'><i class='ti-pencil'></i></button>`;
 
             wrapper += editBtn;
@@ -3144,16 +3259,16 @@
 
         const sortTable_LastModifiedFirst = (tableName) => {
             switch (tableName) {
-                case 'datatable-morning':
+                case tableNames.MORNING:
                     tMorning.order([6, 'desc']).draw();
                     break;
-                case 'datatable-afternoon':
+                case tableNames.AFTERNOON:
                     tAfternoon.order([6, 'desc']).draw();
                     break;
-                case 'datatable-tomorrow':
-                    tTomorrow.order([7, 'desc']).draw();
+                case tableNames.TOMORROW_MORNING:
+                    tTomorrowMorning.order([7, 'desc']).draw();
                     break;
-                case 'datatable-future':
+                case tableNames.FUTURE:
                     tFuture.order([7, 'desc']).draw();
                     break;
             }
@@ -3308,7 +3423,7 @@
                                 </div>
 
                                 <div id="accordion" class="panel-group">
-                                    <div onclick="assignTable2lastOne('datatable-morning')" class="panel panel-primary">
+                                    <div onclick="assignTable2lastOne(tableNames.MORNING)" class="panel panel-primary">
                                         <div class="panel-heading" id="col1">
                                             <h4 data-toggle="tooltip" data-placement="top"
                                                 title="Morning Rides  سفريات الصباح" class="panel-title">
@@ -3318,7 +3433,7 @@
                                                         נסיעות לבוקר
                                                         <span class="lastModified_counter">
                                                             <span class="lastModified_Records"
-                                                                  onclick="sortTable_LastModifiedFirst('datatable-morning')">
+                                                                  onclick="sortTable_LastModifiedFirst(tableNames.MORNING)">
                                                                 רשומות שעודכנו לאחרונה:
                                                                 <span id="datatable-morning_lastModified_counter">0</span>
                                                             </span>
@@ -3362,7 +3477,7 @@
                                         </div>
                                     </div>
 
-                                    <div onclick="assignTable2lastOne('datatable-afternoon')"
+                                    <div onclick="assignTable2lastOne(tableNames.AFTERNOON)"
                                          class="panel panel-primary">
                                         <div class="panel-heading" id="col2">
                                             <h4 data-toggle="tooltip" data-placement="top"
@@ -3373,7 +3488,7 @@
                                                     נסיעות לאחה"צ
                                                     <span class="lastModified_counter">
                                                         <span class="lastModified_Records"
-                                                              onclick="sortTable_LastModifiedFirst('datatable-afternoon')">
+                                                              onclick="sortTable_LastModifiedFirst(tableNames.AFTERNOON)">
                                                             רשומות שעודכנו לאחרונה:
                                                             <span id="datatable-afternoon_lastModified_counter">0</span>
                                                         </span>
@@ -3417,7 +3532,7 @@
                                         </div>
                                     </div>
 
-                                    <div onclick="assignTable2lastOne('datatable-tomorrow')"
+                                    <div onclick="assignTable2lastOne(tableNames.TOMORROW_MORNING)"
                                          class="panel panel-primary">
                                         <div class="panel-heading" id="col4">
                                             <h4 data-toggle="tooltip" data-placement="bottom" title="Tomorrow Rides"
@@ -3425,10 +3540,10 @@
                                                 <a id="collapsed3_aTag" href="#collapse3" data-parent="#accordion"
                                                    data-toggle="collapse" class="dropdown active open collapsed">
                                                     <span class="m-l-15">
-                                                        נסיעות למחר
+                                                        נסיעות למחר בבוקר
                                                         <span class="lastModified_counter">
                                                             <span class="lastModified_Records"
-                                                                  onclick="sortTable_LastModifiedFirst('datatable-tomorrow')">
+                                                                  onclick="sortTable_LastModifiedFirst(tableNames.TOMORROW_MORNING)">
                                                                 רשומות שעודכנו לאחרונה:
                                                                 <span id="datatable-tomorrow_lastModified_counter">0</span>
                                                             </span>
@@ -3439,7 +3554,7 @@
                                         </div>
                                         <div class="panel-collapse collapse" id="collapse3">
                                             <div class="panel-body">
-                                                <table id="datatable-tomorrow"
+                                                <table id="datatable-tomorrow-morning"
                                                        class="table table-striped table-bordered hover">
                                                     <thead>
                                                         <tr>
@@ -3473,18 +3588,74 @@
                                         </div>
                                     </div>
 
-                                    <div onclick="assignTable2lastOne('datatable-future')" class="panel panel-primary">
+                                    <div onclick="assignTable2lastOne(tableNames.TOMORROW_AFTERNOON)"
+                                         class="panel panel-primary">
+                                        <div class="panel-heading" id="col4">
+                                            <h4 data-toggle="tooltip" data-placement="bottom" title="Tomorrow Rides"
+                                                class="panel-title">
+                                                <a id="collapsed3_aTag" href="#collapse4" data-parent="#accordion"
+                                                   data-toggle="collapse" class="dropdown active open collapsed">
+                                                    <span class="m-l-15">
+                                                       נסיעות למחר אחה"צ
+                                                        <span class="lastModified_counter">
+                                                            <span class="lastModified_Records"
+                                                                  onclick="sortTable_LastModifiedFirst(tableNames.TOMORROW_MORNING)">
+                                                                רשומות שעודכנו לאחרונה:
+                                                                <span id="datatable-tomorrow_lastModified_counter">0</span>
+                                                            </span>
+                                                        </span>
+                                                    </span>
+                                                </a>
+                                            </h4>
+                                        </div>
+                                        <div class="panel-collapse collapse" id="collapse4">
+                                            <div class="panel-body">
+                                                <table id="datatable-tomorrow-morning"
+                                                       class="table table-striped table-bordered hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="middle" title="Date  الساعة">תאריך</th>
+                                                            <th class="middle" title="Time  الساعة">שעה</th>
+                                                            <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
+                                                            <th class="middle" title="Destination  نقطة الوصول">יעד</th>
+                                                            <th class="customWidth4column middle"
+                                                                title="Patient  المريض">החולה</th>
+                                                            <th class="middle" title="Patient's Name">גיל</th>
+                                                            <th class="middle" title="Driver  السائق">המסיע</th>
+                                                            <th class="middle" title="Status  حالة السفرية">
+                                                                סטטוס החולה
+                                                            </th>
+                                                            <th class="customWidth middle" title="Last modified">
+                                                                עודכן
+                                                                לאחרונה
+                                                            </th>
+                                                            <th class="customWidth  middle" title="Remarks  ملاحظات">
+                                                                הערות
+                                                            </th>
+                                                            <th title="isAnonymous"></th> <!-- hidden to the user -->
+                                                            <th class="SmallcustomWidth middle" title="Actions  اعمال">
+                                                                פעולות
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div onclick="assignTable2lastOne(tableNames.FUTURE)" class="panel panel-primary">
                                         <div class="panel-heading" id="col3">
                                             <h4 data-toggle="tooltip" data-placement="bottom"
                                                 title="Future Rides  سفريات مستقبلية" class="panel-title">
-                                                <a id="collapsed4_aTag" href="#collapse4" data-parent="#accordion"
+                                                <a id="collapsed4_aTag" href="#collapse5" data-parent="#accordion"
                                                    data-toggle="collapse" class="dropdown active open collapsed">
                                                     <span class="m-l-15">
                                                         נסיעות עתידיות
                                                     </span>
                                                     <span class="lastModified_counter">
                                                         <span class="lastModified_Records"
-                                                              onclick="sortTable_LastModifiedFirst('datatable-future')">
+                                                              onclick="sortTable_LastModifiedFirst(tableNames.FUTURE)">
                                                             רשומות שעודכנו לאחרונה:
                                                             <span id="datatable-future_lastModified_counter">0</span>
                                                         </span>
@@ -3492,7 +3663,7 @@
                                                 </a>
                                             </h4>
                                         </div>
-                                        <div class="panel-collapse collapse" id="collapse4">
+                                        <div class="panel-collapse collapse" id="collapse5">
                                             <div class="panel-body">
                                                 <table id="datatable-future"
                                                        class="table table-striped table-bordered hover">
