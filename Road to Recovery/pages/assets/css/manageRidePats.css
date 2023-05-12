@@ -280,3 +280,15 @@ input:checked + .slider:before {
 .time {
     font-weight: bold;
 }
+
+.fix-flex-scretch {
+    display: flex;
+    align-self: start;
+    min-height: 35px;
+    min-width: 45px;
+}
+
+.justify-text {
+    padding: 0px 25px;
+    text-align: justify;
+}

@@ -241,6 +241,7 @@
         const DIFFER_AREAS_MSG = 'מכיוון שקו ההסעה של החולה לא נמצא באזור של ההסעה האנונימית הזו, לא ניתן להשתמש בהסעה. יש לפתוח הסעה חדשה עבור החולה הספציפי.';
         const NOT_EXIST = 'ערך זה אינו קיים בבסיס הנתונים';
 
+        const allowedLocations = ['patientform.html', 'viewpatient.html'];
 
         $(document).ready(function () {
             let { COPYWRITE } = GENERAL;
@@ -398,7 +399,7 @@
             });
 
 
-            if (arr_customer.func === 'new' && document.referrer.toLocaleLowerCase().includes('patientform.html')) {
+            if (arr_customer.func === 'new' && isAllowedLocation(document.referrer.toLocaleLowerCase())) {
 
                 let patientFrom_patientForm = JSON.parse(localStorage.getItem('PatientNameForRide'));
 
@@ -865,6 +866,13 @@
 
 
         });
+
+        const isAllowedLocation = (referrer) => {
+
+            const result = allowedLocations.some(alllowedLocation => referrer.includes(alllowedLocation));
+                
+            return result;
+        }
 
         const isSameArea = (existingPatient, targetPatient) => {
             return !(
