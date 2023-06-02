@@ -51,7 +51,7 @@
 
         var cleanPhoneNumber;
         var msgTable;
-        let { convertDBDate2FrontEndDate, datetimeCompareFunc, dateCompareFunc} = GENERAL.USEFULL_FUNCTIONS;
+        let { convertDBDate2FrontEndDate, datetimeCompareFunc, dateCompareFunc } = GENERAL.USEFULL_FUNCTIONS;
 
         checkCookie();
         var allVolunteersFromDb = [];
@@ -197,10 +197,12 @@
                         let joinDate = convertDBDate2FrontEndDate(arr_volunteers[i].JoinDate);
                         joinDate = joinDate.toLocaleString('he-IL', { dateStyle: 'short' });
 
+                        let volunteerTypeAndGender = buildvolunteerTypeAndGenderHTML(arr_volunteers[i].TypeVol, arr_volunteers[i].Gender);
+
                         var Volunteer = {
                             Id: arr_volunteers[i].Id,
                             DisplayName: arr_volunteers[i].DisplayName,
-                            TypeVol: arr_volunteers[i].TypeVol,
+                            TypeVol: volunteerTypeAndGender,
                             CellPhone: arr_volunteers[i].CellPhone,
                             CellPhone2: cellphone2,
                             City: arr_volunteers[i].City,
@@ -236,7 +238,7 @@
                                 className: 'text-left-strong'
                             },
                             { "targets": [11], "orderable": false },
-                            { targets: 7, type: 'de_datetime'},
+                            { targets: 7, type: 'de_datetime' },
                             { targets: 10, type: 'de_date' },
 
 
@@ -264,6 +266,22 @@
                     $('#wait').hide();
                 }
             });
+        }
+
+        const buildvolunteerTypeAndGenderHTML = (type, gender) => {
+
+            let output = type + ' ' + gender;
+            const isMale = gender === 'מתנדב';
+
+            if (isMale) {
+
+                output = formatTypeToMale(type);
+            } else {
+
+                output = formatTypeToFemale(type);
+            }
+
+            return output;
         }
 
         const ConvertDBDate2UIDate = (fullTimeStempStr) => {
@@ -613,110 +631,110 @@
 
 
 
-                </d
-                <!-- end container -->
+                    </d
+                    <!-- end container -->
+
+                </div>
+                <!-- end content -->
+                <!-- FOOTER -->
+                <footer id="rights" data-toggle="tooltip" data-placement="top" title="© All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء" class="footer text-right">
+                </footer>
+
+                <!-- End FOOTER -->
 
             </div>
-            <!-- end content -->
-            <!-- FOOTER -->
-            <footer id="rights" data-toggle="tooltip" data-placement="top" title="© All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء" class="footer text-right">
-            </footer>
-
-            <!-- End FOOTER -->
+            <!-- ============================================================== -->
+            <!-- End page content here -->
+            <!-- ============================================================== -->
 
         </div>
-        <!-- ============================================================== -->
-        <!-- End page content here -->
-        <!-- ============================================================== -->
-
-    </div>
-    <!-- END wrapper -->
+        <!-- END wrapper -->
 
 
 
-    <script>
-        var resizefunc = [];
-    </script>
+        <script>
+            var resizefunc = [];
+        </script>
 
-    <!-- jQuery  -->
-    <script src="assets/js/bootstrap-rtl.min.js"></script>
-    <script src="assets/js/detect.js"></script>
-    <script src="assets/js/fastclick.js"></script>
-    <script src="assets/js/jquery.slimscroll.js"></script>
-    <script src="assets/js/jquery.blockUI.js"></script>
-    <script src="assets/js/waves.js"></script>
-    <script src="assets/js/wow.min.js"></script>
-    <script src="assets/js/jquery.nicescroll.js"></script>
-    <script src="assets/js/jquery.scrollTo.min.js"></script>
-    <script src="../plugins/switchery/switchery.min.js"></script>
+        <!-- jQuery  -->
+        <script src="assets/js/bootstrap-rtl.min.js"></script>
+        <script src="assets/js/detect.js"></script>
+        <script src="assets/js/fastclick.js"></script>
+        <script src="assets/js/jquery.slimscroll.js"></script>
+        <script src="assets/js/jquery.blockUI.js"></script>
+        <script src="assets/js/waves.js"></script>
+        <script src="assets/js/wow.min.js"></script>
+        <script src="assets/js/jquery.nicescroll.js"></script>
+        <script src="assets/js/jquery.scrollTo.min.js"></script>
+        <script src="../plugins/switchery/switchery.min.js"></script>
 
-    <!-- Datatables-->
-    <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
-    <script src="../plugins/datatables/dataTables.bootstrap.js"></script>
-    <script src="../plugins/datatables/dataTables.buttons.min.js"></script>
-    <script src="../plugins/datatables/buttons.bootstrap.min.js"></script>
-    <script src="../plugins/datatables/jszip.min.js"></script>
-    <script src="../plugins/datatables/pdfmake.min.js"></script>
-    <script src="../plugins/datatables/vfs_fonts.js"></script>
-    <script src="../plugins/datatables/buttons.html5.min.js"></script>
-    <script src="../plugins/datatables/buttons.print.min.js"></script>
-    <script src="../plugins/datatables/dataTables.fixedHeader.min.js"></script>
-    <script src="../plugins/datatables/dataTables.keyTable.min.js"></script>
-    <script src="../plugins/datatables/dataTables.responsive.min.js"></script>
-    <script src="../plugins/datatables/responsive.bootstrap.min.js"></script>
-    <script src="../plugins/datatables/dataTables.scroller.min.js"></script>
+        <!-- Datatables-->
+        <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
+        <script src="../plugins/datatables/dataTables.bootstrap.js"></script>
+        <script src="../plugins/datatables/dataTables.buttons.min.js"></script>
+        <script src="../plugins/datatables/buttons.bootstrap.min.js"></script>
+        <script src="../plugins/datatables/jszip.min.js"></script>
+        <script src="../plugins/datatables/pdfmake.min.js"></script>
+        <script src="../plugins/datatables/vfs_fonts.js"></script>
+        <script src="../plugins/datatables/buttons.html5.min.js"></script>
+        <script src="../plugins/datatables/buttons.print.min.js"></script>
+        <script src="../plugins/datatables/dataTables.fixedHeader.min.js"></script>
+        <script src="../plugins/datatables/dataTables.keyTable.min.js"></script>
+        <script src="../plugins/datatables/dataTables.responsive.min.js"></script>
+        <script src="../plugins/datatables/responsive.bootstrap.min.js"></script>
+        <script src="../plugins/datatables/dataTables.scroller.min.js"></script>
 
-    <!-- Datatable init js -->
-    <script src="assets/pages/datatables.init.js"></script>
+        <!-- Datatable init js -->
+        <script src="assets/pages/datatables.init.js"></script>
 
-    <!-- Sweet Alert js -->
-    <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
-    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+        <!-- Sweet Alert js -->
+        <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
+        <script src="assets/pages/jquery.sweet-alert.init.js"></script>
 
-    <script src="assets/js/jquery.core.js"></script>
-    <script src="assets/js/jquery.app.js"></script>
+        <script src="assets/js/jquery.core.js"></script>
+        <script src="assets/js/jquery.app.js"></script>
 
-    <script type="text/javascript">
+        <script type="text/javascript">
 
-        TableManageButtons.init();
+            TableManageButtons.init();
 
-    </script>
-    <!-- ↓ Message Modal ↓   -->
-    <div class="modal fade" id="messagesModal" tabindex="-1" role="dialog" aria-labelledby="messagesModalTitle" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content modal-lg">
-                <div class="modal-header">
-                    <h2 class="modal-title" id="messagesModalTitle">הודעות</h2>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <table id="messagesTable" class="table table-striped table-bordered">
-                        <thead>
-                            <tr dir="rtl">
-                                <th>זמן</th>
-                                <th>מספר הודעה</th>
-                                <th>הודעת אב</th>
-                                <th>סוג</th>
-                                <th>כותרת</th>
-                                <th>תוכן</th>
-                                <th>שולח</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">סגירה</button>
+        </script>
+        <!-- ↓ Message Modal ↓   -->
+        <div class="modal fade" id="messagesModal" tabindex="-1" role="dialog" aria-labelledby="messagesModalTitle" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content modal-lg">
+                    <div class="modal-header">
+                        <h2 class="modal-title" id="messagesModalTitle">הודעות</h2>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <table id="messagesTable" class="table table-striped table-bordered">
+                            <thead>
+                                <tr dir="rtl">
+                                    <th>זמן</th>
+                                    <th>מספר הודעה</th>
+                                    <th>הודעת אב</th>
+                                    <th>סוג</th>
+                                    <th>כותרת</th>
+                                    <th>תוכן</th>
+                                    <th>שולח</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">סגירה</button>
 
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <!-- ↑ Message Modal ↑ -->
+        <!-- ↑ Message Modal ↑ -->
 
-    <div class="modal fade" id="documentedRidesModal" tabindex="-1" role="dialog" aria-labelledby="documentedRidesTitle" aria-hidden="true"></div>
-    <div class="modal fade" id="DocumentedCallsModal" tabindex="-1" role="dialog" aria-labelledby="DocumentedCallsTitle" aria-hidden="true"></div>
+        <div class="modal fade" id="documentedRidesModal" tabindex="-1" role="dialog" aria-labelledby="documentedRidesTitle" aria-hidden="true"></div>
+        <div class="modal fade" id="DocumentedCallsModal" tabindex="-1" role="dialog" aria-labelledby="DocumentedCallsTitle" aria-hidden="true"></div>
 </body>
 </html>
