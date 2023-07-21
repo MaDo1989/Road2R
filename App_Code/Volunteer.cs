@@ -424,6 +424,7 @@ public class Volunteer
         }
     }
     public bool IsNewDriver { get; set; }
+    public DateTime LatestDrive { get; set; }
     public int setVolunteerPrefs(int id, List<string> PrefLocation, List<string> PrefArea, List<string> PrefTime, int AvailableSeats)
     {
         string query = "";
@@ -1482,6 +1483,10 @@ public class Volunteer
             v.NoOfDocumentedRides = Convert.ToInt32(dr["NoOfDocumentedRides"]);
             v.NumOfRides_last2Months = Convert.ToInt32(dr["NumOfRides_last2Months"]);
             v.MostCommonPath = dr["mostCommonPath"].ToString();
+
+            DateTime latestDrive;
+            DateTime.TryParse(dr["latestDrive"].ToString(), out latestDrive);
+            v.LatestDrive = latestDrive;
 
             if (nearByCities.Keys.Contains(v.city))
             {

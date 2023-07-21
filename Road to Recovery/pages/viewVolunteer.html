@@ -47,22 +47,65 @@
 
     <script src="assets/js/documentedCalls.js"></script>
     <script src="assets/js/documentedRides.js"></script>
+
+
+
     <script>
 
         var cleanPhoneNumber;
         var msgTable;
         let { convertDBDate2FrontEndDate, datetimeCompareFunc, dateCompareFunc } = GENERAL.USEFULL_FUNCTIONS;
+        let columnsVisibiltyFlags = [];
+        const columnsVisibiltyFlagsName = 'columnsVisibiltyFlags';
 
         checkCookie();
         var allVolunteersFromDb = [];
 
         $(document).ready(function () {
+
+            $('#skipPageButton').click(function () {
+                var pageNumber = parseInt($('#skipPageInput').val());
+                tbl.page(pageNumber - 1).draw('page');
+            });
+
             $("#DocumentedCallsModal").attr("w3-include-html", "DocumentedCallsModal.html");
             $("#documentedRidesModal").attr("w3-include-html", "documentedRidesModal.html");
 
 
             let { COPYWRITE } = GENERAL;
             $('#rights').html(COPYWRITE());
+            const parentDiv = document.querySelector("#columnsVisibiltyContainer");
+            const labels = parentDiv.querySelectorAll("label");
+            const checkboxes = parentDiv.querySelectorAll("input[type='checkbox']");
+
+            if (localStorage.hasOwnProperty(columnsVisibiltyFlagsName)) {
+
+                columnsVisibiltyFlags = JSON.parse(localStorage.getItem(columnsVisibiltyFlagsName));
+
+                checkboxes.forEach((checkbox) => {
+
+                    const key = parseInt(checkbox.dataset.column);
+                    checkbox.checked = columnsVisibiltyFlagsName[key];
+                });
+
+            } else {
+                columnsVisibiltyFlags = [];
+
+                labels.forEach((label) => {
+                    const key = parseInt(label.previousElementSibling.dataset.column);
+
+                    columnsVisibiltyFlags[key] = true;
+                });
+
+                checkboxes.forEach((checkbox) => {
+
+                    const key = parseInt(checkbox.dataset.column);
+                    checkbox.checked = columnsVisibiltyFlagsName[key];
+                });
+
+              
+                localStorage.setItem(columnsVisibiltyFlagsName, JSON.stringify(columnsVisibiltyFlags));
+            }
 
 
             if (localStorage.activeVol == "undefined" || localStorage.activeVol === undefined)
@@ -105,6 +148,16 @@
             });
 
         });
+
+        const updateLsVisibilty = (checkboxId, value) => {
+
+            if (localStorage.hasOwnProperty(columnsVisibiltyFlagsName)) {
+
+                columnsVisibiltyFlags = JSON.parse(localStorage.getItem(columnsVisibiltyFlagsName));
+                columnsVisibiltyFlags[checkboxId] = value;
+                localStorage.setItem(columnsVisibiltyFlagsName, JSON.stringify(columnsVisibiltyFlags));
+            }
+        }
 
         function ActiveMode() {
             localStorage.activeVol = $("#activeCustomers").prop('checked');
@@ -197,6 +250,11 @@
                         let joinDate = convertDBDate2FrontEndDate(arr_volunteers[i].JoinDate);
                         joinDate = joinDate.toLocaleString('he-IL', { dateStyle: 'short' });
 
+                        let latestDrive = convertDBDate2FrontEndDate(arr_volunteers[i].LatestDrive);
+                        latestDrive = latestDrive.toLocaleString('he-IL', { dateStyle: 'short' });
+
+
+
                         let volunteerTypeAndGender = buildvolunteerTypeAndGenderHTML(arr_volunteers[i].TypeVol, arr_volunteers[i].Gender);
 
                         var Volunteer = {
@@ -209,11 +267,12 @@
                             Remarks: arr_volunteers[i].Remarks,
                             Buttons: btnStr,
                             LastModified: lastModified,
-                            EnglishName: arr_volunteers[i].EnglishName,
+                            //     EnglishName: arr_volunteers[i].EnglishName,
                             NumOfRides_last2Months: arr_volunteers[i].NumOfRides_last2Months,
                             MostCommonPath: arr_volunteers[i].MostCommonPath,
                             NearestBigCity: arr_volunteers[i].NearestBigCity,
                             JoinDate: joinDate,
+                            LatestDrive: latestDrive
                         }
                         allVolunteersFromDb.push(Volunteer);
                     }
@@ -226,7 +285,8 @@
                         "destroy": true,
                         dom: 'Bfrtip',
                         buttons: [
-                            'excel'
+                            'excel',
+                            //'colvis'
                         ],
                         columnDefs: [
                             {
@@ -237,25 +297,25 @@
                                 targets: 3,
                                 className: 'text-left-strong'
                             },
-                            { "targets": [11], "orderable": false },
-                            { targets: 7, type: 'de_datetime' },
-                            { targets: 10, type: 'de_date' },
+                            { "targets": [10], "orderable": false },
+                            { targets: 6, type: 'de_datetime' },
+                            { targets: 9, type: 'de_date' },
 
 
                         ],
                         columns: [
-                            { data: "DisplayName", width: "5%" },              //0
-                            { data: "TypeVol", width: "4%" },                  //1
-                            { data: "CellPhone", width: "4%" },                //2
-                            { data: "EnglishName", width: "7%" },              //3
-                            { data: "City", width: "4%" },                     //4
-                            { data: "NearestBigCity", width: "4%" },            //5
-                            { data: "Remarks", width: "14%" },                 //6
-                            { data: "LastModified", width: "10%" },             //7
-                            { data: "NumOfRides_last2Months", width: "4%" },   //8
-                            { data: "MostCommonPath", width: "7%" },           //9
-                            { data: "JoinDate", width: "7%" },                 //10
-                            { data: "Buttons", width: "15%" },                 //11
+                            { data: "DisplayName", width: "1%" },              //0
+                            { data: "TypeVol", width: "1%" },                  //1
+                            { data: "CellPhone", width: "2%" },                //2
+                            //{ data: "EnglishName", width: "3%" },              //3
+                            { data: "City", width: "2%" },                     //4
+                            { data: "NearestBigCity", width: "4%" },           //5
+                            { data: "Remarks", width: "7%" },                 //6
+                            { data: "LastModified", width: "7%" },             //7
+                            { data: "NumOfRides_last2Months", width: "2%" },   //8
+                            { data: "MostCommonPath", width: "3%" },           //9
+                            { data: "JoinDate", width: "4%" },                 //10
+                            { data: "Buttons", width: "25%" },                 //11
                         ],
                     });
 
@@ -266,19 +326,32 @@
                     $('#wait').hide();
                 }
             });
+
+            document.querySelectorAll('input.toggle-vis').forEach((el) => {
+                el.addEventListener('change', function (e) {
+                    e.preventDefault();
+                    let columnIdx = e.target.getAttribute('data-column');
+                    let column = tbl.column(columnIdx);
+
+                    column.visible(e.target.checked);
+                });
+            });
+
+
         }
 
         const buildvolunteerTypeAndGenderHTML = (type, gender) => {
 
             let output = type + ' ' + gender;
             const isMale = gender === 'מתנדב';
+            const taf = 'ת';
 
             if (isMale) {
 
-                output = formatTypeToMale(type);
+                output = type;
             } else {
 
-                output = formatTypeToFemale(type);
+                output = type + taf;
             }
 
             return output;
@@ -312,7 +385,8 @@
         }
 
         function buttonsEvents() {
-            pastePhone.onpaste = cleanPhoneNumber;
+            //      pastePhone.onpaste = cleanPhoneNumber;
+
             $('#datatable-buttons tbody').on('click', '#edit', function () {
                 var data = tbl.row($(this).parents('tr')).data();
                 arr_details = { displayName: data.DisplayName, func: "edit" };
@@ -596,13 +670,36 @@
                                         <button type="button" id="createCustomer" onclick="newVolunteerForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>חדש</button>
                                     </div>
                                 </div>
+                                <div id="columnsVisibiltyContainer" class="checkbox checkbox-primary">
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(0, this.checked)" data-column="0">
+                                    <label>המתנדב/ת</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(1, this.checked)" data-column="1">
+                                    <label>סוג משתמש/ת</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(2, this.checked)" data-column="2">
+                                    <label>טלפון</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(3, this.checked)" data-column="3">
+                                    <label>יישוב</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(4, this.checked)" data-column="4">
+                                    <label>עיר גדולה קרובה</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(5, this.checked)" data-column="5">
+                                    <label>הערות</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(6, this.checked)" data-column="6">
+                                    <label>עודכן לאחרונה</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(7, this.checked)" data-column="7">
+                                    <label>מס' הסעות בחודשיים אחרונים</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(8, this.checked)" data-column="8">
+                                    <label>מסלול שכיח: נקודה לנקודה</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(9, this.checked)" data-column="9">
+                                    <label>תאריך הצטרפות</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(10, this.checked)" data-column="10">
+                                    <label>פעולות</label>
+                                </div>
                                 <table id="datatable-buttons" class="table table-striped table-bordered">
                                     <thead>
                                         <tr dir="rtl">
                                             <th>המתנדב/ת</th>
                                             <th>סוג משתמש/ת</th>
                                             <th>טלפון</th>
-                                            <th>שם באנגלית</th>
                                             <th>יישוב</th>
                                             <th>עיר גדולה קרובה</th>
                                             <th style="text-align:right">הערות</th>
@@ -621,6 +718,11 @@
 
 
                                 </table>
+                                <div>
+                                    <label for="skipPageInput">עבור לעמוד:</label>
+                                    <input type="number" id="skipPageInput" min="1">
+                                    <button class="btn btn-success waves-effect w-md waves-light m-b-5" id="skipPageButton">עבור</button>
+                                </div>
                                 <div id="wait" style="display:none;width:69px;height:89px;position:absolute;top:50%;left:50%;padding:2px;">
                                     <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
                                 </div>
@@ -649,7 +751,6 @@
 
         </div>
         <!-- END wrapper -->
-
 
 
         <script>
@@ -699,6 +800,8 @@
             TableManageButtons.init();
 
         </script>
+
+
         <!-- ↓ Message Modal ↓   -->
         <div class="modal fade" id="messagesModal" tabindex="-1" role="dialog" aria-labelledby="messagesModalTitle" aria-hidden="true">
             <div class="modal-dialog" role="document">
