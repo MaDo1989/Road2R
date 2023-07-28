@@ -21,12 +21,14 @@ File: Icons
   font-style: normal;
 }
 .fa {
-  display: inline-block;
-  font: normal normal normal 14px/1 FontAwesome;
-  font-size: inherit;
-  text-rendering: auto;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* R2R addons - Yogi =========== */
+    font-size: x-large;
 }
 /* makes the font 33% larger relative to the icon container */
 .fa-lg {
@@ -7231,16 +7233,18 @@ MIT License: https://github.com/driftyco/ionicons
 }
 [class^="ti-"],
 [class*=" ti-"] {
-  font-family: 'themify';
-  speak: none;
-  font-style: normal;
-  font-weight: normal;
-  font-variant: normal;
-  text-transform: none;
-  line-height: 1;
-  /* Better Font Rendering =========== */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    font-family: 'themify';
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* R2R addons - Yogi =========== */
+    font-size: x-large;
 }
 .ti-wand:before {
   content: "\e600";
