@@ -424,7 +424,7 @@ public class Volunteer
         }
     }
     public bool IsNewDriver { get; set; }
-    public DateTime LatestDrive { get; set; }
+    public DateTime? LatestDrive { get; set; }
     public int setVolunteerPrefs(int id, List<string> PrefLocation, List<string> PrefArea, List<string> PrefTime, int AvailableSeats)
     {
         string query = "";
@@ -1402,7 +1402,7 @@ public class Volunteer
             {
                 v.NearestBigCity = nearByCities[v.City];//BENNY FILL HERE
             }
-            
+
             //v.Day1 = dr["preferDay1"].ToString();
             //v.Hour1 = dr["preferHour1"].ToString();
             //v.Day2 = dr["preferDay2"].ToString();
@@ -1486,7 +1486,14 @@ public class Volunteer
 
             DateTime latestDrive;
             DateTime.TryParse(dr["latestDrive"].ToString(), out latestDrive);
-            v.LatestDrive = latestDrive;
+            if (latestDrive == DateTime.MinValue)
+            {
+                v.LatestDrive = null;
+            }
+            else
+            {
+                v.LatestDrive = latestDrive;
+            }
 
             if (nearByCities.Keys.Contains(v.city))
             {
@@ -1518,7 +1525,7 @@ public class Volunteer
 
             v.EnglishName = dr["englishName"].ToString();
             DateTime lastmodified;
-            DateTime.TryParse(dr["lastModified"].ToString(),out lastmodified);
+            DateTime.TryParse(dr["lastModified"].ToString(), out lastmodified);
             v.DateTime_LastModified = lastmodified;
 
             if (dr["isDriving"].ToString() != "")
