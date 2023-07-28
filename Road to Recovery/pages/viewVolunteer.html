@@ -47,22 +47,65 @@
 
     <script src="assets/js/documentedCalls.js"></script>
     <script src="assets/js/documentedRides.js"></script>
+
+
+
     <script>
 
         var cleanPhoneNumber;
         var msgTable;
-        let { convertDBDate2FrontEndDate, datetimeCompareFunc, dateCompareFunc} = GENERAL.USEFULL_FUNCTIONS;
+        let { convertDBDate2FrontEndDate, datetimeCompareFunc, dateCompareFunc } = GENERAL.USEFULL_FUNCTIONS;
+        let columnsVisibiltyFlags = [];
+        const columnsVisibiltyFlagsName = 'columnsVisibiltyFlags';
 
         checkCookie();
         var allVolunteersFromDb = [];
 
         $(document).ready(function () {
+
+            $('#skipPageButton').click(function () {
+                var pageNumber = parseInt($('#skipPageInput').val());
+                tbl.page(pageNumber - 1).draw('page');
+            });
+
             $("#DocumentedCallsModal").attr("w3-include-html", "DocumentedCallsModal.html");
             $("#documentedRidesModal").attr("w3-include-html", "documentedRidesModal.html");
 
 
             let { COPYWRITE } = GENERAL;
             $('#rights').html(COPYWRITE());
+            const parentDiv = document.querySelector("#columnsVisibiltyContainer");
+            const labels = parentDiv.querySelectorAll("label");
+            const checkboxes = parentDiv.querySelectorAll("input[type='checkbox']");
+
+            if (localStorage.hasOwnProperty(columnsVisibiltyFlagsName)) {
+
+                columnsVisibiltyFlags = JSON.parse(localStorage.getItem(columnsVisibiltyFlagsName));
+
+                checkboxes.forEach((checkbox) => {
+
+                    const key = parseInt(checkbox.dataset.column);
+                    checkbox.checked = columnsVisibiltyFlags[key];
+                });
+
+            } else {
+                columnsVisibiltyFlags = [];
+
+                labels.forEach((label) => {
+                    const key = parseInt(label.previousElementSibling.dataset.column);
+
+                    columnsVisibiltyFlags[key] = true;
+                });
+
+                checkboxes.forEach((checkbox) => {
+
+                    const key = parseInt(checkbox.dataset.column);
+                    checkbox.checked = columnsVisibiltyFlags[key];
+                });
+
+
+                localStorage.setItem(columnsVisibiltyFlagsName, JSON.stringify(columnsVisibiltyFlags));
+            }
 
 
             if (localStorage.activeVol == "undefined" || localStorage.activeVol === undefined)
@@ -105,6 +148,16 @@
             });
 
         });
+
+        const updateLsVisibilty = (checkboxId, value) => {
+
+            if (localStorage.hasOwnProperty(columnsVisibiltyFlagsName)) {
+
+                columnsVisibiltyFlags = JSON.parse(localStorage.getItem(columnsVisibiltyFlagsName));
+                columnsVisibiltyFlags[checkboxId] = value;
+                localStorage.setItem(columnsVisibiltyFlagsName, JSON.stringify(columnsVisibiltyFlags));
+            }
+        }
 
         function ActiveMode() {
             localStorage.activeVol = $("#activeCustomers").prop('checked');
@@ -197,18 +250,25 @@
                         let joinDate = convertDBDate2FrontEndDate(arr_volunteers[i].JoinDate);
                         joinDate = joinDate.toLocaleString('he-IL', { dateStyle: 'short' });
 
+                        let latestDrive = convertDBDate2FrontEndDate(arr_volunteers[i].LatestDrive);
+                        latestDrive = latestDrive === null ? '' : latestDrive.toLocaleString('he-IL', { dateStyle: 'short' });
+
+
+
+                        let volunteerTypeAndGender = buildvolunteerTypeAndGenderHTML(arr_volunteers[i].TypeVol, arr_volunteers[i].Gender);
+
                         var Volunteer = {
                             Id: arr_volunteers[i].Id,
                             DisplayName: arr_volunteers[i].DisplayName,
-                            TypeVol: arr_volunteers[i].TypeVol,
+                            TypeVol: volunteerTypeAndGender,
                             CellPhone: arr_volunteers[i].CellPhone,
                             CellPhone2: cellphone2,
                             City: arr_volunteers[i].City,
                             Remarks: arr_volunteers[i].Remarks,
                             Buttons: btnStr,
                             LastModified: lastModified,
-                            EnglishName: arr_volunteers[i].EnglishName,
                             NumOfRides_last2Months: arr_volunteers[i].NumOfRides_last2Months,
+                            LatestDrive: latestDrive,
                             MostCommonPath: arr_volunteers[i].MostCommonPath,
                             NearestBigCity: arr_volunteers[i].NearestBigCity,
                             JoinDate: joinDate,
@@ -224,7 +284,7 @@
                         "destroy": true,
                         dom: 'Bfrtip',
                         buttons: [
-                            'excel'
+                            'excel',
                         ],
                         columnDefs: [
                             {
@@ -236,24 +296,25 @@
                                 className: 'text-left-strong'
                             },
                             { "targets": [11], "orderable": false },
-                            { targets: 7, type: 'de_datetime'},
-                            { targets: 10, type: 'de_date' },
+                            { targets: 6, type: 'de_datetime' },
+                            { targets: 8, type: 'de_date' },
+                            { targets: 11, type: 'de_date' },
 
 
                         ],
                         columns: [
-                            { data: "DisplayName", width: "5%" },              //0
-                            { data: "TypeVol", width: "4%" },                  //1
-                            { data: "CellPhone", width: "4%" },                //2
-                            { data: "EnglishName", width: "7%" },              //3
-                            { data: "City", width: "4%" },                     //4
-                            { data: "NearestBigCity", width: "4%" },            //5
-                            { data: "Remarks", width: "14%" },                 //6
-                            { data: "LastModified", width: "10%" },             //7
-                            { data: "NumOfRides_last2Months", width: "4%" },   //8
-                            { data: "MostCommonPath", width: "7%" },           //9
-                            { data: "JoinDate", width: "7%" },                 //10
-                            { data: "Buttons", width: "15%" },                 //11
+                            { data: "DisplayName", width: "1%" },              //0
+                            { data: "TypeVol", width: "1%" },                  //1
+                            { data: "CellPhone", width: "2%" },                //2
+                            { data: "City", width: "2%" },                     //3
+                            { data: "NearestBigCity", width: "4%" },           //4
+                            { data: "Remarks", width: "7%" },                  //5
+                            { data: "LastModified", width: "7%" },             //6
+                            { data: "NumOfRides_last2Months", width: "2%" },   //7
+                            { data: "LatestDrive", width: "2%" },              //8
+                            { data: "MostCommonPath", width: "3%" },           //9
+                            { data: "JoinDate", width: "4%" },                 //10
+                            { data: "Buttons", width: "25%" },                 //11
                         ],
                     });
 
@@ -264,6 +325,35 @@
                     $('#wait').hide();
                 }
             });
+
+            document.querySelectorAll('input.toggle-vis').forEach((el) => {
+                el.addEventListener('change', function (e) {
+                    e.preventDefault();
+                    let columnIdx = e.target.getAttribute('data-column');
+                    let column = tbl.column(columnIdx);
+
+                    column.visible(e.target.checked);
+                });
+            });
+
+
+        }
+
+        const buildvolunteerTypeAndGenderHTML = (type, gender) => {
+
+            let output = type + ' ' + gender;
+            const isMale = gender === 'מתנדב';
+            const taf = 'ת';
+
+            if (isMale) {
+
+                output = type;
+            } else {
+
+                output = type + taf;
+            }
+
+            return output;
         }
 
         const ConvertDBDate2UIDate = (fullTimeStempStr) => {
@@ -294,7 +384,8 @@
         }
 
         function buttonsEvents() {
-            pastePhone.onpaste = cleanPhoneNumber;
+            //      pastePhone.onpaste = cleanPhoneNumber;
+
             $('#datatable-buttons tbody').on('click', '#edit', function () {
                 var data = tbl.row($(this).parents('tr')).data();
                 arr_details = { displayName: data.DisplayName, func: "edit" };
@@ -578,31 +669,56 @@
                                         <button type="button" id="createCustomer" onclick="newVolunteerForm()" class="btn btn-success waves-effect w-md waves-light m-b-5"><span class="glyphicon glyphicon-plus-sign m-r-5"></span>חדש</button>
                                     </div>
                                 </div>
+                                <div id="columnsVisibiltyContainer" class="checkbox checkbox-primary">
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(0, this.checked)" data-column="0">
+                                    <label>המתנדב/ת</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(1, this.checked)" data-column="1">
+                                    <label>סוג משתמש/ת</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(2, this.checked)" data-column="2">
+                                    <label>טלפון</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(3, this.checked)" data-column="3">
+                                    <label>יישוב</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(4, this.checked)" data-column="4">
+                                    <label>עיר גדולה קרובה</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(5, this.checked)" data-column="5">
+                                    <label>הערות</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(6, this.checked)" data-column="6">
+                                    <label>עודכן לאחרונה</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(7, this.checked)" data-column="7">
+                                    <label>מס' הסעות בחודשיים אחרונים</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(8, this.checked)" data-column="8">
+                                    <label>תאריך הסעה אחרונה</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(9, this.checked)" data-column="8">
+                                    <label>מסלול שכיח: נקודה לנקודה</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(10, this.checked)" data-column="9">
+                                    <label>תאריך הצטרפות</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(11, this.checked)" data-column="10">
+                                    <label>פעולות</label>
+                                </div>
                                 <table id="datatable-buttons" class="table table-striped table-bordered">
                                     <thead>
                                         <tr dir="rtl">
                                             <th>המתנדב/ת</th>
                                             <th>סוג משתמש/ת</th>
                                             <th>טלפון</th>
-                                            <th>שם באנגלית</th>
                                             <th>יישוב</th>
                                             <th>עיר גדולה קרובה</th>
                                             <th style="text-align:right">הערות</th>
                                             <th>עודכן לאחרונה</th>
                                             <th>מס' הסעות בחודשיים אחרונים</th>
+                                            <th>תאריך הסעה אחרונה</th>
                                             <th>מסלול שכיח: נקודה לנקודה</th>
                                             <th>תאריך הצטרפות</th>
                                             <th>פעולות</th>
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
-
-
-
-
-
-
                                 </table>
+                                <div>
+                                    <label for="skipPageInput">עבור לעמוד:</label>
+                                    <input type="number" id="skipPageInput" min="1">
+                                    <button class="btn btn-success waves-effect w-md waves-light m-b-5" id="skipPageButton">עבור</button>
+                                </div>
                                 <div id="wait" style="display:none;width:69px;height:89px;position:absolute;top:50%;left:50%;padding:2px;">
                                     <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
                                 </div>
@@ -613,110 +729,111 @@
 
 
 
-                </d
-                <!-- end container -->
+                    </d
+                    <!-- end container -->
+
+                </div>
+                <!-- end content -->
+                <!-- FOOTER -->
+                <footer id="rights" data-toggle="tooltip" data-placement="top" title="© All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء" class="footer text-right">
+                </footer>
+
+                <!-- End FOOTER -->
 
             </div>
-            <!-- end content -->
-            <!-- FOOTER -->
-            <footer id="rights" data-toggle="tooltip" data-placement="top" title="© All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء" class="footer text-right">
-            </footer>
-
-            <!-- End FOOTER -->
+            <!-- ============================================================== -->
+            <!-- End page content here -->
+            <!-- ============================================================== -->
 
         </div>
-        <!-- ============================================================== -->
-        <!-- End page content here -->
-        <!-- ============================================================== -->
-
-    </div>
-    <!-- END wrapper -->
+        <!-- END wrapper -->
 
 
+        <script>
+            var resizefunc = [];
+        </script>
 
-    <script>
-        var resizefunc = [];
-    </script>
+        <!-- jQuery  -->
+        <script src="assets/js/bootstrap-rtl.min.js"></script>
+        <script src="assets/js/detect.js"></script>
+        <script src="assets/js/fastclick.js"></script>
+        <script src="assets/js/jquery.slimscroll.js"></script>
+        <script src="assets/js/jquery.blockUI.js"></script>
+        <script src="assets/js/waves.js"></script>
+        <script src="assets/js/wow.min.js"></script>
+        <script src="assets/js/jquery.nicescroll.js"></script>
+        <script src="assets/js/jquery.scrollTo.min.js"></script>
+        <script src="../plugins/switchery/switchery.min.js"></script>
 
-    <!-- jQuery  -->
-    <script src="assets/js/bootstrap-rtl.min.js"></script>
-    <script src="assets/js/detect.js"></script>
-    <script src="assets/js/fastclick.js"></script>
-    <script src="assets/js/jquery.slimscroll.js"></script>
-    <script src="assets/js/jquery.blockUI.js"></script>
-    <script src="assets/js/waves.js"></script>
-    <script src="assets/js/wow.min.js"></script>
-    <script src="assets/js/jquery.nicescroll.js"></script>
-    <script src="assets/js/jquery.scrollTo.min.js"></script>
-    <script src="../plugins/switchery/switchery.min.js"></script>
+        <!-- Datatables-->
+        <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
+        <script src="../plugins/datatables/dataTables.bootstrap.js"></script>
+        <script src="../plugins/datatables/dataTables.buttons.min.js"></script>
+        <script src="../plugins/datatables/buttons.bootstrap.min.js"></script>
+        <script src="../plugins/datatables/jszip.min.js"></script>
+        <script src="../plugins/datatables/pdfmake.min.js"></script>
+        <script src="../plugins/datatables/vfs_fonts.js"></script>
+        <script src="../plugins/datatables/buttons.html5.min.js"></script>
+        <script src="../plugins/datatables/buttons.print.min.js"></script>
+        <script src="../plugins/datatables/dataTables.fixedHeader.min.js"></script>
+        <script src="../plugins/datatables/dataTables.keyTable.min.js"></script>
+        <script src="../plugins/datatables/dataTables.responsive.min.js"></script>
+        <script src="../plugins/datatables/responsive.bootstrap.min.js"></script>
+        <script src="../plugins/datatables/dataTables.scroller.min.js"></script>
 
-    <!-- Datatables-->
-    <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
-    <script src="../plugins/datatables/dataTables.bootstrap.js"></script>
-    <script src="../plugins/datatables/dataTables.buttons.min.js"></script>
-    <script src="../plugins/datatables/buttons.bootstrap.min.js"></script>
-    <script src="../plugins/datatables/jszip.min.js"></script>
-    <script src="../plugins/datatables/pdfmake.min.js"></script>
-    <script src="../plugins/datatables/vfs_fonts.js"></script>
-    <script src="../plugins/datatables/buttons.html5.min.js"></script>
-    <script src="../plugins/datatables/buttons.print.min.js"></script>
-    <script src="../plugins/datatables/dataTables.fixedHeader.min.js"></script>
-    <script src="../plugins/datatables/dataTables.keyTable.min.js"></script>
-    <script src="../plugins/datatables/dataTables.responsive.min.js"></script>
-    <script src="../plugins/datatables/responsive.bootstrap.min.js"></script>
-    <script src="../plugins/datatables/dataTables.scroller.min.js"></script>
+        <!-- Datatable init js -->
+        <script src="assets/pages/datatables.init.js"></script>
 
-    <!-- Datatable init js -->
-    <script src="assets/pages/datatables.init.js"></script>
+        <!-- Sweet Alert js -->
+        <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
+        <script src="assets/pages/jquery.sweet-alert.init.js"></script>
 
-    <!-- Sweet Alert js -->
-    <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
-    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+        <script src="assets/js/jquery.core.js"></script>
+        <script src="assets/js/jquery.app.js"></script>
 
-    <script src="assets/js/jquery.core.js"></script>
-    <script src="assets/js/jquery.app.js"></script>
+        <script type="text/javascript">
 
-    <script type="text/javascript">
+            TableManageButtons.init();
 
-        TableManageButtons.init();
+        </script>
 
-    </script>
-    <!-- ↓ Message Modal ↓   -->
-    <div class="modal fade" id="messagesModal" tabindex="-1" role="dialog" aria-labelledby="messagesModalTitle" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content modal-lg">
-                <div class="modal-header">
-                    <h2 class="modal-title" id="messagesModalTitle">הודעות</h2>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <table id="messagesTable" class="table table-striped table-bordered">
-                        <thead>
-                            <tr dir="rtl">
-                                <th>זמן</th>
-                                <th>מספר הודעה</th>
-                                <th>הודעת אב</th>
-                                <th>סוג</th>
-                                <th>כותרת</th>
-                                <th>תוכן</th>
-                                <th>שולח</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">סגירה</button>
 
+        <!-- ↓ Message Modal ↓   -->
+        <div class="modal fade" id="messagesModal" tabindex="-1" role="dialog" aria-labelledby="messagesModalTitle" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content modal-lg">
+                    <div class="modal-header">
+                        <h2 class="modal-title" id="messagesModalTitle">הודעות</h2>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <table id="messagesTable" class="table table-striped table-bordered">
+                            <thead>
+                                <tr dir="rtl">
+                                    <th>זמן</th>
+                                    <th>מספר הודעה</th>
+                                    <th>הודעת אב</th>
+                                    <th>סוג</th>
+                                    <th>כותרת</th>
+                                    <th>תוכן</th>
+                                    <th>שולח</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">סגירה</button>
+
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <!-- ↑ Message Modal ↑ -->
+        <!-- ↑ Message Modal ↑ -->
 
-    <div class="modal fade" id="documentedRidesModal" tabindex="-1" role="dialog" aria-labelledby="documentedRidesTitle" aria-hidden="true"></div>
-    <div class="modal fade" id="DocumentedCallsModal" tabindex="-1" role="dialog" aria-labelledby="DocumentedCallsTitle" aria-hidden="true"></div>
+        <div class="modal fade" id="documentedRidesModal" tabindex="-1" role="dialog" aria-labelledby="documentedRidesTitle" aria-hidden="true"></div>
+        <div class="modal fade" id="DocumentedCallsModal" tabindex="-1" role="dialog" aria-labelledby="DocumentedCallsTitle" aria-hidden="true"></div>
 </body>
 </html>

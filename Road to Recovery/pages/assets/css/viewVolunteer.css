@@ -1,4 +1,4 @@
-﻿/* ↓ over ride bootstrap ↓ */
+/* ↓ over ride bootstrap ↓ */
 
 .badge {
     margin-top: 0px;
@@ -120,15 +120,19 @@ textarea:disabled:hover {
 }
 
 .btnWrapper-right{
-    display:inline-block;
-    width: 40px;
+    display: inline-block;
+    width: 60px;
 }
 .btnWrapper-left {
     display: inline-block;
-    width: 70px;
+    /* width: 2px; */
 }
 
 /*override bootstrap*/
 .badge{
     width: 30px;
+}
+
+.pointer-cursor{
+    cursor: pointer
 }
