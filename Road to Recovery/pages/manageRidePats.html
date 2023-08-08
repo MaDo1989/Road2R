@@ -1388,7 +1388,8 @@
 
             $("#assignDriverModal").attr("w3-include-html", "assignDriverModal.html");
             $('#assignDriverModal').on('shown.bs.modal', bsModalHasShown); // triger cb function only after modal is shown
-
+            $('#editRemarkModal').on('shown.bs.modal', editRemarkModalHasShown); // triger cb function only after modal is shown
+            
 
             $("#editTimeModal").attr("w3-include-html", "editTimeModal.html");
             $("#editPatientStatusModal").attr("w3-include-html", "editPatientStatusModal.html");
@@ -1551,7 +1552,6 @@
                     return datetimeCompareFunc(a, b, false);
 
                 },
-
             });
 
             getCoors();
@@ -3161,7 +3161,7 @@
             const editBtn = `<button type='button' data-toggle="modal" onclick="prepreparationEditRemark(this, ${ridePatNum})" data-target="#editRemarkModal" class='fix-flex-scretch btn btn-icon waves-effect waves-light btn-secondary' title='עריכה'><i class='ti-pencil'></i></button>`;
 
             wrapper += editBtn;
-            wrapper += `<div class="justify-text">${remark}</div>`;
+            wrapper += `<div class="m-l-10">${remark}</div>`;
 
             wrapper += '</div>';
 
@@ -3303,8 +3303,20 @@
 
             const ridepatObject = arr_rides.find(r => r.RidePatNum === ridepatNum);
             const remarkToRender = ridepatObject.Remark;
-
             $('#editRemarkTextEditor').val(remarkToRender);
+        }
+
+        const editRemarkModalHasShown = () => {
+
+            const inputField = document.getElementById('editRemarkTextEditor');
+            inputField.value = inputField.value.trim();
+
+            inputField.value = inputField.value += '\n';
+            const endOfRemark = inputField.value.length;
+            inputField.selectionStart = endOfRemark;
+            inputField.selectionEnd = endOfRemark;
+
+            focusOnElement('editRemarkTextEditor');
         }
 
         const checkeditTimeNotFinishedCB = (NotFinishedIsChecked) => {
@@ -3716,7 +3728,7 @@
                                                 <a id="collapsed3_aTag" href="#collapse4" data-parent="#accordion"
                                                    data-toggle="collapse" class="dropdown active open collapsed">
                                                     <span class="m-l-15">
-                                                       נסיעות למחר אחה"צ
+                                                        נסיעות למחר אחה"צ
                                                         <span class="lastModified_counter">
                                                             <span class="lastModified_Records"
                                                                   onclick="sortTable_LastModifiedFirst(tableNames.TOMORROW_MORNING)">
