@@ -1389,7 +1389,7 @@
             $("#assignDriverModal").attr("w3-include-html", "assignDriverModal.html");
             $('#assignDriverModal').on('shown.bs.modal', bsModalHasShown); // triger cb function only after modal is shown
             $('#editRemarkModal').on('shown.bs.modal', editRemarkModalHasShown); // triger cb function only after modal is shown
-            
+
 
             $("#editTimeModal").attr("w3-include-html", "editTimeModal.html");
             $("#editPatientStatusModal").attr("w3-include-html", "editPatientStatusModal.html");
@@ -3309,10 +3309,17 @@
         const editRemarkModalHasShown = () => {
 
             const inputField = document.getElementById('editRemarkTextEditor');
-            inputField.value = inputField.value.trim();
+            let textLength = inputField.value.length;
+            let endOfRemark = 0;
 
-            inputField.value = inputField.value += '\n';
-            const endOfRemark = inputField.value.length;
+            if (textLength > 0) {
+
+                inputField.value = inputField.value.trim();
+                inputField.value = inputField.value += '\n';
+                textLength = inputField.value.length;
+                endOfRemark = textLength;
+            }
+
             inputField.selectionStart = endOfRemark;
             inputField.selectionEnd = endOfRemark;
 
