@@ -190,13 +190,15 @@
             $("#rp_center_daily_by_month").click(on_report_click);
             $("#rp_center_monthly_by_year").click(on_report_click);
             $("#rp_center_patients_rides").click(on_report_click);
+            $("#rp_center_tomorrows_rides").click(on_report_click);
+            
 
 
             
-            $("#dsb_hl").click(dashboard_hl_init);
+            // $("#dsb_hl").click(dashboard_hl_init);
 
             // fast-load dashboard:
-            // dashboard_hl_init();  
+            // dashboard_hl_init();
         });
 
 
@@ -299,6 +301,7 @@
                                         <li><a class="report_link_cls" id="rp_center_daily_by_month"> מרכז תיאום - מבט יומי</a></li>
                                         <li><a class="report_link_cls" id="rp_center_monthly_by_year"> מרכז תיאום - מבט חודשי</a></li>
                                         <li><a class="report_link_cls" id="rp_center_patients_rides"> מרכז תיאום - הסעת חולים</a></li>
+                                        <li><a class="report_link_cls" id="rp_center_tomorrows_rides"> מרכז תיאום - הסעות של מחר</a></li>
                                     </ul>
                                 </li>
                                 <li>
@@ -314,7 +317,7 @@
                                         <li><a class="report_link_cls" id="rp_pil_vls_per_month">הסעות מתנדבים בפילוח חודשי </a></li>
                                         <li><a class="report_link_cls" id="rp_pil_vl_ride_month">מתנדבים מסיעים בחתך חודשי </a></li>
                                         <li><a class="report_link_cls" id="rp_pil_vl_ride_recent_period">הסעות בתקופה האחרונה </a></li>
-                                        <li><a class="report_link_cls" id="dsb_hl">Dashboard</a></li>
+                                        <li><a class="report_link_cls" href="reportsMain.html?dashboard=true"  target="r2r_dashboard" id="open_dsb_in_new_win">Dashboard</a></li>
                                     </ul>
                                 </li>
                                 <li id="rp_special_list" style="display:none">
@@ -454,7 +457,7 @@
                                 <table id="table_rp_center_monthly_by_year" class="table table-striped table-bordered">
                                     <thead>
                                         <tr>
-                                            <th title="People" class="timeCustomWidth">  </th>
+                                            <th title="נתונים" class="timeCustomWidth">  </th>
                                             <th title="1" class="timeCustomWidth">1</th>
                                             <th title="2" class="timeCustomWidth">2</th>
                                             <th title="3" class="timeCustomWidth">3</th>
@@ -505,6 +508,23 @@
                                     </tfoot>
                                 </table>
                             </div>
+                            <div id="div_table_center_tomorrows_rides" style="display:none" class="card-box table-responsive">
+                                <table id="table_center_tomorrows_rides" class="table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th title="Origin" class="timeCustomWidth">  מוצא</th>
+                                            <th title="Destination" class="timeCustomWidth">יעד</th>
+                                            <th title="Pickuptime" class="timeCustomWidth">שעה</th>
+                                            <th title="pat1_name" class="timeCustomWidth">חולה</th>
+                                            <th title="pat1_escorts" class="timeCustomWidth">מלווים</th>
+                                            <th title="pat2_name" class="timeCustomWidth">חולה</th>
+                                            <th title="pat2_escorts" class="timeCustomWidth">מלווים</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
 
                             <div id="wait" style="display:none;width:69px;height:89px;position:fixed;top:50%;left:50%;padding:2px;">
                                 <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
@@ -545,30 +565,29 @@
                         </div>
 
                         <div class="col-sm-2" id="dsb_hl_daily_rides">
-                            <h3>הסעות</h3><p />
+                            <h3   data-toggle="tooltip" title="הסעה = תנועת רכב אחד, ממוצא ליעד, של חולה אחד או יותר." data-html="true"   >הסעות</h3><p />
                             <p id="dsb_hl_daily_rides_total" class="dsb_daily_num">--</p>
                             <strong class="lead">ל - <span id="dsb_hl_daily_rides_attention" class="dsb_daily_num"> -- </span> אין עדיין נהג</strong>
                         </div>
 
-
-                        <div class="col-sm-1">
-                            &nbsp;
-                        </div>
-
                         <div class="col-sm-2" id="dsb_hl_daily_patients">
-                            <h3>חולים</h3><p />
+                            <h3 data-toggle="tooltip" title="לא כולל מלווים"  >חולים</h3><p />
                             <p id="dsb_hl_daily_patients_total" class="dsb_daily_num">--</p>
                             <p>ל - <span id="dsb_hl_daily_patients_attention" class="dsb_daily_num"> -- </span> אין עדיין הסעה</p>
                         </div>
 
-                        <div class="col-sm-1">
-                            &nbsp;
-                        </div>
 
                         <div class="col-sm-2" id="dsb_hl_daily_volunteers">
-                            <h3>מתנדבים</h3><p />
+                            <h3 data-toggle="tooltip" title="מתנדב יכול לבצע מספר הסעות באותו יום."  >מתנדבים</h3><p />
                             <p id="dsb_hl_daily_volunteers_total" class="dsb_daily_num">--</p>
                             <p> <span id="dsb_hl_daily_volunteers_attention" class="dsb_daily_num"> -- </span> חדשים</p>
+                        </div>
+
+
+                        <div class="col-sm-2" id="dsb_hl_daily_demands">
+                            <h3  data-toggle="tooltip" title="דרישה = נסיעה של חולה אחד, ממחסום לבית-חולים, או בחזרה." data-html="true"  >דרישות</h3><p />
+                            <p id="dsb_hl_daily_demands_total" class="dsb_daily_num">--</p>
+                            <p> <span class="dsb_daily_num"> &nbsp; </span> &nbsp; </p>
                         </div>
 
                     </div>
@@ -638,6 +657,12 @@
                                 <div class="row dsb_weekly_num" id="dsb_hl_weekly_tbl_prev_new">--</div>
                                 <div class="row dsb_weekly_num" id="dsb_hl_weekly_tbl_2wks_ago_new">--         </div>
                             </div>
+                            <div class="col-sm-1">
+                                <div class="row">דרישות          </div>
+                                <div class="row dsb_weekly_num" id="dsb_hl_weekly_tbl_curr_demands">--             </div>
+                                <div class="row dsb_weekly_num" id="dsb_hl_weekly_tbl_prev_demands">--</div>
+                                <div class="row dsb_weekly_num" id="dsb_hl_weekly_tbl_2wks_ago_demands">--         </div>
+                            </div>
                             <div class="col-sm-3">
                                 &nbsp;
                             </div>
@@ -706,7 +731,13 @@
                                 <div class="row dsb_monthly_num" id="dsb_hl_monthly_tbl_prev_new">--</div>
                                 <div class="row dsb_monthly_num" id="dsb_hl_monthly_tbl_yoy_new">--         </div>
                             </div>
-                            <div class="col-sm-3">
+                            <div class="col-sm-1">
+                                <div class="row">דרישות          </div>
+                                <div class="row dsb_monthly_num" id="dsb_hl_monthly_tbl_curr_demands">--             </div>
+                                <div class="row dsb_monthly_num" id="dsb_hl_monthly_tbl_prev_demands">--</div>
+                                <div class="row dsb_monthly_num" id="dsb_hl_monthly_tbl_yoy_demands">--         </div>
+                            </div>
+                            <div class="col-sm-2">
                                 &nbsp;
                             </div>
                         </div>
@@ -720,7 +751,8 @@
                                     <label class="col-sm-2" style="padding: 0.5em 0px;">בחרו שנה:</label>
                                     <div class="col-sm-4">
                                         <select id="dsb_select_year" class="form-control">
-                                            <option value="2022" selected>2022</option>
+                                            <option value="2023" selected>2023</option>
+                                            <option value="2022">2022</option>
                                             <option value="2021">2021</option>
                                             <option value="2020">2020</option>
                                         </select>
@@ -758,6 +790,11 @@
                                 <div class="row">מתנדבים     <div class="dsb_hl_legend_header" style="background-color: rgb(255, 159, 64)"></div>       </div>
                                 <div class="row dsb_yearly_num" id="dsb_hl_yearly_tbl_ytd_vols">  --           </div>
                                 <div class="row dsb_yearly_num" id="dsb_hl_yearly_tbl_yoy_vols">--</div>
+                            </div>
+                            <div class="col-sm-1">
+                                <div class="row">דרישות           </div>
+                                <div class="row dsb_yearly_num" id="dsb_hl_yearly_tbl_ytd_demands">  --           </div>
+                                <div class="row dsb_yearly_num" id="dsb_hl_yearly_tbl_yoy_demands">--</div>
                             </div>
                         </div>
 
@@ -804,8 +841,8 @@
                                         <div class="form-group">
                                             <label class="col-sm-2" style="padding: 0.5em 0px;">מתנדב</label>
                                             <div class="col-sm-10" id="selectDriver">
-                                                <input placeholder="מקבל רשימת שמות..." type="text" template_id="select_driver" 
-                                                       class="form-control ui-autocomplete-input" autocomplete="off" 
+                                                <input placeholder="מקבל רשימת שמות..." type="text" template_id="select_driver"
+                                                       class="form-control ui-autocomplete-input" autocomplete="off"
                                                        disabled
                                                        aria-required="true" aria-invalid="false">
                                             </div>
@@ -860,6 +897,20 @@
                                             <label class="col-sm-2" style="padding: 0.5em 0px;">עד תאריך</label>
                                             <div class="col-sm-10">
                                                 <input type="text" template_id="select_date_end" class="form-control" aria-required="true" aria-invalid="false">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row report_template" name="template_DATE_SELECT">
+                            <div class="card-box">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label class="col-sm-2" style="padding: 0.5em 0px;"> תאריך</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" template_id="select_date" class="form-control" aria-required="true" aria-invalid="false">
                                             </div>
                                         </div>
                                     </div>
@@ -977,7 +1028,8 @@
                                             <label class="col-sm-2" style="padding: 0.5em 0px;">שנה</label>
                                             <div class="col-sm-10">
                                                 <select template_id="select_year" class="form-control">
-                                                    <option value="2022" selected>2022</option>
+                                                    <option value="2023" selected>2023</option>
+                                                    <option value="2022">2022</option>
                                                     <option value="2021">2021</option>
                                                     <option value="2020">2020</option>
                                                     <option value="2019">2019</option>
@@ -1046,7 +1098,8 @@
                                             <div class="col-sm-10">
                                                 <select template_id="select_year_ytd" class="form-control">
                                                     <option value="last_12_months" selected>שנה אחורה מהיום</option>
-                                                    <option value="2022">2022 - YTD</option>
+                                                    <option value="2023">2023 - YTD</option>
+                                                    <option value="2022">2022</option>
                                                     <option value="2021">2021</option>
                                                     <option value="2020">2020</option>
                                                 </select>
