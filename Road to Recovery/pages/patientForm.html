@@ -103,6 +103,10 @@
         .redTxt {
             color: red;
         }
+
+        .adjustHeight {
+            height: 35px;
+        }
     </style>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <!--City Autocomplete-->
@@ -443,7 +447,7 @@
                     $('#wait').hide();
 
                     var patient = JSON.parse(data.d);
-                   
+
                     if (patient.DisplayName === null) {
                         //uploadData($("#patientFirstName").val()) --very bad idea
                         alert("לחולה הנל אין שם מלא ולא ניתן לערוך/לשמור אותו");
@@ -916,11 +920,13 @@
                                                 &nbsp
                                             </button>
                                             <div id="backToRide">
+                                                <button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5 adjustHeight' id='createCustomer' onclick="createRide()" title='יצירת הסעה'><i class='ti-car'></i></button>
                                                 <button type="button" onclick="createRide()"
                                                         class="btn btn-info waves-effect w-md m-b-5">
                                                     <i data-toggle="tooltip" title="عودة Back to ride"></i>&nbsp Create
                                                     Ride &nbsp
                                                 </button>
+
                                             </div>
 
                                         </div>
@@ -934,7 +940,8 @@
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label data-toggle="tooltip" title="اسم شخصي First Name"
-                                                           class="col-sm-2 control-label">שם פרטי&nbsp;
+                                                           class="col-sm-2 control-label">
+                                                        שם פרטי&nbsp;
                                                         <span class="required">*</span>
                                                     </label>
                                                     <div class="col-sm-6">
