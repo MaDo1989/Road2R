@@ -1276,7 +1276,9 @@
 
             $('#wait').show();
             let ridepatToManipulate = arr_rides.find(r => r.RidePatNum === _ridepatToManipulate);
-            const newRemark = $('#editRemarkTextEditor').val();
+            let newRemark = $('#editRemarkTextEditor').val();
+
+            newRemark = newRemark.replace(/\n/g, "<br>");
 
             let data = {
                 ridePatId: _ridepatToManipulate,
@@ -3308,7 +3310,7 @@
 
         const editRemarkModalHasShown = () => {
 
-            const inputField = document.getElementById('editRemarkTextEditor');
+            let inputField = document.getElementById('editRemarkTextEditor');
             let textLength = inputField.value.length;
             let endOfRemark = 0;
 
@@ -3318,6 +3320,7 @@
                 inputField.value = inputField.value += '\n';
                 textLength = inputField.value.length;
                 endOfRemark = textLength;
+                inputField.value = inputField.value.replace(/<br>/g, "\n");
             }
 
             inputField.selectionStart = endOfRemark;
