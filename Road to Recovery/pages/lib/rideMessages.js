@@ -195,13 +195,39 @@ const netDate = (fullTimeStempStr) => {
 
 const patientMessage = (patient) => {
     let txt = "";
+
+    let agePrefix = ``;
+    if (patient.GenderAsEnum == 0) {
+        agePrefix = `בת`;
+        if (patient.Age < 1) {
+            agePrefix = `תינוקת`
+        }
+    }
+    else if (patient.GenderAsEnum == 1) {
+        agePrefix = `בן`;
+        if (patient.Age < 1) {
+            agePrefix = `תינוק`
+        }
+    }
+    else {
+        agePrefix = `בגיל`;
+    }
+    if (patient.Age == 1) {
+        agePrefix += `שנה`
+    }
+    else if (patient.Age > 1) {
+        agePrefix += ` ${patient.Age}`;
+    }
+
+    /*console.log('Gilad-->', agePrefix);*/
+
     try {
-        txt = patient.isAnonymous ? `חולה` : `${patient.name}`;
+        txt = patient.isAnonymous ? `חולה` : `${patient.name} ${agePrefix}`;
     } catch {
         console.log("error in patientMessage");
         console.log(patient);
     }
-    txt = patient.isAnonymous ? `חולה` : `${patient.name}`;
+    txt = patient.isAnonymous ? `חולה` : `${patient.name} ${agePrefix}`;
     txt += sep;
     numberOfEscorts = patient.isAnonymous
         ? patient.numOfEscorts
@@ -219,7 +245,7 @@ const patientMessage = (patient) => {
         else
             txt += `רק ${numberOfEscorts} המלווים`;
     }
-        
-  txt += sep;
-  return txt;
+
+    txt += sep;
+    return txt;
 };
