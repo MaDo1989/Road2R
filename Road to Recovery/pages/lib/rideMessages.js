@@ -34,6 +34,7 @@ const showMessage = (arr_rides, ridePatNum) => {
                 numOfEscorts: AllRidesForThisDriver[i].Pat.EscortedList.length
             };
         } else {
+            /*console.log('Gilad-->' + JSON.stringify(AllRidesForThisDriver[i].Pat.GenderAsEnum), JSON.stringify(AllRidesForThisDriver[i].Pat.Age));*/
             patient = {
                 isAnonymous: false,
                 name: AllRidesForThisDriver[i].Pat.DisplayName.split("_")[0],
@@ -43,6 +44,8 @@ const showMessage = (arr_rides, ridePatNum) => {
                 escorts: AllRidesForThisDriver[i].Pat.EscortedList,
                 GenderAsEnum: AllRidesForThisDriver[i].Pat.GenderAsEnum,
                 Age: AllRidesForThisDriver[i].Pat.Age,
+
+
             };
         }
 
@@ -61,30 +64,34 @@ const showMessage = (arr_rides, ridePatNum) => {
 
 function buildMessage(message) {
     //sep = `<br/>`;
+    /* console.log('Gilad-->' + JSON.stringify(message),JSON.stringify(message.Age), JSON.stringify(message.GenderAsEnum));*/
     sep = `\n`;
 
     //let txt = `${message.ridePatNum}` + sep;
     let firstName = message.driver.split(" ")[0];
     //let txt = `שלום ${message.driver}` + sep;
-    let txt = `שלום ${firstName}` + sep;
+    let txt = `,שלום ${firstName}` + sep;
 
     txt += `הסעה מ${message.origin} ל${message.destination}` + sep;
     if (message.totalPeople === 1) txt += `סה"כ אדם אחד` + sep;
     else txt += `סה"כ ${message.totalPeople} אנשים` + sep;
-    txt += messageDate(message.date) + sep;
+    txt += messageDate(message.date);
     if (message.patients.length === 1) {
-        txt += sep;
+
+        txt += sep + sep;
         //txt += "הפרטים:" + sep;
         txt += patientMessage(message.patients[0]);
         if (!message.patients[0].isAnonymous) {
             let phoneText = getPatientsPhonesText(message.patients[0]);
             if (phoneText !== ``) {
                 //txt += `טלפונים:` + sep;
-                //txt += sep;
+                /*txt += sep;*/
                 txt += phoneText;
             }
         }
-    } else {
+        /*console.log('Gilad --- > im here only one ', message.patients.length, txt)*/
+    }
+    else {
         //txt += `הסעת ${message.patients.length} חולים` + sep;
         for (var i = 0; i < message.patients.length; i++) {
             txt += sep;
@@ -95,16 +102,17 @@ function buildMessage(message) {
                 let phoneText = getPatientsPhonesText(message.patients[i]);
                 if (phoneText != ``) {
                     //txt += `טלפונים:` + sep;
-                    txt += sep;
+                    /*txt += sep;*/
                     txt += phoneText;
                 }
             }
         }
+        /*console.log('Gilad --- > im here multi ', message.patients.length, txt)*/
     }
 
     //txt += `***********************************` + sep;
     //txt += `***********************************` + sep;
-    txt += sep + "תודה ונסיעה טובה!";
+    txt += sep + sep + "!תודה ונסיעה טובה";
     return txt;
     //  $("#message").append(txt);
 }
@@ -130,9 +138,8 @@ const getPatientsPhonesText = (patient) => {
                 patient.escorts[i].CellPhone.slice(0, 3) +
                 "-" +
                 patient.escorts[i].CellPhone.slice(3, patient.escorts[i].CellPhone.length);
-            txt += sep +
-                `${patient.escorts[i].DisplayName}: ${cellphone}` +
-                sep;
+            txt += `\n${patient.escorts[i].DisplayName}: ${cellphone}`;
+
 
         }
 
@@ -222,12 +229,12 @@ const patientMessage = (patient) => {
     /*console.log('Gilad-->', agePrefix);*/
 
     try {
-        txt = patient.isAnonymous ? `חולה` : `${patient.name} ${agePrefix}`;
+        txt = patient.isAnonymous ? `חולה` : `${patient.name}, ${agePrefix}`;
     } catch {
         console.log("error in patientMessage");
         console.log(patient);
     }
-    txt = patient.isAnonymous ? `חולה` : `${patient.name} ${agePrefix}`;
+    txt = patient.isAnonymous ? `חולה` : `${patient.name}, ${agePrefix}`;
     txt += sep;
     numberOfEscorts = patient.isAnonymous
         ? patient.numOfEscorts
