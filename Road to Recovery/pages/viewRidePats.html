@@ -143,13 +143,15 @@
             $('#wait').show();
             $.ajax({
                 dataType: "json",
-                url: "WebService.asmx/GetRidePatViewByTimeFilter",
+                url: "WebService.asmx/GetRidePatViewByTimeFilter_Gilad",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
                 data: JSON.stringify(timeRanges),
                 success: ImportDataByTimeFilters_SCB,
                 error: ImportDataByTimeFilters_ECB
             });
+
+
 
         }
 

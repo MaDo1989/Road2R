@@ -409,7 +409,29 @@ public class WebService : System.Web.Services.WebService
 
     }
 
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string getPatients_Gilad(string active = "true")
+    {
+        bool activeBool = Convert.ToBoolean(active);
+        try
+        {
+            HttpResponse response = GzipMe();
 
+            Patient p = new Patient();
+            List<Patient> patientsList = p.GetPatientsList_Gilad(activeBool);
+            //j.MaxJsonLength = int.MaxValue;
+            j.MaxJsonLength = Int32.MaxValue;
+            return j.Serialize(patientsList);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in getPatients", ex);
+            //throw new Exception("שגיאה בשליפת נתוני חולים");
+            throw ex;
+        }
+
+    }
 
     [WebMethod(EnableSession = true)]
     public string getPatients1()
@@ -884,6 +906,28 @@ public class WebService : System.Web.Services.WebService
         try
         {
             List<RidePat> lrp = new RidePat().GetRidePatViewByTimeFilter(from, until);
+            j.MaxJsonLength = Int32.MaxValue;
+            return j.Serialize(lrp);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetRidePatViewByTimeFilter", ex);
+            throw new Exception("שגיאה בייבוא נתונים לפי חתך זמנים");
+        }
+    }
+
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetRidePatViewByTimeFilter_Gilad(int from, int until)
+    {
+        //Gilad Update this with Data Reader only 
+        //TO DO 
+        //try to add Gzip.
+        try
+        {
+            HttpResponse response = GzipMe();
+            List<RidePat> lrp = new RidePat().GetRifePatViewByTimeFilter_DR_Gilad(from, until);
             j.MaxJsonLength = Int32.MaxValue;
             return j.Serialize(lrp);
         }
