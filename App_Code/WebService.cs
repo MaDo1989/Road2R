@@ -1556,6 +1556,70 @@ public class WebService : System.Web.Services.WebService
 
     }
 
+    //Gilad Touch here
+    [WebMethod(EnableSession=true)]
+    public string GetAbsenceByVolunteerId(int volunteerId)
+    {
+        try
+        {
+            Absence absence = new Absence();
+            return j.Serialize(absence.GetAbsenceByVolunteerId(volunteerId));
+
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetAbsenceByVolunteerId", ex);
+            throw new Exception("שגיאה בשליפת היעדרויות"+ex.Message);
+        }
+    }
+    [WebMethod(EnableSession = true)]
+    public string UpdateAbsenceById(int AbsenceId, int coorId, DateTime from, DateTime until, string cause, string note)
+    {
+        try
+        {
+            Absence absence = new Absence();
+            return j.Serialize( absence.UpdateAbsenceById(AbsenceId, coorId, from, until, cause, note));
+
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in UpdateAbsenceById", ex);
+            throw new Exception("שגיאה בעדכון היעדרות" + ex.Message);
+        }
+    }
+
+    [WebMethod(EnableSession = true)]
+    public string DeleteAbsenceById(int AbsenceId)
+    {
+        try
+        {
+            Absence absence = new Absence();
+            return j.Serialize(absence.DeleteAbsenceById(AbsenceId));
+
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in DeleteAbsenceById", ex);
+            throw new Exception("שגיאה במחיקת היעדרות" + ex.Message);
+        }
+    }
+
+    [WebMethod(EnableSession = true)]
+    public string InsertNewAbsence(int volunteerId, int coorId, DateTime from, DateTime until, string cause, string note)
+    {
+        try
+        {
+            Absence absence = new Absence();
+            return j.Serialize(absence.InsertNewAbsence(volunteerId,  coorId,  from,  until,  cause,  note));
+
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in InsertNewAbsence", ex);
+            throw new Exception("שגיאה בהוספת היעדרות" + ex.Message);
+        }
+    }
+
     [WebMethod(EnableSession = true)]
     public string GetDrivers(bool isActive, bool isDriving)
     {

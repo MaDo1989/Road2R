@@ -8,6 +8,9 @@ using System.Configuration;
 //using Microsoft.Extensions.Configuration;
 using System.Collections;
 using System.Web.UI.WebControls;
+using log4net.Util.TypeConverters;
+using System.Activities.Expressions;
+//using static ReportService;
 
 public class DBservice_Gilad
 {
@@ -294,8 +297,171 @@ public class DBservice_Gilad
 
     }
 
+    public List<Absence> GetAbsenceByVolunteerId(int volunteerId)
+    {
+        SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@id", volunteerId);
+        cmd = CreateCommandWithStoredProcedureGeneral("GetVoluntterAbsenceById", con, paramDic);
+        List<Absence> listToReturn = new List<Absence>();
 
 
+        try
+        {
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+            while (dataReader.Read())
+            {
+                Absence absence = new Absence();
+                absence.Id = Convert.ToInt32(dataReader["Id"]);
+                absence.VolunteerId = Convert.ToInt32(dataReader["VolunteerId"]);
+                absence.CoordinatorId = Convert.ToInt32(dataReader["CoordinatorId"]);
+                absence.FromDate = Convert.ToDateTime(dataReader["FromDate"]);
+                absence.UntilDate = Convert.ToDateTime(dataReader["UntilDate"]);
+                absence.Cause = dataReader["Cause"].ToString();
+                absence.Note = dataReader["Note"].ToString();
+                absence.AbsenceStatus = Convert.ToBoolean(dataReader["AbsenceStatus"]);
+                absence.IsDeleted = Convert.ToBoolean(dataReader["isDeleted"]);
+                listToReturn.Add(absence);
+
+
+
+            }
+            return listToReturn;
+        }
+        catch (Exception ex)
+        {
+
+            throw new Exception("exception in DBservice_Gilad.cs GetVoluntterAbsenceById sp -->" + ex);
+        }
+        finally 
+        { 
+            if (con != null)
+            {
+                con.Close();
+            } 
+        }
+    }
+
+    public int UpdateAbsenceById(int AbsenceId,int coorId, DateTime from, DateTime until , string cause,string note)
+    {
+        SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@absenceId", AbsenceId);
+        paramDic.Add("@fromDate", from);
+        paramDic.Add("@untilDate", until);
+        paramDic.Add("@cause", cause);
+        paramDic.Add("@note", note);
+        paramDic.Add("@coorId", coorId);
+        cmd = CreateCommandWithStoredProcedureGeneral("updateAbsenceById", con, paramDic);
+        int numEffected = 0;
+        try
+        {
+             numEffected = cmd.ExecuteNonQuery();
+            return numEffected;
+        }
+        
+        catch (Exception ex)
+        {
+
+            throw new Exception("exception in DBservice_Gilad.cs updateAbsenceById sp -->" + ex);
+        }
+    }
+
+    public int DeleteAbsenceById(int AbsenceId)
+    {
+        SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@absenceId", AbsenceId);
+
+        cmd = CreateCommandWithStoredProcedureGeneral("DeleteAbsenceById", con, paramDic);
+
+        int numEffected = 0;
+        try
+        {
+            numEffected = cmd.ExecuteNonQuery();
+            return numEffected;
+        }
+
+        catch (Exception ex)
+        {
+
+            throw new Exception("exception in DBservice_Gilad.cs DeleteAbsenceById sp -->" + ex);
+        }
+    }
+
+    public int InsertNewAbsence(int volunteerId, int coorId, DateTime from, DateTime until, string cause, string note)
+    {
+        SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@volunteerId", volunteerId);
+        paramDic.Add("@FromDate", from);
+        paramDic.Add("@UntilDate", until);
+        paramDic.Add("@Cause", cause);
+        paramDic.Add("@Note", note);
+        paramDic.Add("@CoordinatorId", coorId);
+        cmd = CreateCommandWithStoredProcedureGeneral("InsertToAbsence", con, paramDic);
+        int numEffected = 0;
+        try
+        {
+            numEffected = cmd.ExecuteNonQuery();
+            return numEffected;
+        }
+
+        catch (Exception ex)
+        {
+
+            throw new Exception("exception in DBservice_Gilad.cs InsertToAbsence sp -->" + ex);
+        }
+    }
+
+    // ---- Create Command with SP ---- \\ 
     private SqlCommand CreateCommandWithStoredProcedureGeneral(String spName, SqlConnection con, Dictionary<string, object> paramDic)
 	{
 
