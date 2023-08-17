@@ -1447,6 +1447,9 @@ public class Volunteer
         return list;
     }
 
+
+
+
     public List<Volunteer> getVolunteersList_V2_WebOnly(bool active)
     {
         #region DB functions
@@ -1538,6 +1541,17 @@ public class Volunteer
 
         return list;
     }
+
+    public List <Volunteer> getVolunteersList_V2_WebOnly_Gilad(bool active)
+    {
+        DBservice_Gilad dBservice_Gilad = new DBservice_Gilad();
+        return dBservice_Gilad.getVolunteersList_V2_WebOnly_Gilad(active);
+    }
+
+
+
+
+
 
 
     public Volunteer getVolunteer()

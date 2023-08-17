@@ -1556,6 +1556,26 @@ public class WebService : System.Web.Services.WebService
 
     }
 
+
+    [WebMethod(EnableSession = true)]
+    public string getVolunteers_Gilad(bool active)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            Volunteer c = new Volunteer();
+            List<Volunteer> volunteersList = c.getVolunteersList_V2_WebOnly_Gilad(active);
+            return j.Serialize(volunteersList);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in getVolunteers", ex);
+            throw new Exception("שגיאה בשליפת מתנדבים אחרי עדכון של גלעד");
+        }
+
+    }
+
     //Gilad Touch here
     [WebMethod(EnableSession=true)]
     public string GetAbsenceByVolunteerId(int volunteerId)
