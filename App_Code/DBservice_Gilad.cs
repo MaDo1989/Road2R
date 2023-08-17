@@ -523,6 +523,14 @@ public class DBservice_Gilad
                 {
                     v.LatestDrive = latestDrive;
                 }
+                if (dataReader["AbsenceStatus"].ToString() == "")
+                {
+                    v.AbsenceStatus = false;
+                }
+                else
+                {
+                    v.AbsenceStatus = Convert.ToBoolean(dataReader["AbsenceStatus"].ToString());
+                }
 
                 if (nearByCities.Keys.Contains(v.City))
                 {

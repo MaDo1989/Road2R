@@ -50,7 +50,7 @@ public class Volunteer
     string lastModified;
     string volunteerIdentity;
     bool? knowsArabic;
-
+    bool absenceStatus;
     string englishFN;
     string englishLN;
     bool? isDriving;
@@ -1321,6 +1321,19 @@ public class Volunteer
         set
         {
             role = value;
+        }
+    }
+
+    public bool AbsenceStatus
+    {
+        get
+        {
+            return absenceStatus;
+        }
+
+        set
+        {
+            absenceStatus = value;
         }
     }
 
