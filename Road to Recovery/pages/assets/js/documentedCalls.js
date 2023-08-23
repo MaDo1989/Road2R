@@ -93,13 +93,10 @@ function manipulateDocumentedCallsModal(button, tableToWithdrawDataFrom) {
 
             });
             $('#wait').hide();
-            /*console.log($('#DocumentedCallsModal').html())*/
-            //let AbsenceBtn = `<button type="button" class="btn btn-secondary" data-dismiss="modal">סגירה</button>
-            //<button>ניהול היעדרויות</button>`;
-            //$('#DocumentedCallsModal .modal-footer').html(AbsenceBtn)
+            // Gilad touch here
+            // need to render here the AbsenceModal like the CallModal.
             $('.AbsenceBtn')[0].id = thisVolunteerId
             RenderToAbsenceModal(rowData.DisplayName, thisVolunteerId);
-            console.log('Gilad check -- > ', thisVolunteerId)
 
         },
         error: function (err) {

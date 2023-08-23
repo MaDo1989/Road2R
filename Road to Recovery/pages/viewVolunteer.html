@@ -330,9 +330,10 @@
                     });
 
                     buttonsEvents();
-                    /*console.log($('#DocumentedCallsModal .modal-content')[0].innerHTML);*/
-                    //Gilad Touch Here...
-                    $('#DocumentedCallsModal .modal-body')[0].innerHTML += `<button onclick="Stam(this)" class="AbsenceBtn btn waves-effect btn-primary">ניהול היעדרויות</button>`;
+                    
+                    //Gilad Touch Here.
+                    // to toggle the modal use this button ניהול היעדרויות.
+                    $('#DocumentedCallsModal .modal-body')[0].innerHTML += `<button onclick="ManageAbsenceToggle()" class="AbsenceBtn btn waves-effect btn-primary">ניהול היעדרויות</button>`;
                 },
                 error: function (err) {
                     alert("Error in getVolunteers: " + err.responseText);
@@ -562,10 +563,8 @@
         }
 
 
-        const Stam = (btn) => {
+        const ManageAbsenceToggle = () => {
             $('#DocumentedCallsModal').modal('toggle');
-            console.log('Gilad ---> volunteer id -->', btn.id);
-            const VolunteerId = parseInt(btn.id);
             $('#DocumentedAbsenceModal').modal('toggle');
         }
 
