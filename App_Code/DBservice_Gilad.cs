@@ -327,10 +327,12 @@ public class DBservice_Gilad
                 absence.Id = Convert.ToInt32(dataReader["Id"]);
                 absence.VolunteerId = Convert.ToInt32(dataReader["VolunteerId"]);
                 absence.CoordinatorId = Convert.ToInt32(dataReader["CoordinatorId"]);
+                absence.DaysToReturn = Convert.ToInt32(dataReader["DaysToReturn"]);
                 absence.FromDate = Convert.ToDateTime(dataReader["FromDate"]);
                 absence.UntilDate = Convert.ToDateTime(dataReader["UntilDate"]);
                 absence.Cause = dataReader["Cause"].ToString();
                 absence.Note = dataReader["Note"].ToString();
+                absence.CoorName = dataReader["CoorName"].ToString();
                 absence.AbsenceStatus = Convert.ToBoolean(dataReader["AbsenceStatus"]);
                 absence.IsDeleted = Convert.ToBoolean(dataReader["isDeleted"]);
                 listToReturn.Add(absence);

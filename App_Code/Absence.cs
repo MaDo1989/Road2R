@@ -9,10 +9,12 @@ public class Absence
     int id;
     int volunteerId;
     int coordinatorId;
+    int daysToReturn;
     DateTime fromDate;
     DateTime untilDate;
     string cause;
     string note;
+    string coorName;
     bool absenceStatus;
     bool isDeleted;
 
@@ -133,8 +135,31 @@ public class Absence
         }
     }
 
+    public int DaysToReturn
+    {
+        get
+        {
+            return daysToReturn;
+        }
 
+        set
+        {
+            daysToReturn = value;
+        }
+    }
 
+    public string CoorName
+    {
+        get
+        {
+            return coorName;
+        }
+
+        set
+        {
+            coorName = value;
+        }
+    }
 
     public List<Absence> GetAbsenceByVolunteerId(int volunteerId)
     {

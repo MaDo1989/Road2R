@@ -20,6 +20,7 @@ function manipulateDocumentedCallsModal(button, tableToWithdrawDataFrom) {
 
     let childrenof_td = button.parentElement.children;
 
+    
     for (let i = 0; i < childrenof_td.length; i++) {
         if (childrenof_td[i].id.includes('badgeOf_')) {
             spanBadgeId = childrenof_td[i].id;
@@ -29,7 +30,8 @@ function manipulateDocumentedCallsModal(button, tableToWithdrawDataFrom) {
     thisVolunteerId = parseInt(rowData.Id); //this variable is goobal to this page & used also in documentAcall2DB !!!
 
     $('#DocumentedCallsTitle').text("שיחות עם " + rowData.DisplayName)
-
+    
+    /*console.log('Gilad -->', rowData)*/
     $.ajax({
         dataType: "json",
         url: "WebService.asmx/GetDocumentedCallsByDriverId",
@@ -91,6 +93,13 @@ function manipulateDocumentedCallsModal(button, tableToWithdrawDataFrom) {
 
             });
             $('#wait').hide();
+            /*console.log($('#DocumentedCallsModal').html())*/
+            //let AbsenceBtn = `<button type="button" class="btn btn-secondary" data-dismiss="modal">סגירה</button>
+            //<button>ניהול היעדרויות</button>`;
+            //$('#DocumentedCallsModal .modal-footer').html(AbsenceBtn)
+            $('.AbsenceBtn')[0].id = thisVolunteerId
+            RenderToAbsenceModal(rowData.DisplayName, thisVolunteerId);
+            console.log('Gilad check -- > ', thisVolunteerId)
 
         },
         error: function (err) {
