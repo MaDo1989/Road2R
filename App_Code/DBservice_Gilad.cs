@@ -450,11 +450,16 @@ public class DBservice_Gilad
         paramDic.Add("@Note", note);
         paramDic.Add("@CoordinatorId", coorId);
         cmd = CreateCommandWithStoredProcedureGeneral("InsertToAbsence", con, paramDic);
-        int numEffected = 0;
+        SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+        int ScopeId = -1;
+
         try
         {
-            numEffected = cmd.ExecuteNonQuery();
-            return numEffected;
+            while (dataReader.Read())
+            {
+                ScopeId = Convert.ToInt32(dataReader["AbsenceId"]);
+            }
+            return ScopeId;
         }
 
         catch (Exception ex)

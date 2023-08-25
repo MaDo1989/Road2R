@@ -398,6 +398,26 @@
             return fullTimeStemp;
         }
 
+        const ConvertDBDate2PickerFormat = (dateStr) => {
+            let str = ConvertDBDate2UIDate(dateStr);
+            str = str.replace(".", "-").replace(".", "-");
+            str = ReverseString(str);
+
+            let split = str.split("-");
+            if (split[1].length==1) {
+                split[1] = '0' + split[1];
+            }
+            if (split[2].length == 1) {
+                split[2] = '0' + split[2];
+            }
+            return `${split[0]}-${split[1]}-${split[2]}`;
+
+        }
+
+        function ReverseString(str) {
+            return str.split('-').reverse().join('-')
+        }
+
         function buttonsEvents() {
             //      pastePhone.onpaste = cleanPhoneNumber;
 
@@ -741,7 +761,7 @@
                                     <input type="number" id="skipPageInput" min="1">
                                     <button class="btn btn-success waves-effect w-md waves-light m-b-5" id="skipPageButton">עבור</button>
                                 </div>
-                                <div id="wait" style="display:none;width:69px;height:89px;position:absolute;top:50%;left:50%;padding:2px;">
+                                <div id="wait" style="display:none;width:69px;height:89px;position:absolute;z-index:5;top:50%;left:50%;padding:2px;">
                                     <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
                                 </div>
                             </div>

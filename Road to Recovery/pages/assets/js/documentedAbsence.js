@@ -1,8 +1,18 @@
 ﻿let documentedAbsenceTable;
 let VolunteerID = 0;
+let ThisDisplayName = ``;
+let ThisAbsencesList = [];
+let isEdit = false;
+let ThisAbsenceId = -1;
+let thisRowClicked = -1;
+
+
+// this function render the dataTable stracture and render the data.(used also as a data refresh)
 const RenderToAbsenceModal = (VolunteerName, VolunteerId) => {
+    $('#wait').show();
     $('#DocumentedAbsenceTitle').text("היעדרויות של " + VolunteerName);
     VolunteerID = VolunteerId
+    ThisDisplayName = VolunteerName;
     $.ajax({
         dataType: "json",
         url: "WebService.asmx/GetAbsenceByVolunteerId",
@@ -11,7 +21,7 @@ const RenderToAbsenceModal = (VolunteerName, VolunteerId) => {
         data: JSON.stringify({ volunteerId: VolunteerId }),
         success: function (data) {
             Absences = JSON.parse(data.d);
-
+            ThisAbsencesList = Absences;
             if (documentedAbsenceTable != null) {
                 documentedAbsenceTable.destroy();
             }
@@ -60,12 +70,12 @@ const RenderToAbsenceModal = (VolunteerName, VolunteerId) => {
                     {
                         data: (data) => {
                             let btnStr = `<div class='btnWrapper-right'>
-                            <button id="AbsenceEdit${data.Id}" type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'>
+                            <button id="AbsenceEdit${data.Id}" type='button' onclick="Delete_O_Edit_AbsenceRow(this)" data-absence='${JSON.stringify( data ) }' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'>
                             <i class='ti-pencil'></i>
                             </button>
                             </div>
                             <div class='btnWrapper-left'>
-                            <button id="AbsenceDelete${data.Id}" type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'>
+                            <button id="AbsenceDelete${data.Id}" type='button' onclick="Delete_O_Edit_AbsenceRow(this)" data-absence='${JSON.stringify(data) }' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'>
                             <i class='fa fa-remove'></i>
                             </button>
                             </div>`;
@@ -80,7 +90,7 @@ const RenderToAbsenceModal = (VolunteerName, VolunteerId) => {
 
 
             });
-
+            $('#wait').hide();
         },
         error: function (err) {
             alert("Error in GetVolunteersAbsences !: " + err.responseText);
@@ -89,15 +99,92 @@ const RenderToAbsenceModal = (VolunteerName, VolunteerId) => {
     });
 }
 
+const Delete_O_Edit_AbsenceRow = (btn) => {
+    const AbsenceData = JSON.parse(btn.getAttribute('data-absence')); 
+    const ThisRow = btn.parentNode.parentNode.parentNode;
+    console.log('Gilad Check ! ---> ', ThisRow.id, AbsenceData.Id);
+    let absenceID = ThisRow.id != '' ? parseInt(ThisRow.id) : AbsenceData.Id;
+    ThisAbsenceId = absenceID
+    //Delete This Row
+    if (btn.id.includes('AbsenceDelete')) {
+        const DataTable = $('#DocumentedAbsenceTable').DataTable();
 
+
+        //need to get the identity scop from database to prevent this error.
+        if (absenceID==undefined) {
+            alert('לא ניתן למחוק את השורה יש לצאת מהחלון ולחזור כדי למחוק.');
+            return;
+        }
+        console.log('Gilad check --> what im delete ? ', absenceID )
+        swal({
+            title: "האם אתם בטוחים?",
+            type: "warning",
+            text: "היעדרות זו תימחק",
+            showCancelButton: true,
+            cancelButtonText: "בטל",
+            confirmButtonClass: 'btn-warning',
+            confirmButtonText: "מחיקה",
+            closeOnConfirm: true
+        }, function () {
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/DeleteAbsenceById",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                data: JSON.stringify({ AbsenceId: absenceID }),
+                success: (data) => {
+                    
+                    //To render the deletion immediately, a deletion must also be performed in the data table and draw.
+                    //Front end cheat
+                    //const RowIndex = [...ThisRow.parentNode.children].indexOf(ThisRow);
+                    //DataTable.row(RowIndex).remove().draw();
+                    console.log('Gilad -- > result from delete', data);
+                    RenderToAbsenceModal(ThisDisplayName, VolunteerID)
+                },
+
+                error: function (err) {
+                    alert("Error in GetVolunteersAbsences !: " + err.responseText);
+                    $('#wait').hide();
+                }
+            });
+        });
+
+
+
+
+
+
+
+    }
+    //Edit This Row
+    else {
+        thisRowClicked = [...ThisRow.parentNode.children].indexOf(ThisRow)
+        console.log('Gilad check -- > what i got', AbsenceData);
+        
+        //need to get the identity-scop from database to prevent this error.
+        if (AbsenceData.Id == undefined) {
+            alert('לא ניתן לעדכן את השורה יש לצאת מהחלון ולחזור כדי לעדכן.');
+            return;
+        }
+        else {
+            openDocumentAAbsenceModal();
+            isEdit = true;
+            $('#AAbsenceModalTitle').text('עריכת היעדרות');
+        }
+        $("#DocumentAAbsenceDatePickerFrom").val(ConvertDBDate2PickerFormat(AbsenceData.FromDate));
+        $("#DocumentAAbsenceDatePickerUntil").val(ConvertDBDate2PickerFormat(AbsenceData.UntilDate));
+        $("#DocumentAAbsence_choooseContent").val(AbsenceData.Cause);
+        $("#DocumentAAbsence_writeContent").val(AbsenceData.Note);
+    }
+
+}
 
 const openDocumentAAbsenceModal = () => {
+    isEdit = false;
     $('#DocumentAAbsencesModal').modal('show');
-
     $('.closeBtn_DocumentAcallsModal').prop('disabled', true);
     $('#saveAbsenceBtn').prop('disabled', false);
     $('#cancellAbsenceBtn').prop('disabled', false);
-
 
     //get a list of all coordinators ()
     let allCordinatorsFromDB = [];
@@ -107,7 +194,7 @@ const openDocumentAAbsenceModal = () => {
     $('#DocumentAcall_writeContent').val('');
     $('#DocumentAcall_choooseContent').prop('disabled', false);
     $('#DocumentAcall_writeContent').prop('disabled', false);
-
+    $('#AAbsenceModalTitle').text('הוספת היעדרות');
 
     $('#DocumentAAbsence_contentErrorMsg').hide();
     $('#DocumentAAbsence_CoordinatorErrorMsg').hide();
@@ -135,7 +222,12 @@ const openDocumentAAbsenceModal = () => {
 
 
 const documentAAbsence2DB = () => {
+
+    $('#wait').show();
+
     //int volunteerId, int coorId, DateTime from, DateTime until, string cause, string note
+    //int AbsenceId, int coorId, DateTime from, DateTime until, string cause, string note
+
     const NewAbsence = {
         volunteerId: parseInt(VolunteerID),
         coorId: parseInt($("#DocumentAAbsence_choooseCoordinator").val()),
@@ -144,14 +236,34 @@ const documentAAbsence2DB = () => {
         cause: $("#DocumentAAbsence_choooseContent").val(),
         note: $("#DocumentAAbsence_writeContent").val()
     }
-    console.log('Gilad --- > ', NewAbsence);
-    if (NewAbsence.note == '') {
+    const UpdateAbsence = {
+        AbsenceId: parseInt(ThisAbsenceId),
+        coorId: parseInt($("#DocumentAAbsence_choooseCoordinator").val()),
+        from: $("#DocumentAAbsenceDatePickerFrom").val(),
+        until: $("#DocumentAAbsenceDatePickerUntil").val(),
+        cause: $("#DocumentAAbsence_choooseContent").val(),
+        note: $("#DocumentAAbsence_writeContent").val()
+    }
+
+    let Method = 'InsertNewAbsence';
+    let dataToSend = NewAbsence;
+    if (isEdit) {
+        Method = 'UpdateAbsenceById';
+        dataToSend = UpdateAbsence;
+        if (dataToSend.AbsenceId==-1) {
+            alert('Error no absence id in -- >documentAAbsence2DB')
+            return;
+        }
+    }
+
+
+
+    if (dataToSend.note == '') {
         NewAbsence.note = 'אין';
-        console.log('Gilad --- >אין הערה ', NewAbsence.note);
     }
    
 
-    if (NewAbsence.cause == '-1' || NewAbsence.from == '' || NewAbsence.until == '') {
+    if (dataToSend.cause == '-1' || dataToSend.from == '' || dataToSend.until == '') {
         $('#DocumentAAbsence_contentErrorMsg').show();
         $('#DocumentAAbsence_CoordinatorErrorMsg').hide();
 
@@ -160,7 +272,7 @@ const documentAAbsence2DB = () => {
 
 
 
-    if (new Date(NewAbsence.until) < new Date(NewAbsence.from)) {
+    if (new Date(dataToSend.until) < new Date(dataToSend.from)) {
         $('#DocumentAAbsence_CoordinatorErrorMsg').show();
         $('#DocumentAAbsence_contentErrorMsg').hide();
 
@@ -169,60 +281,39 @@ const documentAAbsence2DB = () => {
 
 
 
-    console.log('Gilad --- > what im send ?', NewAbsence);
     $.ajax({
         dataType: "json",
-        url: "WebService.asmx/InsertNewAbsence",
+        url: "WebService.asmx/"+Method,
         contentType: "application/json; charset=utf-8",
         type: "POST",
-        data: JSON.stringify( NewAbsence ),
+        data: JSON.stringify(dataToSend),
         success: function (data) {
-            // ↓ front-end cheating ↓
 
-            //step 1: show the change on the grid right away
-
-            /*
-             in order to add row to this dataTable you should
-
-             1. convert callRecordedDate to the form of → "/Date(1607810400000)/"
-             2. convert callRecordedTime to the form of → time object with hours and minutes properties
-
-               or else you will suffer from various errors
-             */
-            let DocumentedAbsenceTable = $('#DocumentedAbsenceTable').DataTable();
-
-            let from = new Date(NewAbsence.from).getTime();
-            let until = new Date(NewAbsence.until).getTime();
+            let from = new Date(dataToSend.from).getTime();
+            let until = new Date(dataToSend.until).getTime();
             let today = new Date().getTime();
-            let daysToReturn = null;
-            if (from > today) {
-                daysToReturn = 'עתידי'
+
+
+            // to get the phone btn of this volunteer by DOM
+            // check the dates and color it
+            // orange mean busy
+            // blue mean available
+            const BtnToColor = document.getElementById(`${VolunteerID}`).childNodes[11].childNodes[3].childNodes[1];
+
+            if (today >= from) {
+
+                BtnToColor.setAttribute('style', 'background-color:#efa834 !important; border: 1px solid #efa834 !important');
+
             }
             else {
-                daysToReturn = Math.ceil((until - today) / 86400000);
-            }
-            from = `/Date(${from})/`;
-            until = `/Date(${until})/`;
-            NewAbsence.CoorName = $("#DocumentAAbsence_choooseCoordinator option:selected").text();
+                BtnToColor.setAttribute('style', 'background-color:#3bafda !important; border: 1px solid #3bafda !important');
 
-
-
-
-
-            const addRowData = {
-                Cause: NewAbsence.cause,
-                CoorName: NewAbsence.CoorName,
-                DaysToReturn: daysToReturn,
-                Note: NewAbsence.note,
-                UntilDate: until,
-                FromDate: from
             }
 
-            DocumentedAbsenceTable.row.add(addRowData).draw(false);
-            console.log(data);
+            RenderToAbsenceModal(ThisDisplayName, VolunteerID);
 
         },
-        error: function (err) { alert("Error in Insert New Absence Ajax: " + err.responseText); }
+        error: function (err) { alert("Error in Insert New Absence Ajax: " + err.responseText); $('#wait').hide(); }
     });
 
     $('#DocumentAAbsencesModal').modal('toggle');
