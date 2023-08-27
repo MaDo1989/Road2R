@@ -31,7 +31,6 @@ function manipulateDocumentedCallsModal(button, tableToWithdrawDataFrom) {
 
     $('#DocumentedCallsTitle').text("שיחות עם " + rowData.DisplayName)
     
-    /*console.log('Gilad -->', rowData)*/
     $.ajax({
         dataType: "json",
         url: "WebService.asmx/GetDocumentedCallsByDriverId",

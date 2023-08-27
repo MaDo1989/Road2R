@@ -102,7 +102,6 @@ const RenderToAbsenceModal = (VolunteerName, VolunteerId) => {
 const Delete_O_Edit_AbsenceRow = (btn) => {
     const AbsenceData = JSON.parse(btn.getAttribute('data-absence')); 
     const ThisRow = btn.parentNode.parentNode.parentNode;
-    console.log('Gilad Check ! ---> ', ThisRow.id, AbsenceData.Id);
     let absenceID = ThisRow.id != '' ? parseInt(ThisRow.id) : AbsenceData.Id;
     ThisAbsenceId = absenceID
     //Delete This Row
@@ -111,11 +110,11 @@ const Delete_O_Edit_AbsenceRow = (btn) => {
 
 
         //need to get the identity scop from database to prevent this error.
+       // gilad fixed that there is no reason to this "if" just for safety.
         if (absenceID==undefined) {
             alert('לא ניתן למחוק את השורה יש לצאת מהחלון ולחזור כדי למחוק.');
             return;
         }
-        console.log('Gilad check --> what im delete ? ', absenceID )
         swal({
             title: "האם אתם בטוחים?",
             type: "warning",
@@ -138,7 +137,7 @@ const Delete_O_Edit_AbsenceRow = (btn) => {
                     //Front end cheat
                     //const RowIndex = [...ThisRow.parentNode.children].indexOf(ThisRow);
                     //DataTable.row(RowIndex).remove().draw();
-                    console.log('Gilad -- > result from delete', data);
+                    //^^^cause to alot of synchronization probalmes, therefore refreshing the table.
                     RenderToAbsenceModal(ThisDisplayName, VolunteerID)
                 },
 
@@ -162,6 +161,7 @@ const Delete_O_Edit_AbsenceRow = (btn) => {
         console.log('Gilad check -- > what i got', AbsenceData);
         
         //need to get the identity-scop from database to prevent this error.
+        // gilad fixed that there is no reason to this "if" just for safety.
         if (AbsenceData.Id == undefined) {
             alert('לא ניתן לעדכן את השורה יש לצאת מהחלון ולחזור כדי לעדכן.');
             return;
@@ -300,7 +300,7 @@ const documentAAbsence2DB = () => {
             // blue mean available
             const BtnToColor = document.getElementById(`${VolunteerID}`).childNodes[11].childNodes[3].childNodes[1];
 
-            if (today >= from) {
+            if (today >= from && today<=until) {
 
                 BtnToColor.setAttribute('style', 'background-color:#efa834 !important; border: 1px solid #efa834 !important');
 
@@ -309,6 +309,7 @@ const documentAAbsence2DB = () => {
                 BtnToColor.setAttribute('style', 'background-color:#3bafda !important; border: 1px solid #3bafda !important');
 
             }
+
 
             RenderToAbsenceModal(ThisDisplayName, VolunteerID);
 
