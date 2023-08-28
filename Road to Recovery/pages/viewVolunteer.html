@@ -61,7 +61,7 @@
 
         checkCookie();
         var allVolunteersFromDb = [];
-
+        let activeChangedFlag = false;
         $(document).ready(function () {
 
             $('#skipPageButton').click(function () {
@@ -166,6 +166,7 @@
 
         function ActiveMode() {
             localStorage.activeVol = $("#activeCustomers").prop('checked');
+            activeChangedFlag = true;
             refreshTable();
         }
 
@@ -333,7 +334,10 @@
                     
                     //Gilad Touch Here.
                     // to toggle the modal use this button ניהול היעדרויות.
-                    $('#DocumentedCallsModal .modal-body')[0].innerHTML += `<button onclick="ManageAbsenceToggle()" class="AbsenceBtn btn waves-effect btn-primary">ניהול היעדרויות</button>`;
+                    if (activeChangedFlag==false) {
+                        $('#DocumentedCallsModal .modal-body')[0].innerHTML += `<button onclick="ManageAbsenceToggle()" class="AbsenceBtn btn waves-effect btn-primary">ניהול היעדרויות</button>`;
+
+                    }
                 },
                 error: function (err) {
                     alert("Error in getVolunteers: " + err.responseText);

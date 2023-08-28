@@ -1122,9 +1122,10 @@
             return driversPromise;
         }
 
+
+
         const assignDriverToRidePat = () => {
             $('#wait').show();
-
             const driverNameFromInput = $('#driver').val();
 
             if (typeof driverNameFromInput === 'undefined' || !driverNameFromInput || driverNameFromInput.length === 0 || !driverNames.includes(driverNameFromInput)) {
@@ -1132,36 +1133,104 @@
                 $('#wait').hide();
                 return alert('יש לבחור נהג מתוך הרשימה');
             }
-
             const driverIndex = driverNames.indexOf(driverNameFromInput);
             const userSelected = drivers[driverIndex];
-
             let request;
             let dataString;
 
-            if (_isDriverReplacement) {
-                //update the ride record with the new driver.
-                request = {
-                    ridePatId: _ridepatToManipulate,
-                    rideNum: _assignDriverToRideNum,
-                    newDriverId: userSelected.Id,
-                    assignedFromAppId: APP_ID
+
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/GetAbsenceByVolunteerId",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                data: JSON.stringify({ volunteerId: userSelected.Id }),
+                success: function (data) {
+                    $('#wait').hide();
+                    Absences = JSON.parse(data.d);
+                    let absenceStatus = false;
+                    //console.log('Gilad check -- > ', Absences)
+                    for (var i = 0; i < Absences.length; i++) {
+                        if (Absences[i].AbsenceStatus) {
+                            absenceStatus = true;
+                        }
+                    }
+                    if (absenceStatus) {
+                        swal({
+                            title: "?האם הינך בטוח/ה שברצונך לשבץ נהג זה",
+                            type: "warning",
+                            text: 'נהג זה כרגע אינו זמין,באפשרותך לשבץ אותו בכל זאת או לבחור בנהג חלופי',
+                            showCancelButton: true,
+                            cancelButtonText: "בטל",
+                            confirmButtonClass: 'btn-warning',
+                            confirmButtonText: "שבץ",
+                            closeOnConfirm: true
+                        }, function (userResponse) {
+                            if (userResponse) {
+                                if (_isDriverReplacement) {
+                                    //update the ride record with the new driver.
+                                    request = {
+                                        ridePatId: _ridepatToManipulate,
+                                        rideNum: _assignDriverToRideNum,
+                                        newDriverId: userSelected.Id,
+                                        assignedFromAppId: APP_ID
+                                    }
+
+                                    dataString = JSON.stringify(request);
+                                    ajaxCall('UpdateDriver', dataString, UpdateDriver_SCB, UpdateDriver_ECB);
+                                } else {
+
+                                    request = {
+                                        ridePatId: _ridepatToManipulate,
+                                        userId: userSelected.Id,
+                                        driverType: "primary",
+                                        assignedFromAppId: APP_ID
+                                    };
+
+                                    dataString = JSON.stringify(request);
+                                    ajaxCall('AssignRideToRidePat', dataString, assignDriverToRidePat_SCB, assignDriverToRidePat_ECB);
+                                }
+                                assignDriverToRidePatAbort();
+                            }
+
+                        });
+                    }
+                    else {
+                        if (_isDriverReplacement) {
+                            //update the ride record with the new driver.
+                            request = {
+                                ridePatId: _ridepatToManipulate,
+                                rideNum: _assignDriverToRideNum,
+                                newDriverId: userSelected.Id,
+                                assignedFromAppId: APP_ID
+                            }
+
+                            dataString = JSON.stringify(request);
+                            ajaxCall('UpdateDriver', dataString, UpdateDriver_SCB, UpdateDriver_ECB);
+                        } else {
+
+                            request = {
+                                ridePatId: _ridepatToManipulate,
+                                userId: userSelected.Id,
+                                driverType: "primary",
+                                assignedFromAppId: APP_ID
+                            };
+
+                            dataString = JSON.stringify(request);
+                            ajaxCall('AssignRideToRidePat', dataString, assignDriverToRidePat_SCB, assignDriverToRidePat_ECB);
+                        }
+                    }
+
+                },
+                error: function (err) {
+                    alert("Error in GetVolunteersAbsences (manageridepat.html ajax) !: " + err.responseText);
+                    $('#wait').hide();
                 }
+            });
 
-                dataString = JSON.stringify(request);
-                ajaxCall('UpdateDriver', dataString, UpdateDriver_SCB, UpdateDriver_ECB);
-            } else {
 
-                request = {
-                    ridePatId: _ridepatToManipulate,
-                    userId: userSelected.Id,
-                    driverType: "primary",
-                    assignedFromAppId: APP_ID
-                };
 
-                dataString = JSON.stringify(request);
-                ajaxCall('AssignRideToRidePat', dataString, assignDriverToRidePat_SCB, assignDriverToRidePat_ECB);
-            }
+           
         }
 
         const assignDriverToRidePatAbort = () => {

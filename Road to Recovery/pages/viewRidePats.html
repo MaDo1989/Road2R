@@ -145,6 +145,9 @@
                 dataType: "json",
                 url: "WebService.asmx/GetRidePatViewByTimeFilter_Gilad",
                 contentType: "application/json; charset=utf-8",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-Encoding", "gzip");
+                },
                 type: "POST",
                 data: JSON.stringify(timeRanges),
                 success: ImportDataByTimeFilters_SCB,

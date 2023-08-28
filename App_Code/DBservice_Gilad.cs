@@ -172,7 +172,7 @@ public class DBservice_Gilad
         Dictionary<string, object> paramDic = new Dictionary<string, object>();
         paramDic.Add("@from", from);
         paramDic.Add("@to", until);
-        cmd = CreateCommandWithStoredProcedureGeneral("spGet_rpview_ByTimeRange", con, paramDic);
+        cmd = CreateCommandWithStoredProcedureGeneral("spGet_rpview_ByTimeRange_Gilad", con, paramDic);
 
         try
         {
@@ -195,8 +195,8 @@ public class DBservice_Gilad
 
                     //string searchExpression = "Id = " + primary.Id;
                     //DataRow[] driverRow = driverTable.Select(searchExpression);
-                    //primary.DisplayName = driverRow[0]["DisplayName"].ToString();
-                    //primary.CellPhone = driverRow[0]["CellPhone"].ToString();
+                    primary.DisplayName = dataReader["DriverName"].ToString();
+                    primary.CellPhone = dataReader["DriverPhone"].ToString();
 
                     rp.Drivers.Add(primary);
                 }
