@@ -138,6 +138,10 @@ const Delete_O_Edit_AbsenceRow = (btn) => {
                     //const RowIndex = [...ThisRow.parentNode.children].indexOf(ThisRow);
                     //DataTable.row(RowIndex).remove().draw();
                     //^^^cause to alot of synchronization probalmes, therefore refreshing the table.
+
+                    //mabye need to color the call btn after delete
+                    console.log('Gilad check --> Delete sucsses ', data.d, absenceID, ThisAbsencesList, thisVolunteerId);
+                    ColorCallBtn_afterDelete(absenceID, ThisAbsencesList, thisVolunteerId)
                     RenderToAbsenceModal(ThisDisplayName, VolunteerID)
                 },
 
@@ -177,6 +181,28 @@ const Delete_O_Edit_AbsenceRow = (btn) => {
         $("#DocumentAAbsence_writeContent").val(AbsenceData.Note);
     }
 
+}
+
+const ColorCallBtn_afterDelete = (absenceID,absencesListOfThisVolunteer, volunteerId) => {
+    if (absencesListOfThisVolunteer != undefined) {
+        const BtnToColor = document.getElementById(`${volunteerId}`).childNodes[11].childNodes[3].childNodes[1];
+
+        const resFilter = absencesListOfThisVolunteer.filter((absence) => {
+            return (absence.Id != absenceID && absence.VolunteerId == volunteerId && absence.AbsenceStatus)
+        });
+
+        console.log('Gilad res :', ThisAbsencesList, resFilter, volunteerId, BtnToColor);
+        if (resFilter.length == 0) {
+            //blue available
+            BtnToColor.setAttribute('style', 'background-color:#3bafda !important; border: 1px solid #3bafda !important');
+
+        }
+        else {
+            //orange busy 
+            BtnToColor.setAttribute('style', 'background-color:#efa834 !important; border: 1px solid #efa834 !important');
+
+        }
+    }
 }
 
 const openDocumentAAbsenceModal = () => {
