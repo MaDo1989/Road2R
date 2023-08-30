@@ -140,7 +140,7 @@ const Delete_O_Edit_AbsenceRow = (btn) => {
                     //^^^cause to alot of synchronization probalmes, therefore refreshing the table.
 
                     //mabye need to color the call btn after delete
-                    console.log('Gilad check --> Delete sucsses ', data.d, absenceID, ThisAbsencesList, thisVolunteerId);
+                    //console.log('Gilad check --> Delete sucsses ', data.d, absenceID, ThisAbsencesList, thisVolunteerId);
                     ColorCallBtn_afterDelete(absenceID, ThisAbsencesList, thisVolunteerId)
                     RenderToAbsenceModal(ThisDisplayName, VolunteerID)
                 },
@@ -162,7 +162,7 @@ const Delete_O_Edit_AbsenceRow = (btn) => {
     //Edit This Row
     else {
         thisRowClicked = [...ThisRow.parentNode.children].indexOf(ThisRow)
-        console.log('Gilad check -- > what i got', AbsenceData);
+        //console.log('Gilad check -- > what i got', AbsenceData);
         
         //need to get the identity-scop from database to prevent this error.
         // gilad fixed that there is no reason to this "if" just for safety.
@@ -183,6 +183,7 @@ const Delete_O_Edit_AbsenceRow = (btn) => {
 
 }
 
+// this function color the btn -for indcation of availble
 const ColorCallBtn_afterDelete = (absenceID,absencesListOfThisVolunteer, volunteerId) => {
     if (absencesListOfThisVolunteer != undefined) {
         const BtnToColor = document.getElementById(`${volunteerId}`).childNodes[11].childNodes[3].childNodes[1];
@@ -191,7 +192,7 @@ const ColorCallBtn_afterDelete = (absenceID,absencesListOfThisVolunteer, volunte
             return (absence.Id != absenceID && absence.VolunteerId == volunteerId && absence.AbsenceStatus)
         });
 
-        console.log('Gilad res :', ThisAbsencesList, resFilter, volunteerId, BtnToColor);
+        //console.log('Gilad res :', ThisAbsencesList, resFilter, volunteerId, BtnToColor);
         if (resFilter.length == 0) {
             //blue available
             BtnToColor.setAttribute('style', 'background-color:#3bafda !important; border: 1px solid #3bafda !important');
@@ -224,6 +225,8 @@ const openDocumentAAbsenceModal = () => {
 
     $('#DocumentAAbsence_contentErrorMsg').hide();
     $('#DocumentAAbsence_CoordinatorErrorMsg').hide();
+    $('#DocumentAAbsence_DatesError').hide();
+
 
     $.ajax({
         dataType: "json",
@@ -273,6 +276,12 @@ const documentAAbsence2DB = () => {
 
     let Method = 'InsertNewAbsence';
     let dataToSend = NewAbsence;
+    let until = new Date(dataToSend.until).getTime(); 
+    let today = new Date()
+    today = new Date(`${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`);
+    today = today.getTime();//because today is alredy begin and until its like (00:00) in time.
+
+
     if (isEdit) {
         Method = 'UpdateAbsenceById';
         dataToSend = UpdateAbsence;
@@ -292,7 +301,16 @@ const documentAAbsence2DB = () => {
     if (dataToSend.cause == '-1' || dataToSend.from == '' || dataToSend.until == '') {
         $('#DocumentAAbsence_contentErrorMsg').show();
         $('#DocumentAAbsence_CoordinatorErrorMsg').hide();
+        $('#DocumentAAbsence_DatesError').hide();
 
+
+        return;
+    }
+
+    if (until < today) {
+        $('#DocumentAAbsence_DatesError').show();
+        $('#DocumentAAbsence_contentErrorMsg').hide();
+        $('#DocumentAAbsence_CoordinatorErrorMsg').hide();
         return;
     }
 
@@ -301,6 +319,8 @@ const documentAAbsence2DB = () => {
     if (new Date(dataToSend.until) < new Date(dataToSend.from)) {
         $('#DocumentAAbsence_CoordinatorErrorMsg').show();
         $('#DocumentAAbsence_contentErrorMsg').hide();
+        $('#DocumentAAbsence_DatesError').hide();
+
 
         return;
     }
@@ -317,7 +337,9 @@ const documentAAbsence2DB = () => {
 
             let from = new Date(dataToSend.from).getTime();
             let until = new Date(dataToSend.until).getTime();
-            let today = new Date().getTime();
+            let today = new Date()
+            today = new Date(`${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`)
+            today = today.getTime();
 
 
             // to get the phone btn of this volunteer by DOM
