@@ -1900,6 +1900,7 @@
 
 
                     if (thistable && deleteBtn) {
+                        //console.log('Gilad check from deleteRidePat --> ', deleteBtn,)
                         thistable.row($(deleteBtn).parents('tr')).remove().draw();
                     } else {
                         location.reload();
@@ -2022,10 +2023,17 @@
                 }
 
             }
-
+           
             returnRidePat = null;
             $('#messagesModal').modal('toggle');
             $('#DriverReturnRidePatMsg').html("");
+            //if (thisTable && deleteBtn) {
+            //    console.log('Gilad check from deleteReturn --> ', deleteBtn.children[10].children[0].children[1],$(deleteBtn).parents('tr'), $('#' + RidePat.RidePatNum).parents('tr'));
+            //    thisTable.row($(deleteBtn).parents('tr')).remove().draw();
+            //}
+            //console.log('Gilad check from deleteReturn --> ', deleteBtn, deleteBtn.children[deleteBtn.children.length-1].children[0].children[1]);
+            //deleteBtn = deleteBtn.children[10].children[0].children[1];
+            deleteBtn = deleteBtn.children[deleteBtn.children.length - 1].children[0].children[1]
             deleteRidePat(RidePat, deleteBtn, thisTable);
         }
 

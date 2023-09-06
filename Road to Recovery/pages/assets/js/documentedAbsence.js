@@ -306,6 +306,14 @@ const documentAAbsence2DB = () => {
 
         return;
     }
+    if (new Date(dataToSend.until) < new Date(dataToSend.from)) {
+        $('#DocumentAAbsence_CoordinatorErrorMsg').show();
+        $('#DocumentAAbsence_contentErrorMsg').hide();
+        $('#DocumentAAbsence_DatesError').hide();
+
+
+        return;
+    }
 
     if (until < today) {
         $('#DocumentAAbsence_DatesError').show();
@@ -316,14 +324,7 @@ const documentAAbsence2DB = () => {
 
 
 
-    if (new Date(dataToSend.until) < new Date(dataToSend.from)) {
-        $('#DocumentAAbsence_CoordinatorErrorMsg').show();
-        $('#DocumentAAbsence_contentErrorMsg').hide();
-        $('#DocumentAAbsence_DatesError').hide();
 
-
-        return;
-    }
 
 
 
