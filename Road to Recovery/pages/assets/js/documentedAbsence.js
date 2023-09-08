@@ -1,4 +1,5 @@
-﻿let documentedAbsenceTable;
+﻿
+let documentedAbsenceTable;
 let VolunteerID = 0;
 let ThisDisplayName = ``;
 let ThisAbsencesList = [];
@@ -22,6 +23,9 @@ const RenderToAbsenceModal = (VolunteerName, VolunteerId) => {
         success: function (data) {
             Absences = JSON.parse(data.d);
             ThisAbsencesList = Absences;
+            ColorCallBtn_afterChange(ThisAbsenceId, ThisAbsencesList, VolunteerID)
+
+
             if (documentedAbsenceTable != null) {
                 documentedAbsenceTable.destroy();
             }
@@ -141,7 +145,7 @@ const Delete_O_Edit_AbsenceRow = (btn) => {
 
                     //mabye need to color the call btn after delete
                     //console.log('Gilad check --> Delete sucsses ', data.d, absenceID, ThisAbsencesList, thisVolunteerId);
-                    ColorCallBtn_afterDelete(absenceID, ThisAbsencesList, thisVolunteerId)
+                    ColorCallBtn_afterChange(absenceID, ThisAbsencesList, thisVolunteerId)
                     RenderToAbsenceModal(ThisDisplayName, VolunteerID)
                 },
 
@@ -184,8 +188,8 @@ const Delete_O_Edit_AbsenceRow = (btn) => {
 }
 
 // this function color the btn -for indcation of availble
-const ColorCallBtn_afterDelete = (absenceID,absencesListOfThisVolunteer, volunteerId) => {
-    if (absencesListOfThisVolunteer != undefined) {
+const ColorCallBtn_afterChange = (absenceID,absencesListOfThisVolunteer, volunteerId) => {
+    if (absencesListOfThisVolunteer != undefined && absenceID!=-1) {
         const BtnToColor = document.getElementById(`${volunteerId}`).childNodes[11].childNodes[3].childNodes[1];
 
         const resFilter = absencesListOfThisVolunteer.filter((absence) => {
@@ -249,6 +253,28 @@ const openDocumentAAbsenceModal = () => {
  
 }
 
+const checkColidAbsence = (absencList, from, until) => {
+    from = new Date(from).getTime();
+    until = new Date(until).getTime();
+    
+
+    if (absencList.length > 0) {
+        const filter = absencList.filter((abs) => {
+            ABSfrom = parseInt(abs.FromDate.replace('/Date(', '').replace(')/', ''));
+            ABSuntil = parseInt(abs.UntilDate.replace('/Date(', '').replace(')/', ''));
+            //console.log((ABSfrom >= from && until >= ABSfrom) || (from <= ABSuntil && until >= ABSuntil), ABSfrom, ABSuntil)
+            return (ABSfrom >= from && until >= ABSfrom) || (from <= ABSuntil && until >= ABSuntil)
+
+        })
+        if (filter.length > 0) {
+            return true;
+        }
+
+
+    }
+    return false;
+
+}
 
 const documentAAbsence2DB = () => {
 
@@ -280,7 +306,6 @@ const documentAAbsence2DB = () => {
     let today = new Date()
     today = new Date(`${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`);
     today = today.getTime();//because today is alredy begin and until its like (00:00) in time.
-
 
     if (isEdit) {
         Method = 'UpdateAbsenceById';
@@ -324,47 +349,102 @@ const documentAAbsence2DB = () => {
 
 
 
+      
+    if (checkColidAbsence(ThisAbsencesList, dataToSend.from, dataToSend.until)) {
+        swal({
+            title: "קיימת כפילות בהיעדרות שהכנסת להיעדרויות אחרות של המתנדב",
+            type: "warning",
+            text: "האם בכל זאת להקצות היעדרות זו למתנדב זה ?",
+            showCancelButton: true,
+            cancelButtonText: "בטל",
+            confirmButtonClass: 'btn-warning',
+            confirmButtonText: "כן",
+            closeOnConfirm: true
+        }, () => {
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/" + Method,
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                data: JSON.stringify(dataToSend),
+                success: function (data) {
+
+                    //let from = new Date(dataToSend.from).getTime();
+                    //let until = new Date(dataToSend.until).getTime();
+                    //let today = new Date()
+                    //today = new Date(`${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`)
+                    //today = today.getTime();
+                    //console.log('Gilad check -->', data.d)
+                    ThisAbsenceId = data.d
+
+                    // to get the phone btn of this volunteer by DOM
+                    // check the dates and color it
+                    // orange mean busy
+                    // blue mean available
+                    //const BtnToColor = document.getElementById(`${VolunteerID}`).childNodes[11].childNodes[3].childNodes[1];
+
+                    //if (today >= from && today<=until) {
+
+                    //    BtnToColor.setAttribute('style', 'background-color:#efa834 !important; border: 1px solid #efa834 !important');
+
+                    //}
+                    //else {
+                    //    BtnToColor.setAttribute('style', 'background-color:#3bafda !important; border: 1px solid #3bafda !important');
+
+                    //}
+
+
+                    RenderToAbsenceModal(ThisDisplayName, VolunteerID);
+
+                },
+                error: function (err) { alert("Error in Insert New Absence Ajax: " + err.responseText); $('#wait').hide(); }
+            });
+        });
+    }
+    else {
+        $.ajax({
+            dataType: "json",
+            url: "WebService.asmx/" + Method,
+            contentType: "application/json; charset=utf-8",
+            type: "POST",
+            data: JSON.stringify(dataToSend),
+            success: function (data) {
+
+                //let from = new Date(dataToSend.from).getTime();
+                //let until = new Date(dataToSend.until).getTime();
+                //let today = new Date()
+                //today = new Date(`${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`)
+                //today = today.getTime();
+                //console.log('Gilad check -->', data.d)
+                ThisAbsenceId = data.d
+
+                // to get the phone btn of this volunteer by DOM
+                // check the dates and color it
+                // orange mean busy
+                // blue mean available
+                //const BtnToColor = document.getElementById(`${VolunteerID}`).childNodes[11].childNodes[3].childNodes[1];
+
+                //if (today >= from && today<=until) {
+
+                //    BtnToColor.setAttribute('style', 'background-color:#efa834 !important; border: 1px solid #efa834 !important');
+
+                //}
+                //else {
+                //    BtnToColor.setAttribute('style', 'background-color:#3bafda !important; border: 1px solid #3bafda !important');
+
+                //}
+
+
+                RenderToAbsenceModal(ThisDisplayName, VolunteerID);
+
+            },
+            error: function (err) { alert("Error in Insert New Absence Ajax: " + err.responseText); $('#wait').hide(); }
+        });
+    }
+    
 
 
 
-
-    $.ajax({
-        dataType: "json",
-        url: "WebService.asmx/"+Method,
-        contentType: "application/json; charset=utf-8",
-        type: "POST",
-        data: JSON.stringify(dataToSend),
-        success: function (data) {
-
-            let from = new Date(dataToSend.from).getTime();
-            let until = new Date(dataToSend.until).getTime();
-            let today = new Date()
-            today = new Date(`${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`)
-            today = today.getTime();
-
-
-            // to get the phone btn of this volunteer by DOM
-            // check the dates and color it
-            // orange mean busy
-            // blue mean available
-            const BtnToColor = document.getElementById(`${VolunteerID}`).childNodes[11].childNodes[3].childNodes[1];
-
-            if (today >= from && today<=until) {
-
-                BtnToColor.setAttribute('style', 'background-color:#efa834 !important; border: 1px solid #efa834 !important');
-
-            }
-            else {
-                BtnToColor.setAttribute('style', 'background-color:#3bafda !important; border: 1px solid #3bafda !important');
-
-            }
-
-
-            RenderToAbsenceModal(ThisDisplayName, VolunteerID);
-
-        },
-        error: function (err) { alert("Error in Insert New Absence Ajax: " + err.responseText); $('#wait').hide(); }
-    });
 
     $('#DocumentAAbsencesModal').modal('toggle');
     $('.closeBtn_DocumentAcallsModal').prop('disabled', false);
