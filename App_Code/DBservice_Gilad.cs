@@ -18,7 +18,63 @@ public class DBservice_Gilad
 	public SqlConnection con;
 
 
+    public List <object> GetTomorrowRides()
+    {
+        SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
 
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+        cmd = CreateCommandWithStoredProcedureGeneral("GetTomorrowRides_Gilad", con, null);
+        List <object> list = new List<object>();
+
+        try
+        {
+
+
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            while (dataReader.Read())
+            {
+                var rideFromRPview = new {
+                    Id = Convert.ToInt32(dataReader["Id"]),
+                    pickupTime = Convert.ToDateTime(dataReader["pickupTime"]),
+                    pickupHour = dataReader["pickupHour"].ToString(),
+                    OriginE = dataReader["OriginE"].ToString(),
+                    DestinationE = dataReader["DestinationE"].ToString(),
+                    numOfPass = Convert.ToInt32(dataReader["numOfPass"]),
+                    patientEName = dataReader["EnglishName"].ToString(),
+
+                };
+                list.Add(rideFromRPview);
+            }
+
+            return list;
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        finally
+        {
+            if (con != null)
+            {
+                // close the db connection
+                con.Close();
+            }
+        }
+
+
+    }
 
 	public List<Patient> GetPatinetsByActiveStatus(bool active)
 	{
@@ -59,17 +115,7 @@ public class DBservice_Gilad
 			{
 
 				Patient OnePatient = new Patient();
-				//quest.QuestionId = Convert.ToInt32(dataReader["questionId"]);
-				//quest.QuestionBody = dataReader["questionBody"].ToString();
-				//quest.QuestionCurrectAnswer = dataReader["questionCurrectAnswer"].ToString();
-				//quest.QuestionDistractingA = dataReader["questionDistractingA"].ToString();
-				//quest.QuestionDistractingB = dataReader["questionDistractingB"].ToString();
-				//quest.QuestionDistractingC = dataReader["questionDistractingC"].ToString();
-				//quest.QuestionCategory = dataReader["questionCategory"].ToString();
-				//quest.QuestionDifficulty = Convert.ToInt32(dataReader["questionDifficulty"]);
-				////quest.PhotoId = Convert.ToInt32(dataReader["photoId"]);
 
-				//questlist.Add(quest);
 
 				OnePatient.Id = int.Parse(dataReader["Id"].ToString());
 				OnePatient.IsAnonymous = dataReader["IsAnonymous"].ToString();
@@ -141,7 +187,7 @@ public class DBservice_Gilad
 		}
 	}
 
-    public List<RidePat> GetRidePatViewByTimeFilter_Gilad_DR(int from, int until)
+    public List<RidePat> GetRidePatViewByTimeFilter_Gilad_DR(int from, int until,bool isDeletedtoShow)
     {
         
         //Gilad_gilad_
@@ -172,6 +218,7 @@ public class DBservice_Gilad
         Dictionary<string, object> paramDic = new Dictionary<string, object>();
         paramDic.Add("@from", from);
         paramDic.Add("@to", until);
+        paramDic.Add("@isDeletedtoShow", isDeletedtoShow);
         cmd = CreateCommandWithStoredProcedureGeneral("spGet_rpview_ByTimeRange_Gilad", con, paramDic);
 
         try

@@ -919,7 +919,7 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetRidePatViewByTimeFilter_Gilad(int from, int until)
+    public string GetRidePatViewByTimeFilter_Gilad(int from, int until, bool isDeletedtoShow)
     {
         //Gilad Update this with Data Reader only 
         //TO DO 
@@ -927,7 +927,7 @@ public class WebService : System.Web.Services.WebService
         try
         {
             HttpResponse response = GzipMe();
-            List<RidePat> lrp = new RidePat().GetRifePatViewByTimeFilter_DR_Gilad(from, until);
+            List<RidePat> lrp = new RidePat().GetRifePatViewByTimeFilter_DR_Gilad(from, until, isDeletedtoShow);
             j.MaxJsonLength = Int32.MaxValue;
             return j.Serialize(lrp);
         }
@@ -982,6 +982,27 @@ public class WebService : System.Web.Services.WebService
             CatchErrors catchErrors = new CatchErrors("WebService: Exception in GetRidePatView", ex + " " + ex.Message + " " + ex.InnerException + " " + ex.Source, ex.StackTrace);
             Log.Error("Error in GetRidePatView", ex);
             throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+    //This method is used for שבץ אותי
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string Get_Tomorrow_RidePatView_Gilad()
+    {
+        try
+        {
+
+            DBservice_Gilad db = new DBservice_Gilad();
+            List<object> r = db.GetTomorrowRides();
+            j.MaxJsonLength = Int32.MaxValue;
+            return j.Serialize(r);
+        }
+        catch (Exception ex)
+        {
+            CatchErrors catchErrors = new CatchErrors("WebService: Exception in GetRidePatView", ex + " " + ex.Message + " " + ex.InnerException + " " + ex.Source, ex.StackTrace);
+            Log.Error("Error in GetRidePatView", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות של הבוקר Get_Tomorrow_RidePatView_Gilad");
         }
 
     }

@@ -135,11 +135,15 @@
             let from = $('#from').val();
             let until = $('#until').val();
 
+            //Gilad addition
+            const isDeletedtoShow = document.getElementById('deletedRidePats').checked //true mean show only deleted ride false mean *without* status=נמחקה
+
             let timeRanges = {
                 from: from,
-                until: until
-            }
+                until: until,
+                isDeletedtoShow: isDeletedtoShow
 
+            }
             $('#wait').show();
             $.ajax({
                 dataType: "json",
@@ -661,25 +665,28 @@
                 location.href = "ridePatForm.html";
             });
 
-            $('#deletedRidePats').on('change', function () {
+            //$('#deletedRidePats').on('change', function () {
 
-                let lastmodifiedColumn = tbl.column('9');
-                let showDeletedColumn = $("#deletedRidePats").prop('checked');
+            //    let lastmodifiedColumn = tbl.column('9');
+            //    let showDeletedColumn = $("#deletedRidePats").prop('checked');
+            //    ImportDataByTimeFilters();
+            //    if (showDeletedColumn) {
+            //        $('#deleteFewRidePatsBtn').hide();
+            //        $('#recoverFewRidePatsBtn').show();
+            //        lastmodifiedColumn.visible(true);
 
-                if (showDeletedColumn) {
-                    $('#deleteFewRidePatsBtn').hide();
-                    $('#recoverFewRidePatsBtn').show();
-                    lastmodifiedColumn.visible(true);
-
-                } else {
-                    $('#deleteFewRidePatsBtn').show();
-                    $('#recoverFewRidePatsBtn').hide();
-                    lastmodifiedColumn.visible(false);
-                }
+            //    } else {
+            //        $('#deleteFewRidePatsBtn').show();
+            //        $('#recoverFewRidePatsBtn').hide();
+            //        lastmodifiedColumn.visible(false);
+            //    }
 
 
 
-            });
+
+
+            //});
+
 
             const RecoverRidePat = (btn) => {
 
@@ -809,7 +816,22 @@
 
 
         }
+        const HandleChangeDeleteRidePats = () => {
 
+            let lastmodifiedColumn = tbl.column('9');
+            let showDeletedColumn = $("#deletedRidePats").prop('checked');
+            ImportDataByTimeFilters();
+            if (showDeletedColumn) {
+                $('#deleteFewRidePatsBtn').hide();
+                $('#recoverFewRidePatsBtn').show();
+                lastmodifiedColumn.visible(true);
+
+            } else {
+                $('#deleteFewRidePatsBtn').show();
+                $('#recoverFewRidePatsBtn').hide();
+                lastmodifiedColumn.visible(false);
+            }
+        }
 
         //#region the old way to delete ridepat
         /*
@@ -1052,7 +1074,7 @@
                     <div class="row">
                         <div class="col-sm-10">
                             <div class="checkbox checkbox-primary">
-                                <input id="deletedRidePats" type="checkbox" onchange="refreshTable()" onclick="deActivate_RemoveCandidates()">
+                                <input id="deletedRidePats" type="checkbox" onchange="HandleChangeDeleteRidePats()">
                                 <label data-toggle="tooltip" data-placement="bottom" title="show deleted rides" for="deletedRidePats">
                                     הצג נסיעות שנמחקו בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
                                 </label>

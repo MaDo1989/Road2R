@@ -1439,10 +1439,10 @@ public class RidePat
 
     }
 
-    public List <RidePat> GetRifePatViewByTimeFilter_DR_Gilad(int from,int until)
+    public List <RidePat> GetRifePatViewByTimeFilter_DR_Gilad(int from,int until, bool isDeletedtoShow)
     {
         DBservice_Gilad dBservice_Gilad = new DBservice_Gilad();
-        return dBservice_Gilad.GetRidePatViewByTimeFilter_Gilad_DR(from, until);
+        return dBservice_Gilad.GetRidePatViewByTimeFilter_Gilad_DR(from, until, isDeletedtoShow);
     }
 
 

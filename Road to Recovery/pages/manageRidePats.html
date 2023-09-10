@@ -14,7 +14,9 @@
     <script src="lib/lz-string.js"></script>
     <script src="lib/master.js"></script>
     <script src="lib/rideMessages.js"></script>
-
+    <!-- use version 0.20.0 -->
+    <!--this script cdn is for export to xlsx file without changing the data tables.-->
+    <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 
     <!-- #region REAL-TIME BY SIGNALR - FOR ANY COMPLAINTS WHATSOEVER YOU CAN TALK 2 YOGEV-->
     <script src="../../Scripts/jquery-3.6.0.min.js"></script>
@@ -1230,7 +1232,7 @@
 
 
 
-           
+
         }
 
         const assignDriverToRidePatAbort = () => {
@@ -1811,6 +1813,63 @@
 
         }
 
+        //gilad addition
+
+        function jsonToExcelAndDownload(data, fileName) {
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Tomorrow-Ride');
+            XLSX.writeFile(wb, fileName + '.xlsx');
+        }
+
+        const ExportToExcel = () => {
+            //const dest = tomorrowMorningRidePats[0].destination
+            //const origin = tomorrowMorningRidePats[0].origin
+            //let time = tomorrowMorningRidePats[0].time.replace('<div class="elementsInSameLine"><span class="time">', '').replace(`</span><button type='button' data-toggle="modal" data-target="#editTimeModal" onclick="prepreparationEditTimeModal(this, ${tomorrowMorningRidePats[0].ridePatNum})" class='btn btn-icon waves-effect waves-light btn-secondary' title='עריכה'><i class='ti-pencil'></i></button></div>`, '');
+            //let patientName = tomorrowMorningRidePats[0].patient.split('>')[1].split('<')[0]
+            $('#wait').show();
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/Get_Tomorrow_RidePatView_Gilad",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                success: (data) => {
+                    $('#wait').hide();
+                    let d = new Date();
+                    let tomorrowListExcel = JSON.parse(data.d);
+                    let listToExcel = [];
+                    let rideNum = 1;
+                    let lastId = 0;
+                    tomorrowListExcel.forEach(row => {
+                        if (listToExcel.length > 0 && lastId != row.Id) {
+                            //console.log('???', listToExcel.length > 0 && listToExcel.at(-1).Id != row.Id, listToExcel.at(-1).Id, row.Id)
+                            let spaceRow = {}
+                            rideNum++;
+                            listToExcel.push(spaceRow);
+                        }
+                        let rowToExcel = {
+                            Row: rideNum,
+                            From: row.OriginE,
+                            To: row.DestinationE,
+                            At: row.pickupHour,
+                            Pateint_Name: row.patientEName,
+                            Num_of_passengers: row.numOfPass
+                        };
+                        lastId = row.Id;
+                        listToExcel.push(rowToExcel);
+                    })
+                    //console.log('res Gilad ', listToExcel);
+                    jsonToExcelAndDownload(listToExcel, `Tomorrow-Ride ${d.getDate()+1}-${d.getMonth() + 1}-${d.getFullYear()}`);
+
+
+                },
+                error: (error) => {
+                    console.log('from ajax to Get_Tomorrow_RidePatView_Gilad ', error);
+                    $('#wait').hide();
+ }
+            });
+        }
+
         function copyMessageButton(copyMsgBtn, table) {
 
             let ridePatNum = parseInt(copyMsgBtn.id);
@@ -2023,7 +2082,7 @@
                 }
 
             }
-           
+
             returnRidePat = null;
             $('#messagesModal').modal('toggle');
             $('#DriverReturnRidePatMsg').html("");
@@ -3636,6 +3695,11 @@
                                                 class="btn btn-success waves-effect w-md waves-light m-b-5">
                                             <span class="glyphicon glyphicon-plus-sign m-r-5"></span>
                                             חדש
+                                        </button>
+
+                                        <button onclick="ExportToExcel()" class="btn btn-success waves-effect w-md waves-light m-b-5">
+                                            <span class="glyphicon glyphicon-list-alt m-r-5"></span>
+                                                    הודעה למתאמות
                                         </button>
 
                                     </div>
