@@ -292,3 +292,24 @@ input:checked + .slider:before {
     padding: 0px 25px;
     text-align: justify;
 }
+
+/*gilad addition*/
+
+#accordion .panel-primary .blue1 {
+    background-color: #0b5b79;
+}
+#accordion .panel-primary .blue2 {
+    background-color: #177497;
+}
+#accordion .panel-primary .blue3 {
+    background-color: #2b94bb;
+}
+#accordion .panel-primary .blue4 {
+    background-color: #4bb0d5;
+}
+#accordion .panel-primary .blue5 {
+    background-color: #6ac3e3;
+}
+
+
+
