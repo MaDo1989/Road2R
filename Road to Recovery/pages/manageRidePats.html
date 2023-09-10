@@ -14,7 +14,9 @@
     <script src="lib/lz-string.js"></script>
     <script src="lib/master.js"></script>
     <script src="lib/rideMessages.js"></script>
-
+    <!-- use version 0.20.0 -->
+    <!--this script cdn is for export to xlsx file without changing the data tables.-->
+    <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 
     <!-- #region REAL-TIME BY SIGNALR - FOR ANY COMPLAINTS WHATSOEVER YOU CAN TALK 2 YOGEV-->
     <script src="../../Scripts/jquery-3.6.0.min.js"></script>
@@ -1122,9 +1124,10 @@
             return driversPromise;
         }
 
+
+
         const assignDriverToRidePat = () => {
             $('#wait').show();
-
             const driverNameFromInput = $('#driver').val();
 
             if (typeof driverNameFromInput === 'undefined' || !driverNameFromInput || driverNameFromInput.length === 0 || !driverNames.includes(driverNameFromInput)) {
@@ -1132,36 +1135,104 @@
                 $('#wait').hide();
                 return alert('יש לבחור נהג מתוך הרשימה');
             }
-
             const driverIndex = driverNames.indexOf(driverNameFromInput);
             const userSelected = drivers[driverIndex];
-
             let request;
             let dataString;
 
-            if (_isDriverReplacement) {
-                //update the ride record with the new driver.
-                request = {
-                    ridePatId: _ridepatToManipulate,
-                    rideNum: _assignDriverToRideNum,
-                    newDriverId: userSelected.Id,
-                    assignedFromAppId: APP_ID
+
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/GetAbsenceByVolunteerId",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                data: JSON.stringify({ volunteerId: userSelected.Id }),
+                success: function (data) {
+                    $('#wait').hide();
+                    Absences = JSON.parse(data.d);
+                    let absenceStatus = false;
+                    //console.log('Gilad check -- > ', Absences)
+                    for (var i = 0; i < Absences.length; i++) {
+                        if (Absences[i].AbsenceStatus) {
+                            absenceStatus = true;
+                        }
+                    }
+                    if (absenceStatus) {
+                        swal({
+                            title: "?האם הינך בטוח/ה שברצונך לשבץ נהג זה",
+                            type: "warning",
+                            text: 'נהג זה כרגע אינו זמין,באפשרותך לשבץ אותו בכל זאת או לבחור בנהג חלופי',
+                            showCancelButton: true,
+                            cancelButtonText: "בטל",
+                            confirmButtonClass: 'btn-warning',
+                            confirmButtonText: "שבץ",
+                            closeOnConfirm: true
+                        }, function (userResponse) {
+                            if (userResponse) {
+                                if (_isDriverReplacement) {
+                                    //update the ride record with the new driver.
+                                    request = {
+                                        ridePatId: _ridepatToManipulate,
+                                        rideNum: _assignDriverToRideNum,
+                                        newDriverId: userSelected.Id,
+                                        assignedFromAppId: APP_ID
+                                    }
+
+                                    dataString = JSON.stringify(request);
+                                    ajaxCall('UpdateDriver', dataString, UpdateDriver_SCB, UpdateDriver_ECB);
+                                } else {
+
+                                    request = {
+                                        ridePatId: _ridepatToManipulate,
+                                        userId: userSelected.Id,
+                                        driverType: "primary",
+                                        assignedFromAppId: APP_ID
+                                    };
+
+                                    dataString = JSON.stringify(request);
+                                    ajaxCall('AssignRideToRidePat', dataString, assignDriverToRidePat_SCB, assignDriverToRidePat_ECB);
+                                }
+                                assignDriverToRidePatAbort();
+                            }
+
+                        });
+                    }
+                    else {
+                        if (_isDriverReplacement) {
+                            //update the ride record with the new driver.
+                            request = {
+                                ridePatId: _ridepatToManipulate,
+                                rideNum: _assignDriverToRideNum,
+                                newDriverId: userSelected.Id,
+                                assignedFromAppId: APP_ID
+                            }
+
+                            dataString = JSON.stringify(request);
+                            ajaxCall('UpdateDriver', dataString, UpdateDriver_SCB, UpdateDriver_ECB);
+                        } else {
+
+                            request = {
+                                ridePatId: _ridepatToManipulate,
+                                userId: userSelected.Id,
+                                driverType: "primary",
+                                assignedFromAppId: APP_ID
+                            };
+
+                            dataString = JSON.stringify(request);
+                            ajaxCall('AssignRideToRidePat', dataString, assignDriverToRidePat_SCB, assignDriverToRidePat_ECB);
+                        }
+                    }
+
+                },
+                error: function (err) {
+                    alert("Error in GetVolunteersAbsences (manageridepat.html ajax) !: " + err.responseText);
+                    $('#wait').hide();
                 }
+            });
 
-                dataString = JSON.stringify(request);
-                ajaxCall('UpdateDriver', dataString, UpdateDriver_SCB, UpdateDriver_ECB);
-            } else {
 
-                request = {
-                    ridePatId: _ridepatToManipulate,
-                    userId: userSelected.Id,
-                    driverType: "primary",
-                    assignedFromAppId: APP_ID
-                };
 
-                dataString = JSON.stringify(request);
-                ajaxCall('AssignRideToRidePat', dataString, assignDriverToRidePat_SCB, assignDriverToRidePat_ECB);
-            }
+
         }
 
         const assignDriverToRidePatAbort = () => {
@@ -1742,6 +1813,63 @@
 
         }
 
+        //gilad addition
+
+        function jsonToExcelAndDownload(data, fileName) {
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Tomorrow-Ride');
+            XLSX.writeFile(wb, fileName + '.xlsx');
+        }
+
+        const ExportToExcel = () => {
+            //const dest = tomorrowMorningRidePats[0].destination
+            //const origin = tomorrowMorningRidePats[0].origin
+            //let time = tomorrowMorningRidePats[0].time.replace('<div class="elementsInSameLine"><span class="time">', '').replace(`</span><button type='button' data-toggle="modal" data-target="#editTimeModal" onclick="prepreparationEditTimeModal(this, ${tomorrowMorningRidePats[0].ridePatNum})" class='btn btn-icon waves-effect waves-light btn-secondary' title='עריכה'><i class='ti-pencil'></i></button></div>`, '');
+            //let patientName = tomorrowMorningRidePats[0].patient.split('>')[1].split('<')[0]
+            $('#wait').show();
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/Get_Tomorrow_RidePatView_Gilad",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                success: (data) => {
+                    $('#wait').hide();
+                    let d = new Date();
+                    let tomorrowListExcel = JSON.parse(data.d);
+                    let listToExcel = [];
+                    let rideNum = 1;
+                    let lastId = 0;
+                    tomorrowListExcel.forEach(row => {
+                        if (listToExcel.length > 0 && lastId != row.Id) {
+                            //console.log('???', listToExcel.length > 0 && listToExcel.at(-1).Id != row.Id, listToExcel.at(-1).Id, row.Id)
+                            let spaceRow = {}
+                            rideNum++;
+                            listToExcel.push(spaceRow);
+                        }
+                        let rowToExcel = {
+                            Row: rideNum,
+                            From: row.OriginE,
+                            To: row.DestinationE,
+                            At: row.pickupHour,
+                            Pateint_Name: row.patientEName,
+                            Num_of_passengers: row.numOfPass
+                        };
+                        lastId = row.Id;
+                        listToExcel.push(rowToExcel);
+                    })
+                    //console.log('res Gilad ', listToExcel);
+                    jsonToExcelAndDownload(listToExcel, `Tomorrow-Ride ${d.getDate()+1}-${d.getMonth() + 1}-${d.getFullYear()}`);
+
+
+                },
+                error: (error) => {
+                    console.log('from ajax to Get_Tomorrow_RidePatView_Gilad ', error);
+                    $('#wait').hide();
+ }
+            });
+        }
+
         function copyMessageButton(copyMsgBtn, table) {
 
             let ridePatNum = parseInt(copyMsgBtn.id);
@@ -1831,6 +1959,7 @@
 
 
                     if (thistable && deleteBtn) {
+                        //console.log('Gilad check from deleteRidePat --> ', deleteBtn,)
                         thistable.row($(deleteBtn).parents('tr')).remove().draw();
                     } else {
                         location.reload();
@@ -1957,6 +2086,13 @@
             returnRidePat = null;
             $('#messagesModal').modal('toggle');
             $('#DriverReturnRidePatMsg').html("");
+            //if (thisTable && deleteBtn) {
+            //    console.log('Gilad check from deleteReturn --> ', deleteBtn.children[10].children[0].children[1],$(deleteBtn).parents('tr'), $('#' + RidePat.RidePatNum).parents('tr'));
+            //    thisTable.row($(deleteBtn).parents('tr')).remove().draw();
+            //}
+            //console.log('Gilad check from deleteReturn --> ', deleteBtn, deleteBtn.children[deleteBtn.children.length-1].children[0].children[1]);
+            //deleteBtn = deleteBtn.children[10].children[0].children[1];
+            deleteBtn = deleteBtn.children[deleteBtn.children.length - 1].children[0].children[1]
             deleteRidePat(RidePat, deleteBtn, thisTable);
         }
 
@@ -2194,7 +2330,7 @@
             }
 
             var volunteerId = -1 // VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
-
+            //gilad check
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/GetRidePatView",
@@ -3559,6 +3695,11 @@
                                                 class="btn btn-success waves-effect w-md waves-light m-b-5">
                                             <span class="glyphicon glyphicon-plus-sign m-r-5"></span>
                                             חדש
+                                        </button>
+
+                                        <button onclick="ExportToExcel()" class="btn btn-success waves-effect w-md waves-light m-b-5">
+                                            <span class="glyphicon glyphicon-list-alt m-r-5"></span>
+                                                    הודעה למתאמות
                                         </button>
 
                                     </div>
