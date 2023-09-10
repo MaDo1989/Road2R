@@ -658,7 +658,12 @@ public class DBservice_Gilad
 
 		cmd.CommandTimeout = 30;           // Time to wait for the execution' The default is 30 seconds
 
-		cmd.CommandType = System.Data.CommandType.StoredProcedure; // the type of the command, can also be text
+        if (spName== "spGet_rpview_ByTimeRange_Gilad")
+        {
+            cmd.CommandTimeout = 85;  // spesific this sp taking almost 40 sec. that way change the timeout.
+        }
+
+        cmd.CommandType = System.Data.CommandType.StoredProcedure; // the type of the command, can also be text
 
 		if (paramDic != null)
 			foreach (KeyValuePair<string, object> param in paramDic)

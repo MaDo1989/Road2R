@@ -1000,7 +1000,7 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
-            CatchErrors catchErrors = new CatchErrors("WebService: Exception in GetRidePatView", ex + " " + ex.Message + " " + ex.InnerException + " " + ex.Source, ex.StackTrace);
+            CatchErrors catchErrors = new CatchErrors("WebService: Exception in Get_Tomorrow_RidePatView_Gilad", ex + " " + ex.Message + " " + ex.InnerException + " " + ex.Source, ex.StackTrace);
             Log.Error("Error in GetRidePatView", ex);
             throw new Exception("שגיאה בשליפת נתוני הסעות של הבוקר Get_Tomorrow_RidePatView_Gilad");
         }
