@@ -29,7 +29,7 @@ function manipulateDocumentedCallsModal(button, tableToWithdrawDataFrom) {
 
     thisVolunteerId = parseInt(rowData.Id); //this variable is goobal to this page & used also in documentAcall2DB !!!
 
-    $('#DocumentedCallsTitle').text("שיחות עם " + rowData.DisplayName)
+    $('#DocumentedCallsTitle').text("שיחות עם " + rowData.DisplayName.split('<br>')[0])
     
     $.ajax({
         dataType: "json",
