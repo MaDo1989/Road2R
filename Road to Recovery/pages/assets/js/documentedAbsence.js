@@ -11,7 +11,7 @@ let thisRowClicked = -1;
 // this function render the dataTable stracture and render the data.(used also as a data refresh)
 const RenderToAbsenceModal = (VolunteerName, VolunteerId) => {
     $('#wait').show();
-    $('#DocumentedAbsenceTitle').text("היעדרויות של " + VolunteerName);
+    $('#DocumentedAbsenceTitle').text("היעדרויות של " + VolunteerName.split('<br>')[0]);
     VolunteerID = VolunteerId
     ThisDisplayName = VolunteerName;
     $.ajax({
@@ -263,7 +263,7 @@ const checkColidAbsence = (absencList, from, until) => {
             ABSfrom = parseInt(abs.FromDate.replace('/Date(', '').replace(')/', ''));
             ABSuntil = parseInt(abs.UntilDate.replace('/Date(', '').replace(')/', ''));
             //console.log((ABSfrom >= from && until >= ABSfrom) || (from <= ABSuntil && until >= ABSuntil), ABSfrom, ABSuntil)
-            return (ABSfrom >= from && until >= ABSfrom) || (from <= ABSuntil && until >= ABSuntil)
+            return (ABSfrom >= from && until >= ABSfrom) || (from <= ABSuntil && until >= ABSuntil) || (from>=ABSfrom && until<=ABSuntil)
 
         })
         if (filter.length > 0) {
