@@ -549,10 +549,11 @@ public class DBservice_Gilad
                 Volunteer v = new Volunteer();
                 v.Id = int.Parse(dataReader["Id"].ToString());
                 v.DisplayName = dataReader["DisplayName"].ToString();
-                v.FirstNameA = dataReader["FirstNameA"].ToString();
+                //v.FirstNameA = dataReader["FirstNameA"].ToString();
                 v.FirstNameH = dataReader["FirstNameH"].ToString();
                 v.LastNameH = dataReader["LastNameH"].ToString();
-                v.LastNameA = dataReader["LastNameA"].ToString();
+                v.EnglishName = dataReader["EnglishName"].ToString();
+                //v.LastNameA = dataReader["LastNameA"].ToString();
                 v.CellPhone = dataReader["CellPhone"].ToString();
                 v.CellPhone2 = dataReader["CellPhone2"].ToString();
                 v.HomePhone = dataReader["HomePhone"].ToString();

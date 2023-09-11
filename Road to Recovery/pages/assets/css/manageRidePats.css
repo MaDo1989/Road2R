@@ -311,5 +311,9 @@ input:checked + .slider:before {
     background-color: #6ac3e3;
 }
 
+#accordion .panel-body .dataTables_wrapper table .statusComplete {
+    background-color:beige;
+}
+
 
 

@@ -119,24 +119,32 @@ const getPatientsPhonesText = (patient) => {
         //txt += `${patient.name}: ${cellphone}` + sep;
         txt += `${cellphone}`;
     }
-
-    for (var i = 0; i < patient.escorts.length; i++) {
-        if (
-            patient.escorts[i].IsAnonymous == false &&
-            validateMobileNumFullVersion(patient.escorts[i].CellPhone)
-        ) {
-
-            let cellphone =
-                patient.escorts[i].CellPhone.slice(0, 3) +
-                "-" +
-                patient.escorts[i].CellPhone.slice(3, patient.escorts[i].CellPhone.length);
-            txt += sep +
-                `${patient.escorts[i].DisplayName}: ${cellphone}` +
-                sep;
-
-        }
-
+    if (validateMobileNumFullVersion(patient.cellPhone1)) {
+        let cellphone =
+            patient.cellPhone1.slice(0, 3) +
+            "-" +
+            patient.cellPhone1.slice(3, patient.cellPhone1.length);
+        //txt += `${patient.name}: ${cellphone}` + sep;
+        txt += sep+`${cellphone}`;
     }
+
+    //for (var i = 0; i < patient.escorts.length; i++) {
+    //    if (
+    //        patient.escorts[i].IsAnonymous == false &&
+    //        validateMobileNumFullVersion(patient.escorts[i].CellPhone)
+    //    ) {
+
+    //        let cellphone =
+    //            patient.escorts[i].CellPhone.slice(0, 3) +
+    //            "-" +
+    //            patient.escorts[i].CellPhone.slice(3, patient.escorts[i].CellPhone.length);
+    //        txt += sep +
+    //            `${patient.escorts[i].DisplayName}: ${cellphone}` +
+    //            sep;
+
+    //    }
+
+    //}
     return txt;
 };
 

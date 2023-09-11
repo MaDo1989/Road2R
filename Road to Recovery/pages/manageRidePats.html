@@ -54,6 +54,7 @@
         let isAfterNoonRide;
         let treatmentFinished;
         let driverIsAssigned;
+        let listRowstoColor = [];
         //#endregion
 
         //#region Functions to Reuse
@@ -1191,6 +1192,7 @@
 
                                     dataString = JSON.stringify(request);
                                     ajaxCall('AssignRideToRidePat', dataString, assignDriverToRidePat_SCB, assignDriverToRidePat_ECB);
+                                    $(`#${_ridepatToManipulate}`).addClass('statusComplete');
                                 }
                                 assignDriverToRidePatAbort();
                             }
@@ -1431,6 +1433,7 @@
                         rideId: _assignDriverToRideNum,
                         driverId: _driverId
                     }
+                    $(`#${_ridepatToManipulate}`).removeClass('statusComplete');
                     const dataString = JSON.stringify(request);
                     ajaxCall('LeaveRidePat', dataString, deleteRideSuccessCB, deleteRideErrorCB);
                 }
@@ -1443,7 +1446,6 @@
         }
 
         const deleteRideSuccessCB = (data) => {
-
             $('#wait').hide();
             $('#assignDriverModal').modal('hide');
             assignDriverToRidePatAbort();
@@ -2365,9 +2367,15 @@
                     let patientAge = null;
                     let isPatientStatusShouldPaintRow = false;
                     let remarkHTML = '';
+                    listRowstoColor = [];
 
-
+                    
                     for (let i = 0; i < arr_rides.length; i++) {
+                        if (arr_rides[i].Status=='שובץ נהג') {
+                            //console.log(arr_rides[i], document.getElementById(arr_rides[i].RidePatNum), $(`#${arr_rides[i].RidePatNum}`));
+                            listRowstoColor.push(arr_rides[i].RidePatNum);
+        
+                        }
 
                         if (allSortsSwitch && areasToShow_arr !== null) {
                             if (areasToShow_arr.length !== 0) {
@@ -2996,8 +3004,9 @@
                     //            || ↑DATATABLES PROPERTIES↑||
                     //            ============================
 
-
+                    colorRowWithDriver(listRowstoColor);
                     $(".dataTables_empty").html("אין הסעות لا توجد سفريات No drives");
+
 
                 },
                 error: function (err) {
@@ -3007,6 +3016,19 @@
             });
         }
 
+
+        //gilad
+        const colorRowWithDriver = (rideArray) => {
+            if (rideArray.length==0) {
+                return;
+            }
+            rideArray.forEach(rideID => {
+                if (document.getElementById(rideID)!=null) {
+                    $(`#${rideID}`).addClass('statusComplete');
+                }
+            })
+        }
+        
         const callIfPatientStatusShouldPaintRow = (ride) => {
 
             let result = false;
