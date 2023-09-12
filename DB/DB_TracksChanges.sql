@@ -1,1 +1,14 @@
-﻿
+﻿Absence Table
+
+
+spGet_rpview_ByTimeRange_Gilad
+GetTomorrowRides_Gilad
+spGetCandidatesDetails_Gilad
+InsertToAbsence
+GetVoluntterAbsenceById
+spVolunteerTypeView_GetVolunteersList_Gilad
+updateAbsenceById
+DeleteAbsenceById
+GetAllAbsence
+sp_PatientsAndEquipment_Gilad
+spVolunteerTypeView_GetVolunteersList
