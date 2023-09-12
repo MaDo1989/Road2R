@@ -1,5 +1,6 @@
 web.config
 Web.config
+r2rapp - Web Deploy.pubxml
 *.log
 *.pubxml
 04-April-2020.sln
@@ -20,3 +21,5 @@ App_Data/PublishProfiles/r2rapp - Web Deploy.pubxml
 App_Data/PublishProfiles/r2rapp - Web Deploy.pubxml
 *.pubxml
 *.publishproj
+App_Data/PublishProfiles/r2rapp - Web Deploy.pubxml
+App_Data/PublishProfiles/r2rapp - Web Deploy.pubxml

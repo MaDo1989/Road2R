@@ -409,7 +409,29 @@ public class WebService : System.Web.Services.WebService
 
     }
 
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string getPatients_Gilad(string active = "true")
+    {
+        bool activeBool = Convert.ToBoolean(active);
+        try
+        {
+            HttpResponse response = GzipMe();
 
+            Patient p = new Patient();
+            List<Patient> patientsList = p.GetPatientsList_Gilad(activeBool);
+            //j.MaxJsonLength = int.MaxValue;
+            j.MaxJsonLength = Int32.MaxValue;
+            return j.Serialize(patientsList);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in getPatients", ex);
+            //throw new Exception("שגיאה בשליפת נתוני חולים");
+            throw ex;
+        }
+
+    }
 
     [WebMethod(EnableSession = true)]
     public string getPatients1()
@@ -894,6 +916,28 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetRidePatViewByTimeFilter_Gilad(int from, int until, bool isDeletedtoShow)
+    {
+        //Gilad Update this with Data Reader only 
+        //TO DO 
+        //try to add Gzip.
+        try
+        {
+            HttpResponse response = GzipMe();
+            List<RidePat> lrp = new RidePat().GetRifePatViewByTimeFilter_DR_Gilad(from, until, isDeletedtoShow);
+            j.MaxJsonLength = Int32.MaxValue;
+            return j.Serialize(lrp);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetRidePatViewByTimeFilter", ex);
+            throw new Exception("שגיאה בייבוא נתונים לפי חתך זמנים");
+        }
+    }
+
     [WebMethod(EnableSession = true)]
     // [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public void ChangeArrayOF_RidePatStatuses(string newStatus, List<int> ridePatNums, DateTime clientUTCTimeStemp)
@@ -938,6 +982,27 @@ public class WebService : System.Web.Services.WebService
             CatchErrors catchErrors = new CatchErrors("WebService: Exception in GetRidePatView", ex + " " + ex.Message + " " + ex.InnerException + " " + ex.Source, ex.StackTrace);
             Log.Error("Error in GetRidePatView", ex);
             throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+
+    }
+    //This method is used for שבץ אותי
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string Get_Tomorrow_RidePatView_Gilad()
+    {
+        try
+        {
+
+            DBservice_Gilad db = new DBservice_Gilad();
+            List<object> r = db.GetTomorrowRides();
+            j.MaxJsonLength = Int32.MaxValue;
+            return j.Serialize(r);
+        }
+        catch (Exception ex)
+        {
+            CatchErrors catchErrors = new CatchErrors("WebService: Exception in Get_Tomorrow_RidePatView_Gilad", ex + " " + ex.Message + " " + ex.InnerException + " " + ex.Source, ex.StackTrace);
+            Log.Error("Error in GetRidePatView", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות של הבוקר Get_Tomorrow_RidePatView_Gilad");
         }
 
     }
@@ -1510,6 +1575,90 @@ public class WebService : System.Web.Services.WebService
             throw new Exception("שגיאה בשליפת מתנדבים");
         }
 
+    }
+
+
+    [WebMethod(EnableSession = true)]
+    public string getVolunteers_Gilad(bool active)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+
+            Volunteer c = new Volunteer();
+            List<Volunteer> volunteersList = c.getVolunteersList_V2_WebOnly_Gilad(active);
+            return j.Serialize(volunteersList);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in getVolunteers", ex);
+            throw new Exception("שגיאה בשליפת מתנדבים אחרי עדכון של גלעד");
+        }
+
+    }
+
+    //Gilad Touch here
+    [WebMethod(EnableSession=true)]
+    public string GetAbsenceByVolunteerId(int volunteerId)
+    {
+        try
+        {
+            Absence absence = new Absence();
+            return j.Serialize(absence.GetAbsenceByVolunteerId(volunteerId));
+
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetAbsenceByVolunteerId", ex);
+            throw new Exception("שגיאה בשליפת היעדרויות"+ex.Message);
+        }
+    }
+    [WebMethod(EnableSession = true)]
+    public string UpdateAbsenceById(int AbsenceId, int coorId, DateTime from, DateTime until, string cause, string note)
+    {
+        try
+        {
+            Absence absence = new Absence();
+            return j.Serialize( absence.UpdateAbsenceById(AbsenceId, coorId, from, until, cause, note));
+
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in UpdateAbsenceById", ex);
+            throw new Exception("שגיאה בעדכון היעדרות" + ex.Message);
+        }
+    }
+
+    [WebMethod(EnableSession = true)]
+    public string DeleteAbsenceById(int AbsenceId)
+    {
+        try
+        {
+            Absence absence = new Absence();
+            return j.Serialize(absence.DeleteAbsenceById(AbsenceId));
+
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in DeleteAbsenceById", ex);
+            throw new Exception("שגיאה במחיקת היעדרות" + ex.Message);
+        }
+    }
+
+    [WebMethod(EnableSession = true)]
+    public string InsertNewAbsence(int volunteerId, int coorId, DateTime from, DateTime until, string cause, string note)
+    {
+        try
+        {
+            Absence absence = new Absence();
+            return j.Serialize(absence.InsertNewAbsence(volunteerId,  coorId,  from,  until,  cause,  note));
+
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in InsertNewAbsence", ex);
+            throw new Exception("שגיאה בהוספת היעדרות" + ex.Message);
+        }
     }
 
     [WebMethod(EnableSession = true)]

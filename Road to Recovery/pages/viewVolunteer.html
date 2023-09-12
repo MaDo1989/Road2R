@@ -47,6 +47,7 @@
 
     <script src="assets/js/documentedCalls.js"></script>
     <script src="assets/js/documentedRides.js"></script>
+    <script src="assets/js/documentedAbsence.js"></script>
 
 
 
@@ -60,7 +61,7 @@
 
         checkCookie();
         var allVolunteersFromDb = [];
-
+        let activeChangedFlag = false;
         $(document).ready(function () {
 
             $('#skipPageButton').click(function () {
@@ -70,6 +71,7 @@
 
             $("#DocumentedCallsModal").attr("w3-include-html", "DocumentedCallsModal.html");
             $("#documentedRidesModal").attr("w3-include-html", "documentedRidesModal.html");
+            $("#DocumentedAbsenceModal").attr("w3-include-html", "documentedAbsenceModal.html");
 
 
             let { COPYWRITE } = GENERAL;
@@ -124,7 +126,7 @@
             var userName = GENERAL.USER.getUserDisplayName();
             $("#userName").html(userName);
             $("#closeModal").click(function () {
-
+                
             });
 
 
@@ -147,6 +149,9 @@
                 }
             });
 
+
+
+
         });
 
         const updateLsVisibilty = (checkboxId, value) => {
@@ -161,6 +166,7 @@
 
         function ActiveMode() {
             localStorage.activeVol = $("#activeCustomers").prop('checked');
+            activeChangedFlag = true;
             refreshTable();
         }
 
@@ -184,7 +190,7 @@
             var active = $("#activeCustomers").prop('checked');
             $.ajax({
                 dataType: "json",
-                url: "WebService.asmx/getVolunteers",
+                url: "WebService.asmx/getVolunteers_Gilad",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
                 data: JSON.stringify({ active: active }),
@@ -192,6 +198,7 @@
 
                     $('#wait').hide();
                     var arr_volunteers = JSON.parse(data.d);
+                    //console.log(arr_volunteers);
                     GENERAL.VOLUNTEERS.setVolunteersList(JSON.stringify(arr_volunteers));
                     for (i in arr_volunteers) {
                         if (driveVol === true && (!arr_volunteers[i].IsDriving)) continue;
@@ -199,7 +206,7 @@
                         //כפתור צפייה כרגע מוסתר
                         //var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button>";
                         var editBtn = "<div class='btnWrapper-right'><button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button></div>";
-
+                        
                         btnStr += /*showBtn + " " +*/ editBtn;
                         let deleteBtn = '';
                         if (arr_volunteers[i].IsActive == false) {
@@ -223,11 +230,17 @@
                         showDocumentedRidesBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedRidesBtn" title="תיעוד הסעות" data-toggle="modal" data-target="#documentedRidesModal"><i class="fa fa-car" aria-hidden="true"></i></button></div>';
                         btnStr += showDocumentedRidesBtn;
 
+                        
+
 
                         let showDocumentedCallsBtn = '';
                         showDocumentedCallsBtn += `<div class='btnWrapper-left'><span id="badgeOf_${arr_volunteers[i].Id}" class="badge badge-pill badge-default">${arr_volunteers[i].NoOfDocumentedCalls}</span>`;
                         showDocumentedCallsBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedCallsBtn" title="שיחות מתועדות" data-backdrop="static" data-keyboard="false" data-toggle="modal" data-target="#DocumentedCallsModal"><i class="fa fa-phone" aria-hidden="true"></i></button></div>';
-
+                        //21.08.23 Gilad Add this to change the color of phone btn.(AbsenceStatus == true --> color orange.)
+                        if (arr_volunteers[i].AbsenceStatus) {
+                            showDocumentedCallsBtn = `<div class='btnWrapper-left'><span id="badgeOf_${arr_volunteers[i].Id}" class="badge badge-pill badge-default">${arr_volunteers[i].NoOfDocumentedCalls}</span>`;
+                            showDocumentedCallsBtn += '<button style="background-color:#efa834 !important;border: 1px solid #efa834 !important;" type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedCallsBtn" title="שיחות מתועדות" data-backdrop="static" data-keyboard="false" data-toggle="modal" data-target="#DocumentedCallsModal"><i class="fa fa-phone" aria-hidden="true"></i></button></div>';
+                        }
                         btnStr += showDocumentedCallsBtn;
 
 
@@ -256,10 +269,14 @@
 
 
                         let volunteerTypeAndGender = buildvolunteerTypeAndGenderHTML(arr_volunteers[i].TypeVol, arr_volunteers[i].Gender);
+                        let englishNameVolunteer = ''
+                        if (arr_volunteers[i].EnglishName!='') {
+                            englishNameVolunteer = ' <br> '+arr_volunteers[i].EnglishName;
+                        }
 
                         var Volunteer = {
                             Id: arr_volunteers[i].Id,
-                            DisplayName: arr_volunteers[i].DisplayName,
+                            DisplayName: arr_volunteers[i].DisplayName+englishNameVolunteer,
                             TypeVol: volunteerTypeAndGender,
                             CellPhone: arr_volunteers[i].CellPhone,
                             CellPhone2: cellphone2,
@@ -275,6 +292,7 @@
                         }
                         allVolunteersFromDb.push(Volunteer);
                     }
+                    
 
                     tbl = $('#datatable-buttons').DataTable({
                         data: allVolunteersFromDb,
@@ -319,6 +337,13 @@
                     });
 
                     buttonsEvents();
+                    
+                    //Gilad Touch Here.
+                    // to toggle the modal use this button ניהול היעדרויות.
+                    if (activeChangedFlag==false) {
+                        $('#DocumentedCallsModal .modal-body')[0].innerHTML += `<button onclick="ManageAbsenceToggle()" class="AbsenceBtn btn waves-effect btn-primary">ניהול היעדרויות</button>`;
+
+                    }
                 },
                 error: function (err) {
                     alert("Error in getVolunteers: " + err.responseText);
@@ -381,6 +406,26 @@
             let fullTimeStempNumber = dateAsStr.substring(startTrim, endTrim);
             let fullTimeStemp = new Date(parseInt(fullTimeStempNumber));
             return fullTimeStemp;
+        }
+
+        const ConvertDBDate2PickerFormat = (dateStr) => {
+            let str = ConvertDBDate2UIDate(dateStr);
+            str = str.replace(".", "-").replace(".", "-");
+            str = ReverseString(str);
+
+            let split = str.split("-");
+            if (split[1].length==1) {
+                split[1] = '0' + split[1];
+            }
+            if (split[2].length == 1) {
+                split[2] = '0' + split[2];
+            }
+            return `${split[0]}-${split[1]}-${split[2]}`;
+
+        }
+
+        function ReverseString(str) {
+            return str.split('-').reverse().join('-')
         }
 
         function buttonsEvents() {
@@ -547,6 +592,12 @@
             location.href = "volunteerForm.html";
         }
 
+
+        const ManageAbsenceToggle = () => {
+            $('#DocumentedCallsModal').modal('toggle');
+            $('#DocumentedAbsenceModal').modal('toggle');
+        }
+
     </script>
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -595,9 +646,9 @@
 
                         <!--Search-->
                         <!--<form role="search" class="navbar-right app-search pull-right hidden-xs">
-                            <input type="text" placeholder="חיפוש..." class="form-control app-search-input">
-                            <a href=""><i class="fa fa-search"></i></a>
-                        </form>-->
+                        <input type="text" placeholder="חיפוש..." class="form-control app-search-input">
+                        <a href=""><i class="fa fa-search"></i></a>
+                    </form>-->
                     </div>
                     <!--/.nav-collapse -->
                 </div>
@@ -640,19 +691,19 @@
                             <div class="card-box table-responsive">
 
                                 <!--<div class="row">
-                                    <div class="col-sm-8">
-                                        <h4 class="m-t-0 header-title"><b>טבלת מתנדבים</b></h4>
-                                        <p class="text-muted font-13 m-b-30">
-                                            מבט כללי על המתנדבים שבוצעו, ניתן לצפות בפרטים נוספים בלחיצה על כפתור ההרחבה.
-                                        </p>
-                                    </div>
-                                    <div class="col-sm-4 text-right">
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button> צפייה
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button> עריכה
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button> מחיקה
-                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo'></i></button> שחזור
-                                    </div>
-                                </div>-->
+                                <div class="col-sm-8">
+                                    <h4 class="m-t-0 header-title"><b>טבלת מתנדבים</b></h4>
+                                    <p class="text-muted font-13 m-b-30">
+                                        מבט כללי על המתנדבים שבוצעו, ניתן לצפות בפרטים נוספים בלחיצה על כפתור ההרחבה.
+                                    </p>
+                                </div>
+                                <div class="col-sm-4 text-right">
+                                    <button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button> צפייה
+                                    <button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button> עריכה
+                                    <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button> מחיקה
+                                    <button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo'></i></button> שחזור
+                                </div>
+                            </div>-->
                                 <div class="row">
                                     <div class="col-sm-3 checkbox checkbox-primary text-left">
                                         <input id="activeCustomers" type="checkbox" onchange="ActiveMode()" checked>
@@ -720,7 +771,7 @@
                                     <input type="number" id="skipPageInput" min="1">
                                     <button class="btn btn-success waves-effect w-md waves-light m-b-5" id="skipPageButton">עבור</button>
                                 </div>
-                                <div id="wait" style="display:none;width:69px;height:89px;position:absolute;top:50%;left:50%;padding:2px;">
+                                <div id="wait" style="display:none;width:69px;height:89px;position:absolute;z-index:5;top:50%;left:50%;padding:2px;">
                                     <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
                                 </div>
                             </div>
@@ -829,6 +880,7 @@
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">סגירה</button>
 
                     </div>
+
                 </div>
             </div>
         </div>
@@ -836,5 +888,6 @@
 
         <div class="modal fade" id="documentedRidesModal" tabindex="-1" role="dialog" aria-labelledby="documentedRidesTitle" aria-hidden="true"></div>
         <div class="modal fade" id="DocumentedCallsModal" tabindex="-1" role="dialog" aria-labelledby="DocumentedCallsTitle" aria-hidden="true"></div>
+        <div class="modal fade" id="DocumentedAbsenceModal" tabindex="-1" role="dialog" aria-labelledby="DocumentedAbsenceTitle" aria-hidden="true"></div>
 </body>
 </html>

@@ -20,6 +20,7 @@ function manipulateDocumentedCallsModal(button, tableToWithdrawDataFrom) {
 
     let childrenof_td = button.parentElement.children;
 
+    
     for (let i = 0; i < childrenof_td.length; i++) {
         if (childrenof_td[i].id.includes('badgeOf_')) {
             spanBadgeId = childrenof_td[i].id;
@@ -28,8 +29,8 @@ function manipulateDocumentedCallsModal(button, tableToWithdrawDataFrom) {
 
     thisVolunteerId = parseInt(rowData.Id); //this variable is goobal to this page & used also in documentAcall2DB !!!
 
-    $('#DocumentedCallsTitle').text("שיחות עם " + rowData.DisplayName)
-
+    $('#DocumentedCallsTitle').text("שיחות עם " + rowData.DisplayName.split('<br>')[0])
+    
     $.ajax({
         dataType: "json",
         url: "WebService.asmx/GetDocumentedCallsByDriverId",
@@ -91,6 +92,10 @@ function manipulateDocumentedCallsModal(button, tableToWithdrawDataFrom) {
 
             });
             $('#wait').hide();
+            // Gilad touch here
+            // need to render here the AbsenceModal like the CallModal.
+            $('.AbsenceBtn')[0].id = thisVolunteerId
+            RenderToAbsenceModal(rowData.DisplayName, thisVolunteerId);
 
         },
         error: function (err) {

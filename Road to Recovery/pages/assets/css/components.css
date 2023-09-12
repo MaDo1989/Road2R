@@ -95,6 +95,11 @@
     border: 1px solid #3bafda !important;
 }
 
+table tr td div .btn-busy {
+    background-color: #efa834 !important;
+    border: 1px solid #efa834 !important;
+}
+
     .btn-primary:hover,
     .btn-primary:focus,
     .btn-primary:active,
@@ -1063,7 +1068,7 @@ th {
 .table > tfoot > tr > th,
 .table > thead > tr > td,
 .table > thead > tr > th {
-    border-top: 1px solid #f3f3f3;
+    border-top: 1px solid #bfbfbf
 }
 
 .table > thead > tr > th {
