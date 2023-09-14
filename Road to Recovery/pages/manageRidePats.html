@@ -130,9 +130,9 @@
 
                 case ADD_DRIVER:
 
-                    if (!isFutureTable && updated_ridePat.Pat.IsAnonymous === 'True') {
-                        $(tr_node2manipulate).addClass('driverAssign2AnonymousRide');
-                    }
+                    //if (!isFutureTable && updated_ridePat.Pat.IsAnonymous === 'True') {
+                    //    $(tr_node2manipulate).addClass('driverAssign2AnonymousRide');
+                    //}
 
                     break;
 
@@ -256,7 +256,7 @@
                 driverIsAssigned = updated_ridePat.Drivers.length > 0;
 
                 if (!driverIsAssigned && treatmentFinished) {
-                    manipilateNodeStyle(tr_node2manipulate, updated_ridePat, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED);
+                //    manipilateNodeStyle(tr_node2manipulate, updated_ridePat, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED);
                 }
 
             }
@@ -1181,6 +1181,8 @@
 
                                     dataString = JSON.stringify(request);
                                     ajaxCall('UpdateDriver', dataString, UpdateDriver_SCB, UpdateDriver_ECB);
+                                    colorRowWithDriver([_ridepatToManipulate]);
+                                //    $(`#${_ridepatToManipulate}`).addClass('statusComplete');
                                 } else {
 
                                     request = {
@@ -1192,7 +1194,8 @@
 
                                     dataString = JSON.stringify(request);
                                     ajaxCall('AssignRideToRidePat', dataString, assignDriverToRidePat_SCB, assignDriverToRidePat_ECB);
-                                    $(`#${_ridepatToManipulate}`).addClass('statusComplete');
+                                    colorRowWithDriver([_ridepatToManipulate]);
+                                //    $(`#${_ridepatToManipulate}`).addClass('statusComplete');
                                 }
                                 assignDriverToRidePatAbort();
                             }
@@ -1211,6 +1214,9 @@
 
                             dataString = JSON.stringify(request);
                             ajaxCall('UpdateDriver', dataString, UpdateDriver_SCB, UpdateDriver_ECB);
+                            colorRowWithDriver([_ridepatToManipulate]);
+                            //$(`#${_ridepatToManipulate}`).addClass('statusComplete');
+
                         } else {
 
                             request = {
@@ -1222,6 +1228,9 @@
 
                             dataString = JSON.stringify(request);
                             ajaxCall('AssignRideToRidePat', dataString, assignDriverToRidePat_SCB, assignDriverToRidePat_ECB);
+                            colorRowWithDriver([_ridepatToManipulate]);
+                            //$(`#${_ridepatToManipulate}`).addClass('statusComplete');
+
                         }
                     }
 
@@ -3019,11 +3028,25 @@
 
         //gilad
         const colorRowWithDriver = (rideArray) => {
+            
+
             if (rideArray.length==0) {
                 return;
             }
             rideArray.forEach(rideID => {
-                if (document.getElementById(rideID)!=null) {
+                //console.log('Gilad--->', document.getElementById(rideID), rideID);
+                if (document.getElementById(rideID) == null) {
+                    return
+                }
+                let timespan=''
+                if (document.getElementById(rideID).children[0].children.length == 0) {
+                    timespan = document.getElementById(rideID).children[1].children[0].children[0].innerHTML
+                }
+                else {
+                    timespan = document.getElementById(rideID).children[0].children[0].children[0].innerHTML;
+                }
+
+                if (timespan !='אחה"צ') {
                     $(`#${rideID}`).addClass('statusComplete');
                 }
             })
