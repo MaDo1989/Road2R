@@ -1339,6 +1339,8 @@
 
                 $('#wait').hide();
                 removeClass('highlightRow');
+                colorRowWithDriver([_ridepatToManipulate]);
+
                 $('#editTimeModal').modal('hide');
             }
 
@@ -1833,7 +1835,7 @@
             XLSX.writeFile(wb, fileName + '.xlsx');
         }
 
-        const ExportToExcel = () => {
+        const MessageToPalestinianCoor = () => {
             //const dest = tomorrowMorningRidePats[0].destination
             //const origin = tomorrowMorningRidePats[0].origin
             //let time = tomorrowMorningRidePats[0].time.replace('<div class="elementsInSameLine"><span class="time">', '').replace(`</span><button type='button' data-toggle="modal" data-target="#editTimeModal" onclick="prepreparationEditTimeModal(this, ${tomorrowMorningRidePats[0].ridePatNum})" class='btn btn-icon waves-effect waves-light btn-secondary' title='עריכה'><i class='ti-pencil'></i></button></div>`, '');
@@ -1846,39 +1848,98 @@
                 type: "POST",
                 success: (data) => {
                     $('#wait').hide();
-                    let d = new Date();
                     let tomorrowListExcel = JSON.parse(data.d);
                     let listToExcel = [];
                     let rideNum = 1;
-                    let lastId = 0;
                     tomorrowListExcel.forEach(row => {
-                        if (listToExcel.length > 0 && lastId != row.Id) {
-                            //console.log('???', listToExcel.length > 0 && listToExcel.at(-1).Id != row.Id, listToExcel.at(-1).Id, row.Id)
-                            let spaceRow = {}
-                            rideNum++;
-                            listToExcel.push(spaceRow);
-                        }
+
                         let rowToExcel = {
                             Row: rideNum,
                             From: row.OriginE,
                             To: row.DestinationE,
                             At: row.pickupHour,
                             Pateint_Name: row.patientEName,
-                            Num_of_passengers: row.numOfPass
+                            Num_of_passengers: row.numOfPass,
+                            Driver: row.MainDriver
                         };
-                        lastId = row.Id;
+                        rideNum++;
                         listToExcel.push(rowToExcel);
                     })
+                    const stringToCopy = buildMessageString(listToExcel);
+
+                    navigator.clipboard.writeText(stringToCopy)
+                        .then(function () {
+                            swal({
+                                title: "ההודעה מוכנה בפעולת הדבק",
+                                timer: 1000,
+                                type: "success",
+                                showConfirmButton: false
+                            });
+                        }, function (err) {
+                            swal({
+                                title: "העתקת ההודעה נכשלה",
+                                timer: 1000,
+                                type: "error",
+                                showConfirmButton: false
+                            });
+                        });
+
+
+
+                    //was excel
                     //console.log('res Gilad ', listToExcel);
-                    jsonToExcelAndDownload(listToExcel, `Tomorrow-Ride ${d.getDate()+1}-${d.getMonth() + 1}-${d.getFullYear()}`);
+                    //jsonToExcelAndDownload(listToExcel, `Tomorrow-Ride ${d.getDate()+1}-${d.getMonth() + 1}-${d.getFullYear()}`);
 
 
                 },
                 error: (error) => {
                     console.log('from ajax to Get_Tomorrow_RidePatView_Gilad ', error);
                     $('#wait').hide();
- }
+                }
+            
             });
+        }
+
+        //gilad
+        const buildMessageString = (rideList) => {
+            const d = new Date();
+            const space = '\n';
+            const line = '______________________________________________________________________________________________________________________' + space+space;
+            const tab = '\t';
+            let str = `Tomorrow-Rides${tab}${ d.getDate() + 1 } - ${ d.getMonth() + 1 } - ${ d.getFullYear() }` +space;
+            str += line;
+
+            for (let i = 0; i < rideList.length; i++) {
+                rideList[i].same = i + 1;
+
+                if (i != 0 && isSameRide(rideList[i], rideList[i - 1])) {
+                    rideList[i].same = i+1;
+                    rideList[i - 1].same = i + 1;
+
+                }
+
+
+            }
+            for (let i = 0; i < rideList.length; i++) {
+                let tempStr = '';
+                if (i != 0 && rideList[i].same != rideList[i - 1].same) {
+                    tempStr=line
+                }
+                tempStr += `Ride number:${tab}${rideList[i].same}${tab}||${tab}From:${tab}${rideList[i].From}${tab}||${tab}To:${tab}${rideList[i].To}${tab}||${tab}At:${tab}${rideList[i].At}${tab}||${tab}Patient name:${tab}${rideList[i].Pateint_Name}${tab}||${tab}#passengers:${tab}${rideList[i].Num_of_passengers}${tab}||`;
+                tempStr += space;
+                str += tempStr;
+            }
+            str += line;
+
+            return str;
+
+        }
+        //gilad
+        const isSameRide = (ride1,ride2) => {
+            if (ride1.At == ride2.At && ride1.From == ride2.From && ride1.To == ride2.To && ride1.Driver == ride2.Driver) {
+                return true
+            }
+            return false;
         }
 
         function copyMessageButton(copyMsgBtn, table) {
@@ -3038,16 +3099,24 @@
                 if (document.getElementById(rideID) == null) {
                     return
                 }
-                let timespan=''
+                let timespan = ''
+                let PatientNameSpan = '';
                 if (document.getElementById(rideID).children[0].children.length == 0) {
                     timespan = document.getElementById(rideID).children[1].children[0].children[0].innerHTML
+                    PatientNameSpan = document.getElementById(rideID).children[4].children[0].innerHTML
                 }
                 else {
                     timespan = document.getElementById(rideID).children[0].children[0].children[0].innerHTML;
+                    PatientNameSpan = document.getElementById(rideID).children[3].children[0].innerHTML
+
                 }
 
-                if (timespan !='אחה"צ') {
+                if (timespan != 'אחה"צ' && PatientNameSpan != 'חולה') {
                     $(`#${rideID}`).addClass('statusComplete');
+                }
+                else if (timespan == 'אחה"צ' || PatientNameSpan == 'חולה') {
+                    $(`#${rideID}`).removeClass('statusComplete');
+
                 }
             })
         }
@@ -3742,8 +3811,8 @@
                                             חדש
                                         </button>
 
-                                        <button onclick="ExportToExcel()" class="btn btn-success waves-effect w-md waves-light m-b-5">
-                                            <span class="glyphicon glyphicon-list-alt m-r-5"></span>
+                                        <button onclick="MessageToPalestinianCoor()" class="btn btn-success waves-effect w-md waves-light m-b-5">
+                                            <span class="glyphicon glyphicon-copy m-r-5"></span>
                                                     הודעה למתאמות
                                         </button>
 

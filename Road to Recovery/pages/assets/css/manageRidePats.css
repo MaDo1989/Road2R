@@ -234,9 +234,9 @@ input:checked + .slider:before {
     background: red;
 }
 
-.withIn24HoursDrive {
+/*.withIn24HoursDrive {
     background: orange;
-}
+}*/
 
 .add-driver {
     margin-top: 5px;
