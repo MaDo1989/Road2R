@@ -51,6 +51,7 @@ public class DBservice_Gilad
                     DestinationE = dataReader["DestinationE"].ToString(),
                     numOfPass = Convert.ToInt32(dataReader["numOfPass"]),
                     patientEName = dataReader["EnglishName"].ToString(),
+                    MainDriver = Convert.ToInt32(dataReader["MainDriver"]),
 
                 };
                 list.Add(rideFromRPview);

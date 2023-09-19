@@ -1,5 +1,4 @@
-﻿
-Absence Table
+﻿Absence Table
 
 
 spGet_rpview_ByTimeRange_Gilad

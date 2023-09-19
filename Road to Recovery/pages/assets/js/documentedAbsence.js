@@ -188,12 +188,16 @@ const Delete_O_Edit_AbsenceRow = (btn) => {
 }
 
 // this function color the btn -for indcation of availble
-const ColorCallBtn_afterChange = (absenceID,absencesListOfThisVolunteer, volunteerId) => {
+const ColorCallBtn_afterChange = (absenceID, absencesListOfThisVolunteer, volunteerId) => {
+
+    console.log('Gilad check -->', absenceID, absencesListOfThisVolunteer, volunteerId)
+
     if (absencesListOfThisVolunteer != undefined && absenceID!=-1) {
         const BtnToColor = document.getElementById(`${volunteerId}`).childNodes[11].childNodes[3].childNodes[1];
 
+        // becarful i changed the condition here----> was--> (absence.id!=ThisAbsenceId)
         const resFilter = absencesListOfThisVolunteer.filter((absence) => {
-            return (absence.Id != absenceID && absence.VolunteerId == volunteerId && absence.AbsenceStatus)
+            return (absence.VolunteerId == volunteerId && absence.AbsenceStatus)
         });
 
         //console.log('Gilad res :', ThisAbsencesList, resFilter, volunteerId, BtnToColor);
