@@ -1904,18 +1904,26 @@
         const buildMessageString = (rideList) => {
             const d = new Date();
             const space = '\n';
-            const line = '______________________________________________________________________________________________________________________' + space+space;
+            const line = '______________________________________________________________________________' + space+space;
             const tab = '\t';
+            const sep = `\t||\t`;
             let str = `Tomorrow-Rides${tab}${ d.getDate() + 1 } - ${ d.getMonth() + 1 } - ${ d.getFullYear() }` +space;
             str += line;
+
 
             for (let i = 0; i < rideList.length; i++) {
                 rideList[i].same = i + 1;
 
                 if (i != 0 && isSameRide(rideList[i], rideList[i - 1])) {
-                    rideList[i].same = i+1;
+                    rideList[i].same = i + 1;
                     rideList[i - 1].same = i + 1;
+                    //this change for cal the num of passanger each ride.
+                    rideList[i].Num_of_passengers = rideList[i].Num_of_passengers + rideList[i - 1].Num_of_passengers + 1;
+                    rideList[i - 1].Num_of_passengers = rideList[i].Num_of_passengers
 
+                }
+                else {
+                    rideList[i].Num_of_passengers += 1;
                 }
 
 
@@ -1925,7 +1933,7 @@
                 if (i != 0 && rideList[i].same != rideList[i - 1].same) {
                     tempStr=line
                 }
-                tempStr += `Ride number:${tab}${rideList[i].same}${tab}||${tab}From:${tab}${rideList[i].From}${tab}||${tab}To:${tab}${rideList[i].To}${tab}||${tab}At:${tab}${rideList[i].At}${tab}||${tab}Patient name:${tab}${rideList[i].Pateint_Name}${tab}||${tab}#passengers:${tab}${rideList[i].Num_of_passengers}${tab}||`;
+                tempStr += `Ride-number: ${rideList[i].same}${sep}From: ${rideList[i].From}${sep}To: ${rideList[i].To}${sep}At: ${rideList[i].At}${sep}Patient name: ${rideList[i].Pateint_Name}${sep}#passengers: ${rideList[i].Num_of_passengers}`;
                 tempStr += space;
                 str += tempStr;
             }
