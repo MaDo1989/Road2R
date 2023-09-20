@@ -506,13 +506,13 @@
                 //console.log(rowData);
 
 
-                $('#messagesModalTitle').text("היסטוריית הודעות - " + rowData.DisplayName)
+                $('#messagesModalTitle').text("היסטוריית הודעות - " + rowData.DisplayName.split('<br>')[0])
                 $.ajax({
                     dataType: "json",
                     url: "WebService.asmx/getMessages",
                     contentType: "application/json; charset=utf-8",
                     type: "POST",
-                    data: JSON.stringify({ displayName: rowData.DisplayName }),
+                    data: JSON.stringify({ displayName: rowData.DisplayName.split('<br>')[0] }),
                     success: function (data) {
                         var data = JSON.parse(data.d)
                         //console.log(data)
