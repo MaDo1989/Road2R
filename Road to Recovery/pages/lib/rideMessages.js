@@ -134,7 +134,6 @@ const getPatientsPhonesText = (patient) => {
             patient.cellPhone1.slice(3, patient.cellPhone1.length);
         //txt += `${patient.name}: ${cellphone}` + sep;
         txt += sep+`${cellphone}`;
->>>>>>> Gilad
     }
 
     //for (var i = 0; i < patient.escorts.length; i++) {

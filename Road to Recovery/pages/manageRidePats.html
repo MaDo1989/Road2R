@@ -1339,7 +1339,9 @@
 
                 $('#wait').hide();
                 removeClass('highlightRow');
-                colorRowWithDriver([_ridepatToManipulate]);
+                //the timeout is because the render take time and we want to update the color in real time. by gilad.
+                setTimeout(colorRowWithDriver, 750, [_ridepatToManipulate])
+                //colorRowWithDriver([_ridepatToManipulate]);
 
                 $('#editTimeModal').modal('hide');
             }
@@ -1904,9 +1906,9 @@
         const buildMessageString = (rideList) => {
             const d = new Date();
             const space = '\n';
-            const line = '______________________________________________________________________________' + space+space;
+            const line = '_______________________________________________________________' + space+space;
             const tab = '\t';
-            const sep = `\t||\t`;
+            const sep = `  `;
             let str = `Tomorrow-Rides${tab}${ d.getDate() + 1 } - ${ d.getMonth() + 1 } - ${ d.getFullYear() }` +space;
             str += line;
 
@@ -1930,10 +1932,10 @@
             }
             for (let i = 0; i < rideList.length; i++) {
                 let tempStr = '';
-                if (i != 0 && rideList[i].same != rideList[i - 1].same) {
-                    tempStr=line
-                }
-                tempStr += `Ride-number: ${rideList[i].same}${sep}From: ${rideList[i].From}${sep}To: ${rideList[i].To}${sep}At: ${rideList[i].At}${sep}Patient name: ${rideList[i].Pateint_Name}${sep}#passengers: ${rideList[i].Num_of_passengers}`;
+                //if (i != 0 && rideList[i].same != rideList[i - 1].same) {
+                //    tempStr=line
+                //}
+                tempStr += `Ride ${rideList[i].same}${sep}From: ${rideList[i].From}${sep}To: ${rideList[i].To}${sep}At: ${rideList[i].At}${sep}${rideList[i].Pateint_Name}${sep} (${rideList[i].Num_of_passengers})`;
                 tempStr += space;
                 str += tempStr;
             }
