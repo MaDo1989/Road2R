@@ -1837,6 +1837,22 @@
             XLSX.writeFile(wb, fileName + '.xlsx');
         }
 
+
+
+        const FixedHour = (DBdateString) => {
+            let h = new Date(convertDBDate2FrontEndDate(DBdateString)).getHours()
+            let m = new Date(convertDBDate2FrontEndDate(DBdateString)).getMinutes();
+            if (h.toString().length==1) {
+                h = `0${h}`;
+            }
+            if (m.toString().length==1) {
+                m = `0${m}`;
+            }
+            return `${h}:${m}`;
+        }
+
+
+
         const MessageToPalestinianCoor = () => {
             //const dest = tomorrowMorningRidePats[0].destination
             //const origin = tomorrowMorningRidePats[0].origin
@@ -1854,12 +1870,12 @@
                     let listToExcel = [];
                     let rideNum = 1;
                     tomorrowListExcel.forEach(row => {
-
+                        //console.log('Gilad check this -->', FixedHour(row.pickupTime), row.pickupTime);
                         let rowToExcel = {
                             Row: rideNum,
                             From: row.OriginE,
                             To: row.DestinationE,
-                            At: row.pickupHour,
+                            At: FixedHour(row.pickupTime),
                             Pateint_Name: row.patientEName,
                             Num_of_passengers: row.numOfPass,
                             Driver: row.MainDriver
@@ -3313,27 +3329,30 @@
                 numOfPassengers_English = `<span class="numOfPassengers">${numOfEscorts + (ridepat.OnlyEscort ? 0 : 1)
                     } passengers</span>`;
 
-                escortsPhone2render = '<span class="escortsPhone2render block">מלווים: ';
+
+
+                // Gilad comment out it --> avraham doesnt want the phone Number of Escorts its no needed !!
+                //escortsPhone2render = '<span class="escortsPhone2render block">מלווים: ';
                 numOfRealEscorts = 0;
 
-                ridepat.Escorts.map((es, i) => {
-                    if (validateMobileNumFullVersion(es.CellPhone)) {
-                        numOfRealEscorts++;
-                        escortsPhone2render += `${addSeperator2MobileNum(
-                            es.CellPhone,
-                            "-"
-                        )}, `;
+                //ridepat.Escorts.map((es, i) => {
+                //    if (validateMobileNumFullVersion(es.CellPhone)) {
+                //        numOfRealEscorts++;
+                //        escortsPhone2render += `${addSeperator2MobileNum(
+                //            es.CellPhone,
+                //            "-"
+                //        )}, `;
 
-                        if (i === numOfEscorts - 1) {
-                            escortsPhone2render = escortsPhone2render.substring(
-                                0,
-                                escortsPhone2render.length - 2
-                            );
-                            escortsPhone2render += "</span>";
-                        }
+                //        if (i === numOfEscorts - 1) {
+                //            escortsPhone2render = escortsPhone2render.substring(
+                //                0,
+                //                escortsPhone2render.length - 2
+                //            );
+                //            escortsPhone2render += "</span>";
+                //        }
 
-                    }
-                });
+                //    }
+                //});
                 if (numOfRealEscorts === 0) escortsPhone2render = "";
             } else {
                 numOfPassengers = `<span class="numOfPassengers">נוסע יחיד</span>`;
