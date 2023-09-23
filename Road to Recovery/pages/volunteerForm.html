@@ -249,6 +249,8 @@
 
         //function to fill form for edit
         function uploadDataVol(displayName) {
+            //console.log('Gilad check before -->', displayName.split('<br>')[0]);
+            displayName = displayName.split('<br>')[0];
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/getVolunteer",
