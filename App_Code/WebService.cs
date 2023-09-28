@@ -898,7 +898,7 @@ public class WebService : System.Web.Services.WebService
     //    return j.Serialize(r);
     //}
 
-
+     
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string GetRidePatViewByTimeFilter(int from, int until)
@@ -1972,7 +1972,7 @@ public class WebService : System.Web.Services.WebService
     //}
 
 
-
+    
 
     [WebMethod(EnableSession = true)]
     public string loginDriver(string uName, string password)

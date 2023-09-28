@@ -945,7 +945,8 @@
                     var address = $("#address").val();
                     var func = arr_customer.func;
                     var remark = $("#remarks").val();;
-                    var displayName = arr_volunteer.displayName;
+                    //Gilad change here displayName.split('<br>')[0]
+                    var displayName = arr_volunteer.displayName.split('<br>')[0];
                     //NEW:
                     var englishFN = $("#volunteerFirstNameEnglish").val();
                     var englishLN = $("#volunteerLastNameEnglish").val();
