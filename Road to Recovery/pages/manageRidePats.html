@@ -2398,6 +2398,30 @@
         }
 
 
+        const CHECK = () => {
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/GetUnityRide",
+                contentType: "application/json; charset=utf-8",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-Encoding", "gzip");
+                },
+                type: "POST",
+                data: JSON.stringify({days: 7 }),
+                success: function (data) {
+                    $('#wait').hide();
+                    arr_rides = JSON.parse(data.d);
+                    console.log('Gilad check this -->', arr_rides)
+
+
+                },
+                error: function (err) {
+                    $('#wait').hide();
+                    alert("Error in GetRidePatView: " + err.responseText);
+                }
+            });
+        }
+
         function refreshTable(timeInterval = 7) {
             $('#wait').show();
 
@@ -2429,6 +2453,7 @@
 
             var volunteerId = -1 // VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
             //gilad check
+            console.log('Gilad check this -->', volunteerId, timeInterval)
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/GetRidePatView",
@@ -2441,7 +2466,7 @@
                 success: function (data) {
                     $('#wait').hide();
                     arr_rides = JSON.parse(data.d);
-
+                    console.log('Gilad check this -->', arr_rides)
                     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
 
                     let thisRidePatDate;

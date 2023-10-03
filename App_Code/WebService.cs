@@ -953,6 +953,27 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+    //Gilad update 03/10/23
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetUnityRide(int days)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+            UnityRide unityRide = new UnityRide();
+            j.MaxJsonLength = Int32.MaxValue;
+            return j.Serialize(unityRide.GetUnityRideView(days));
+
+
+        }
+        catch (Exception ex)
+        {
+            CatchErrors catchErrors = new CatchErrors("WebService: Exception in GetUnityRide", ex + " " + ex.Message + " " + ex.InnerException + " " + ex.Source, ex.StackTrace);
+            Log.Error("Error in GetUnityRide", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+    }
 
 
 
