@@ -14,7 +14,9 @@
     <script src="lib/lz-string.js"></script>
     <script src="lib/master.js"></script>
     <script src="lib/rideMessages.js"></script>
-
+    <!-- use version 0.20.0 -->
+    <!--this script cdn is for export to xlsx file without changing the data tables.-->
+    <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 
     <!-- #region REAL-TIME BY SIGNALR - FOR ANY COMPLAINTS WHATSOEVER YOU CAN TALK 2 YOGEV-->
     <script src="../../Scripts/jquery-3.6.0.min.js"></script>
@@ -52,6 +54,7 @@
         let isAfterNoonRide;
         let treatmentFinished;
         let driverIsAssigned;
+        let listRowstoColor = [];
         //#endregion
 
         //#region Functions to Reuse
@@ -127,9 +130,9 @@
 
                 case ADD_DRIVER:
 
-                    if (!isFutureTable && updated_ridePat.Pat.IsAnonymous === 'True') {
-                        $(tr_node2manipulate).addClass('driverAssign2AnonymousRide');
-                    }
+                    //if (!isFutureTable && updated_ridePat.Pat.IsAnonymous === 'True') {
+                    //    $(tr_node2manipulate).addClass('driverAssign2AnonymousRide');
+                    //}
 
                     break;
 
@@ -253,7 +256,7 @@
                 driverIsAssigned = updated_ridePat.Drivers.length > 0;
 
                 if (!driverIsAssigned && treatmentFinished) {
-                    manipilateNodeStyle(tr_node2manipulate, updated_ridePat, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED);
+                //    manipilateNodeStyle(tr_node2manipulate, updated_ridePat, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED);
                 }
 
             }
@@ -1122,9 +1125,10 @@
             return driversPromise;
         }
 
+
+
         const assignDriverToRidePat = () => {
             $('#wait').show();
-
             const driverNameFromInput = $('#driver').val();
 
             if (typeof driverNameFromInput === 'undefined' || !driverNameFromInput || driverNameFromInput.length === 0 || !driverNames.includes(driverNameFromInput)) {
@@ -1132,36 +1136,114 @@
                 $('#wait').hide();
                 return alert('יש לבחור נהג מתוך הרשימה');
             }
-
             const driverIndex = driverNames.indexOf(driverNameFromInput);
             const userSelected = drivers[driverIndex];
-
             let request;
             let dataString;
 
-            if (_isDriverReplacement) {
-                //update the ride record with the new driver.
-                request = {
-                    ridePatId: _ridepatToManipulate,
-                    rideNum: _assignDriverToRideNum,
-                    newDriverId: userSelected.Id,
-                    assignedFromAppId: APP_ID
+
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/GetAbsenceByVolunteerId",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                data: JSON.stringify({ volunteerId: userSelected.Id }),
+                success: function (data) {
+                    $('#wait').hide();
+                    Absences = JSON.parse(data.d);
+                    let absenceStatus = false;
+                    //console.log('Gilad check -- > ', Absences)
+                    for (var i = 0; i < Absences.length; i++) {
+                        if (Absences[i].AbsenceStatus) {
+                            absenceStatus = true;
+                        }
+                    }
+                    if (absenceStatus) {
+                        swal({
+                            title: "?האם הינך בטוח/ה שברצונך לשבץ נהג זה",
+                            type: "warning",
+                            text: 'נהג זה כרגע אינו זמין,באפשרותך לשבץ אותו בכל זאת או לבחור בנהג חלופי',
+                            showCancelButton: true,
+                            cancelButtonText: "בטל",
+                            confirmButtonClass: 'btn-warning',
+                            confirmButtonText: "שבץ",
+                            closeOnConfirm: true
+                        }, function (userResponse) {
+                            if (userResponse) {
+                                if (_isDriverReplacement) {
+                                    //update the ride record with the new driver.
+                                    request = {
+                                        ridePatId: _ridepatToManipulate,
+                                        rideNum: _assignDriverToRideNum,
+                                        newDriverId: userSelected.Id,
+                                        assignedFromAppId: APP_ID
+                                    }
+
+                                    dataString = JSON.stringify(request);
+                                    ajaxCall('UpdateDriver', dataString, UpdateDriver_SCB, UpdateDriver_ECB);
+                                    colorRowWithDriver([_ridepatToManipulate]);
+                                //    $(`#${_ridepatToManipulate}`).addClass('statusComplete');
+                                } else {
+
+                                    request = {
+                                        ridePatId: _ridepatToManipulate,
+                                        userId: userSelected.Id,
+                                        driverType: "primary",
+                                        assignedFromAppId: APP_ID
+                                    };
+
+                                    dataString = JSON.stringify(request);
+                                    ajaxCall('AssignRideToRidePat', dataString, assignDriverToRidePat_SCB, assignDriverToRidePat_ECB);
+                                    colorRowWithDriver([_ridepatToManipulate]);
+                                //    $(`#${_ridepatToManipulate}`).addClass('statusComplete');
+                                }
+                                assignDriverToRidePatAbort();
+                            }
+
+                        });
+                    }
+                    else {
+                        if (_isDriverReplacement) {
+                            //update the ride record with the new driver.
+                            request = {
+                                ridePatId: _ridepatToManipulate,
+                                rideNum: _assignDriverToRideNum,
+                                newDriverId: userSelected.Id,
+                                assignedFromAppId: APP_ID
+                            }
+
+                            dataString = JSON.stringify(request);
+                            ajaxCall('UpdateDriver', dataString, UpdateDriver_SCB, UpdateDriver_ECB);
+                            colorRowWithDriver([_ridepatToManipulate]);
+                            //$(`#${_ridepatToManipulate}`).addClass('statusComplete');
+
+                        } else {
+
+                            request = {
+                                ridePatId: _ridepatToManipulate,
+                                userId: userSelected.Id,
+                                driverType: "primary",
+                                assignedFromAppId: APP_ID
+                            };
+
+                            dataString = JSON.stringify(request);
+                            ajaxCall('AssignRideToRidePat', dataString, assignDriverToRidePat_SCB, assignDriverToRidePat_ECB);
+                            colorRowWithDriver([_ridepatToManipulate]);
+                            //$(`#${_ridepatToManipulate}`).addClass('statusComplete');
+
+                        }
+                    }
+
+                },
+                error: function (err) {
+                    alert("Error in GetVolunteersAbsences (manageridepat.html ajax) !: " + err.responseText);
+                    $('#wait').hide();
                 }
+            });
 
-                dataString = JSON.stringify(request);
-                ajaxCall('UpdateDriver', dataString, UpdateDriver_SCB, UpdateDriver_ECB);
-            } else {
 
-                request = {
-                    ridePatId: _ridepatToManipulate,
-                    userId: userSelected.Id,
-                    driverType: "primary",
-                    assignedFromAppId: APP_ID
-                };
 
-                dataString = JSON.stringify(request);
-                ajaxCall('AssignRideToRidePat', dataString, assignDriverToRidePat_SCB, assignDriverToRidePat_ECB);
-            }
+
         }
 
         const assignDriverToRidePatAbort = () => {
@@ -1257,6 +1339,10 @@
 
                 $('#wait').hide();
                 removeClass('highlightRow');
+                //the timeout is because the render take time and we want to update the color in real time. by gilad.
+                setTimeout(colorRowWithDriver, 750, [_ridepatToManipulate])
+                //colorRowWithDriver([_ridepatToManipulate]);
+
                 $('#editTimeModal').modal('hide');
             }
 
@@ -1360,6 +1446,7 @@
                         rideId: _assignDriverToRideNum,
                         driverId: _driverId
                     }
+                    $(`#${_ridepatToManipulate}`).removeClass('statusComplete');
                     const dataString = JSON.stringify(request);
                     ajaxCall('LeaveRidePat', dataString, deleteRideSuccessCB, deleteRideErrorCB);
                 }
@@ -1372,7 +1459,6 @@
         }
 
         const deleteRideSuccessCB = (data) => {
-
             $('#wait').hide();
             $('#assignDriverModal').modal('hide');
             assignDriverToRidePatAbort();
@@ -1742,6 +1828,146 @@
 
         }
 
+        //gilad addition
+
+        function jsonToExcelAndDownload(data, fileName) {
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Tomorrow-Ride');
+            XLSX.writeFile(wb, fileName + '.xlsx');
+        }
+
+
+
+        const FixedHour = (DBdateString) => {
+            let h = new Date(convertDBDate2FrontEndDate(DBdateString)).getHours()
+            let m = new Date(convertDBDate2FrontEndDate(DBdateString)).getMinutes();
+            if (h.toString().length==1) {
+                h = `0${h}`;
+            }
+            if (m.toString().length==1) {
+                m = `0${m}`;
+            }
+            return `${h}:${m}`;
+        }
+
+
+
+        const MessageToPalestinianCoor = () => {
+            //const dest = tomorrowMorningRidePats[0].destination
+            //const origin = tomorrowMorningRidePats[0].origin
+            //let time = tomorrowMorningRidePats[0].time.replace('<div class="elementsInSameLine"><span class="time">', '').replace(`</span><button type='button' data-toggle="modal" data-target="#editTimeModal" onclick="prepreparationEditTimeModal(this, ${tomorrowMorningRidePats[0].ridePatNum})" class='btn btn-icon waves-effect waves-light btn-secondary' title='עריכה'><i class='ti-pencil'></i></button></div>`, '');
+            //let patientName = tomorrowMorningRidePats[0].patient.split('>')[1].split('<')[0]
+            $('#wait').show();
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/Get_Tomorrow_RidePatView_Gilad",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                success: (data) => {
+                    $('#wait').hide();
+                    let tomorrowListExcel = JSON.parse(data.d);
+                    let listToExcel = [];
+                    let rideNum = 1;
+                    tomorrowListExcel.forEach(row => {
+                        //console.log('Gilad check this -->', FixedHour(row.pickupTime), row.pickupTime);
+                        let rowToExcel = {
+                            Row: rideNum,
+                            From: row.OriginE,
+                            To: row.DestinationE,
+                            At: FixedHour(row.pickupTime),
+                            Pateint_Name: row.patientEName,
+                            Num_of_passengers: row.numOfPass,
+                            Driver: row.MainDriver
+                        };
+                        rideNum++;
+                        listToExcel.push(rowToExcel);
+                    })
+                    const stringToCopy = buildMessageString(listToExcel);
+
+                    navigator.clipboard.writeText(stringToCopy)
+                        .then(function () {
+                            swal({
+                                title: "ההודעה מוכנה בפעולת הדבק",
+                                timer: 1000,
+                                type: "success",
+                                showConfirmButton: false
+                            });
+                        }, function (err) {
+                            swal({
+                                title: "העתקת ההודעה נכשלה",
+                                timer: 1000,
+                                type: "error",
+                                showConfirmButton: false
+                            });
+                        });
+
+
+
+                    //was excel
+                    //console.log('res Gilad ', listToExcel);
+                    //jsonToExcelAndDownload(listToExcel, `Tomorrow-Ride ${d.getDate()+1}-${d.getMonth() + 1}-${d.getFullYear()}`);
+
+
+                },
+                error: (error) => {
+                    console.log('from ajax to Get_Tomorrow_RidePatView_Gilad ', error);
+                    $('#wait').hide();
+                }
+            
+            });
+        }
+
+        //gilad
+        const buildMessageString = (rideList) => {
+            const d = new Date();
+            const space = '\n';
+            const line = '_______________________________________________________________' + space+space;
+            const tab = '\t';
+            const sep = `  `;
+            let str = `Tomorrow-Rides${tab}${ d.getDate() + 1 } - ${ d.getMonth() + 1 } - ${ d.getFullYear() }` +space;
+            str += line;
+
+
+            for (let i = 0; i < rideList.length; i++) {
+                rideList[i].same = i + 1;
+
+                if (i != 0 && isSameRide(rideList[i], rideList[i - 1])) {
+                    rideList[i].same = i + 1;
+                    rideList[i - 1].same = i + 1;
+                    //this change for cal the num of passanger each ride.
+                    rideList[i].Num_of_passengers = rideList[i].Num_of_passengers + rideList[i - 1].Num_of_passengers + 1;
+                    rideList[i - 1].Num_of_passengers = rideList[i].Num_of_passengers
+
+                }
+                else {
+                    rideList[i].Num_of_passengers += 1;
+                }
+
+
+            }
+            for (let i = 0; i < rideList.length; i++) {
+                let tempStr = '';
+                //if (i != 0 && rideList[i].same != rideList[i - 1].same) {
+                //    tempStr=line
+                //}
+                tempStr += `Ride ${rideList[i].same}${sep}From: ${rideList[i].From}${sep}To: ${rideList[i].To}${sep}At: ${rideList[i].At}${sep}${rideList[i].Pateint_Name}${sep} (${rideList[i].Num_of_passengers})`;
+                tempStr += space;
+                str += tempStr;
+            }
+            str += line;
+
+            return str;
+
+        }
+        //gilad
+        const isSameRide = (ride1,ride2) => {
+            if (ride1.At == ride2.At && ride1.From == ride2.From && ride1.To == ride2.To && ride1.Driver == ride2.Driver) {
+                return true
+            }
+            return false;
+        }
+
         function copyMessageButton(copyMsgBtn, table) {
 
             let ridePatNum = parseInt(copyMsgBtn.id);
@@ -1831,6 +2057,7 @@
 
 
                     if (thistable && deleteBtn) {
+                        //console.log('Gilad check from deleteRidePat --> ', deleteBtn,)
                         thistable.row($(deleteBtn).parents('tr')).remove().draw();
                     } else {
                         location.reload();
@@ -1957,6 +2184,13 @@
             returnRidePat = null;
             $('#messagesModal').modal('toggle');
             $('#DriverReturnRidePatMsg').html("");
+            //if (thisTable && deleteBtn) {
+            //    console.log('Gilad check from deleteReturn --> ', deleteBtn.children[10].children[0].children[1],$(deleteBtn).parents('tr'), $('#' + RidePat.RidePatNum).parents('tr'));
+            //    thisTable.row($(deleteBtn).parents('tr')).remove().draw();
+            //}
+            //console.log('Gilad check from deleteReturn --> ', deleteBtn, deleteBtn.children[deleteBtn.children.length-1].children[0].children[1]);
+            //deleteBtn = deleteBtn.children[10].children[0].children[1];
+            deleteBtn = deleteBtn.children[deleteBtn.children.length - 1].children[0].children[1]
             deleteRidePat(RidePat, deleteBtn, thisTable);
         }
 
@@ -2194,7 +2428,7 @@
             }
 
             var volunteerId = -1 // VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
-
+            //gilad check
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/GetRidePatView",
@@ -2229,9 +2463,15 @@
                     let patientAge = null;
                     let isPatientStatusShouldPaintRow = false;
                     let remarkHTML = '';
+                    listRowstoColor = [];
 
-
+                    
                     for (let i = 0; i < arr_rides.length; i++) {
+                        if (arr_rides[i].Status=='שובץ נהג') {
+                            //console.log(arr_rides[i], document.getElementById(arr_rides[i].RidePatNum), $(`#${arr_rides[i].RidePatNum}`));
+                            listRowstoColor.push(arr_rides[i].RidePatNum);
+        
+                        }
 
                         if (allSortsSwitch && areasToShow_arr !== null) {
                             if (areasToShow_arr.length !== 0) {
@@ -2860,8 +3100,9 @@
                     //            || ↑DATATABLES PROPERTIES↑||
                     //            ============================
 
-
+                    colorRowWithDriver(listRowstoColor);
                     $(".dataTables_empty").html("אין הסעות لا توجد سفريات No drives");
+
 
                 },
                 error: function (err) {
@@ -2871,6 +3112,41 @@
             });
         }
 
+
+        //gilad
+        const colorRowWithDriver = (rideArray) => {
+            
+
+            if (rideArray.length==0) {
+                return;
+            }
+            rideArray.forEach(rideID => {
+                //console.log('Gilad--->', document.getElementById(rideID), rideID);
+                if (document.getElementById(rideID) == null) {
+                    return
+                }
+                let timespan = ''
+                let PatientNameSpan = '';
+                if (document.getElementById(rideID).children[0].children.length == 0) {
+                    timespan = document.getElementById(rideID).children[1].children[0].children[0].innerHTML
+                    PatientNameSpan = document.getElementById(rideID).children[4].children[0].innerHTML
+                }
+                else {
+                    timespan = document.getElementById(rideID).children[0].children[0].children[0].innerHTML;
+                    PatientNameSpan = document.getElementById(rideID).children[3].children[0].innerHTML
+
+                }
+
+                if (timespan != 'אחה"צ' && PatientNameSpan != 'חולה') {
+                    $(`#${rideID}`).addClass('statusComplete');
+                }
+                else if (timespan == 'אחה"צ' || PatientNameSpan == 'חולה') {
+                    $(`#${rideID}`).removeClass('statusComplete');
+
+                }
+            })
+        }
+        
         const callIfPatientStatusShouldPaintRow = (ride) => {
 
             let result = false;
@@ -3053,27 +3329,30 @@
                 numOfPassengers_English = `<span class="numOfPassengers">${numOfEscorts + (ridepat.OnlyEscort ? 0 : 1)
                     } passengers</span>`;
 
-                escortsPhone2render = '<span class="escortsPhone2render block">מלווים: ';
+
+
+                // Gilad comment out it --> avraham doesnt want the phone Number of Escorts its no needed !!
+                //escortsPhone2render = '<span class="escortsPhone2render block">מלווים: ';
                 numOfRealEscorts = 0;
 
-                ridepat.Escorts.map((es, i) => {
-                    if (validateMobileNumFullVersion(es.CellPhone)) {
-                        numOfRealEscorts++;
-                        escortsPhone2render += `${addSeperator2MobileNum(
-                            es.CellPhone,
-                            "-"
-                        )}, `;
+                //ridepat.Escorts.map((es, i) => {
+                //    if (validateMobileNumFullVersion(es.CellPhone)) {
+                //        numOfRealEscorts++;
+                //        escortsPhone2render += `${addSeperator2MobileNum(
+                //            es.CellPhone,
+                //            "-"
+                //        )}, `;
 
-                        if (i === numOfEscorts - 1) {
-                            escortsPhone2render = escortsPhone2render.substring(
-                                0,
-                                escortsPhone2render.length - 2
-                            );
-                            escortsPhone2render += "</span>";
-                        }
+                //        if (i === numOfEscorts - 1) {
+                //            escortsPhone2render = escortsPhone2render.substring(
+                //                0,
+                //                escortsPhone2render.length - 2
+                //            );
+                //            escortsPhone2render += "</span>";
+                //        }
 
-                    }
-                });
+                //    }
+                //});
                 if (numOfRealEscorts === 0) escortsPhone2render = "";
             } else {
                 numOfPassengers = `<span class="numOfPassengers">נוסע יחיד</span>`;
@@ -3561,12 +3840,17 @@
                                             חדש
                                         </button>
 
+                                        <!--<button onclick="MessageToPalestinianCoor()" class="btn btn-success waves-effect w-md waves-light m-b-5">
+                                            <span class="glyphicon glyphicon-copy m-r-5"></span>
+                                                    הודעה למתאמות
+                                        </button>-->
+
                                     </div>
                                 </div>
 
                                 <div id="accordion" class="panel-group">
                                     <div onclick="assignTable2lastOne(tableNames.MORNING)" class="panel panel-primary">
-                                        <div class="panel-heading" id="col1">
+                                        <div class="panel-heading blue1" id="col1">
                                             <h4 data-toggle="tooltip" data-placement="top"
                                                 title="Morning Rides  سفريات الصباح" class="panel-title">
                                                 <a id="collapsed1_aTag" href="#collapse1" data-parent="#accordion"
@@ -3620,8 +3904,8 @@
                                     </div>
 
                                     <div onclick="assignTable2lastOne(tableNames.AFTERNOON)"
-                                         class="panel panel-primary">
-                                        <div class="panel-heading" id="col2">
+                                         class="panel panel-primary ">
+                                        <div class="panel-heading blue2" id="col2">
                                             <h4 data-toggle="tooltip" data-placement="top"
                                                 title="Afternoon Rides  سفريات المساء" class="panel-title">
                                                 <a id="collapsed2_aTag" href="#collapse2" data-parent="#accordion"
@@ -3675,8 +3959,8 @@
                                     </div>
 
                                     <div onclick="assignTable2lastOne(tableNames.TOMORROW_MORNING)"
-                                         class="panel panel-primary">
-                                        <div class="panel-heading" id="col4">
+                                         class="panel panel-primary ">
+                                        <div class="panel-heading blue3" id="col4">
                                             <h4 data-toggle="tooltip" data-placement="bottom" title="Tomorrow Rides"
                                                 class="panel-title">
                                                 <a id="collapsed3_aTag" href="#collapse3" data-parent="#accordion"
@@ -3732,7 +4016,7 @@
 
                                     <div onclick="assignTable2lastOne(tableNames.TOMORROW_AFTERNOON)"
                                          class="panel panel-primary">
-                                        <div class="panel-heading" id="col4">
+                                        <div class="panel-heading blue4" id="col4">
                                             <h4 data-toggle="tooltip" data-placement="bottom" title="Tomorrow Rides"
                                                 class="panel-title">
                                                 <a id="collapsed3_aTag" href="#collapse4" data-parent="#accordion"
@@ -3787,7 +4071,7 @@
                                     </div>
 
                                     <div onclick="assignTable2lastOne(tableNames.FUTURE)" class="panel panel-primary">
-                                        <div class="panel-heading" id="col3">
+                                        <div class="panel-heading blue5" id="col3">
                                             <h4 data-toggle="tooltip" data-placement="bottom"
                                                 title="Future Rides  سفريات مستقبلية" class="panel-title">
                                                 <a id="collapsed4_aTag" href="#collapse5" data-parent="#accordion"

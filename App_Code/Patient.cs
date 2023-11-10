@@ -687,6 +687,14 @@ public class Patient
         return list;
     }
 
+
+    public List<Patient> GetPatientsList_Gilad(bool active)
+    {
+        DBservice_Gilad dBservice_Gilad = new DBservice_Gilad();
+        return dBservice_Gilad.GetPatinetsByActiveStatus(active);
+    }
+
+
     //this function is for generating patients after anonymous patient is set. only patients with same locations will be assingned.
     public List<Patient> getAnonymousPatientsList(bool active, string origin, string dest)
     {

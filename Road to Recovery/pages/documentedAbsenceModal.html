@@ -1,0 +1,112 @@
+﻿<link href="assets/css/documentedCalls.css" rel="stylesheet" />
+
+<div class="modal-dialog" role="document">
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <button id="overRideBS_modal_4changeClose_x-Absence" type="button" class="close closeBtn_DocumentAcallsModal" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <h2 class="modal-title" id="DocumentedAbsenceTitle">היעדרויות של</h2>
+        </div>
+        <div class="modal-body ">
+            <div class="text-right AbsencePlusBtn">
+                <button type="button" id="documentAAbsencePlusBtn" class="btn btn-default"
+                        data-keyboard="false"
+                        title="הוספת היעדרות"
+                        data-target="#DocumentAAbsenceModal" onclick="openDocumentAAbsenceModal()">
+                    <i class="fa fa-plus"></i>
+                </button>
+            </div>
+            <table id="DocumentedAbsenceTable" class="table table-striped table-bordered">
+                <thead>
+                    <tr dir="rtl">
+                        <th>מתאריך</th>
+                        <th>עד תאריך</th>
+                        <th>ימים לחזרה</th>
+                        <th>רכז.ת</th>
+                        <th>סיבה</th>
+                        <th>הערות</th>
+                        <th>פעולות</th>
+                        <th id="invisible">z</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <!-- ↓ DocumentAAbsenceModal ↓ -->
+
+        <div class="modal fade" id="DocumentAAbsencesModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div id="overRideBS_modal-dialog-Absence" class="modal-dialog" role="document">
+                <div id="overRideBS_modal_4changeBg-Absence" class="modal-content">
+                    <div class="modal-header">
+                        <h2 id="AAbsenceModalTitle" class="modal-title">הוספת היעדרות</h2>
+                    </div>
+                    <div id="overRideBS_modal_4changelinesColor-Absence" class="modal-body">
+                        <span class="redTxt">* שדה חובה</span>
+                        <br />
+                        <br />
+                        <table id="DocumentAAbsenceTable">
+                            <tr>
+                                <td class="rightCol">מתאריך <span class="redTxt">*</span></td>
+                                <td class="leftCol">
+                                    <input name="DocumentAAbsenceDatePicker" id="DocumentAAbsenceDatePickerFrom" type="date" />
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="rightCol">עד תאריך <span class="redTxt">*</span></td>
+                                <td class="leftCol">
+                                    <input name="DocumentAAbsenceDatePicker" id="DocumentAAbsenceDatePickerUntil" type="date" />
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="rightCol">רכז.ת <span class="redTxt">*</span></td>
+                                <td class="leftCol">
+                                    <select id="DocumentAAbsence_choooseCoordinator">
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="rightCol">סיבת היעדרות <span class="redTxt">*</span></td>
+                                <td class="leftCol">
+                                    <select id="DocumentAAbsence_choooseContent" onchange="">
+                                        <option value="-1">יש לבחור סיבה</option>
+                                        <option value="מחלה">מחלה</option>
+                                        <option value='חול'>חו"ל</option>
+                                        <option value="אחר">אחר</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="rightCol">הערות</td>
+                                <td class="leftCol">
+                                    <textarea id="DocumentAAbsence_writeContent" maxlength="400" placeholder="&lt;מלל חופשי עד 155 תווים&gt;"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                            </tr>
+                        </table>
+                        <span id="DocumentAAbsence_contentErrorMsg" class="redTxt">יש למלא את כל שדות החובה (*)</span>
+                        <span id="DocumentAAbsence_CoordinatorErrorMsg" class="redTxt">תאריך התחלה גדול מתאריך החזרה, נא להכניס טווח תקין של תאריכים</span>
+                        <span id="DocumentAAbsence_DatesError" class="redTxt">תאריך החזרה חלף, יש לבחור תאריך חזרה עתידי</span>
+
+                    </div>
+                    <div class="text-right modal-footer">
+                        <!-- for some reason right in bs means left -->
+                        <button type="button" id="saveAbsenceBtn" class="fixWidth btn btn-secondary" onclick="documentAAbsence2DB()">שמירה</button>
+                        <button type="button" id="cancellAbsenceBtn" class="fixWidth btn btn-secondary" onclick="cancelAbsenceDocument()">ביטול</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ↑ DocumentAcallsModal ↑ -->
+        <div class="text-right modal-footer">
+            <!-- for some reason right in bs means left -->
+            <button type="button" class="btn btn-secondary closeBtn_DocumentAcallsModal" data-dismiss="modal">סגירה</button>
+        </div>
+    </div>
+</div>
+
+

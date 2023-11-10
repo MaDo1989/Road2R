@@ -295,7 +295,7 @@ public class CandidatesLogic
             query += ids.Last() != id ? "," : "";
         }
 
-        query += "exec spGetCandidatesDetails @IDs=@CandidatesIds";
+        query += "exec spGetCandidatesDetails_Gilad @IDs=@CandidatesIds";
 
         try
         {

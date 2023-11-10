@@ -129,7 +129,7 @@
             var active = $("#activePatient").prop('checked');
             $.ajax({
                 dataType: "json",
-                url: "WebService.asmx/getPatients",
+                url: "WebService.asmx/getPatients_Gilad",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
                 data: JSON.stringify({ active: active }),

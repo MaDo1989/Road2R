@@ -50,7 +50,7 @@ public class Volunteer
     string lastModified;
     string volunteerIdentity;
     bool? knowsArabic;
-
+    bool absenceStatus;
     string englishFN;
     string englishLN;
     bool? isDriving;
@@ -1324,6 +1324,19 @@ public class Volunteer
         }
     }
 
+    public bool AbsenceStatus
+    {
+        get
+        {
+            return absenceStatus;
+        }
+
+        set
+        {
+            absenceStatus = value;
+        }
+    }
+
     public Volunteer()
     {
         //
@@ -1447,6 +1460,9 @@ public class Volunteer
         return list;
     }
 
+
+
+
     public List<Volunteer> getVolunteersList_V2_WebOnly(bool active)
     {
         #region DB functions
@@ -1538,6 +1554,17 @@ public class Volunteer
 
         return list;
     }
+
+    public List <Volunteer> getVolunteersList_V2_WebOnly_Gilad(bool active)
+    {
+        DBservice_Gilad dBservice_Gilad = new DBservice_Gilad();
+        return dBservice_Gilad.getVolunteersList_V2_WebOnly_Gilad(active);
+    }
+
+
+
+
+
 
 
     public Volunteer getVolunteer()
@@ -1851,7 +1878,7 @@ public class Volunteer
             DbService db = new DbService();
             SqlCommand cmd = new SqlCommand();
             cmd.CommandType = CommandType.Text;
-            SqlParameter[] cmdParams = new SqlParameter[24];
+            SqlParameter[] cmdParams = new SqlParameter[25];
             cmdParams[0] = cmd.Parameters.AddWithValue("@address", v.Address);
             cmdParams[1] = cmd.Parameters.AddWithValue("@cell", v.CellPhone);
             cmdParams[2] = cmd.Parameters.AddWithValue("@cell2", v.CellPhone2);
@@ -1884,13 +1911,14 @@ public class Volunteer
             cmdParams[20] = cmd.Parameters.AddWithValue("@englishLN", v.EnglishLN);
             cmdParams[21] = cmd.Parameters.AddWithValue("@birthDate", v.BirthDate);
             cmdParams[22] = cmd.Parameters.AddWithValue("@isDriving", v.IsDriving);
+            
 
 
             if (v.Role == null)
                 v.Role = "ללא תפקיד";
             cmdParams[23] = cmd.Parameters.AddWithValue("@role", v.Role);
 
-
+            cmdParams[24] = cmd.Parameters.AddWithValue("@isActive", v.IsActive);
 
             string newName = v.FirstNameH + " " + v.LastNameH;
             newName = newName.Replace("'", "''");
@@ -2018,6 +2046,9 @@ public class Volunteer
                 {
                     throw e;
                 }
+
+
+
 
             }
         }

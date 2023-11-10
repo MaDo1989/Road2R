@@ -6,7 +6,7 @@ function manipulateDocumentedRidesModal(button, tableToWithdrawDataFrom) {
 
     let rowData = tableToWithdrawDataFrom.row($(button).parents('tr')).data();
 
-    $('#documentedRidesTitle').text("תיעוד הסעות " + rowData.DisplayName)
+    $('#documentedRidesTitle').text("תיעוד הסעות " + rowData.DisplayName.split('<br>')[0])
     $.ajax({
         dataType: "json",
         url: "WebService.asmx/GetVolunteersDocumentedRides",
