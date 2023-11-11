@@ -1927,7 +1927,7 @@ public class Volunteer
             if (func == "edit")
             {
                 ChangeLastUpdateBy(0, v.DisplayName);
-                IsSuccessAndReason isSuccessIsActiveToggleModel = SetVolunteerIsActive(v.DisplayName, v.IsActive);
+                IsSuccessAndReason isSuccessIsActiveToggleModel = SetVolunteerIsActive(v.Id, v.IsActive);
                 if (!isSuccessIsActiveToggleModel.IsSuccess)
                 {
                     throw new Exception(isSuccessIsActiveToggleModel.Reason);
@@ -2058,7 +2058,7 @@ public class Volunteer
         }
     }
 
-    public IsSuccessAndReason SetVolunteerIsActive(string displayName, bool? isActive)
+    public IsSuccessAndReason SetVolunteerIsActive(int id, bool? isActive)
     {
         dbs = new DbService();
         IsSuccessAndReason result = new IsSuccessAndReason();
@@ -2068,7 +2068,7 @@ public class Volunteer
             dbs = new DbService();
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.CommandText = "spVolunteer_ToggleActiveness";
-            cmd.Parameters.AddWithValue("@displayName", displayName);
+            cmd.Parameters.AddWithValue("@volunteerId", id);
             isActive = isActive ?? false;//if null then = false;
             cmd.Parameters.AddWithValue("@isActive", isActive);
 

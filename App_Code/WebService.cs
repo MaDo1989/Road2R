@@ -1416,12 +1416,12 @@ public class WebService : System.Web.Services.WebService
 
     #region volunteers functions
     [WebMethod(EnableSession = true)]
-    public string SetVolunteerIsActive(string displayName, string active)
+    public string SetVolunteerIsActive(int id, string active)
     {
         try
         {
             Volunteer v = new Volunteer();
-            IsSuccessAndReason result = v.SetVolunteerIsActive(displayName, active == "true");
+            IsSuccessAndReason result = v.SetVolunteerIsActive(id, active == "true");
 
             return j.Serialize(result);
 
