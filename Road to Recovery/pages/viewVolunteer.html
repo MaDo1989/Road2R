@@ -126,7 +126,7 @@
             var userName = GENERAL.USER.getUserDisplayName();
             $("#userName").html(userName);
             $("#closeModal").click(function () {
-                
+
             });
 
 
@@ -206,7 +206,7 @@
                         //כפתור צפייה כרגע מוסתר
                         //var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button>";
                         var editBtn = "<div class='btnWrapper-right'><button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button></div>";
-                        
+
                         btnStr += /*showBtn + " " +*/ editBtn;
                         let deleteBtn = '';
                         if (arr_volunteers[i].IsActive == false) {
@@ -230,7 +230,7 @@
                         showDocumentedRidesBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedRidesBtn" title="תיעוד הסעות" data-toggle="modal" data-target="#documentedRidesModal"><i class="fa fa-car" aria-hidden="true"></i></button></div>';
                         btnStr += showDocumentedRidesBtn;
 
-                        
+
 
 
                         let showDocumentedCallsBtn = '';
@@ -270,13 +270,13 @@
 
                         let volunteerTypeAndGender = buildvolunteerTypeAndGenderHTML(arr_volunteers[i].TypeVol, arr_volunteers[i].Gender);
                         let englishNameVolunteer = ''
-                        if (arr_volunteers[i].EnglishName!='') {
-                            englishNameVolunteer = ' <br> '+arr_volunteers[i].EnglishName;
+                        if (arr_volunteers[i].EnglishName != '') {
+                            englishNameVolunteer = ' <br> ' + arr_volunteers[i].EnglishName;
                         }
 
                         var Volunteer = {
                             Id: arr_volunteers[i].Id,
-                            DisplayName: arr_volunteers[i].DisplayName+englishNameVolunteer,
+                            DisplayName: arr_volunteers[i].DisplayName + englishNameVolunteer,
                             TypeVol: volunteerTypeAndGender,
                             CellPhone: arr_volunteers[i].CellPhone,
                             CellPhone2: cellphone2,
@@ -292,7 +292,7 @@
                         }
                         allVolunteersFromDb.push(Volunteer);
                     }
-                    
+
 
                     tbl = $('#datatable-buttons').DataTable({
                         data: allVolunteersFromDb,
@@ -337,10 +337,10 @@
                     });
 
                     buttonsEvents();
-                    
+
                     //Gilad Touch Here.
                     // to toggle the modal use this button ניהול היעדרויות.
-                    if (activeChangedFlag==false) {
+                    if (activeChangedFlag == false) {
                         $('#DocumentedCallsModal .modal-body')[0].innerHTML += `<button onclick="ManageAbsenceToggle()" class="AbsenceBtn btn waves-effect btn-primary">ניהול היעדרויות</button>`;
 
                     }
@@ -414,7 +414,7 @@
             str = ReverseString(str);
 
             let split = str.split("-");
-            if (split[1].length==1) {
+            if (split[1].length == 1) {
                 split[1] = '0' + split[1];
             }
             if (split[2].length == 1) {
@@ -457,7 +457,7 @@
                     confirmButtonText: "מחיקה",
                     closeOnConfirm: false
                 }, function () {
-                    deactivateVolunteer(data.DisplayName, 'false');
+                    deactivateVolunteer(data.Id, 'false');
                     setTimeout(function () { refreshTable() }, 1001);
                 });
             });
@@ -474,7 +474,7 @@
                     confirmButtonText: "שחזר",
                     closeOnConfirm: false
                 }, function () {
-                    deactivateVolunteer(data.DisplayName, 'true');
+                    deactivateVolunteer(data.Id, 'true');
                     swal({
                         title: "המתנדב הפך לפעיל",
                         timer: 1000,
@@ -550,7 +550,7 @@
             });
         }
 
-        function deactivateVolunteer(displayName, active) {
+        function deactivateVolunteer(id, active) {
             checkCookie();
 
 
@@ -559,7 +559,7 @@
                 url: "WebService.asmx/SetVolunteerIsActive",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                data: JSON.stringify({ displayName: displayName, active: active }),
+                data: JSON.stringify({ id: id, active: active }),
                 success: function (data) {
 
                     const response = JSON.parse(data.d);
@@ -646,9 +646,9 @@
 
                         <!--Search-->
                         <!--<form role="search" class="navbar-right app-search pull-right hidden-xs">
-                        <input type="text" placeholder="חיפוש..." class="form-control app-search-input">
-                        <a href=""><i class="fa fa-search"></i></a>
-                    </form>-->
+                            <input type="text" placeholder="חיפוש..." class="form-control app-search-input">
+                            <a href=""><i class="fa fa-search"></i></a>
+                        </form>-->
                     </div>
                     <!--/.nav-collapse -->
                 </div>
@@ -691,19 +691,19 @@
                             <div class="card-box table-responsive">
 
                                 <!--<div class="row">
-                                <div class="col-sm-8">
-                                    <h4 class="m-t-0 header-title"><b>טבלת מתנדבים</b></h4>
-                                    <p class="text-muted font-13 m-b-30">
-                                        מבט כללי על המתנדבים שבוצעו, ניתן לצפות בפרטים נוספים בלחיצה על כפתור ההרחבה.
-                                    </p>
-                                </div>
-                                <div class="col-sm-4 text-right">
-                                    <button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button> צפייה
-                                    <button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button> עריכה
-                                    <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button> מחיקה
-                                    <button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo'></i></button> שחזור
-                                </div>
-                            </div>-->
+                                    <div class="col-sm-8">
+                                        <h4 class="m-t-0 header-title"><b>טבלת מתנדבים</b></h4>
+                                        <p class="text-muted font-13 m-b-30">
+                                            מבט כללי על המתנדבים שבוצעו, ניתן לצפות בפרטים נוספים בלחיצה על כפתור ההרחבה.
+                                        </p>
+                                    </div>
+                                    <div class="col-sm-4 text-right">
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' title='צפייה'><i class='fa fa-wpforms'></i></button> צפייה
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' title='עריכה'><i class='ti-pencil'></i></button> עריכה
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button> מחיקה
+                                        <button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='reactive' title='שחזור'><i class='fa fa-undo'></i></button> שחזור
+                                    </div>
+                                </div>-->
                                 <div class="row">
                                     <div class="col-sm-3 checkbox checkbox-primary text-left">
                                         <input id="activeCustomers" type="checkbox" onchange="ActiveMode()" checked>

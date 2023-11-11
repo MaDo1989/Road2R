@@ -462,6 +462,7 @@
                         // generateBarrierPat(patient);
                         //generateStatus(patient);
                         //generateGender(patient);
+                        $('#patientId').html(patient.Id)
                         $("#PatientName").val(patient.DisplayName);
                         $("#patientEnglishName").val(patient.EnglishName);
                         $("#patientFirstName").val(patient.FirstNameH);
@@ -1264,6 +1265,7 @@
                         </form>
                     </div>
                 </div>
+                <span hidden id="patientId"></span>
                 <!-- end container -->
             </div>
             <!-- end content -->
@@ -1430,8 +1432,9 @@
                     //      IsAnonymous = true;
                     // }
 
-                    var Pat = JSON.parse(GENERAL.PATIENTS.getPatientsList());
-                    var Id = Pat.Id;
+                    let Pat = JSON.parse(GENERAL.PATIENTS.getPatientsList());
+                    let Id = parseInt($('#patientId').html());
+
 
                     //set Equipment
                     var selected = [];
