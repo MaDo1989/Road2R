@@ -1555,7 +1555,7 @@ public class Volunteer
         return list;
     }
 
-    public List <Volunteer> getVolunteersList_V2_WebOnly_Gilad(bool active)
+    public List<Volunteer> getVolunteersList_V2_WebOnly_Gilad(bool active)
     {
         DBservice_Gilad dBservice_Gilad = new DBservice_Gilad();
         return dBservice_Gilad.getVolunteersList_V2_WebOnly_Gilad(active);
@@ -1573,8 +1573,18 @@ public class Volunteer
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
         SqlParameter[] cmdParams = new SqlParameter[1];
-        cmdParams[0] = cmd.Parameters.AddWithValue("name", displayName);
-        string query = "select * from VolunteerTypeView where displayName=@name";
+        string query;
+
+        if (Id != -1)
+        {
+            cmdParams[0] = cmd.Parameters.AddWithValue("id", Id);
+            query = "select * from VolunteerTypeView where id=@id";
+        }
+        else //support mobile? -need to be fixes asap
+        {
+            cmdParams[0] = cmd.Parameters.AddWithValue("name", displayName);
+            query = "select * from VolunteerTypeView where displayName=@name";
+        }
         Volunteer v = new Volunteer();
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query, true, cmd.CommandType, cmdParams);
@@ -1911,7 +1921,7 @@ public class Volunteer
             cmdParams[20] = cmd.Parameters.AddWithValue("@englishLN", v.EnglishLN);
             cmdParams[21] = cmd.Parameters.AddWithValue("@birthDate", v.BirthDate);
             cmdParams[22] = cmd.Parameters.AddWithValue("@isDriving", v.IsDriving);
-            
+
 
 
             if (v.Role == null)

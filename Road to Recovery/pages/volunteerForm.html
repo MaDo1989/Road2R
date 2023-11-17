@@ -196,7 +196,7 @@
             if (JSON.parse(GENERAL.VOLUNTEERS.getVolunteersList()).length != 0) {
                 arr_volunteer = JSON.parse(GENERAL.VOLUNTEERS.getVolunteersList());
                 if (arr_volunteer.func == "edit" || arr_volunteer.func == "show") {
-                    uploadDataVol(arr_volunteer.displayName);
+                    uploadDataVol(arr_volunteer.displayName, arr_volunteer.id);
 
                     if (arr_volunteer.func == "show") {
                         $("#activeVolunteer").attr('disabled', 'disabled');
@@ -248,13 +248,13 @@
         }
 
         //function to fill form for edit
-        function uploadDataVol(displayName) {
+        function uploadDataVol(displayName, id) {
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/getVolunteer",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                data: JSON.stringify({ displayName: displayName }),
+                data: JSON.stringify({ displayName: displayName, id: id }),
                 success: function (data) {
                     var volunteer = JSON.parse(data.d);
                     console.log(volunteer)

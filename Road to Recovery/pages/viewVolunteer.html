@@ -433,7 +433,8 @@
 
             $('#datatable-buttons tbody').on('click', '#edit', function () {
                 var data = tbl.row($(this).parents('tr')).data();
-                arr_details = { displayName: data.DisplayName, func: "edit" };
+                //arr_details = { displayName: data.DisplayName, func: "edit" };
+                arr_details = { displayName: data.DisplayName, id: data.Id, func: "edit" };
                 GENERAL.VOLUNTEERS.setVolunteersList(JSON.stringify(arr_details));
                 location.href = "volunteerForm.html";
             });

@@ -1679,12 +1679,13 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
-    public string getVolunteer(string displayName)
+    public string getVolunteer(string displayName = "", int id = -1)
     {
         try
         {
             Volunteer v = new Volunteer();
             v.DisplayName = displayName;
+            v.Id = id;
             Volunteer volunteer = v.getVolunteer();
             return j.Serialize(volunteer);
         }
