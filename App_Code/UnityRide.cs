@@ -11,8 +11,13 @@ public class UnityRide
     int ridePatNum;
 	string patientName;
     int patientId;
+    string patientStatus;
+    string patientBirthdate;
 	string patientCellPhone;
-	string origin;
+    int amountOfEscorts;
+    int amountOfEquipments;
+    List<string> patientEquipments;
+    string origin;
 	string destination;
 	DateTime pickupTime;
 	string coorName;
@@ -303,7 +308,70 @@ public class UnityRide
         }
     }
 
+    public string PatientStatus
+    {
+        get
+        {
+            return patientStatus;
+        }
 
+        set
+        {
+            patientStatus = value;
+        }
+    }
+
+    public string PatientBirthdate
+    {
+        get
+        {
+            return patientBirthdate;
+        }
+
+        set
+        {
+            patientBirthdate = value;
+        }
+    }
+
+    public int AmountOfEscorts
+    {
+        get
+        {
+            return amountOfEscorts;
+        }
+
+        set
+        {
+            amountOfEscorts = value;
+        }
+    }
+
+    public int AmountOfEquipments
+    {
+        get
+        {
+            return amountOfEquipments;
+        }
+
+        set
+        {
+            amountOfEquipments = value;
+        }
+    }
+
+    public List<string> PatientEquipments
+    {
+        get
+        {
+            return patientEquipments;
+        }
+
+        set
+        {
+            patientEquipments = value;
+        }
+    }
 
     public List<UnityRide> GetUnityRideView(int days)
     {

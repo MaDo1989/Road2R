@@ -11,13 +11,62 @@ using System.Web.UI.WebControls;
 using log4net.Util.TypeConverters;
 using System.Activities.Expressions;
 using System.Linq;
+using System.Data.Common;
 //using static ReportService;
 
 public class DBservice_Gilad
 {
 	public SqlConnection con;
 
+    public List<string> GetListOfEquipmentsForPAtient(int patientID)
+    {
+        List<string> list2Return = new List<string>();
+        SqlCommand cmd2;
+        Dictionary<string, object> paramDic2 = new Dictionary<string, object>();
+        paramDic2.Add("@patientId", patientID);
+        SqlConnection con2;
+        try
+        {
+            con2 = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con2.Open();
+        }
 
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+
+        cmd2 = CreateCommandWithStoredProcedureGeneral("spGetEquipmentsForSpesificPatient", con2, paramDic2);
+        try
+        {
+            SqlDataReader dataReader2 = cmd2.ExecuteReader(CommandBehavior.CloseConnection);
+            while (dataReader2.Read())
+            {
+                string oneEquipment;
+                oneEquipment = dataReader2["EquipmentName"].ToString();
+                list2Return.Add(oneEquipment);
+            }
+            return list2Return;
+
+        }
+        catch (Exception ex)
+        {
+
+            throw (ex);
+        }
+        finally
+        {
+            if (con2 != null)
+            {
+                con2.Close();
+            }
+
+        }
+        
+
+    }
 
     public List<UnityRide> GetRidesForRidePatView(int days)
     {
@@ -53,6 +102,14 @@ public class DBservice_Gilad
                 oneRide.PatientName = dataReader["PatientName"].ToString();
                 oneRide.PatientId = Convert.ToInt32(dataReader["PatientId"]);
                 oneRide.PatientCellPhone = dataReader["PatientCellPhone"].ToString();
+                oneRide.PatientStatus = dataReader["PatientStatus"].ToString();
+                oneRide.PatientBirthdate = dataReader["PatientBirthDate"].ToString();
+                oneRide.AmountOfEquipments = Convert.ToInt32(dataReader["AmountOfEquipments"]);
+                if (oneRide.AmountOfEquipments > 0)
+                {
+                    oneRide.PatientEquipments = GetListOfEquipmentsForPAtient(oneRide.PatientId);
+                }
+                oneRide.AmountOfEscorts = Convert.ToInt32(dataReader["AmountOfEscorts"]);
                 oneRide.Origin = dataReader["Origin"].ToString();
                 oneRide.Destination = dataReader["Destination"].ToString();
                 oneRide.PickupTime = Convert.ToDateTime(dataReader["pickupTime"]);
@@ -85,7 +142,15 @@ public class DBservice_Gilad
                     oneRide.NoOfDocumentedRides = Convert.ToInt32(dataReader["NoOfDocumentedRides"]);
 
                 }
-                oneRide.IsAnonymous = Convert.ToBoolean(dataReader["IsAnonymous"]);
+                if (dataReader.IsDBNull(dataReader.GetOrdinal("IsAnonymous")))
+                {
+                    oneRide.IsAnonymous = false;
+                }
+                else
+                {
+                    oneRide.IsAnonymous = Convert.ToBoolean(dataReader["IsAnonymous"]);
+
+                }
                 oneRide.IsNewDriver = Convert.ToBoolean(dataReader["IsNewDriver"]);
                 list2Return.Add(oneRide);
 
