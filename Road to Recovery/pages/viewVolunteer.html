@@ -553,7 +553,9 @@
         function deactivateVolunteer(displayName, active) {
             checkCookie();
 
-
+            //fixing bug with <br> tag
+            //console.log('Gilad-->',displayName.split('<br>')[0])
+            displayName = displayName.split('<br>')[0];
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/SetVolunteerIsActive",
