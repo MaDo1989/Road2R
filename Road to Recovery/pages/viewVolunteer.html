@@ -467,7 +467,7 @@
                 swal({
                     title: "האם אתם בטוחים?",
                     type: "warning",
-                    text: "שחזור המתנדב " + data.DisplayName,
+                    text: "שחזור המתנדב " + data.DisplayName.split("<br>")[0],
                     showCancelButton: true,
                     cancelButtonText: "בטל",
                     confirmButtonClass: 'btn-warning',
