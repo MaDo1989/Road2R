@@ -11,8 +11,11 @@ public class UnityRide
     int ridePatNum;
 	string patientName;
     int patientId;
+    int patientGender;
     string patientStatus;
+    DateTime patientStatusEditTime;
     string patientBirthdate;
+    int patientAge;
 	string patientCellPhone;
     int amountOfEscorts;
     int amountOfEquipments;
@@ -370,6 +373,45 @@ public class UnityRide
         set
         {
             patientEquipments = value;
+        }
+    }
+
+    public DateTime PatientStatusEditTime
+    {
+        get
+        {
+            return patientStatusEditTime;
+        }
+
+        set
+        {
+            patientStatusEditTime = value;
+        }
+    }
+
+    public int PatientGender
+    {
+        get
+        {
+            return patientGender;
+        }
+
+        set
+        {
+            patientGender = value;
+        }
+    }
+
+    public int PatientAge
+    {
+        get
+        {
+            return patientAge;
+        }
+
+        set
+        {
+            patientAge = value;
         }
     }
 

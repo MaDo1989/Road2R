@@ -94,6 +94,7 @@ public class DBservice_Gilad
 
 
             SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+            DateTime? nullableDateTime = null;
 
             while (dataReader.Read())
             {
@@ -101,9 +102,29 @@ public class DBservice_Gilad
                 oneRide.RidePatNum = Convert.ToInt32(dataReader["RidePatNum"]);
                 oneRide.PatientName = dataReader["PatientName"].ToString();
                 oneRide.PatientId = Convert.ToInt32(dataReader["PatientId"]);
+                oneRide.PatientGender =Convert.ToInt32(Convertions.ConvertStringToGender(dataReader["PatientGender"].ToString()));
                 oneRide.PatientCellPhone = dataReader["PatientCellPhone"].ToString();
                 oneRide.PatientStatus = dataReader["PatientStatus"].ToString();
+                if (oneRide.PatientStatus!="")
+                {
+                    oneRide.PatientStatusEditTime = Convert.ToDateTime(dataReader["patientStatusTime"]);
+
+                }
+
+                //another option*
+                //if(dataReader.IsDBNull(dataReader.GetOrdinal("patientStatusTime"))){
+
+                //}
+                //else
+                //{
+                //    oneRide.PatientStatusEditTime = Convert.ToDateTime(dataReader["patientStatusTime"]);
+
+                //}
+
                 oneRide.PatientBirthdate = dataReader["PatientBirthDate"].ToString();
+                DateTime? dateOfBirth = String.IsNullOrEmpty(dataReader["PatientBirthDate"].ToString()) ? null : (DateTime?)Convert.ToDateTime(dataReader["PatientBirthDate"].ToString());
+                oneRide.PatientAge = Convert.ToInt32(Calculations.CalculateAge(dateOfBirth));
+
                 oneRide.AmountOfEquipments = Convert.ToInt32(dataReader["AmountOfEquipments"]);
                 if (oneRide.AmountOfEquipments > 0)
                 {
