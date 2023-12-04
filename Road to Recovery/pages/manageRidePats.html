@@ -2455,7 +2455,7 @@
 
             var volunteerId = -1 // VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
             //gilad check
-            console.log('Gilad check this -->', volunteerId, timeInterval)
+            console.log('Gilad check this new func* -->', volunteerId, timeInterval)
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/GetUnityRide",
@@ -2468,7 +2468,7 @@
                 success: function (data) {
                     $('#wait').hide();
                     arr_rides = JSON.parse(data.d);
-                    console.log('Gilad check this -->', arr_rides)
+                    console.log('Gilad check this new func*  -->', arr_rides)
                     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
 
                     let thisRidePatDate;
@@ -2510,16 +2510,16 @@
                         }
                         thisRidePatDate = convertDBDate2FrontEndDate(arr_rides[i].PickupTime);
                         timeHTML = buildTimeHTML(thisRidePatDate, arr_rides[i].RidePatNum);
-                        numOfEscorts = arr_rides[i].Escorts.length;
+                        numOfEscorts = arr_rides[i].AmountOfEscorts;
 
                         //#region adjust patient column
-                        patientHTML = buildPatientHTML(arr_rides[i]);
+                        patientHTML = buildPatientHTML_AfterUnited(arr_rides[i]);
                         //#endregion
 
                         //#region adjust driver column
                         driverHTML = '';
 
-                        if (arr_rides[i].Drivers.length > 0) {
+                        if (arr_rides[i].DriverName !='') {
 
                             driverHTML = buildDriverHTML(arr_rides[i].RidePatNum, arr_rides[i].Drivers[0], arr_rides[i].RideNum);
                         } else {
@@ -3176,7 +3176,7 @@
 
             var volunteerId = -1 // VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
             //gilad check
-            console.log('Gilad check this -->', volunteerId, timeInterval)
+            console.log('Gilad check this regular refresh* -->', volunteerId, timeInterval)
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/GetRidePatView",
@@ -4052,6 +4052,108 @@
 
             return driverWrapper;
         }
+
+        //this is for check after gilad changes to united tabels with new api 3/12
+        const buildPatientHTML_AfterUnited = (ridepat) => {
+
+            let patientPhone2render = "";
+            let numOfEscorts = ridepat.AmountOfEscorts;
+            let numOfPassengers = '<span class="numOfPassengers">נוסע יחיד</span>';
+            let numOfPassengers_English =
+                '<span class="numOfPassengers">single passenger</span>';
+            let escortsPhone2render = "";
+            let equipmentsAndnumOfPassengers = "";
+
+            if (validateMobileNumFullVersion(ridepat.PatientCellPhone)) {
+                patientPhone2render = `<span class="patientPhone2render">${addSeperator2MobileNum(
+                    ridepat.PatientCellPhone,
+                    "-"
+                )}</span>`;
+            }
+
+            if (numOfEscorts > 0) {
+
+                numOfPassengers = `<span class="numOfPassengers">${numOfEscorts + (ridepat.OnlyEscort ? 0 : 1)//+1 is the patient himself
+                    } נוסעים</span>`;
+                numOfPassengers_English = `<span class="numOfPassengers">${numOfEscorts + (ridepat.OnlyEscort ? 0 : 1)
+                    } passengers</span>`;
+
+
+
+                // Gilad comment out it --> avraham doesnt want the phone Number of Escorts its no needed !!
+                //escortsPhone2render = '<span class="escortsPhone2render block">מלווים: ';
+                numOfRealEscorts = 0;
+
+                //ridepat.Escorts.map((es, i) => {
+                //    if (validateMobileNumFullVersion(es.CellPhone)) {
+                //        numOfRealEscorts++;
+                //        escortsPhone2render += `${addSeperator2MobileNum(
+                //            es.CellPhone,
+                //            "-"
+                //        )}, `;
+
+                //        if (i === numOfEscorts - 1) {
+                //            escortsPhone2render = escortsPhone2render.substring(
+                //                0,
+                //                escortsPhone2render.length - 2
+                //            );
+                //            escortsPhone2render += "</span>";
+                //        }
+
+                //    }
+                //});
+                if (numOfRealEscorts === 0) escortsPhone2render = "";
+            } else {
+                numOfPassengers = `<span class="numOfPassengers">נוסע יחיד</span>`;
+                numOfPassengers_English = `<span class="numOfPassengers">single pasnger</span>`;
+            }
+
+            if (ridepat.PatientEquipments!=null) {
+                equipmentsAndnumOfPassengers = `<div class="equipmentsAndnumOfPassengers">`;
+                equipmentsAndnumOfPassengers += isAssistant
+                    ? numOfPassengers_English
+                    : numOfPassengers;
+                equipmentsAndnumOfPassengers += `<div>`;
+                ridepat.Pat.Equipment.map((eq) => {
+                    equipmentsAndnumOfPassengers += `<img class="equipments-img" src="../../Media/${eq}.png" />`;
+                });
+                equipmentsAndnumOfPassengers += `</div>`;
+                equipmentsAndnumOfPassengers += `</div>`;
+            } else {
+                equipmentsAndnumOfPassengers = `<div class="equipmentsAndnumOfPassengers block">`;
+                equipmentsAndnumOfPassengers += isAssistant
+                    ? numOfPassengers_English
+                    : numOfPassengers;
+                equipmentsAndnumOfPassengers += `</div>`;
+            }
+
+            let patientAddons =
+                equipmentsAndnumOfPassengers + patientPhone2render + escortsPhone2render;
+            let patientName2render = "";
+            let patient_English_Name2render = "";
+
+            if (ridepat.PatientName.includes("אנונימי")) {
+                patientName2render = "<span class='boldFont'>חולה</span>";
+                patient_English_Name2render = "<span class='boldFont'>patient</span>";
+            } else {
+                patientName2render = `<a href="patientform.html" data-obj="patient" class='showMe blueFont clickable boldFont' id='${ridepat.PatientId}'>${ridepat.PatientName}</a>`;
+                patient_English_Name2render = `<a href="patientform.html" data-obj="patient" class='showMe blueFont clickable boldFont' id='${ridepat.Pat.Id}'>${ridepat.Pat.EnglishName}</a>`;
+            }
+
+
+            let result = null;
+            if (isAssistant) {
+
+                result = patient_English_Name2render;
+            } else {
+
+                result = patientName2render
+            }
+
+            result = result.concat(' ' + patientAddons);
+
+            return result;
+        };
 
         const buildPatientHTML = (ridepat) => {
 
