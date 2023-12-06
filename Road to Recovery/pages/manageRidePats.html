@@ -1643,7 +1643,7 @@
             });
 
             getCoors();
-            refreshTable();
+            refreshTable()
 
             if (!isAssistant) {
 
@@ -2423,8 +2423,8 @@
         }
 
 
-        //Gilad Try somthing
-        function refreshTable_Gilad_TEST_TEST(timeInterval = 7) {
+        //This one take from unityRide the data *work* needed to switch between refreshTable func to refreshTable_UnityRide func
+        function refreshTable_UnityRide(timeInterval = 7) {
             $('#wait').show();
 
             morningRidePats = [];
@@ -2563,8 +2563,9 @@
                         //custom object for buildPatientAgeHTML function.
                         let ageObj = {}
                         ageObj.Age = arr_rides[i].PatientAge;
-                        ageObj.GenderAsEnum = arr_rides[i].PatientGender
-                        patientAge = buildPatientAgeHTML(ageObj);
+                        ageObj.GenderAsEnum = arr_rides[i].PatientGender;
+                        ageObj.IsAnonymous = arr_rides[i].IsAnonymous;
+                        patientAge = buildPatientAgeHTML_AfterUnited(ageObj);
                         //#endregion
 
 
@@ -2580,8 +2581,10 @@
                         thisRidePat = {
                             ridePatNum: arr_rides[i].RidePatNum,
                             time: timeHTML,
-                            origin: isAssistant ? arr_rides[i].Origin.EnglishName : arr_rides[i].Origin.Name,
-                            destination: isAssistant ? arr_rides[i].Destination.EnglishName : arr_rides[i].Destination.Name,
+                            //origin: isAssistant ? arr_rides[i].Origin.EnglishName : arr_rides[i].Origin.Name,
+                            //destination: isAssistant ? arr_rides[i].Destination.EnglishName : arr_rides[i].Destination.Name,
+                            origin: arr_rides[i].Origin,
+                            destination: arr_rides[i].Destination,
                             patient: patientHTML,
                             patientAge: patientAge,
                             driver: driverHTML,
@@ -2631,6 +2634,7 @@
                     //           || ↓DATATABLES PROPERTIES↓||
                     //           ============================
 
+                    console.log('Morning table data-->', morningRidePats);
                     tMorning = $(`#${tableNames.MORNING}`).DataTable({
                         data: morningRidePats,
                         rowId: 'ridePatNum',
@@ -3167,11 +3171,6 @@
                 }
             });
         }
-
-
-
-
-
 
         function refreshTable(timeInterval = 7) {
             $('#wait').show();
@@ -3977,6 +3976,54 @@
             return result;
         }
 
+
+        const buildPatientAgeHTML_AfterUnited = (patient) => {
+
+            let age = '';
+            const boy = 'בן ', girl = 'בת ';
+            const gender = GetPatientGender(patient.GenderAsEnum, isAssistant)
+            const isMaleHebrew = gender === maleInHebrew;
+            const isMaleEnglish = gender === male;
+
+            if (gender.length === 0 && IsNullOrUndefined(patient.Age)) {
+                return '';
+            }
+
+            if (IsNullOrUndefined(patient.Age)) {
+
+                let result = '';
+
+                if (!isAssistant) {
+
+                    result = isMaleHebrew ? boy : girl;
+                } else {
+
+                    result = isMaleEnglish ? male : female;
+                }
+
+                return result;
+            }
+
+            if (patient.IsAnonymous !== true) {
+                const isGenderEmpty = gender === '';
+                age = '<span>'
+
+                if (!isAssistant) {
+
+                    age += isMaleHebrew ? boy : gender === femaleInHebrew ? girl : '';
+                }
+                else {
+
+                    age += isMaleEnglish ? 'his age ' : gender === female ? 'her age ' : '';
+                }
+
+                age += patient.Age;
+                age += '</span>';
+            }
+
+
+            return age;
+        }
         const buildPatientAgeHTML = (patient) => {
 
             let age = '';

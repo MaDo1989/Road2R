@@ -1649,8 +1649,77 @@
             }
         }
 
+        // will needed for later to custom
+        const CustomObject = (thisRide) => {
+
+            let CustomObj = {};
+            CustomObj.RidePatNum = thisRide[0].Value;
+            CustomObj.Status = thisRide[9].Value;
+            CustomObj.Remark = thisRide[8].Value;
+            CustomObj.OnlyEscort = thisRide[10].Value;
+            CustomObj.LastModified = thisRide[11].Value;
+            CustomObj.Date = thisRide[7].Value;
+
+            CustomObj.Pat = {};
+            CustomObj.Pat.DisplayName = thisRide[1].Value;
+            CustomObj.Pat.DisplayNameA = thisRide[16].Value;
+            CustomObj.Pat.EnglishName = thisRide[14].Value;
+            CustomObj.Pat.PatientIdentity = thisRide[15].Value;
+            CustomObj.Pat.Equipment = thisRide[17].Value;
+            CustomObj.Pat.IsAnonymous = thisRide[19].Value;
+            CustomObj.Escorts = [];
+            for (var i = 0; i < thisRide[18].Value.length; i++) {
+                let oneEscort = {}
+                oneEscort.Id = thisRide[18].Value[i][0].Value;
+                oneEscort.DisplayName = thisRide[18].Value[i][1].Value;
+                CustomObj.Escorts.push(oneEscort);
+            }
+
+
+            CustomObj.Drivers = [];
+            let Maindriver = {};
+            Maindriver.DisplayName = thisRide[13].Value;
+            Maindriver.Id = thisRide[12].Value;
+            CustomObj.Drivers.push(Maindriver);
+            if (Maindriver.Id == null) {
+                CustomObj.Drivers = [];
+            }
+
+            CustomObj.Destination = {};
+            CustomObj.Destination.Name = thisRide[6].Value;
+            CustomObj.Origin = {};
+            CustomObj.Origin.Name = thisRide[5].Value;
+
+            return CustomObj;
+        }
+
+
+        //Test the New Api for load data in this page
+        const Check_test_API = (ridePatNum) => {
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/GetUnityRideToEdit",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                data: JSON.stringify({ UnityRideId: ridePatNum }),
+                success: function (data) {
+                    let thisRide = JSON.parse(data.d)[0];
+                    console.log('Before Custom', thisRide);
+                    thisRide = CustomObject(thisRide);
+                    console.log('After Custom', thisRide);
+
+
+                },
+                error: function (err) {
+                    $('#wait').hide();
+                    alert("Error in uploadData: " + err.responseText);
+                }
+            });
+        }
+
         //function to fill form for edit
         async function uploadData(ridePatNum) {
+            console.log('Gilad check i just clicked', ridePatNum)
             //  generatePat();
             getPatients_slim();
             generateLocation()
@@ -1673,6 +1742,7 @@
 
 
                             ridePat = JSON.parse(data.d);
+                            console.log('how its need to look like :', ridePat);
                             escorts_inthisRidePat = ridePat.Escorts;
 
 

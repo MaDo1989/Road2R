@@ -975,7 +975,27 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+    //Gilad update 06/12/23 use for edit one ride
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetUnityRideToEdit(int UnityRideId)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+            UnityRide unityRide = new UnityRide();
+            j.MaxJsonLength = Int32.MaxValue;
+            return j.Serialize(unityRide.GetUnityRide(UnityRideId));
 
+
+        }
+        catch (Exception ex)
+        {
+            CatchErrors catchErrors = new CatchErrors("WebService: Exception in GetUnityRide", ex + " " + ex.Message + " " + ex.InnerException + " " + ex.Source, ex.StackTrace);
+            Log.Error("Error in GetUnityRide", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+    }
 
     //This method is used for שבץ אותי
     [WebMethod(EnableSession = true)]

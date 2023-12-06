@@ -420,4 +420,9 @@ public class UnityRide
         DBservice_Gilad dBservice_Gilad = new DBservice_Gilad();
         return dBservice_Gilad.GetRidesForRidePatView(days);
     }
+    public List<object> GetUnityRide(int UnityRideId)
+    {
+        DBservice_Gilad dBservice = new DBservice_Gilad();
+        return dBservice.GetUnityRide(UnityRideId);
+    }
 }
