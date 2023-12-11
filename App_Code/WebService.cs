@@ -290,11 +290,11 @@ public class WebService : System.Web.Services.WebService
 
     //Gilad try to set UnityRide 
     [WebMethod(EnableSession = true)]
-    public int setUnityRide(UnityRide unityRide)
+    public int setUnityRide(UnityRide unityRide,string func,int numOfRide,string repeatEvery)
     {
         try
         {
-            int res = unityRide.SetUnityRide(unityRide);
+            int res = unityRide.SetUnityRide(unityRide,func,numOfRide,repeatEvery);
             return res; 
         }
         catch (Exception ex)

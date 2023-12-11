@@ -836,22 +836,22 @@
             console.log('After Custom', unityRide);
             let dataString = JSON.stringify({ unityRide });
 
-             $.ajax({
-                        dataType: "json",
-                        url: "WebService.asmx/setUnityRide",
-                        contentType: "application/json; charset=utf-8",
-                        type: "POST",
-                        data: dataString,
-                        success: function (data) {
-                            console.log('Sucsses res -->', data);
+             //$.ajax({
+             //           dataType: "json",
+             //           url: "WebService.asmx/setUnityRide",
+             //           contentType: "application/json; charset=utf-8",
+             //           type: "POST",
+             //           data: dataString,
+             //           success: function (data) {
+             //               console.log('Sucsses res -->', data);
 
-                        },
-                        error: function (err) {
-                            $('#wait').hide();
-                            console.log('Error from new API',err);
+             //           },
+             //           error: function (err) {
+             //               $('#wait').hide();
+             //               console.log('Error from new API',err);
                                 
-                        }
-             });
+             //           }
+             //});
 
 
 

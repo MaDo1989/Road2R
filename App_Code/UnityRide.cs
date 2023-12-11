@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Activities.Expressions;
 using System.Collections;
 using System.Collections.Generic;
@@ -426,11 +426,43 @@ public class UnityRide
         return dBservice.GetUnityRide(UnityRideId);
     }
 
-    public int SetUnityRide(UnityRide unityride)
+    public int SetUnityRide(UnityRide unityride, string func, int numOfRide, string repeatEvery)
     {
         DBservice_Gilad dBservice = new DBservice_Gilad();
-        return dBservice.SetUnityRide(unityride);
+
+        if (func=="new")
+        {
+            if (numOfRide==1)
+            {
+                return dBservice.SetUnityRide(unityride);
+
+            }
+            else
+            {
+                List<DateTime> dateList = new List<DateTime>();
+                dateList = BuildFutureRidesDates(unityride.pickupTime, repeatEvery, numOfRide);
+                for (int i = 0; i < dateList.Count; i++)
+                {
+                    int res = 0;
+                    unityride.PickupTime = dateList[i];
+                    res=dBservice.SetUnityRide(unityride);
+                    if (i==dateList.Count-1)
+                    {
+                        return res;
+                    }
+                }
+            }
+
+
+        }
+        else if(func=="edit"){
+            return dBservice.UpdateUnityRide(unityride);
+        }
+        // if didnt send func name its an error = -1 ;
+        return -1;
     }
+
+
 
     public string NEWCheckLocationForUnityRideArea(string origin, string destination)
     {
@@ -453,5 +485,36 @@ public class UnityRide
             }
         }
         return rideArea;
+    }
+
+    private List<DateTime> BuildFutureRidesDates(DateTime date, string repeatRideEvery, int numberOfRides)
+    {
+        List<DateTime> listOfDatesAfterUTCfix = new List<DateTime>();
+        listOfDatesAfterUTCfix.Add(date);
+        DateTime firstDate = date;
+
+        DateTime dateAfterIncrement;
+        for (int i = 1; i < numberOfRides; i++)
+        {
+            dateAfterIncrement = repeatRideEvery == "כל שבוע" ? date.AddDays(7) : date.AddDays(1);
+            listOfDatesAfterUTCfix.Add(dateAfterIncrement);
+            date = listOfDatesAfterUTCfix[i];
+        }
+
+        TimeZoneInfo israelTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Israel Standard Time");
+        bool isFirstRideDateDayLightSaving = israelTimeZone.IsDaylightSavingTime(firstDate);
+
+        for (int i = 1; i < listOfDatesAfterUTCfix.Count; i++)
+        {
+            if (isFirstRideDateDayLightSaving && !israelTimeZone.IsDaylightSavingTime(listOfDatesAfterUTCfix[i]))
+            {
+                listOfDatesAfterUTCfix[i] = listOfDatesAfterUTCfix[i].AddHours(1);
+            }
+            else if (!isFirstRideDateDayLightSaving && israelTimeZone.IsDaylightSavingTime(listOfDatesAfterUTCfix[i]))
+            {
+                listOfDatesAfterUTCfix[i] = listOfDatesAfterUTCfix[i].AddHours(-1);
+            }
+        }
+        return listOfDatesAfterUTCfix;
     }
 }

@@ -487,6 +487,56 @@ public class DBservice_Gilad
 
 
     }
+    public int UpdateUnityRide(UnityRide unityRide)
+    {
+        SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+        unityRide.Area = unityRide.NEWCheckLocationForUnityRideArea(unityRide.Origin, unityRide.Destination);
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@patientName", unityRide.PatientName);
+        paramDic.Add("@patientId", unityRide.PatientId);
+        paramDic.Add("@origin", unityRide.Origin);
+        paramDic.Add("@destination", unityRide.Destination);
+        paramDic.Add("@pickupTime", unityRide.PickupTime);
+        paramDic.Add("@remark", unityRide.Remark);
+        paramDic.Add("@onlyEscort", unityRide.OnlyEscort);
+        paramDic.Add("@area", unityRide.Area);
+        paramDic.Add("@isAnonymous", unityRide.IsAnonymous);
+        paramDic.Add("@coorName", unityRide.CoorName);
+        paramDic.Add("@driverName", unityRide.DriverName == null ? DBNull.Value.ToString() : unityRide.DriverName);
+        paramDic.Add("@amountOfEscorts", unityRide.AmountOfEscorts);
+        cmd = CreateCommandWithStoredProcedureGeneral("spUpdateRideInUnityRide", con, paramDic);
+        int numEffected = 0;
+        try
+        {
+            numEffected = cmd.ExecuteNonQuery();
+            return numEffected;
+        }
+        catch (Exception ex)
+        {
+
+            throw ex;
+        }
+        finally
+        {
+            if (con != null)
+            {
+                con.Close();
+            }
+        }
+
+
+    }
     public List<Patient> GetPatinetsByActiveStatus(bool active)
 	{
 
