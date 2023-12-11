@@ -1305,6 +1305,7 @@
 
         }
 
+        //Gilad change here the date to PickupTime
         const updateRidePatTime = () => {
 
             $('#wait').show();
@@ -1327,7 +1328,7 @@
             }
 
             let ridepatToManipulate = arr_rides.find(r => r.RidePatNum === _ridepatToManipulate);
-            let dateToManipulate = convertDBDate2FrontEndDate(ridepatToManipulate.Date);
+            let dateToManipulate = convertDBDate2FrontEndDate(ridepatToManipulate.PickupTime);
             dateToManipulate.setHours(hours, minutes);
 
             let data = {
@@ -1502,7 +1503,7 @@
                 localStorage.refreshTime = String(this.value);
                 refreshTime = parseInt(JSON.parse(localStorage.refreshTime));
                 clearInterval(refreshInterval);
-                refreshInterval = setInterval("refreshTable()", refreshTime);
+                refreshInterval = setInterval("refreshTable_UnityRide()", refreshTime);
 
             });
 
@@ -1643,11 +1644,12 @@
             });
 
             getCoors();
-            refreshTable()
+            refreshTable_UnityRide();
+            //refreshTable()
 
             if (!isAssistant) {
 
-                refreshInterval = setInterval("refreshTable()", refreshTime);
+                refreshInterval = setInterval("refreshTable_UnityRide()", refreshTime);
             }
 
             let allSortsSwitch = true;
@@ -2300,7 +2302,7 @@
             localStorage.setItem('arrayOF_areasObj', JSON.stringify(arrayOF_areasObj));
             localStorage.setItem('areasToShow_arr', JSON.stringify(areasToShow_arr));
 
-            refreshTable();
+            refreshTable_UnityRide();
         }
 
         const allSortsSwitch_changed = () => {
@@ -2312,12 +2314,12 @@
 
                 $('#allSortsLabel').html('הפעל סינון');
                 $('#openSortsControllers').prop('disabled', true);
-                refreshTable();
+                refreshTable_UnityRide();
             } else {
 
                 $('#allSortsLabel').html('כבה סינון');
                 $('#openSortsControllers').prop('disabled', false);
-                refreshTable();
+                refreshTable_UnityRide();
             }
 
         }
@@ -4112,7 +4114,7 @@
                     break
             }
 
-            refreshTable(timeInterval);
+            refreshTable_UnityRide(timeInterval);
         }
 
         const buildDriverHTML = (ridePatNum, driver, rideNum) => {
@@ -4450,6 +4452,7 @@
             }
         }
 
+        //gilad change here the date to PickupTime
         function prepreparationEditTimeModal(thisBtn, ridepatNum) {
             _ridepatToManipulate = ridepatNum
             highLightRow(thisBtn);
@@ -4458,7 +4461,7 @@
             BuildTimeDDLs('hours', 'minutes');
 
             const ridepatObject = arr_rides.find(r => r.RidePatNum === ridepatNum);
-            const ridePatTime = convertDBDate2FrontEndDate(ridepatObject.Date);
+            const ridePatTime = convertDBDate2FrontEndDate(ridepatObject.PickupTime);
 
             let hoursAsDoubleDigits = createDoubleDigit(ridePatTime.getHours());
             let minutesAsDoubleDigits = createDoubleDigit(ridePatTime.getMinutes());

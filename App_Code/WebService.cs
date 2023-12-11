@@ -286,6 +286,27 @@ public class WebService : System.Web.Services.WebService
 
         }
     }
+
+
+    //Gilad try to set UnityRide 
+    [WebMethod(EnableSession = true)]
+    public int setUnityRide(UnityRide unityRide)
+    {
+        try
+        {
+            int res = unityRide.SetUnityRide(unityRide);
+            return res; 
+        }
+        catch (Exception ex)
+        {
+
+            throw ex;
+        }
+    }
+
+
+
+
     //לסדר
     [WebMethod(EnableSession = true)]
     public int setRidePat(RidePat RidePat, string func, bool isAnonymous, int numberOfRides, string repeatRideEvery)

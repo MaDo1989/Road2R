@@ -122,6 +122,57 @@ public class DBservice_Gilad
     }
 
 
+    public List<object> GetListOfEscortsByPatientId(int patientId)
+    {
+        List<object> list2Return = new List<object>();
+        SqlCommand cmd2;
+        Dictionary<string, object> paramDic2 = new Dictionary<string, object>();
+        paramDic2.Add("@patientId", patientId);
+        SqlConnection con2;
+        try
+        {
+            con2 = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con2.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+
+        cmd2 = CreateCommandWithStoredProcedureGeneral("spGetEscortsByPatientId", con2, paramDic2);
+        try
+        {
+            SqlDataReader dataReader2 = cmd2.ExecuteReader(CommandBehavior.CloseConnection);
+            while (dataReader2.Read())
+            {
+                dynamic oneEscort = new ExpandoObject();
+                oneEscort.Id = Convert.ToInt32(dataReader2["Id"]);
+                oneEscort.DisplayName = dataReader2["DisplayName"].ToString();
+                list2Return.Add(oneEscort);
+            }
+            return list2Return;
+
+        }
+        catch (Exception ex)
+        {
+
+            throw (ex);
+        }
+        finally
+        {
+            if (con2 != null)
+            {
+                con2.Close();
+            }
+
+        }
+
+
+    }
+
     public List<UnityRide> GetRidesForRidePatView(int days)
     {
         SqlCommand cmd;
@@ -358,7 +409,9 @@ public class DBservice_Gilad
                 OneRideTry.Equipments = Convert.ToInt32(dataReader["AmountOfEquipments"]) > 0 ? GetListOfEquipmentsForPAtient(Convert.ToInt32(dataReader["PatientId"])) : new List<string>();
                 OneRideTry.Escorts = OneRideTry.AmountOfEscorts>0? GetListOfEscortsByUnityRideId(OneRideTry.RidePatNum) : new List<string>();
                 OneRideTry.IsAnonymous = dataReader["IsAnonymous"]!= DBNull.Value ? Convert.ToBoolean(dataReader["IsAnonymous"]) : false;
-
+                OneRideTry.EscortList = GetListOfEscortsByPatientId(OneRideTry.PatientId);
+                OneRideTry.CoorName = dataReader["Coordinator"].ToString();
+                OneRideTry.CoorId = Convert.ToInt32(dataReader["CoordinatorID"]);
                 list.Add(OneRideTry);
             }
 
@@ -380,7 +433,61 @@ public class DBservice_Gilad
         }
     }
 
-	public List<Patient> GetPatinetsByActiveStatus(bool active)
+    public int SetUnityRide(UnityRide unityRide)
+    {
+        SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+        unityRide.Area = unityRide.NEWCheckLocationForUnityRideArea(unityRide.Origin, unityRide.Destination);
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@patientName", unityRide.PatientName);
+        paramDic.Add("@patientId", unityRide.PatientId);
+        paramDic.Add("@origin", unityRide.Origin);
+        paramDic.Add("@destination", unityRide.Destination);
+        paramDic.Add("@pickupTime", unityRide.PickupTime);
+        paramDic.Add("@remark", unityRide.Remark);
+        paramDic.Add("@onlyEscort", unityRide.OnlyEscort);
+        paramDic.Add("@area", unityRide.Area);
+        paramDic.Add("@isAnonymous", unityRide.IsAnonymous);
+        paramDic.Add("@coorName", unityRide.CoorName);
+        paramDic.Add("@driverName", unityRide.DriverName==null?DBNull.Value.ToString(): unityRide.DriverName);
+        paramDic.Add("@amountOfEscorts", unityRide.AmountOfEscorts);
+        cmd = CreateCommandWithStoredProcedureGeneral("spSetNewUnityRide", con, paramDic);
+        int res = 0;
+        try
+        {
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+            while (dataReader.Read())
+            {
+                res = Convert.ToInt32(dataReader["RidePatNum"]);
+            }
+            return res;
+        }
+        catch (Exception ex)
+        {
+
+            throw ex;
+        }
+        finally
+        {
+            if (con != null)
+            {
+                con.Close();
+            }
+        }
+
+
+    }
+    public List<Patient> GetPatinetsByActiveStatus(bool active)
 	{
 
 		Location tmp = new Location();

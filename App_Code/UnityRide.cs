@@ -425,4 +425,33 @@ public class UnityRide
         DBservice_Gilad dBservice = new DBservice_Gilad();
         return dBservice.GetUnityRide(UnityRideId);
     }
+
+    public int SetUnityRide(UnityRide unityride)
+    {
+        DBservice_Gilad dBservice = new DBservice_Gilad();
+        return dBservice.SetUnityRide(unityride);
+    }
+
+    public string NEWCheckLocationForUnityRideArea(string origin, string destination)
+    {
+       
+        Location l = new Location();
+        string originArea = l.GetAreaForPoint(origin);
+        string destinationArea = l.GetAreaForPoint(destination);
+        List<string> allAreas = l.getAreas();
+        string rideArea = originArea + " - " + destinationArea;
+        if (originArea == destinationArea)
+        {
+            rideArea = originArea;
+        }
+        else if (!allAreas.Contains(rideArea))
+        {
+            rideArea = destinationArea + " - " + originArea;
+            if (!allAreas.Contains(rideArea))
+            {
+                throw new ArgumentException("area not undefined");
+            }
+        }
+        return rideArea;
+    }
 }
