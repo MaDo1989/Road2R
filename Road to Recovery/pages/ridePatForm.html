@@ -832,26 +832,28 @@
             unityRide.IsAnonymous = dataobj.isAnonymous;
             unityRide.CoorName = dataobj.RidePat.Coordinator.DisplayName;
             unityRide.DriverName = $('#driver').val() == '' ? null : $('#driver').val()
+            unityRide.RidePatNum = dataobj.func == 'edit' ? dataobj.RidePat.RidePatNum : 0;
             unityRide.AmountOfEscorts = dataobj.RidePat.Escorts.length;
-            console.log('After Custom', unityRide);
-            let dataString = JSON.stringify({ unityRide });
+            let request = { unityRide: unityRide, func: dataobj.func, numOfRide: dataobj.numberOfRides, repeatEvery: dataobj.repeatRideEvery };
+            console.log('After Custom',request);
+            let dataString = JSON.stringify(request);
 
-             //$.ajax({
-             //           dataType: "json",
-             //           url: "WebService.asmx/setUnityRide",
-             //           contentType: "application/json; charset=utf-8",
-             //           type: "POST",
-             //           data: dataString,
-             //           success: function (data) {
-             //               console.log('Sucsses res -->', data);
+             $.ajax({
+                        dataType: "json",
+                        url: "WebService.asmx/setUnityRide",
+                        contentType: "application/json; charset=utf-8",
+                        type: "POST",
+                        data: dataString,
+                        success: function (data) {
+                            console.log('Sucsses res -->', data.d);
 
-             //           },
-             //           error: function (err) {
-             //               $('#wait').hide();
-             //               console.log('Error from new API',err);
+                        },
+                        error: function (err) {
+                            $('#wait').hide();
+                            console.log('Error from new API',err);
                                 
-             //           }
-             //});
+                        }
+             });
 
 
 

@@ -515,6 +515,8 @@ public class DBservice_Gilad
         paramDic.Add("@coorName", unityRide.CoorName);
         paramDic.Add("@driverName", unityRide.DriverName == null ? DBNull.Value.ToString() : unityRide.DriverName);
         paramDic.Add("@amountOfEscorts", unityRide.AmountOfEscorts);
+        paramDic.Add("@unityRideId", unityRide.RidePatNum);
+
         cmd = CreateCommandWithStoredProcedureGeneral("spUpdateRideInUnityRide", con, paramDic);
         int numEffected = 0;
         try
