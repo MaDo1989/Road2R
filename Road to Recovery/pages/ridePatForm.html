@@ -634,7 +634,10 @@
                     localStorage.setItem("PatientNameForRide", null);
 
                     console.log('Gilad check || before submit the form data:', JSON.parse(dataString));
-                    CheckAPI_Gilad(dataString)
+                    setUnityRideNew(dataString);
+
+                    //Before united-(old API and tables in DB)
+                    //********************************************************** */
                     //$.ajax({
                     //    dataType: "json",
                     //    url: "WebService.asmx/setRidePat",
@@ -818,7 +821,8 @@
         });
 
 
-        const CheckAPI_Gilad = (data) => {
+        // new func for new way to save rides in the DB -Gilad
+        const setUnityRideNew = (data) => {
             console.log('from test CheckAPI_Gilad ', JSON.parse(data));
             let dataobj = JSON.parse(data);
             const unityRide = {};
@@ -846,6 +850,18 @@
                         data: dataString,
                         success: function (data) {
                             console.log('Sucsses res -->', data.d);
+                            const result = JSON.parse(data.d);
+                            if (result == -1 || result == 0) {
+                                showErrorSwal(request.unityRide.PickupTime);
+                            }
+                            else {
+                                $('#wait').hide();
+                                document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
+                                document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
+                                document.getElementById('modalButtons').innerHTML += '<button onclick="createReturnRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn">יצירת החזרה &nbsp;<i class="ti-car m-r-5"></i></button>';
+                                showMyModal('Modal');
+                            }
+
 
                         },
                         error: function (err) {
@@ -871,6 +887,16 @@
             //paramDic.Add("@coorName", unityRide.CoorName);
             //paramDic.Add("@driverName", unityRide.DriverName);
             //paramDic.Add("@amountOfEscorts", unityRide.AmountOfEscorts);
+        }
+        //this is for the swal error modal if somethinggo wrong or already exist.
+        const showErrorSwal = (date) => {
+             $('#wait').hide();
+             let date2present = new Date(date).toLocaleDateString('he-IL');
+             swal(
+             "خطأ\nשגיאה",
+             "קיימת כבר הסעה בתאריך " + date2present + " עם אותו החולה ואותן נקודות האיסוף\nيوجد سفرية بالتاريخ (التاريخ) مع نفس المريض ونفس نقطة الالتقاء",
+             "warning"
+             );
         }
 
         const isAllowedLocation = (referrer) => {
