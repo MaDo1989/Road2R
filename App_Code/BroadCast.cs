@@ -35,6 +35,14 @@ public class BroadCast
             hubContext.Clients.All.ridePatUpdated(rp);
         }
     }
+    public static void BroadCast2Clients_UnityRideUpdated(UnityRide ur)
+    {
+        if (ShouldClientsBeUpdated(ur.PickupTime,30))
+        {
+            IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<UnityRideHub>();
+            hubContext.Clients.All.UnityRideUpdated(ur);
+        }
+    }
 
     private static bool ShouldClientsBeUpdated(DateTime rpDate, int maxNumOfDays)
     {

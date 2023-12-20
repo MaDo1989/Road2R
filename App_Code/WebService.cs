@@ -2347,6 +2347,24 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
+    public void UpdateUnityRideTime(int unityRideId, DateTime pickupTime)
+    {
+        try
+        {
+            UnityRide unityRide = new UnityRide();
+            unityRide.updateUnityRideTime(unityRideId, pickupTime);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in UpdateUnityRideTime", ex);
+            throw new Exception(ex.Message);
+        }
+    }
+
+
+
+
+    [WebMethod(EnableSession = true)]
     public void UpdateRidePatTime(int ridePatId, DateTime dateTime)
     {
         try

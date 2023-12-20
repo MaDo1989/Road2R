@@ -462,8 +462,6 @@ public class UnityRide
         return -1;
     }
 
-
-
     public string NEWCheckLocationForUnityRideArea(string origin, string destination)
     {
        
@@ -486,6 +484,20 @@ public class UnityRide
         }
         return rideArea;
     }
+
+    public void updateUnityRideTime(int unityRideNum, DateTime editedTime)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+        UnityRide unityRide = new UnityRide();
+        unityRide = db.updateUnityRideTime(unityRideNum, editedTime);
+        if(unityRide.RidePatNum!=-1)
+        {
+            BroadCast.BroadCast2Clients_UnityRideUpdated(unityRide);
+        }
+    }
+
+
+
 
     private List<DateTime> BuildFutureRidesDates(DateTime date, string repeatRideEvery, int numberOfRides)
     {
