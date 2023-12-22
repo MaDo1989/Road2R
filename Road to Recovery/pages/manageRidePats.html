@@ -82,7 +82,9 @@
             CustomObj.Pat.PatientIdentity = 0;
             CustomObj.Pat.Equipment = thisRide.PatientEquipments;
             CustomObj.Pat.IsAnonymous = thisRide.IsAnonymous;
-            CustomObj.Pat.RidePatPatientStatus = thisRide.PatientStatus;
+            CustomObj.Pat.RidePatPatientStatus = {};
+            CustomObj.Pat.RidePatPatientStatus.Status = thisRide.PatientStatus == "" ? -1 : 1;
+            CustomObj.Pat.RidePatPatientStatus.EditTimeStamp = thisRide.PatientStatusEditTime
 
             CustomObj.Pat.EscortedList = [];
             CustomObj.Escorts = [];
@@ -92,7 +94,7 @@
             //    oneEscort.DisplayName = thisRide[18].Value[i][1].Value;
             //    CustomObj.Escorts.push(oneEscort);
             //}
-            for (var i = 0; i < AmountOfEscorts; i++) {
+            for (var i = 0; i < CustomObj.AmountOfEscorts; i++) {
                 let oneEscort = {}
                 oneEscort.Id = 0
                 oneEscort.DisplayName = ''
@@ -601,10 +603,10 @@
                         row2manipulate.status = buildStatusString(customRide.Pat.RidePatPatientStatus, customRide.RidePatNum);
                         row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                         row2manipulate.remark = buildRemarkHTML(customRide.Remark, customRide.RidePatNum);
-                        row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
+                        row2manipulate.buttons = buildAcionsButtonsHTML(customRide.RidePatNum, customRide.Drivers);
 
-                        tTomorrowAfternoon.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                        increaseCounter(tableNames.TOMORROW_AFTERNOON, updated_ridePat.RidePatNum);
+                        tTomorrowAfternoon.row(`#${customRide.RidePatNum}`).data(row2manipulate).draw('page');
+                        increaseCounter(tableNames.TOMORROW_AFTERNOON, customRide.RidePatNum);
 
                         tr_nodesAsArray = Array.from(tTomorrowMorning.rows().nodes());
 
@@ -613,25 +615,25 @@
 
                     case tableNames.FUTURE:
 
-                        row2manipulate = tFuture.row(`#${updated_ridePat.RidePatNum}`).data();
+                        row2manipulate = tFuture.row(`#${customRide.RidePatNum}`).data();
 
                         row2manipulate.date = thisRidePatDate.toLocaleDateString('he-IL');
-                        row2manipulate.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
-                        row2manipulate.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
-                        row2manipulate.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
-                        row2manipulate.patient = buildPatientHTML(updated_ridePat);
-                        row2manipulate.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
-                        row2manipulate.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
+                        row2manipulate.time = buildTimeHTML(thisRidePatDate, customRide.RidePatNum);
+                        row2manipulate.origin = !isAssistant ? customRide.Origin.Name : customRide.Origin.EnglishName;
+                        row2manipulate.destination = !isAssistant ? customRide.Destination.Name : customRide.Destination.EnglishName;
+                        row2manipulate.patient = buildPatientHTML(customRide);
+                        row2manipulate.driver = buildDriverHTML(customRide.RidePatNum, customRide.Drivers[0], customRide.RidePatNum);
+                        row2manipulate.status = buildStatusString(customRide.Pat.RidePatPatientStatus, customRide.RidePatNum);
                         row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
-                        row2manipulate.remark = buildRemarkHTML(updated_ridePat.Remark, updated_ridePat.RidePatNum);;
-                        row2manipulate.buttons = buildAcionsButtonsHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers);
+                        row2manipulate.remark = buildRemarkHTML(customRide.Remark, customRide.RidePatNum);;
+                        row2manipulate.buttons = buildAcionsButtonsHTML(customRide.RidePatNum, customRide.Drivers);
 
-                        tFuture.row(`#${updated_ridePat.RidePatNum}`).data(row2manipulate).draw('page');
-                        increaseCounter(tableNames.FUTURE, updated_ridePat.RidePatNum);
+                        tFuture.row(`#${customRide.RidePatNum}`).data(row2manipulate).draw('page');
+                        increaseCounter(tableNames.FUTURE, customRide.RidePatNum);
 
                         tr_nodesAsArray = Array.from(tFuture.rows().nodes());
-                        tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
-                        manipilateNodeStyle(tr_node2manipulate, updated_ridePat, ADD_DRIVER, true);
+                        tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${customRide.RidePatNum}`);
+                        manipilateNodeStyle(tr_node2manipulate, customRide, ADD_DRIVER, true);
 
                         break;
 
@@ -642,21 +644,21 @@
                 }
 
                 if (tr_nodesAsArray) {
-                    tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${updated_ridePat.RidePatNum}`);
+                    tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${customRide.RidePatNum}`);
 
-                    updatedRidePat_status = updated_ridePat.Pat.RidePatPatientStatus.Status;
+                    updatedRidePat_status = customRide.Pat.RidePatPatientStatus.Status;
                     treatmentFinished = updatedRidePat_status === patientStatus.Finished;
                     isAfterNoonRide = thisRidePatDate.getMinutes() === afternoonIndicator;
-                    driverIsAssigned = updated_ridePat.Drivers.length > 0;
+                    driverIsAssigned = customRide.Drivers.length > 0;
 
                     if (treatmentFinished) {
 
                         if (!driverIsAssigned) {
 
-                            manipilateNodeStyle(tr_node2manipulate, updated_ridePat, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED);
+                            manipilateNodeStyle(tr_node2manipulate, customRide, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED);
                         } else if (driverIsAssigned && isAfterNoonRide) {
 
-                            manipilateNodeStyle(tr_node2manipulate, updated_ridePat, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED);
+                            manipilateNodeStyle(tr_node2manipulate, customRide, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED);
                         } else {
 
                             $(tr_node2manipulate).removeClass('highlightRow-after-patientStatusModal');
