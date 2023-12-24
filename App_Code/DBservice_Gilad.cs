@@ -1223,6 +1223,246 @@ public class DBservice_Gilad
         
     }
 
+    public UnityRide updateRemark(int UnityRideID, string newRemark)
+    {
+        SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@ridePatNum", UnityRideID);
+        paramDic.Add("@newRemark", newRemark);
+        cmd = CreateCommandWithStoredProcedureGeneral("spUnityRide_updateRemark", con, paramDic);
+        UnityRide unityRide = new UnityRide();
+
+
+        try
+        {
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+            while (dataReader.Read())
+            {
+                int rideId = Convert.ToInt32(dataReader["RidePatNum"]);
+                if (rideId != -1)
+                {
+                    unityRide.RidePatNum = rideId;
+                    unityRide.PatientName = dataReader["PatientName"].ToString();
+                    unityRide.PatientId = Convert.ToInt32(dataReader["PatientId"]);
+                    unityRide.PatientGender = Convert.ToInt32(Convertions.ConvertStringToGender(dataReader["PatientGender"].ToString()));
+                    unityRide.PatientCellPhone = dataReader["PatientCellPhone"].ToString();
+                    unityRide.PatientStatus = dataReader["PatientStatus"].ToString();
+                    if (unityRide.PatientStatus != "")
+                    {
+                        unityRide.PatientStatusEditTime = Convert.ToDateTime(dataReader["patientStatusTime"]);
+
+                    }
+
+                    unityRide.PatientBirthdate = dataReader["PatientBirthDate"].ToString();
+                    DateTime? dateOfBirth = String.IsNullOrEmpty(dataReader["PatientBirthDate"].ToString()) ? null : (DateTime?)Convert.ToDateTime(dataReader["PatientBirthDate"].ToString());
+                    unityRide.PatientAge = Convert.ToInt32(Calculations.CalculateAge(dateOfBirth));
+
+                    unityRide.AmountOfEquipments = Convert.ToInt32(dataReader["AmountOfEquipments"]);
+                    if (unityRide.AmountOfEquipments > 0)
+                    {
+                        unityRide.PatientEquipments = GetListOfEquipmentsForPAtient(unityRide.PatientId);
+                    }
+                    unityRide.AmountOfEscorts = Convert.ToInt32(dataReader["AmountOfEscorts"]);
+                    unityRide.Origin = dataReader["Origin"].ToString();
+                    unityRide.Destination = dataReader["Destination"].ToString();
+                    unityRide.PickupTime = Convert.ToDateTime(dataReader["pickupTime"]);
+                    unityRide.CoorName = dataReader["Coordinator"].ToString();
+                    unityRide.Remark = dataReader["Remark"].ToString();
+                    unityRide.Status = dataReader["Status"].ToString();
+                    unityRide.Area = dataReader["Area"].ToString();
+                    unityRide.Shift = dataReader["Shift"].ToString();
+                    unityRide.OnlyEscort = Convert.ToBoolean(dataReader["OnlyEscort"]);
+                    unityRide.LastModified = Convert.ToDateTime(dataReader["lastModified"]);
+                    unityRide.CoorId = Convert.ToInt32(dataReader["CoordinatorID"]);
+
+                    if (dataReader.IsDBNull(dataReader.GetOrdinal("MainDriver")))
+                    {
+                        unityRide.MainDriver = -1;
+                    }
+                    else
+                    {
+                        unityRide.MainDriver = Convert.ToInt32(dataReader["MainDriver"]);
+
+                    }
+                    unityRide.DriverName = dataReader["DriverName"].ToString();
+                    unityRide.DriverCellPhone = dataReader["DriverCellPhone"].ToString();
+                    if (dataReader.IsDBNull(dataReader.GetOrdinal("NoOfDocumentedRides")))
+                    {
+                        unityRide.NoOfDocumentedRides = 0;
+                    }
+                    else
+                    {
+                        unityRide.NoOfDocumentedRides = Convert.ToInt32(dataReader["NoOfDocumentedRides"]);
+
+                    }
+                    if (dataReader.IsDBNull(dataReader.GetOrdinal("IsAnonymous")))
+                    {
+                        unityRide.IsAnonymous = false;
+                    }
+                    else
+                    {
+                        unityRide.IsAnonymous = Convert.ToBoolean(dataReader["IsAnonymous"]);
+
+                    }
+                    unityRide.IsNewDriver = Convert.ToBoolean(dataReader["IsNewDriver"]);
+                }
+
+            }
+            return unityRide;
+        }
+        catch (Exception ex)
+        {
+
+            throw new Exception("error in dbService_Gilad.cs updateRemark func or spUnityRide_updateRemark sp -->" + ex.Message);
+
+        }
+        finally
+        {
+            if (con != null)
+            {
+                con.Close();
+            }
+
+        }
+
+    }
+
+    public UnityRide updatePatientStatusAndTime(int patientId, int unityRideID, string patientStatus, DateTime? editTimeStamp)
+    {
+        SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@PatientId", patientId);
+        paramDic.Add("@RidePatNum", unityRideID);
+        paramDic.Add("@PatientStatus", patientStatus);
+        paramDic.Add("@EditTimeStamp", editTimeStamp);
+        cmd = CreateCommandWithStoredProcedureGeneral("spUpdatePatientStatusUnityRide", con, paramDic);
+        UnityRide unityRide = new UnityRide();
+        unityRide = reciveUnityRideDB(cmd);
+        return unityRide;
+
+    }
+
+
+    private UnityRide reciveUnityRideDB(SqlCommand cmd)
+    {
+        UnityRide unityRide = new UnityRide();
+        try
+        {
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+            while (dataReader.Read())
+            {
+                int rideId = Convert.ToInt32(dataReader["RidePatNum"]);
+                if (rideId != -1)
+                {
+                    unityRide.RidePatNum = rideId;
+                    unityRide.PatientName = dataReader["PatientName"].ToString();
+                    unityRide.PatientId = Convert.ToInt32(dataReader["PatientId"]);
+                    unityRide.PatientGender = Convert.ToInt32(Convertions.ConvertStringToGender(dataReader["PatientGender"].ToString()));
+                    unityRide.PatientCellPhone = dataReader["PatientCellPhone"].ToString();
+                    unityRide.PatientStatus = dataReader["PatientStatus"].ToString();
+                    if (unityRide.PatientStatus != "")
+                    {
+                        unityRide.PatientStatusEditTime = Convert.ToDateTime(dataReader["patientStatusTime"]);
+
+                    }
+
+                    unityRide.PatientBirthdate = dataReader["PatientBirthDate"].ToString();
+                    DateTime? dateOfBirth = String.IsNullOrEmpty(dataReader["PatientBirthDate"].ToString()) ? null : (DateTime?)Convert.ToDateTime(dataReader["PatientBirthDate"].ToString());
+                    unityRide.PatientAge = Convert.ToInt32(Calculations.CalculateAge(dateOfBirth));
+
+                    unityRide.AmountOfEquipments = Convert.ToInt32(dataReader["AmountOfEquipments"]);
+                    if (unityRide.AmountOfEquipments > 0)
+                    {
+                        unityRide.PatientEquipments = GetListOfEquipmentsForPAtient(unityRide.PatientId);
+                    }
+                    unityRide.AmountOfEscorts = Convert.ToInt32(dataReader["AmountOfEscorts"]);
+                    unityRide.Origin = dataReader["Origin"].ToString();
+                    unityRide.Destination = dataReader["Destination"].ToString();
+                    unityRide.PickupTime = Convert.ToDateTime(dataReader["pickupTime"]);
+                    unityRide.CoorName = dataReader["Coordinator"].ToString();
+                    unityRide.Remark = dataReader["Remark"].ToString();
+                    unityRide.Status = dataReader["Status"].ToString();
+                    unityRide.Area = dataReader["Area"].ToString();
+                    unityRide.Shift = dataReader["Shift"].ToString();
+                    unityRide.OnlyEscort = Convert.ToBoolean(dataReader["OnlyEscort"]);
+                    unityRide.LastModified = Convert.ToDateTime(dataReader["lastModified"]);
+                    unityRide.CoorId = Convert.ToInt32(dataReader["CoordinatorID"]);
+
+                    if (dataReader.IsDBNull(dataReader.GetOrdinal("MainDriver")))
+                    {
+                        unityRide.MainDriver = -1;
+                    }
+                    else
+                    {
+                        unityRide.MainDriver = Convert.ToInt32(dataReader["MainDriver"]);
+
+                    }
+                    unityRide.DriverName = dataReader["DriverName"].ToString();
+                    unityRide.DriverCellPhone = dataReader["DriverCellPhone"].ToString();
+                    if (dataReader.IsDBNull(dataReader.GetOrdinal("NoOfDocumentedRides")))
+                    {
+                        unityRide.NoOfDocumentedRides = 0;
+                    }
+                    else
+                    {
+                        unityRide.NoOfDocumentedRides = Convert.ToInt32(dataReader["NoOfDocumentedRides"]);
+
+                    }
+                    if (dataReader.IsDBNull(dataReader.GetOrdinal("IsAnonymous")))
+                    {
+                        unityRide.IsAnonymous = false;
+                    }
+                    else
+                    {
+                        unityRide.IsAnonymous = Convert.ToBoolean(dataReader["IsAnonymous"]);
+
+                    }
+                    unityRide.IsNewDriver = Convert.ToBoolean(dataReader["IsNewDriver"]);
+                }
+
+            }
+            return unityRide;
+        }
+        catch (Exception ex)
+        {
+
+            throw new Exception("error in dbService_Gilad.cs in reciveUnityRideDB function -->" + ex.Message);
+
+        }
+        finally
+        {
+            if (con != null)
+            {
+                con.Close();
+            }
+
+        }
+
+    }
     // ---- Create Command with SP ---- \\ 
     private SqlCommand CreateCommandWithStoredProcedureGeneral(String spName, SqlConnection con, Dictionary<string, object> paramDic)
 	{

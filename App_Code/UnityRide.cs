@@ -496,7 +496,25 @@ public class UnityRide
         }
     }
 
+    public void updateRemark(int UnityRideID, string newRemark)
+    {
+        DBservice_Gilad dBservice = new DBservice_Gilad();
+        UnityRide returnride = new UnityRide();
+        returnride = dBservice.updateRemark(UnityRideID, newRemark);
+        if (returnride.RidePatNum!=-1)
+        {
+            BroadCast.BroadCast2Clients_UnityRideUpdated(returnride);
 
+        }
+    }
+
+    public void updatePatientStatusandTime (int patientId, int unityRideID, string patientStatus, DateTime? editTimeStamp)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+        UnityRide ur = new UnityRide();
+        ur = db.updatePatientStatusAndTime(patientId, unityRideID, patientStatus, editTimeStamp);
+        BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
+    }
 
 
     private List<DateTime> BuildFutureRidesDates(DateTime date, string repeatRideEvery, int numberOfRides)

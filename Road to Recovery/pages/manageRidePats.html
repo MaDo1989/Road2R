@@ -80,7 +80,7 @@
             CustomObj.Pat.DisplayNameA = ''
             CustomObj.Pat.EnglishName = ''
             CustomObj.Pat.PatientIdentity = 0;
-            CustomObj.Pat.Equipment = thisRide.PatientEquipments;
+            CustomObj.Pat.Equipment = thisRide.PatientEquipments == null ? [] : thisRide.PatientEquipments ;
             CustomObj.Pat.IsAnonymous = thisRide.IsAnonymous;
             CustomObj.Pat.RidePatPatientStatus = {};
             CustomObj.Pat.RidePatPatientStatus.Status = thisRide.PatientStatus == "" ? -1 : 1;
@@ -94,11 +94,18 @@
             //    oneEscort.DisplayName = thisRide[18].Value[i][1].Value;
             //    CustomObj.Escorts.push(oneEscort);
             //}
-            for (var i = 0; i < CustomObj.AmountOfEscorts; i++) {
+            for (var i = 0; i < thisRide.AmountOfEscorts; i++) {
                 let oneEscort = {}
                 oneEscort.Id = 0
                 oneEscort.DisplayName = ''
                 CustomObj.Pat.EscortedList.push(oneEscort);
+            }
+
+            for (var i = 0; i < thisRide.AmountOfEscorts; i++) {
+                let oneEscort = {}
+                oneEscort.Id = 0
+                oneEscort.DisplayName = ''
+                CustomObj.Escorts.push(oneEscort);
             }
 
             CustomObj.Drivers = [];
@@ -515,6 +522,8 @@
                 *********************/
 
             const customRide = CustomRideObject(updatedUnityRide); // to ajust the object
+
+            console.log('After Custom object look like this-->', customRide)
 
             tableName2manipulate = getTableName2Manipulate(customRide.RidePatNum);
             thisRidePatDate = fixDate_WhichComeFromOpenConnection(customRide.Date);
@@ -1486,6 +1495,59 @@
             removeClass('highlightRow');
         }
 
+        //New Api because the unity Gilad
+        const updateUnityridePatientStatus = () => {
+            $('#wait').show();
+            removeClass('highlightRow');
+            const hours = $("#editPatientStatusModalHours").val();
+            const minutes = $("#editPatientStatusModalMinutes").val();
+            const isTreatmentFinished = !$("#editPatientStatusNotFinishedCB").is(':checked');
+
+            //if (
+            //    isNaN(hours) || isNaN(minutes) ||
+            //    hours === null || minutes === null
+            //) {
+            //    $('#wait').hide();
+            //    return alert('נא לבחור שעה מהרשימות הנגללות או לבטל את הפעולה');
+            //}
+
+            let ridepatToManipulate = arr_rides.find(r => r.RidePatNum === _ridepatToManipulate);
+            const now = new Date();
+            console.log('check it --', ridepatToManipulate, isTreatmentFinished)
+            const editTimeStamp = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
+            //to continue here !!!!!!!!!! ------- !!!!!!!!
+
+            //ridepatToManipulate = CustomRideObject(ridepatToManipulate);
+            //ridepatToManipulate.Pat.RidePatPatientStatus.Status = isTreatmentFinished;
+            //ridepatToManipulate.Pat.RidePatPatientStatus.EditTimeStamp = editTimeStamp;
+            //update_arr_rides(ridepatToManipulate);
+
+            //const data = {
+            //    patientId: ridepatToManipulate.Pat.Id,
+            //    ridePatId: ridepatToManipulate.RidePatNum,
+            //    patientStatus: isTreatmentFinished ? "Finished" : "Not Finished",
+            //    editTimeStamp: editTimeStamp
+            //}
+
+            //const updatePatientStatus_SCB = () => {
+
+            //    $('#wait').hide();
+            //    $('#editPatientStatusModal').modal('hide');
+            //}
+
+            //const updatePatientStatus_ECB = (err) => {
+
+            //    $('#wait').hide();
+            //    $('#editPatientStatusModal').modal('hide');
+            //    console.log(err);
+            //    alert(err);
+            //}
+
+            //console.log('Gilad check the data send -->', data);
+            //ajaxCall('UpdatePatientStatus', JSON.stringify(data), updatePatientStatus_SCB, updatePatientStatus_ECB);
+        }
+
+
         const updateRidePatPatientStatus = () => {
 
             $('#wait').show();
@@ -1506,7 +1568,7 @@
             const now = new Date();
 
             const editTimeStamp = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
-
+            ridepatToManipulate = CustomRideObject(ridepatToManipulate);
             ridepatToManipulate.Pat.RidePatPatientStatus.Status = isTreatmentFinished;
             ridepatToManipulate.Pat.RidePatPatientStatus.EditTimeStamp = editTimeStamp;
             update_arr_rides(ridepatToManipulate);
@@ -1532,6 +1594,7 @@
                 alert(err);
             }
 
+            console.log('Gilad check the data send -->', data);
             ajaxCall('UpdatePatientStatus', JSON.stringify(data), updatePatientStatus_SCB, updatePatientStatus_ECB);
 
 
@@ -1649,6 +1712,37 @@
 
         }
 
+
+        //new API to update remark by Gilad
+        const updateRemark_UnityRide = () => {
+            $('#wait').show();
+            let ridepatToManipulate = arr_rides.find(r => r.RidePatNum === _ridepatToManipulate);
+            let newRemark = $('#editRemarkTextEditor').val();
+
+            newRemark = newRemark.replace(/\n/g, "<br>");
+
+            let data = {
+                UnityRideID: _ridepatToManipulate,
+                newRemark
+            };
+            console.log('Gilad check -->', data);
+            const updateRemark_SCB = () => {
+
+                $('#wait').hide();
+                removeClass('highlightRow');
+                $('#editRemarkModal').modal('hide');
+            }
+
+            const updateRemark_ECB = (err) => {
+
+                $('#wait').hide();
+                removeClass('highlightRow');
+                $('#editRemarkModal').modal('hide');
+                alert(err);
+            }
+
+            ajaxCall('UpdateUnityRideRemark', JSON.stringify(data), updateRemark_SCB, updateRemark_ECB);
+        }
 
         const updateRemark = () => {
 
@@ -4805,7 +4899,8 @@
             let $hoursSelect = $('#editPatientStatusModalHours');
             let $minutesSelect = $('#editPatientStatusModalMinutes');
 
-            const ridepatObject = arr_rides.find(r => r.RidePatNum === ridepatNum);
+            let ridepatObject = arr_rides.find(r => r.RidePatNum === ridepatNum);
+            ridepatObject = CustomRideObject(ridepatObject);
             const ridePatPatientStatus = ridepatObject.Pat.RidePatPatientStatus.Status;
             let editTimeStamp = ridepatObject.Pat.RidePatPatientStatus.EditTimeStamp;
 

@@ -2620,7 +2620,25 @@ public class WebService : System.Web.Services.WebService
             throw new Exception(ex.Message);
         }
     }
-    
+
+
+    [WebMethod(EnableSession = true)]
+    public void UpdatePatientStatus_UnityRide(int patientId, int unityRideID, string patientStatus, DateTime? editTimeStamp)
+    {
+        try
+        {
+            UnityRide ur = new UnityRide();
+            ur.updatePatientStatusandTime(patientId, unityRideID, patientStatus, editTimeStamp);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in UpdatePatientStatus", ex);
+            throw new Exception(ex.Message);
+        }
+    }
+
+
+
     [WebMethod(EnableSession = true)]
     public void UpdateRidePatRemark(int ridePatId, string newRemark)
     {
@@ -2628,6 +2646,22 @@ public class WebService : System.Web.Services.WebService
         {
             RidePat rp = new RidePat();
             rp.UpdateRidePatRemark(ridePatId, newRemark);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in UpdateRidePatRemark", ex);
+            throw new Exception(ex.Message);
+        }
+    }
+
+
+    [WebMethod(EnableSession = true)]
+    public void UpdateUnityRideRemark(int UnityRideID, string newRemark)
+    {
+        try
+        {
+            UnityRide ur = new UnityRide();
+            ur.updateRemark(UnityRideID, newRemark);
         }
         catch (Exception ex)
         {
