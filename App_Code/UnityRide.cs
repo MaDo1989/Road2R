@@ -516,6 +516,15 @@ public class UnityRide
         BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
     }
 
+    public void updateDriver (int driverId, int unityRideId)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+        UnityRide ur = new UnityRide();
+        ur = db.updateDriver(driverId, unityRideId);
+        BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
+
+    }
+
 
     private List<DateTime> BuildFutureRidesDates(DateTime date, string repeatRideEvery, int numberOfRides)
     {
