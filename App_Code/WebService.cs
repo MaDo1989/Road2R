@@ -1383,6 +1383,28 @@ public class WebService : System.Web.Services.WebService
 
     }
 
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public void AssignUpdateDriverToUnityRide(int UnityRideId, int DriverId) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
+    {
+        
+
+        try
+        {
+            UnityRide ur = new UnityRide();
+            ur.updateDriver(DriverId, UnityRideId);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in AssignUpdateDriverToUnityRide", ex);
+            throw new Exception(ex.Message);
+
+        }
+
+    }
+
+
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string CombineRideRidePat(int rideId, int RidePatId) //Get RideId & RidePatId - combine them

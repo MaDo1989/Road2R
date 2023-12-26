@@ -20,4 +20,8 @@ public class UnityRideHub : Hub
        Clients.All.UnityRideUpdated(ur);
     }
 
+    public void BroadCast_driverAssigningorUpdate(UnityRide ur)
+    {
+        Clients.All.driverHasAssigned2UnityRide(ur);
+    }
 }

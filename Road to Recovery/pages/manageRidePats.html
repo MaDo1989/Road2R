@@ -680,7 +680,6 @@
             }
         }
 
-
         notification.client.driverHasAssigned2RidePat = function (updated_ridePat) {
 
             /*   *********************
@@ -1368,6 +1367,15 @@
 
         //continue here..
 
+        const assignOrUpdateAPIcall = (unityRideID, DriverId) => {
+            const request = {
+                UnityRideId: unityRideID,
+                DriverId: DriverId,
+            }
+            ajaxCall('AssignUpdateDriverToUnityRide', JSON.stringify(request), assignDriverToRidePat_SCB, assignDriverToRidePat_ECB);
+
+        }
+
         const assignDriverToRidePat = () => {
             $('#wait').show();
             const driverNameFromInput = $('#driver').val();
@@ -1411,68 +1419,19 @@
                             closeOnConfirm: true
                         }, function (userResponse) {
                             if (userResponse) {
-                                if (_isDriverReplacement) {
-                                    //update the ride record with the new driver.
-                                    request = {
-                                        ridePatId: _ridepatToManipulate,
-                                        rideNum: _assignDriverToRideNum,
-                                        newDriverId: userSelected.Id,
-                                        assignedFromAppId: APP_ID
-                                    }
-
-                                    dataString = JSON.stringify(request);
-                                    ajaxCall('UpdateDriver', dataString, UpdateDriver_SCB, UpdateDriver_ECB);
-                                    colorRowWithDriver([_ridepatToManipulate]);
-                                //    $(`#${_ridepatToManipulate}`).addClass('statusComplete');
-                                } else {
-
-                                    request = {
-                                        ridePatId: _ridepatToManipulate,
-                                        userId: userSelected.Id,
-                                        driverType: "primary",
-                                        assignedFromAppId: APP_ID
-                                    };
-
-                                    dataString = JSON.stringify(request);
-                                    ajaxCall('AssignRideToRidePat', dataString, assignDriverToRidePat_SCB, assignDriverToRidePat_ECB);
-                                    colorRowWithDriver([_ridepatToManipulate]);
-                                //    $(`#${_ridepatToManipulate}`).addClass('statusComplete');
-                                }
+                                assignOrUpdateAPIcall(_ridepatToManipulate, userSelected.Id);
+                                colorRowWithDriver([_ridepatToManipulate]);
                                 assignDriverToRidePatAbort();
+
                             }
 
                         });
                     }
                     else {
-                        if (_isDriverReplacement) {
-                            //update the ride record with the new driver.
-                            request = {
-                                ridePatId: _ridepatToManipulate,
-                                rideNum: _assignDriverToRideNum,
-                                newDriverId: userSelected.Id,
-                                assignedFromAppId: APP_ID
-                            }
+                        assignOrUpdateAPIcall(_ridepatToManipulate, userSelected.Id);
+                        colorRowWithDriver([_ridepatToManipulate]);
+                        assignDriverToRidePatAbort();
 
-                            dataString = JSON.stringify(request);
-                            ajaxCall('UpdateDriver', dataString, UpdateDriver_SCB, UpdateDriver_ECB);
-                            colorRowWithDriver([_ridepatToManipulate]);
-                            //$(`#${_ridepatToManipulate}`).addClass('statusComplete');
-
-                        } else {
-
-                            request = {
-                                ridePatId: _ridepatToManipulate,
-                                userId: userSelected.Id,
-                                driverType: "primary",
-                                assignedFromAppId: APP_ID
-                            };
-
-                            dataString = JSON.stringify(request);
-                            ajaxCall('AssignRideToRidePat', dataString, assignDriverToRidePat_SCB, assignDriverToRidePat_ECB);
-                            colorRowWithDriver([_ridepatToManipulate]);
-                            //$(`#${_ridepatToManipulate}`).addClass('statusComplete');
-
-                        }
                     }
 
                 },
@@ -4501,6 +4460,17 @@
 
             refreshTable_UnityRide(timeInterval);
         }
+
+        //continue here with to ajust the function to new update !!!!!!
+        //continue here with to ajust the function to new update !!!!!!
+        //continue here with to ajust the function to new update !!!!!!
+        //continue here with to ajust the function to new update !!!!!!
+        //continue here with to ajust the function to new update !!!!!!
+        //continue here with to ajust the function to new update !!!!!!
+        //continue here with to ajust the function to new update !!!!!!
+        //continue here with to ajust the function to new update !!!!!!
+        //continue here with to ajust the function to new update !!!!!!
+
 
         const buildDriverHTML = (ridePatNum, driver, rideNum) => {
             let driverWrapper = '';
