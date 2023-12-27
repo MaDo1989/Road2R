@@ -426,9 +426,13 @@ public class UnityRide
         return dBservice.GetUnityRide(UnityRideId);
     }
 
-    public int SetUnityRide(UnityRide unityride, string func, int numOfRide, string repeatEvery)
+    public int SetUnityRide(UnityRide unityride, string func, int numOfRide, string repeatEvery,bool firstTry)
     {
         DBservice_Gilad dBservice = new DBservice_Gilad();
+        if (dBservice.CheckValidDriverRides(unityride.RidePatNum,unityride.MainDriver,unityride.PickupTime)==true && firstTry == true)
+        {
+            return -5;
+        }
 
         if (func=="new")
         {
@@ -516,11 +520,26 @@ public class UnityRide
         BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
     }
 
-    public void updateDriver (int driverId, int unityRideId)
+    public void updateDriver(int driverId, int unityRideId, bool isDelete)
     {
         DBservice_Gilad db = new DBservice_Gilad();
         UnityRide ur = new UnityRide();
-        ur = db.updateDriver(driverId, unityRideId);
+        if (isDelete)
+        {
+            ur = db.updateDriver(-1, unityRideId);
+            //send push notification to coordinator phone
+            Message m = new Message();
+            //get driver details 
+            Volunteer V = new Volunteer();
+            V = V.getVolunteerByID(driverId);
+            m.driverCanceledRide(unityRideId, V);
+
+        }
+        else
+        {
+            ur = db.updateDriver(driverId, unityRideId);
+
+        }
         BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
 
     }

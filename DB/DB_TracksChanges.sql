@@ -1,4 +1,215 @@
-﻿/****** Object:  StoredProcedure [dbo].[spUpdateRideInUnityRide]    Script Date: 12/12/2023 12:35:18 ******/
+﻿
+-- =======================================================
+-- Create Stored Procedure Template for Azure SQL Database
+-- =======================================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad>
+-- Create Date: <27/12/23>
+-- Description: <To check if is there any ride with same time but diffrent places for same driver >
+-- =============================================
+CREATE PROCEDURE spCheckValidDrive
+(
+    -- Add the parameters for the stored procedure here
+	@UnityRideID INT,
+	@MainDriver INT,
+	@pickupTime dateTime
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+
+    -- Insert statements for procedure here
+	IF EXISTS(select 1
+	from UnityRide
+	where RidePatNum != 135902 and
+		  pickupTime = '2023-12-28 06:00:00.000' and 
+		  MainDriver = 14430)
+	select 1 as 'res'
+	ELSE
+	select 0 as 'res'
+END
+GO
+
+
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+/****** Object:  StoredProcedure [dbo].[spUpdateDriverUnityRide]    Script Date: 26/12/2023 18:28:57 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad>
+-- Create Date: <25/12/23>
+-- Description: <update a driver to spesific unity ride also to delete driver from ride>
+-- =============================================
+ALTER PROCEDURE [dbo].[spUpdateDriverUnityRide]
+(
+    -- Add the parameters for the stored procedure here
+	@driverID int,
+	@unityRideID int
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+
+    -- Insert statements for procedure here
+	DECLARE @driverName nvarchar(255) = (select displayname from volunteer where Id=@driverID)
+	DECLARE @driverPhone varchar(11) = (select cellphone from volunteer where id= @driverID)
+	DECLARE @NoOfDocumentedRides int = (select NoOfDocumentedRides from volunteer where id= @driverID)
+	DECLARE @isNewDriver bit = case when (select count(*) from UnityRide where pickupTime<=GETDATE() and MainDriver=@driverID)<=3 then 1 else 0 end
+
+	-- for assign driver to unity ride
+	IF @driverID!=-1
+	UPDATE UnityRide
+	set MainDriver = @driverID,
+		DriverName = @driverName,
+		DriverCellPhone = @driverPhone,
+		NoOfDocumentedRides = @NoOfDocumentedRides,
+		IsNewDriver = @isNewDriver,
+		lastModified = GETDATE()
+		
+	where RidePatNum = @unityRideID
+	
+	-- for delete driver from unity ride
+	ELSE 
+		UPDATE UnityRide
+	set MainDriver = NULL,
+		DriverName = NULL,
+		DriverCellPhone = NULL,
+		NoOfDocumentedRides = NULL,
+		IsNewDriver = 1,
+		lastModified = GETDATE()
+	where RidePatNum = @unityRideID
+
+select * from UnityRide where RidePatNum = @unityRideID
+END
+
+
+
+
+
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- =======================================================
+-- Create Stored Procedure Template for Azure SQL Database
+-- =======================================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad>
+-- Create Date: <24/12/23>
+-- Description: <for update the status of patiet in a ride update in 2 tables because of the unity>
+-- =============================================
+ALTER PROCEDURE spUpdatePatientStatusUnityRide
+(
+    -- Add the parameters for the stored procedure here
+	@PatientId INT,
+	@RidePatNum INT,
+	@PatientStatus nvarchar(55),
+	@EditTimeStamp datetime
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+	
+		IF NOT EXISTS (SELECT 1 FROM RidePatPatientStatus WHERE RidePatNum=@RidePatNum)
+		BEGIN
+			INSERT INTO RidePatPatientStatus (PatientId, RidePatNum, PatientStatus, EditTimeStamp)
+			VALUES (@PatientId, @RidePatNum, @PatientStatus, @EditTimeStamp);
+		END
+	ELSE
+		BEGIN
+			UPDATE RidePatPatientStatus
+			SET PatientStatus = @PatientStatus, EditTimeStamp=@EditTimeStamp
+			WHERE RidePatNum=@RidePatNum
+		END
+
+		UPDATE UnityRide
+		SET LastModified=GETDATE(),PatientStatus=@PatientStatus,patientStatusTime=@EditTimeStamp
+		WHERE RidePatNum=@RidePatNum
+
+		select * 
+		from UnityRide
+		where RidePatNum=@RidePatNum
+END
+GO
+
+
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+-- =======================================================
+-- Create Stored Procedure Template for Azure SQL Database
+-- =======================================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad>
+-- Create Date: <24/12/23>
+-- Description: <according to unity rides need to update remark in the same way like ridepat>
+-- =============================================
+CREATE PROCEDURE spUnityRide_updateRemark
+(
+    -- Add the parameters for the stored procedure here
+	@ridePatNum int,
+	@newRemark nvarchar(255)
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+	
+    -- Insert statements for procedure here
+	UPDATE UnityRide
+	SET Remark=@newRemark
+	WHERE RidePatNum=@ridePatNum
+
+	if @@ROWCOUNT>0
+	select * from UnityRide where RidePatNum=@ridePatNum
+	else
+	select -1 as 'RidePatNum'
+	
+END
+GO
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+/****** Object:  StoredProcedure [dbo].[spUpdateRideInUnityRide]    Script Date: 27/12/2023 13:35:56 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -40,8 +251,9 @@ BEGIN
 	DECLARE @NoOfDocumentedRides int = (select NoOfDocumentedRides from volunteer where id= @driverId)
 	DECLARE @isNewDriver bit = case when (select count(*) from UnityRide where pickupTime<=GETDATE() and MainDriver=@driverId)<=3 then 1 else 0 end
 
-	DECLARE @AmountOfEquipments int =0
-	SET @AmountOfEquipments  = (select count(PatientId) from Equipment_Patient where PatientId = @patientId group by PatientId)
+	DECLARE @AmountOfEquipments int = 0
+	SET @AmountOfEquipments  = case when(select count(PatientId) from Equipment_Patient where PatientId = @patientId group by PatientId) is null then 0 ELSE 
+	(select count(PatientId) from Equipment_Patient where PatientId = @patientId group by PatientId)end
 	set @driverName = case when @driverName='' then null else @driverName end
 
 	DECLARE @FlagVar int =-1
@@ -74,6 +286,7 @@ BEGIN
 	WHERE RidePatNum=@unityRideId;
 
 END
+
 
 
 
@@ -203,7 +416,6 @@ END
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-
 /****** Object:  StoredProcedure [dbo].[spUnityRide_UpdateDateAndTime]    Script Date: 20/12/2023 13:57:30 ******/
 SET ANSI_NULLS ON
 GO
@@ -241,6 +453,9 @@ select -1 as 'RidePatNum'
 
 COMMIT TRAN UpdateUnityRideTime
 END
+
+
+
 
 
 
@@ -436,6 +651,8 @@ BEGIN
 	where id = @patientId
 END
 GO
+
+
 
 
 

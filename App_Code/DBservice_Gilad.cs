@@ -434,6 +434,65 @@ public class DBservice_Gilad
         }
     }
 
+    public bool CheckValidDriverRides(int unityRideID,int driverID,DateTime pickupTime) {
+        SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@UnityRideID", unityRideID);
+        paramDic.Add("@MainDriver", driverID);
+        paramDic.Add("@pickupTime", pickupTime);
+        cmd = CreateCommandWithStoredProcedureGeneral("spCheckValidDrive", con, paramDic);
+
+
+        try
+        {
+
+
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+            int res = -1;
+            while (dataReader.Read())
+            {
+                
+
+
+                res = Convert.ToInt32(dataReader["res"]);
+
+            }
+            if (res>0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        finally
+        {
+            if (con != null)
+            {
+                // close the db connection
+                con.Close();
+            }
+        }
+    }
+
     public int SetUnityRide(UnityRide unityRide)
     {
         SqlCommand cmd;

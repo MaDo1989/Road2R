@@ -838,7 +838,7 @@
             unityRide.DriverName = $('#driver').val() == '' ? null : $('#driver').val()
             unityRide.RidePatNum = dataobj.func == 'edit' ? dataobj.RidePat.RidePatNum : 0;
             unityRide.AmountOfEscorts = dataobj.RidePat.Escorts.length;
-            let request = { unityRide: unityRide, func: dataobj.func, numOfRide: dataobj.numberOfRides, repeatEvery: dataobj.repeatRideEvery };
+            let request = { unityRide: unityRide, func: dataobj.func, numOfRide: dataobj.numberOfRides, repeatEvery: dataobj.repeatRideEvery, firstTry:true };
             console.log('After Custom',request);
             let dataString = JSON.stringify(request);
 
@@ -851,16 +851,68 @@
                         success: function (data) {
                             console.log('Sucsses res -->', data.d);
                             const result = JSON.parse(data.d);
-                            if (result == -1 || result == 0) {
-                                showErrorSwal(request.unityRide.PickupTime);
+                            if (result == -5) {
+                                swal({
+                                    title: "נהג זה שובץ לנסיעה בשעה שבחרת במקומות שונים",
+                                    type: "warning",
+                                    text: '? האם בכל זאת תרצה לשבץ נהג זה לנסיעה זאת ',
+                                    showCancelButton: true,
+                                    cancelButtonText: "בטל",
+                                    confirmButtonClass: 'btn-warning',
+                                    confirmButtonText: "שבץ",
+                                    closeOnConfirm: true
+                                }, function (userResponse) {
+                                    if (userResponse) {
+                                        let request2 = { unityRide: unityRide, func: dataobj.func, numOfRide: dataobj.numberOfRides, repeatEvery: dataobj.repeatRideEvery, firstTry: false };
+                                        let dataString2 = JSON.stringify(request2);
+                                        $.ajax({
+                                            dataType: "json",
+                                            url: "WebService.asmx/setUnityRide",
+                                            contentType: "application/json; charset=utf-8",
+                                            type: "POST",
+                                            data: dataString2,
+                                            success: function (data) {
+                                                console.log('Sucsses res -->', data.d);
+                                                const result = JSON.parse(data.d);
+
+                                                if (result == -1 || result == 0) {
+                                                    showErrorSwal(request.unityRide.PickupTime);
+                                                }
+                                                else {
+                                                    $('#wait').hide();
+                                                    document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
+                                                    document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
+                                                    document.getElementById('modalButtons').innerHTML += '<button onclick="createReturnRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn">יצירת החזרה &nbsp;<i class="ti-car m-r-5"></i></button>';
+                                                    showMyModal('Modal');
+                                                }
+                                            },
+                                            error: function (err) {
+                                                $('#wait').hide();
+                                                console.log('Error from new API', err);
+
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        $('#wait').hide();
+                                    }
+
+                                });
                             }
                             else {
-                                $('#wait').hide();
-                                document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
-                                document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
-                                document.getElementById('modalButtons').innerHTML += '<button onclick="createReturnRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn">יצירת החזרה &nbsp;<i class="ti-car m-r-5"></i></button>';
-                                showMyModal('Modal');
+                                if (result == -1 || result == 0) {
+                                    showErrorSwal(request.unityRide.PickupTime);
+                                }
+                                else {
+                                    $('#wait').hide();
+                                    document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
+                                    document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
+                                    document.getElementById('modalButtons').innerHTML += '<button onclick="createReturnRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn">יצירת החזרה &nbsp;<i class="ti-car m-r-5"></i></button>';
+                                    showMyModal('Modal');
+                                }
                             }
+
+
 
 
                         },
@@ -1788,7 +1840,7 @@
                         success: function (data) {
 
 
-
+                            
                             let thisRide = JSON.parse(data.d)[0];
                             thisRide = CustomObject(thisRide);
                             ridePat = thisRide

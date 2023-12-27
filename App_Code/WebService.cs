@@ -290,11 +290,11 @@ public class WebService : System.Web.Services.WebService
 
     //Gilad try to set UnityRide 
     [WebMethod(EnableSession = true)]
-    public int setUnityRide(UnityRide unityRide,string func,int numOfRide,string repeatEvery)
+    public int setUnityRide(UnityRide unityRide,string func,int numOfRide,string repeatEvery,bool firstTry)
     {
         try
         {
-            int res = unityRide.SetUnityRide(unityRide,func,numOfRide,repeatEvery);
+            int res = unityRide.SetUnityRide(unityRide,func,numOfRide,repeatEvery, firstTry);
             return res; 
         }
         catch (Exception ex)
@@ -1386,14 +1386,15 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public void AssignUpdateDriverToUnityRide(int UnityRideId, int DriverId) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
+    public void AssignUpdateDriverToUnityRide(int UnityRideId, int DriverId,bool isDelete) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
     {
         
 
         try
         {
             UnityRide ur = new UnityRide();
-            ur.updateDriver(DriverId, UnityRideId);
+            ur.updateDriver(DriverId, UnityRideId, isDelete);
+
         }
         catch (Exception ex)
         {

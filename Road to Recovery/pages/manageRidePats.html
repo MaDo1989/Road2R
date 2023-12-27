@@ -112,6 +112,7 @@
             let Maindriver = {};
             Maindriver.DisplayName = thisRide.DriverName;
             Maindriver.Id = thisRide.MainDriver;
+            Maindriver.CellPhone = thisRide.DriverCellPhone
             CustomObj.Drivers.push(Maindriver);
             if (Maindriver.Id == null || Maindriver.Id==-1) {
                 CustomObj.Drivers = [];
@@ -192,6 +193,7 @@
             lastModified_td = nodechilds.find(x => x.className.includes('last-modified_td'));
             driver_td = nodechilds.find(x => x.className.includes('driver_td'));
             $(lastModified_td).addClass('within2HoursSinceChange');
+            //console.log('CHECK COLOR-->', driver_td)
             $(driver_td).removeClass('withIn12HoursDrive withIn24HoursDrive');
 
             switch (functionlity) {
@@ -262,7 +264,7 @@
             ridePat2Draw.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
             ridePat2Draw.patient = buildPatientHTML(updated_ridePat);
             row2manipulate.patientAge = buildPatientAgeHTML(updated_ridePat.Pat);
-            ridePat2Draw.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RideNum);
+            ridePat2Draw.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RidePatNum);
             ridePat2Draw.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
             ridePat2Draw.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
             ridePat2Draw.remark = buildRemarkHTML(updated_ridePat.Remark, updated_ridePat.RidePatNum);
@@ -324,7 +326,7 @@
                 driverIsAssigned = updated_ridePat.Drivers.length > 0;
 
                 if (!driverIsAssigned && treatmentFinished) {
-                //    manipilateNodeStyle(tr_node2manipulate, updated_ridePat, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED);
+                   manipilateNodeStyle(tr_node2manipulate, updated_ridePat, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED);
                 }
 
             }
@@ -545,7 +547,7 @@
                         row2manipulate.origin = !isAssistant ? customRide.Origin.Name : customRide.Origin.EnglishName;
                         row2manipulate.destination = !isAssistant ? customRide.Destination.Name : customRide.Destination.EnglishName;
                         row2manipulate.patient = buildPatientHTML(customRide);
-                        row2manipulate.driver = buildDriverHTML(customRide.RidePatNum, customRide.Drivers[0], customRide.RideNum);
+                        row2manipulate.driver = buildDriverHTML(customRide.RidePatNum, customRide.Drivers[0], customRide.RidePatNum);
                         row2manipulate.status = buildStatusString(customRide.Pat.RidePatPatientStatus, customRide.RidePatNum);
                         row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                         row2manipulate.remark = buildRemarkHTML(customRide.Remark, customRide.RidePatNum);
@@ -661,7 +663,7 @@
                     driverIsAssigned = customRide.Drivers.length > 0;
 
                     if (treatmentFinished) {
-
+                        //console.log('color check -->', tr_node2manipulate, customRide, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED)
                         if (!driverIsAssigned) {
 
                             manipilateNodeStyle(tr_node2manipulate, customRide, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED);
@@ -673,7 +675,8 @@
                             $(tr_node2manipulate).removeClass('highlightRow-after-patientStatusModal');
                         }
                     } else {
-
+                        //console.log('color check -->', tr_node2manipulate, customRide, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED)
+                        manipilateNodeStyle(tr_node2manipulate, customRide, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED);
                         $(tr_node2manipulate).removeClass('highlightRow-after-patientStatusModal');
                     }
                 }
@@ -1371,6 +1374,7 @@
             const request = {
                 UnityRideId: unityRideID,
                 DriverId: DriverId,
+                isDelete: false
             }
             ajaxCall('AssignUpdateDriverToUnityRide', JSON.stringify(request), assignDriverToRidePat_SCB, assignDriverToRidePat_ECB);
 
@@ -1787,13 +1791,15 @@
                     $('#wait').show();
 
                     const request = {
-                        ridePatId: _ridepatToManipulate,
-                        rideId: _assignDriverToRideNum,
-                        driverId: _driverId
+                        UnityRideId: _ridepatToManipulate,
+                        DriverId: _driverId,
+                        isDelete: true
+
                     }
                     $(`#${_ridepatToManipulate}`).removeClass('statusComplete');
                     const dataString = JSON.stringify(request);
-                    ajaxCall('LeaveRidePat', dataString, deleteRideSuccessCB, deleteRideErrorCB);
+                    ajaxCall('AssignUpdateDriverToUnityRide', dataString, deleteRideSuccessCB, deleteRideErrorCB);
+
                 }
 
             });
@@ -1806,6 +1812,12 @@
         const deleteRideSuccessCB = (data) => {
             $('#wait').hide();
             $('#assignDriverModal').modal('hide');
+            //let td = document.getElementById(_ridepatToManipulate).getElementsByClassName('driver_td')[0]
+            //td.classList.add('withIn12HoursDrive')
+            let tr = document.getElementById(_ridepatToManipulate)
+            tr_node2manipulate = tr;
+            manipilateNodeStyle(tr_node2manipulate, _ridepatToManipulate, REMOVE_DRIVER, false, tableName2manipulate);
+
             assignDriverToRidePatAbort();
         }
 
@@ -2769,7 +2781,7 @@
         }
 
 
-        //This one take from unityRide the data *work* needed to switch between refreshTable func to refreshTable_UnityRide func
+        //This one take from unityRide the data *work* 
         function refreshTable_UnityRide(timeInterval = 7) {
             $('#wait').show();
 
@@ -2814,7 +2826,7 @@
                 success: function (data) {
                     $('#wait').hide();
                     arr_rides = JSON.parse(data.d);
-                    console.log('Gilad check this new func*  -->', arr_rides)
+                    //console.log('Gilad check this new func*  -->', arr_rides)
                     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
 
                     let thisRidePatDate;
@@ -2980,7 +2992,7 @@
                     //           || ↓DATATABLES PROPERTIES↓||
                     //           ============================
 
-                    console.log('Morning table data-->', morningRidePats);
+                    //console.log('Morning table data-->', morningRidePats);
                     tMorning = $(`#${tableNames.MORNING}`).DataTable({
                         data: morningRidePats,
                         rowId: 'ridePatNum',
@@ -4461,21 +4473,13 @@
             refreshTable_UnityRide(timeInterval);
         }
 
-        //continue here with to ajust the function to new update !!!!!!
-        //continue here with to ajust the function to new update !!!!!!
-        //continue here with to ajust the function to new update !!!!!!
-        //continue here with to ajust the function to new update !!!!!!
-        //continue here with to ajust the function to new update !!!!!!
-        //continue here with to ajust the function to new update !!!!!!
-        //continue here with to ajust the function to new update !!!!!!
-        //continue here with to ajust the function to new update !!!!!!
-        //continue here with to ajust the function to new update !!!!!!
+       
 
 
         const buildDriverHTML = (ridePatNum, driver, rideNum) => {
             let driverWrapper = '';
             let isDriverReplacement;
-
+            //console.log('this is what i got -->', ridePatNum, driver, rideNum)
             if (typeof driver !== 'undefined' && typeof rideNum !== 'undefined') {
 
                 isDriverReplacement = true;
