@@ -64,6 +64,8 @@
             ridePatBeforeUpdate = arr_rides[index];
             arr_rides[index] = updated_ridePat;
         }
+
+        //make the flat object to complex object like the old API
         const CustomRideObject = (thisRide) => {
 
             let CustomObj = {};
@@ -134,6 +136,8 @@
 
             return CustomObj;
         }
+
+
         const getTableName2Manipulate = (ridePatNum) => {
             let tableName2manipulate;
             if (typeof tMorning.row(`#${ridePatNum}`).data() !== 'undefined') {
@@ -2149,8 +2153,10 @@
                 ...original_deleteCandidate,
                 Date: convertDBDate2FrontEndDate(original_deleteCandidate.Date)
             }
+            deleteCandidate = CustomRideObject(deleteCandidate);
+            deleteCandidate.Date = new Date(convert2DBDateToInt(deleteCandidate.Date));
 
-
+            //console.log('check delete--=>', deleteCandidate);
             let isAfterNoon = deleteCandidate.Date.getMinutes() === 14;
             let isToday = table.context[0].sTableId === "datatable-afternoon" || table.context[0].sTableId === "datatable-morning";
 
@@ -2167,6 +2173,9 @@
             msg2user += isAfterNoon ? 'בשעות אחה"צ ' :
                 `בשעה ${date.toLocaleString('he-IL', { timeStyle: 'short' })} `;
 
+            let addToTextWarning = ''
+            addToTextWarning = (original_deleteCandidate.MainDriver == -1) && (original_deleteCandidate.IsAnonymous == true) ? '(לא יהיה ניתן לשחזר מידע את הנסיעה (תימחק לצמיתות)' : '';
+            msg2user += '\n' + addToTextWarning;
             swal({
                 title: "هل انت متأكد?\nהאם אתם בטוחים?",
                 type: "warning",
@@ -2178,7 +2187,8 @@
                 closeOnConfirm: true
             }, function (userResponse) {
                 if (userResponse) {
-                    deleteRidePat(original_deleteCandidate, deleteBtn, table);
+                   // deleteRidePat(original_deleteCandidate, deleteBtn, table);
+                   deleteUnityRide(original_deleteCandidate, deleteBtn, table)
                 }
 
             });
@@ -2479,6 +2489,55 @@
 
         }
 
+
+        const deleteUnityRide = (ridePat, deleteBtn, thistable) => {
+            checkCookie();
+            $('#wait').show();
+            // var numberOfRides = 1;
+            //var repeatRide = "";
+            let ridePatNums2MarkDeleted = [];
+            ridePatNums2MarkDeleted.push(ridePat.RidePatNum);
+            let nowInUTC = new Date().toUTCString();
+            let request = { UnityRideID: ridePat.RidePatNum };
+            
+                $.ajax({
+                    dataType: "json",
+                    url: "WebService.asmx/deleteUnityRide",
+                    contentType: "application/json; charset=utf-8",
+                    type: "POST",
+                    async: false,
+                    data: JSON.stringify({ request }),
+                    success: function (data) {
+                        swal({
+                            title: "لقد تم حذف السفرية\nההסעה נמחקה",
+                            timer: 1000,
+                            type: "success",
+                            showConfirmButton: false
+                        });
+
+
+                        if (thistable && deleteBtn) {
+                            //console.log('Gilad check from deleteRidePat --> ', deleteBtn,)
+                            thistable.row($(deleteBtn).parents('tr')).remove().draw();
+                        } else {
+                            location.reload();
+                        }
+                        $('#wait').hide();
+
+                    },
+                    error: function (err) {
+                        alert("Error in deleteUnityRide: " + err.responseText);
+                        console.log(err);
+                    }
+                })
+            
+
+      
+
+        
+        }
+
+
         function newRidePatForm() {
             ridePatNum = " ";
             arr_details = { ridePatNum: ridePatNum, func: "new" };
@@ -2549,6 +2608,7 @@
             //console.log('Gilad check from deleteReturn --> ', deleteBtn, deleteBtn.children[deleteBtn.children.length-1].children[0].children[1]);
             //deleteBtn = deleteBtn.children[10].children[0].children[1];
             deleteBtn = deleteBtn.children[deleteBtn.children.length - 1].children[0].children[1]
+
             deleteRidePat(RidePat, deleteBtn, thisTable);
         }
 

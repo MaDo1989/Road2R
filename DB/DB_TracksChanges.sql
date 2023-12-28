@@ -1,7 +1,5 @@
 ﻿
--- =======================================================
--- Create Stored Procedure Template for Azure SQL Database
--- =======================================================
+/****** Object:  StoredProcedure [dbo].[spCheckValidDrive]    Script Date: 28/12/2023 12:30:06 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -11,7 +9,7 @@ GO
 -- Create Date: <27/12/23>
 -- Description: <To check if is there any ride with same time but diffrent places for same driver >
 -- =============================================
-CREATE PROCEDURE spCheckValidDrive
+ALTER PROCEDURE [dbo].[spCheckValidDrive]
 (
     -- Add the parameters for the stored procedure here
 	@UnityRideID INT,
@@ -26,14 +24,14 @@ BEGIN
     -- Insert statements for procedure here
 	IF EXISTS(select 1
 	from UnityRide
-	where RidePatNum != 135902 and
-		  pickupTime = '2023-12-28 06:00:00.000' and 
-		  MainDriver = 14430)
+	where RidePatNum != @UnityRideID and
+		  pickupTime = @pickupTime and 
+		  MainDriver = @MainDriver)
 	select 1 as 'res'
 	ELSE
 	select 0 as 'res'
 END
-GO
+
 
 
 
