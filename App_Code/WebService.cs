@@ -1406,6 +1406,32 @@ public class WebService : System.Web.Services.WebService
     }
 
 
+
+
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public void deleteUnityRide(int UnityRideID) 
+    {
+
+
+        try
+        {
+            UnityRide ur = new UnityRide();
+            ur.deleteUnityRide(UnityRideID);
+
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in deleteUnityRide", ex);
+            throw new Exception(ex.Message);
+
+        }
+
+    }
+
+
+
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string CombineRideRidePat(int rideId, int RidePatId) //Get RideId & RidePatId - combine them

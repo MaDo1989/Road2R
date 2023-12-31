@@ -544,6 +544,14 @@ public class UnityRide
 
     }
 
+    public void deleteUnityRide(int unityRideId)
+    {
+        DBservice_Gilad dBservice = new DBservice_Gilad();
+        UnityRide ur = new UnityRide();
+        ur = dBservice.deleteUnityRide(unityRideId);
+        BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
+
+    }
 
     private List<DateTime> BuildFutureRidesDates(DateTime date, string repeatRideEvery, int numberOfRides)
     {

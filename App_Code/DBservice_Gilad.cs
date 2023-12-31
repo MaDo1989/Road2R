@@ -1273,6 +1273,29 @@ public class DBservice_Gilad
         return unityRide;
     }
 
+    public UnityRide deleteUnityRide(int unityRideID)
+    {
+        SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@unityRideID", unityRideID);
+        cmd = CreateCommandWithStoredProcedureGeneral("spDeleteUnityRide", con, paramDic);
+        UnityRide unityRide = new UnityRide();
+        unityRide = reciveUnityRideDB(cmd);
+        return unityRide;
+    }
+
     private UnityRide reciveUnityRideDB(SqlCommand cmd)
     {
         UnityRide unityRide = new UnityRide();

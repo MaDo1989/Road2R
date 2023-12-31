@@ -2499,14 +2499,13 @@
             ridePatNums2MarkDeleted.push(ridePat.RidePatNum);
             let nowInUTC = new Date().toUTCString();
             let request = { UnityRideID: ridePat.RidePatNum };
-            
+            console.log('check request -->', request)
                 $.ajax({
                     dataType: "json",
                     url: "WebService.asmx/deleteUnityRide",
                     contentType: "application/json; charset=utf-8",
                     type: "POST",
-                    async: false,
-                    data: JSON.stringify({ request }),
+                    data: JSON.stringify(request),
                     success: function (data) {
                         swal({
                             title: "لقد تم حذف السفرية\nההסעה נמחקה",
@@ -2527,6 +2526,7 @@
                     },
                     error: function (err) {
                         alert("Error in deleteUnityRide: " + err.responseText);
+                        $('#wait').hide();
                         console.log(err);
                     }
                 })
