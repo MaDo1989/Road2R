@@ -553,6 +553,12 @@ public class UnityRide
 
     }
 
+    public List<UnityRide> Get_unityRide_ByTimeRange(int from, int until, bool isDeletedtoShow)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+        return db.Get_unityRide_ByTimeRange(from, until, isDeletedtoShow);
+    }
+
     private List<DateTime> BuildFutureRidesDates(DateTime date, string repeatRideEvery, int numberOfRides)
     {
         List<DateTime> listOfDatesAfterUTCfix = new List<DateTime>();

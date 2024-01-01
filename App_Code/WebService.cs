@@ -943,8 +943,7 @@ public class WebService : System.Web.Services.WebService
     public string GetRidePatViewByTimeFilter_Gilad(int from, int until, bool isDeletedtoShow)
     {
         //Gilad Update this with Data Reader only 
-        //TO DO 
-        //try to add Gzip.
+
         try
         {
             HttpResponse response = GzipMe();
@@ -958,6 +957,33 @@ public class WebService : System.Web.Services.WebService
             throw new Exception("שגיאה בייבוא נתונים לפי חתך זמנים");
         }
     }
+
+
+
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string Get_unityRide_ByTimeRange(int from, int until, bool isDeletedtoShow)
+    {
+
+        try
+        {
+            HttpResponse response = GzipMe();
+            UnityRide ur = new UnityRide();
+            List<UnityRide> list = new List<UnityRide>();
+            list = ur.Get_unityRide_ByTimeRange(from, until, isDeletedtoShow);
+            j.MaxJsonLength = Int32.MaxValue;
+            return j.Serialize(list);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in Get_unityRide_ByTimeRange", ex);
+            throw new Exception("שגיאה בייבוא נתונים לפי חתך זמנים");
+        }
+    }
+
+
+
 
     [WebMethod(EnableSession = true)]
     // [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
