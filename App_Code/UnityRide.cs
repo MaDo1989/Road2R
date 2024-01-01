@@ -544,12 +544,23 @@ public class UnityRide
 
     }
 
-    public void deleteUnityRide(int unityRideId)
+    public void deleteUnityRide(List<int> listIDs)
     {
         DBservice_Gilad dBservice = new DBservice_Gilad();
         UnityRide ur = new UnityRide();
-        ur = dBservice.deleteUnityRide(unityRideId);
-        BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
+        if (listIDs.Count>1)
+        {
+            for (int i = 0; i < listIDs.Count; i++)
+            {
+                dBservice.deleteUnityRide(listIDs[i]);
+            }
+        }
+        else
+        {
+            ur = dBservice.deleteUnityRide(listIDs[0]);
+            BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
+        }
+
 
     }
 

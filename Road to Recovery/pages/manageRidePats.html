@@ -138,6 +138,7 @@
         }
 
 
+     
         const getTableName2Manipulate = (ridePatNum) => {
             let tableName2manipulate;
             if (typeof tMorning.row(`#${ridePatNum}`).data() !== 'undefined') {
@@ -2498,7 +2499,9 @@
             let ridePatNums2MarkDeleted = [];
             ridePatNums2MarkDeleted.push(ridePat.RidePatNum);
             let nowInUTC = new Date().toUTCString();
-            let request = { UnityRideID: ridePat.RidePatNum };
+            const listIds = []
+            listIds.push(ridePat.RidePatNum);
+            let request = { ListIDs: listIds };
             console.log('check request -->', request)
                 $.ajax({
                     dataType: "json",
