@@ -283,7 +283,7 @@
         function refreshTable() {
             //this function doesnt changeing timeFilteredArr or fetching data from the back-end
             $('#wait').show();
-            setTimeout(() => { $('#wait').hide() }, 1000);
+            setTimeout(() => { $('#wait').hide() }, 500);
 
 
             checkCookie();
@@ -620,7 +620,7 @@
 
         const Recover_FewRidePats = () => {
 
-            let txt2post = `האם אתם בטוחים? האם למחוק את כל ${ridePatNums2MarkRecovered.length} ההסעות שנבחרו ברשימה המוצגת לפניך?`;
+            let txt2post = `האם אתם בטוחים? האם לשחזר את כל ${ridePatNums2MarkRecovered.length} ההסעות שנבחרו ברשימה המוצגת לפניך?`;
             swal({
                 title: "האם אתם בטוחים?",
                 text: txt2post,
@@ -636,10 +636,10 @@
                     $('#wait').show();
                     $.ajax({
                         dataType: "json",
-                        url: "WebService.asmx/ChangeArrayOF_RidePatStatuses",
+                        url: "WebService.asmx/recoverUnityRides",
                         contentType: "application/json; charset=utf-8",
                         type: "POST",
-                        data: JSON.stringify({ newStatus: 'ממתינה לשיבוץ', ridePatNums: ridePatNums2MarkRecovered, clientUTCTimeStemp: new Date().toUTCString() }),
+                        data: JSON.stringify({ listIDs: ridePatNums2MarkRecovered }),
                         success: function (data) {
                             $('#wait').hide();
                             swal({
@@ -658,7 +658,7 @@
                         },
                         error: function (err) {
                             $('#wait').hide();
-                            alert("Error in Recover_FewRidePats:" + err.responseText);
+                            alert("Error in Recover_UnityRides:" + err.responseText);
                         }
                     });
 
@@ -793,7 +793,7 @@
                                                                                                                                             מ - ${origin} ל - ${destenation}
                                                                                                                                             בתאריך -  ${date}`;
 
-
+                let list = [ridePat_Num]
                 swal({
                     title: "האם לשחזר נסיעה?",
                     text: txt2post,
@@ -808,10 +808,10 @@
                     if (isConfirm) {
                         $.ajax({
                             dataType: "json",
-                            url: "WebService.asmx/changeRidePatStatus",
+                            url: "WebService.asmx/recoverUnityRides",
                             contentType: "application/json; charset=utf-8",
                             type: "POST",
-                            data: JSON.stringify({ newStatus: 'ממתינה לשיבוץ', ridePatNum: ridePat_Num }),
+                            data: JSON.stringify({ listIDs: list }),
                             success: function (data) {
                                 refreshTable();
                                 swal({
@@ -821,9 +821,9 @@
                                     showConfirmButton: false
                                 });
                                 //right after
-                                setTimeout(function () { ImportDataByTimeFilters() }, 1001);//literally means go fetch new data from server side with the same time frame
+                                setTimeout(function () { ImportDataByTimeFilters() }, 250);//literally means go fetch new data from server side with the same time frame
                             },
-                            error: function (err) { alert("Error in RecoverRidePat:" + err.responseText); }
+                            error: function (err) { alert("Error in RecoverUnityRide:" + err.responseText); }
                         });
 
                     } else {

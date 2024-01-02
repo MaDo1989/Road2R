@@ -515,7 +515,7 @@
                     let nowInUTC = new Date().toUTCString();
                     var func = arr_customer.func;
 
-
+                    
 
 
 
@@ -903,7 +903,18 @@
                                 if (result == -1 || result == 0) {
                                     showErrorSwal(request.unityRide.PickupTime);
                                 }
-                                else {
+                                else if (result == -9)
+                                {
+                                    console.log('Error in setUnityRide ', request)
+                                    Swal.fire({
+                                        title: "שגיאה",
+                                        text: "העדכון לא בוצע קיימת שגיאה בשליחת הנתונים",
+                                        icon: "error"
+                                    });
+                                }
+
+                                else
+                                {
                                     $('#wait').hide();
                                     document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
                                     document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
@@ -1035,7 +1046,8 @@
 
         const fillPage_withPatientData = (patient, markThe1stEscort = false) => {
 
-            isAnonymous = patient.IsAnonymous === 'True';
+            //console.log('inside fillPage_withPatientData --> patient-', patient)
+            isAnonymous = patient.IsAnonymous === true;
             localStorage.PatID = patient.Id;
             $('#pat').val(patient.DisplayName);
             $('#patEnglishName').val(patient.EnglishName);
@@ -1275,7 +1287,7 @@
 
                 for (var i = 0; i < patients_JSONArray.length; i++) {
 
-                    if (isAssistant && patients_JSONArray[i].IsAnonymous === 'True') {
+                    if (isAssistant && patients_JSONArray[i].IsAnonymous === true) {
                         continue;
                     }
                     patients_Names.push(patients_JSONArray[i].DisplayName.trim());
@@ -1752,6 +1764,7 @@
             CustomObj.Pat.PatientIdentity = thisRide[15].Value;
             CustomObj.Pat.Equipment = thisRide[17].Value;
             CustomObj.Pat.IsAnonymous = thisRide[19].Value;
+            isAnonymous = CustomObj.Pat.IsAnonymous
 
             CustomObj.Pat.EscortedList = [];
             CustomObj.Escorts = [];
@@ -1883,7 +1896,7 @@
                             }
 
                             //editing anonymous ridepat only if a driver assigned to the ride.
-                            if ((ridePat.Pat.IsAnonymous == "True") && (ridePat.Status != 'ממתינה לשיבוץ')) {
+                            if ((ridePat.Pat.IsAnonymous == true) && (ridePat.Status != 'ממתינה לשיבוץ')) {
 
                                 //$("#afterNoon").attr('disabled', 'disabled');
                                 $("#Origin").attr('disabled', 'disabled');
@@ -1893,7 +1906,7 @@
                                 $("#dateRide").attr('disabled', 'disabled');
                                 $("#dirBTN").attr('disabled', 'disabled');
                             }
-                            if (ridePat.Pat.IsAnonymous == "True") {
+                            if (ridePat.Pat.IsAnonymous == true) {
                                 var area = "";
                                 //if(ridePat.Pat.DisplayName.indexOf('מרכז') !== -1){
                                 //    area="מרכז";
@@ -1993,7 +2006,7 @@
                             ridePat.Destination.Name = ridePat.Destination.Name.replace("'", "\\'");
                             $("#selectDestination option[value='" + ridePat.Destination.Name + "']").prop('selected', true);
 
-                            if (ridePat.Pat.IsAnonymous == "True") {
+                            if (ridePat.Pat.IsAnonymous == true) {
                                 currentOrigin = ridePat.Origin.Name;
                                 currentDestination = ridePat.Destination.Name;
                             }
@@ -2136,7 +2149,7 @@
                             }
 
                             //editing anonymous ridepat only if a driver assigned to the ride.
-                            if ((ridePat.Pat.IsAnonymous == "True") && (ridePat.Status != 'ממתינה לשיבוץ')) {
+                            if ((ridePat.Pat.IsAnonymous == true) && (ridePat.Status != 'ממתינה לשיבוץ')) {
 
                                 //$("#afterNoon").attr('disabled', 'disabled');
                                 $("#Origin").attr('disabled', 'disabled');
@@ -2146,7 +2159,7 @@
                                 $("#dateRide").attr('disabled', 'disabled');
                                 $("#dirBTN").attr('disabled', 'disabled');
                             }
-                            if (ridePat.Pat.IsAnonymous == "True") {
+                            if (ridePat.Pat.IsAnonymous == true) {
                                 var area = "";
                                 //if(ridePat.Pat.DisplayName.indexOf('מרכז') !== -1){
                                 //    area="מרכז";
@@ -2246,7 +2259,7 @@
                             ridePat.Destination.Name = ridePat.Destination.Name.replace("'", "\\'");
                             $("#selectDestination option[value='" + ridePat.Destination.Name + "']").prop('selected', true);
 
-                            if (ridePat.Pat.IsAnonymous == "True") {
+                            if (ridePat.Pat.IsAnonymous == true) {
                                 currentOrigin = ridePat.Origin.Name;
                                 currentDestination = ridePat.Destination.Name;
                             }

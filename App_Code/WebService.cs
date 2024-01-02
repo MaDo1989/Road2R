@@ -1000,6 +1000,22 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+    [WebMethod(EnableSession = true)]
+    public bool recoverUnityRides(List<int> listIDs)
+    {
+        try
+        {
+            UnityRide ur = new UnityRide();
+            return ur.recoverUnityRides(listIDs);
+        }
+        catch (Exception ex)
+        {
+
+            throw new Exception("error in recoverUnityRides API" +ex);
+        }
+
+    }
+
     //Gilad update 03/10/23
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]

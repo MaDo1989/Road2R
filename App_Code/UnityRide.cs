@@ -429,7 +429,7 @@ public class UnityRide
     public int SetUnityRide(UnityRide unityride, string func, int numOfRide, string repeatEvery,bool firstTry)
     {
         DBservice_Gilad dBservice = new DBservice_Gilad();
-        if (dBservice.CheckValidDriverRides(unityride.RidePatNum,unityride.MainDriver,unityride.PickupTime)==true && firstTry == true)
+        if (dBservice.CheckValidDriverRides(unityride.RidePatNum,unityride.DriverName, unityride.PickupTime)==true && firstTry == true)
         {
             return -5;
         }
@@ -462,8 +462,29 @@ public class UnityRide
         else if(func=="edit"){
             return dBservice.UpdateUnityRide(unityride);
         }
-        // if didnt send func name its an error = -1 ;
-        return -1;
+        // if didnt send func name its an error = -9 ;
+        return -9;
+    }
+
+    public bool recoverUnityRides(List<int> ListIDs)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+        bool indcation = false;
+        for (int i = 0; i < ListIDs.Count; i++)
+        {
+            int res = db.recoverUnityRide(ListIDs[i]);
+           
+            if (res >0)
+            {
+              indcation = true;
+            }
+            else
+            {
+              indcation = false;
+            }
+            
+        }
+        return indcation;
     }
 
     public string NEWCheckLocationForUnityRideArea(string origin, string destination)

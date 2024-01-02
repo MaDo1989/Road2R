@@ -550,7 +550,7 @@ public class DBservice_Gilad
         }
     }
 
-    public bool CheckValidDriverRides(int unityRideID,int driverID,DateTime pickupTime) {
+    public bool CheckValidDriverRides(int unityRideID,string DriverName,DateTime pickupTime) {
         SqlCommand cmd;
         try
         {
@@ -565,7 +565,7 @@ public class DBservice_Gilad
         }
         Dictionary<string, object> paramDic = new Dictionary<string, object>();
         paramDic.Add("@UnityRideID", unityRideID);
-        paramDic.Add("@MainDriver", driverID);
+        paramDic.Add("@DriverName", DriverName);
         paramDic.Add("@pickupTime", pickupTime);
         cmd = CreateCommandWithStoredProcedureGeneral("spCheckValidDrive", con, paramDic);
 
@@ -608,6 +608,52 @@ public class DBservice_Gilad
             }
         }
     }
+
+
+    public int recoverUnityRide(int unityRideID)
+    {
+        SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@unityRideID", unityRideID);
+
+        cmd = CreateCommandWithStoredProcedureGeneral("spRecoverUnityRide", con, paramDic);
+        int res = -1;
+
+        try
+        {
+
+
+            res = cmd.ExecuteNonQuery();
+            return res;
+         
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            throw new Exception("exception in DBservice_Gilad.cs -> recoverUnityRide " + ex);
+        }
+
+        finally
+        {
+            if (con != null)
+            {
+                // close the db connection
+                con.Close();
+            }
+        }
+    }
+
 
     public int SetUnityRide(UnityRide unityRide)
     {
