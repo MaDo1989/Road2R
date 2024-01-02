@@ -2514,27 +2514,27 @@
         }
 
         function deleteRideSuccessCB() {
-            if (driverMode == "edit") {
-                currentDriverId = userSelected;
-                var request = {
-                    ridePatId: ridePatId,
-                    userId: userSelected,
-                    driverType: "primary",
-                    assignedFromAppId: APP_ID
-                };
+            //if (driverMode == "edit") {
+            //    currentDriverId = userSelected;
+            //    var request = {
+            //        ridePatId: ridePatId,
+            //        userId: userSelected,
+            //        driverType: "primary",
+            //        assignedFromAppId: APP_ID
+            //    };
 
-                var dataString = JSON.stringify(request);
-                $.ajax({ // ajax call starts
-                    url: 'WebService.asmx/AssignRideToRidePat',   // server side web service method
-                    data: dataString,                          // the parameters sent to the server
-                    type: 'POST',                              // can be also GET
-                    dataType: 'json',                          // expecting JSON datatype from the server
-                    contentType: 'application/json; charset = utf-8', // sent to the server
-                    success: signDriverSuccessCB,                // data.d id the Variable data contains the data we get from serverside
-                    error: signDriverErrorCB
-                }) // end of ajax call
+            //    var dataString = JSON.stringify(request);
+            //    $.ajax({ // ajax call starts
+            //        url: 'WebService.asmx/AssignRideToRidePat',   // server side web service method
+            //        data: dataString,                          // the parameters sent to the server
+            //        type: 'POST',                              // can be also GET
+            //        dataType: 'json',                          // expecting JSON datatype from the server
+            //        contentType: 'application/json; charset = utf-8', // sent to the server
+            //        success: signDriverSuccessCB,                // data.d id the Variable data contains the data we get from serverside
+            //        error: signDriverErrorCB
+            //    }) // end of ajax call
 
-            } else if (driverMode == "delete") {
+            //}
                 //$('#Driver').val(0)
 
                 $('#driver').val("")
@@ -2548,7 +2548,7 @@
                 });
                 $('#deleteDriver').hide();
                 currentDriverId = -1;
-            }
+            
 
             driverMode = "";
 
@@ -2571,13 +2571,13 @@
                 driverMode = "delete";
                 deleteDriverFlag = true;
                 request = {
-                    ridePatId: ridePatId,
-                    rideId: RideId,
-                    driverId: userSelected
+                    UnityRideId: ridePatId,
+                    isDelete: true,
+                    DriverId: userSelected
                 }
                 var dataString = JSON.stringify(request);
                 $.ajax({ // ajax call starts
-                    url: 'WebService.asmx/LeaveRidePat',   // server side web service method
+                    url: 'WebService.asmx/AssignUpdateDriverToUnityRide',   // server side web service method
                     data: dataString,                          // the parameters sent to the server
                     type: 'POST',                              // can be also GET
                     dataType: 'json',                          // expecting JSON datatype from the server

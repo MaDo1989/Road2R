@@ -429,10 +429,14 @@ public class UnityRide
     public int SetUnityRide(UnityRide unityride, string func, int numOfRide, string repeatEvery,bool firstTry)
     {
         DBservice_Gilad dBservice = new DBservice_Gilad();
-        if (dBservice.CheckValidDriverRides(unityride.RidePatNum,unityride.DriverName, unityride.PickupTime)==true && firstTry == true)
+        if (unityride.DriverName!=null)
         {
-            return -5;
+            if (dBservice.CheckValidDriverRides(unityride.RidePatNum, unityride.DriverName, unityride.PickupTime) == true && firstTry == true)
+            {
+                return -5;
+            }
         }
+
 
         if (func=="new")
         {
