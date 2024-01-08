@@ -1,32 +1,44 @@
 ﻿let days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
 
+
+
+
 const showMessage = (arr_rides, ridePatNum) => {
-    const ridepat = arr_rides.find((r) => r.RidePatNum === ridePatNum);
+    let ridepat = arr_rides.find((r) => r.RidePatNum === ridePatNum);
+    console.log('Check what i got before ->', ridepat)
+    ridepat = CustomRideObject(ridepat);
+    console.log('Check what i after ->', ridepat)
+
 
     if (ridepat.Drivers.length == 0) return;
     // get all the rides going to this direction with this driver
-    const onlyRidepatsWithDriver = arr_rides.filter((r) => r.Drivers.length > 0);
+    const onlyRidepatsWithDriver = arr_rides.filter((r) => r.MainDriver > 0);
+    console.log('onlyRidepatsWithDriver ->', onlyRidepatsWithDriver)
     AllRidesForThisDriver = onlyRidepatsWithDriver.filter((r) => {
+        const oneRide = CustomRideObject(r);
         return (
-            r.Destination.Name === ridepat.Destination.Name &&
-            r.Origin.Name === ridepat.Origin.Name &&
-            r.Drivers[0].Id === ridepat.Drivers[0].Id &&
-            r.Date === ridepat.Date
+            oneRide.Destination.Name === ridepat.Destination.Name &&
+            oneRide.Origin.Name === ridepat.Origin.Name &&
+            oneRide.Drivers[0].Id === ridepat.Drivers[0].Id &&
+            oneRide.Date === ridepat.Date
         );
     });
     // remove names that include _ used for unique display names
     let driverName =
-        AllRidesForThisDriver[0].Drivers[0].DisplayName.split("_")[0];
+        AllRidesForThisDriver[0].DriverName.split("_")[0];
     message = {
-        origin: AllRidesForThisDriver[0].Origin.Name,
-        destination: AllRidesForThisDriver[0].Destination.Name,
+        origin: AllRidesForThisDriver[0].Origin,
+        destination: AllRidesForThisDriver[0].Destination,
         driver: driverName,
-        date: AllRidesForThisDriver[0].Date,
+        date: AllRidesForThisDriver[0].PickupTime,
         patients: [],
         totalPeople: 0
     };
 
     for (var i = 0; i < AllRidesForThisDriver.length; i++) {
+        console.log('before AllRidesForThisDriver[i]', AllRidesForThisDriver[i])
+        AllRidesForThisDriver[i] = CustomRideObject(AllRidesForThisDriver[i]);
+        console.log('After AllRidesForThisDriver[i]', AllRidesForThisDriver[i])
 
         if (AllRidesForThisDriver[i].Pat.IsAnonymous) {
             patient = {

@@ -535,6 +535,10 @@ public class UnityRide
             BroadCast.BroadCast2Clients_UnityRideUpdated(returnride);
 
         }
+        else
+        {
+            DBservice_Gilad.WriteToErrorFile("UpdateUnityRideRemark updateRemark", "RidePatNum is -1 " + returnride.ToString());
+        }
     }
 
     public void updatePatientStatusandTime (int patientId, int unityRideID, string patientStatus, DateTime? editTimeStamp)

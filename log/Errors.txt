@@ -1,0 +1,21 @@
+******************************07/01/2024 18:53:58******************************
+FROM : 
+getCoorList()
+The Error msg : 
+Error in bla bla
+END
+******************************07/01/2024 18:54:52******************************
+FROM : 
+getCoorList()
+webservice
+dbservice
+stamstam
+The Error msg : 
+Error in bla bla
+END
+******************************07/01/2024 18:55:41******************************
+FROM : 
+getCoorList() -> webservice -> dbservice -> stamstam
+The Error msg : 
+Error in bla bla
+END

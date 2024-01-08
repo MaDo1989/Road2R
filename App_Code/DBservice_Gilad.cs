@@ -14,6 +14,9 @@ using System.Linq;
 using System.Data.Common;
 using System.Activities.Statements;
 using System.Dynamic;
+//using static System.Net.Mime.MediaTypeNames;
+using System.IO;
+using System.Web;
 //using static Constants.Enums;
 //using static ReportService;
 
@@ -122,7 +125,36 @@ public class DBservice_Gilad
 
     }
 
+    static public void WriteToErrorFile(string ancestors,string ExceptionString)
+    {
+        string Path = "\\log\\Errors.txt";
+        string stackTracesfilePath = HttpContext.Current.Server.MapPath("~") + Path;
+        DateTime currentDate = DateTime.Now;
+        string formattedDate = currentDate.ToString("dd/MM/yyyy HH:mm:ss");
+        string linebreak = "\n";
+        ancestors = ancestors.Replace(" ", " -> ");
+        string sep = "******************************";
+        string txtToFile = sep + formattedDate + sep + linebreak;
+        txtToFile += "FROM : " + linebreak + ancestors + linebreak;
+        txtToFile += "The Error msg : " + linebreak + ExceptionString + linebreak + "END";
 
+
+
+
+
+
+        try
+        {
+            using (StreamWriter writer = new StreamWriter(stackTracesfilePath,true))
+            {
+                // Write the text to the file
+                writer.WriteLine(txtToFile);
+            }
+        }
+        catch(Exception ex) { 
+            throw new Exception("error in write to txt file "+ex.Message);
+        }
+    }
     public List<object> GetListOfEscortsByPatientId(int patientId)
     {
         List<object> list2Return = new List<object>();
@@ -287,7 +319,8 @@ public class DBservice_Gilad
         }
         catch (Exception ex)
         {
-            throw (ex);
+            WriteToErrorFile("GetUnityRide GetUnityRideView GetRidesForRidePatView spGetUnitedRides", ex.Message + ex.ToString());
+            throw (new Exception(ex.Message));
         }
 
         finally
@@ -403,6 +436,7 @@ public class DBservice_Gilad
         }
         catch (Exception ex)
         {
+            WriteToErrorFile("Get_unityRide_ByTimeRange Get_unityRide_ByTimeRange spGet_UnityRide_ByTimeRange", ex.Message +ex.ToString());
             throw new Exception("exception in DBservice_Gilad.cs ?  Get_unityRide_ByTimeRange" + ex);
         }
 
@@ -537,6 +571,7 @@ public class DBservice_Gilad
         catch (Exception ex)
         {
             // write to log
+            WriteToErrorFile("GetUnityRideToEdit GetUnityRideToEdit GetUnityRide", ex.Message + ex.ToString());
             throw (ex);
         }
 
@@ -596,6 +631,7 @@ public class DBservice_Gilad
         catch (Exception ex)
         {
             // write to log
+            WriteToErrorFile("setUnityRide SetUnityRide CheckValidDriverRides spCheckValidDrive", ex.Message + ex.ToString());
             throw (ex);
         }
 
@@ -641,6 +677,7 @@ public class DBservice_Gilad
         catch (Exception ex)
         {
             // write to log
+            WriteToErrorFile("recoverUnityRides recoverUnityRide spRecoverUnityRide",ex.Message + ex.ToString());
             throw new Exception("exception in DBservice_Gilad.cs -> recoverUnityRide " + ex);
         }
 
@@ -696,7 +733,7 @@ public class DBservice_Gilad
         }
         catch (Exception ex)
         {
-
+            WriteToErrorFile("setUnityRide SetUnityRide spSetNewUnityRide", ex.Message + ex.ToString());
             throw ex;
         }
         finally
@@ -748,7 +785,7 @@ public class DBservice_Gilad
         }
         catch (Exception ex)
         {
-
+            WriteToErrorFile("setUnityRide SetUnityRide UpdateUnityRide spUpdateRideInUnityRide", ex.Message + ex.ToString());
             throw ex;
         }
         finally
@@ -1351,7 +1388,8 @@ public class DBservice_Gilad
         paramDic.Add("@unityRideId", unityRideNum);
         cmd = CreateCommandWithStoredProcedureGeneral("spUnityRide_UpdateDateAndTime", con, paramDic);
         UnityRide unityRide = new UnityRide();
-        unityRide = reciveUnityRideDB(cmd);
+        string ancestors = "UpdateUnityRideTime updateUnityRideTime spUnityRide_UpdateDateAndTime reciveUnityRideDB";
+        unityRide = reciveUnityRideDB(cmd, ancestors);
         return unityRide;
 
 
@@ -1378,8 +1416,8 @@ public class DBservice_Gilad
         cmd = CreateCommandWithStoredProcedureGeneral("spUnityRide_updateRemark", con, paramDic);
         UnityRide unityRide = new UnityRide();
 
-
-        unityRide = reciveUnityRideDB(cmd);
+        string ancestors = "UpdateUnityRideRemark updateRemark spUnityRide_updateRemark reciveUnityRideDB";
+        unityRide = reciveUnityRideDB(cmd, ancestors);
         return unityRide;
 
     }
@@ -1406,7 +1444,8 @@ public class DBservice_Gilad
         paramDic.Add("@EditTimeStamp", editTimeStamp);
         cmd = CreateCommandWithStoredProcedureGeneral("spUpdatePatientStatusUnityRide", con, paramDic);
         UnityRide unityRide = new UnityRide();
-        unityRide = reciveUnityRideDB(cmd);
+        string ancestors = "UpdatePatientStatus_UnityRide updatePatientStatusandTime updatePatientStatusAndTime spUpdatePatientStatusUnityRide reciveUnityRideDB";
+        unityRide = reciveUnityRideDB(cmd, ancestors);
         return unityRide;
 
     }
@@ -1431,7 +1470,8 @@ public class DBservice_Gilad
         paramDic.Add("@unityRideID", unityRideID);
         cmd = CreateCommandWithStoredProcedureGeneral("spUpdateDriverUnityRide", con, paramDic);
         UnityRide unityRide = new UnityRide();
-        unityRide = reciveUnityRideDB(cmd);
+        string ancestors = "AssignUpdateDriverToUnityRide updateDriver spUpdateDriverUnityRide reciveUnityRideDB";
+        unityRide = reciveUnityRideDB(cmd, ancestors);
         return unityRide;
     }
 
@@ -1454,11 +1494,12 @@ public class DBservice_Gilad
         paramDic.Add("@unityRideID", unityRideID);
         cmd = CreateCommandWithStoredProcedureGeneral("spDeleteUnityRide", con, paramDic);
         UnityRide unityRide = new UnityRide();
-        unityRide = reciveUnityRideDB(cmd);
+        string ancestors = "deleteUnityRide deleteUnityRide spDeleteUnityRide reciveUnityRideDB";
+        unityRide = reciveUnityRideDB(cmd, ancestors);
         return unityRide;
     }
 
-    private UnityRide reciveUnityRideDB(SqlCommand cmd)
+    private UnityRide reciveUnityRideDB(SqlCommand cmd,string ancestors)
     {
         UnityRide unityRide = new UnityRide();
         try
@@ -1540,7 +1581,7 @@ public class DBservice_Gilad
         }
         catch (Exception ex)
         {
-
+            WriteToErrorFile(ancestors,ex.Message+ex.ToString());
             throw new Exception("error in dbService_Gilad.cs in reciveUnityRideDB function -->" + ex.Message);
 
         }
