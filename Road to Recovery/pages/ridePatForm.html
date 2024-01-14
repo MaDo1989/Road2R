@@ -1047,7 +1047,7 @@
         const fillPage_withPatientData = (patient, markThe1stEscort = false) => {
 
             //console.log('inside fillPage_withPatientData --> patient-', patient)
-            isAnonymous = patient.IsAnonymous === true;
+            isAnonymous = patient.IsAnonymous === "True";
             localStorage.PatID = patient.Id;
             $('#pat').val(patient.DisplayName);
             $('#patEnglishName').val(patient.EnglishName);

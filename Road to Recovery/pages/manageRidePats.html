@@ -528,7 +528,7 @@
                 * !!! IMPORTANT !!! *
                 *********************/
 
-            const customRide = CustomRideObject(updatedUnityRide); // to ajust the object
+            let customRide = CustomRideObject(updatedUnityRide); // to ajust the object
 
             console.log('After Custom object look like this-->', customRide)
 
@@ -562,6 +562,10 @@
                         increaseCounter(tableNames.MORNING, customRide.RidePatNum);
 
                         tr_nodesAsArray = Array.from(tMorning.rows().nodes());
+
+                        if (customRide.Status == 'נמחקה') {
+                            tMorning.row(`#${customRide.RidePatNum}`).remove().draw()
+                        }
                         break;
 
                     case tableNames.AFTERNOON:
@@ -582,6 +586,9 @@
                         increaseCounter(tableNames.AFTERNOON, updated_ridePat.RidePatNum);
 
                         tr_nodesAsArray = Array.from(tAfternoon.rows().nodes());
+                        if (customRide.Status == 'נמחקה') {
+                            tAfternoon.row(`#${customRide.RidePatNum}`).remove().draw()
+                        }
                         break;
 
                     case tableNames.TOMORROW_MORNING:
@@ -604,6 +611,9 @@
 
                         tr_nodesAsArray = Array.from(tTomorrowMorning.rows().nodes());
 
+                        if (customRide.Status == 'נמחקה') {
+                            tTomorrowMorning.row(`#${customRide.RidePatNum}`).remove().draw()
+                        }
                         break;
 
                     case tableNames.TOMORROW_AFTERNOON:
@@ -626,6 +636,9 @@
 
                         tr_nodesAsArray = Array.from(tTomorrowMorning.rows().nodes());
 
+                        if (customRide.Status == 'נמחקה') {
+                            tTomorrowAfternoon.row(`#${customRide.RidePatNum}`).remove().draw()
+                        }
                         break;
 
 
@@ -650,6 +663,12 @@
                         tr_nodesAsArray = Array.from(tFuture.rows().nodes());
                         tr_node2manipulate = tr_nodesAsArray.find(node => node.id === `${customRide.RidePatNum}`);
                         manipilateNodeStyle(tr_node2manipulate, customRide, ADD_DRIVER, true);
+                        if (customRide.Status == 'נמחקה') {
+                            tFuture.row(`#${customRide.RidePatNum}`).remove().draw()
+                        }
+                        if (customRide.RidePatNum <0) {
+                            tFuture.row(`#${customRide.RidePatNum*-1}`).remove().draw()
+                        }
 
                         break;
 
@@ -2156,7 +2175,6 @@
             }
             deleteCandidate = CustomRideObject(deleteCandidate);
             deleteCandidate.Date = new Date(convert2DBDateToInt(deleteCandidate.Date));
-
             //console.log('check delete--=>', deleteCandidate);
             let isAfterNoon = deleteCandidate.Date.getMinutes() === 14;
             let isToday = table.context[0].sTableId === "datatable-afternoon" || table.context[0].sTableId === "datatable-morning";
@@ -2517,10 +2535,11 @@
                             showConfirmButton: false
                         });
 
-
                         if (thistable && deleteBtn) {
+                            //console.log('Check This table and btn', thistable, deleteBtn, thistable.row($(deleteBtn).parents('tr')))
                             //console.log('Gilad check from deleteRidePat --> ', deleteBtn,)
-                            thistable.row($(deleteBtn).parents('tr')).remove().draw();
+                            let stam = thistable.row($(deleteBtn).parents('tr')).remove().draw();
+                            console.log(stam);
                         } else {
                             location.reload();
                         }

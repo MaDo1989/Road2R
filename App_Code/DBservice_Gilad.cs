@@ -1508,7 +1508,7 @@ public class DBservice_Gilad
             while (dataReader.Read())
             {
                 int rideId = Convert.ToInt32(dataReader["RidePatNum"]);
-                if (rideId != -1)
+                if (rideId > -1)
                 {
                     unityRide.RidePatNum = rideId;
                     unityRide.PatientName = dataReader["PatientName"].ToString();

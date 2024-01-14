@@ -556,12 +556,14 @@ public class UnityRide
         if (isDelete)
         {
             ur = db.updateDriver(-1, unityRideId);
+
+            //?
             //send push notification to coordinator phone
-            Message m = new Message();
+            //Message m = new Message();
             //get driver details 
-            Volunteer V = new Volunteer();
-            V = V.getVolunteerByID(driverId);
-            m.driverCanceledRide(unityRideId, V);
+            //Volunteer V = new Volunteer();
+            //V = V.getVolunteerByID(driverId);
+            //m.driverCanceledRide(unityRideId, V);
 
         }
         else
