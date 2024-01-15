@@ -601,6 +601,11 @@ public class UnityRide
         return db.Get_unityRide_ByTimeRange(from, until, isDeletedtoShow);
     }
 
+    public List<UnityRide> GetUnityRidesByVolunteerId(int volunteerId)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+        return db.GetRidesByVolunteer(volunteerId);
+    }
     private List<DateTime> BuildFutureRidesDates(DateTime date, string repeatRideEvery, int numberOfRides)
     {
         List<DateTime> listOfDatesAfterUTCfix = new List<DateTime>();

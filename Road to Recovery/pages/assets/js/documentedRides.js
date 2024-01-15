@@ -1,5 +1,78 @@
 ﻿let historyTable;
 
+//make the flat object to complex object like the old API
+const CustomRideObject = (thisRide) => {
+
+    let CustomObj = {};
+    CustomObj.RidePatNum = thisRide.RidePatNum;
+    CustomObj.Status = thisRide.Status;
+    CustomObj.Remark = thisRide.Remark;
+    CustomObj.OnlyEscort = thisRide.OnlyEscort;
+    CustomObj.LastModified = thisRide.LastModified;
+    CustomObj.Date = thisRide.PickupTime;
+
+    CustomObj.Pat = {};
+    CustomObj.Pat.DisplayName = thisRide.PatientName;
+    CustomObj.Pat.Id = thisRide.PatientId;
+    CustomObj.Pat.DisplayNameA = ''
+    CustomObj.Pat.EnglishName = ''
+    CustomObj.Pat.PatientIdentity = 0;
+    CustomObj.Pat.Equipment = thisRide.PatientEquipments == null ? [] : thisRide.PatientEquipments;
+    CustomObj.Pat.IsAnonymous = thisRide.IsAnonymous;
+    CustomObj.Pat.RidePatPatientStatus = {};
+    CustomObj.Pat.RidePatPatientStatus.Status = (thisRide.PatientStatus == "" || thisRide.PatientStatus == "Not Finished") ? -1 : 1;
+    CustomObj.Pat.RidePatPatientStatus.EditTimeStamp = thisRide.PatientStatusEditTime
+
+    CustomObj.Pat.EscortedList = [];
+    CustomObj.Escorts = [];
+    //for (var i = 0; i < thisRide[18].Value.length; i++) {
+    //    let oneEscort = {}
+    //    oneEscort.Id = thisRide[18].Value[i][0].Value;
+    //    oneEscort.DisplayName = thisRide[18].Value[i][1].Value;
+    //    CustomObj.Escorts.push(oneEscort);
+    //}
+    for (var i = 0; i < thisRide.AmountOfEscorts; i++) {
+        let oneEscort = {}
+        oneEscort.Id = 0
+        oneEscort.DisplayName = ''
+        CustomObj.Pat.EscortedList.push(oneEscort);
+    }
+
+    for (var i = 0; i < thisRide.AmountOfEscorts; i++) {
+        let oneEscort = {}
+        oneEscort.Id = 0
+        oneEscort.DisplayName = ''
+        CustomObj.Escorts.push(oneEscort);
+    }
+
+    CustomObj.Drivers = [];
+    let Maindriver = {};
+    Maindriver.DisplayName = thisRide.DriverName;
+    Maindriver.Id = thisRide.MainDriver;
+    Maindriver.CellPhone = thisRide.DriverCellPhone
+    CustomObj.Drivers.push(Maindriver);
+    if (Maindriver.Id == null || Maindriver.Id == -1) {
+        CustomObj.Drivers = [];
+    }
+
+    CustomObj.Destination = {};
+    CustomObj.Destination.Name = thisRide.Destination
+    CustomObj.Origin = {};
+    CustomObj.Origin.Name = thisRide.Origin;
+
+    CustomObj.Pat.Barrier = {}
+    CustomObj.Pat.Hospital = {}
+    CustomObj.Pat.Barrier.Name = CustomObj.Destination.Name;
+    CustomObj.Pat.Hospital.Name = CustomObj.Origin.Name;
+
+    CustomObj.Coordinator = {};
+    CustomObj.Coordinator.DisplayName = thisRide.CoorName
+    CustomObj.Coordinator.Id = thisRide.CoorId
+
+    return CustomObj;
+}
+
+
 function manipulateDocumentedRidesModal(button, tableToWithdrawDataFrom) {
 
     $('#wait').show();
@@ -9,12 +82,20 @@ function manipulateDocumentedRidesModal(button, tableToWithdrawDataFrom) {
     $('#documentedRidesTitle').text("תיעוד הסעות " + rowData.DisplayName.split('<br>')[0])
     $.ajax({
         dataType: "json",
-        url: "WebService.asmx/GetVolunteersDocumentedRides",
+        url: "WebService.asmx/GetVolunteersDocumentedUnityRides",
         contentType: "application/json; charset=utf-8",
         type: "POST",
         data: JSON.stringify({ volunteerId: rowData.Id }),
         success: function (data) {
             data = JSON.parse(data.d)
+            //console.log('Gilad Need check before - >',data)
+            let arrRes = []
+            for (var i = 0; i < data.length; i++) {
+                let ur = CustomRideObject(data[i]);
+                arrRes.push(ur);
+            }
+            //console.log('Gilad Need check after - >', arrRes)
+            data = arrRes; 
 
             if (historyTable != null) {
                 historyTable.destroy();

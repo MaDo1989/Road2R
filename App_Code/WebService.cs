@@ -228,6 +228,23 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetVolunteersDocumentedUnityRides(int volunteerId)
+    {
+        try
+        {
+            UnityRide ur = new UnityRide();
+            return j.Serialize(ur.GetUnityRidesByVolunteerId(volunteerId));
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetVolunteersDocumentedUnityRides", ex);
+            throw new Exception("שגיאה בהבאת היסטוריית הסעות של מתנדב");
+        }
+    }
+
     [WebMethod(EnableSession = true)]
     public string getescortedsListMobile(string displayName, string patientCell)
     {

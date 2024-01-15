@@ -1067,6 +1067,56 @@ public class DBservice_Gilad
 
     }
 
+    public List<UnityRide> GetRidesByVolunteer(int volunteerID)
+    {
+        SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        string ancestors = "GetVolunteersDocumentedUnityRides GetUnityRidesByVolunteerId GetRidesByVolunteer spUnityRide_GetVolunteersRideHistory";
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@volunteerId", volunteerID);
+        cmd = CreateCommandWithStoredProcedureGeneral("spUnityRide_GetVolunteersRideHistory", con, paramDic);
+        List<UnityRide> list2Return = new List<UnityRide>();
+        try
+        {
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+            while (dataReader.Read())
+            {
+                UnityRide unityRide = new UnityRide();
+                unityRide.RidePatNum = Convert.ToInt32(dataReader["RidePatNum"]);
+                unityRide.PatientName = dataReader["PatientName"].ToString();
+                unityRide.Remark = dataReader["Remark"].ToString();
+                unityRide.Destination = dataReader["Destination"].ToString();
+                unityRide.Origin = dataReader["Origin"].ToString();
+                unityRide.PickupTime = Convert.ToDateTime(dataReader["pickupTime"]);
+                list2Return.Add(unityRide);
+            }
+            return list2Return;
+        }
+        catch (Exception ex)
+        {
+            WriteToErrorFile(ancestors, "Error to get rides by volunteerId \n" + ex.Message + ex.ToString());
+            throw new Exception("Error to get GetRidesByVolunteer dbservice_gilad" + ex.Message);
+        }
+        finally { 
+            if (con != null) {
+
+                con.Close();
+
+            }
+        }
+    }
+
     public List<Absence> GetAbsenceByVolunteerId(int volunteerId)
     {
         SqlCommand cmd;
@@ -1366,6 +1416,8 @@ public class DBservice_Gilad
         }
 
     }
+
+
 
 
     public UnityRide updateUnityRideTime(int unityRideNum, DateTime editedTime)
