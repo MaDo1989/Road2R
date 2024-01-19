@@ -1117,6 +1117,51 @@ public class DBservice_Gilad
         }
     }
 
+    /* 
+     *     https://docs.progress.com/bundle/datadirect-openaccess/page/topics/clientref/choosing-between-a-dataset-and-a-datareader.html
+     * A critical choice when designing your application is whether to use a DataSet or a DataReader. 
+     * If you need to retrieve many records rapidly, use a DataReader. 
+     * The DataReader object is fast, returning a fire hose of read-only data from the server, one record at a time. 
+     * In addition, retrieving results with a DataReader requires significantly less memory than creating a DataSet. 
+     * The DataReader does not allow random fetching, nor does it allow for updating the data.
+     * However, .NET data providers optimize their DataReaders for efficiently fetching large amounts of data.
+     * */
+
+    // IMPORTANT: the caller must call .Close() on the returned SqlDataReader
+    public SqlDataReader GetDataReaderBySqlCommand(SqlCommand cmd)
+    {
+        SqlDataReader dataReader;
+
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        cmd.Connection = con;              // assign the connection to the command object
+        try
+        {
+            dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+        }
+        catch (Exception ex)
+        {
+            WriteToErrorFile("GetDataReaderBySqlCommand", "Error running command \n" + ex.Message + ex.ToString());
+            if (con != null)
+            {
+                con.Close();
+            }
+            throw new Exception("Error to get GetDataReaderBySqlCommand dbservice_gilad" + ex.Message);
+        }
+        return dataReader;
+    }
+
+
     public List<Absence> GetAbsenceByVolunteerId(int volunteerId)
     {
         SqlCommand cmd;

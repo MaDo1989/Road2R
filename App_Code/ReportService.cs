@@ -9,7 +9,7 @@ using System.Web;
 
 /* Notes:
  * 
- 
+    Jan-2024:  Prefixing with U_ the variants that use United scheme 
   
  */
 public class ReportService
@@ -203,6 +203,7 @@ public class ReportService
         DataTable dt = ds.Tables[0];
         return dt;
     }
+
 
 
     //@@ TODO:  Maybe ths is not needed?
@@ -1110,7 +1111,7 @@ INNER JOIN Volunteer ON BUFF.MainDriver=Volunteer.Id";
         return result;
     }
 
-    public List<RidesForVolunteer> GetReportVolunteerRides(int volunteerId, string start_date, string end_date)
+    public List<RidesForVolunteer> S_GetReportVolunteerRides(int volunteerId, string start_date, string end_date)
     {
         if (volunteerId <= 0)
         {
@@ -1157,6 +1158,86 @@ INNER JOIN Volunteer ON BUFF.MainDriver=Volunteer.Id";
             throw e;
         }
 
+    }
+
+    public List<RidesForVolunteer> U_GetReportVolunteerRides(int volunteerId, string start_date, string end_date)
+    {
+        if (volunteerId <= 0)
+        {
+            throw new ArgumentException("Negative volunteerId is not supported");
+        }
+
+        DBservice_Gilad db = new DBservice_Gilad();
+
+        string query = @"SELECT ridepatNum , patientName, Origin, Destination ,PickupTime, Status
+                        from UnityRide 
+                        WHERE PickupTime < @end_date AND pickuptime >= @start_date 
+                        AND MainDriver =  @ID 
+                        AND status not like N'נמחקה'";
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@ID", SqlDbType.Int).Value = volunteerId;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        SqlDataReader reader = db.GetDataReaderBySqlCommand(cmd);
+
+        List<RidesForVolunteer> result = new List<RidesForVolunteer>();
+
+        try
+        {
+            while (reader.Read())
+            {
+                try
+                {
+                    RidesForVolunteer obj = new RidesForVolunteer();
+                    obj.PatDisplayName = reader["patientName"].ToString();
+                    obj.OriginName = reader["Origin"].ToString();
+                    obj.DestinationName = reader["Destination"].ToString();
+                    obj.Date = reader["PickupTime"].ToString();
+                    obj.Status = reader["Status"].ToString();
+
+                    result.Add(obj);
+                }
+                catch (Exception ex)
+                {
+
+                    throw ex;
+                }
+            }
+
+            reader.Close();
+            return result;
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+
+    }
+
+    
+    internal bool compare_S_vs_U_results(List<RidesForVolunteer>s, List<RidesForVolunteer> u)
+    {
+        return s.Count == u.Count;
+    }
+    public List<RidesForVolunteer> GetReportVolunteerRides(int volunteerId, string start_date, string end_date)
+
+    {
+        // First call the original implementation
+        List<RidesForVolunteer> s_result = S_GetReportVolunteerRides(volunteerId, start_date, end_date);
+        
+        // Now call the new United implementation
+        List<RidesForVolunteer> u_result = U_GetReportVolunteerRides(volunteerId, start_date, end_date);
+
+        // Compare
+        if ( !compare_S_vs_U_results(s_result, u_result))
+        {
+            throw new Exception("GetReportVolunteerRides mismatch");
+        }
+
+        // return the united result
+        return u_result;
     }
 
     internal List<CenterDailybyMonthInfo> GetReportCenterDailybyMonth(string start_date, string end_date)
