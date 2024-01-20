@@ -102,12 +102,30 @@ public class ReportService
         }
     }
 
-    public class VolunteerPerPatient
+    public class VolunteerPerPatient : IEquatable<VolunteerPerPatient>
     {
         public string Volunteer { get; set; }
         public string Date { get; set; }
         public string Origin { get; set; }
         public string Destination { get; set; }
+
+        public bool Equals(VolunteerPerPatient other)
+        {
+            if (other == null)
+                return false;
+
+            return this.Volunteer == other.Volunteer && this.Date == other.Date
+                && this.Origin == other.Origin && this.Destination == other.Destination;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as VolunteerPerPatient);
+        }
+        public override int GetHashCode()
+        {
+            return Volunteer.GetHashCode() ^ Date.GetHashCode() ^ Origin.GetHashCode() ^ Destination.GetHashCode();
+        }
 
     }
 
@@ -1178,7 +1196,7 @@ and MainDriver is not NULL)
     }
 
 
-    internal List<VolunteerPerPatient> GetReportVolunteersPerPatient(int patient)
+    internal List<VolunteerPerPatient> S_GetReportVolunteersPerPatient(int patient)
     {
         DbService db = new DbService();
 
@@ -1212,6 +1230,54 @@ INNER JOIN Volunteer ON BUFF.MainDriver=Volunteer.Id";
         }
 
         return result;
+    }
+
+    internal List<VolunteerPerPatient> U_GetReportVolunteersPerPatient(int patient)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+
+        string query =
+            @"SELECT convert(varchar, PickupTime, 103) AS PickupTime, Origin, Destination, DriverName AS DisplayName
+            From UnityRide
+            WHERE pickuptime >= '2019-1-01'
+            and MainDriver is not null
+            and PatientId  =  @patient
+            ";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@patient", SqlDbType.Int).Value = patient;
+
+        SqlDataReader reader = db.GetDataReaderBySqlCommand(cmd);
+
+        List<VolunteerPerPatient> result = new List<VolunteerPerPatient>();
+
+        while (reader.Read())
+        {
+            VolunteerPerPatient obj = new VolunteerPerPatient();
+            obj.Volunteer = reader["DisplayName"].ToString();
+            obj.Origin = reader["Origin"].ToString();
+            obj.Destination = reader["Destination"].ToString();
+            obj.Date = reader["PickupTime"].ToString();
+            result.Add(obj);
+        }
+
+        reader.Close();
+        return result;
+    }
+
+    internal List<VolunteerPerPatient> GetReportVolunteersPerPatient(int patient)
+    {
+        List<VolunteerPerPatient> s = S_GetReportVolunteersPerPatient(patient);
+        List<VolunteerPerPatient> u = U_GetReportVolunteersPerPatient(patient);
+
+        if (!compare_S_vs_U_results_unordered(s, u))
+        {
+            throw new Exception("GetReportVolunteersPerPatient mismatch");
+        }
+
+        // return the united result
+        return u;
     }
 
     public List<RidesForVolunteer> S_GetReportVolunteerRides(int volunteerId, string start_date, string end_date)
