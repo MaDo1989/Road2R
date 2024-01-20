@@ -314,7 +314,7 @@ AND RidePat.pickuptime >= '2020-1-01'
         return dt;
     }
 
-    internal List<SliceVolunteersPerMonthInfo> GetReportSliceVolunteerPerMonth(string start_date, string end_date)
+    internal List<SliceVolunteersPerMonthInfo> S_GetReportSliceVolunteerPerMonth(string start_date, string end_date)
     {
         DbService db = new DbService();
 
@@ -383,6 +383,84 @@ AND RidePat.pickuptime >= '2020-1-01'
         }
 
         return result;
+    }
+
+    internal List<SliceVolunteersPerMonthInfo> U_GetReportSliceVolunteerPerMonth(string start_date, string end_date)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+
+        // Inner select groups by time, origin&dest, to avoid counting the same ride multiple times 
+
+        string query =
+             @"select MainDriver, Volunteer.DisplayName as DisplayName, 
+                Volunteer.CityCityName as CityName, Volunteer.CellPhone as CellPhone, 
+                 convert(varchar, Volunteer.JoinDate, 103)  as JoinDate,
+              sum(case when MONTH([pickuptime]) = '1' then 1 else 0 end) Jan,
+              sum(case when MONTH([pickuptime]) = '2' then 1 else 0 end) Feb,
+              sum(case when MONTH([pickuptime]) = '3' then 1 else 0 end) Mar,
+              sum(case when MONTH([pickuptime]) = '4' then 1 else 0 end) Apr,
+              sum(case when MONTH([pickuptime]) = '5' then 1 else 0 end) May,
+              sum(case when MONTH([pickuptime]) = '6' then 1 else 0 end) Jun,
+              sum(case when MONTH([pickuptime]) = '7' then 1 else 0 end) Jul,
+              sum(case when MONTH([pickuptime]) = '8' then 1 else 0 end) Aug,
+              sum(case when MONTH([pickuptime]) = '9' then 1 else 0 end) Sep,
+              sum(case when MONTH([pickuptime]) = '10' then 1 else 0 end) Oct,
+              sum(case when MONTH([pickuptime]) = '11' then 1 else 0 end) Nov,
+              sum(case when MONTH([pickuptime]) = '12' then 1 else 0 end) Dec
+             FROM (select MainDriver, PickupTime  from UnityRide ur 
+					where pickuptime >= @start_date 
+					AND pickuptime <= @end_date
+					AND MainDriver is not null
+					GROUP BY MainDriver, PickupTime, Origin, Destination 
+			   ) inner_select
+            INNER JOIN Volunteer on Volunteer.Id = inner_select.MainDriver 
+            Group BY MainDriver, Volunteer.DisplayName, Volunteer.CityCityName, Volunteer.CellPhone, Volunteer.JoinDate
+            ";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        SqlDataReader reader = db.GetDataReaderBySqlCommand(cmd);
+
+        List<SliceVolunteersPerMonthInfo> result = new List<SliceVolunteersPerMonthInfo>();
+
+        while (reader.Read())
+        {
+            SliceVolunteersPerMonthInfo obj = new SliceVolunteersPerMonthInfo();
+                obj.DisplayName = reader["DisplayName"].ToString();
+                obj.City = reader["CityName"].ToString();
+                obj.CellPhone = reader["CellPhone"].ToString();
+                obj.JoinDate = reader["JoinDate"].ToString();
+                obj.Jan = reader["Jan"].ToString();
+                obj.Feb = reader["Feb"].ToString();
+                obj.Mar = reader["Mar"].ToString();
+                obj.Apr = reader["Apr"].ToString();
+                obj.May = reader["May"].ToString();
+                obj.Jun = reader["Jun"].ToString();
+                obj.Jul = reader["Jul"].ToString();
+                obj.Aug = reader["Aug"].ToString();
+                obj.Sep = reader["Sep"].ToString();
+                obj.Oct = reader["Oct"].ToString();
+                obj.Nov = reader["Nov"].ToString();
+                obj.Dec = reader["Dec"].ToString();
+
+                result.Add(obj);
+        }
+        reader.Close();
+        return result;
+    }
+
+    internal List<SliceVolunteersPerMonthInfo> GetReportSliceVolunteerPerMonth(string start_date, string end_date)
+    {
+        List<SliceVolunteersPerMonthInfo> s = S_GetReportSliceVolunteerPerMonth(start_date, end_date);
+        List<SliceVolunteersPerMonthInfo> u = U_GetReportSliceVolunteerPerMonth(start_date, end_date);
+        if ( ! compare_S_vs_U_results_unordered(s,u))
+        {
+            throw new Exception("Mismatch in GetReportSliceVolunteerPerMonth");
+        }
+        return u;
     }
 
     internal List<ReportService.SliceVolunteersCountInMonthInfo> GetReportSliceVolunteersCountInMonth(string start_date, string end_date)
