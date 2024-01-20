@@ -9,13 +9,34 @@ using System.Web;
 
 /* Notes:
  * 
-    Jan-2024:  Prefixing with U_ the variants that use United scheme 
+Jan-2024:    migrating to "United" dtabase scheme
+Given excistsing Report:   GetXXX
+We copy it code so we will have two copies of the method
+we rename one to be S_GetXXX - this is teh original implementation
+We rename teh otehr to be U_GetXXX - this will be the variant that use United scheme 
+We implement original GetXXX as following:
+
+    internal List<YYYY> GetXXXX(string start_date, string end_date)
+    {
+        List<YYYY> s = S_GetReportVolunteerWeekly(start_date, end_date);  // << original implementation
+        List<YYYY> u = U_GetReportVolunteerWeekly(start_date, end_date);  // << New implementation using United
+        if ( !compare_S_vs_U_results_ordered(s,u))                        // << Compare both lists (requires Equitable interfaces)
+        {
+            throw new Exception("GetXXXX mismatch");
+        }
+        return u;                                                         // return results
+    }
+
+    for Object type YYY to support comparing inlist, need to implement IEquatable:
+    See implementation example in  class VolunteerPerRegion
+
+
   
  */
 public class ReportService
 {
 
-    public class RidesForVolunteer
+    public class RidesForVolunteer : IEquatable<RidesForVolunteer>
     {
         public string Date { get; set; }
         public string OriginName { get; set; }
@@ -25,6 +46,30 @@ public class ReportService
         public string Drivers { get; set; }
         public string Day { get; set; }
         public string Status { get; internal set; }
+
+        public bool Equals(RidesForVolunteer other)
+        {
+            if (other == null)
+                return false;
+
+            return this.Date == other.Date && this.OriginName == other.OriginName
+                && this.DestinationName == other.DestinationName
+                && this.Time == other.Time
+                && this.PatDisplayName == other.PatDisplayName
+                && this.Drivers == other.Drivers
+                && this.Day == other.Day
+                && this.Status == other.Status;
+        }
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as RidesForVolunteer);
+        }
+        public override int GetHashCode()
+        {
+            return Date.GetHashCode() ^ OriginName.GetHashCode() ^ Time.GetHashCode()
+                    ^ PatDisplayName.GetHashCode() ^ Drivers.GetHashCode() 
+                    ^ Day.GetHashCode() ^ Status.GetHashCode();
+        }
     }
 
 
@@ -34,11 +79,27 @@ public class ReportService
         public string ID { get; set; }
     }
 
-    public class VolunteerPerRegion
+    public class VolunteerPerRegion : IEquatable<VolunteerPerRegion>
     {
 
         public string Volunteer { get; set; }
         public string Region { get; set; }
+
+        public bool Equals(VolunteerPerRegion other)
+        {
+            if (other == null)
+                return false;
+
+            return this.Volunteer == other.Volunteer && this.Region == other.Region;
+        }
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as VolunteerPerRegion);
+        }
+        public override int GetHashCode()
+        {
+            return Volunteer.GetHashCode() ^ Region.GetHashCode();
+        }
     }
 
     public class VolunteerPerPatient
@@ -430,7 +491,7 @@ GROUP BY inner_select.DisplayName
         return dt;
     }
 
-    internal List<VolunteerPerRegion> GetReportVolunteerWeekly(string start_date, string end_date)
+    internal List<VolunteerPerRegion> S_GetReportVolunteerWeekly(string start_date, string end_date)
     {
         DbService db = new DbService();
 
@@ -462,6 +523,48 @@ GROUP BY inner_select.DisplayName
         }
 
         return result;
+    }
+
+    internal List<VolunteerPerRegion> U_GetReportVolunteerWeekly(string start_date, string end_date)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+        string query =
+            @"select DISTINCT DriverName AS DisplayName, Area
+                from UnityRide
+                Where Pickuptime < @end_date
+                AND pickuptime >=  @start_date
+                AND status not like N'נמחקה'
+                ORDER BY Area ASC";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        SqlDataReader reader = db.GetDataReaderBySqlCommand(cmd);
+
+        List<VolunteerPerRegion> result = new List<VolunteerPerRegion>();
+
+        while (reader.Read())
+        {
+            VolunteerPerRegion obj = new VolunteerPerRegion();
+            obj.Volunteer = reader["DisplayName"].ToString();
+            obj.Region = reader["Area"].ToString();
+            result.Add(obj);
+        }
+        reader.Close();
+        return result;
+    }
+
+    internal List<VolunteerPerRegion> GetReportVolunteerWeekly(string start_date, string end_date)
+    {
+        List<VolunteerPerRegion> s = S_GetReportVolunteerWeekly(start_date, end_date);
+        List<VolunteerPerRegion> u = U_GetReportVolunteerWeekly(start_date, end_date);
+        if ( !compare_S_vs_U_results_ordered(s,u))
+        {
+            throw new Exception("GetReportVolunteerWeekly mismatch");
+        }
+        return u;
     }
 
     internal MetricMonthlyInfo GetReportNewDriversInRange(string start_date, string end_date)
@@ -1217,10 +1320,16 @@ INNER JOIN Volunteer ON BUFF.MainDriver=Volunteer.Id";
     }
 
     
-    internal bool compare_S_vs_U_results(List<RidesForVolunteer>s, List<RidesForVolunteer> u)
+    internal bool compare_S_vs_U_results_unordered<T>(List<T>s, List<T> u)
     {
         return s.Count == u.Count;
     }
+
+    internal bool compare_S_vs_U_results_ordered<T>(List<T> s, List<T> u)
+    {
+        return Enumerable.SequenceEqual(s, u);
+    }
+
     public List<RidesForVolunteer> GetReportVolunteerRides(int volunteerId, string start_date, string end_date)
 
     {
@@ -1231,7 +1340,7 @@ INNER JOIN Volunteer ON BUFF.MainDriver=Volunteer.Id";
         List<RidesForVolunteer> u_result = U_GetReportVolunteerRides(volunteerId, start_date, end_date);
 
         // Compare
-        if ( !compare_S_vs_U_results(s_result, u_result))
+        if ( !compare_S_vs_U_results_ordered(s_result, u_result))
         {
             throw new Exception("GetReportVolunteerRides mismatch");
         }
