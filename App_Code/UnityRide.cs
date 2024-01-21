@@ -601,6 +601,29 @@ public class UnityRide
         return db.Get_unityRide_ByTimeRange(from, until, isDeletedtoShow);
     }
 
+    public int assignDriverMobile(int UnityRideId,string driverCellphone)
+    {
+        UnityRide ur = new UnityRide();
+        DBservice_Gilad db = new DBservice_Gilad();
+        ur = db.assignDriverMobile(UnityRideId, driverCellphone);
+        if (ur.RidePatNum>-1)
+        {
+            BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
+            return ur.RidePatNum;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+
+
+    public RidePat getUnityRideAsRP(int UnityRideId)
+    {
+        DBservice_Gilad dBservice = new DBservice_Gilad();
+        return dBservice.GetUnityRideAsRidePat(UnityRideId);
+    }
+
     public List<UnityRide> GetUnityRidesByVolunteerId(int volunteerId)
     {
         DBservice_Gilad db = new DBservice_Gilad();

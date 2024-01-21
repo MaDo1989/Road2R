@@ -95,6 +95,12 @@ public class RideSlimExt : RideSlim
         }
     }
 
+
+
+
+
+
+
     public Object GetRidePatView(int daysAhead)
     {
 
@@ -106,93 +112,114 @@ public class RideSlimExt : RideSlim
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.StoredProcedure;
         cmd.Parameters.AddWithValue("@daysAhead", daysAhead);
-        cmd.CommandText = "spGetBasicRidePatData";
+        // old sp before united
+        // cmd.CommandText = "spGetBasicRidePatData";
+        // the new sp
+        cmd.CommandText = "spGetBasicDataUnityRide";
         //if (db.con.State == ConnectionState.Closed)
         //{
         //    con.Open();
         //}
 
         //command.Connection = con;
-        SqlDataReader dr = db.GetDataReaderSP(cmd);
-        while (dr.Read())
+        try
         {
-            Id = Convert.ToInt32(dr["ridepatnum"]);
-            Destination = dr["destination"].ToString();
-            Origin = dr["origin"].ToString();
-            PickUpTime = Convert.ToDateTime(dr["PickUpTime"].ToString());
-
-            bool isAnonymous = true;
-            if (dr["IsAnonymous"] == System.DBNull.Value)
-                isAnonymous = false;
-            else
-                isAnonymous = Convert.ToBoolean(dr["IsAnonymous"]);
-            PatientName = dr["patient"].ToString();
-            if (isAnonymous || PatientName.Contains("אנונימי") || PatientName.Contains("Anonymous"))
-                PatientName = "אנונימי";
-
-            CellPhone = dr["CellPhone"].ToString();
-            RideSlimExt rse = new RideSlimExt(PatientName, "", 0, Origin, Destination, PickUpTime, Id, CellPhone);
-            rse.Area = dr["area"].ToString();
-            rse.OnlyEscort = Convert.ToBoolean(dr["onlyEscort"]);
-            dic.Add(Id, rse);
-        }
-
-        dr.Close();
-
-        // get the escorts
-        cmd.CommandText = "spGetEscortsForRides";
-        dr = db.GetDataReaderSP(cmd);
-        while (dr.Read())
-        {
-            int ridepatnum = Convert.ToInt32(dr["ridepatnum"]);
-            if (dic[ridepatnum].escorts == null)
+            SqlDataReader dr = db.GetDataReaderSP(cmd);
+            while (dr.Read())
             {
+                Id = Convert.ToInt32(dr["ridepatnum"]);
+                Destination = dr["destination"].ToString();
+                Origin = dr["origin"].ToString();
+                PickUpTime = Convert.ToDateTime(dr["PickUpTime"].ToString());
+
+                bool isAnonymous = true;
+                if (dr["IsAnonymous"] == System.DBNull.Value)
+                    isAnonymous = false;
+                else
+                    isAnonymous = Convert.ToBoolean(dr["IsAnonymous"]);
+                PatientName = dr["patient"].ToString();
+                if (isAnonymous || PatientName.Contains("אנונימי") || PatientName.Contains("Anonymous"))
+                    PatientName = "אנונימי";
+
+                CellPhone = dr["CellPhone"].ToString();
+                RideSlimExt rse = new RideSlimExt(PatientName, "", 0, Origin, Destination, PickUpTime, Id, CellPhone);
+                rse.Area = dr["area"].ToString();
+                rse.OnlyEscort = Convert.ToBoolean(dr["onlyEscort"]);
+                dic.Add(Id, rse);
+
+                int ridepatnum = Convert.ToInt32(dr["ridepatnum"]);
                 dic[ridepatnum].escorts = new List<EscoretSlim>();
-            }
-            string displayName = dr["DisplayName"].ToString();
-            bool isAnonymous = true;
-            if (dr["IsAnonymous"] == System.DBNull.Value)
-                isAnonymous = false;
-            else
-                isAnonymous = Convert.ToBoolean(dr["IsAnonymous"]);
-
-            if (isAnonymous != true && !displayName.Contains("אנונימי") && !displayName.Contains("Anonymus"))
-            {
-                string cellphone = dr["CellPhone"].ToString();
-                dic[ridepatnum].escorts.Add(new EscoretSlim(displayName, cellphone, 0));
-            }
-            else
-                dic[ridepatnum].escorts.Add(new EscoretSlim("אנונימי", "", 0));
-        }
-        dr.Close();
-
-        // get the equipment
-        cmd.CommandText = "spGetEquipmentPerPatient";
-        dr = db.GetDataReaderSP(cmd);
-        while (dr.Read())
-        {
-            string patient = dr["patient"].ToString();
-            string equipment = dr["Name"].ToString();
-            foreach (KeyValuePair<int, RideSlimExt> kv in dic)
-            {
-                if (kv.Value.PatientName == patient)
+                int amoutOfEscorts = Convert.ToInt32(dr["AmountOfEscorts"]);
+                for (int i = 0; i < amoutOfEscorts; i++)
                 {
-                    if (kv.Value.equipment == null)
-                        kv.Value.equipment = new List<string>();
-                    kv.Value.equipment.Add(equipment);
+                    dic[ridepatnum].escorts.Add(new EscoretSlim("x", "0", 0));
                 }
             }
+            dr.Close();
+
+
+
+
+            // get the escorts
+            //cmd.CommandText = "spGetEscortsForRides";
+            //dr = db.GetDataReaderSP(cmd);
+            //while (dr.Read())
+            //{
+            //    int ridepatnum = Convert.ToInt32(dr["ridepatnum"]);
+            //    if (dic[ridepatnum].escorts == null)
+            //    {
+            //        dic[ridepatnum].escorts = new List<EscoretSlim>();
+            //    }
+            //    string displayName = dr["DisplayName"].ToString();
+            //    bool isAnonymous = true;
+            //    if (dr["IsAnonymous"] == System.DBNull.Value)
+            //        isAnonymous = false;
+            //    else
+            //        isAnonymous = Convert.ToBoolean(dr["IsAnonymous"]);
+
+            //    if (isAnonymous != true && !displayName.Contains("אנונימי") && !displayName.Contains("Anonymus"))
+            //    {
+            //        string cellphone = dr["CellPhone"].ToString();
+            //        dic[ridepatnum].escorts.Add(new EscoretSlim(displayName, cellphone, 0));
+            //    }
+            //    else
+            //        dic[ridepatnum].escorts.Add(new EscoretSlim("אנונימי", "", 0));
+            //}
+            //dr.Close();
+
+
+            // get the equipment
+            cmd.CommandText = "spGetEquipmentPerPatient";
+            dr = db.GetDataReaderSP(cmd);
+            while (dr.Read())
+            {
+                string patient = dr["patient"].ToString();
+                string equipment = dr["Name"].ToString();
+                foreach (KeyValuePair<int, RideSlimExt> kv in dic)
+                {
+                    if (kv.Value.PatientName == patient)
+                    {
+                        if (kv.Value.equipment == null)
+                            kv.Value.equipment = new List<string>();
+                        kv.Value.equipment.Add(equipment);
+                    }
+                }
+            }
+
+            db.CloseConnection();
+
+
+            List<RideSlimExt> l = dic.Values.ToList<RideSlimExt>();
+
+            Object o = RideSlimExtToObject(l);
+
+            return o;
         }
-
-        db.CloseConnection();
-
-
-        List<RideSlimExt> l = dic.Values.ToList<RideSlimExt>();
-
-        Object o = RideSlimExtToObject(l);
-
-        return o;
-
+        catch (Exception ex)
+        {
+            DBservice_Gilad.WriteToErrorFile("GetRidePatViewSlim GetRidePatView spGetBasicDataUnityRide", ex.Message + ex.ToString());
+            throw new Exception("Error in GetRidePatView " + ex.Message);
+        }
     }
 
     private Object RideSlimExtToObject(List<RideSlimExt> RideList)

@@ -1146,6 +1146,23 @@ public class WebService : System.Web.Services.WebService
 
     }
 
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetUnityRide_RidePat(int ridePatNum)
+    {
+        try
+        {
+            UnityRide ur = new UnityRide();
+            return j.Serialize(ur.getUnityRideAsRP(ridePatNum));
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetUnityRide_RidePat", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעה");
+        }
+
+    }
+
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -1413,6 +1430,22 @@ public class WebService : System.Web.Services.WebService
 
     }
 
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string AssignRideToUnityRideWithMobile(int ridePatId, string mobile, int assignedFromAppId) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
+    {
+        try
+        {
+            UnityRide ur = new UnityRide();
+            int res = ur.assignDriverMobile(ridePatId, mobile);
+            return j.Serialize(res);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("fail to assign");
+        }
+
+    }
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
