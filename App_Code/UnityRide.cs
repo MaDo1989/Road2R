@@ -624,6 +624,12 @@ public class UnityRide
         return dBservice.GetUnityRideAsRidePat(UnityRideId);
     }
 
+    public int leaveUnityRideFromMobile(int UnityRideId , int driverID)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+        return db.leaveUnityRideForMobile(UnityRideId, driverID);
+    }
+
     public List<UnityRide> GetUnityRidesByVolunteerId(int volunteerId)
     {
         DBservice_Gilad db = new DBservice_Gilad();

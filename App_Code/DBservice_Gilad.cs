@@ -636,7 +636,7 @@ public class DBservice_Gilad
         {
             // write to log
             WriteToErrorFile("GetUnityRide_RidePat getUnityRideAsRP GetUnityRideAsRidePat GetUnityRide", ex.Message + ex.ToString());
-            throw (ex);
+            throw new Exception ("error in GetUnityRideAsRidePat "+ex.Message);
         }
 
         finally
@@ -834,7 +834,46 @@ public class DBservice_Gilad
 
 
 
-   
+   public int leaveUnityRideForMobile(int driverID,int unityRideID)
+    {
+        SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@UnityRideID", unityRideID);
+        paramDic.Add("@driverId", driverID);
+
+
+        cmd = CreateCommandWithStoredProcedureGeneral("spDriverLeaveUnityRide", con, paramDic);
+        int res = -1;
+        UnityRide ur = new UnityRide();
+        try
+        {
+            ur = reciveUnityRideDB(cmd, "LeaveUnityRide leaveUnityRideFromMobile leaveUnityRideForMobile spDriverLeaveUnityRide");
+            if (ur.RidePatNum>0)
+            {
+                res = 1;
+                BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
+                
+            }
+            return res;
+        }
+        catch (Exception ex)
+        {
+
+            
+            throw new Exception("Error leaveUnityRideForMobile dbservice_gilad" + ex.Message);
+        }
+    }
 
 
 

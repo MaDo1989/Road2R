@@ -1580,6 +1580,29 @@ public class WebService : System.Web.Services.WebService
 
     }
 
+
+    [WebMethod(EnableSession = true, Description = "delete from only one unityRide")]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string LeaveUnityRide(int ridePatId, int rideId, int driverId)
+    {
+        try
+        {
+            //need to send push from here!
+
+            //RidePat rp = new RidePat();
+            //int res = rp.LeaveRidePat(ridePatId, rideId, driverId);
+            UnityRide ur = new UnityRide();
+            int res = ur.leaveUnityRideFromMobile(rideId, driverId);
+            return j.Serialize(res);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in LeaveUnityRide", ex);
+            throw new Exception("שגיאה בעת שנהג עזב נסיעה");
+        }
+
+    }
+
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string getAllStatus()
