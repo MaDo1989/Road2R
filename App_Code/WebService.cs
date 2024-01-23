@@ -1432,12 +1432,12 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string AssignRideToUnityRideWithMobile(int ridePatId, string mobile, int assignedFromAppId) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
+    public string AssignRideToUnityRideWithMobile(int ridePatId, int userId, string driverType) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
     {
         try
         {
             UnityRide ur = new UnityRide();
-            int res = ur.assignDriverMobile(ridePatId, mobile);
+            int res = ur.assignDriverMobile(ridePatId, userId);
             return j.Serialize(res);
         }
         catch (Exception ex)
@@ -1592,7 +1592,7 @@ public class WebService : System.Web.Services.WebService
             //RidePat rp = new RidePat();
             //int res = rp.LeaveRidePat(ridePatId, rideId, driverId);
             UnityRide ur = new UnityRide();
-            int res = ur.leaveUnityRideFromMobile(rideId, driverId);
+            int res = ur.leaveUnityRideFromMobile(ridePatId, driverId);
             return j.Serialize(res);
         }
         catch (Exception ex)

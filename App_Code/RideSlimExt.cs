@@ -152,7 +152,7 @@ public class RideSlimExt : RideSlim
                 int amoutOfEscorts = Convert.ToInt32(dr["AmountOfEscorts"]);
                 for (int i = 0; i < amoutOfEscorts; i++)
                 {
-                    dic[ridepatnum].escorts.Add(new EscoretSlim("x", "0", 0));
+                    dic[ridepatnum].escorts.Add(new EscoretSlim());
                 }
             }
             dr.Close();

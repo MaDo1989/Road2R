@@ -601,11 +601,11 @@ public class UnityRide
         return db.Get_unityRide_ByTimeRange(from, until, isDeletedtoShow);
     }
 
-    public int assignDriverMobile(int UnityRideId,string driverCellphone)
+    public int assignDriverMobile(int UnityRideId,int userId)
     {
         UnityRide ur = new UnityRide();
         DBservice_Gilad db = new DBservice_Gilad();
-        ur = db.assignDriverMobile(UnityRideId, driverCellphone);
+        ur = db.assignDriverMobile(UnityRideId, userId);
         if (ur.RidePatNum>-1)
         {
             BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
@@ -627,7 +627,7 @@ public class UnityRide
     public int leaveUnityRideFromMobile(int UnityRideId , int driverID)
     {
         DBservice_Gilad db = new DBservice_Gilad();
-        return db.leaveUnityRideForMobile(UnityRideId, driverID);
+        return db.leaveUnityRideForMobile(driverID, UnityRideId);
     }
 
     public List<UnityRide> GetUnityRidesByVolunteerId(int volunteerId)

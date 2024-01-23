@@ -1603,7 +1603,7 @@ public class DBservice_Gilad
 
     }
 
-    public UnityRide assignDriverMobile(int unityRideID, string DriverCellphone)
+    public UnityRide assignDriverMobile(int unityRideID, int userId)
     {
         SqlCommand cmd;
         try
@@ -1620,7 +1620,7 @@ public class DBservice_Gilad
 
         Dictionary<string, object> paramDic = new Dictionary<string, object>();
         paramDic.Add("@unityRideID", unityRideID);
-        paramDic.Add("@driverPhone", DriverCellphone);
+        paramDic.Add("@userId", userId);
         cmd = CreateCommandWithStoredProcedureGeneral("spAssignDriverMobile", con, paramDic);
         string ancestors = "assignDriverMobile spAssignDriverMobile";
         int createRideId = -1;
