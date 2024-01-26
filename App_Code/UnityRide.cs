@@ -640,6 +640,7 @@ public class UnityRide
         List<DateTime> listOfDatesAfterUTCfix = new List<DateTime>();
         listOfDatesAfterUTCfix.Add(date);
         DateTime firstDate = date;
+        Dictionary<string, object> mixedDictionary = new Dictionary<string, object>();
 
         DateTime dateAfterIncrement;
         for (int i = 1; i < numberOfRides; i++)
@@ -651,18 +652,35 @@ public class UnityRide
 
         TimeZoneInfo israelTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Israel Standard Time");
         bool isFirstRideDateDayLightSaving = israelTimeZone.IsDaylightSavingTime(firstDate);
+        mixedDictionary.Add("isFirstRideDateDayLightSaving", isFirstRideDateDayLightSaving);
+        mixedDictionary.Add("firstDate", firstDate);
+        mixedDictionary.Add("israelTimeZone.id", israelTimeZone.Id);
+
+       
 
         for (int i = 1; i < listOfDatesAfterUTCfix.Count; i++)
         {
+ 
+
+            mixedDictionary.Add("israelTimeZone.IsDaylightSavingTime(listOfDatesAfterUTCfix["+i+"])", israelTimeZone.IsDaylightSavingTime(listOfDatesAfterUTCfix[i]));
+            mixedDictionary.Add("listOfDatesAfterUTCfix["+i+"]", listOfDatesAfterUTCfix[i]);
             if (isFirstRideDateDayLightSaving && !israelTimeZone.IsDaylightSavingTime(listOfDatesAfterUTCfix[i]))
             {
                 listOfDatesAfterUTCfix[i] = listOfDatesAfterUTCfix[i].AddHours(1);
+                DBservice_Gilad.StringToTextFile(Environment.NewLine + i + " \ni was here +1\n ", "AnyDebug");
+
             }
             else if (!isFirstRideDateDayLightSaving && israelTimeZone.IsDaylightSavingTime(listOfDatesAfterUTCfix[i]))
             {
                 listOfDatesAfterUTCfix[i] = listOfDatesAfterUTCfix[i].AddHours(-1);
+                DBservice_Gilad.StringToTextFile(Environment.NewLine + i+" \ni was here -1\n ", "AnyDebug");
             }
         }
+
+        DBservice_Gilad.DebugToTextFile(mixedDictionary);
+
+
+
         return listOfDatesAfterUTCfix;
     }
 }

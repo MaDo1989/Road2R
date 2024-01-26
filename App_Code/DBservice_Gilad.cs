@@ -137,7 +137,7 @@ public class DBservice_Gilad
         string sep = "******************************";
         string txtToFile = sep + formattedDate + sep + linebreak;
         txtToFile += "FROM : " + linebreak + ancestors + linebreak;
-        txtToFile += "The Error msg : " + linebreak + ExceptionString + linebreak + "END";
+        txtToFile += "The Error msg : " + linebreak + ExceptionString + linebreak + " END";
 
 
 
@@ -156,6 +156,56 @@ public class DBservice_Gilad
             throw new Exception("error in write to txt file "+ex.Message);
         }
     }
+
+
+    static public void DebugToTextFile(Dictionary<string,object> dicOfVars)
+    {
+        string Path = "\\log\\AnyDebug.txt";
+        string stackTracesfilePath = HttpContext.Current.Server.MapPath("~") + Path;
+        DateTime currentDate = DateTime.Now;
+        string formattedDate = currentDate.ToString("dd/MM/yyyy HH:mm:ss");
+        string linebreak = Environment.NewLine;
+        string FinalString = "***************************************Debug-"+ formattedDate + "***************************************";
+
+        foreach (var item in dicOfVars)
+        {
+            FinalString += linebreak + item.Key.ToString() + " " + item.Value.ToString();
+        }
+        FinalString += linebreak + "*********************************************************************************************" + linebreak;
+
+        try
+        {
+            using (StreamWriter writer = new StreamWriter(stackTracesfilePath, true))
+            {
+                // Write the text to the file
+                writer.WriteLine(FinalString);
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("error in write to txt file " + ex.Message);
+        }
+    }
+
+    static public void StringToTextFile(string str,string fileName)
+    {
+        string Path = "\\log\\"+ fileName + ".txt";
+        string stackTracesfilePath = HttpContext.Current.Server.MapPath("~") + Path;
+        try
+        {
+            using (StreamWriter writer = new StreamWriter(stackTracesfilePath, true))
+            {
+                // Write the text to the file
+                writer.WriteLine(str);
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("error in write to txt file " + ex.Message);
+        }
+
+    }
+
     public List<object> GetListOfEscortsByPatientId(int patientId)
     {
         List<object> list2Return = new List<object>();
