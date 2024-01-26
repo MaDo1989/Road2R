@@ -181,10 +181,27 @@ public class ReportService
 
     }
 
-    public class SliceVolunteersCountInMonthInfo
+    public class SliceVolunteersCountInMonthInfo  : IEquatable<SliceVolunteersCountInMonthInfo>
     {
         public string Volunteer { get; set; }
         public string Count { get; set; }
+        public bool Equals(SliceVolunteersCountInMonthInfo other)
+        {
+            if (other == null)
+                return false;
+
+            return this.Volunteer == other.Volunteer && this.Count == other.Count;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as SliceVolunteersCountInMonthInfo);
+        }
+        public override int GetHashCode()
+        {
+            return Volunteer.GetHashCode() ^ Count.GetHashCode();
+        }
+
     }
 
 
@@ -463,7 +480,8 @@ AND RidePat.pickuptime >= '2020-1-01'
         return u;
     }
 
-    internal List<ReportService.SliceVolunteersCountInMonthInfo> GetReportSliceVolunteersCountInMonth(string start_date, string end_date)
+    // מתנדבים מסיעים בחתך חודשי   : פילוחים
+    internal List<ReportService.SliceVolunteersCountInMonthInfo> S_GetReportSliceVolunteersCountInMonth(string start_date, string end_date)
     {
         DbService db = new DbService();
 
@@ -500,6 +518,56 @@ GROUP BY inner_select.DisplayName
         }
 
         return result;
+    }
+
+    // מתנדבים מסיעים בחתך חודשי   : פילוחים
+    internal List<ReportService.SliceVolunteersCountInMonthInfo> U_GetReportSliceVolunteersCountInMonth(string start_date, string end_date)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+
+        // Inner-Select - Grouping by pickup time, dest & Orig is part of better accuracy
+        // it avoids counting the same ride with multiple patients as 2 rides 
+        string query =
+            @"Select DisplayName, count(*) as COUNT_C   FROM  
+                (SELECT DriverName AS DisplayName, PickupTime, Origin, Destination, count(*) as INNER_C
+                  FROM UnityRide ur  
+                  WHERE pickuptime <  @end_date
+                  AND pickuptime >= @start_date
+                  and MainDriver is not null
+                  GROUP BY DriverName, PickupTime, Origin, Destination 
+                  ) inner_select
+                GROUP BY inner_select.DisplayName
+            ";
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        SqlDataReader reader = db.GetDataReaderBySqlCommand(cmd);
+
+        List<SliceVolunteersCountInMonthInfo> result = new List<SliceVolunteersCountInMonthInfo>();
+
+        while (reader.Read())
+        {
+            SliceVolunteersCountInMonthInfo obj = new SliceVolunteersCountInMonthInfo();
+            obj.Volunteer = reader["DisplayName"].ToString();
+            obj.Count = reader["COUNT_C"].ToString();
+            result.Add(obj);
+        }
+        reader.Close();
+        return result;
+    }
+
+    // מתנדבים מסיעים בחתך חודשי   : פילוחים
+    internal List<ReportService.SliceVolunteersCountInMonthInfo> GetReportSliceVolunteersCountInMonth(string start_date, string end_date)
+    {
+        List<SliceVolunteersCountInMonthInfo> s = S_GetReportSliceVolunteersCountInMonth(start_date, end_date);  // << original implementation
+        List<SliceVolunteersCountInMonthInfo> u = U_GetReportSliceVolunteersCountInMonth(start_date, end_date);  // << New implementation using United
+        if (!compare_S_vs_U_results_ordered(s, u))                        // << Compare both lists (requires Equitable interfaces)
+        {
+            throw new Exception("GetReportSliceVolunteersCountInMonth mismatch");
+        }
+        return u;                                                         // return results
     }
 
     private DataTable getRides()
