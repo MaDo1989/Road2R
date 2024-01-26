@@ -14,3 +14,4 @@ log/MyTestAppender.log
 /.vs/Road2R/config/applicationhost.config
 log/StackTraces.txt
 log/Errors.txt
+log/AnyDebug.txt
