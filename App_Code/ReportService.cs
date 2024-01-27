@@ -129,7 +129,7 @@ public class ReportService
 
     }
 
-    public class VolunteerKM
+    public class VolunteerKM : IEquatable<VolunteerKM>
     {
         public string Volunteer { get; set; }
         public string Date { get; set; }
@@ -137,6 +137,25 @@ public class ReportService
         public string Destination { get; set; }
         public string Patient { get; set; }
 
+        public bool Equals(VolunteerKM other)
+        {
+            if (other == null)
+                return false;
+
+            return this.Volunteer == other.Volunteer && this.Date == other.Date
+                && this.Origin == other.Origin && this.Destination == other.Destination
+                && this.Patient == other.Patient;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as VolunteerKM);
+        }
+        public override int GetHashCode()
+        {
+            return Volunteer.GetHashCode() ^ Date.GetHashCode() ^ Origin.GetHashCode()
+                ^ Destination.GetHashCode() ^ Patient.GetHashCode();
+        }
     }
 
     public class VolunteerInfo
@@ -160,7 +179,7 @@ public class ReportService
 
     }
 
-    public class SliceVolunteersPerMonthInfo
+    public class SliceVolunteersPerMonthInfo : IEquatable<SliceVolunteersPerMonthInfo>
     {
         public string DisplayName { get; set; }
         public string City { get; set; }
@@ -179,6 +198,32 @@ public class ReportService
         public string Nov { get; set; }
         public string Dec { get; set; }
 
+        public bool Equals(SliceVolunteersPerMonthInfo other)
+        {
+            if (other == null)
+                return false;
+
+            return this.DisplayName == other.DisplayName && this.City == other.City
+                && this.CellPhone == other.CellPhone && this.JoinDate == other.JoinDate
+                && this.Jan == other.Jan && this.Feb == other.Feb && this.Mar == other.Mar
+                && this.Apr == other.Apr && this.May == other.May && this.Jun == other.Jun
+                && this.Jul == other.Jul && this.Aug == other.Aug && this.Sep == other.Sep
+                && this.Oct == other.Oct && this.Nov == other.Nov && this.Dec == other.Dec;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as SliceVolunteersPerMonthInfo);
+        }
+        public override int GetHashCode()
+        {
+            return this.DisplayName.GetHashCode() ^ this.City.GetHashCode() 
+                ^ this.CellPhone.GetHashCode() ^ this.JoinDate.GetHashCode()
+                ^ this.Jan.GetHashCode() ^ this.Feb.GetHashCode() ^ this.Mar.GetHashCode()
+                ^ this.Apr.GetHashCode() ^ this.May.GetHashCode() ^ this.Jun.GetHashCode()
+                ^ this.Jul.GetHashCode() ^ this.Aug.GetHashCode() ^ this.Sep.GetHashCode()
+                ^ this.Oct.GetHashCode() ^ this.Nov.GetHashCode() ^ this.Dec.GetHashCode();
+        }
     }
 
     public class SliceVolunteersCountInMonthInfo  : IEquatable<SliceVolunteersCountInMonthInfo>
@@ -1155,6 +1200,7 @@ GROUP BY inner_select.DisplayName
         return cmd;
     }
 
+    // מיוחדים : רשימת מתנדבים לביטוח לאומי
     internal List<VolunteerInfo> GetReportVolunteerList(string cell_phone, string start_date, string only_with_rides)
     {
         List<VolunteerInfo> result = new List<VolunteerInfo>();
@@ -1199,7 +1245,8 @@ GROUP BY inner_select.DisplayName
 
 
 
-    internal List<VolunteerKM> GetReportVolunteersKM(string start_date, string end_date)
+    //  מתנדבים – שנתי : לעמותה
+    internal List<VolunteerKM> S_GetReportVolunteersKM(string start_date, string end_date)
     {
         DbService db = new DbService();
 
@@ -1238,6 +1285,58 @@ ORDER BY Volunteer.DisplayName ASC
         }
 
         return result;
+    }
+
+
+    //  מתנדבים – שנתי : לעמותה
+    internal List<VolunteerKM> U_GetReportVolunteersKM(string start_date, string end_date)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+
+        string query =
+             @"SELECT convert(varchar, PickupTime, 103) AS PickupTime, Origin, Destination, DriverName AS DisplayName, PatientName  AS PatName  
+            FROM UnityRide ur  
+            WHERE pickuptime >= '2019-1-01'
+                and MainDriver is not null
+                AND pickuptime < @end_date
+                AND pickuptime >= @start_date
+            ORDER BY DisplayName ASC
+            ";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        SqlDataReader reader = db.GetDataReaderBySqlCommand(cmd);
+        
+
+        List<VolunteerKM> result = new List<ReportService.VolunteerKM>();
+
+        while (reader.Read())
+        {
+            ReportService.VolunteerKM obj = new ReportService.VolunteerKM();
+            obj.Volunteer = reader["DisplayName"].ToString();
+            obj.Patient = reader["PatName"].ToString();
+            obj.Origin = reader["Origin"].ToString();
+            obj.Destination = reader["Destination"].ToString();
+            obj.Date = reader["PickupTime"].ToString();
+            result.Add(obj);
+        }
+
+        return result;
+    }
+
+
+    internal List<VolunteerKM> GetReportVolunteersKM(string start_date, string end_date)
+    {
+        List<VolunteerKM> s = S_GetReportVolunteersKM(start_date, end_date);  // << original implementation
+        List<VolunteerKM> u = U_GetReportVolunteersKM(start_date, end_date);  // << New implementation using United
+        if (!compare_S_vs_U_results_unordered(s, u))                        // << Compare both lists (requires Equitable interfaces)
+        {
+            throw new Exception("GetReportVolunteersKM mismatch");
+        }
+        return u;   
     }
 
     internal List<NameIDPair> GetPatientsDisplayNames()
@@ -1531,11 +1630,25 @@ INNER JOIN Volunteer ON BUFF.MainDriver=Volunteer.Id";
 
     }
 
-    
-    internal bool compare_S_vs_U_results_unordered<T>(List<T>s, List<T> u)
+
+    internal bool compare_S_vs_U_results_unordered<T>(List<T> s, List<T> u)
     {
-        return s.Count == u.Count;
+        if (s.Count != u.Count)
+        {
+            return false;
+        }
+
+        HashSet<T> u_set = new HashSet<T>(u);
+        foreach (var elem in s)
+        {
+            if (!u_set.Contains(elem))
+            {
+                return false;
+            }
+        }
+        return true;
     }
+
 
     internal bool compare_S_vs_U_results_ordered<T>(List<T> s, List<T> u)
     {
