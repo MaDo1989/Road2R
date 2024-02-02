@@ -265,11 +265,28 @@ public class ReportService
         public string CellPhone { get; set; }
     }
 
-    public class CenterDailybyMonthInfo
+    public class CenterDailybyMonthInfo : IEquatable<CenterDailybyMonthInfo>
     {
         public string Date { get; set; }
         public string PatientCount { get; set; }
         public string VolunteerCount { get; set; }
+        public bool Equals(CenterDailybyMonthInfo other)
+        {
+            if (other == null)
+                return false;
+
+            return this.Date == other.Date && this.PatientCount == other.PatientCount
+                && this.VolunteerCount == other.VolunteerCount;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as CenterDailybyMonthInfo);
+        }
+        public override int GetHashCode()
+        {
+            return Date.GetHashCode() ^ PatientCount.GetHashCode() ^ VolunteerCount.GetHashCode();
+        }
     }
 
     public class CenterMonthlyByYearInfo
@@ -1674,7 +1691,8 @@ INNER JOIN Volunteer ON BUFF.MainDriver=Volunteer.Id";
         return u_result;
     }
 
-    internal List<CenterDailybyMonthInfo> GetReportCenterDailybyMonth(string start_date, string end_date)
+    //  מרכז תיאום - מבט יומי :לעמותה
+    internal List<CenterDailybyMonthInfo> S_GetReportCenterDailybyMonth(string start_date, string end_date)
     {
         DbService db = new DbService();
 
@@ -1708,6 +1726,54 @@ group by CONVERT(date, pickuptime) ";
         return result;
     }
 
+    //  מרכז תיאום - מבט יומי :לעמותה
+    internal List<CenterDailybyMonthInfo> U_GetReportCenterDailybyMonth(string start_date, string end_date)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+
+        string query =
+        @"select  count(DISTINCT MainDriver) AS Drivers, count(DISTINCT PatientId ) As Patients, CONVERT(date, pickuptime) as DayInMonth
+            FROM UnityRide ur  
+            where pickuptime >=  @start_date 
+                and pickuptime <=  @end_date
+                and MainDriver is not null
+            group by CONVERT(date, pickuptime)";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        SqlDataReader reader = db.GetDataReaderBySqlCommand(cmd);
+
+        List<CenterDailybyMonthInfo> result = new List<CenterDailybyMonthInfo>();
+
+        while (reader.Read())
+        {
+            CenterDailybyMonthInfo obj = new CenterDailybyMonthInfo();
+            obj.Date = reader["DayInMonth"].ToString();
+            obj.VolunteerCount = reader["Drivers"].ToString();
+            obj.PatientCount = reader["Patients"].ToString();
+            result.Add(obj);
+        }
+
+        reader.Close();
+        return result;
+    }
+
+
+    internal List<CenterDailybyMonthInfo> GetReportCenterDailybyMonth(string start_date, string end_date)
+    {
+        {
+            List<CenterDailybyMonthInfo> s = S_GetReportCenterDailybyMonth(start_date, end_date);  // << original implementation
+            List<CenterDailybyMonthInfo> u = U_GetReportCenterDailybyMonth(start_date, end_date);  // << New implementation using United
+            if (!compare_S_vs_U_results_ordered(s, u))                        // << Compare both lists (requires Equitable interfaces)
+            {
+                throw new Exception("GetReportCenterDailybyMonth mismatch");
+            }
+            return u;                                                         // return results
+        }
+    }
 
     internal List<CenterMonthlyByYearInfo> GetReportCenterMonthlyByYear(string start_date, string end_date)
     {
