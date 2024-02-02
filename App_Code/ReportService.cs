@@ -289,13 +289,34 @@ public class ReportService
         }
     }
 
-    public class CenterMonthlyByYearInfo
+    public class CenterMonthlyByYearInfo : IEquatable<CenterMonthlyByYearInfo>
     {
         public string PatientCount { get; set; }
         public string VolunteerCount { get; set; }
         public string RidesCount { get; set; }
         public string DemandsCount { get; set; }
         public string Month { get; set; }
+
+        public bool Equals(CenterMonthlyByYearInfo other)
+        {
+            if (other == null)
+                return false;
+
+            return this.RidesCount == other.RidesCount && this.PatientCount == other.PatientCount
+                && this.VolunteerCount == other.VolunteerCount && this.DemandsCount == other.DemandsCount
+                && this.Month == other.Month;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as CenterMonthlyByYearInfo);
+        }
+        public override int GetHashCode()
+        {
+            return RidesCount.GetHashCode() ^ PatientCount.GetHashCode() ^ VolunteerCount.GetHashCode()
+                ^ DemandsCount.GetHashCode() ^ Month.GetHashCode();
+        }
+
     }
 
 
@@ -1775,7 +1796,8 @@ group by CONVERT(date, pickuptime) ";
         }
     }
 
-    internal List<CenterMonthlyByYearInfo> GetReportCenterMonthlyByYear(string start_date, string end_date)
+    //  מרכז תיאום - מבט חודשי : לעמותה
+    internal List<CenterMonthlyByYearInfo> S_GetReportCenterMonthlyByYear(string start_date, string end_date)
     {
         DbService db = new DbService();
 
@@ -1832,6 +1854,75 @@ group by CONVERT(date, pickuptime) ";
         return result;
     }
 
+    //  מרכז תיאום - מבט חודשי : לעמותה
+    internal List<CenterMonthlyByYearInfo> U_GetReportCenterMonthlyByYear(string start_date, string end_date)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+
+        string query = @"SELECT  
+        MONTH(pickuptime) as MONTH_C, count(DISTINCT PatientName) as COUNT_PAT,
+        count(DISTINCT MainDriver) as COUNT_VOL, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDE,
+        count(PatientName) as COUNT_DEMAND_RAW, SUM(MULTI_SEG_TO_SUBSTRACT) AS MULTI_SEG_TO_SUBSTRACT_C
+        FROM (
+	           select MainDriver  , PickupTime, Origin, Destination, PatientName, 
+	              ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) as row_num_C,
+	              CASE WHEN ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) = '1' THEN 1
+		              ELSE 0
+	              END AS Unique_Drive_C,
+  				  CASE WHEN ROW_NUMBER() OVER (PARTITION by FORMAT (PickupTime , 'yyyy-MM-dd'), PatientName  ORDER BY PickupTime Asc)  = '3' THEN 1
+					ELSE 0
+				  END AS MULTI_SEG_TO_SUBSTRACT 
+	              from UnityRide ur 
+	              where pickuptime >= @start_date 
+	                AND pickuptime <= @end_date 
+	                AND MainDriver is not null
+	                AND PatientName not like N'אנונימי%'
+              ) s 
+        GROUP BY MONTH(pickuptime)
+        ORDER BY MONTH_C ASC";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        SqlDataReader reader = db.GetDataReaderBySqlCommand(cmd);
+
+        //  call another query so we know how many multi-segment rides we had
+        //  IDictionary<string, int>   multiSegMonthDB = secondary_query_GetMultiSegmentRidesMonthly(start_date, end_date);
+
+        List<CenterMonthlyByYearInfo> result = new List<CenterMonthlyByYearInfo>();
+
+        while (reader.Read())
+        {
+            CenterMonthlyByYearInfo obj = new CenterMonthlyByYearInfo();
+            obj.PatientCount = reader["COUNT_PAT"].ToString();
+            obj.VolunteerCount = reader["COUNT_VOL"].ToString();
+            obj.RidesCount = reader["COUNT_UNIQUE_RIDE"].ToString();
+            obj.Month = reader["MONTH_C"].ToString();
+
+            // substract the number of multi-seg rides
+            int orig_count = helper_unsafe_ParseIntger(reader["COUNT_DEMAND_RAW"].ToString());
+            int new_value = orig_count - helper_unsafe_ParseIntger(reader["MULTI_SEG_TO_SUBSTRACT_C"].ToString());
+            obj.DemandsCount = new_value.ToString();
+            result.Add(obj);
+        }
+
+        reader.Close();
+        return result;
+    }
+
+    internal List<CenterMonthlyByYearInfo> GetReportCenterMonthlyByYear(string start_date, string end_date)
+    {
+        List<CenterMonthlyByYearInfo> s = S_GetReportCenterMonthlyByYear(start_date, end_date);  // << original implementation
+        List<CenterMonthlyByYearInfo> u = U_GetReportCenterMonthlyByYear(start_date, end_date);  // << New implementation using United
+        if (!compare_S_vs_U_results_ordered(s, u))                        // << Compare both lists (requires Equitable interfaces)
+        {
+            throw new Exception("GetReportCenterMonthlyByYear mismatch");
+        }
+        return u;                                                         // return results
+
+    }
 
     /* Purpose: calculate how many cases we have of a patient being driven over 2 times a day, e.g.
      *  Barrier --> Some-handover-location -> Hospital  -->  Barrier
