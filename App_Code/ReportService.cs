@@ -365,7 +365,7 @@ public class ReportService
         }
     }
 
-    public class CenterTomorrowsRides
+    public class CenterTomorrowsRides : IEquatable<CenterTomorrowsRides>
     {
         public string Patient { get; set; }
         public string DriverID { get; set; }
@@ -373,6 +373,28 @@ public class ReportService
         public string EscortCount { get; set; }
         public string Origin { get; set; }
         public string Destination { get; set; }
+
+        public bool Equals(CenterTomorrowsRides other)
+        {
+            if (other == null)
+                return false;
+
+            return this.Patient == other.Patient && this.DriverID == other.DriverID
+                && this.Origin == other.Origin && this.Destination == other.Destination
+                && this.Pickuptime == other.Pickuptime && this.EscortCount == other.EscortCount;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as CenterTomorrowsRides);
+        }
+        public override int GetHashCode()
+        {
+            return DriverID.GetHashCode() ^ Origin.GetHashCode()
+                ^ Destination.GetHashCode() ^ Patient.GetHashCode()
+                ^ Pickuptime.GetHashCode() ^ EscortCount.GetHashCode();
+        }
+
     }
 
     private DataTable getDriverByID(int driverID, DbService db)
@@ -2211,7 +2233,8 @@ string origin, string destination)
         return result;
     }
 
-    internal List<ReportService.CenterTomorrowsRides> GetReportCenterTomorrowsRides(string start_date, string end_date)
+    // מרכז תיאום - הסעות של מחר : לעמותה
+    internal List<ReportService.CenterTomorrowsRides> S_GetReportCenterTomorrowsRides(string start_date, string end_date)
     {
         DbService db = new DbService();
 
@@ -2258,6 +2281,71 @@ string origin, string destination)
 
         db.CloseConnection(); // force freeing teh temporary table
         return result;
+    }
+
+    // מרכז תיאום - הסעות של מחר : לעמותה
+    internal List<ReportService.CenterTomorrowsRides> U_GetReportCenterTomorrowsRides(string start_date, string end_date)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+
+        // Create Temporary Table, counting escorts per Ride
+        string query =
+            @"select RidePatNum, COUNT(*) AS COUNT_C INTO #ESCORTS_PER_RIDE
+                from RidePatEscortView
+                GROUP BY RidePatNum ";
+        //@@   db.GetDataSetByQuery(query, false);  // do not close the connection.
+
+        // Find the records, using LEFT joins to get English names of Orig/Dest
+        // Also use the temporary table to count escorts per ride
+        query =
+           @"Select Pickuptime, MainDriver, p.EnglishName, l1.EnglishName as ORIGIN_C, l2.EnglishName AS DEST_C, ur.AmountOfEscorts  AS ESCORTS_C
+                from UnityRide ur 
+                LEFT JOIN Location l1  ON ur.Origin = l1.Name 
+                LEFT JOIN Location l2  ON ur.Destination = l2.Name 
+                LEFT JOIN Patient p ON ur.PatientId = p.Id 
+                WHERE MainDriver is not null
+                 AND pickuptime > @start_date
+                 AND pickuptime < @end_date
+                ORDER BY PickupTime, p.EnglishName ASC";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        SqlDataReader reader = db.GetDataReaderBySqlCommand(cmd);
+
+        List<ReportService.CenterTomorrowsRides> result = new List<ReportService.CenterTomorrowsRides>();
+        while (reader.Read())
+        {
+            CenterTomorrowsRides obj = new CenterTomorrowsRides();
+            obj.Patient = reader["EnglishName"].ToString();
+            obj.Origin = reader["ORIGIN_C"].ToString();
+            obj.Destination = reader["DEST_C"].ToString();
+            obj.EscortCount = reader["ESCORTS_C"].ToString();
+            obj.Pickuptime = reader["Pickuptime"].ToString();
+            obj.DriverID = reader["MainDriver"].ToString();
+            if (obj.EscortCount.Equals("0"))
+            {
+                // so it can be the same in comparison
+                obj.EscortCount = "";
+            }
+            result.Add(obj);
+        }
+
+        reader.Close();
+        return result;
+    }
+
+    internal List<ReportService.CenterTomorrowsRides> GetReportCenterTomorrowsRides(string start_date, string end_date)
+    {
+        List<CenterTomorrowsRides> s = S_GetReportCenterTomorrowsRides(start_date, end_date);  // << original implementation
+        List<CenterTomorrowsRides> u = U_GetReportCenterTomorrowsRides(start_date, end_date);  // << New implementation using United
+        if (!compare_S_vs_U_results_unordered(s, u))                        // << Compare both lists (requires Equitable interfaces)
+        {
+            throw new Exception("GetReportCenterTomorrowsRides mismatch");
+        }
+        return u;                                                         // return results
     }
 
 
