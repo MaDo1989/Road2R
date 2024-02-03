@@ -2133,7 +2133,8 @@ group by CONVERT(date, pickuptime) ";
     }
 
 
-    internal string GetReportCenterPatientsRidesCount(string volunteer, string start_date, string end_date,
+    // מרכז תיאום - הסעת חולים: לעמותה
+    internal string S_GetReportCenterPatientsRidesCount(string volunteer, string start_date, string end_date,
 string origin, string destination)
     {
         DbService db = new DbService();
@@ -2156,6 +2157,44 @@ string origin, string destination)
 
         string result = dt.Rows[0]["PAT_COUNT"].ToString();
         return result;
+    }
+
+    // מרכז תיאום - הסעת חולים: לעמותה
+    internal string U_GetReportCenterPatientsRidesCount(string volunteer, string start_date, string end_date,
+string origin, string destination)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+        SqlCommand cmd = build_command_ReportCenterPatientsRides(volunteer, start_date, end_date, origin, destination);
+
+        string condition = build_condition_ReportCenterPatientsRides(volunteer, origin, destination);
+
+        string query =
+        @"select count(PatientId) , count(DISTINCT PatientId) AS PAT_COUNT
+          from UnityRide ur  
+	      where pickuptime > @start_date
+	      AND pickuptime < @end_date  
+          " + condition;
+
+        cmd.CommandText = query;
+
+        SqlDataReader reader = db.GetDataReaderBySqlCommand(cmd);
+        reader.Read();
+        string result = reader["PAT_COUNT"].ToString();
+        reader.Close();
+
+        return result;
+    }
+
+    internal string GetReportCenterPatientsRidesCount(string volunteer, string start_date, string end_date,
+string origin, string destination)
+    {
+        string s = S_GetReportCenterPatientsRidesCount(volunteer, start_date, end_date, origin, destination);
+        string u = U_GetReportCenterPatientsRidesCount(volunteer, start_date, end_date, origin, destination);
+        if (! s.Equals(u))
+        {
+            throw new Exception("GetReportCenterPatientsRidesCount mismatch");
+        }
+        return u;      
     }
 
     private int helper_unsafe_ParseIntger(string s)
