@@ -337,13 +337,32 @@ public class ReportService
         public string Demands { get; set; }
     }
 
-    public class CenterPatientsRidesInfo
+    public class CenterPatientsRidesInfo : IEquatable<CenterPatientsRidesInfo>
     {
         public string Volunteer { get; set; }
         public string Month { get; set; }
         public string Count { get; set; }
         public string Origin { get; set; }
         public string Destination { get; set; }
+        public bool Equals(CenterPatientsRidesInfo other)
+        {
+            if (other == null)
+                return false;
+
+            return this.Volunteer == other.Volunteer && this.Month == other.Month
+                && this.Count == other.Count && this.Origin == other.Origin
+                && this.Destination == other.Destination;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as CenterPatientsRidesInfo);
+        }
+        public override int GetHashCode()
+        {
+            return Volunteer.GetHashCode() ^ Month.GetHashCode() ^ Count.GetHashCode()
+                ^ Origin.GetHashCode() ^ Destination.GetHashCode();
+        }
     }
 
     public class CenterTomorrowsRides
@@ -2010,7 +2029,8 @@ group by CONVERT(date, pickuptime) ";
         return cmd;
     }
 
-    internal List<CenterPatientsRidesInfo> GetReportCenterPatientsRides(string volunteer, string start_date, string end_date,
+    // מרכז תיאום - הסעת חולים : לעמותה
+    internal List<CenterPatientsRidesInfo> S_GetReportCenterPatientsRides(string volunteer, string start_date, string end_date,
     string origin, string destination)
     {
         DbService db = new DbService();
@@ -2053,6 +2073,63 @@ group by CONVERT(date, pickuptime) ";
         }
 
         return result;
+    }
+
+    // מרכז תיאום - הסעת חולים : לעמותה
+    internal List<CenterPatientsRidesInfo> U_GetReportCenterPatientsRides(string volunteer, string start_date, string end_date,
+    string origin, string destination)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+        SqlCommand cmd = build_command_ReportCenterPatientsRides(volunteer, start_date, end_date, origin, destination);
+
+        string condition = build_condition_ReportCenterPatientsRides(volunteer, origin, destination);
+
+        string query =
+        @"select
+            FORMAT (PICKUP_TIME_C, 'MM-yy') AS MONTH_C, Origin , Destination, DISPLAY_NAME_C, count(*) AS COUNT_C
+            from 
+            (  select PickupTime AS PICKUP_TIME_C, Origin , Destination,  DriverName AS DISPLAY_NAME_C
+	            FROM UnityRide ur  
+	            where pickuptime > @start_date
+                AND pickuptime < @end_date " +
+                condition +
+                @" GROUP BY PickupTime, Origin , Destination, DriverName
+            ) s
+            GROUP BY FORMAT (PICKUP_TIME_C, 'MM-yy'),  Origin , Destination, DISPLAY_NAME_C
+            order by MONTH_C ASC";
+
+        cmd.CommandText = query;
+
+        SqlDataReader reader = db.GetDataReaderBySqlCommand(cmd);
+        
+        List<CenterPatientsRidesInfo> result = new List<CenterPatientsRidesInfo>();
+
+        while (reader.Read())
+        {
+            CenterPatientsRidesInfo obj = new CenterPatientsRidesInfo();
+            obj.Volunteer = reader["DISPLAY_NAME_C"].ToString();
+            obj.Month = reader["MONTH_C"].ToString();
+            obj.Origin = reader["Origin"].ToString();
+            obj.Destination = reader["Destination"].ToString();
+            obj.Count = reader["COUNT_C"].ToString();
+            result.Add(obj);
+        }
+
+        reader.Close();
+        return result;
+    }
+
+    // מרכז תיאום - הסעת חולים : לעמותה
+    internal List<CenterPatientsRidesInfo> GetReportCenterPatientsRides(string volunteer, string start_date, string end_date,
+    string origin, string destination)
+    {
+        List<CenterPatientsRidesInfo> s = S_GetReportCenterPatientsRides(volunteer, start_date, end_date, origin, destination);
+        List<CenterPatientsRidesInfo> u = U_GetReportCenterPatientsRides(volunteer, start_date, end_date, origin, destination);  
+        if (!compare_S_vs_U_results_ordered(s, u))                        // << Compare both lists (requires Equitable interfaces)
+        {
+            throw new Exception("GetReportCenterPatientsRides mismatch");
+        }
+        return u;                                                         // return results
     }
 
 
