@@ -424,37 +424,6 @@ public class ReportService
         return dt;
     }
 
-
-
-    //@@ TODO:  Maybe ths is not needed?
-    private DataTable getVolunteerRidesPerWeek(string start_date, string end_date, DbService db)
-    {
-        /*
-         * SELECT RidePat.Patient , Volunteer.DisplayName, RidePat.Area ,RidePat.PickupTime, RidePat.MainDriver
-FROM RidePat
-INNER JOIN Volunteer ON RidePat.MainDriver=Volunteer.Id
-AND RidePat.pickuptime < '2020-3-01'
-AND RidePat.pickuptime >= '2020-1-01'
-
-    */
-
-        string query = @" SELECT RidePat.Patient , Volunteer.DisplayName, RidePat.Area ,RidePat.PickupTime, RidePat.MainDriver
-                        FROM RidePat
-                        INNER JOIN Volunteer ON RidePat.MainDriver=Volunteer.Id
-                        AND RidePat.pickuptime < '2020-3-01'
-                        AND RidePat.pickuptime >= '2020-1-01'";
-
-        SqlCommand cmd = new SqlCommand(query);
-        cmd.CommandType = CommandType.Text;
-        //cmd.Parameters.Add("@ID", SqlDbType.Int).Value = driverID;
-        //cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
-        //cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
-
-        DataSet ds = db.GetDataSetBySqlCommand(cmd);
-        DataTable dt = ds.Tables[0];
-        return dt;
-    }
-
     internal List<SliceVolunteersPerMonthInfo> S_GetReportSliceVolunteerPerMonth(string start_date, string end_date)
     {
         DbService db = new DbService();
@@ -728,7 +697,7 @@ GROUP BY inner_select.DisplayName
 
     }
 
-    private List<string> GetDistinctListOfField(string field, string table)
+    private List<string> S_GetDistinctListOfField(string field, string table)
     {
         DbService db = new DbService();
         string query = string.Format("select DISTINCT {0} AS FIELD from {1}", field, table);
@@ -749,6 +718,37 @@ GROUP BY inner_select.DisplayName
         return result;
     }
 
+    private List<string> U_GetDistinctListOfField(string field, string table)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+        string query = string.Format("select DISTINCT {0} AS FIELD from {1}", field, table);
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+
+        SqlDataReader reader = db.GetDataReaderBySqlCommand(cmd);
+
+        List<string> result = new List<string>();
+
+        while (reader.Read())
+        {
+            result.Add(reader["FIELD"].ToString());
+        }
+
+        return result;
+    }
+
+    // מרכז תיאום - הסעת חולים  לעמותה
+    private List<string> GetDistinctListOfField(string field, string table)
+    {
+        List<string> s = S_GetDistinctListOfField(field, table);  // << original implementation
+        List<string> u = U_GetDistinctListOfField(field, table);  // << New implementation using United
+        if (!compare_S_vs_U_results_ordered(s, u))                        // << Compare both lists (requires Equitable interfaces)
+        {
+            throw new Exception("GetDistinctListOfField mismatch");
+        }
+        return u;                                                         // return results
+    }
 
     internal List<string> GetReportHospitals()
     {
@@ -760,6 +760,7 @@ GROUP BY inner_select.DisplayName
         return GetDistinctListOfField("Barrier", "Patient");
     }
 
+    // מרכז תיאום - הסעת חולים  לעמותה
     internal List<string> GetReportLocations()
     {
         return GetDistinctListOfField("name", "Location");
@@ -2349,165 +2350,5 @@ string origin, string destination)
     }
 
 
-    //@@ TODO:  See notes on this method name in reports.js
-    public List<RidePat> GetReportRidesWeeklyPerRegion(string start_date, string end_date)
-    {
-        DbService db = new DbService();
-        Location tmp = new Location();
-        Hashtable locations = tmp.getLocationsEnglishName();
-
-
-        DataTable pickupsTable = getVolunteerRidesPerWeek(start_date, end_date, db);
-        List<RidePat> rpl = new List<RidePat>();
-
-        int counter = 0;
-
-        try
-        {
-            foreach (DataRow dr in pickupsTable.Rows)
-            {
-                try
-                {
-                    counter++;
-
-                    RidePat rp = new RidePat();
-                    rp.Coordinator = new Volunteer();
-                    rp.Coordinator.DisplayName = dr["Coordinator"].ToString();
-                    rp.Drivers = new List<Volunteer>();
-
-                    if (dr["MainDriver"].ToString() != "")
-                    {
-
-                        Volunteer primary = new Volunteer();
-                        primary.DriverType = "Primary";
-/* @@
-                        primary.Id = int.Parse(dr["MainDriver"].ToString());
-                        DataRow driverRow = driverTable.Rows[0];
-                        primary.DisplayName = driverRow["DisplayName"].ToString();
-                        primary.CellPhone = driverRow["CellPhone"].ToString();
-                        rp.Drivers.Add(primary);
-@@ */
-    }
-
-
-                    // if (numOfDrivers > 1)
-                    // {
-                    if (dr["secondaryDriver"].ToString() != "")
-                    {
-                        // Do we care about these for a report? 
-                        if (false)
-                        {
-                            throw new Exception("Secondary Driver lookup not implemented yet");
-                            Volunteer secondary = new Volunteer();
-                            secondary.DriverType = "secondary";
-                            secondary.Id = int.Parse(dr["secondaryDriver"].ToString());
-                            string searchExpression = "Id = " + secondary.Id;
-/* @@ 
-                            DataRow[] driverRow = driverTable.Select(searchExpression);
-                            secondary.DisplayName = driverRow[0]["DisplayName"].ToString();
-                            secondary.CellPhone = driverRow[0]["CellPhone"].ToString();
-                            rp.Drivers.Add(secondary);
-
-    @@ */
-                        }
-                    }
-
-                    rp.RidePatNum = int.Parse(dr["RidePatNum"].ToString());
-                    try
-                    {
-                        rp.RideNum = int.Parse(dr["RideNum"].ToString());
-                    }
-                    catch (Exception)
-                    {
-
-                    }
-
-                    Patient thePatient = new Patient();
-                    thePatient.DisplayName = dr["DisplayName"].ToString();
-                    thePatient.EnglishName = dr["EnglishName"].ToString();
-                    thePatient.CellPhone = dr["CellPhone"].ToString();
-                    thePatient.IsAnonymous = dr["IsAnonymous"].ToString();
-                    thePatient.Id = int.Parse(dr["Id"].ToString());
-
-                    rp.Pat = thePatient;
-
-                    rp.Pat.EscortedList = new List<Escorted>();
-/* @@
-                    string escortSearchExpression = "RidePatNum = " + rp.RidePatNum;
-                    DataRow[] escortRow = escortTable.Select(escortSearchExpression);
-                    foreach (DataRow row in escortRow)
-                    {
-                        Escorted e = new Escorted();
-                        e.Id = int.Parse(row[0].ToString());
-                        e.DisplayName = row[1].ToString();
-                        rp.Pat.EscortedList.Add(e);
-                    }
-                    @@ */
-
-
-
-                    Location origin = new Location();
-                    origin.Name = dr["Origin"].ToString();
-                    if (locations[origin.Name] == null)
-                    {
-                        origin.EnglishName = "";
-                    }
-                    else origin.EnglishName = locations[origin.Name].ToString();
-                    rp.Origin = origin;
-                    Location dest = new Location();
-                    dest.Name = dr["Destination"].ToString();
-                    if (locations[dest.Name] == null)
-                    {
-                        dest.EnglishName = "";
-                    }
-                    else dest.EnglishName = locations[dest.Name].ToString();
-                    rp.Destination = dest;
-                    rp.Area = dr["Area"].ToString();
-                    rp.Shift = dr["Shift"].ToString();
-                    rp.Date = Convert.ToDateTime(dr["PickupTime"].ToString());
-                    rp.Status = dr["Status"].ToString();
-                    if (rp.RideNum > 0) // if RidePat is assigned to a Ride - Take the Ride's status
-                    {
-/* @@ 
-                        string searchExpression = "RideRideNum = " + rp.RideNum;
-                        DataRow[] rideRow = rideTable.Select(searchExpression);
-                        //rideRow = rideRow.OrderBy(x => x.TimeOfDay).ToList();
-                        rp.Statuses = new List<string>();
-                        foreach (DataRow status in rideRow)
-                        {
-                            rp.Statuses.Add(status.ItemArray[0].ToString());
-                        }
-                        try
-                        {
-                            rp.Status = rp.Statuses[rp.Statuses.Count - 1];
-                        }
-                        catch (Exception err)
-                        {
-
-                            throw err;
-                        }
-
-@@ */
-                    }
-
-                    rpl.Add(rp);
-                }
-                catch (Exception ex)
-                {
-
-                    throw ex;
-                }
-
-
-            }
-
-            return rpl;
-        }
-        catch (Exception e)
-        {
-            throw e;
-        }
-
-    }
-
+   
 }
