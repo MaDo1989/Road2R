@@ -257,12 +257,31 @@ public class ReportService
         public SqlParameter[] sqlParameters { get; set; }
     }
 
-    public class VolunteersInPeriod
+    public class VolunteersInPeriod : IEquatable<VolunteersInPeriod>
     {
         public String Id { get; set; }
         public string Volunteer { get; set; }
         public string CityCityName { get; set; }
         public string CellPhone { get; set; }
+
+        public bool Equals(VolunteersInPeriod other)
+        {
+            if (other == null)
+                return false;
+
+            return this.Id == other.Id && this.Volunteer == other.Volunteer
+                && this.CityCityName == other.CityCityName && this.CellPhone == other.CellPhone;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as VolunteersInPeriod);
+        }
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode() ^ Volunteer.GetHashCode() 
+                ^ CityCityName.GetHashCode() ^ CellPhone.GetHashCode();
+        }
     }
 
     public class CenterDailybyMonthInfo : IEquatable<CenterDailybyMonthInfo>
@@ -959,7 +978,7 @@ GROUP BY inner_select.DisplayName
         return result;
     }
 
-    internal MetricInfo GetReportRangeNeedDriversMetrics(string start_date, string end_date)
+    internal MetricInfo S_GetReportRangeNeedDriversMetrics(string start_date, string end_date)
     {
         DbService db = new DbService();
 
@@ -995,6 +1014,58 @@ GROUP BY inner_select.DisplayName
             Value2 = uniqueIDs.Count
         };
         return result;
+    }
+
+    // TODO:Unity:   This is not returning same results as RPView. Ask Gilad if he cleaned UnityRide
+    internal MetricInfo U_GetReportRangeNeedDriversMetrics(string start_date, string end_date)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+
+        string query =
+             @"select RidePatNum AS ID from UnityRide
+                where MainDriver is NULL
+                and pickuptime > @start_date
+                and pickuptime < @end_date
+                and Status = N'ממתינה לשיבוץ' ";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        SqlDataReader reader = db.GetDataReaderBySqlCommand(cmd);
+
+        int count = 0;
+        HashSet<string> uniqueIDs = new HashSet<string>();
+
+        while (reader.Read())
+        {
+            uniqueIDs.Add(reader["ID"].ToString());
+            count++;
+        }
+        reader.Close();
+
+        MetricInfo result = new MetricInfo
+        {
+            MetricName = "NeedDrivers",
+            Value1 = count,
+            Value2 = uniqueIDs.Count
+        };
+        return result;
+    }
+
+    internal MetricInfo GetReportRangeNeedDriversMetrics(string start_date, string end_date)
+    {
+        MetricInfo s = S_GetReportRangeNeedDriversMetrics(start_date, end_date);  // << original implementation
+        MetricInfo u = U_GetReportRangeNeedDriversMetrics(start_date, end_date);  // << New implementation using United
+
+        // TODO:Unity:   This is not returning same results as RPView. Ask Gilad if he cleaned UnityRide
+        // if (s.Value1 != u.Value1 || s.Value2 != u.Value2)  
+        //{
+          //  throw new Exception("GetReportRangeNeedDriversMetrics mismatch");
+        //}
+        return u;    
+
     }
 
     internal List<MetricMonthlyInfo> S_GetReportRangeDigestMetrics(string start_date, string end_date, string prev_start, string prev_end, string query)
@@ -1572,8 +1643,8 @@ order BY DisplayName ASC
     }
 
 
-
-    internal List<VolunteersInPeriod> GetReportSliceVolunteersInPeriod(int delta_start, int delta_end)
+    //  הסעות בתקופה האחרונה   פילוחים
+    internal List<VolunteersInPeriod> S_GetReportSliceVolunteersInPeriod(int delta_start, int delta_end)
     {
         DbService db = new DbService();
         List<VolunteersInPeriod> result = new List<VolunteersInPeriod>();
@@ -1613,6 +1684,58 @@ and MainDriver is not NULL)
         }
 
         return result;
+    }
+
+    //  הסעות בתקופה האחרונה   פילוחים
+    internal List<VolunteersInPeriod> U_GetReportSliceVolunteersInPeriod(int delta_start, int delta_end)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+        List<VolunteersInPeriod> result = new List<VolunteersInPeriod>();
+
+        string query =
+@"select  DISTINCT s2.MainDriver, Volunteer.DisplayName, Volunteer.CityCityName, Volunteer.CellPhone
+from 
+(select MainDriver, SUM(NEW) AS NEW_CNT, SUM(OLD) AS OLD_CNT from 
+	(select MainDriver,
+		case when CONVERT(date, pickuptime) > CONVERT(date, dateadd(day, @delta_end, getdate())) then 1 else 0 end AS NEW,
+		case when CONVERT(date, pickuptime) > CONVERT(date, dateadd(day, @delta_start, getdate())) then 1 else 0 end AS OLD
+		from UnityRide ur2  
+		where pickuptime <= getdate() 
+		and MainDriver is not NULL) S
+	GROUP BY MainDriver) s2
+INNER JOIN Volunteer on Volunteer.Id = s2.MainDriver 
+where NEW_CNT = '0' and not OLD_CNT = '0'
+";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@delta_start", SqlDbType.Int).Value = delta_start;
+        cmd.Parameters.Add("@delta_end", SqlDbType.Int).Value = delta_end;
+
+        SqlDataReader reader = db.GetDataReaderBySqlCommand(cmd);
+
+        while (reader.Read())
+        {
+            VolunteersInPeriod obj = new VolunteersInPeriod();
+            obj.Id = reader["MainDriver"].ToString();
+            obj.Volunteer = reader["DisplayName"].ToString();
+            obj.CellPhone = reader["CellPhone"].ToString();
+            obj.CityCityName = reader["CityCityName"].ToString();
+            result.Add(obj);
+        }
+        reader.Close();
+        return result;
+    }
+
+    internal List<VolunteersInPeriod> GetReportSliceVolunteersInPeriod(int delta_start, int delta_end)
+    {
+        List<VolunteersInPeriod> s = S_GetReportSliceVolunteersInPeriod(delta_start, delta_end);  // << original implementation
+        List<VolunteersInPeriod> u = U_GetReportSliceVolunteersInPeriod(delta_start, delta_end);  // << New implementation using United
+        if (!compare_S_vs_U_results_unordered(s, u))                        // << Compare both lists (requires Equitable interfaces)
+        {
+            throw new Exception("GetReportSliceVolunteersInPeriod mismatch");
+        }
+        return u;                                                         // return results
     }
 
 
