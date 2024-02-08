@@ -328,13 +328,33 @@ public class ReportService
     }
 
 
-    public class MetricMonthlyInfo
+    public class MetricMonthlyInfo : IEquatable<MetricMonthlyInfo>
     {
         public string Day { get; set; }
         public string Rides { get; set; }
         public string Patients { get; set; }
         public string Volunteers { get; set; }
         public string Demands { get; set; }
+
+        public bool Equals(MetricMonthlyInfo other)
+        {
+            if (other == null)
+                return false;
+
+            return this.Day == other.Day && this.Rides == other.Rides
+                && this.Patients == other.Patients && this.Volunteers == other.Volunteers
+                && this.Demands == other.Demands;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as MetricMonthlyInfo);
+        }
+        public override int GetHashCode()
+        {
+            return Day.GetHashCode() ^ Rides.GetHashCode() ^ Patients.GetHashCode()
+                ^ Volunteers.GetHashCode() ^ Demands.GetHashCode();
+        }
     }
 
     public class CenterPatientsRidesInfo : IEquatable<CenterPatientsRidesInfo>
@@ -734,7 +754,7 @@ GROUP BY inner_select.DisplayName
         {
             result.Add(reader["FIELD"].ToString());
         }
-
+        reader.Close();
         return result;
     }
 
@@ -977,7 +997,7 @@ GROUP BY inner_select.DisplayName
         return result;
     }
 
-    internal List<MetricMonthlyInfo> GetReportRangeDigestMetrics(string start_date, string end_date, string prev_start, string prev_end, string query)
+    internal List<MetricMonthlyInfo> S_GetReportRangeDigestMetrics(string start_date, string end_date, string prev_start, string prev_end, string query)
     {
         DbService db = new DbService();
 
@@ -1016,7 +1036,47 @@ GROUP BY inner_select.DisplayName
         return result;
     }
 
-    
+
+    internal List<MetricMonthlyInfo> U_GetReportRangeDigestMetrics(string start_date, string end_date, string prev_start, string prev_end, string query)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+        if (!prev_start.Equals("NA"))
+        {
+            cmd.Parameters.Add("@prev_start", SqlDbType.Date).Value = prev_start;
+            cmd.Parameters.Add("@prev_end", SqlDbType.Date).Value = prev_end;
+        }
+
+        SqlDataReader reader = db.GetDataReaderBySqlCommand(cmd);
+
+        bool with_demands = query.Contains("COUNT_DEMAND_RAW");
+        List<MetricMonthlyInfo> result = new List<MetricMonthlyInfo>();
+
+        while (reader.Read())
+        {
+            MetricMonthlyInfo obj = new MetricMonthlyInfo();
+            obj.Day = reader["SPAN_C"].ToString();
+            obj.Rides = reader["COUNT_UNIQUE_RIDES"].ToString();
+            obj.Patients = reader["COUNT_PAT"].ToString();
+            obj.Volunteers = reader["COUNT_VOL"].ToString();
+            if (with_demands)
+            {
+                int raw_count = helper_unsafe_ParseIntger(reader["COUNT_DEMAND_RAW"].ToString());
+                int actual_count = raw_count - helper_unsafe_ParseIntger(reader["MULTI_SEG_TO_SUBSTRACT_C"].ToString());
+                obj.Demands = actual_count.ToString();
+            }
+            result.Add(obj);
+        }
+
+        reader.Close();
+        return result;
+    }
+
+
 
     // pickuptime >= @start_date      AND pickuptime <= @end_date
 
@@ -1073,11 +1133,11 @@ GROUP BY inner_select.DisplayName
                 GROUP BY {0} ORDER BY {0} ASC",
                 span_column, pickup_time_condition);
 
-        return GetReportRangeDigestMetrics(start_date, end_date, prev_start, prev_end, query);
+        return S_GetReportRangeDigestMetrics(start_date, end_date, prev_start, prev_end, query);
     }
 
     // Called from dashboard daily rows:   start_current_daily_totals() */
-    internal List<MetricMonthlyInfo> GetReportDailyDigestMetrics(string start_date, string end_date)
+    internal List<MetricMonthlyInfo> S_GetReportDailyDigestMetrics(string start_date, string end_date)
     {
         // Gets info also on rides without an allocted driver
         string query =
@@ -1097,9 +1157,44 @@ GROUP BY inner_select.DisplayName
                     AND RPView.pickuptime < @end_date
                     ) s";
 
-        return GetReportRangeDigestMetrics(start_date, end_date, "NA", "NA", query);
+        return S_GetReportRangeDigestMetrics(start_date, end_date, "NA", "NA", query);
     }
 
+
+    // Called from dashboard daily rows:   start_current_daily_totals() */
+    internal List<MetricMonthlyInfo> U_GetReportDailyDigestMetrics(string start_date, string end_date)
+    {
+        // Gets info also on rides without an allocted driver
+        string query =
+             @"SELECT  1 AS SPAN_C, count(DISTINCT DisplayName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, 
+                    count(DISTINCT MainDriver) as COUNT_VOL, count(DisplayName) as COUNT_DEMAND_RAW, SUM(MULTI_SEG_TO_SUBSTRACT) AS MULTI_SEG_TO_SUBSTRACT_C
+               FROM (
+                    Select  MainDriver  , PickupTime, Origin, Destination, PatientName AS DisplayName, 
+                        CASE WHEN ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) = '1' THEN 1
+                        ELSE 0
+                        END AS Unique_Drive_C,
+			            CASE WHEN ROW_NUMBER() OVER (PARTITION by FORMAT (PickupTime , 'yyyy-MM-dd'), PatientName  ORDER BY PickupTime Asc)  = '3' THEN 1
+				        ELSE 0
+			            END AS MULTI_SEG_TO_SUBSTRACT 
+                    FROM UnityRide ur  
+                    WHERE  Status != N'נמחקה'
+                    AND ur.pickuptime > @start_date
+                    AND ur.pickuptime < @end_date
+                    ) s";
+
+        return U_GetReportRangeDigestMetrics(start_date, end_date, "NA", "NA", query);
+    }
+
+    internal List<MetricMonthlyInfo> GetReportDailyDigestMetrics(string start_date, string end_date)
+    {
+        List<MetricMonthlyInfo> s = S_GetReportDailyDigestMetrics(start_date, end_date);  // << original implementation
+        List<MetricMonthlyInfo> u = U_GetReportDailyDigestMetrics(start_date, end_date);  // << New implementation using United
+        if (!compare_S_vs_U_results_ordered(s, u))                        // << Compare both lists (requires Equitable interfaces)
+        {
+            throw new Exception("GetReportDailyDigestMetrics mismatch");
+        }
+        return u;                                                         // return results
+    }
 
     // Returns the day info as MM-dd string
     // Function Name is incorrect, is used by Month Graph as well.
