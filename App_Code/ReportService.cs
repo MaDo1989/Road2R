@@ -171,12 +171,29 @@ public class ReportService
 
     }
 
-    public class VolunteersPerMonthInfo
+    public class VolunteersPerMonthInfo : IEquatable<VolunteersPerMonthInfo>
     {
         public string Year { get; set; }
         public string Month { get; set; }
         public string Count { get; set; }
 
+        public bool Equals(VolunteersPerMonthInfo other)
+        {
+            if (other == null)
+                return false;
+
+            return this.Year == other.Year && this.Month == other.Month
+                && this.Count == other.Count;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as VolunteersPerMonthInfo);
+        }
+        public override int GetHashCode()
+        {
+            return Year.GetHashCode() ^ Month.GetHashCode() ^ Count.GetHashCode();
+        }
     }
 
     public class SliceVolunteersPerMonthInfo : IEquatable<SliceVolunteersPerMonthInfo>
@@ -1316,7 +1333,8 @@ GROUP BY inner_select.DisplayName
     }
 
 
-    internal List<VolunteersPerMonthInfo> GetReportVolunteerPerMonth(string start_date)
+    // מספר המתנדבים המסיעים פר חודש : לעמותה
+    internal List<VolunteersPerMonthInfo> S_GetReportVolunteerPerMonth(string start_date)
     {
         DbService db = new DbService();
 
@@ -1347,7 +1365,59 @@ GROUP BY inner_select.DisplayName
         }
 
         return result;
+    }
 
+    // מספר המתנדבים המסיעים פר חודש : לעמותה
+    internal List<VolunteersPerMonthInfo> U_GetReportVolunteerPerMonth(string start_date)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+
+        string query =
+             @"SELECT count(DISTINCT MainDriver )as COUNT_G, YEAR(PickupTime) as YEAR_G, MONTH(PickupTime) as MONTH_G
+                FROM UnityRide
+                where PickupTime >= @start_date
+                and PickupTime <= CURRENT_TIMESTAMP
+                GROUP BY YEAR(PickupTime), MONTH(PickupTime) 
+                ORDER  BY YEAR_G, MONTH_G ASC";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+
+        SqlDataReader reader = db.GetDataReaderBySqlCommand(cmd);
+        
+        List<VolunteersPerMonthInfo> result = new List<VolunteersPerMonthInfo>();
+
+        while (reader.Read())
+        {
+            VolunteersPerMonthInfo obj = new VolunteersPerMonthInfo();
+            obj.Year = reader["YEAR_G"].ToString();
+            obj.Month = reader["MONTH_G"].ToString();
+            obj.Count = reader["COUNT_G"].ToString();
+            result.Add(obj);
+        }
+        reader.Close();
+        return result;
+    }
+
+    internal List<VolunteersPerMonthInfo> GetReportVolunteerPerMonth(string start_date)
+    {
+        List<VolunteersPerMonthInfo> s = S_GetReportVolunteerPerMonth(start_date);  // << original implementation
+        List<VolunteersPerMonthInfo> u = U_GetReportVolunteerPerMonth(start_date);  // << New implementation using United
+
+        // Special comparison, since we have no end_date.
+        HashSet<VolunteersPerMonthInfo> u_set = new HashSet<VolunteersPerMonthInfo>(u);
+        foreach (var elem in s)
+        {
+            if (!u_set.Contains(elem))
+            {
+                if (!elem.Year.Equals("2023") && !elem.Year.Equals("2024"))  // skip comparing 2023/24
+                {
+                    throw new Exception("GetReportVolunteerPerMonth mismatch");
+                }
+            }
+        }
+        return u;                                                         // return results
 
     }
 
