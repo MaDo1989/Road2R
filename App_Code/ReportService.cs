@@ -719,19 +719,6 @@ GROUP BY inner_select.DisplayName
         return u;                                                         // return results
     }
 
-    private DataTable getRides()
-    {
-        DbService db = new DbService();
-        SqlCommand cmd = new SqlCommand();
-        //SqlParameter[] cmdparams= new SqlParameter[1];
-        cmd.CommandType = CommandType.Text;
-        //cmdparams[0] = cmd.Parameters.AddWithValue("id", id);
-        string query = "select * from status_Ride order by Timestamp asc";
-        DataSet ds = db.GetDataSetByQuery(query);
-        DataTable dt = ds.Tables[0];
-        return dt;
-    }
-
 
     internal string CommitReportedVolunteerListToNI_DB(string cell_phone, string start_date, string only_with_rides)
     {
@@ -820,20 +807,6 @@ GROUP BY inner_select.DisplayName
     internal List<string> GetReportLocations()
     {
         return GetDistinctListOfField("name", "Location");
-    }
-
-
-    private DataTable getEscorts()
-    {
-        DbService db = new DbService();
-        SqlCommand cmd = new SqlCommand();
-        //SqlParameter[] cmdparams= new SqlParameter[1];
-        cmd.CommandType = CommandType.Text;
-        //cmdparams[0] = cmd.Parameters.AddWithValue("id", id);
-        string query = "select * from RidePatEscortView";
-        DataSet ds = db.GetDataSetByQuery(query);
-        DataTable dt = ds.Tables[0];
-        return dt;
     }
 
     internal List<VolunteerPerRegion> S_GetReportVolunteerWeekly(string start_date, string end_date)
@@ -997,7 +970,7 @@ GROUP BY inner_select.DisplayName
 
     internal List<MetricMonthlyInfo> U_GetReportYearlyGraphMetrics(string start_date, string end_date)
     {
-        DbService db = new DbService();
+        DBservice_Gilad db = new DBservice_Gilad();
 
         /* The inner query allows identifying unique rides.
          * If we have same 'MainDriver, PickupTime, Origin, Destination', the ride is shared between patients
@@ -1028,21 +1001,20 @@ GROUP BY inner_select.DisplayName
         cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
         cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
 
-        DataSet ds = db.GetDataSetBySqlCommand(cmd);
-        DataTable dt = ds.Tables[0];
+        SqlDataReader reader = db.GetDataReaderBySqlCommand(cmd);
 
         List<MetricMonthlyInfo> result = new List<MetricMonthlyInfo>();
 
-        foreach (DataRow dr in dt.Rows)
+        while (reader.Read())
         {
             MetricMonthlyInfo obj = new MetricMonthlyInfo();
-            obj.Day = dr["MONTH_C"].ToString();
-            obj.Rides = dr["COUNT_UNIQUE_RIDES"].ToString();
-            obj.Patients = dr["COUNT_PAT"].ToString();
-            obj.Volunteers = dr["COUNT_VOL"].ToString();
+            obj.Day = reader["MONTH_C"].ToString();
+            obj.Rides = reader["COUNT_UNIQUE_RIDES"].ToString();
+            obj.Patients = reader["COUNT_PAT"].ToString();
+            obj.Volunteers = reader["COUNT_VOL"].ToString();
             result.Add(obj);
         }
-
+        reader.Close();
         return result;
     }
 
