@@ -1287,7 +1287,7 @@ GROUP BY inner_select.DisplayName
     // Returns the day info as MM-dd string
     // Function Name is incorrect, is used by Month Graph as well.
     // This allows optimizations - all 3 weeks spans in one call, 2 months in one call etc..
-    internal List<ReportService.MetricMonthlyInfo> GetReportWeeklyGraphMetrics(string start_date, string end_date)
+    internal List<ReportService.MetricMonthlyInfo> S_GetReportWeeklyGraphMetrics(string start_date, string end_date)
     {
         DbService db = new DbService();
 
@@ -1332,6 +1332,63 @@ GROUP BY inner_select.DisplayName
 
     }
 
+
+    // Returns the day info as MM-dd string
+    // Function Name is incorrect, is used by Month Graph as well.
+    // This allows optimizations - all 3 weeks spans in one call, 2 months in one call etc..
+    internal List<ReportService.MetricMonthlyInfo> U_GetReportWeeklyGraphMetrics(string start_date, string end_date)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+
+        string query =
+      @"SELECT FORMAT (PickupTime, 'yyyy-MM-dd') as DAY_C ,  count(DISTINCT PatientName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, count(DISTINCT MainDriver) as COUNT_VOL
+        FROM (
+            Select  MainDriver  , PickupTime, Origin, Destination, PatientName, 
+            CASE 
+                WHEN ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) = '1' THEN 1
+                ELSE 0
+            END AS Unique_Drive_C
+            FROM UnityRide ur  
+            WHERE MainDriver is not null
+            AND ur.pickuptime > @start_date
+            AND ur.pickuptime < @end_date
+        ) s 
+        GROUP BY FORMAT (PickupTime, 'yyyy-MM-dd')
+        ORDER BY DAY_C ASC";
+
+        SqlCommand cmd = new SqlCommand(query);
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
+        cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
+
+        SqlDataReader reader = db.GetDataReaderBySqlCommand(cmd);
+
+        List<MetricMonthlyInfo> result = new List<MetricMonthlyInfo>();
+
+        while (reader.Read())
+        {
+            MetricMonthlyInfo obj = new MetricMonthlyInfo();
+            obj.Day = reader["DAY_C"].ToString();
+            obj.Rides = reader["COUNT_UNIQUE_RIDES"].ToString();
+            obj.Patients = reader["COUNT_PAT"].ToString();
+            obj.Volunteers = reader["COUNT_VOL"].ToString();
+            result.Add(obj);
+        }
+        reader.Close();
+        return result;
+
+    }
+
+    internal List<ReportService.MetricMonthlyInfo> GetReportWeeklyGraphMetrics(string start_date, string end_date)
+    {
+        List<ReportService.MetricMonthlyInfo> s = S_GetReportWeeklyGraphMetrics(start_date, end_date);  // << original implementation
+        List<ReportService.MetricMonthlyInfo> u = U_GetReportWeeklyGraphMetrics(start_date, end_date);  // << New implementation using United
+        if (!compare_S_vs_U_results_ordered(s, u))                        // << Compare both lists (requires Equitable interfaces)
+        {
+            throw new Exception("GetReportWeeklyGraphMetrics mismatch");
+        }
+        return u;                                                         // return results
+    }
 
     // מספר המתנדבים המסיעים פר חודש : לעמותה
     internal List<VolunteersPerMonthInfo> S_GetReportVolunteerPerMonth(string start_date)
