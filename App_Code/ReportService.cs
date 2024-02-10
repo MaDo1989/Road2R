@@ -1182,7 +1182,7 @@ GROUP BY inner_select.DisplayName
 
     // Note: This is used in rows for Week/Month & Year in Dashboard.
     // Recheck all three spans after changing
-    internal List<MetricMonthlyInfo> GetReportWithPeriodDigestMetrics(string start_date, string end_date, string prev_start, string prev_end, string span)
+    internal List<MetricMonthlyInfo> S_GetReportWithPeriodDigestMetrics(string start_date, string end_date, string prev_start, string prev_end, string span)
     {
         string span_column;
         if (span.Equals("WEEK"))
@@ -1223,6 +1223,63 @@ GROUP BY inner_select.DisplayName
 
         return S_GetReportRangeDigestMetrics(start_date, end_date, prev_start, prev_end, query);
     }
+
+    // Note: This is used in rows for Week/Month & Year in Dashboard.
+    // Recheck all three spans after changing
+    internal List<MetricMonthlyInfo> U_GetReportWithPeriodDigestMetrics(string start_date, string end_date, string prev_start, string prev_end, string span)
+    {
+        string span_column;
+        if (span.Equals("WEEK"))
+        {
+            span_column = "CONCAT (YEAR(PickupTime), '-', DATEPART(week, PickupTime) )";  // YYYY-WKNUM
+        }
+        else if (span.Equals("MONTH"))
+        {
+            span_column = "CONVERT(nvarchar(7), PickupTime, 23)";  // YYYY-MM
+        }
+        else if (span.Equals("YEAR"))
+        {
+            span_column = "YEAR(PickupTime)";
+        }
+        else
+        {
+            return null;
+        }
+
+        string pickup_time_condition = buildTimeCondition("PickupTime", prev_start);
+
+
+        string query = string.Format(@"SELECT {0} AS SPAN_C, count(DISTINCT PatientName) as COUNT_PAT, SUM(Unique_Drive_C) as COUNT_UNIQUE_RIDES, 
+                count(DISTINCT MainDriver) as COUNT_VOL, count(PatientName) as COUNT_DEMAND_RAW, SUM(MULTI_SEG_TO_SUBSTRACT) AS MULTI_SEG_TO_SUBSTRACT_C
+                FROM  (
+	                select MainDriver  , PickupTime, Origin, Destination, PatientName, 
+	                CASE WHEN ROW_NUMBER() OVER (PARTITION by MainDriver, PickupTime, Origin, Destination  ORDER BY PickupTime Asc) = '1' THEN 1
+		                ELSE 0
+	                END AS Unique_Drive_C,
+					CASE WHEN ROW_NUMBER() OVER (PARTITION by FORMAT (PickupTime , 'yyyy-MM-dd'), PatientName  ORDER BY PickupTime Asc)  = '3' THEN 1
+						ELSE 0
+					END AS MULTI_SEG_TO_SUBSTRACT 
+	                from UnityRide
+	                where {1} AND MainDriver is not null
+                )  s
+                GROUP BY {0} ORDER BY {0} ASC",
+                span_column, pickup_time_condition);
+
+        return U_GetReportRangeDigestMetrics(start_date, end_date, prev_start, prev_end, query);
+    }
+
+    internal List<MetricMonthlyInfo> GetReportWithPeriodDigestMetrics(string start_date, string end_date, string prev_start, string prev_end, string span)
+    {
+        List<MetricMonthlyInfo> s = S_GetReportWithPeriodDigestMetrics(start_date, end_date, prev_start, prev_end, span);  // << original implementation
+        List<MetricMonthlyInfo> u = U_GetReportWithPeriodDigestMetrics(start_date, end_date, prev_start, prev_end, span);  // << New implementation using United
+        if (!compare_S_vs_U_results_ordered(s, u))                        // << Compare both lists (requires Equitable interfaces)
+        {
+            throw new Exception("GetReportWithPeriodDigestMetrics mismatch");
+        }
+        return u;                                                         // return results
+    }
+
+
 
     // Called from dashboard daily rows:   start_current_daily_totals() */
     internal List<MetricMonthlyInfo> S_GetReportDailyDigestMetrics(string start_date, string end_date)
