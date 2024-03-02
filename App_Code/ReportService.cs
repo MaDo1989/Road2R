@@ -885,37 +885,56 @@ GROUP BY inner_select.DisplayName
         return u;
     }
 
-    internal MetricMonthlyInfo GetReportNewDriversInRange(string start_date, string end_date)
+    // DSB - New drivers - 3 different spans
+    internal MetricMonthlyInfo U_GetReportNewDriversInRange(string start_date, string end_date)
     {
-        DbService db = new DbService();
+        DBservice_Gilad db = new DBservice_Gilad();
 
         string query =
              @"select  count (DISTINCT MainDriver)  AS COUNT_VOL
-            from RPView
-            where MainDriver is not null
-            and pickuptime >= @start_date
-            and pickuptime <= @end_date
-            AND not MainDriver in (
-	            select distinct MainDriver
-	            from RPView
-	            where MainDriver is not null
-	            and pickuptime < @start_date)";
+                from ( 
+                    select MainDriver, SUM(IS_OLD) AS COUNT_OLD_DRIVES
+                    from
+                    ( 
+                        select MainDriver, 
+	                        CASE WHEN pickuptime < @start_date THEN 1
+		                    ELSE 0
+	                        END AS IS_OLD
+	                    from UnityRide ur 
+	                    where pickuptime <= @end_date
+	                    AND MainDriver is not null 
+                    ) s
+                    Group By MainDriver	 
+                ) s2
+                where COUNT_OLD_DRIVES = '0'
+	            order by COUNT_VOL ASC";
 
         SqlCommand cmd = new SqlCommand(query);
         cmd.CommandType = CommandType.Text;
         cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
         cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
 
-        DataSet ds = db.GetDataSetBySqlCommand(cmd);
-        DataTable dt = ds.Tables[0];
+        SqlDataReader reader = db.GetDataReaderBySqlCommand(cmd);
 
         MetricMonthlyInfo result = new MetricMonthlyInfo();
+        while (reader.Read())
+        {
+            result.Volunteers = reader["COUNT_VOL"].ToString();
+        }
 
-        DataRow dr = dt.Rows[0];
-        result.Volunteers = dr["COUNT_VOL"].ToString();
+        reader.Close();
 
         return result;
     }
+
+
+    // DSB - New drivers - 3 different spans
+    // Not bothering keeping the S_ variant as perf is bad.
+    internal MetricMonthlyInfo GetReportNewDriversInRange(string start_date, string end_date)
+    {
+        return U_GetReportNewDriversInRange(start_date, end_date);
+    }
+
 
     internal List<MetricMonthlyInfo> S_GetReportYearlyGraphMetrics(string start_date, string end_date)
     {
@@ -967,6 +986,7 @@ GROUP BY inner_select.DisplayName
 
         return result;
     }
+
 
     internal List<MetricMonthlyInfo> U_GetReportYearlyGraphMetrics(string start_date, string end_date)
     {
