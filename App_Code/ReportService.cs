@@ -2713,7 +2713,7 @@ string origin, string destination)
                 WHERE MainDriver is not null
                 AND pickuptime > @start_date
                 AND pickuptime < @end_date
-                ORDER BY PickupTime ASC";
+                ORDER BY PickupTime, MainDriver, r.EnglishName ASC";
 
         SqlCommand cmd = new SqlCommand(query);
         cmd.CommandType = CommandType.Text;
@@ -2745,16 +2745,9 @@ string origin, string destination)
     {
         DBservice_Gilad db = new DBservice_Gilad();
 
-        // Create Temporary Table, counting escorts per Ride
-        string query =
-            @"select RidePatNum, COUNT(*) AS COUNT_C INTO #ESCORTS_PER_RIDE
-                from RidePatEscortView
-                GROUP BY RidePatNum ";
-        //@@   db.GetDataSetByQuery(query, false);  // do not close the connection.
 
         // Find the records, using LEFT joins to get English names of Orig/Dest
-        // Also use the temporary table to count escorts per ride
-        query =
+        string query =
            @"Select Pickuptime, MainDriver, p.EnglishName, l1.EnglishName as ORIGIN_C, l2.EnglishName AS DEST_C, ur.AmountOfEscorts  AS ESCORTS_C
                 from UnityRide ur 
                 LEFT JOIN Location l1  ON ur.Origin = l1.Name 
@@ -2763,7 +2756,7 @@ string origin, string destination)
                 WHERE MainDriver is not null
                  AND pickuptime > @start_date
                  AND pickuptime < @end_date
-                ORDER BY PickupTime, p.EnglishName ASC";
+                ORDER BY PickupTime, MainDriver, p.EnglishName ASC";
 
         SqlCommand cmd = new SqlCommand(query);
         cmd.CommandType = CommandType.Text;
