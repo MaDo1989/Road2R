@@ -127,6 +127,8 @@
 
             CustomObj.Pat.Barrier = {}
             CustomObj.Pat.Hospital = {}
+            CustomObj.Pat.Age = thisRide.PatientAge;
+            CustomObj.Pat.GenderAsEnum = thisRide.PatientGender;
             CustomObj.Pat.Barrier.Name = CustomObj.Destination.Name;
             CustomObj.Pat.Hospital.Name = CustomObj.Origin.Name;
 
@@ -2365,7 +2367,7 @@
                 const dateTicks = fixDate_WhichComeFromOpenConnection(messageObject.date, false);
                 messageObject.date = repaireDateForMeesageModule(dateTicks);
             }
-
+            //console.log('what im send here ? ', messageObject);
             let textMessageToCopy = buildMessage(messageObject);
             console.log(textMessageToCopy);
 
@@ -2895,7 +2897,7 @@
 
             var volunteerId = -1 // VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
             //gilad check
-            console.log('Gilad check this new func* -->', volunteerId, timeInterval)
+            //console.log('Gilad check this new func* -->', volunteerId, timeInterval)
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/GetUnityRide",
@@ -3002,6 +3004,7 @@
 
                         //custom object for buildPatientAgeHTML function.
                         let ageObj = {}
+                        ageObj.PatientName = arr_rides[i].PatientName;
                         ageObj.Age = arr_rides[i].PatientAge;
                         ageObj.GenderAsEnum = arr_rides[i].PatientGender;
                         ageObj.IsAnonymous = arr_rides[i].IsAnonymous;
@@ -4418,7 +4421,6 @@
 
 
         const buildPatientAgeHTML_AfterUnited = (patient) => {
-
             let age = '';
             const boy = 'בן ', girl = 'בת ';
             const gender = GetPatientGender(patient.GenderAsEnum, isAssistant)
@@ -4460,7 +4462,15 @@
                 age += patient.Age;
                 age += '</span>';
             }
-
+            //let ageNumber = patient.Age == 0 ? '' : patient.Age;
+            if (patient.GenderAsEnum == -1 && !patient.IsAnonymous) {
+                if (patient.Age == 0) {
+                    age = `<span></span>`;
+                }
+                else {
+                    age = `<span>בגיל ${patient.Age}</span>`;
+                }
+            }
 
             return age;
         }
