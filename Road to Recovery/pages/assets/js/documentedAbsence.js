@@ -177,7 +177,7 @@ const Delete_O_Edit_AbsenceRow = (btn) => {
         else {
             openDocumentAAbsenceModal();
             isEdit = true;
-            $('#AAbsenceModalTitle').text('עריכת היעדרות');
+            $('#AAbsenceModalTitle').text('עריכת היעדרות קיימת');
         }
         $("#DocumentAAbsenceDatePickerFrom").val(ConvertDBDate2PickerFormat(AbsenceData.FromDate));
         $("#DocumentAAbsenceDatePickerUntil").val(ConvertDBDate2PickerFormat(AbsenceData.UntilDate));
@@ -193,8 +193,8 @@ const ColorCallBtn_afterChange = (absenceID, absencesListOfThisVolunteer, volunt
     //console.log('Gilad check -->', absenceID, absencesListOfThisVolunteer, volunteerId)
 
     if (absencesListOfThisVolunteer != undefined && absenceID!=-1) {
-        const BtnToColor = document.getElementById(`${volunteerId}`).childNodes[11].childNodes[3].childNodes[1];
-
+        const BtnToColor = document.getElementById(`${volunteerId}`).childNodes[11].childNodes[2].childNodes[1];
+        //console.log('BtnToColor', BtnToColor, 'volunteerId', volunteerId,)
         // becarful i changed the condition here----> was--> (absence.id!=ThisAbsenceId)
         const resFilter = absencesListOfThisVolunteer.filter((absence) => {
             return (absence.VolunteerId == volunteerId && absence.AbsenceStatus)
@@ -229,12 +229,17 @@ const openDocumentAAbsenceModal = () => {
     $('#DocumentAcall_writeContent').val('');
     $('#DocumentAcall_choooseContent').prop('disabled', false);
     $('#DocumentAcall_writeContent').prop('disabled', false);
-    $('#AAbsenceModalTitle').text('הוספת היעדרות');
+    $('#AAbsenceModalTitle').text('הוספת היעדרות חדשה');
 
     $('#DocumentAAbsence_contentErrorMsg').hide();
     $('#DocumentAAbsence_CoordinatorErrorMsg').hide();
     $('#DocumentAAbsence_DatesError').hide();
-
+    //reset the inputs
+    $('#DocumentAAbsenceDatePickerFrom').val('');
+    $('#DocumentAAbsenceDatePickerUntil').val('');
+    $('#DocumentAAbsence_choooseCoordinator').val('');
+    $('#DocumentAAbsence_choooseContent').val('');
+    $('#DocumentAAbsence_writeContent').val('');
 
     $.ajax({
         dataType: "json",
@@ -354,7 +359,7 @@ const documentAAbsence2DB = () => {
 
 
       
-    if (checkColidAbsence(ThisAbsencesList, dataToSend.from, dataToSend.until)) {
+    if (checkColidAbsence(ThisAbsencesList, dataToSend.from, dataToSend.until) && !isEdit) {
         swal({
             title: "קיימת כפילות בהיעדרות שהכנסת להיעדרויות אחרות של המתנדב",
             type: "warning",

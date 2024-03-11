@@ -2985,11 +2985,11 @@
                         //#region Status
                         //custom for buildstatusString function
                         let statusObj = {}
-                        if (arr_rides[i].PatientStatus == '') {
-                            statusObj.Status = -1;
+                        if (arr_rides[i].PatientStatus == '' || arr_rides[i].PatientStatus =='Finished') {
+                            statusObj.Status = 1;
                         }
                         else {
-                            statusObj.Status = 1;
+                            statusObj.Status = -1;
 
                         }
                         statusObj.EditTimeStamp = arr_rides[i].PatientStatusEditTime;
@@ -4814,9 +4814,12 @@
 
         const buildStatusString = (statusObj, ridePatNum) => {
 
+            
             let statusWrapper = `<div class="elementsInSameLine">`;
-
+            console.log('statusObj', statusObj, 'statusObj.Status', statusObj.Status)
             const status = GetPatientStatus(statusObj.Status, isAssistant);
+            console.log('status', status, 'ridePatNum', ridePatNum)
+
             const editTimeStamp = convertDBDate2FrontEndDate(statusObj.EditTimeStamp);
             const editBtn = `<button type='button' data-toggle="modal" data-target="#editPatientStatusModal" onclick="prepreparationEditPatientStatusModal(this, ${ridePatNum})" class='btn btn-icon waves-effect waves-light btn-secondary' title='עריכה'><i class='ti-pencil'></i></button>`;
 
@@ -4935,10 +4938,18 @@
 
         const BuildTimeDDLs = (hoursId, minutesId) => {
 
+            
             const minutesArr = [0, 15, 30, 45];
             let $hoursSelect = $(`#${hoursId}`);
             let $minutesSelect = $(`#${minutesId}`);
             let doubleDigitsValue = '';
+
+
+            // Clear existing options
+            $hoursSelect.empty();
+            $minutesSelect.empty();
+            $minutesSelect.html('<option disabled="" selected="">דקות</option>');
+            $hoursSelect.html('<option disabled="" selected="">שעות</option>')
             for (let i = 0; i < 46; i++) {
 
                 if (i < 24) {
@@ -4953,6 +4964,10 @@
                     $('<option>', { value: doubleDigitsValue, text: doubleDigitsValue }).appendTo($minutesSelect);
                 }
             }
+            $hoursSelect.val('');
+            $minutesSelect.val('');
+
+
 
         }
 
@@ -4966,23 +4981,30 @@
             let $minutesSelect = $('#editPatientStatusModalMinutes');
 
             let ridepatObject = arr_rides.find(r => r.RidePatNum === ridepatNum);
+            //console.log('before!!!', ridepatObject)
             ridepatObject = CustomRideObject(ridepatObject);
+            //console.log('after!!!', ridepatObject)
             const ridePatPatientStatus = ridepatObject.Pat.RidePatPatientStatus.Status;
             let editTimeStamp = ridepatObject.Pat.RidePatPatientStatus.EditTimeStamp;
-
+            
             if (editTimeStamp !== null) {
 
                 editTimeStamp = convertDBDate2FrontEndDate(editTimeStamp);
                 let hoursAsDoubleDigits = createDoubleDigit(editTimeStamp.getHours());
                 let minutesAsDoubleDigits = createDoubleDigit(editTimeStamp.getMinutes());
-
+                //console.log('editTimeStamp???', editTimeStamp);
                 $hoursSelect.val(hoursAsDoubleDigits);
                 $minutesSelect.val(minutesAsDoubleDigits);
+                if (ridePatPatientStatus==-1) {
+                    $hoursSelect.val('');
+                    $minutesSelect.val('');
+                }
             } else {
 
                 retrieveDDLToInitial('#editPatientStatusModalMinutes');
                 retrieveDDLToInitial('#editPatientStatusModalHours');
                 checkeditTimeNotFinishedCB(true);
+
             }
         }
 

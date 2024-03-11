@@ -759,7 +759,7 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
-            Log.Error("Error in setPatient", ex);
+            Log.Error("Error in setPatient XXXXXXX", ex);
             throw ex;
         }
 
