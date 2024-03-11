@@ -245,6 +245,29 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string CheckFutureRides(int volunteerId)
+    {
+        try
+        {
+            Volunteer v = new Volunteer();
+            return j.Serialize(v.hasFutureRides(volunteerId));
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in CheckFutureRides", ex);
+            throw new Exception("שגיאה בבדיקה נסיעות עתידיות");
+        }
+    }
+
+
+
+
+
+
     [WebMethod(EnableSession = true)]
     public string getescortedsListMobile(string displayName, string patientCell)
     {

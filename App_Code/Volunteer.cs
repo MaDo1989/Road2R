@@ -576,6 +576,12 @@ public class Volunteer
     }
 
 
+    public int hasFutureRides(int volunteerID)
+    {
+        DBservice_Gilad db  = new DBservice_Gilad();
+        return db.hasFutureRides(volunteerID);
+    }
+
 
     internal List<Volunteer> getCoorList()
     {

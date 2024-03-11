@@ -1034,6 +1034,52 @@ public class DBservice_Gilad
 
 
     }
+
+
+    public int hasFutureRides(int volunteerID)
+    {
+        SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@volunteerId", volunteerID);
+
+        cmd = CreateCommandWithStoredProcedureGeneral("sp_VolunteerHasFutureRides", con, paramDic);
+        int res = 0;
+        try
+        {
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+            while (dataReader.Read())
+            {
+                res = Convert.ToInt32(dataReader["hasFutureRides"]);
+            }
+            return res;
+        }
+        catch (Exception ex)
+        {
+            WriteToErrorFile("CheckFutureRides hasFutureRides", ex.Message + ex.ToString());
+            throw ex;
+        }
+        finally
+        {
+            if (con != null)
+            {
+                con.Close();
+            }
+        }
+    }
+
+
     public List<Patient> GetPatinetsByActiveStatus(bool active)
 	{
 
