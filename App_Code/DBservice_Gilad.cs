@@ -1080,6 +1080,54 @@ public class DBservice_Gilad
     }
 
 
+
+    public int hasFutureRidesByDates(int volunteerID,DateTime start, DateTime end)
+    {
+        SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@volunteerId", volunteerID);
+        paramDic.Add("@startTime", start);
+        paramDic.Add("@endTime", end);
+
+
+        cmd = CreateCommandWithStoredProcedureGeneral("spCheckFutureRideBeforeAbsence", con, paramDic);
+        int res = 0;
+        try
+        {
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+            while (dataReader.Read())
+            {
+                res = Convert.ToInt32(dataReader["RidePatNum"]);
+            }
+            return res;
+        }
+        catch (Exception ex)
+        {
+            WriteToErrorFile("CheckRideBeforePost checkRidesBeforePostAbsence hasFutureRidesByDates spCheckFutureRideBeforeAbsence ", ex.Message + ex.ToString());
+            throw ex;
+        }
+        finally
+        {
+            if (con != null)
+            {
+                con.Close();
+            }
+        }
+    }
+
+
     public List<Patient> GetPatinetsByActiveStatus(bool active)
 	{
 

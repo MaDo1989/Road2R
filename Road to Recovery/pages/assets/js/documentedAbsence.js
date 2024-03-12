@@ -357,7 +357,7 @@ const documentAAbsence2DB = () => {
     }
 
 
-
+    console.log('check what we got', dataToSend);
       
     if (checkColidAbsence(ThisAbsencesList, dataToSend.from, dataToSend.until) && !isEdit) {
         swal({

@@ -959,7 +959,28 @@ public class WebService : System.Web.Services.WebService
     //    return j.Serialize(r);
     //}
 
-     
+
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string CheckRideBeforePost(int volunteerId,DateTime start,DateTime end)
+    {
+        try
+        {
+            int res = Absence.checkRidesBeforePostAbsence(volunteerId, start, end);
+            j.MaxJsonLength = Int32.MaxValue;
+            return j.Serialize(res);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in CheckRideBeforePost ", ex);
+            throw new Exception("שגיאה בבדיקת הסעות מול היעדרות");
+        }
+    }
+
+
+
+
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string GetRidePatViewByTimeFilter(int from, int until)
