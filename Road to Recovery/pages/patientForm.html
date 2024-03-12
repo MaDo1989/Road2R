@@ -1434,6 +1434,7 @@
 
                     let Pat = JSON.parse(GENERAL.PATIENTS.getPatientsList());
                     let Id = parseInt($('#patientId').html());
+                    isNaN(Id) ? Id = 0 : Id = Id;
 
 
                     //set Equipment
@@ -1452,13 +1453,13 @@
                             }
                         }
                     }
-
+                    //console.log('Id', Id)
                     patient = {
                         firstNameH: name, firstNameA: nameA, lastNameH: lastName, lastNameA: lastNameA, cellPhone: phone, cellPhone1: phone1,
                         city: city, gender: gender, barrier: barrier, hospital: hospital, homephone: homePhone,
                         department: department, Equipment: EquipmentArr, history: history, remarks: remarks, IsActive: IsActive, Id: Id, birthDate: Bdate, EnglishName: englishName, PatientIdentity: patientId
                     }
-
+                   // console.log('patient', patient)
                     $.ajax({
                         dataType: "json",
                         url: "WebService.asmx/setPatient",

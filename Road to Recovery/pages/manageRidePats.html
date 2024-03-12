@@ -1516,7 +1516,7 @@
                 patientStatus: isTreatmentFinished ? "Finished" : "Not Finished",
                 editTimeStamp: editTimeStamp
             }
-            console.log('check it --', data)
+            //console.log('check it --', data)
 
             const updatePatientStatus_SCB = () => {
 
@@ -4816,9 +4816,9 @@
 
             
             let statusWrapper = `<div class="elementsInSameLine">`;
-            console.log('statusObj', statusObj, 'statusObj.Status', statusObj.Status)
+            //console.log('statusObj', statusObj, 'statusObj.Status', statusObj.Status)
             const status = GetPatientStatus(statusObj.Status, isAssistant);
-            console.log('status', status, 'ridePatNum', ridePatNum)
+            //console.log('status', status, 'ridePatNum', ridePatNum)
 
             const editTimeStamp = convertDBDate2FrontEndDate(statusObj.EditTimeStamp);
             const editBtn = `<button type='button' data-toggle="modal" data-target="#editPatientStatusModal" onclick="prepreparationEditPatientStatusModal(this, ${ridePatNum})" class='btn btn-icon waves-effect waves-light btn-secondary' title='עריכה'><i class='ti-pencil'></i></button>`;

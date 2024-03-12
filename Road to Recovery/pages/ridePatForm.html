@@ -633,7 +633,7 @@
                     var dataString = JSON.stringify(request);
                     localStorage.setItem("PatientNameForRide", null);
 
-                    console.log('Gilad check || before submit the form data:', JSON.parse(dataString));
+                    //console.log('Gilad check || before submit the form data:', JSON.parse(dataString));
                     setUnityRideNew(dataString);
 
                     //Before united-(old API and tables in DB)
@@ -1046,7 +1046,7 @@
 
         const fillPage_withPatientData = (patient, markThe1stEscort = false) => {
 
-            //console.log('inside fillPage_withPatientData --> patient-', patient)
+            console.log('inside fillPage_withPatientData --> patient-', patient)
             isAnonymous = patient.IsAnonymous === "True";
             localStorage.PatID = patient.Id;
             $('#pat').val(patient.DisplayName);
@@ -1059,10 +1059,11 @@
                 EscortedList = patient.EscortedList;
                 let str = '';
                 for (var i = 0; i < EscortedList.length; i++) {
-                    str += `<input id='escortCB${EscortedList[i].Id}' type=checkbox name='${EscortedList[i].EnglishName}' ${i === 0 && markThe1stEscort ? 'checked' : ''} >&nbsp`;
-                    str += `<label data-toggle='tooltip' title='${EscortedList[i].EnglishName}' for='escortCB${EscortedList[i].Id}'>${EscortedList[i].DisplayName}</label>&nbsp&nbsp</br>`;
+                    str += `<input id='escortCB${EscortedList[i].Id}' type=checkbox name='${EscortedList[i].DisplayName}' ${i === 0 && markThe1stEscort ? 'checked' : ''} >&nbsp`;
+                    str += `<label data-toggle='tooltip' title='${EscortedList[i].DisplayName}' for='escortCB${EscortedList[i].Id}'>${EscortedList[i].DisplayName}</label>&nbsp&nbsp</br>`;
                 }
                 $("#selectEscort").html(str);
+
 
             } else {
                 $("#selectEscort").html('');
@@ -1766,6 +1767,8 @@
             CustomObj.Pat.IsAnonymous = thisRide[19].Value;
             isAnonymous = CustomObj.Pat.IsAnonymous
 
+            CustomObj.AmountOfEscorts = thisRide[3].Value;
+
             CustomObj.Pat.EscortedList = [];
             CustomObj.Escorts = [];
             for (var i = 0; i < thisRide[18].Value.length; i++) {
@@ -1833,7 +1836,7 @@
 
         //function to fill form for edit
         async function uploadData_new(ridePatNum) {
-            console.log('Gilad check i just clicked', ridePatNum)
+            //console.log('Gilad check i just clicked', ridePatNum)
             //  generatePat();
             getPatients_slim();
             generateLocation()
@@ -1855,9 +1858,10 @@
 
                             
                             let thisRide = JSON.parse(data.d)[0];
+                            //console.log('before -->', thisRide)
                             thisRide = CustomObject(thisRide);
                             ridePat = thisRide
-                            console.log('how its need to look like :', ridePat);
+                            //console.log('how its need to look like :', ridePat);
                             escorts_inthisRidePat = ridePat.Escorts;
 
 
@@ -1968,13 +1972,16 @@
                             fillPage_withPatientData(ridePat.Pat);
 
                             //this code incharge to mark which escorts to checked in.
-                            if (typeof escorts_inthisRidePat !== "undefined") {
+                            if (ridePat.Pat.EscortedList.length>0) {
+                                for (var i = 0; i < ridePat.Pat.EscortedList.length; i++) {
+                                    if (i < ridePat.AmountOfEscorts) {
+                                        $(`#escortCB${ridePat.Pat.EscortedList[i].Id}`).prop('checked', true);
 
-                                for (var i = 0; i < escorts_inthisRidePat.length; i++) {
-
-                                    $(`#escortCB${escorts_inthisRidePat[i].Id}`).prop('checked', true);
+                                    }
                                 }
                             }
+
+
 
                             //if (typeof arr_escort_inthisRidePat !== "undefined") {
 
