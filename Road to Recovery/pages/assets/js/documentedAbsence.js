@@ -378,31 +378,7 @@ const documentAAbsence2DB = () => {
                 data: JSON.stringify(dataToSend),
                 success: function (data) {
 
-                    //let from = new Date(dataToSend.from).getTime();
-                    //let until = new Date(dataToSend.until).getTime();
-                    //let today = new Date()
-                    //today = new Date(`${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`)
-                    //today = today.getTime();
-                    //console.log('Gilad check -->', data.d)
                     ThisAbsenceId = data.d
-
-                    // to get the phone btn of this volunteer by DOM
-                    // check the dates and color it
-                    // orange mean busy
-                    // blue mean available
-                    //const BtnToColor = document.getElementById(`${VolunteerID}`).childNodes[11].childNodes[3].childNodes[1];
-
-                    //if (today >= from && today<=until) {
-
-                    //    BtnToColor.setAttribute('style', 'background-color:#efa834 !important; border: 1px solid #efa834 !important');
-
-                    //}
-                    //else {
-                    //    BtnToColor.setAttribute('style', 'background-color:#3bafda !important; border: 1px solid #3bafda !important');
-
-                    //}
-
-
                     RenderToAbsenceModal(ThisDisplayName, VolunteerID);
 
                 },
@@ -413,42 +389,64 @@ const documentAAbsence2DB = () => {
     else {
         $.ajax({
             dataType: "json",
-            url: "WebService.asmx/" + Method,
+            url: "WebService.asmx/CheckRideBeforePost" ,
             contentType: "application/json; charset=utf-8",
             type: "POST",
-            data: JSON.stringify(dataToSend),
+            data: JSON.stringify({volunteerId:dataToSend.volunteerId,start:dataToSend.from,end:dataToSend.until}),
             success: function (data) {
+                console.log('the result !!', data.d);
 
-                //let from = new Date(dataToSend.from).getTime();
-                //let until = new Date(dataToSend.until).getTime();
-                //let today = new Date()
-                //today = new Date(`${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`)
-                //today = today.getTime();
-                //console.log('Gilad check -->', data.d)
-                ThisAbsenceId = data.d
+                if (parseInt(data.d) == -1) {
+                    $.ajax({
+                        dataType: "json",
+                        url: "WebService.asmx/" + Method,
+                        contentType: "application/json; charset=utf-8",
+                        type: "POST",
+                        data: JSON.stringify(dataToSend),
+                        success: function (data) {
 
-                // to get the phone btn of this volunteer by DOM
-                // check the dates and color it
-                // orange mean busy
-                // blue mean available
-                //const BtnToColor = document.getElementById(`${VolunteerID}`).childNodes[11].childNodes[3].childNodes[1];
+                            ThisAbsenceId = data.d
 
-                //if (today >= from && today<=until) {
+                            RenderToAbsenceModal(ThisDisplayName, VolunteerID);
 
-                //    BtnToColor.setAttribute('style', 'background-color:#efa834 !important; border: 1px solid #efa834 !important');
+                        },
+                        error: function (err) { alert("Error in Insert New Absence Ajax: " + err.responseText); $('#wait').hide(); }
+                    });
+                }
+                else {
+                    swal({
+                        title: "שים לב ! \n למתנדב זה יש נסיעה החופפת בתאריכים אלו",
+                        type: "warning",
+                        text: "האם בכל זאת להקצות היעדרות זו למתנדב זה ?",
+                        showCancelButton: true,
+                        cancelButtonText: "בטל",
+                        confirmButtonClass: 'btn-warning',
+                        confirmButtonText: "כן",
+                        closeOnConfirm: true
+                    }, () => {
+                        $.ajax({
+                            dataType: "json",
+                            url: "WebService.asmx/" + Method,
+                            contentType: "application/json; charset=utf-8",
+                            type: "POST",
+                            data: JSON.stringify(dataToSend),
+                            success: function (data) {
 
-                //}
-                //else {
-                //    BtnToColor.setAttribute('style', 'background-color:#3bafda !important; border: 1px solid #3bafda !important');
+                                ThisAbsenceId = data.d
+                                RenderToAbsenceModal(ThisDisplayName, VolunteerID);
 
-                //}
+                            },
+                            error: function (err) { alert("Error in Insert New Absence Ajax: " + err.responseText); $('#wait').hide(); }
+                        });
+                    });
+                }
 
-
-                RenderToAbsenceModal(ThisDisplayName, VolunteerID);
-
+       
             },
-            error: function (err) { alert("Error in Insert New Absence Ajax: " + err.responseText); $('#wait').hide(); }
+            error: function (err) { alert("Error in CheckRideBeforePost api " + err.responseText); $('#wait').hide(); }
         });
+
+  
     }
     
 
