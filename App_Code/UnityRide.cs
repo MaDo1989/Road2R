@@ -651,8 +651,16 @@ public class UnityRide
         }
 
         TimeZoneInfo israelTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Israel Standard Time");
-        bool isFirstRideDateDayLightSaving = israelTimeZone.IsDaylightSavingTime(firstDate);
+        bool isFirstRideDateDayLightSaving = IsSummerTimeInIsrael(firstDate);
+
+
+        //this function is not working -->
+        //israelTimeZone.IsDaylightSavingTime(someDate));
+
+
+
         mixedDictionary.Add("isFirstRideDateDayLightSaving", isFirstRideDateDayLightSaving);
+        mixedDictionary.Add("isFirstRideDateDayLightSaving_new way_", IsSummerTimeInIsrael(firstDate));
         mixedDictionary.Add("firstDate", firstDate);
         mixedDictionary.Add("israelTimeZone.id", israelTimeZone.Id);
 
@@ -664,16 +672,17 @@ public class UnityRide
 
             mixedDictionary.Add("israelTimeZone.IsDaylightSavingTime(listOfDatesAfterUTCfix["+i+"])", israelTimeZone.IsDaylightSavingTime(listOfDatesAfterUTCfix[i]));
             mixedDictionary.Add("listOfDatesAfterUTCfix["+i+"]", listOfDatesAfterUTCfix[i]);
-            if (isFirstRideDateDayLightSaving && !israelTimeZone.IsDaylightSavingTime(listOfDatesAfterUTCfix[i]))
+            mixedDictionary.Add("listOfDatesAfterUTCfix[" + i + "] new way", IsSummerTimeInIsrael(listOfDatesAfterUTCfix[i]));
+            if (isFirstRideDateDayLightSaving && !IsSummerTimeInIsrael(listOfDatesAfterUTCfix[i]))
             {
                 listOfDatesAfterUTCfix[i] = listOfDatesAfterUTCfix[i].AddHours(1);
-                DBservice_Gilad.StringToTextFile(Environment.NewLine + i + " \ni was here +1\n ", "AnyDebug");
+                //DBservice_Gilad.StringToTextFile(Environment.NewLine + i + " \ni was here +1\n ", "AnyDebug");
 
             }
-            else if (!isFirstRideDateDayLightSaving && israelTimeZone.IsDaylightSavingTime(listOfDatesAfterUTCfix[i]))
+            else if (!isFirstRideDateDayLightSaving && IsSummerTimeInIsrael(listOfDatesAfterUTCfix[i]))
             {
                 listOfDatesAfterUTCfix[i] = listOfDatesAfterUTCfix[i].AddHours(-1);
-                DBservice_Gilad.StringToTextFile(Environment.NewLine + i+" \ni was here -1\n ", "AnyDebug");
+                //DBservice_Gilad.StringToTextFile(Environment.NewLine + i+" \ni was here -1\n ", "AnyDebug");
             }
         }
 
@@ -683,4 +692,49 @@ public class UnityRide
 
         return listOfDatesAfterUTCfix;
     }
+
+
+    private static bool IsSummerTimeInIsrael(DateTime date)
+    {
+        // Specify the time zone for Israel
+        TimeZoneInfo israelTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Israel Standard Time");
+
+        // Calculate the start and end dates of daylight saving time for the provided year
+        int year = date.Year;
+        DateTime dstStart = GetDaylightSavingTimeStart(year);
+        DateTime dstEnd = GetDaylightSavingTimeEnd(year);
+
+        // Check if the provided date falls within the daylight saving time range
+        bool isSummerTime = date >= dstStart && date < dstEnd;
+
+        return isSummerTime;
+    }
+
+    // Helper method to calculate the start date of daylight saving time for the provided year
+    private static DateTime GetDaylightSavingTimeStart(int year)
+    {
+        DateTime lastFridayInMarch = new DateTime(year, 3, 31);
+        while (lastFridayInMarch.DayOfWeek != DayOfWeek.Friday)
+        {
+            lastFridayInMarch = lastFridayInMarch.AddDays(-1);
+        }
+        return lastFridayInMarch;
+    }
+
+    // Helper method to calculate the end date of daylight saving time for the provided year
+    private static DateTime GetDaylightSavingTimeEnd(int year)
+    {
+        DateTime lastSundayInOctober = new DateTime(year, 10, 31);
+        DayOfWeek lastSundayOfWeek = lastSundayInOctober.DayOfWeek;
+        int daysUntilLastSunday = (int)lastSundayOfWeek;
+        DateTime dstEnd = lastSundayInOctober.AddDays(-daysUntilLastSunday);
+        return dstEnd;
+    }
 }
+
+
+
+
+
+
+

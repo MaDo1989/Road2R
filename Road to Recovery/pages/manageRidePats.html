@@ -38,6 +38,7 @@
         let nodechilds;
         let lastModified_td;
         let ridePatBeforeUpdate;
+        let _timeinterval_G ='טווח זמן'
         const ADD_DRIVER = 'add driver', REMOVE_DRIVER = 'remove driver', RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED = 'ridepat_patient_status_edittime_changed';
         const tableNames = {
             MORNING: 'datatable-morning',
@@ -4538,12 +4539,13 @@
             }
             selectList.onchange = loadFutureTable;
             container.appendChild(selectList);
+            selectList.value = _timeinterval_G;
         }
 
         const loadFutureTable = () => {
             const selectList = document.querySelector('#future-table-time-interval-select');
             let timeInterval = selectList.value;
-
+            _timeinterval_G = timeInterval;
             switch (timeInterval) {
                 case 'שבוע':
                     timeInterval = 7;
@@ -4561,7 +4563,6 @@
                     timeInterval = 7;
                     break
             }
-
             refreshTable_UnityRide(timeInterval);
         }
 

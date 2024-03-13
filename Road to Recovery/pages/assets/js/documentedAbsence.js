@@ -434,6 +434,7 @@ const documentAAbsence2DB = () => {
 
                                 ThisAbsenceId = data.d
                                 RenderToAbsenceModal(ThisDisplayName, VolunteerID);
+                                $('#wait').hide();
 
                             },
                             error: function (err) { alert("Error in Insert New Absence Ajax: " + err.responseText); $('#wait').hide(); }
@@ -465,6 +466,7 @@ const documentAAbsence2DB = () => {
 }
 
 const cancelAbsenceDocument = () => {
+    $('#wait').hide();
     $('#saveAbsenceBtn').prop('disabled', true);
     $('#cancellAbsenceBtn').prop('disabled', true);
     $('#DocumentAAbsencesModal').modal('toggle');
