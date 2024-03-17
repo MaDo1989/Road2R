@@ -823,7 +823,7 @@
 
         // new func for new way to save rides in the DB -Gilad
         const setUnityRideNew = (data) => {
-            console.log('from test CheckAPI_Gilad ', JSON.parse(data));
+            //console.log('from test CheckAPI_Gilad ', JSON.parse(data));
             let dataobj = JSON.parse(data);
             const unityRide = {};
             unityRide.PatientName = dataobj.RidePat.Pat.DisplayName;
@@ -839,7 +839,7 @@
             unityRide.RidePatNum = dataobj.func == 'edit' ? dataobj.RidePat.RidePatNum : 0;
             unityRide.AmountOfEscorts = dataobj.RidePat.Escorts.length;
             let request = { unityRide: unityRide, func: dataobj.func, numOfRide: dataobj.numberOfRides, repeatEvery: dataobj.repeatRideEvery, firstTry:true };
-            console.log('After Custom',request);
+            //console.log('After Custom',request);
             let dataString = JSON.stringify(request);
 
              $.ajax({
@@ -849,7 +849,7 @@
                         type: "POST",
                         data: dataString,
                         success: function (data) {
-                            console.log('Sucsses res -->', data.d);
+                            //console.log('Sucsses res -->', data.d);
                             const result = JSON.parse(data.d);
                             if (result == -5) {
                                 swal({
@@ -872,7 +872,7 @@
                                             type: "POST",
                                             data: dataString2,
                                             success: function (data) {
-                                                console.log('Sucsses res -->', data.d);
+                                                //console.log('Sucsses res -->', data.d);
                                                 const result = JSON.parse(data.d);
 
                                                 if (result == -1 || result == 0) {
@@ -1046,7 +1046,7 @@
 
         const fillPage_withPatientData = (patient, markThe1stEscort = false) => {
 
-            console.log('inside fillPage_withPatientData --> patient-', patient)
+            //console.log('inside fillPage_withPatientData --> patient-', patient)
             isAnonymous = patient.IsAnonymous === "True";
             localStorage.PatID = patient.Id;
             $('#pat').val(patient.DisplayName);
@@ -1679,7 +1679,7 @@
                         $('#numberOfRides').val(duplicateRidePat.numberOfRides);
                         $("#duplicateRidePat").prop("checked", true);
                         // $('#hideDuplicate').show();
-                        console.log(duplicateRidePat)
+                        //console.log(duplicateRidePat)
 
                         localStorage.removeItem("duplicateRidePat");
                     }
@@ -1821,9 +1821,9 @@
                 data: JSON.stringify({ UnityRideId: ridePatNum }),
                 success: function (data) {
                     let thisRide = JSON.parse(data.d)[0];
-                    console.log('Before Custom', thisRide);
+                    //console.log('Before Custom', thisRide);
                     thisRide = CustomObject(thisRide);
-                    console.log('After Custom', thisRide);
+                    //console.log('After Custom', thisRide);
 
 
                 },
@@ -2094,7 +2094,7 @@
 
         //function to fill form for edit
         async function uploadData(ridePatNum) {
-            console.log('Gilad check i just clicked', ridePatNum)
+            //console.log('Gilad check i just clicked', ridePatNum)
             //  generatePat();
             getPatients_slim();
             generateLocation()
@@ -2117,7 +2117,7 @@
 
 
                             ridePat = JSON.parse(data.d);
-                            console.log('how its need to look like :', ridePat);
+                            //console.log('how its need to look like :', ridePat);
                             escorts_inthisRidePat = ridePat.Escorts;
 
 
@@ -2500,7 +2500,7 @@
         function signDriverSuccessCB(data) {
 
             RideId = data.d;
-            console.log(RideId);
+            //console.log(RideId);
             $('#wait').hide();
             swal({
                 title: "הנהג התווסף להסעה",

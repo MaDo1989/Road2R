@@ -363,7 +363,7 @@
             /*  *********↑↑↑*********
                 * !!! IMPORTANT !!! *
                 *********************/
-            console.log('From notification.client.ridePatUpdated--> get this-->', updated_ridePat);
+            //console.log('From notification.client.ridePatUpdated--> get this-->', updated_ridePat);
             tableName2manipulate = getTableName2Manipulate(updated_ridePat.RidePatNum);
             thisRidePatDate = fixDate_WhichComeFromOpenConnection(updated_ridePat.Date);
             thisRidePatLastModified = fixDate_WhichComeFromOpenConnection(updated_ridePat.LastModified);
@@ -521,7 +521,7 @@
 
         //Gilad addition use signalR
         notification2.client.UnityRideUpdated = function (updatedUnityRide) {
-            console.log('From server to client in notification2.client.ridePatUpdated get this --> ', updatedUnityRide);
+            //console.log('From server to client in notification2.client.ridePatUpdated get this --> ', updatedUnityRide);
             /*   *********************
                  * !!! IMPORTANT !!! *
                  ********↓↓↓**********/
@@ -533,7 +533,7 @@
 
             let customRide = CustomRideObject(updatedUnityRide); // to ajust the object
 
-            console.log('After Custom object look like this-->', customRide)
+            //console.log('After Custom object look like this-->', customRide)
 
             tableName2manipulate = getTableName2Manipulate(customRide.RidePatNum);
             thisRidePatDate = fixDate_WhichComeFromOpenConnection(customRide.Date);
@@ -1337,7 +1337,7 @@
                 timer = setTimeout(function () {
 
                     candidate4IhaveSeen = e.target.parentElement.id;
-                    console.log(e);
+                   // console.log(e);
                     $('.ContextMenu_dropdown').removeClass('hidden');
                     $(".ContextMenu_dropdown").css({ position: "absolute", top: e.pageY, left: e.pageX });
                 }, 500);
@@ -1584,7 +1584,7 @@
                 alert(err);
             }
 
-            console.log('Gilad check the data send -->', data);
+            //console.log('Gilad check the data send -->', data);
             ajaxCall('UpdatePatientStatus', JSON.stringify(data), updatePatientStatus_SCB, updatePatientStatus_ECB);
 
 
@@ -1640,7 +1640,7 @@
                 alert(err);
             }
 
-            console.log('From updateRidePatTime func--> send this-->', data);
+            //console.log('From updateRidePatTime func--> send this-->', data);
 
             ajaxCall('UpdateRidePatTime', JSON.stringify(data), updateRidePatTime_SCB, updateRidePatTime_ECB);
 
@@ -1696,7 +1696,7 @@
                 alert(err);
             }
 
-            console.log('From NEW updateUnityRideTime NEW func--> send this-->', data);
+            //console.log('From NEW updateUnityRideTime NEW func--> send this-->', data);
 
             ajaxCall('UpdateUnityRideTime', JSON.stringify(data), updateUnityRideTime_SCB, updateUnityRideTime_ECB);
 
@@ -1715,7 +1715,7 @@
                 UnityRideID: _ridepatToManipulate,
                 newRemark
             };
-            console.log('Gilad check -->', data);
+            //console.log('Gilad check -->', data);
             const updateRemark_SCB = () => {
 
                 $('#wait').hide();
@@ -2370,7 +2370,7 @@
             }
             //console.log('what im send here ? ', messageObject);
             let textMessageToCopy = buildMessage(messageObject);
-            console.log(textMessageToCopy);
+            //console.log(textMessageToCopy);
 
             navigator.clipboard.writeText(textMessageToCopy)
                 .then(function () {
@@ -2523,7 +2523,7 @@
             const listIds = []
             listIds.push(ridePat.RidePatNum);
             let request = { ListIDs: listIds };
-            console.log('check request -->', request)
+            //console.log('check request -->', request)
                 $.ajax({
                     dataType: "json",
                     url: "WebService.asmx/deleteUnityRide",
@@ -2542,7 +2542,7 @@
                             //console.log('Check This table and btn', thistable, deleteBtn, thistable.row($(deleteBtn).parents('tr')))
                             //console.log('Gilad check from deleteRidePat --> ', deleteBtn,)
                             let stam = thistable.row($(deleteBtn).parents('tr')).remove().draw();
-                            console.log(stam);
+                            //console.log(stam);
                         } else {
                             location.reload();
                         }
@@ -2854,7 +2854,7 @@
                 success: function (data) {
                     $('#wait').hide();
                     const test = JSON.parse(data.d);
-                    console.log('Gilad check this -->', test)
+                    //console.log('Gilad check this -->', test)
 
 
                 },
@@ -3647,7 +3647,7 @@
 
             var volunteerId = -1 // VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
             //gilad check
-            console.log('Gilad check this regular refresh* -->', volunteerId, timeInterval)
+            //console.log('Gilad check this regular refresh* -->', volunteerId, timeInterval)
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/GetRidePatView",
@@ -3660,7 +3660,7 @@
                 success: function (data) {
                     $('#wait').hide();
                     arr_rides = JSON.parse(data.d);
-                    console.log('Gilad check this -->', arr_rides)
+                    //console.log('Gilad check this -->', arr_rides)
                     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
 
                     let thisRidePatDate;

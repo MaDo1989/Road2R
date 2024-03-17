@@ -357,7 +357,7 @@ const documentAAbsence2DB = () => {
     }
 
 
-    console.log('check what we got', dataToSend);
+    //console.log('check what we got', dataToSend);
       
     if (checkColidAbsence(ThisAbsencesList, dataToSend.from, dataToSend.until) && !isEdit) {
         swal({
@@ -394,7 +394,7 @@ const documentAAbsence2DB = () => {
             type: "POST",
             data: JSON.stringify({volunteerId:dataToSend.volunteerId,start:dataToSend.from,end:dataToSend.until}),
             success: function (data) {
-                console.log('the result !!', data.d);
+                //console.log('the result !!', data.d);
 
                 if (parseInt(data.d) == -1) {
                     $.ajax({

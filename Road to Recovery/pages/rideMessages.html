@@ -54,7 +54,7 @@
             else { 
                 let onlyRidepatsWithDriver = arr_rides.filter(r => r.Drivers.length > 0);
                 for (var i = 0; i < onlyRidepatsWithDriver.length; i++) {
-                    console.log("RidePatNum: " + onlyRidepatsWithDriver[i].RidePatNum);
+                    //console.log("RidePatNum: " + onlyRidepatsWithDriver[i].RidePatNum);
                     msg = showMessage(arr_rides,onlyRidepatsWithDriver[i].RidePatNum);
                     buildMessage(msg);
                     }
@@ -82,7 +82,7 @@
                 data: JSON.stringify({ volunteerId: volunteerId, maxDays: 7 }),
                 success: function (data) {
                     arr_rides = JSON.parse(data.d);
-                    console.log("loaded " + arr_rides.length + " ridepats");
+                   // console.log("loaded " + arr_rides.length + " ridepats");
                     $("#chooseRide").css("visibility", "visible");
                     //console.log(arr_rides);
                 },
