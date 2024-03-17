@@ -1528,7 +1528,6 @@
 
                 $('#wait').hide();
                 $('#editPatientStatusModal').modal('hide');
-                console.log('im here -->', ridepatToManipulate )
             }
 
             const updatePatientStatus_ECB = (err) => {
@@ -4377,7 +4376,6 @@
 
                 }
                 let thisRide = findRideByNumber(rideID);
-                console.log('there is a try -->', thisRide)
 
 
                 if (timespan != 'אחה"צ' && PatientNameSpan != 'חולה' && thisRide.MainDriver!=-1) {
@@ -4496,6 +4494,10 @@
             }
             if (patient.Age == 0) {
                 age = `<span></span>`;
+            }
+            if (patient.Age == 1) {
+                age = `<span>בגיל שנה</span>`;
+
             }
             //console.log(patient)
 
@@ -4890,8 +4892,12 @@
             const deleteBtn = `<button type='button' class='remove               btn btn-icon waves-effect waves-light btn-secondary' id='${ridePatNum}'  name='${ridePatNum}' title='מחיקה'>         <i class='fa fa-remove'></i></button>`;
             const messageToCopyBtn = `<button type='button' class='copyMessage   btn btn-icon waves-effect waves-light btn-secondary' id='${ridePatNum}'  name='${ridePatNum}' title='העתקת הודעה'>   <i class='fa fa-envelope'></i></button>`;
             const candidateBtn = `<button type='button' title="בשיפוצים" disabled class='candidatesBtn btn btn-icon waves-effect waves-light btn-secondary'     id='${ridePatNum}'  name='${ridePatNum}' title='מועמדים להסעה'> <i class='fa fa-car'></i></button>`;
-
-            let buttonsWrapper = `<div class='elementsInSameLine'>${editBtn} ${deleteBtn} ${drivers.length > 0 ? messageToCopyBtn : candidateBtn}</div>`;
+            let thisRide = findRideByNumber(ridePatNum);
+            let timeNum = thisRide.PickupTime.replace('/', '').replace('/', '').replace('Date(', '').replace(')', '');
+            timeNum = parseInt(timeNum);
+            let time = new Date(timeNum);
+            console.log("time,", timeNum, time.getHours(), ridePatNum)
+            let buttonsWrapper = `<div class='elementsInSameLine'>${editBtn} ${deleteBtn} ${(drivers.length > 0 && time.getHours()<20 )? messageToCopyBtn : candidateBtn}</div>`;
 
             return buttonsWrapper;
         }

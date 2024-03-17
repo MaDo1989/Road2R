@@ -243,7 +243,7 @@ const patientMessage = (patient) => {
         }
     }
     if (patient.Age == 1) {
-        agePrefix += `שנה `;
+        agePrefix += ` שנה `;
     }
     else if (patient.Age == 2) {
         agePrefix += `שנתיים `;
@@ -252,7 +252,7 @@ const patientMessage = (patient) => {
         agePrefix += ` ${patient.Age}`;
     }
 
-    /*console.log('Gilad-->', agePrefix);*/
+    console.log('Gilad-->', agePrefix);
 
     try {
         txt = patient.isAnonymous ? `חולה` : `${patient.name}, ${agePrefix}`;
