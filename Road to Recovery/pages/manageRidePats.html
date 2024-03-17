@@ -586,7 +586,7 @@
                         row2manipulate.buttons = buildAcionsButtonsHTML(customRide.RidePatNum, customRide.Drivers);
 
                         tAfternoon.row(`#${customRide.RidePatNum}`).data(row2manipulate).draw('page');
-                        increaseCounter(tableNames.AFTERNOON, updated_ridePat.RidePatNum);
+                        increaseCounter(tableNames.AFTERNOON, customRide.RidePatNum);
 
                         tr_nodesAsArray = Array.from(tAfternoon.rows().nodes());
                         if (customRide.Status == 'נמחקה') {
@@ -1395,7 +1395,6 @@
             return driversPromise;
         }
 
-        //continue here..
 
         const assignOrUpdateAPIcall = (unityRideID, DriverId) => {
             const request = {
@@ -1451,7 +1450,10 @@
                         }, function (userResponse) {
                             if (userResponse) {
                                 assignOrUpdateAPIcall(_ridepatToManipulate, userSelected.Id);
-                                colorRowWithDriver([_ridepatToManipulate]);
+                                setTimeout(() => {
+                                    colorRowWithDriver([_ridepatToManipulate]);
+
+                                },450)
                                 assignDriverToRidePatAbort();
 
                             }
@@ -1460,7 +1462,10 @@
                     }
                     else {
                         assignOrUpdateAPIcall(_ridepatToManipulate, userSelected.Id);
-                        colorRowWithDriver([_ridepatToManipulate]);
+                        setTimeout(() => {
+                            colorRowWithDriver([_ridepatToManipulate]);
+
+                        }, 450)
                         assignDriverToRidePatAbort();
 
                     }
@@ -1523,6 +1528,7 @@
 
                 $('#wait').hide();
                 $('#editPatientStatusModal').modal('hide');
+                console.log('im here -->', ridepatToManipulate )
             }
 
             const updatePatientStatus_ECB = (err) => {
@@ -2986,11 +2992,12 @@
                         //#region Status
                         //custom for buildstatusString function
                         let statusObj = {}
-                        if (arr_rides[i].PatientStatus == '' || arr_rides[i].PatientStatus =='Finished') {
-                            statusObj.Status = 1;
+                        //console.log('Check here -->', arr_rides[i])
+                        if (arr_rides[i].PatientStatus == '' || arr_rides[i].PatientStatus =='Not Finished') {
+                            statusObj.Status = -1;
                         }
                         else {
-                            statusObj.Status = -1;
+                            statusObj.Status = 1;
 
                         }
                         statusObj.EditTimeStamp = arr_rides[i].PatientStatusEditTime;
@@ -4330,7 +4337,19 @@
                 }
             });
         }
-
+        function findRideByNumber(rideNumber) {
+            // Iterate through each ride object in the array
+            for (let i = 0; i < arr_rides.length; i++) {
+                const ride = arr_rides[i];
+                // Check if the ride number matches the provided rideNumber
+                if (ride.RidePatNum === rideNumber) {
+                    // Return the ride object if found
+                    return ride;
+                }
+            }
+            // If the ride is not found, return null or handle it as needed
+            return null;
+        }
 
         //gilad
         const colorRowWithDriver = (rideArray) => {
@@ -4349,17 +4368,22 @@
                 if (document.getElementById(rideID).children[0].children.length == 0) {
                     timespan = document.getElementById(rideID).children[1].children[0].children[0].innerHTML
                     PatientNameSpan = document.getElementById(rideID).children[4].children[0].innerHTML
+
+                  
                 }
                 else {
                     timespan = document.getElementById(rideID).children[0].children[0].children[0].innerHTML;
                     PatientNameSpan = document.getElementById(rideID).children[3].children[0].innerHTML
 
                 }
+                let thisRide = findRideByNumber(rideID);
+                console.log('there is a try -->', thisRide)
 
-                if (timespan != 'אחה"צ' && PatientNameSpan != 'חולה') {
+
+                if (timespan != 'אחה"צ' && PatientNameSpan != 'חולה' && thisRide.MainDriver!=-1) {
                     $(`#${rideID}`).addClass('statusComplete');
                 }
-                else if (timespan == 'אחה"צ' || PatientNameSpan == 'חולה') {
+                else if (timespan == 'אחה"צ' || PatientNameSpan == 'חולה' || thisRide.MainDriver==-1) {
                     $(`#${rideID}`).removeClass('statusComplete');
 
                 }
@@ -4465,13 +4489,15 @@
             }
             //let ageNumber = patient.Age == 0 ? '' : patient.Age;
             if (patient.GenderAsEnum == -1 && !patient.IsAnonymous) {
-                if (patient.Age == 0) {
-                    age = `<span></span>`;
-                }
-                else {
+
+                
                     age = `<span>בגיל ${patient.Age}</span>`;
-                }
+               
             }
+            if (patient.Age == 0) {
+                age = `<span></span>`;
+            }
+            //console.log(patient)
 
             return age;
         }
@@ -4828,7 +4854,6 @@
 
             statusWrapper += '<div class="column">';
             statusWrapper += statusHTML;
-
             if (statusObj.Status === patientStatus.Finished) {
 
                 statusWrapper += editTimeStamp ? '<div class="timeUnderStatus">' + editTimeStamp.toLocaleTimeString('he-IL', { timeStyle: 'short' }) + '</div>' : '';
