@@ -4874,7 +4874,7 @@
 
         const buildRemarkHTML = (remark, ridePatNum) => {
 
-            let wrapper = '<div class="elementsInSameLine">';
+            let wrapper = '<div class="ToRight elementsInSameLine">';
 
             const editBtn = `<button type='button' data-toggle="modal" onclick="prepreparationEditRemark(this, ${ridePatNum})" data-target="#editRemarkModal" class='fix-flex-scretch btn btn-icon waves-effect waves-light btn-secondary' title='עריכה'><i class='ti-pencil'></i></button>`;
 
@@ -4896,7 +4896,7 @@
             let timeNum = thisRide.PickupTime.replace('/', '').replace('/', '').replace('Date(', '').replace(')', '');
             timeNum = parseInt(timeNum);
             let time = new Date(timeNum);
-            console.log("time,", timeNum, time.getHours(), ridePatNum)
+            //console.log("time,", timeNum, time.getHours(), ridePatNum)
             let buttonsWrapper = `<div class='elementsInSameLine'>${editBtn} ${deleteBtn} ${(drivers.length > 0 && time.getHours()<20 )? messageToCopyBtn : candidateBtn}</div>`;
 
             return buttonsWrapper;
