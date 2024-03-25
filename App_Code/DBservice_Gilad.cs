@@ -319,6 +319,7 @@ public class DBservice_Gilad
                 {
                     oneRide.PatientEquipments = GetListOfEquipmentsForPAtient(oneRide.PatientId);
                 }
+                oneRide.AmountOfEquipments = oneRide.PatientEquipments.Count();
                 oneRide.AmountOfEscorts = Convert.ToInt32(dataReader["AmountOfEscorts"]);
                 oneRide.Origin = dataReader["Origin"].ToString();
                 oneRide.Destination = dataReader["Destination"].ToString();
