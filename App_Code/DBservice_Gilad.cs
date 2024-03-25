@@ -315,7 +315,7 @@ public class DBservice_Gilad
                 oneRide.PatientAge = Convert.ToInt32(Calculations.CalculateAge(dateOfBirth));
 
                 oneRide.AmountOfEquipments = Convert.ToInt32(dataReader["AmountOfEquipments"]);
-                if (oneRide.AmountOfEquipments > 0)
+                if (oneRide.AmountOfEquipments >= 0)
                 {
                     oneRide.PatientEquipments = GetListOfEquipmentsForPAtient(oneRide.PatientId);
                 }
