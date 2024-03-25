@@ -387,12 +387,13 @@ const documentAAbsence2DB = () => {
         });
     }
     else {
+        console.log('check ? ', dataToSend)
         $.ajax({
             dataType: "json",
             url: "WebService.asmx/CheckRideBeforePost" ,
             contentType: "application/json; charset=utf-8",
             type: "POST",
-            data: JSON.stringify({volunteerId:dataToSend.volunteerId,start:dataToSend.from,end:dataToSend.until}),
+            data: JSON.stringify({ volunteerId: VolunteerID,start:dataToSend.from,end:dataToSend.until}),
             success: function (data) {
                 //console.log('the result !!', data.d);
 

@@ -5015,11 +5015,12 @@
             let ridepatObject = arr_rides.find(r => r.RidePatNum === ridepatNum);
             //console.log('before!!!', ridepatObject)
             ridepatObject = CustomRideObject(ridepatObject);
-            //console.log('after!!!', ridepatObject)
+            console.log('after!!!', ridepatObject)
             const ridePatPatientStatus = ridepatObject.Pat.RidePatPatientStatus.Status;
             let editTimeStamp = ridepatObject.Pat.RidePatPatientStatus.EditTimeStamp;
-            
-            if (editTimeStamp !== null) {
+            //console.log('test ', editTimeStamp)
+            //ridePatPatientStatus == -1 ? editTimeStamp = null : editTimeStamp = editTimeStamp;
+            if (ridePatPatientStatus != -1) {
 
                 editTimeStamp = convertDBDate2FrontEndDate(editTimeStamp);
                 let hoursAsDoubleDigits = createDoubleDigit(editTimeStamp.getHours());
