@@ -386,6 +386,67 @@ public class DBservice_Gilad
 
     }
 
+    public List <UnityRide> GetWeeklyThanks(DateTime thisSunday,DateTime endDate)
+    {
+        SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@thisSunday", thisSunday);
+        paramDic.Add("@endDate", endDate);
+
+
+        cmd = CreateCommandWithStoredProcedureGeneral("spGetWeeklyThanksVol", con, paramDic);
+
+        List<UnityRide> list2Return = new List<UnityRide>();
+
+        try
+        {
+
+
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            while (dataReader.Read())
+            {
+                UnityRide oneRide = new UnityRide();
+
+           
+                oneRide.CoorName = dataReader["Coordinator"].ToString();
+                oneRide.CoorId = Convert.ToInt32(dataReader["CoordinatorID"]);
+                oneRide.MainDriver = Convert.ToInt32(dataReader["MainDriver"]);
+                oneRide.DriverName = dataReader["DriverName"].ToString();
+                list2Return.Add(oneRide);
+
+            }
+
+            return list2Return;
+        }
+        catch (Exception ex)
+        {
+            WriteToErrorFile("GetWeeklyThanksforVolunteers GetWeeklyRidesForThanks GetWeeklyThanks spGetWeeklyThanksVol", ex.Message + ex.ToString());
+            throw (new Exception(ex.Message));
+        }
+
+        finally
+        {
+            if (con != null)
+            {
+                con.Close();
+            }
+        }
+
+    }
+
 
     public List<UnityRide> Get_unityRide_ByTimeRange(int from, int until, bool isDeletedtoShow)
     {

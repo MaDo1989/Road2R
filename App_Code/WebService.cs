@@ -1150,6 +1150,28 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetWeeklyThanksforVolunteers()
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+            UnityRide ur = new UnityRide();
+            List <UnityRide> List = ur.GetWeeklyRidesForThanks();
+            j.MaxJsonLength = Int32.MaxValue;
+            return j.Serialize(List);
+
+
+        }
+        catch (Exception ex)
+        {
+
+            Log.Error("Error in GetWeeklyThanksforVolunteers", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות לתודות");
+        }
+    }
     //This method is used for שבץ אותי
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]

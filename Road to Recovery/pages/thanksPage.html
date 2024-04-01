@@ -1,0 +1,375 @@
+﻿<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="KSMoving">
+    <meta name="author" content="Coderthemes">
+
+    <link rel="shortcut icon" href="assets/images/favicon_1.ico">
+
+    <title>דף תודות</title>
+
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <!-- DataTables -->
+    <link href="../plugins/datatables/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/buttons.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/fixedHeader.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/responsive.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../plugins/datatables/scroller.bootstrap.min.css" rel="stylesheet" type="text/css" />
+
+    <!-- Sweet Alert css -->
+    <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
+
+    <link href="../plugins/switchery/switchery.min.css" rel="stylesheet" />
+    <link href="assets/css/bootstrap-rtl.min.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/core.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/icons.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/components.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/pages.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/menu.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/responsive.css" rel="stylesheet" type="text/css">
+    <!--sapir css-->
+    <link href="assets/css/sapirCss.css" rel="stylesheet" />
+    <link href="assets/css/viewLog.css" rel="stylesheet" />
+    <script src="assets/js/CookiesFunctions.js"></script>
+
+    <script src="assets/js/modernizr.min.js"></script>
+
+    <!--GENERAL object and additional functions-->
+    <script src="lib/lz-string.js"></script>
+    <script src="lib/master.js"></script>
+
+    <script src="assets/js/jquery.min.js"></script>
+
+    <script src="dataTables.js"></script>
+    <script src="moment.js"></script>
+    <script src="datetime-moment.js"></script>
+
+
+    <!-- Select2 css+js -->
+    <link href="assets/css/select2.css" rel="stylesheet" />
+    <script src="assets/js/select2.min.js"></script>
+    <!--<script src="lib/moment.js"></script>-->
+    <!--<script src="../plugins/moment/moment.js"></script>-->
+    <script src="lib/sorting.js"></script>
+
+    <script src="lib/includeHTML.js"></script>
+
+    <script>
+        //checkCookie();
+        let { convertDBDate2FrontEndDate } = GENERAL.USEFULL_FUNCTIONS;
+        let { ajaxCall } = GENERAL.FETCH_DATA;
+
+        $(document).ready(function () {
+            _allNames = '';
+
+            let { COPYWRITE } = GENERAL;
+            $('#rights').html(COPYWRITE());
+
+            if (window.location.hostname.toString() == 'localhost' || window.location.pathname.toLowerCase().indexOf('test') != -1) {
+                $("#na").css("background-color", "#ffde89");
+            }
+            if (window.location.href.indexOf('http://40.117.122.242/Road%20to%20Recovery/') != -1) {
+                window.location.href = "notAvailable.html";
+            }
+            includeHTML();
+            var userName = GENERAL.USER.getUserDisplayName();
+            $("#userName").html(userName);
+            $('#wait').hide();
+
+
+        });
+
+
+
+
+        const GetweeklyRidesForThanks = () => {
+            $('#wait').show();
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/GetWeeklyThanksforVolunteers",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                success: function (data) {
+                    let Ddata = JSON.parse(data.d);
+                    //console.log('what we got ?', Ddata);
+                    //console.log('uniq coors ->', getUniqueCoordinators(Ddata));
+                    $('#wait').hide();
+                    let coorArr = getUniqueCoordinators(Ddata)
+                    RenderWeeklyVol(Ddata, coorArr);
+                },
+                error: function (err) {
+                    alert("Error in GetweeklyRidesForThanks " + err.responseText);
+                    $('#wait').hide();
+                }
+            });
+        }
+
+        function getUniqueCoordinators(array) {
+            // Extracting unique coordinators using Set
+            const uniqueCoordinators = new Set(array.map(item => item.CoorName));
+            // Converting Set back to an array
+            return Array.from(uniqueCoordinators);
+        }
+
+        const RenderWeeklyVol = (allArr, CoorArr) => {
+            const copyArray = [];
+            let strToRender = `<div class="col-sm-12"><div class="bCard">`;
+            for (var i = 0; i < CoorArr.length; i++) {
+                let coorName = CoorArr[i];
+                copyArray.push(coorName);
+                strToRender += `<h1 id="${coorName}" class="coorNameTitle">${coorName}</h1>
+                    <hr class="hrSep" />
+                    <div class="VolWrpr">`;
+                for (var j = 0; j < allArr.length; j++) {
+                    let ride = allArr[j];
+                    if (ride.CoorName == coorName) {
+                        copyArray.push(ride.DriverName);
+                        strToRender += `<span class="volName">${ride.DriverName}, </span>`;
+                    }
+                }
+                strToRender += `</div>`;
+            }
+            _allNames = copyArray.join(" ");
+            strToRender += `</div>
+                <div><button class="copyBtn" onclick="copyNamesToClipBoard()"> <i class="glyphicon glyphicon-copy"></i>
+העתקה</button></div>
+                </div>`;
+
+            document.getElementById('ph').innerHTML = strToRender;
+            $('#ph').fadeIn();
+            //<div class="col-sm-12">
+            //    <div class="bCard">
+            //        <h1 id="123" class="coorNameTitle">אברהם דנון</h1>
+            //        <hr class="hrSep" />
+            //        <div class="VolWrpr">
+            //            <span class="volName">בלה בלה,</span>
+            //            <span class="volName">בלה בלה,</span>
+            //            <span class="volName">בלה בלה,</span>
+            //            <span class="volName">בלה בלה,</span>
+            //            <span class="volName">בלה בלה,</span>
+            //            <span class="volName">בלה בלה,</span>
+            //        </div>
+
+            //        <h1 id="123" class="coorNameTitle">אברהם דנון</h1>
+            //        <hr class="hrSep" />
+            //        <div class="VolWrpr">
+            //            <span class="volName">בלה בלה,</span>
+            //            <span class="volName">בלה בלה,</span>
+            //            <span class="volName">בלה בלה,</span>
+            //            <span class="volName">בלה בלה,</span>
+            //            <span class="volName">בלה בלה,</span>
+            //            <span class="volName">בלה בלה,</span>
+            //        </div>
+            //        <h1 id="123" class="coorNameTitle">אברהם דנון</h1>
+            //        <hr class="hrSep" />
+            //        <div class="VolWrpr">
+            //            <span class="volName">בלה בלה,</span>
+            //            <span class="volName">בלה בלה,</span>
+            //            <span class="volName">בלה בלה,</span>
+            //            <span class="volName">בלה בלה,</span>
+            //            <span class="volName">בלה בלה,</span>
+            //            <span class="volName">בלה בלה,</span>
+            //        </div>
+            //    </div>
+            //</div>
+        }
+
+        const copyNamesToClipBoard = () => {
+            if (_allNames != '') {
+                copyText(_allNames);
+            }
+        }
+
+        const copyText = (text) => {
+            navigator.clipboard.writeText(text)
+                .then(function () {
+                    swal({
+                        title: "ההודעה מוכנה בפעולת הדבק",
+                        timer: 1000,
+                        type: "success",
+                        showConfirmButton: false
+                    });
+                }, function (err) {
+                    swal({
+                        title: "העתקת ההודעה נכשלה",
+                        timer: 1000,
+                        type: "error",
+                        showConfirmButton: false
+                    });
+                });
+        }
+
+    </script>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+    <link href="assets/css/thanksPage.css" rel="stylesheet" type="text/css">
+
+</head>
+
+
+<body class="fixed-left">
+    <div id="wait">
+        <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
+    </div>
+    <!-- Begin page -->
+    <div id="wrapper">
+
+        <!-- Top Bar Start -->
+        <div class="topbar">
+
+
+
+            <!-- Navbar -->
+            <div id="na" class="navbar navbar-default" role="navigation">
+                <div class="container">
+                    <div class="">
+                        <!--Expend/Collaps Side Menue-->
+                        <div class="pull-left">
+                            <button class="button-menu-mobile open-left waves-effect">
+                                <i class="md md-menu"></i>
+                            </button>
+                            <span class="clearfix"></span>
+                        </div>
+
+                        <!-- LOGO -->
+                        <div class="pull-left">
+                            <div class="text-center">
+                                <a href="manageRidePats.html" class="logo"><span>בדרך להחלמה</span>&nbsp&nbsp&nbsp</a>
+                            </div>
+                        </div>
+                        <div class="pull-right">
+                            <a href="passwordForm.html"> <span class="logo" id="userName"></span></a>
+                        </div>
+                    </div>
+                    <!--/.nav-collapse -->
+                </div>
+            </div>
+        </div>
+        <!-- Top Bar End -->
+        <!-- ========== Right Sidebar Start ========== -->
+        <div w3-include-html="menu.html"></div>
+        <!-- Right Sidebar End -->
+        <!-- ============================================================== -->
+        <!-- Start page Content here -->
+        <!-- ============================================================== -->
+        <div class="content-page">
+            <!-- Start content -->
+            <div class="content">
+                <div class="container">
+
+                    <!-- Page-Title -->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="page-title-box">
+                                <ol class="breadcrumb pull-right">
+
+                                    <li class="active">דף תודות</li>
+                                </ol>
+                                <h4 class="page-title">
+                                    דף תודות&nbsp&nbsp
+                                    <i>
+                                        <img src="../../Media/יומן מערכת.png" height="25" width="25" />
+                                    </i>
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" id="actionsBtns">
+                        <div class="col-sm-6">
+                            <button onclick="GetweeklyRidesForThanks()" class=" btn btn-primary menuBtns">הצג תודות השבוע</button>
+                        </div>
+                    </div>
+
+                    <div class="row" id="ph">
+                      
+                       
+                    </div>
+
+
+
+
+
+                </div>
+                <!-- end container -->
+
+            </div>
+            <!-- end content -->
+            <!-- FOOTER -->
+            <footer id="rights" data-toggle="tooltip" data-placement="top" title="© All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء" class="footer text-right">
+            </footer>
+
+            <!-- End FOOTER -->
+
+        </div>
+        <!-- ============================================================== -->
+        <!-- End page content here -->
+        <!-- ============================================================== -->
+
+    </div>
+    <!-- END wrapper -->
+
+
+
+    <script>
+        var resizefunc = [];
+    </script>
+
+    <!-- jQuery  -->
+    <script src="assets/js/bootstrap-rtl.min.js"></script>
+    <script src="assets/js/detect.js"></script>
+    <script src="assets/js/fastclick.js"></script>
+    <script src="assets/js/jquery.slimscroll.js"></script>
+    <script src="assets/js/jquery.blockUI.js"></script>
+    <script src="assets/js/waves.js"></script>
+    <script src="assets/js/wow.min.js"></script>
+    <script src="assets/js/jquery.nicescroll.js"></script>
+    <script src="assets/js/jquery.scrollTo.min.js"></script>
+    <script src="../plugins/switchery/switchery.min.js"></script>
+
+    <!-- Datatables-->
+    <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="../plugins/datatables/dataTables.bootstrap.js"></script>
+    <script src="../plugins/datatables/dataTables.buttons.min.js"></script>
+    <script src="../plugins/datatables/buttons.bootstrap.min.js"></script>
+    <script src="../plugins/datatables/jszip.min.js"></script>
+    <script src="../plugins/datatables/pdfmake.min.js"></script>
+    <script src="../plugins/datatables/vfs_fonts.js"></script>
+    <script src="../plugins/datatables/buttons.html5.min.js"></script>
+    <script src="../plugins/datatables/buttons.print.min.js"></script>
+    <script src="../plugins/datatables/dataTables.fixedHeader.min.js"></script>
+    <script src="../plugins/datatables/dataTables.keyTable.min.js"></script>
+    <script src="../plugins/datatables/dataTables.responsive.min.js"></script>
+    <script src="../plugins/datatables/responsive.bootstrap.min.js"></script>
+    <script src="../plugins/datatables/dataTables.scroller.min.js"></script>
+
+    <!-- Datatable init js -->
+    <script src="assets/pages/datatables.init.js"></script>
+
+    <!-- Sweet Alert js -->
+    <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
+    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+
+    <script src="assets/js/jquery.core.js"></script>
+    <script src="assets/js/jquery.app.js"></script>
+    <!--<script src="cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+    <script src="cdn.datatables.net/plug-ins/1.10.19/sorting/datetime-moment.js"></script>-->
+    <!--<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>-->
+    <!--<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+    <script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+    <script src="//cdn.datatables.net/plug-ins/1.10.12/sorting/datetime-moment.js"></script>-->
+    <script type="text/javascript">
+
+        TableManageButtons.init();
+
+    </script>
+</body>
+</html>

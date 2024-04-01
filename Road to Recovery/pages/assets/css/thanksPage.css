@@ -1,0 +1,56 @@
+﻿#wait {
+    position: fixed;
+    top: 50%;
+    left: 45%;
+    z-index: 20000;
+}
+
+.hrSep {
+    border: 0;
+    border-top: 2px solid #bdbdbd;
+    border-radius: 15px;
+    width: 45%;
+    /* text-align: right; */
+    margin: 0;
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+
+.coorNameTitle{
+
+}
+
+.VolWrpr {
+    margin-bottom: 25px;
+}
+
+#ph {
+    padding: 15px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    border-radius:10px;
+    display:none;
+}
+
+.menuBtns{
+    margin-bottom:35px;
+}
+
+.copyBtn {
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
+    border-radius:8px;
+}
+    .copyBtn i {
+        font-size: 20px;
+        color: darkblue;
+    }
+
+.copyBtn:hover{
+    color:darkblue;
+}
+
+    .copyBtn i:hover{
+        color:darkgoldenrod
+    }

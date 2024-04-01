@@ -428,6 +428,16 @@ public class UnityRide
         return dBservice.GetUnityRide(UnityRideId);
     }
 
+    public List <UnityRide> GetWeeklyRidesForThanks()
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+
+        DateTime thisSunday = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
+        DateTime endDate = thisSunday.AddDays(7).Date;
+
+        return db.GetWeeklyThanks(thisSunday, endDate);
+    }
+
     public int SetUnityRide(UnityRide unityride, string func, int numOfRide, string repeatEvery,bool firstTry)
     {
         DBservice_Gilad dBservice = new DBservice_Gilad();
