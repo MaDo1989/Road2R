@@ -1453,7 +1453,7 @@
                                 setTimeout(() => {
                                     colorRowWithDriver([_ridepatToManipulate]);
 
-                                },450)
+                                },750)
                                 assignDriverToRidePatAbort();
 
                             }
@@ -1465,7 +1465,7 @@
                         setTimeout(() => {
                             colorRowWithDriver([_ridepatToManipulate]);
 
-                        }, 450)
+                        }, 750)
                         assignDriverToRidePatAbort();
 
                     }
@@ -1784,6 +1784,7 @@
         }
 
         const assignDriverToRidePat_SCB = (data) => {
+            //console.log('what data ? ', data);
             $('#wait').hide();
             removeClass('highlightRow');
             $('#assignDriverModal').modal('hide');
