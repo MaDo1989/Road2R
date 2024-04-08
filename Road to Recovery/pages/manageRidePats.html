@@ -4353,7 +4353,6 @@
         //gilad
         const colorRowWithDriver = (rideArray) => {
             
-
             if (rideArray.length==0) {
                 return;
             }
@@ -4377,7 +4376,7 @@
                 }
                 let thisRide = findRideByNumber(rideID);
 
-
+                console.log('checking:', 'timespan:', timespan, 'PatientNameSpan: ', PatientNameSpan, 'The Ride:', thisRide);
                 if (timespan != 'אחה"צ' && PatientNameSpan != 'חולה' && thisRide.MainDriver!=-1) {
                     $(`#${rideID}`).addClass('statusComplete');
                 }
@@ -4444,6 +4443,7 @@
 
 
         const buildPatientAgeHTML_AfterUnited = (patient) => {
+
             let age = '';
             const boy = 'בן ', girl = 'בת ';
             const gender = GetPatientGender(patient.GenderAsEnum, isAssistant)
@@ -4492,18 +4492,20 @@
                     age = `<span>בגיל ${patient.Age}</span>`;
                
             }
-            if (patient.Age == 0) {
-                age = `<span></span>`;
-            }
+
             if (patient.Age == 1) {
                 age = `<span>בגיל שנה</span>`;
 
+            }
+            if (patient.Age == 0 || patient.IsAnonymous) {
+                age = `<span></span>`;
             }
             //console.log(patient)
 
             return age;
         }
         const buildPatientAgeHTML = (patient) => {
+            console.log('use me ? ');
 
             let age = '';
             const boy = 'בן ', girl = 'בת ';

@@ -77,7 +77,7 @@ function buildMessage(message) {
     //sep = `<br/>`;
     /* console.log('Gilad-->' + JSON.stringify(message),JSON.stringify(message.Age), JSON.stringify(message.GenderAsEnum));*/
     sep = `\n`;
-    console.log('what im get message ', message)
+    //console.log('what im get message ', message)
     //let txt = `${message.ridePatNum}` + sep;
     let firstName = message.driver.split(" ")[0];
     //let txt = `שלום ${message.driver}` + sep;
@@ -222,7 +222,7 @@ const netDate = (fullTimeStempStr) => {
 
 const patientMessage = (patient) => {
     let txt = "";
-    console.log('patient patientMessage()-->', patient)
+    //console.log('patient patientMessage()-->', patient)
     let agePrefix = ``;
     if (patient.GenderAsEnum == 0) {
         agePrefix = `בת`;
