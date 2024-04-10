@@ -215,9 +215,10 @@
                             btnStr += " " + reactiveBtn;
                         }
                         else {
-                            deleteBtn = "<div class='btnWrapper-left'><button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button></div>";
-                            var messagesBtn = "<div class='btnWrapper-right'><button type='button' class='btn btn-icon waves-effect waves-light btn-light btn-sm m-b-5' id='messages' title='הודעות' data-toggle='modal' data-target='#messagesModal'><i class='fa fa-envelope-o'></i></button></div>";
-                            btnStr += messagesBtn;
+                            deleteBtn = "<div class='btnWrapper-left'><button  type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' title='מחיקה'><i class='fa fa-remove'></i></button></div>";
+                            var messagesBtn = "<div class='btnWrapper-right'><button type='button' disabled class='btn btn-icon waves-effect waves-light btn-light btn-sm m-b-5' id='messages' title='הודעות' data-toggle='modal' data-target='#messagesModal'><i class='fa fa-envelope-o'></i></button></div>";
+                            //btnStr += messagesBtn;
+                            // this old button need to be removed acoording to avrahm . 
                         }
                         var cellphone2 = "";
                         if (arr_volunteers[i].CellPhone2 != "") {
@@ -447,18 +448,20 @@
 
             $('#datatable-buttons tbody').on('click', '#remove', function () {
                 var data = tbl.row($(this).parents('tr')).data();
+                //console.log('what is data', data);
                 swal({
                     title: "האם אתם בטוחים?",
                     type: "warning",
-                    text: "הפיכת המתנדב " + data.DisplayName + " ללא פעיל",
+                    text: "הפיכת המתנדב " + data.DisplayName.split('<br>')[0] + " ללא פעיל",
                     showCancelButton: true,
                     cancelButtonText: "בטל",
                     confirmButtonClass: 'btn-warning',
                     confirmButtonText: "מחיקה",
                     closeOnConfirm: false
                 }, function () {
-                    deactivateVolunteer(data.DisplayName, 'false');
-                    setTimeout(function () { refreshTable() }, 1001);
+                    beforeDeactiveCheckFutureRides(data);
+                    //deactivateVolunteer(data.DisplayName, 'false');
+                    //setTimeout(function () { refreshTable() }, 1001);
                 });
             });
 
@@ -594,6 +597,47 @@
             location.href = "volunteerForm.html";
         }
 
+        const beforeDeactiveCheckFutureRides = (volunteer) => {
+            $('#wait').show();
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/CheckFutureRides",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                data: JSON.stringify({ volunteerId: volunteer.Id }),
+                success: function (data) {
+
+                    const response = JSON.parse(data.d);
+                    
+                    if (response==0) {
+                        deactivateVolunteer(volunteer.DisplayName, 'false');
+                      setTimeout(function () { refreshTable() }, 1001);
+                    }
+                    else if (response==1) {
+                        swal({
+                            title: "שימו לב !",
+                            type: "warning",
+                            text: "לתשומת ליבך למתנדב זה קיימות נסיעות עתידיות, האם עדיין ברצונך להמשיך בפעולה?",
+                            showCancelButton: true,
+                            cancelButtonText: "בטל",
+                            confirmButtonClass: 'btn-warning',
+                            confirmButtonText: "מחיקה",
+                            closeOnConfirm: false
+                        }, function () {
+                            deactivateVolunteer(volunteer.DisplayName, 'false');
+                            setTimeout(function () { refreshTable() }, 1001);
+                        });
+                    }
+            
+
+                    $('#wait').hide();
+                },
+                error: function (err) {
+                    alert("Error in beforeDeactiveCheckFutureRides: " + err.responseText);
+                    $('#wait').hide();
+                }
+            });
+        }
 
         const ManageAbsenceToggle = () => {
             $('#DocumentedCallsModal').modal('toggle');

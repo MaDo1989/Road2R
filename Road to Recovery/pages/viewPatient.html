@@ -119,6 +119,7 @@
             refreshTable();
         }
 
+
         function refreshTable() {
             allPatientsFromDB = [];
             $('#wait').show();
@@ -141,10 +142,11 @@
                     var arr_patients = JSON.parse(data.d);
                     GENERAL.PATIENTS.setPatients(JSON.stringify(arr_patients));
                     //GENERAL.VOLUNTEERS.setvolunteersList(arr_volunteers);
+                     arr_patients = mergeDuplicates(arr_patients, 'Id');
 
                     for (i in arr_patients) {
 
-
+                        //console.log('patient', arr_patients[i]);
                         var equip = "";
                         for (j in arr_patients[i].Equipment) {
                             equip += arr_patients[i].Equipment[j] + ", ";
@@ -426,6 +428,30 @@
             location.href = "patientForm.html";
         }
 
+
+
+        function mergeDuplicates(jsonArray, uniqueAttribute) {
+            const mergedMap = new Map();
+
+            // Iterate through each object in the array
+            jsonArray.forEach(obj => {
+                const objId = obj[uniqueAttribute];
+
+                // Check if the ID already exists in the map
+                if (mergedMap.has(objId)) {
+                    // If it does, merge the related equipment
+                    const existingObj = mergedMap.get(objId);
+                    existingObj.Equipment.push(...obj.Equipment);
+                } else {
+                    // If it doesn't, add the object to the map
+                    mergedMap.set(objId, { ...obj });
+                }
+            });
+
+            // Convert the map back to an array of merged objects
+            const mergedArray = Array.from(mergedMap.values());
+            return mergedArray;
+        }
     </script>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->

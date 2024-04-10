@@ -245,6 +245,29 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string CheckFutureRides(int volunteerId)
+    {
+        try
+        {
+            Volunteer v = new Volunteer();
+            return j.Serialize(v.hasFutureRides(volunteerId));
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in CheckFutureRides", ex);
+            throw new Exception("שגיאה בבדיקה נסיעות עתידיות");
+        }
+    }
+
+
+
+
+
+
     [WebMethod(EnableSession = true)]
     public string getescortedsListMobile(string displayName, string patientCell)
     {
@@ -736,7 +759,7 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
-            Log.Error("Error in setPatient", ex);
+            Log.Error("Error in setPatient XXXXXXX", ex);
             throw ex;
         }
 
@@ -936,7 +959,28 @@ public class WebService : System.Web.Services.WebService
     //    return j.Serialize(r);
     //}
 
-     
+
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string CheckRideBeforePost(int volunteerId,DateTime start,DateTime end)
+    {
+        try
+        {
+            int res = Absence.checkRidesBeforePostAbsence(volunteerId, start, end);
+            j.MaxJsonLength = Int32.MaxValue;
+            return j.Serialize(res);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in CheckRideBeforePost ", ex);
+            throw new Exception("שגיאה בבדיקת הסעות מול היעדרות");
+        }
+    }
+
+
+
+
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string GetRidePatViewByTimeFilter(int from, int until)
@@ -1141,6 +1185,23 @@ public class WebService : System.Web.Services.WebService
         catch (Exception ex)
         {
             Log.Error("Error in GetRidePat", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעה");
+        }
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetUnityRide_RidePat(int ridePatNum)
+    {
+        try
+        {
+            UnityRide ur = new UnityRide();
+            return j.Serialize(ur.getUnityRideAsRP(ridePatNum));
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetUnityRide_RidePat", ex);
             throw new Exception("שגיאה בשליפת נתוני הסעה");
         }
 
@@ -1413,6 +1474,22 @@ public class WebService : System.Web.Services.WebService
 
     }
 
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string AssignRideToUnityRideWithMobile(int ridePatId, int userId, string driverType) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
+    {
+        try
+        {
+            UnityRide ur = new UnityRide();
+            int res = ur.assignDriverMobile(ridePatId, userId);
+            return j.Serialize(res);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("fail to assign");
+        }
+
+    }
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -1542,6 +1619,29 @@ public class WebService : System.Web.Services.WebService
         catch (Exception ex)
         {
             Log.Error("Error in LeaveRidePat", ex);
+            throw new Exception("שגיאה בעת שנהג עזב נסיעה");
+        }
+
+    }
+
+
+    [WebMethod(EnableSession = true, Description = "delete from only one unityRide")]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string LeaveUnityRide(int ridePatId, int rideId, int driverId)
+    {
+        try
+        {
+            //need to send push from here!
+
+            //RidePat rp = new RidePat();
+            //int res = rp.LeaveRidePat(ridePatId, rideId, driverId);
+            UnityRide ur = new UnityRide();
+            int res = ur.leaveUnityRideFromMobile(ridePatId, driverId);
+            return j.Serialize(res);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in LeaveUnityRide", ex);
             throw new Exception("שגיאה בעת שנהג עזב נסיעה");
         }
 

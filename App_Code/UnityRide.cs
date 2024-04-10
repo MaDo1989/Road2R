@@ -2,8 +2,10 @@
 using System.Activities.Expressions;
 using System.Collections;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Web;
 
 public class UnityRide
@@ -449,6 +451,21 @@ public class UnityRide
             {
                 List<DateTime> dateList = new List<DateTime>();
                 dateList = BuildFutureRidesDates(unityride.pickupTime, repeatEvery, numOfRide);
+                string method = ConfigurationManager.AppSettings["dayLightSaving_method"];
+                if (method == "lastFriday")
+                {
+                    dateList = BuildFutureRidesDates(unityride.pickupTime, repeatEvery, numOfRide);
+
+                }
+                else if (method == "lastSunday")
+                {
+                    dateList = BuildFutureRidesDates_sundayMethod(unityride.pickupTime, repeatEvery, numOfRide);
+
+                }
+                else
+                {
+                    throw new Exception("error in the web config <add key=\"dayLightSaving_method\" value=\"lastFriday\" />");
+                }
                 for (int i = 0; i < dateList.Count; i++)
                 {
                     int res = 0;
@@ -601,6 +618,35 @@ public class UnityRide
         return db.Get_unityRide_ByTimeRange(from, until, isDeletedtoShow);
     }
 
+    public int assignDriverMobile(int UnityRideId,int userId)
+    {
+        UnityRide ur = new UnityRide();
+        DBservice_Gilad db = new DBservice_Gilad();
+        ur = db.assignDriverMobile(UnityRideId, userId);
+        if (ur.RidePatNum>-1)
+        {
+            BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
+            return ur.RidePatNum;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+
+
+    public RidePat getUnityRideAsRP(int UnityRideId)
+    {
+        DBservice_Gilad dBservice = new DBservice_Gilad();
+        return dBservice.GetUnityRideAsRidePat(UnityRideId);
+    }
+
+    public int leaveUnityRideFromMobile(int UnityRideId , int driverID)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+        return db.leaveUnityRideForMobile(driverID, UnityRideId);
+    }
+
     public List<UnityRide> GetUnityRidesByVolunteerId(int volunteerId)
     {
         DBservice_Gilad db = new DBservice_Gilad();
@@ -611,6 +657,66 @@ public class UnityRide
         List<DateTime> listOfDatesAfterUTCfix = new List<DateTime>();
         listOfDatesAfterUTCfix.Add(date);
         DateTime firstDate = date;
+        Dictionary<string, object> mixedDictionary = new Dictionary<string, object>();
+
+        DateTime dateAfterIncrement;
+        for (int i = 1; i < numberOfRides; i++)
+        {
+            dateAfterIncrement = repeatRideEvery == "כל שבוע" ? date.AddDays(7) : date.AddDays(1);
+            listOfDatesAfterUTCfix.Add(dateAfterIncrement);
+            date = listOfDatesAfterUTCfix[i];
+        }
+
+        TimeZoneInfo israelTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Israel Standard Time");
+        bool isFirstRideDateDayLightSaving = IsSummerTimeInIsrael(firstDate);
+
+
+        //this function is not working -->
+        //israelTimeZone.IsDaylightSavingTime(someDate));
+
+
+
+        mixedDictionary.Add("isFirstRideDateDayLightSaving", isFirstRideDateDayLightSaving);
+        mixedDictionary.Add("isFirstRideDateDayLightSaving_new way_", IsSummerTimeInIsrael(firstDate));
+        mixedDictionary.Add("firstDate", firstDate);
+        mixedDictionary.Add("israelTimeZone.id", israelTimeZone.Id);
+
+       
+
+        for (int i = 1; i < listOfDatesAfterUTCfix.Count; i++)
+        {
+ 
+
+            mixedDictionary.Add("israelTimeZone.IsDaylightSavingTime(listOfDatesAfterUTCfix["+i+"])", israelTimeZone.IsDaylightSavingTime(listOfDatesAfterUTCfix[i]));
+            mixedDictionary.Add("listOfDatesAfterUTCfix["+i+"]", listOfDatesAfterUTCfix[i]);
+            mixedDictionary.Add("listOfDatesAfterUTCfix[" + i + "] new way", IsSummerTimeInIsrael(listOfDatesAfterUTCfix[i]));
+            if (isFirstRideDateDayLightSaving && !IsSummerTimeInIsrael(listOfDatesAfterUTCfix[i]))
+            {
+                listOfDatesAfterUTCfix[i] = listOfDatesAfterUTCfix[i].AddHours(1);
+                //DBservice_Gilad.StringToTextFile(Environment.NewLine + i + " \ni was here +1\n ", "AnyDebug");
+
+            }
+            else if (!isFirstRideDateDayLightSaving && IsSummerTimeInIsrael(listOfDatesAfterUTCfix[i]))
+            {
+                listOfDatesAfterUTCfix[i] = listOfDatesAfterUTCfix[i].AddHours(-1);
+                //DBservice_Gilad.StringToTextFile(Environment.NewLine + i+" \ni was here -1\n ", "AnyDebug");
+            }
+        }
+
+        DBservice_Gilad.DebugToTextFile(mixedDictionary);
+
+
+
+        return listOfDatesAfterUTCfix;
+    }
+
+
+    private List<DateTime> BuildFutureRidesDates_sundayMethod(DateTime date, string repeatRideEvery, int numberOfRides)
+    {
+        List<DateTime> listOfDatesAfterUTCfix = new List<DateTime>();
+        listOfDatesAfterUTCfix.Add(date);
+        DateTime firstDate = date;
+        Dictionary<string, object> mixedDictionary = new Dictionary<string, object>();
 
         DateTime dateAfterIncrement;
         for (int i = 1; i < numberOfRides; i++)
@@ -622,18 +728,81 @@ public class UnityRide
 
         TimeZoneInfo israelTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Israel Standard Time");
         bool isFirstRideDateDayLightSaving = israelTimeZone.IsDaylightSavingTime(firstDate);
+        mixedDictionary.Add("isFirstRideDateDayLightSaving", isFirstRideDateDayLightSaving);
+        mixedDictionary.Add("isFirstRideDateDayLightSaving_new way_", IsSummerTimeInIsrael(firstDate));
+        mixedDictionary.Add("firstDate", firstDate);
+        mixedDictionary.Add("israelTimeZone.id", israelTimeZone.Id);
+
+
 
         for (int i = 1; i < listOfDatesAfterUTCfix.Count; i++)
         {
+
+
+            mixedDictionary.Add("israelTimeZone.IsDaylightSavingTime(listOfDatesAfterUTCfix[" + i + "])", israelTimeZone.IsDaylightSavingTime(listOfDatesAfterUTCfix[i]));
+            mixedDictionary.Add("listOfDatesAfterUTCfix[" + i + "]", listOfDatesAfterUTCfix[i]);
+            mixedDictionary.Add("listOfDatesAfterUTCfix[" + i + "] new way", IsSummerTimeInIsrael(listOfDatesAfterUTCfix[i]));
             if (isFirstRideDateDayLightSaving && !israelTimeZone.IsDaylightSavingTime(listOfDatesAfterUTCfix[i]))
             {
                 listOfDatesAfterUTCfix[i] = listOfDatesAfterUTCfix[i].AddHours(1);
+                //DBservice_Gilad.StringToTextFile(Environment.NewLine + i + " \ni was here +1\n ", "AnyDebug");
+
             }
             else if (!isFirstRideDateDayLightSaving && israelTimeZone.IsDaylightSavingTime(listOfDatesAfterUTCfix[i]))
             {
                 listOfDatesAfterUTCfix[i] = listOfDatesAfterUTCfix[i].AddHours(-1);
+                //DBservice_Gilad.StringToTextFile(Environment.NewLine + i+" \ni was here -1\n ", "AnyDebug");
             }
         }
+
+        DBservice_Gilad.DebugToTextFile(mixedDictionary);
+
+
+
         return listOfDatesAfterUTCfix;
     }
+
+    private static bool IsSummerTimeInIsrael(DateTime date)
+    {
+        // Specify the time zone for Israel
+        TimeZoneInfo israelTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Israel Standard Time");
+
+        // Calculate the start and end dates of daylight saving time for the provided year
+        int year = date.Year;
+        DateTime dstStart = GetDaylightSavingTimeStart(year);
+        DateTime dstEnd = GetDaylightSavingTimeEnd(year);
+
+        // Check if the provided date falls within the daylight saving time range
+        bool isSummerTime = date >= dstStart && date < dstEnd;
+
+        return isSummerTime;
+    }
+
+    // Helper method to calculate the start date of daylight saving time for the provided year
+    private static DateTime GetDaylightSavingTimeStart(int year)
+    {
+        DateTime lastFridayInMarch = new DateTime(year, 3, 31);
+        while (lastFridayInMarch.DayOfWeek != DayOfWeek.Friday)
+        {
+            lastFridayInMarch = lastFridayInMarch.AddDays(-1);
+        }
+        return lastFridayInMarch;
+    }
+
+    // Helper method to calculate the end date of daylight saving time for the provided year
+    private static DateTime GetDaylightSavingTimeEnd(int year)
+    {
+        DateTime lastSundayInOctober = new DateTime(year, 10, 31);
+        DayOfWeek lastSundayOfWeek = lastSundayInOctober.DayOfWeek;
+        int daysUntilLastSunday = (int)lastSundayOfWeek;
+        DateTime dstEnd = lastSundayInOctober.AddDays(-daysUntilLastSunday);
+        return dstEnd;
+    }
 }
+
+
+
+
+
+
+

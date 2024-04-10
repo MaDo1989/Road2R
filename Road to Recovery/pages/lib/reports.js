@@ -691,7 +691,7 @@ function empty_func(id) {
 
 function rp_amuta_vls_per_km_field_year_post_clone(id) {
     var today = new Date();
-    $('#select_year').val(today.getFullYear() - 1);
+    $('#select_year').val(today.getFullYear());
     $("#select_year").change(rp_amuta_vls_km__refresh_preview);
 
     rp_amuta_vls_km__refresh_preview();
