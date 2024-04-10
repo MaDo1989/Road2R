@@ -4894,7 +4894,7 @@
             const editBtn = `<button type='button' class='edit                   btn btn-icon waves-effect waves-light btn-secondary' id='${ridePatNum}'  name='${ridePatNum}' title='עריכה'>         <i class='ti-pencil'></i></button>`;
             const deleteBtn = `<button type='button' class='remove               btn btn-icon waves-effect waves-light btn-secondary' id='${ridePatNum}'  name='${ridePatNum}' title='מחיקה'>         <i class='fa fa-remove'></i></button>`;
             const messageToCopyBtn = `<button type='button' class='copyMessage   btn btn-icon waves-effect waves-light btn-secondary' id='${ridePatNum}'  name='${ridePatNum}' title='העתקת הודעה'>   <i class='fa fa-envelope'></i></button>`;
-            const candidateBtn = `<button type='button' title="בשיפוצים" disabled class='candidatesBtn btn btn-icon waves-effect waves-light btn-secondary'     id='${ridePatNum}'  name='${ridePatNum}' title='מועמדים להסעה'> <i class='fa fa-car'></i></button>`;
+            const candidateBtn = `<button type='button' title="בשיפוצים"  class='candidatesBtn btn btn-icon waves-effect waves-light btn-secondary'     id='${ridePatNum}'  name='${ridePatNum}' title='מועמדים להסעה'> <i class='fa fa-car'></i></button>`;
             let thisRide = findRideByNumber(ridePatNum);
             let timeNum = thisRide.PickupTime.replace('/', '').replace('/', '').replace('Date(', '').replace(')', '');
             timeNum = parseInt(timeNum);

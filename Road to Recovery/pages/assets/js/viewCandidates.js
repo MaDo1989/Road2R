@@ -226,16 +226,17 @@ const getRidePat = () => {
 }
 
 const renderRidePatDetails = (ridepat) => {
-    ridepatDate = convertDBDate2FrontEndDate(ridepat.Date);
+    console.log('what is ridepat ? ',ridepat)
+    ridepatDate = convertDBDate2FrontEndDate(ridepat.PickupTime);
     let isToday = isItToday(ridepatDate);
     let isAfterNoon = ridepatDate.getMinutes() === 14;
     
 
     let ridePatDetails = `מ`;
-    ridePatDetails += ridepat.Origin.Name;
+    ridePatDetails += ridepat.Origin;
     ridePatDetails += ' ';
     ridePatDetails += `ל`;
-    ridePatDetails += ridepat.Destination.Name;
+    ridePatDetails += ridepat.Destination;
     ridePatDetails += ' ';
     ridePatDetails += isToday ? 'היום' : `ב` + getHebrew_WeekDay(ridepatDate.getDay());
     ridePatDetails += ' ';
@@ -243,14 +244,14 @@ const renderRidePatDetails = (ridepat) => {
     ridePatDetails += ' ';
     ridePatDetails += isAfterNoon ? `אחה"צ` : `בשעה  ${ridepatDate.toLocaleString('he-IL', { timeStyle: 'short' })}`;
     ridePatDetails += ' ';
-    ridePatDetails += 'מקומות: ' + parseInt(ridepat.Escorts.length + 1);
+    ridePatDetails += 'מקומות: ' + parseInt(ridepat.AmountOfEscorts + 1);
     //ridePatDetails += ridepatDate.Equipment.length > 0 && ridepatDate.Equipment.includes(''); 
 
     document.getElementById('RideCandidates_ph').innerHTML = ridePatDetails;
 }
 
 const isItToday = (d) => {
-
+    console.log('what is d', d);
     let now = new Date(Date.now());
     let daysMatch = d.getDate() === now.getDate();
     let monthMatch = d.getMonth() === now.getMonth();
@@ -262,13 +263,13 @@ const isItToday = (d) => {
 }
 
 const getCandidates = () => {
-
     // BENNY
     let numOfCandidates = 25;
     let newFlag = false;
     let dayInWeek = ridepatDate.getDay();
 
     $('#wait').show();
+    console.log('what sent ? ', { ridePatNum, numOfCandidates, newFlag, dayInWeek })
     ajaxCall(
         'GetCandidates',
         JSON.stringify({ ridePatNum, numOfCandidates, newFlag, dayInWeek }),

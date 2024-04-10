@@ -124,6 +124,7 @@ function getWeeklyThanks(rides) {
 
 function showThanks() {
     var thanks = getWeeklyThanks(arr_rides);
+    console.log('wtf is thanks', thanks);
     str = "";
     for (c in thanks) {
         str += "<h3>" + c + "</h3>";
