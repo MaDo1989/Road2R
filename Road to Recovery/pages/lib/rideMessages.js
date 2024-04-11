@@ -252,7 +252,7 @@ const patientMessage = (patient) => {
         agePrefix += ` ${patient.Age}`;
     }
 
-    console.log('Gilad-->', agePrefix);
+    //console.log('Gilad-->', agePrefix);
 
     try {
         txt = patient.isAnonymous ? `חולה` : `${patient.name}, ${agePrefix}`;

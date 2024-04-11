@@ -4377,7 +4377,7 @@
                 }
                 let thisRide = findRideByNumber(rideID);
 
-                console.log('checking:', 'timespan:', timespan, 'PatientNameSpan: ', PatientNameSpan, 'The Ride:', thisRide);
+                //console.log('checking:', 'timespan:', timespan, 'PatientNameSpan: ', PatientNameSpan, 'The Ride:', thisRide);
                 if (timespan != 'אחה"צ' && PatientNameSpan != 'חולה' && thisRide.MainDriver!=-1) {
                     $(`#${rideID}`).addClass('statusComplete');
                 }
