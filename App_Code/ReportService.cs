@@ -852,6 +852,7 @@ GROUP BY inner_select.DisplayName
                 Where Pickuptime < @end_date
                 AND pickuptime >=  @start_date
                 AND status not like N'נמחקה'
+                and DriverName is not null
                 ORDER BY Area ASC";
 
         SqlCommand cmd = new SqlCommand(query);

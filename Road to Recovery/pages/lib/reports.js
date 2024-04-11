@@ -1142,7 +1142,7 @@ function refresh_amuta_vls_week_Table(start_date, end_date) {
         success: function (data) {
             $('#wait').hide();
             arr_rides = JSON.parse(data.d);
-            console.log('Gilad check -->', arr_rides);
+            //console.log('Gilad check -->', arr_rides);
 
             $('#div_table_amuta_vls_week').show();
             tbl = $('#table_amuta_vls_week').DataTable({
