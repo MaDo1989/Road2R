@@ -515,7 +515,7 @@
                     let nowInUTC = new Date().toUTCString();
                     var func = arr_customer.func;
 
-
+                    
 
 
 
@@ -605,58 +605,6 @@
                         pushMsg = "העוזר " + userName + " הקים נסיעה חדשה עם החולה " + $("#pat").val() + " בתאריך " + dateForPush + " בשעה " + hourForPush + " מ" + $("#Origin").val() + " ל" + $("#Destination").val();
 
 
-
-                        //NEW 24.07.20
-
-                        //rideBack = false;
-                        //if (rideBack) {
-                        //    tmpOrigin = Origin;
-                        //    Origin = Destination;
-                        //    Destination = tmpOrigin;
-                        //    date = new Date(Year, Month, Day, 22, 14);
-                        //    RidePatBack = {
-                        //        Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Remark: Remark, Escorts: Escorts, Date: date, OnlyEscort: OnlyEscort
-                        //    }
-                        //    console.log(RidePat)
-                        //    console.log(RidePatBack)
-                        //    var requestBack = { RidePat: RidePatBack, func: func, isAnonymous: isAnonymous, numberOfRides: numberOfRides, repeatRideEvery: repeatRide }
-                        //    var dataString = JSON.stringify(requestBack);
-
-                        //    $.ajax({
-                        //        dataType: "json",
-                        //        url: "WebService.asmx/setRidePat",
-                        //        contentType: "application/json; charset=utf-8",
-                        //        type: "POST",
-                        //        async: false,
-                        //        data: dataString,
-                        //        success: function (data) {
-                        //            //SaveAddresses(0, numberOfRecords, customerID);
-                        //            console.log("num: " + data.d);
-                        //            if (data.d !== 1) {
-                        //                swal({
-                        //                    title: "נשמרה ההסעה חזור\nلقت تمت عملية الحفظ",
-                        //                    type: "success",
-                        //                    timer: 1000,
-                        //                    showConfirmButton: false
-                        //                });
-                        //            }
-                        //        },
-                        //        error: function (err) {
-                        //            swal(
-                        //                "خطأ\nשגיאה",
-                        //                "משהו השתבש ברישום ההסעה חזור, צא ונסה שנית",
-                        //                "warning"
-                        //            );
-
-                        //        }
-                        //    });
-                        //}
-
-
-
-                        //END NEW
-
-
                     }
                     else {
                         if (x_wasClicked) {
@@ -685,144 +633,149 @@
                     var dataString = JSON.stringify(request);
                     localStorage.setItem("PatientNameForRide", null);
 
-                    $.ajax({
-                        dataType: "json",
-                        url: "WebService.asmx/setRidePat",
-                        contentType: "application/json; charset=utf-8",
-                        type: "POST",
-                        data: dataString,
-                        success: function (data) {
-                            if (data.d === 1) {
-                                //there is such a drive and status is not נמחקה
+                    //console.log('Gilad check || before submit the form data:', JSON.parse(dataString));
+                    setUnityRideNew(dataString);
 
-                                $('#wait').hide();
-                                let date2present = new Date(request.RidePat.Date).toLocaleDateString('he-IL');
-                                swal(
-                                    "خطأ\nשגיאה",
-                                    "קיימת כבר הסעה בתאריך " + date2present + " עם אותו החולה ואותן נקודות האיסוף\nيوجد سفرية بالتاريخ (التاريخ) مع نفس المريض ونفس نقطة الالتقاء",
-                                    "warning"
-                                );
+                    //Before united-(old API and tables in DB)
+                    //********************************************************** */
+                    //$.ajax({
+                    //    dataType: "json",
+                    //    url: "WebService.asmx/setRidePat",
+                    //    contentType: "application/json; charset=utf-8",
+                    //    type: "POST",
+                    //    data: dataString,
+                    //    success: function (data) {
+                    //        if (data.d === 1) {
+                    //            //there is such a drive and status is not נמחקה
 
-                            } else if (data.d < 0) { //there is such a drive and status = נמחקה
+                    //            $('#wait').hide();
+                    //            let date2present = new Date(request.RidePat.Date).toLocaleDateString('he-IL');
+                    //            swal(
+                    //                "خطأ\nשגיאה",
+                    //                "קיימת כבר הסעה בתאריך " + date2present + " עם אותו החולה ואותן נקודות האיסוף\nيوجد سفرية بالتاريخ (التاريخ) مع نفس المريض ونفس نقطة الالتقاء",
+                    //                "warning"
+                    //            );
 
-                                let rideNumber = data.d * -1; //retriving the rideNumber back to positive number
-                                rideNumberForNo = rideNumber;
-                                let returnDriveExist = false;
-                                tmpOrigin = Origin;
-                                Origin = Destination;
-                                Destination = tmpOrigin;
-                                RidePatBack = {
-                                    Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Remark: Remark, Escorts: Escorts, Date: date, OnlyEscort: OnlyEscort
-                                }
-                                $.ajax({
-                                    dataType: "json",
-                                    url: "WebService.asmx/CheckRidePat",
-                                    contentType: "application/json; charset=utf-8",
-                                    type: "POST",
-                                    //  async: false,
-                                    data: JSON.stringify({ RidePatBack }),
-                                    success: function (data) {
-                                        $('#wait').hide();
-                                        let driverInput_hasValue = ($('#driver').val() !== "");
+                    //        } else if (data.d < 0) { //there is such a drive and status = נמחקה
 
-                                        returnDriveExist = JSON.parse(data.d);
-                                        console.log(returnDriveExist)
-                                        var DestIsHospital = hospitals.includes(request.RidePat.Destination.Name);
+                    //            let rideNumber = data.d * -1; //retriving the rideNumber back to positive number
+                    //            rideNumberForNo = rideNumber;
+                    //            let returnDriveExist = false;
+                    //            tmpOrigin = Origin;
+                    //            Origin = Destination;
+                    //            Destination = tmpOrigin;
+                    //            RidePatBack = {
+                    //                Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Remark: Remark, Escorts: Escorts, Date: date, OnlyEscort: OnlyEscort
+                    //            }
+                    //            $.ajax({
+                    //                dataType: "json",
+                    //                url: "WebService.asmx/CheckRidePat",
+                    //                contentType: "application/json; charset=utf-8",
+                    //                type: "POST",
+                    //                //  async: false,
+                    //                data: JSON.stringify({ RidePatBack }),
+                    //                success: function (data) {
+                    //                    $('#wait').hide();
+                    //                    let driverInput_hasValue = ($('#driver').val() !== "");
 
-                                        if (driverInput_hasValue) {
-                                            currentDriverId = -1;
-                                            addDriver(rideNumber);
-                                        }
+                    //                    returnDriveExist = JSON.parse(data.d);
+                    //                    console.log(returnDriveExist)
+                    //                    var DestIsHospital = hospitals.includes(request.RidePat.Destination.Name);
 
-                                        if (DestIsHospital && !returnDriveExist || DestIsHospital && isAnonymous) {//offer a return ride
-                                            document.getElementById('ModalTitle').innerHTML = 'הנסיעה שוחזרה בהצלחה';
+                    //                    if (driverInput_hasValue) {
+                    //                        currentDriverId = -1;
+                    //                        addDriver(rideNumber);
+                    //                    }
 
-                                            document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
-                                            document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
-                                            document.getElementById('modalButtons').innerHTML += '<button onclick="createReturnRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn">יצירת החזרה &nbsp;<i class="ti-car m-r-5"></i></button>';
+                    //                    if (DestIsHospital && !returnDriveExist || DestIsHospital && isAnonymous) {//offer a return ride
+                    //                        document.getElementById('ModalTitle').innerHTML = 'הנסיעה שוחזרה בהצלחה';
 
-                                            showMyModal('Modal');
-                                        } else { // dont offer return drive
-                                            document.getElementById('ModalTitle').innerHTML = 'הנסיעה שוחזרה בהצלחה';
-                                            document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
-                                            document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
+                    //                        document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
+                    //                        document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
+                    //                        document.getElementById('modalButtons').innerHTML += '<button onclick="createReturnRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn">יצירת החזרה &nbsp;<i class="ti-car m-r-5"></i></button>';
 
-                                            showMyModal('Modal');
-                                        }
+                    //                        showMyModal('Modal');
+                    //                    } else { // dont offer return drive
+                    //                        document.getElementById('ModalTitle').innerHTML = 'הנסיעה שוחזרה בהצלחה';
+                    //                        document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
+                    //                        document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
 
-                                    },
-                                    error: function (err) {
-                                        $('#wait').hide();
-                                        alert("Error in CheckRidePat: " + err.responseText);
-                                    }
-                                });
-                            }
-                            else {
-                                rideNumber = data.d;
-                                rideNumberForNo = rideNumber;
-                                var returnDriveExist = false;
+                    //                        showMyModal('Modal');
+                    //                    }
 
-                                tmpOrigin = Origin;
-                                Origin = Destination;
-                                Destination = tmpOrigin;
-                                RidePatBack = {
-                                    Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Remark: Remark, Escorts: Escorts, Date: date, OnlyEscort: OnlyEscort
-                                }
+                    //                },
+                    //                error: function (err) {
+                    //                    $('#wait').hide();
+                    //                    alert("Error in CheckRidePat: " + err.responseText);
+                    //                }
+                    //            });
+                    //        }
+                    //        else {
+                    //            rideNumber = data.d;
+                    //            rideNumberForNo = rideNumber;
+                    //            var returnDriveExist = false;
 
-                                $.ajax({
-                                    dataType: "json",
-                                    url: "WebService.asmx/CheckRidePat",
-                                    contentType: "application/json; charset=utf-8",
-                                    type: "POST",
-                                    // async: false,
-                                    data: JSON.stringify({ RidePatBack }),
-                                    success: function (data) {
-                                        $('#wait').hide();
-                                        let driverInput_hasValue = ($('#driver').val() !== "");
-                                        returnDriveExist = JSON.parse(data.d);
-                                        //console.log(returnDriveExist)
-                                        var DestIsHospital = hospitals.includes(request.RidePat.Destination.Name);
-                                        if (driverInput_hasValue) {
-                                            currentDriverId = -1;
-                                            addDriver(rideNumber);
-                                        }
+                    //            tmpOrigin = Origin;
+                    //            Origin = Destination;
+                    //            Destination = tmpOrigin;
+                    //            RidePatBack = {
+                    //                Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Remark: Remark, Escorts: Escorts, Date: date, OnlyEscort: OnlyEscort
+                    //            }
 
-                                        if (DestIsHospital && !returnDriveExist || DestIsHospital && isAnonymous) {//offer a return ride
-                                            document.getElementById('ModalTitle').innerHTML = 'הנסיעה נשמרה';
+                    //            $.ajax({
+                    //                dataType: "json",
+                    //                url: "WebService.asmx/CheckRidePat",
+                    //                contentType: "application/json; charset=utf-8",
+                    //                type: "POST",
+                    //                // async: false,
+                    //                data: JSON.stringify({ RidePatBack }),
+                    //                success: function (data) {
+                    //                    $('#wait').hide();
+                    //                    let driverInput_hasValue = ($('#driver').val() !== "");
+                    //                    returnDriveExist = JSON.parse(data.d);
+                    //                    //console.log(returnDriveExist)
+                    //                    var DestIsHospital = hospitals.includes(request.RidePat.Destination.Name);
+                    //                    if (driverInput_hasValue) {
+                    //                        currentDriverId = -1;
+                    //                        addDriver(rideNumber);
+                    //                    }
 
-                                            document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
-                                            document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
-                                            document.getElementById('modalButtons').innerHTML += '<button onclick="createReturnRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn">יצירת החזרה &nbsp;<i class="ti-car m-r-5"></i></button>';
+                    //                    if (DestIsHospital && !returnDriveExist || DestIsHospital && isAnonymous) {//offer a return ride
+                    //                        document.getElementById('ModalTitle').innerHTML = 'הנסיעה נשמרה';
 
-                                            showMyModal('Modal');
-                                        } else { // dont offer return drive
-                                            document.getElementById('ModalTitle').innerHTML = 'הנסיעה נשמרה';
-                                            document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
-                                            document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
+                    //                        document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
+                    //                        document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
+                    //                        document.getElementById('modalButtons').innerHTML += '<button onclick="createReturnRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn">יצירת החזרה &nbsp;<i class="ti-car m-r-5"></i></button>';
 
-                                            showMyModal('Modal');
-                                        }
-                                    },
-                                    error: function (err) {
-                                        $('#wait').hide();
-                                        alert("Error in CheckRidePat: " + err.responseText);
-                                    }
-                                });
+                    //                        showMyModal('Modal');
+                    //                    } else { // dont offer return drive
+                    //                        document.getElementById('ModalTitle').innerHTML = 'הנסיעה נשמרה';
+                    //                        document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
+                    //                        document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
+
+                    //                        showMyModal('Modal');
+                    //                    }
+                    //                },
+                    //                error: function (err) {
+                    //                    $('#wait').hide();
+                    //                    alert("Error in CheckRidePat: " + err.responseText);
+                    //                }
+                    //            });
 
 
-                            }
+                    //        }
 
-                        },
-                        error: function (err) {
-                            $('#wait').hide();
-                            console.log(err);
-                            swal(
-                                "خطأ\nשגיאה",
-                                "משהו השתבש, צא ונסה שנית\nحدث خطأ ما، الرجاء الخروج والدخول مرة اخرى",
-                                "warning"
-                            );
-                        }
-                    });
+                    //    },
+                    //    error: function (err) {
+                    //        $('#wait').hide();
+                    //        console.log(err);
+                    //        swal(
+                    //            "خطأ\nשגיאה",
+                    //            "משהו השתבש, צא ונסה שנית\nحدث خطأ ما، الرجاء الخروج والدخول مرة اخرى",
+                    //            "warning"
+                    //        );
+                    //    }
+                    //});
                     return false;
                 },
 
@@ -866,6 +819,158 @@
 
 
         });
+
+
+        // new func for new way to save rides in the DB -Gilad
+        const setUnityRideNew = (data) => {
+            //console.log('from test CheckAPI_Gilad ', JSON.parse(data));
+            let dataobj = JSON.parse(data);
+            const unityRide = {};
+            unityRide.PatientName = dataobj.RidePat.Pat.DisplayName;
+            unityRide.PatientId = dataobj.RidePat.Pat.Id;
+            unityRide.Origin = dataobj.RidePat.Origin.Name;
+            unityRide.Destination = dataobj.RidePat.Destination.Name;
+            unityRide.PickupTime = dataobj.RidePat.Date;
+            unityRide.Remark = dataobj.RidePat.Remark;
+            unityRide.OnlyEscort = dataobj.RidePat.OnlyEscort;
+            unityRide.IsAnonymous = dataobj.isAnonymous;
+            unityRide.CoorName = dataobj.RidePat.Coordinator.DisplayName;
+            unityRide.DriverName = $('#driver').val() == '' ? null : $('#driver').val()
+            unityRide.RidePatNum = dataobj.func == 'edit' ? dataobj.RidePat.RidePatNum : 0;
+            unityRide.AmountOfEscorts = dataobj.RidePat.Escorts.length;
+            let request = { unityRide: unityRide, func: dataobj.func, numOfRide: dataobj.numberOfRides, repeatEvery: dataobj.repeatRideEvery, firstTry:true };
+            //console.log('After Custom',request);
+            let dataString = JSON.stringify(request);
+
+             $.ajax({
+                        dataType: "json",
+                        url: "WebService.asmx/setUnityRide",
+                        contentType: "application/json; charset=utf-8",
+                        type: "POST",
+                        data: dataString,
+                        success: function (data) {
+                            //console.log('Sucsses res -->', data.d);
+                            const result = JSON.parse(data.d);
+                            if (result == -5) {
+                                swal({
+                                    title: "נהג זה שובץ לנסיעה בשעה שבחרת במקומות שונים",
+                                    type: "warning",
+                                    text: '? האם בכל זאת תרצה לשבץ נהג זה לנסיעה זאת ',
+                                    showCancelButton: true,
+                                    cancelButtonText: "בטל",
+                                    confirmButtonClass: 'btn-warning',
+                                    confirmButtonText: "שבץ",
+                                    closeOnConfirm: true
+                                }, function (userResponse) {
+                                    if (userResponse) {
+                                        let request2 = { unityRide: unityRide, func: dataobj.func, numOfRide: dataobj.numberOfRides, repeatEvery: dataobj.repeatRideEvery, firstTry: false };
+                                        let dataString2 = JSON.stringify(request2);
+                                        $.ajax({
+                                            dataType: "json",
+                                            url: "WebService.asmx/setUnityRide",
+                                            contentType: "application/json; charset=utf-8",
+                                            type: "POST",
+                                            data: dataString2,
+                                            success: function (data) {
+                                                //console.log('Sucsses res -->', data.d);
+                                                const result = JSON.parse(data.d);
+
+                                                if (result == -1 || result == 0) {
+                                                    showErrorSwal(request.unityRide.PickupTime);
+                                                }
+                                                else {
+                                                    showButtonsModal(isThisAReturnDrive);
+                                                }
+                                            },
+                                            error: function (err) {
+                                                $('#wait').hide();
+                                                console.log('Error from new API', err);
+
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        $('#wait').hide();
+                                    }
+
+                                });
+                            }
+                            else {
+                                if (result == -1 || result == 0) {
+                                    showErrorSwal(request.unityRide.PickupTime);
+                                }
+                                else if (result == -9)
+                                {
+                                    console.log('Error in setUnityRide ', request)
+                                    Swal.fire({
+                                        title: "שגיאה",
+                                        text: "העדכון לא בוצע קיימת שגיאה בשליחת הנתונים",
+                                        icon: "error"
+                                    });
+                                }
+
+                                else
+                                {
+                                    showButtonsModal(isThisAReturnDrive);
+
+                                }
+                            }
+
+
+
+
+                        },
+                        error: function (err) {
+                            $('#wait').hide();
+                            console.log('Error from new API',err);
+                                
+                        }
+             });
+
+            const showButtonsModal = (isReturnDrive) => {
+                if (isReturnDrive) {
+                    $('#wait').hide();
+                    document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
+                    document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
+                    showMyModal('Modal');
+                }
+                else {
+                    $('#wait').hide();
+                    document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
+                    document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
+                    document.getElementById('modalButtons').innerHTML += '<button onclick="createReturnRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn">יצירת החזרה &nbsp;<i class="ti-car m-r-5"></i></button>';
+                    showMyModal('Modal');
+                }
+
+            }
+
+            
+
+            ///////////////////////////////////////////////////////////////////////////
+
+            //paramDic.Add("@patientName", unityRide.PatientName);
+            //paramDic.Add("@patientId", unityRide.PatientId);
+            //paramDic.Add("@origin", unityRide.Origin);
+            //paramDic.Add("@destination", unityRide.Destination);
+            //paramDic.Add("@pickupTime", unityRide.PickupTime);
+            //paramDic.Add("@remark", unityRide.Remark);
+            //paramDic.Add("@onlyEscort", unityRide.OnlyEscort);
+            //paramDic.Add("@area", unityRide.Area);
+            //paramDic.Add("@isAnonymous", unityRide.IsAnonymous);
+            //paramDic.Add("@coorName", unityRide.CoorName);
+            //paramDic.Add("@driverName", unityRide.DriverName);
+            //paramDic.Add("@amountOfEscorts", unityRide.AmountOfEscorts);
+        }
+        //this is for the swal error modal if somethinggo wrong or already exist.
+        const showErrorSwal = (date) => {
+             $('#wait').hide();
+             let date2present = new Date(date).toLocaleDateString('he-IL');
+             swal(
+             "خطأ\nשגיאה",
+             "קיימת כבר הסעה בתאריך " + date2present + " עם אותו החולה ואותן נקודות האיסוף\nيوجد سفرية بالتاريخ (التاريخ) مع نفس المريض ونفس نقطة الالتقاء",
+             "warning"
+             );
+        }
 
         const isAllowedLocation = (referrer) => {
 
@@ -951,7 +1056,8 @@
 
         const fillPage_withPatientData = (patient, markThe1stEscort = false) => {
 
-            isAnonymous = patient.IsAnonymous === 'True';
+            //console.log('inside fillPage_withPatientData --> patient-', patient)
+            isAnonymous = patient.IsAnonymous === "True";
             localStorage.PatID = patient.Id;
             $('#pat').val(patient.DisplayName);
             $('#patEnglishName').val(patient.EnglishName);
@@ -963,10 +1069,11 @@
                 EscortedList = patient.EscortedList;
                 let str = '';
                 for (var i = 0; i < EscortedList.length; i++) {
-                    str += `<input id='escortCB${EscortedList[i].Id}' type=checkbox name='${EscortedList[i].EnglishName}' ${i === 0 && markThe1stEscort ? 'checked' : ''} >&nbsp`;
-                    str += `<label data-toggle='tooltip' title='${EscortedList[i].EnglishName}' for='escortCB${EscortedList[i].Id}'>${EscortedList[i].DisplayName}</label>&nbsp&nbsp</br>`;
+                    str += `<input id='escortCB${EscortedList[i].Id}' type=checkbox name='${EscortedList[i].DisplayName}' ${i === 0 && markThe1stEscort ? 'checked' : ''} >&nbsp`;
+                    str += `<label data-toggle='tooltip' title='${EscortedList[i].DisplayName}' for='escortCB${EscortedList[i].Id}'>${EscortedList[i].DisplayName}</label>&nbsp&nbsp</br>`;
                 }
                 $("#selectEscort").html(str);
+
 
             } else {
                 $("#selectEscort").html('');
@@ -1191,7 +1298,7 @@
 
                 for (var i = 0; i < patients_JSONArray.length; i++) {
 
-                    if (isAssistant && patients_JSONArray[i].IsAnonymous === 'True') {
+                    if (isAssistant && patients_JSONArray[i].IsAnonymous === true) {
                         continue;
                     }
                     patients_Names.push(patients_JSONArray[i].DisplayName.trim());
@@ -1582,12 +1689,12 @@
                         $('#numberOfRides').val(duplicateRidePat.numberOfRides);
                         $("#duplicateRidePat").prop("checked", true);
                         // $('#hideDuplicate').show();
-                        console.log(duplicateRidePat)
+                        //console.log(duplicateRidePat)
 
                         localStorage.removeItem("duplicateRidePat");
                     }
 
-                    uploadData(arr_customer.RidePatNum);
+                    uploadData_new(arr_customer.RidePatNum);
                     $('#hideDuplicate').hide();
                     $("#hideOnEdit").addClass('duplicateDisplay');
 
@@ -1649,8 +1756,356 @@
             }
         }
 
+        // will needed for later to custom between the object UnityRide to RidePat // Gilad
+        const CustomObject = (thisRide) => {
+
+            let CustomObj = {};
+            CustomObj.RidePatNum = thisRide[0].Value;
+            CustomObj.Status = thisRide[9].Value;
+            CustomObj.Remark = thisRide[8].Value;
+            CustomObj.OnlyEscort = thisRide[10].Value;
+            CustomObj.LastModified = thisRide[11].Value;
+            CustomObj.Date = thisRide[7].Value;
+
+            CustomObj.Pat = {};
+            CustomObj.Pat.DisplayName = thisRide[1].Value;
+            CustomObj.Pat.Id = thisRide[2].Value;
+            CustomObj.Pat.DisplayNameA = thisRide[16].Value;
+            CustomObj.Pat.EnglishName = thisRide[14].Value;
+            CustomObj.Pat.PatientIdentity = thisRide[15].Value;
+            CustomObj.Pat.Equipment = thisRide[17].Value;
+            CustomObj.Pat.IsAnonymous = thisRide[19].Value;
+            isAnonymous = CustomObj.Pat.IsAnonymous
+
+            CustomObj.AmountOfEscorts = thisRide[3].Value;
+
+            CustomObj.Pat.EscortedList = [];
+            CustomObj.Escorts = [];
+            for (var i = 0; i < thisRide[18].Value.length; i++) {
+                let oneEscort = {}
+                oneEscort.Id = thisRide[18].Value[i][0].Value;
+                oneEscort.DisplayName = thisRide[18].Value[i][1].Value;
+                CustomObj.Escorts.push(oneEscort);
+            }
+            for (var i = 0; i < thisRide[20].Value.length; i++) {
+                let oneEscort = {}
+                oneEscort.Id = thisRide[20].Value[i][0].Value;
+                oneEscort.DisplayName = thisRide[20].Value[i][1].Value;
+                CustomObj.Pat.EscortedList.push(oneEscort);
+            }
+
+            CustomObj.Drivers = [];
+            let Maindriver = {};
+            Maindriver.DisplayName = thisRide[13].Value;
+            Maindriver.Id = thisRide[12].Value;
+            CustomObj.Drivers.push(Maindriver);
+            if (Maindriver.Id == null) {
+                CustomObj.Drivers = [];
+            }
+
+            CustomObj.Destination = {};
+            CustomObj.Destination.Name = thisRide[6].Value;
+            CustomObj.Origin = {};
+            CustomObj.Origin.Name = thisRide[5].Value;
+
+            CustomObj.Pat.Barrier = {}
+            CustomObj.Pat.Hospital = {}
+            CustomObj.Pat.Barrier.Name = CustomObj.Destination.Name;
+            CustomObj.Pat.Hospital.Name = CustomObj.Origin.Name;
+
+            CustomObj.Coordinator = {};
+            CustomObj.Coordinator.DisplayName = thisRide[21].Value;
+            CustomObj.Coordinator.Id = thisRide[22].Value;
+
+            return CustomObj;
+        }
+
+
+        //Test the New Api for load data in this page
+        const Check_test_API = (ridePatNum) => {
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/GetUnityRideToEdit",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                data: JSON.stringify({ UnityRideId: ridePatNum }),
+                success: function (data) {
+                    let thisRide = JSON.parse(data.d)[0];
+                    //console.log('Before Custom', thisRide);
+                    thisRide = CustomObject(thisRide);
+                    //console.log('After Custom', thisRide);
+
+
+                },
+                error: function (err) {
+                    $('#wait').hide();
+                    alert("Error in uploadData: " + err.responseText);
+                }
+            });
+        }
+
+        //function to fill form for edit
+        async function uploadData_new(ridePatNum) {
+            //console.log('Gilad check i just clicked', ridePatNum)
+            //  generatePat();
+            getPatients_slim();
+            generateLocation()
+                .then((result) => {
+
+                    generateHour();
+                    generateMinute();
+                    generateStatus();
+
+                    $('#wait').show();
+                    $.ajax({
+                        dataType: "json",
+                        url: "WebService.asmx/GetUnityRideToEdit",
+                        contentType: "application/json; charset=utf-8",
+                        type: "POST",
+                        data: JSON.stringify({ UnityRideId: ridePatNum }),
+                        success: function (data) {
+
+
+                            
+                            let thisRide = JSON.parse(data.d)[0];
+                            //console.log('before -->', thisRide)
+                            thisRide = CustomObject(thisRide);
+                            ridePat = thisRide
+                            //console.log('how its need to look like :', ridePat);
+                            escorts_inthisRidePat = ridePat.Escorts;
+
+
+
+                            GENERAL.RIDEPAT.setRidePatList(JSON.stringify(ridePat));
+
+                            var temp = ridePat.Date.substring(ridePat.Date.indexOf("(") + 1, ridePat.Date.indexOf(")"))
+                            var date = new Date(parseInt(temp));
+                            day = date.getDay();
+                            var dayArr = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+                            var dayName = dayArr[day];
+                            var day = date.getDate();
+                            var month = date.getMonth() + 1;
+                            var year = date.getFullYear();
+                            var hours = date.getHours();
+                            var minutes = date.getMinutes();
+                            if (hours < 10) hours = "0" + hours;
+                            if (minutes < 10) minutes = minutes + "0";
+                            if (day < 10) day = "0" + day;
+                            if (month < 10) month = "0" + month;
+                            date = year + "-" + month + "-" + day;
+
+                            //rdate = ryear + "-" + rmonth + "-" + rday;
+                            document.getElementById("dateRide").value = date;
+
+                            if (minutes == "14") {
+                                $("#afterNoon").attr('checked', true);
+
+                                checkAfternoon();
+
+                            } else {
+                                $("#hour option[value='" + hours + "']").prop('selected', true);
+                                $("#minute option[value='" + minutes + "']").prop('selected', true);
+                            }
+                            if (ridePat.Status != 'ממתינה לשיבוץ') {
+                                rideStatusForFields = 1;
+                            }
+
+                            //editing anonymous ridepat only if a driver assigned to the ride.
+                            if ((ridePat.Pat.IsAnonymous == true) && (ridePat.Status != 'ממתינה לשיבוץ')) {
+
+                                //$("#afterNoon").attr('disabled', 'disabled');
+                                $("#Origin").attr('disabled', 'disabled');
+                                $("#Destination").attr('disabled', 'disabled');
+                                //$("#hour").attr('disabled', 'disabled');
+                                //$("#minute").attr('disabled', 'disabled');
+                                $("#dateRide").attr('disabled', 'disabled');
+                                $("#dirBTN").attr('disabled', 'disabled');
+                            }
+                            if (ridePat.Pat.IsAnonymous == true) {
+                                var area = "";
+                                //if(ridePat.Pat.DisplayName.indexOf('מרכז') !== -1){
+                                //    area="מרכז";
+                                //}
+                                //if(ridePat.Pat.DisplayName.indexOf('דרום') !== -1){
+                                //    area="דרום";
+                                //}
+                                //if(ridePat.Pat.DisplayName.indexOf('ירושלים') !== -1){
+                                //    area="ירושלים";
+                                //}
+                                //if(ridePat.Pat.DisplayName.indexOf('צפון') !== -1){
+                                //    area="צפון";
+                                //}
+                                //if (ridePat.Pat.DisplayName.indexOf('ארז') !== -1) {
+                                //    area = "ארז";
+                                //}
+                                //if (ridePat.Pat.DisplayName.indexOf('תרקומיא') !== -1) {
+                                //    area = "תרקומיא";
+                                //}
+                                var origin = ridePat.Origin.Name;
+                                var destination = ridePat.Destination.Name;
+                                isCenterPoint = true;
+                                //getAnonymousPatientsListForArea(origin, destination, area);
+                            }
+                            //else if (ridePat.Pat.IsAnonymous == "True") {
+
+                            //    var origin = ridePat.Origin.Name;
+                            //    var destination = ridePat.Destination.Name;
+                            //    generatePatAnonymous(origin, destination);
+                            //}
+
+                            if (ridePat.OnlyEscort) $("#onlyEscort").prop('checked', true);
+                            $("#ridePatNum").val(ridePat.RidePatNum);
+
+
+                            RideId = ridePat.RideNum;
+                            ridePatId = ridePat.RidePatNum;
+                            if (ridePat.Drivers.length > 0) {
+                                //$('#Driver').val(ridePat.Drivers[0].Id)
+
+                                var driverIDindex = driversID.indexOf(ridePat.Drivers[0].Id);
+
+
+                                $('#driver').val(drivers[driverIDindex])
+                                currentDriverId = ridePat.Drivers[0].Id;
+                                $('#deleteDriver').show();
+                            } else {
+                                currentDriverId = -1; // There is no driver assigned to the ride
+
+                            }
+
+                            $("#pat").val(ridePat.Pat.DisplayName);
+                            existingPatient = ridePat.Pat;
+                            existingOrigion = ridePat.Origin;
+                            existingDestination = ridePat.Destination;
+
+
+                            //this ↓ function also among other things draw the patient's escorts checkboxes
+                            fillPage_withPatientData(ridePat.Pat);
+
+                            //this code incharge to mark which escorts to checked in.
+                            if (ridePat.Pat.EscortedList.length>0) {
+                                for (var i = 0; i < ridePat.Pat.EscortedList.length; i++) {
+                                    if (i < ridePat.AmountOfEscorts) {
+                                        $(`#escortCB${ridePat.Pat.EscortedList[i].Id}`).prop('checked', true);
+
+                                    }
+                                }
+                            }
+
+
+
+                            //if (typeof arr_escort_inthisRidePat !== "undefined") {
+
+                            //    for (i in arr_escort_inthisRidePat) {
+                            //        $(`#escortCB${arr_escort_inthisRidePat[i].Id}`).prop('checked', true);
+
+
+                            //        //if (ridePat.Pat.IsAnonymous == "True" && (ridePat.Status != 'ממתינה לשיבוץ')) {
+                            //        //    var Escorted = new Object();
+                            //        //    Escorted = arr_escort[i];
+                            //        //    checkEscorts.push(Escorted);
+                            //        //}
+                            //        //for (j in ridePat.Escorts) {
+                            //        //    //if (arr_escort[i].DisplayName == ridePat.Escorts[j].DisplayName) {
+                            //        //    //CHECK THIS XXXXXXX
+                            //        //    if (arr_escort[i].Id == ridePat.Escorts[j].Id) {
+                            //        //        $("#escortCB" + arr_escort[i].Id).prop('checked', true);
+                            //        //    }
+                            //        //}
+                            //    }
+                            //} else ($("#selectEscort").html("<label data-toggle='tooltip' title='No escorts'>אין מלווים</label>"));
+
+                            //ridePat.Origin.EnglishName = ridePat.Origin.EnglishName.replace("'", "\\'");
+                            //$("#selectOrigin option[value='" + ridePat.Origin.EnglishName + "']").prop('selected', true);
+                            //ridePat.Destination.EnglishName = ridePat.Destination.EnglishName.replace("'", "\\'");
+                            //$("#selectDestination option[value='" + ridePat.Destination.EnglishName + "']").prop('selected', true);
+                            ridePat.Origin.Name = ridePat.Origin.Name.replace("'", "\\'");
+                            $("#selectOrigin option[value='" + ridePat.Origin.Name + "']").prop('selected', true);
+                            ridePat.Destination.Name = ridePat.Destination.Name.replace("'", "\\'");
+                            $("#selectDestination option[value='" + ridePat.Destination.Name + "']").prop('selected', true);
+
+                            if (ridePat.Pat.IsAnonymous == true) {
+                                currentOrigin = ridePat.Origin.Name;
+                                currentDestination = ridePat.Destination.Name;
+                            }
+
+
+                            //$("#dateRide").val(date);
+
+
+                            $("#coordinator").val(ridePat.Coordinator.DisplayName);
+
+                            $("#remark").val(ridePat.Remark);
+
+                            $("#statusRidePat option[value='" + ridePat.Status + "']").prop('selected', true);
+                            //anonymousName = ridePat.Pat.DisplayName;
+                            isWaiting = ridePat.Status;
+                            if (ridePat.Drivers.length > 0) {
+                                driverId = ridePat.Drivers[0].Id;
+                            }
+                            $('#wait').hide();
+                            $('#driversDiv').show();
+                            $("#lastModified").val(convertDBDate2FrontEndDate(ridePat.LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" }));
+
+                            rideData = arr_customer.RidePatNum;
+                            if (rideData !== 1) {
+                                var rideNumber = rideData;
+
+                                var returnDriveExist = false;
+                                if ($('#driver').val() != "") {
+                                    localStorage.setItem("ReturnRidePatFlag", true);
+                                }
+                                //tmpOrigin = $('#Origin').val();
+                                Pat = { DisplayName: ridePat.Pat.DisplayName, Id: localStorage.PatID };
+                                Origin = { Name: ridePat.Destination.Name };
+                                Destination = { Name: ridePat.Origin.Name };
+                                Coordinator = { DisplayName: ridePat.Coordinator.DisplayName }
+                                Remark = ridePat.Remark;
+                                Escorts = ridePat.Pat.EscortedList;
+                                //↑ even though it is not the most logical thing to do its the best way nowadays
+                                var temp = ridePat.Date.substring(ridePat.Date.indexOf("(") + 1, ridePat.Date.indexOf(")"))
+                                var date = new Date(parseInt(temp));
+                                let now = new Date();
+                                if (date.getTime() < now.getTime()) { // getTime converts the timestemp back to int for more accurate evaluate
+                                    return;
+                                }
+                                OnlyEscort = ridePat.OnlyEscort;
+                                RidePatBack = {
+                                    Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Remark: Remark, Escorts: Escorts, Date: date, OnlyEscort: OnlyEscort
+                                }
+                            }
+                            /*
+                            else {
+                                data.d = data.d.toString();
+                                var temp = data.d.replace(/(?!^)(\d{2})(?=(?:\d{2})*$)/g, '/$1');
+                                //var dateToShow = data.d.replace(;
+
+                                swal(
+                                    "خطأ\nשגיאה",
+                                    "קיימת כבר הסעה בתאריך " + date + " עם אותו החולה ואותן נקודות האיסוף\nيوجد سفرية بالتاريخ (التاريخ) مع نفس المريض ونفس نقطة الالتقاء",
+                                    "warning"
+                                );
+
+                            }
+                            */
+                            request2TurnOffLoader([generateLocationPromise, getPatientByIdPromise]);
+                        },
+                        error: function (err) {
+                            $('#wait').hide();
+                            alert("Error in uploadData: " + err.responseText);
+                        }
+                    });
+                })
+                .catch((err) => {
+                    alert('בעיה במילוי רשימות יעד ומוצא: ' + err);
+                });
+
+
+        }
+
         //function to fill form for edit
         async function uploadData(ridePatNum) {
+            //console.log('Gilad check i just clicked', ridePatNum)
             //  generatePat();
             getPatients_slim();
             generateLocation()
@@ -1673,6 +2128,7 @@
 
 
                             ridePat = JSON.parse(data.d);
+                            //console.log('how its need to look like :', ridePat);
                             escorts_inthisRidePat = ridePat.Escorts;
 
 
@@ -1711,7 +2167,7 @@
                             }
 
                             //editing anonymous ridepat only if a driver assigned to the ride.
-                            if ((ridePat.Pat.IsAnonymous == "True") && (ridePat.Status != 'ממתינה לשיבוץ')) {
+                            if ((ridePat.Pat.IsAnonymous == true) && (ridePat.Status != 'ממתינה לשיבוץ')) {
 
                                 //$("#afterNoon").attr('disabled', 'disabled');
                                 $("#Origin").attr('disabled', 'disabled');
@@ -1721,7 +2177,7 @@
                                 $("#dateRide").attr('disabled', 'disabled');
                                 $("#dirBTN").attr('disabled', 'disabled');
                             }
-                            if (ridePat.Pat.IsAnonymous == "True") {
+                            if (ridePat.Pat.IsAnonymous == true) {
                                 var area = "";
                                 //if(ridePat.Pat.DisplayName.indexOf('מרכז') !== -1){
                                 //    area="מרכז";
@@ -1821,7 +2277,7 @@
                             ridePat.Destination.Name = ridePat.Destination.Name.replace("'", "\\'");
                             $("#selectDestination option[value='" + ridePat.Destination.Name + "']").prop('selected', true);
 
-                            if (ridePat.Pat.IsAnonymous == "True") {
+                            if (ridePat.Pat.IsAnonymous == true) {
                                 currentOrigin = ridePat.Origin.Name;
                                 currentDestination = ridePat.Destination.Name;
                             }
@@ -2055,7 +2511,7 @@
         function signDriverSuccessCB(data) {
 
             RideId = data.d;
-            console.log(RideId);
+            //console.log(RideId);
             $('#wait').hide();
             swal({
                 title: "הנהג התווסף להסעה",
@@ -2076,27 +2532,27 @@
         }
 
         function deleteRideSuccessCB() {
-            if (driverMode == "edit") {
-                currentDriverId = userSelected;
-                var request = {
-                    ridePatId: ridePatId,
-                    userId: userSelected,
-                    driverType: "primary",
-                    assignedFromAppId: APP_ID
-                };
+            //if (driverMode == "edit") {
+            //    currentDriverId = userSelected;
+            //    var request = {
+            //        ridePatId: ridePatId,
+            //        userId: userSelected,
+            //        driverType: "primary",
+            //        assignedFromAppId: APP_ID
+            //    };
 
-                var dataString = JSON.stringify(request);
-                $.ajax({ // ajax call starts
-                    url: 'WebService.asmx/AssignRideToRidePat',   // server side web service method
-                    data: dataString,                          // the parameters sent to the server
-                    type: 'POST',                              // can be also GET
-                    dataType: 'json',                          // expecting JSON datatype from the server
-                    contentType: 'application/json; charset = utf-8', // sent to the server
-                    success: signDriverSuccessCB,                // data.d id the Variable data contains the data we get from serverside
-                    error: signDriverErrorCB
-                }) // end of ajax call
+            //    var dataString = JSON.stringify(request);
+            //    $.ajax({ // ajax call starts
+            //        url: 'WebService.asmx/AssignRideToRidePat',   // server side web service method
+            //        data: dataString,                          // the parameters sent to the server
+            //        type: 'POST',                              // can be also GET
+            //        dataType: 'json',                          // expecting JSON datatype from the server
+            //        contentType: 'application/json; charset = utf-8', // sent to the server
+            //        success: signDriverSuccessCB,                // data.d id the Variable data contains the data we get from serverside
+            //        error: signDriverErrorCB
+            //    }) // end of ajax call
 
-            } else if (driverMode == "delete") {
+            //}
                 //$('#Driver').val(0)
 
                 $('#driver').val("")
@@ -2110,7 +2566,7 @@
                 });
                 $('#deleteDriver').hide();
                 currentDriverId = -1;
-            }
+            
 
             driverMode = "";
 
@@ -2133,13 +2589,13 @@
                 driverMode = "delete";
                 deleteDriverFlag = true;
                 request = {
-                    ridePatId: ridePatId,
-                    rideId: RideId,
-                    driverId: userSelected
+                    UnityRideId: ridePatId,
+                    isDelete: true,
+                    DriverId: userSelected
                 }
                 var dataString = JSON.stringify(request);
                 $.ajax({ // ajax call starts
-                    url: 'WebService.asmx/LeaveRidePat',   // server side web service method
+                    url: 'WebService.asmx/AssignUpdateDriverToUnityRide',   // server side web service method
                     data: dataString,                          // the parameters sent to the server
                     type: 'POST',                              // can be also GET
                     dataType: 'json',                          // expecting JSON datatype from the server

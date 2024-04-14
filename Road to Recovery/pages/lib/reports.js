@@ -691,7 +691,7 @@ function empty_func(id) {
 
 function rp_amuta_vls_per_km_field_year_post_clone(id) {
     var today = new Date();
-    $('#select_year').val(today.getFullYear() - 1);
+    $('#select_year').val(today.getFullYear());
     $("#select_year").change(rp_amuta_vls_km__refresh_preview);
 
     rp_amuta_vls_km__refresh_preview();
@@ -1142,6 +1142,7 @@ function refresh_amuta_vls_week_Table(start_date, end_date) {
         success: function (data) {
             $('#wait').hide();
             arr_rides = JSON.parse(data.d);
+            //console.log('Gilad check -->', arr_rides);
 
             $('#div_table_amuta_vls_week').show();
             tbl = $('#table_amuta_vls_week').DataTable({
@@ -2449,7 +2450,11 @@ function tomorrows_rides_process_data(records) {
             "pat1_name": rides[0].Patient,
             "pat1_escorts": rides[0].EscortCount,
             "pat2_name": "",
-            "pat2_escorts": ""
+            "pat2_escorts": "",
+            "pat3_name": "",
+            "pat3_escorts": "",
+            "pat4_name": "",
+            "pat4_escorts": ""
         }
         if (rides.length > 1) {
             entry["pat2_name"] = rides[1].Patient;
@@ -2458,6 +2463,10 @@ function tomorrows_rides_process_data(records) {
         if (rides.length > 2) {
             entry["pat3_name"] = rides[2].Patient;
             entry["pat3_escorts"] = rides[2].EscortCount;
+        }
+        if (rides.length > 3) {
+            entry["pat4_name"] = rides[3].Patient;
+            entry["pat4_escorts"] = rides[3].EscortCount;
         }
         table.push(entry);
     }
@@ -2493,6 +2502,12 @@ function tomorrows_rides_get_as_text(table, header) {
         let pat_str = curr.pat1_name + "(" + (1 + +curr.pat1_escorts) + ")";
         if (curr.pat2_name) {
             pat_str = pat_str + " + " + curr.pat2_name + "(" + (1 + +curr.pat2_escorts) + ")";
+        }
+        if (curr.pat3_name) {
+            pat_str = pat_str + " + " + curr.pat3_name + "(" + (1 + +curr.pat3_escorts) + ")";
+        }
+        if (curr.pat4_name) {
+            pat_str = pat_str + " + " + curr.pat4_name + "(" + (1 + +curr.pat4_escorts) + ")";
         }
         result.push("        " + pat_str);
     }

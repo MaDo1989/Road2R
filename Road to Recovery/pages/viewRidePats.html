@@ -147,7 +147,7 @@
             $('#wait').show();
             $.ajax({
                 dataType: "json",
-                url: "WebService.asmx/GetRidePatViewByTimeFilter_Gilad",
+                url: "WebService.asmx/Get_unityRide_ByTimeRange",
                 contentType: "application/json; charset=utf-8",
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader("Content-Encoding", "gzip");
@@ -166,13 +166,14 @@
             $('#wait').hide();
             data = JSON.parse(data.d);
             timeFilteredArr = data; // run over the exist and set new value to the entire page
+            //console.log('first Check -->', timeFilteredArr);
             refreshTable();
         }
 
         const ImportDataByTimeFilters_ECB = (data) => {
             $('#wait').hide();
             alert('error in ImportDataByTimeFilters');
-            //console.log(data);
+            console.log(data);
 
         }
 
@@ -207,10 +208,82 @@
             alert("Error in getCoors: " + e.responseText);
         }
 
+        //make the flat object to complex object like the old API
+        const CustomRideObject = (thisRide) => {
+
+            let CustomObj = {};
+            CustomObj.RidePatNum = thisRide.RidePatNum;
+            CustomObj.Status = thisRide.Status;
+            CustomObj.Remark = thisRide.Remark;
+            CustomObj.OnlyEscort = thisRide.OnlyEscort;
+            CustomObj.LastModified = thisRide.LastModified;
+            CustomObj.Date = thisRide.PickupTime;
+
+            CustomObj.Pat = {};
+            CustomObj.Pat.DisplayName = thisRide.PatientName;
+            CustomObj.Pat.Id = thisRide.PatientId;
+            CustomObj.Pat.DisplayNameA = ''
+            CustomObj.Pat.EnglishName = ''
+            CustomObj.Pat.PatientIdentity = 0;
+            CustomObj.Pat.Equipment = thisRide.PatientEquipments == null ? [] : thisRide.PatientEquipments;
+            CustomObj.Pat.IsAnonymous = thisRide.IsAnonymous;
+            CustomObj.Pat.RidePatPatientStatus = {};
+            CustomObj.Pat.RidePatPatientStatus.Status = (thisRide.PatientStatus == "" || thisRide.PatientStatus == "Not Finished") ? -1 : 1;
+            CustomObj.Pat.RidePatPatientStatus.EditTimeStamp = thisRide.PatientStatusEditTime
+
+            CustomObj.Pat.EscortedList = [];
+            CustomObj.Escorts = [];
+            //for (var i = 0; i < thisRide[18].Value.length; i++) {
+            //    let oneEscort = {}
+            //    oneEscort.Id = thisRide[18].Value[i][0].Value;
+            //    oneEscort.DisplayName = thisRide[18].Value[i][1].Value;
+            //    CustomObj.Escorts.push(oneEscort);
+            //}
+            for (var i = 0; i < thisRide.AmountOfEscorts; i++) {
+                let oneEscort = {}
+                oneEscort.Id = 0
+                oneEscort.DisplayName = ''
+                CustomObj.Pat.EscortedList.push(oneEscort);
+            }
+
+            for (var i = 0; i < thisRide.AmountOfEscorts; i++) {
+                let oneEscort = {}
+                oneEscort.Id = 0
+                oneEscort.DisplayName = ''
+                CustomObj.Escorts.push(oneEscort);
+            }
+
+            CustomObj.Drivers = [];
+            let Maindriver = {};
+            Maindriver.DisplayName = thisRide.DriverName;
+            Maindriver.Id = thisRide.MainDriver;
+            Maindriver.CellPhone = thisRide.DriverCellPhone
+            CustomObj.Drivers.push(Maindriver);
+            if (Maindriver.Id == null || Maindriver.Id == -1) {
+                CustomObj.Drivers = [];
+            }
+
+            CustomObj.Destination = {};
+            CustomObj.Destination.Name = thisRide.Destination
+            CustomObj.Origin = {};
+            CustomObj.Origin.Name = thisRide.Origin;
+
+            CustomObj.Pat.Barrier = {}
+            CustomObj.Pat.Hospital = {}
+            CustomObj.Pat.Barrier.Name = CustomObj.Destination.Name;
+            CustomObj.Pat.Hospital.Name = CustomObj.Origin.Name;
+
+            CustomObj.Coordinator = {};
+            CustomObj.Coordinator.DisplayName = thisRide.CoorName
+            CustomObj.Coordinator.Id = thisRide.CoorId
+
+            return CustomObj;
+        }
+
         function refreshTable() {
             //this function doesnt changeing timeFilteredArr or fetching data from the back-end
             $('#wait').show();
-            setTimeout(() => { $('#wait').hide() }, 3000);
+            setTimeout(() => { $('#wait').hide() }, 500);
 
 
             checkCookie();
@@ -232,10 +305,19 @@
             GENERAL.RIDEPAT.setRidePatList(JSON.stringify(timeFilteredArr));
 
             for (i in timeFilteredArr) {
-                if (timeFilteredArr[i].Pat.DisplayName.includes("אנונימי")) {
-                    timeFilteredArr[i].Pat.DisplayName = "חולה";
+
+                //if (i==10) {
+                //    console.log('before custom', timeFilteredArr[i])
+                //}
+                let CustomObj = CustomRideObject(timeFilteredArr[i]);
+                //if (i == 10) {
+                //    console.log('after custom', CustomObj)
+
+                //}
+                if (CustomObj.Pat.DisplayName.includes("אנונימי")) {
+                    CustomObj.Pat.DisplayName = "חולה";
                 }
-                thisRidePatDate = convertDBDate2FrontEndDate(timeFilteredArr[i].Date);
+                thisRidePatDate = convertDBDate2FrontEndDate(CustomObj.Date);
                 thisRidePatDate = adjustDateFormat(thisRidePatDate);
 
                 ////Change date format
@@ -243,12 +325,12 @@
                 //temp = temp.substring(0, temp.indexOf(")"));
                 //var date = new Date(parseInt(temp));
 
-                if (timeFilteredArr[i].Drivers.length != 0) {
-                    driverName = timeFilteredArr[i].Drivers[0].DisplayName;
+                if (CustomObj.Drivers.length != 0) {
+                    driverName = CustomObj.Drivers[0].DisplayName;
                 }
-                destinationName = timeFilteredArr[i].Destination.Name;
-                originName = timeFilteredArr[i].Origin.Name;
-                patientName = timeFilteredArr[i].Pat.DisplayName;
+                destinationName = CustomObj.Destination.Name;
+                originName = CustomObj.Origin.Name;
+                patientName = CustomObj.Pat.DisplayName;
 
                 //if (date.getDate() < 10) {
                 //    day = "0" + date.getDate();
@@ -277,22 +359,22 @@
 
                 if (unassigned) {
                     // $("#activeRidePats").prop('checked', false);
-                    if (timeFilteredArr[i].Status != "ממתינה לשיבוץ") continue;
+                    if (CustomObj.Status != "ממתינה לשיבוץ") continue;
                 }
 
                 if (showDeleted) {
 
-                    if (timeFilteredArr[i].Status !== "נמחקה") continue;
+                    if (CustomObj.Status !== "נמחקה") continue;
 
                 } else {
-                    if (timeFilteredArr[i].Status == "בוטלה" || timeFilteredArr[i].Status == "הסתיימה" || timeFilteredArr[i].Status == 'נמחקה') continue;
+                    if (CustomObj.Status == "בוטלה" || CustomObj.Status == "הסתיימה" || CustomObj.Status == 'נמחקה') continue;
                     //בוטלה and הסתיימה are from old times -- not sure if needed anymore
 
                 }
 
 
                 if (myRidePats) {
-                    if (timeFilteredArr[i].Coordinator.DisplayName != currentCoor) continue;
+                    if (CustomObj.Coordinator.DisplayName != currentCoor) continue;
                 }
 
 
@@ -302,7 +384,7 @@
                 /*
                  BACK IN TIME ONLY THE CREATOR OF A RIDEPAT COULD EDIT || DELETE NOW EVERY ONE CAN. YOGEV 05/05/2021
                  
-                let checkBoxStr = timeFilteredArr[i].Coordinator.DisplayName === currentCoor ?
+                let checkBoxStr = CustomObj.Coordinator.DisplayName === currentCoor ?
                     '<input class="checkBoxes" type="checkbox" onchange=RowChecked(this) />' :
                     '<input type="checkbox" disabled />';
                 */
@@ -317,10 +399,10 @@
                      4. pass rp only
                      */
 
-                    if (timeFilteredArr[i].Coordinator.DisplayName != currentCoor) continue;
-                    if (timeFilteredArr[i].Status !== "ממתינה לשיבוץ") continue;
-                    if (!timeFilteredArr[i].Pat.IsAnonymous) continue;
-                    ridePatDate = timeFilteredArr[i].Date;
+                    if (CustomObj.Coordinator.DisplayName != currentCoor) continue;
+                    if (CustomObj.Status !== "ממתינה לשיבוץ") continue;
+                    if (!CustomObj.Pat.IsAnonymous) continue;
+                    ridePatDate = CustomObj.Date;
                     ridePatDate = parseInt(ridePatDate.substring(ridePatDate.indexOf("(") + 1, ridePatDate.indexOf(")")));
                     if (ridePatDate > Date.now()) continue;
                 }
@@ -329,9 +411,9 @@
                 var btnStr = "";
                 if (!showDeleted) {
 
-                    var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' name='" + timeFilteredArr[i].RidePatNum + "' title='צפייה'><i class='fa fa-wpforms'></i></button>";
-                    var editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' name='" + timeFilteredArr[i].RidePatNum + "' title='עריכה'><i class='ti-pencil'></i></button>";
-                    var deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' name='" + timeFilteredArr[i].RidePatNum + "' title='מחיקה'><i class='fa fa-remove' ></i></button>";
+                    var showBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-success btn-sm m-b-5' id='show' name='" + CustomObj.RidePatNum + "' title='צפייה'><i class='fa fa-wpforms'></i></button>";
+                    var editBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5' id='edit' name='" + CustomObj.RidePatNum + "' title='עריכה'><i class='ti-pencil'></i></button>";
+                    var deleteBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-danger btn-sm m-b-5' id='remove' name='" + CustomObj.RidePatNum + "' title='מחיקה'><i class='fa fa-remove' ></i></button>";
                     //btnStr += " " + showBtn;
 
 
@@ -349,39 +431,39 @@
 
                     btnStr = editBtn += " " + deleteBtn;
                 } else {
-                    let recoverBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='recover' name='" + timeFilteredArr[i].RidePatNum + "' title='שחזור'><i class='ti-share-alt'></i></button>";
+                    let recoverBtn = "<button type='button' class='btn btn-icon waves-effect waves-light btn-warning btn-sm m-b-5' id='recover' name='" + CustomObj.RidePatNum + "' title='שחזור'><i class='ti-share-alt'></i></button>";
                     btnStr = recoverBtn;
                 }
 
 
 
                 let ridePat = {};
-                if (timeFilteredArr[i].Status == "ממתינה לשיבוץ") {
+                if (CustomObj.Status == "ממתינה לשיבוץ") {
 
                     ridePat = {
-                        ridePatNum: timeFilteredArr[i].RidePatNum,
+                        ridePatNum: CustomObj.RidePatNum,
                         checkBox: checkBoxStr,
-                        PatDisplayName: timeFilteredArr[i].Pat.DisplayName,
-                        OriginName: timeFilteredArr[i].Origin.Name,
-                        DestinationName: timeFilteredArr[i].Destination.Name,
+                        PatDisplayName: CustomObj.Pat.DisplayName,
+                        OriginName: CustomObj.Origin.Name,
+                        DestinationName: CustomObj.Destination.Name,
                         Date: thisRidePatDate,
-                        Drivers: timeFilteredArr[i].Status,
-                        Origin_Dest: timeFilteredArr[i].Origin.EnglishName + " - " + timeFilteredArr[i].Destination.EnglishName,
-                        Coordinator: timeFilteredArr[i].Coordinator.DisplayName,
+                        Drivers: CustomObj.Status,
+                        Origin_Dest: CustomObj.Origin.Name + " - " + CustomObj.Destination.Name,
+                        Coordinator: CustomObj.Coordinator.DisplayName,
                         Buttons: btnStr,
                         IsAnonymous: '',
-                        LastModified: convertDBDate2FrontEndDate(timeFilteredArr[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" })
+                        LastModified: convertDBDate2FrontEndDate(CustomObj.LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" })
                     }
                 }
                 else {
-                    for (j in timeFilteredArr[i].Drivers) {
-                        if (timeFilteredArr[i].Drivers[j].DriverType == "Primary") var primary = timeFilteredArr[i].Drivers[j].DisplayName + " " + timeFilteredArr[i].Drivers[j].CellPhone;
+                    for (j in CustomObj.Drivers) {
+                        if (CustomObj.Drivers[j].DriverType == "Primary") var primary = CustomObj.Drivers[j].DisplayName + " " + CustomObj.Drivers[j].CellPhone;
                         //  else secondary = timeFilteredArr[i].Drivers[j].DisplayName + " " + timeFilteredArr[i].Drivers[j].CellPhone;
                     }
                     var drivers = "";
-                    if (timeFilteredArr[i].Drivers.length == 1) {
-                        if (primary != undefined) //Only a primary driver is assigned
-                            drivers = "ראשי: " + primary;
+                    if (CustomObj.Drivers.length > 0) {
+
+                        drivers = CustomObj.Drivers[0].DisplayName + ' - ' + CustomObj.Drivers[0].CellPhone
                         //else //only a secondary driver is assigned
                         //    drivers = "גיבוי בלבד: " + secondary;
                     }
@@ -390,18 +472,18 @@
                     var buttons = btnStr;
 
                     ridePat = {
-                        ridePatNum: timeFilteredArr[i].RidePatNum,
+                        ridePatNum: CustomObj.RidePatNum,
                         checkBox: checkBoxStr,
-                        PatDisplayName: timeFilteredArr[i].Pat.DisplayName,
-                        OriginName: timeFilteredArr[i].Origin.Name,
-                        DestinationName: timeFilteredArr[i].Destination.Name,
+                        PatDisplayName: CustomObj.Pat.DisplayName,
+                        OriginName: CustomObj.Origin.Name,
+                        DestinationName: CustomObj.Destination.Name,
                         Date: thisRidePatDate,
                         Drivers: drivers,
-                        Coordinator: timeFilteredArr[i].Coordinator.DisplayName,
-                        Origin_Dest: timeFilteredArr[i].Origin.EnglishName + " - " + timeFilteredArr[i].Destination.EnglishName,
+                        Coordinator: CustomObj.Coordinator.DisplayName,
+                        Origin_Dest: CustomObj.Origin.Name + " - " + CustomObj.Destination.Name,
                         Buttons: buttons,
-                        IsAnonymous: timeFilteredArr[i].Pat.IsAnonymous,
-                        LastModified: convertDBDate2FrontEndDate(timeFilteredArr[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" })
+                        IsAnonymous: CustomObj.Pat.IsAnonymous,
+                        LastModified: convertDBDate2FrontEndDate(CustomObj.LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" })
                     }
                 }
 
@@ -488,6 +570,7 @@
         const MarkAsRemoved_FewRidePats = () => {
 
             let txt2post = `האם אתם בטוחים? האם למחוק את כל ${ridePatNums2MarkDeleted.length} ההסעות שנבחרו ברשימה המוצגת לפניך?`;
+            txt2post+='\nשים לב נסיעות אנונימיות שטרם שובצו יימחקו לציתות'
             swal({
                 title: "האם אתם בטוחים?",
                 text: txt2post,
@@ -503,10 +586,10 @@
                     $('#wait').show();
                     $.ajax({
                         dataType: "json",
-                        url: "WebService.asmx/ChangeArrayOF_RidePatStatuses",
+                        url: "WebService.asmx/deleteUnityRide",
                         contentType: "application/json; charset=utf-8",
                         type: "POST",
-                        data: JSON.stringify({ newStatus: 'נמחקה', ridePatNums: ridePatNums2MarkDeleted, clientUTCTimeStemp: new Date().toUTCString() }),
+                        data: JSON.stringify({ ListIDs: ridePatNums2MarkDeleted }),
                         success: function (data) {
                             $('#wait').hide();
                             swal({
@@ -521,7 +604,7 @@
                                 ridePatNums2MarkDeleted = [];
                                 $('#deleteFewRidePatsBtn').prop('disabled', true)
                                 ImportDataByTimeFilters();
-                            }, 1001);//literally means go fetch new data from server side with the same time frame
+                            }, 250);//literally means go fetch new data from server side with the same time frame
                         },
                         error: function (err) {
                             $('#wait').hide();
@@ -537,7 +620,7 @@
 
         const Recover_FewRidePats = () => {
 
-            let txt2post = `האם אתם בטוחים? האם למחוק את כל ${ridePatNums2MarkRecovered.length} ההסעות שנבחרו ברשימה המוצגת לפניך?`;
+            let txt2post = `האם אתם בטוחים? האם לשחזר את כל ${ridePatNums2MarkRecovered.length} ההסעות שנבחרו ברשימה המוצגת לפניך?`;
             swal({
                 title: "האם אתם בטוחים?",
                 text: txt2post,
@@ -553,10 +636,10 @@
                     $('#wait').show();
                     $.ajax({
                         dataType: "json",
-                        url: "WebService.asmx/ChangeArrayOF_RidePatStatuses",
+                        url: "WebService.asmx/recoverUnityRides",
                         contentType: "application/json; charset=utf-8",
                         type: "POST",
-                        data: JSON.stringify({ newStatus: 'ממתינה לשיבוץ', ridePatNums: ridePatNums2MarkRecovered, clientUTCTimeStemp: new Date().toUTCString() }),
+                        data: JSON.stringify({ listIDs: ridePatNums2MarkRecovered }),
                         success: function (data) {
                             $('#wait').hide();
                             swal({
@@ -575,7 +658,7 @@
                         },
                         error: function (err) {
                             $('#wait').hide();
-                            alert("Error in Recover_FewRidePats:" + err.responseText);
+                            alert("Error in Recover_UnityRides:" + err.responseText);
                         }
                     });
 
@@ -647,6 +730,13 @@
 
         }
 
+        // Function to find an object with a specific attribute value
+        function findObjectByAttribute(array, attribute, value) {
+            return array.find(function (obj) {
+                return obj[attribute] === value;
+            });
+        }
+
         function buttonsEvents() {
 
             $(".dataTables_empty").html("אין הסעות");
@@ -703,7 +793,7 @@
                                                                                                                                             מ - ${origin} ל - ${destenation}
                                                                                                                                             בתאריך -  ${date}`;
 
-
+                let list = [ridePat_Num]
                 swal({
                     title: "האם לשחזר נסיעה?",
                     text: txt2post,
@@ -718,10 +808,10 @@
                     if (isConfirm) {
                         $.ajax({
                             dataType: "json",
-                            url: "WebService.asmx/changeRidePatStatus",
+                            url: "WebService.asmx/recoverUnityRides",
                             contentType: "application/json; charset=utf-8",
                             type: "POST",
-                            data: JSON.stringify({ newStatus: 'ממתינה לשיבוץ', ridePatNum: ridePat_Num }),
+                            data: JSON.stringify({ listIDs: list }),
                             success: function (data) {
                                 refreshTable();
                                 swal({
@@ -731,9 +821,9 @@
                                     showConfirmButton: false
                                 });
                                 //right after
-                                setTimeout(function () { ImportDataByTimeFilters() }, 1001);//literally means go fetch new data from server side with the same time frame
+                                setTimeout(function () { ImportDataByTimeFilters() }, 250);//literally means go fetch new data from server side with the same time frame
                             },
-                            error: function (err) { alert("Error in RecoverRidePat:" + err.responseText); }
+                            error: function (err) { alert("Error in RecoverUnityRide:" + err.responseText); }
                         });
 
                     } else {
@@ -745,6 +835,7 @@
             }
 
             $('#datatable-buttons tbody').on('click', '#recover', function () { RecoverRidePat(this); });
+
 
             const MarkRidePatAsRemoved = (thisBtn) => {
 
@@ -763,6 +854,16 @@
                 let deleteMe = [];
                 deleteMe.push(ridePatNum);
 
+                let ThisUnityRide = findObjectByAttribute(timeFilteredArr, 'RidePatNum', parseInt(ridePatNum))
+
+                //console.log('RidePat : ', ThisUnityRide, ridePatNum, timeFilteredArr);
+                let addWarningText = (ThisUnityRide.IsAnonymous) && (ThisUnityRide.MainDriver == -1) ? `\nנסיעה זו תמחק לצמיתות ולא יהיה ניתן לשחזר` : '';
+
+
+
+                
+                txt2post += addWarningText;
+
                 swal({
                     title: "האם אתם בטוחים?",
                     text: txt2post,
@@ -778,13 +879,12 @@
                         $('#wait').show();
                         $.ajax({
                             dataType: "json",
-                            url: "WebService.asmx/ChangeArrayOF_RidePatStatuses",
+                            url: "WebService.asmx/deleteUnityRide",
                             contentType: "application/json; charset=utf-8",
                             type: "POST",
-                            data: JSON.stringify({ newStatus: 'נמחקה', ridePatNums: deleteMe, clientUTCTimeStemp: new Date().toUTCString() }),
+                            data: JSON.stringify({ UnityRideID: ridePatNum }),
                             success: function (data) {
                                 $('#wait').hide();
-                                refreshTable();
                                 swal({
                                     title: "ההסעה סומנה כמחוקה 🗑️",
                                     timer: 1000,
@@ -792,11 +892,11 @@
                                     showConfirmButton: false
                                 });
                                 //right after
-                                setTimeout(function () { ImportDataByTimeFilters() }, 1001);//literally means go fetch new data from server side with the same time frame
+                                setTimeout(function () { ImportDataByTimeFilters() }, 250);//literally means go fetch new data from server side with the same time frame
                             },
                             error: function (err) {
                                 $('#wait').hide();
-                                alert("Error in deleteRidePat:" + err.responseText);
+                                alert("Error in deleteUnityRide:" + err.responseText);
                             }
                         });
 

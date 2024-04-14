@@ -249,6 +249,8 @@
 
         //function to fill form for edit
         function uploadDataVol(displayName) {
+            //console.log('Gilad check before -->', displayName.split('<br>')[0]);
+            displayName = displayName.split('<br>')[0];
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/getVolunteer",
@@ -943,7 +945,8 @@
                     var address = $("#address").val();
                     var func = arr_customer.func;
                     var remark = $("#remarks").val();;
-                    var displayName = arr_volunteer.displayName;
+                    //Gilad change here displayName.split('<br>')[0]
+                    var displayName = arr_volunteer.displayName.split('<br>')[0];
                     //NEW:
                     var englishFN = $("#volunteerFirstNameEnglish").val();
                     var englishLN = $("#volunteerLastNameEnglish").val();

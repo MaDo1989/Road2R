@@ -228,6 +228,46 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetVolunteersDocumentedUnityRides(int volunteerId)
+    {
+        try
+        {
+            UnityRide ur = new UnityRide();
+            return j.Serialize(ur.GetUnityRidesByVolunteerId(volunteerId));
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetVolunteersDocumentedUnityRides", ex);
+            throw new Exception("שגיאה בהבאת היסטוריית הסעות של מתנדב");
+        }
+    }
+
+
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string CheckFutureRides(int volunteerId)
+    {
+        try
+        {
+            Volunteer v = new Volunteer();
+            return j.Serialize(v.hasFutureRides(volunteerId));
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in CheckFutureRides", ex);
+            throw new Exception("שגיאה בבדיקה נסיעות עתידיות");
+        }
+    }
+
+
+
+
+
+
     [WebMethod(EnableSession = true)]
     public string getescortedsListMobile(string displayName, string patientCell)
     {
@@ -286,6 +326,27 @@ public class WebService : System.Web.Services.WebService
 
         }
     }
+
+
+    //Gilad try to set UnityRide 
+    [WebMethod(EnableSession = true)]
+    public int setUnityRide(UnityRide unityRide,string func,int numOfRide,string repeatEvery,bool firstTry)
+    {
+        try
+        {
+            int res = unityRide.SetUnityRide(unityRide,func,numOfRide,repeatEvery, firstTry);
+            return res; 
+        }
+        catch (Exception ex)
+        {
+
+            throw ex;
+        }
+    }
+
+
+
+
     //לסדר
     [WebMethod(EnableSession = true)]
     public int setRidePat(RidePat RidePat, string func, bool isAnonymous, int numberOfRides, string repeatRideEvery)
@@ -698,7 +759,7 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
-            Log.Error("Error in setPatient", ex);
+            Log.Error("Error in setPatient XXXXXXX", ex);
             throw ex;
         }
 
@@ -899,6 +960,27 @@ public class WebService : System.Web.Services.WebService
     //}
 
 
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string CheckRideBeforePost(int volunteerId,DateTime start,DateTime end)
+    {
+        try
+        {
+            int res = Absence.checkRidesBeforePostAbsence(volunteerId, start, end);
+            j.MaxJsonLength = Int32.MaxValue;
+            return j.Serialize(res);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in CheckRideBeforePost ", ex);
+            throw new Exception("שגיאה בבדיקת הסעות מול היעדרות");
+        }
+    }
+
+
+
+
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string GetRidePatViewByTimeFilter(int from, int until)
@@ -922,8 +1004,7 @@ public class WebService : System.Web.Services.WebService
     public string GetRidePatViewByTimeFilter_Gilad(int from, int until, bool isDeletedtoShow)
     {
         //Gilad Update this with Data Reader only 
-        //TO DO 
-        //try to add Gzip.
+
         try
         {
             HttpResponse response = GzipMe();
@@ -937,6 +1018,33 @@ public class WebService : System.Web.Services.WebService
             throw new Exception("שגיאה בייבוא נתונים לפי חתך זמנים");
         }
     }
+
+
+
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string Get_unityRide_ByTimeRange(int from, int until, bool isDeletedtoShow)
+    {
+
+        try
+        {
+            HttpResponse response = GzipMe();
+            UnityRide ur = new UnityRide();
+            List<UnityRide> list = new List<UnityRide>();
+            list = ur.Get_unityRide_ByTimeRange(from, until, isDeletedtoShow);
+            j.MaxJsonLength = Int32.MaxValue;
+            return j.Serialize(list);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in Get_unityRide_ByTimeRange", ex);
+            throw new Exception("שגיאה בייבוא נתונים לפי חתך זמנים");
+        }
+    }
+
+
+
 
     [WebMethod(EnableSession = true)]
     // [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -953,8 +1061,65 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+    [WebMethod(EnableSession = true)]
+    public bool recoverUnityRides(List<int> listIDs)
+    {
+        try
+        {
+            UnityRide ur = new UnityRide();
+            return ur.recoverUnityRides(listIDs);
+        }
+        catch (Exception ex)
+        {
+
+            throw new Exception("error in recoverUnityRides API" +ex);
+        }
+
+    }
+
+    //Gilad update 03/10/23
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetUnityRide(int days)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+            UnityRide unityRide = new UnityRide();
+            j.MaxJsonLength = Int32.MaxValue;
+            return j.Serialize(unityRide.GetUnityRideView(days));
 
 
+        }
+        catch (Exception ex)
+        {
+            CatchErrors catchErrors = new CatchErrors("WebService: Exception in GetUnityRide", ex + " " + ex.Message + " " + ex.InnerException + " " + ex.Source, ex.StackTrace);
+            Log.Error("Error in GetUnityRide", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+    }
+
+    //Gilad update 06/12/23 use for edit one ride
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetUnityRideToEdit(int UnityRideId)
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+            UnityRide unityRide = new UnityRide();
+            j.MaxJsonLength = Int32.MaxValue;
+            return j.Serialize(unityRide.GetUnityRide(UnityRideId));
+
+
+        }
+        catch (Exception ex)
+        {
+            CatchErrors catchErrors = new CatchErrors("WebService: Exception in GetUnityRide", ex + " " + ex.Message + " " + ex.InnerException + " " + ex.Source, ex.StackTrace);
+            Log.Error("Error in GetUnityRide", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות");
+        }
+    }
 
     //This method is used for שבץ אותי
     [WebMethod(EnableSession = true)]
@@ -984,6 +1149,28 @@ public class WebService : System.Web.Services.WebService
             throw new Exception("שגיאה בשליפת נתוני הסעות");
         }
 
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetWeeklyThanksforVolunteers()
+    {
+        try
+        {
+            HttpResponse response = GzipMe();
+            UnityRide ur = new UnityRide();
+            List <UnityRide> List = ur.GetWeeklyRidesForThanks();
+            j.MaxJsonLength = Int32.MaxValue;
+            return j.Serialize(List);
+
+
+        }
+        catch (Exception ex)
+        {
+
+            Log.Error("Error in GetWeeklyThanksforVolunteers", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעות לתודות");
+        }
     }
     //This method is used for שבץ אותי
     [WebMethod(EnableSession = true)]
@@ -1020,6 +1207,23 @@ public class WebService : System.Web.Services.WebService
         catch (Exception ex)
         {
             Log.Error("Error in GetRidePat", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעה");
+        }
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetUnityRide_RidePat(int ridePatNum)
+    {
+        try
+        {
+            UnityRide ur = new UnityRide();
+            return j.Serialize(ur.getUnityRideAsRP(ridePatNum));
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetUnityRide_RidePat", ex);
             throw new Exception("שגיאה בשליפת נתוני הסעה");
         }
 
@@ -1292,6 +1496,22 @@ public class WebService : System.Web.Services.WebService
 
     }
 
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string AssignRideToUnityRideWithMobile(int ridePatId, int userId, string driverType) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
+    {
+        try
+        {
+            UnityRide ur = new UnityRide();
+            int res = ur.assignDriverMobile(ridePatId, userId);
+            return j.Serialize(res);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("fail to assign");
+        }
+
+    }
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -1320,6 +1540,55 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
+
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public void AssignUpdateDriverToUnityRide(int UnityRideId, int DriverId,bool isDelete) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
+    {
+        
+
+        try
+        {
+            UnityRide ur = new UnityRide();
+            ur.updateDriver(DriverId, UnityRideId, isDelete);
+
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in AssignUpdateDriverToUnityRide", ex);
+            throw new Exception(ex.Message);
+
+        }
+
+    }
+
+
+
+
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public void deleteUnityRide(List<int>ListIDs) 
+    {
+
+
+        try
+        {
+            UnityRide ur = new UnityRide();
+            ur.deleteUnityRide(ListIDs);
+
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in deleteUnityRide", ex);
+            throw new Exception(ex.Message);
+
+        }
+
+    }
+
+
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -1372,6 +1641,29 @@ public class WebService : System.Web.Services.WebService
         catch (Exception ex)
         {
             Log.Error("Error in LeaveRidePat", ex);
+            throw new Exception("שגיאה בעת שנהג עזב נסיעה");
+        }
+
+    }
+
+
+    [WebMethod(EnableSession = true, Description = "delete from only one unityRide")]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string LeaveUnityRide(int ridePatId, int rideId, int driverId)
+    {
+        try
+        {
+            //need to send push from here!
+
+            //RidePat rp = new RidePat();
+            //int res = rp.LeaveRidePat(ridePatId, rideId, driverId);
+            UnityRide ur = new UnityRide();
+            int res = ur.leaveUnityRideFromMobile(ridePatId, driverId);
+            return j.Serialize(res);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in LeaveUnityRide", ex);
             throw new Exception("שגיאה בעת שנהג עזב נסיעה");
         }
 
@@ -1972,7 +2264,7 @@ public class WebService : System.Web.Services.WebService
     //}
 
 
-
+    
 
     [WebMethod(EnableSession = true)]
     public string loginDriver(string uName, string password)
@@ -2285,6 +2577,24 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
+    public void UpdateUnityRideTime(int unityRideId, DateTime pickupTime)
+    {
+        try
+        {
+            UnityRide unityRide = new UnityRide();
+            unityRide.updateUnityRideTime(unityRideId, pickupTime);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in UpdateUnityRideTime", ex);
+            throw new Exception(ex.Message);
+        }
+    }
+
+
+
+
+    [WebMethod(EnableSession = true)]
     public void UpdateRidePatTime(int ridePatId, DateTime dateTime)
     {
         try
@@ -2540,7 +2850,25 @@ public class WebService : System.Web.Services.WebService
             throw new Exception(ex.Message);
         }
     }
-    
+
+
+    [WebMethod(EnableSession = true)]
+    public void UpdatePatientStatus_UnityRide(int patientId, int unityRideID, string patientStatus, DateTime? editTimeStamp)
+    {
+        try
+        {
+            UnityRide ur = new UnityRide();
+            ur.updatePatientStatusandTime(patientId, unityRideID, patientStatus, editTimeStamp);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in UpdatePatientStatus", ex);
+            throw new Exception(ex.Message);
+        }
+    }
+
+
+
     [WebMethod(EnableSession = true)]
     public void UpdateRidePatRemark(int ridePatId, string newRemark)
     {
@@ -2548,6 +2876,22 @@ public class WebService : System.Web.Services.WebService
         {
             RidePat rp = new RidePat();
             rp.UpdateRidePatRemark(ridePatId, newRemark);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in UpdateRidePatRemark", ex);
+            throw new Exception(ex.Message);
+        }
+    }
+
+
+    [WebMethod(EnableSession = true)]
+    public void UpdateUnityRideRemark(int UnityRideID, string newRemark)
+    {
+        try
+        {
+            UnityRide ur = new UnityRide();
+            ur.updateRemark(UnityRideID, newRemark);
         }
         catch (Exception ex)
         {

@@ -18,6 +18,18 @@ public class BroadCast
         }
     }
 
+
+    public static void BroadCast2Clients_driverHasAssigned2UnityRide(UnityRide ur)
+    {
+        if (ShouldClientsBeUpdated(ur.PickupTime, 30))
+        {
+            IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<UnityRideHub>();
+            hubContext.Clients.All.driverHasAssigned2UnityRide(ur);
+        }
+    }
+
+
+
     public static void BroadCast2Clients_driverHasRemovedFromRidePat(RidePat rp)
     {
         if (ShouldClientsBeUpdated(rp.Date, 30))
@@ -33,6 +45,14 @@ public class BroadCast
         {
             IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<RidePatHub>();
             hubContext.Clients.All.ridePatUpdated(rp);
+        }
+    }
+    public static void BroadCast2Clients_UnityRideUpdated(UnityRide ur)
+    {
+        if (ShouldClientsBeUpdated(ur.PickupTime,30))
+        {
+            IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<UnityRideHub>();
+            hubContext.Clients.All.UnityRideUpdated(ur);
         }
     }
 

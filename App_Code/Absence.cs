@@ -167,6 +167,12 @@ public class Absence
         return dBservice_Gilad.GetAbsenceByVolunteerId(volunteerId);
     }
 
+    static public int checkRidesBeforePostAbsence(int volunteerId,DateTime startDate, DateTime endDate)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+        return db.hasFutureRidesByDates(volunteerId, startDate, endDate);
+    }
+
     public int UpdateAbsenceById(int AbsenceId, int coorId, DateTime from, DateTime until, string cause, string note)
     {
         DBservice_Gilad dBservice =new DBservice_Gilad();
