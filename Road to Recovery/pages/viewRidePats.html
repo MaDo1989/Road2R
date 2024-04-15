@@ -852,7 +852,7 @@
                                                                                                                                                                 מ - ${origin} ל - ${destenation}
                                                                                                                                                                 בתאריך -  ${date}`;
                 let deleteMe = [];
-                deleteMe.push(ridePatNum);
+                deleteMe.push(parseInt(ridePatNum));
 
                 let ThisUnityRide = findObjectByAttribute(timeFilteredArr, 'RidePatNum', parseInt(ridePatNum))
 
@@ -882,7 +882,7 @@
                             url: "WebService.asmx/deleteUnityRide",
                             contentType: "application/json; charset=utf-8",
                             type: "POST",
-                            data: JSON.stringify({ UnityRideID: ridePatNum }),
+                            data: JSON.stringify({ ListIDs: deleteMe }),
                             success: function (data) {
                                 $('#wait').hide();
                                 swal({
