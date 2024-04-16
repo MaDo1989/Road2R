@@ -38,7 +38,7 @@
         let nodechilds;
         let lastModified_td;
         let ridePatBeforeUpdate;
-        let _timeinterval_G ='טווח זמן'
+        let _timeinterval_G = localStorage.getItem('timeInterval') != undefined ? localStorage.getItem('timeInterval') : 'טווח זמן'
         const ADD_DRIVER = 'add driver', REMOVE_DRIVER = 'remove driver', RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED = 'ridepat_patient_status_edittime_changed';
         const tableNames = {
             MORNING: 'datatable-morning',
@@ -2033,7 +2033,9 @@
             });
 
             getCoors();
-            refreshTable_UnityRide();
+
+            let timeInt = _timeinterval_G == 'חודש' ? 30 : _timeinterval_G == 'שבועיים' ? 14 : 7
+            refreshTable_UnityRide(timeInt);
             //refreshTable()
 
             if (!isAssistant) {
@@ -4580,9 +4582,11 @@
             selectList.onchange = loadFutureTable;
             container.appendChild(selectList);
             selectList.value = _timeinterval_G;
+
         }
 
         const loadFutureTable = () => {
+           
             const selectList = document.querySelector('#future-table-time-interval-select');
             let timeInterval = selectList.value;
             _timeinterval_G = timeInterval;
@@ -4603,6 +4607,8 @@
                     timeInterval = 7;
                     break
             }
+            localStorage.setItem('timeInterval', _timeinterval_G);
+
             refreshTable_UnityRide(timeInterval);
         }
 
