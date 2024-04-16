@@ -1084,6 +1084,7 @@
             $('#PatientIdentity').val(patient.PatientIdentity);
 
             if (allowChangeOf_originAndDestination) {
+                console.log('come on : ', allowChangeOf_originAndDestination, patient.Barrier.Name, patient.Hospital.Name)
                 $('#Origin').val(patient.Barrier.Name);
                 $('#Destination').val(patient.Hospital.Name);
             } else {
@@ -1119,6 +1120,8 @@
                 $('#hour').prop('disabled', false);
                 $('#afterNoon').prop('disabled', false);
             }
+
+            $('#wait').hide();
 
         }
 
@@ -1689,11 +1692,11 @@
                         $('#numberOfRides').val(duplicateRidePat.numberOfRides);
                         $("#duplicateRidePat").prop("checked", true);
                         // $('#hideDuplicate').show();
-                        //console.log(duplicateRidePat)
+                        
 
                         localStorage.removeItem("duplicateRidePat");
                     }
-
+                    
                     uploadData_new(arr_customer.RidePatNum);
                     $('#hideDuplicate').hide();
                     $("#hideOnEdit").addClass('duplicateDisplay');
@@ -1716,30 +1719,55 @@
                     }
                 }
                 else {
-                    //check on בדיקה.
-                    $("#afterNoon").attr('disabled', 'disabled');
-                    $("#Origin").attr('disabled', 'disabled');
-                    $("#remark").attr('disabled', 'disabled');
-                    $("#Destination").attr('disabled', 'disabled');
-                    $("#dateRide").attr('disabled', 'disabled');
-                    $("#hour").attr('disabled', 'disabled');
-                    $("#minute").attr('disabled', 'disabled');
-                    $("#dirBTN").attr('disabled', 'disabled');
-                    $("#patArabic").attr('disabled', 'disabled');
-                    //$("#saveCustomer").attr('disabled', 'disabled');
-                    getPatients_slim();
-                    generateLocation()
-                        .then((result) => {
-                            generateHour();
-                            generateMinute();
-                            generateStatus();
-                            getCoor();
-                            request2TurnOffLoader([generateLocationPromise, getPatientByIdPromise]);
-                        })
-                        .catch((err) => {
-                            request2TurnOffLoader(generateLocationPromise, getPatientByIdPromise);
-                            alert(`בעיה במילוי רשימות יעד ומוצא ${err}`);
-                        });
+                    console.log('?impor ', arr_customer, arr_customer.RidePatNum)
+                    if (arr_customer.func == 'new' && arr_customer.RidePatNum != undefined) {
+                       // uploadData_new(arr_customer.RidePatNum);
+                        allowChangeOf_originAndDestination = true;
+                        
+                        getPatients_slim();
+                        generateLocation()
+                            .then((result) => {
+
+                                generateHour();
+                                generateMinute();
+                                generateStatus();
+                                getCoor();
+                                request2TurnOffLoader([generateLocationPromise, getPatientByIdPromise]);
+                                fillPage_withPatientData(arr_customer.Pat);
+                            })
+                            .catch((err) => {
+                                request2TurnOffLoader(generateLocationPromise, getPatientByIdPromise);
+                                alert(`בעיה במילוי רשימות יעד ומוצא ${err}`);
+                            });
+                    }
+                    else {
+                        //check on בדיקה.
+                        $("#afterNoon").attr('disabled', 'disabled');
+                        $("#Origin").attr('disabled', 'disabled');
+                        $("#remark").attr('disabled', 'disabled');
+                        $("#Destination").attr('disabled', 'disabled');
+                        $("#dateRide").attr('disabled', 'disabled');
+                        $("#hour").attr('disabled', 'disabled');
+                        $("#minute").attr('disabled', 'disabled');
+                        $("#dirBTN").attr('disabled', 'disabled');
+                        $("#patArabic").attr('disabled', 'disabled');
+                        //$("#saveCustomer").attr('disabled', 'disabled');
+                        getPatients_slim();
+                        generateLocation()
+                            .then((result) => {
+
+                                generateHour();
+                                generateMinute();
+                                generateStatus();
+                                getCoor();
+                                request2TurnOffLoader([generateLocationPromise, getPatientByIdPromise]);
+                            })
+                            .catch((err) => {
+                                request2TurnOffLoader(generateLocationPromise, getPatientByIdPromise);
+                                alert(`בעיה במילוי רשימות יעד ומוצא ${err}`);
+                            });
+                    }
+
 
 
                 }
@@ -1980,6 +2008,7 @@
 
 
                             //this ↓ function also among other things draw the patient's escorts checkboxes
+                            //console.log('???--> ', ridePat.Pat)
                             fillPage_withPatientData(ridePat.Pat);
 
                             //this code incharge to mark which escorts to checked in.
@@ -2613,6 +2642,7 @@
             let ridepat = JSON.parse(GENERAL.RIDEPAT.getRidePatList());
             ridePat = { ...ridePat, func: 'new' }
             GENERAL.RIDEPAT.setRidePatList(JSON.stringify(ridePat));
+           
             location.reload();
             $('#wait').show();
 

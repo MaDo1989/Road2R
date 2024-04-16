@@ -271,7 +271,7 @@
             ridePat2Draw.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
             ridePat2Draw.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
             ridePat2Draw.patient = buildPatientHTML(updated_ridePat);
-            row2manipulate.patientAge = buildPatientAgeHTML(updated_ridePat.Pat);
+            row2manipulate.patientAge = buildPatientAgeHTML_AfterUnited(updated_ridePat.Pat);
             ridePat2Draw.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RidePatNum);
             ridePat2Draw.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
             ridePat2Draw.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
@@ -5033,7 +5033,7 @@
             let ridepatObject = arr_rides.find(r => r.RidePatNum === ridepatNum);
             //console.log('before!!!', ridepatObject)
             ridepatObject = CustomRideObject(ridepatObject);
-            console.log('after!!!', ridepatObject)
+            //console.log('after!!!', ridepatObject)
             const ridePatPatientStatus = ridepatObject.Pat.RidePatPatientStatus.Status;
             let editTimeStamp = ridepatObject.Pat.RidePatPatientStatus.EditTimeStamp;
             //console.log('test ', editTimeStamp)
