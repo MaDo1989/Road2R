@@ -38,7 +38,7 @@
         let nodechilds;
         let lastModified_td;
         let ridePatBeforeUpdate;
-        let _timeinterval_G ='טווח זמן'
+        let _timeinterval_G = localStorage.getItem('timeInterval') != undefined ? localStorage.getItem('timeInterval') : 'טווח זמן'
         const ADD_DRIVER = 'add driver', REMOVE_DRIVER = 'remove driver', RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED = 'ridepat_patient_status_edittime_changed';
         const tableNames = {
             MORNING: 'datatable-morning',
@@ -271,7 +271,7 @@
             ridePat2Draw.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
             ridePat2Draw.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
             ridePat2Draw.patient = buildPatientHTML(updated_ridePat);
-            row2manipulate.patientAge = buildPatientAgeHTML(updated_ridePat.Pat);
+            row2manipulate.patientAge = buildPatientAgeHTML_AfterUnited(updated_ridePat.Pat);
             ridePat2Draw.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RidePatNum);
             ridePat2Draw.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
             ridePat2Draw.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
@@ -2033,7 +2033,9 @@
             });
 
             getCoors();
-            refreshTable_UnityRide();
+
+            let timeInt = _timeinterval_G == 'חודש' ? 30 : _timeinterval_G == 'שבועיים' ? 14 : 7
+            refreshTable_UnityRide(timeInt);
             //refreshTable()
 
             if (!isAssistant) {
@@ -3406,7 +3408,7 @@
                             },
                             { targets: 8, className: 'last-modified_td' },
                             { targets: 8, type: 'last_modifiedSort' },
-                            { targets: 9, className: 'text-left-strong' },
+                            { targets: 9, className: 'text-right-strong' },
                             { targets: [10], visible: false },
                             { targets: [11], orderable: false }
 
@@ -3516,7 +3518,7 @@
                             },
                             { targets: 8, className: 'last-modified_td' },
                             { targets: 8, type: 'last_modifiedSort' },
-                            { targets: 9, className: 'text-left-strong' },
+                            { targets: 9, className: 'text-right-strong' },
                             { targets: [10], visible: false },
                             { targets: [11], orderable: false }
 
@@ -4121,7 +4123,7 @@
                             },
                             { targets: 8, className: 'last-modified_td' },
                             { targets: 8, type: 'last_modifiedSort' },
-                            { targets: 9, className: 'text-left-strong' },
+                            { targets: 9, className: 'text-right-strong' },
                             { targets: [10], visible: false },
                             { targets: [11], orderable: false }
 
@@ -4231,7 +4233,7 @@
                             },
                             { targets: 8, className: 'last-modified_td' },
                             { targets: 8, type: 'last_modifiedSort' },
-                            { targets: 9, className: 'text-left-strong' },
+                            { targets: 9, className: 'text-right-strong' },
                             { targets: [10], visible: false },
                             { targets: [11], orderable: false }
 
@@ -4495,7 +4497,16 @@
             }
 
             if (patient.Age == 1) {
-                age = `<span>בגיל שנה</span>`;
+                
+                if (patient.GenderAsEnum == -1) {
+                    age = `<span>בגיל שנה</span>`;
+                }
+                else if (patient.GenderAsEnum == 0) {
+                    age = `<span>בת שנה</span>`;
+                }
+                else if (patient.GenderAsEnum == 1) {
+                    age = `<span>בן שנה</span>`;
+                }
 
             }
             if (patient.Age == 0 || patient.IsAnonymous) {
@@ -4571,9 +4582,11 @@
             selectList.onchange = loadFutureTable;
             container.appendChild(selectList);
             selectList.value = _timeinterval_G;
+
         }
 
         const loadFutureTable = () => {
+           
             const selectList = document.querySelector('#future-table-time-interval-select');
             let timeInterval = selectList.value;
             _timeinterval_G = timeInterval;
@@ -4594,6 +4607,8 @@
                     timeInterval = 7;
                     break
             }
+            localStorage.setItem('timeInterval', _timeinterval_G);
+
             refreshTable_UnityRide(timeInterval);
         }
 
@@ -5018,7 +5033,7 @@
             let ridepatObject = arr_rides.find(r => r.RidePatNum === ridepatNum);
             //console.log('before!!!', ridepatObject)
             ridepatObject = CustomRideObject(ridepatObject);
-            console.log('after!!!', ridepatObject)
+            //console.log('after!!!', ridepatObject)
             const ridePatPatientStatus = ridepatObject.Pat.RidePatPatientStatus.Status;
             let editTimeStamp = ridepatObject.Pat.RidePatPatientStatus.EditTimeStamp;
             //console.log('test ', editTimeStamp)
