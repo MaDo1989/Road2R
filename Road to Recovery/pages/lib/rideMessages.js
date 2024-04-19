@@ -45,14 +45,16 @@ const showMessage = (arr_rides, ridePatNum) => {
                 isAnonymous: true,
                 numOfEscorts: AllRidesForThisDriver[i].Pat.EscortedList.length
             };
-        } else {
+        }
+        else {
             /*console.log('Gilad-->' + JSON.stringify(AllRidesForThisDriver[i].Pat.GenderAsEnum), JSON.stringify(AllRidesForThisDriver[i].Pat.Age));*/
+            
             patient = {
                 isAnonymous: false,
                 name: AllRidesForThisDriver[i].Pat.DisplayName.split("_")[0],
                 EnglishName: AllRidesForThisDriver[i].Pat.EnglishName,
                 numOfescorts: AllRidesForThisDriver[i].Pat.EscortedList.length,
-                cellPhone: AllRidesForThisDriver[i].Pat.CellPhone,
+                cellPhone: AllRidesForThisDriver[i].Pat.cellPhone,
                 escorts: AllRidesForThisDriver[i].Pat.EscortedList,
                 GenderAsEnum: AllRidesForThisDriver[i].Pat.GenderAsEnum,
                 Age: AllRidesForThisDriver[i].Pat.Age,
@@ -100,7 +102,7 @@ function buildMessage(message) {
                 txt += phoneText;
             }
         }
-        /*console.log('Gilad --- > im here only one ', message.patients.length, txt)*/
+        //console.log('Gilad --- > im here only one ', message.patients.length, txt)
     }
     else {
         //txt += `הסעת ${message.patients.length} חולים` + sep;
@@ -118,7 +120,7 @@ function buildMessage(message) {
                 }
             }
         }
-        /*console.log('Gilad --- > im here multi ', message.patients.length, txt)*/
+        //console.log('Gilad --- > im here multi ', message.patients.length, txt)
     }
 
     //txt += `***********************************` + sep;

@@ -129,6 +129,7 @@
             CustomObj.Pat.Barrier = {}
             CustomObj.Pat.Hospital = {}
             CustomObj.Pat.Age = thisRide.PatientAge;
+            CustomObj.Pat.cellPhone = thisRide.PatientCellPhone;
             CustomObj.Pat.GenderAsEnum = thisRide.PatientGender;
             CustomObj.Pat.Barrier.Name = CustomObj.Destination.Name;
             CustomObj.Pat.Hospital.Name = CustomObj.Origin.Name;
@@ -4915,7 +4916,7 @@
             timeNum = parseInt(timeNum);
             let time = new Date(timeNum);
             //console.log("time,", timeNum, time.getHours(), ridePatNum)
-            let buttonsWrapper = `<div class='elementsInSameLine'>${editBtn} ${deleteBtn} ${(drivers.length > 0 && time.getHours()<20 )? messageToCopyBtn : candidateBtn}</div>`;
+            let buttonsWrapper = `<div class='elementsInSameLine'>${editBtn} ${deleteBtn} ${(drivers.length > 0 && time.getHours()<=23 )? messageToCopyBtn : candidateBtn}</div>`;
 
             return buttonsWrapper;
         }
