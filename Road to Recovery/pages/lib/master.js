@@ -219,10 +219,18 @@ var GENERAL = {
            * Returns an int → 1608581640000
          */
         convert2DBDateToInt: (fullTimeStempStr) => {
-            let startTrim = fullTimeStempStr.indexOf('(') + 1;
-            let endTrim = fullTimeStempStr.indexOf(')');
-            let fullTimeStempNumber = fullTimeStempStr.substring(startTrim, endTrim);
-            return parseInt(fullTimeStempNumber);
+
+            if (fullTimeStempStr.includes('(') && fullTimeStempStr.includes(')')) {
+                let startTrim = fullTimeStempStr.indexOf('(') + 1;
+                let endTrim = fullTimeStempStr.indexOf(')');
+                let fullTimeStempNumber = fullTimeStempStr.substring(startTrim, endTrim);
+                return parseInt(fullTimeStempNumber);
+            }
+            else {
+                const d = new Date(fullTimeStempStr);
+                return parseInt(d.getTime());
+            }
+
 
         },
 

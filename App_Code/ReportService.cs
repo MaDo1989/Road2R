@@ -620,12 +620,7 @@ public class ReportService
 
     internal List<SliceVolunteersPerMonthInfo> GetReportSliceVolunteerPerMonth(string start_date, string end_date)
     {
-        List<SliceVolunteersPerMonthInfo> s = S_GetReportSliceVolunteerPerMonth(start_date, end_date);
         List<SliceVolunteersPerMonthInfo> u = U_GetReportSliceVolunteerPerMonth(start_date, end_date);
-        if ( ! compare_S_vs_U_results_unordered(s,u))
-        {
-            throw new Exception("Mismatch in GetReportSliceVolunteerPerMonth");
-        }
         return u;
     }
 
@@ -710,12 +705,7 @@ GROUP BY inner_select.DisplayName
     // מתנדבים מסיעים בחתך חודשי   : פילוחים
     internal List<ReportService.SliceVolunteersCountInMonthInfo> GetReportSliceVolunteersCountInMonth(string start_date, string end_date)
     {
-        List<SliceVolunteersCountInMonthInfo> s = S_GetReportSliceVolunteersCountInMonth(start_date, end_date);  // << original implementation
         List<SliceVolunteersCountInMonthInfo> u = U_GetReportSliceVolunteersCountInMonth(start_date, end_date);  // << New implementation using United
-        if (!compare_S_vs_U_results_ordered(s, u))                        // << Compare both lists (requires Equitable interfaces)
-        {
-            throw new Exception("GetReportSliceVolunteersCountInMonth mismatch");
-        }
         return u;                                                         // return results
     }
 
@@ -784,12 +774,7 @@ GROUP BY inner_select.DisplayName
     // מרכז תיאום - הסעת חולים  לעמותה
     private List<string> GetDistinctListOfField(string field, string table)
     {
-        List<string> s = S_GetDistinctListOfField(field, table);  // << original implementation
         List<string> u = U_GetDistinctListOfField(field, table);  // << New implementation using United
-        if (!compare_S_vs_U_results_ordered(s, u))                        // << Compare both lists (requires Equitable interfaces)
-        {
-            throw new Exception("GetDistinctListOfField mismatch");
-        }
         return u;                                                         // return results
     }
 
@@ -877,12 +862,7 @@ GROUP BY inner_select.DisplayName
 
     internal List<VolunteerPerRegion> GetReportVolunteerWeekly(string start_date, string end_date)
     {
-        List<VolunteerPerRegion> s = S_GetReportVolunteerWeekly(start_date, end_date);
         List<VolunteerPerRegion> u = U_GetReportVolunteerWeekly(start_date, end_date);
-        if ( !compare_S_vs_U_results_ordered(s,u))
-        {
-            throw new Exception("GetReportVolunteerWeekly mismatch");
-        }
         return u;
     }
 
@@ -1041,12 +1021,7 @@ GROUP BY inner_select.DisplayName
 
     internal List<MetricMonthlyInfo> GetReportYearlyGraphMetrics(string start_date, string end_date)
     {
-        List<MetricMonthlyInfo> s = S_GetReportYearlyGraphMetrics(start_date, end_date);  // << original implementation
         List<MetricMonthlyInfo> u = U_GetReportYearlyGraphMetrics(start_date, end_date);  // << New implementation using United
-        if (!compare_S_vs_U_results_ordered(s, u))                        // << Compare both lists (requires Equitable interfaces)
-        {
-            throw new Exception("GetReportYearlyGraphMetrics mismatch");
-        }
         return u;                                                         // return results
     }
 
@@ -1128,15 +1103,9 @@ GROUP BY inner_select.DisplayName
 
     internal MetricInfo GetReportRangeNeedDriversMetrics(string start_date, string end_date)
     {
-        MetricInfo s = S_GetReportRangeNeedDriversMetrics(start_date, end_date);  // << original implementation
         MetricInfo u = U_GetReportRangeNeedDriversMetrics(start_date, end_date);  // << New implementation using United
 
-        // TODO:Unity:   This is not returning same results as RPView. Ask Gilad if he cleaned UnityRide
-        // if (s.Value1 != u.Value1 || s.Value2 != u.Value2)  
-        //{
-          //  throw new Exception("GetReportRangeNeedDriversMetrics mismatch");
-        //}
-        return u;    
+        return u;
 
     }
 
@@ -1325,12 +1294,7 @@ GROUP BY inner_select.DisplayName
 
     internal List<MetricMonthlyInfo> GetReportWithPeriodDigestMetrics(string start_date, string end_date, string prev_start, string prev_end, string span)
     {
-        List<MetricMonthlyInfo> s = S_GetReportWithPeriodDigestMetrics(start_date, end_date, prev_start, prev_end, span);  // << original implementation
         List<MetricMonthlyInfo> u = U_GetReportWithPeriodDigestMetrics(start_date, end_date, prev_start, prev_end, span);  // << New implementation using United
-        if (!compare_S_vs_U_results_ordered(s, u))                        // << Compare both lists (requires Equitable interfaces)
-        {
-            throw new Exception("GetReportWithPeriodDigestMetrics mismatch");
-        }
         return u;                                                         // return results
     }
 
@@ -1387,12 +1351,7 @@ GROUP BY inner_select.DisplayName
 
     internal List<MetricMonthlyInfo> GetReportDailyDigestMetrics(string start_date, string end_date)
     {
-        List<MetricMonthlyInfo> s = S_GetReportDailyDigestMetrics(start_date, end_date);  // << original implementation
         List<MetricMonthlyInfo> u = U_GetReportDailyDigestMetrics(start_date, end_date);  // << New implementation using United
-        if (!compare_S_vs_U_results_ordered(s, u))                        // << Compare both lists (requires Equitable interfaces)
-        {
-            throw new Exception("GetReportDailyDigestMetrics mismatch");
-        }
         return u;                                                         // return results
     }
 
@@ -1493,12 +1452,7 @@ GROUP BY inner_select.DisplayName
 
     internal List<ReportService.MetricMonthlyInfo> GetReportWeeklyGraphMetrics(string start_date, string end_date)
     {
-        List<ReportService.MetricMonthlyInfo> s = S_GetReportWeeklyGraphMetrics(start_date, end_date);  // << original implementation
         List<ReportService.MetricMonthlyInfo> u = U_GetReportWeeklyGraphMetrics(start_date, end_date);  // << New implementation using United
-        if (!compare_S_vs_U_results_ordered(s, u))                        // << Compare both lists (requires Equitable interfaces)
-        {
-            throw new Exception("GetReportWeeklyGraphMetrics mismatch");
-        }
         return u;                                                         // return results
     }
 
@@ -1571,21 +1525,8 @@ GROUP BY inner_select.DisplayName
 
     internal List<VolunteersPerMonthInfo> GetReportVolunteerPerMonth(string start_date)
     {
-        List<VolunteersPerMonthInfo> s = S_GetReportVolunteerPerMonth(start_date);  // << original implementation
         List<VolunteersPerMonthInfo> u = U_GetReportVolunteerPerMonth(start_date);  // << New implementation using United
 
-        // Special comparison, since we have no end_date.
-        HashSet<VolunteersPerMonthInfo> u_set = new HashSet<VolunteersPerMonthInfo>(u);
-        foreach (var elem in s)
-        {
-            if (!u_set.Contains(elem))
-            {
-                if (!elem.Year.Equals("2023") && !elem.Year.Equals("2024"))  // skip comparing 2023/24
-                {
-                    throw new Exception("GetReportVolunteerPerMonth mismatch");
-                }
-            }
-        }
         return u;                                                         // return results
 
     }
@@ -1815,12 +1756,7 @@ ORDER BY Volunteer.DisplayName ASC
 
     internal List<VolunteerKM> GetReportVolunteersKM(string start_date, string end_date)
     {
-        List<VolunteerKM> s = S_GetReportVolunteersKM(start_date, end_date);  // << original implementation
         List<VolunteerKM> u = U_GetReportVolunteersKM(start_date, end_date);  // << New implementation using United
-        if (!compare_S_vs_U_results_unordered(s, u))                        // << Compare both lists (requires Equitable interfaces)
-        {
-            throw new Exception("GetReportVolunteersKM mismatch");
-        }
         return u;   
     }
 
@@ -1968,12 +1904,7 @@ where NEW_CNT = '0' and not OLD_CNT = '0'
 
     internal List<VolunteersInPeriod> GetReportSliceVolunteersInPeriod(int delta_start, int delta_end)
     {
-        List<VolunteersInPeriod> s = S_GetReportSliceVolunteersInPeriod(delta_start, delta_end);  // << original implementation
         List<VolunteersInPeriod> u = U_GetReportSliceVolunteersInPeriod(delta_start, delta_end);  // << New implementation using United
-        if (!compare_S_vs_U_results_unordered(s, u))                        // << Compare both lists (requires Equitable interfaces)
-        {
-            throw new Exception("GetReportSliceVolunteersInPeriod mismatch");
-        }
         return u;                                                         // return results
     }
 
@@ -2050,15 +1981,7 @@ INNER JOIN Volunteer ON BUFF.MainDriver=Volunteer.Id";
 
     internal List<VolunteerPerPatient> GetReportVolunteersPerPatient(int patient)
     {
-        List<VolunteerPerPatient> s = S_GetReportVolunteersPerPatient(patient);
         List<VolunteerPerPatient> u = U_GetReportVolunteersPerPatient(patient);
-
-        if (!compare_S_vs_U_results_unordered(s, u))
-        {
-            throw new Exception("GetReportVolunteersPerPatient mismatch");
-        }
-
-        // return the united result
         return u;
     }
 
@@ -2195,19 +2118,7 @@ INNER JOIN Volunteer ON BUFF.MainDriver=Volunteer.Id";
     public List<RidesForVolunteer> GetReportVolunteerRides(int volunteerId, string start_date, string end_date)
 
     {
-        // First call the original implementation
-        List<RidesForVolunteer> s_result = S_GetReportVolunteerRides(volunteerId, start_date, end_date);
-        
-        // Now call the new United implementation
         List<RidesForVolunteer> u_result = U_GetReportVolunteerRides(volunteerId, start_date, end_date);
-
-        // Compare
-        if ( !compare_S_vs_U_results_ordered(s_result, u_result))
-        {
-            throw new Exception("GetReportVolunteerRides mismatch");
-        }
-
-        // return the united result
         return u_result;
     }
 
@@ -2285,12 +2196,7 @@ group by CONVERT(date, pickuptime) ";
     internal List<CenterDailybyMonthInfo> GetReportCenterDailybyMonth(string start_date, string end_date)
     {
         {
-            List<CenterDailybyMonthInfo> s = S_GetReportCenterDailybyMonth(start_date, end_date);  // << original implementation
             List<CenterDailybyMonthInfo> u = U_GetReportCenterDailybyMonth(start_date, end_date);  // << New implementation using United
-            if (!compare_S_vs_U_results_ordered(s, u))                        // << Compare both lists (requires Equitable interfaces)
-            {
-                throw new Exception("GetReportCenterDailybyMonth mismatch");
-            }
             return u;                                                         // return results
         }
     }
@@ -2413,12 +2319,7 @@ group by CONVERT(date, pickuptime) ";
 
     internal List<CenterMonthlyByYearInfo> GetReportCenterMonthlyByYear(string start_date, string end_date)
     {
-        List<CenterMonthlyByYearInfo> s = S_GetReportCenterMonthlyByYear(start_date, end_date);  // << original implementation
         List<CenterMonthlyByYearInfo> u = U_GetReportCenterMonthlyByYear(start_date, end_date);  // << New implementation using United
-        if (!compare_S_vs_U_results_ordered(s, u))                        // << Compare both lists (requires Equitable interfaces)
-        {
-            throw new Exception("GetReportCenterMonthlyByYear mismatch");
-        }
         return u;                                                         // return results
 
     }
@@ -2603,12 +2504,7 @@ group by CONVERT(date, pickuptime) ";
     internal List<CenterPatientsRidesInfo> GetReportCenterPatientsRides(string volunteer, string start_date, string end_date,
     string origin, string destination)
     {
-        List<CenterPatientsRidesInfo> s = S_GetReportCenterPatientsRides(volunteer, start_date, end_date, origin, destination);
         List<CenterPatientsRidesInfo> u = U_GetReportCenterPatientsRides(volunteer, start_date, end_date, origin, destination);  
-        if (!compare_S_vs_U_results_ordered(s, u))                        // << Compare both lists (requires Equitable interfaces)
-        {
-            throw new Exception("GetReportCenterPatientsRides mismatch");
-        }
         return u;                                                         // return results
     }
 
@@ -2668,12 +2564,7 @@ string origin, string destination)
     internal string GetReportCenterPatientsRidesCount(string volunteer, string start_date, string end_date,
 string origin, string destination)
     {
-        string s = S_GetReportCenterPatientsRidesCount(volunteer, start_date, end_date, origin, destination);
         string u = U_GetReportCenterPatientsRidesCount(volunteer, start_date, end_date, origin, destination);
-        if (! s.Equals(u))
-        {
-            throw new Exception("GetReportCenterPatientsRidesCount mismatch");
-        }
         return u;      
     }
 
@@ -2790,12 +2681,7 @@ string origin, string destination)
 
     internal List<ReportService.CenterTomorrowsRides> GetReportCenterTomorrowsRides(string start_date, string end_date)
     {
-        List<CenterTomorrowsRides> s = S_GetReportCenterTomorrowsRides(start_date, end_date);  // << original implementation
         List<CenterTomorrowsRides> u = U_GetReportCenterTomorrowsRides(start_date, end_date);  // << New implementation using United
-        if (!compare_S_vs_U_results_unordered(s, u))                        // << Compare both lists (requires Equitable interfaces)
-        {
-            throw new Exception("GetReportCenterTomorrowsRides mismatch");
-        }
         return u;                                                         // return results
     }
 
