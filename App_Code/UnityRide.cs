@@ -428,6 +428,11 @@ public class UnityRide
         return dBservice.GetUnityRide(UnityRideId);
     }
 
+    public UnityRide GetReturnDrive(int UnityRideID)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+        return db.GetReturnUnityRide(UnityRideID);
+    }
     public List <UnityRide> GetWeeklyRidesForThanks()
     {
         DBservice_Gilad db = new DBservice_Gilad();

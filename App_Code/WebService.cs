@@ -1230,6 +1230,25 @@ public class WebService : System.Web.Services.WebService
     }
 
 
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetReturnRideUnityRide(int unityRideID)
+    {
+        try
+        {
+            UnityRide ur = new UnityRide();
+            return j.Serialize(ur.GetReturnDrive(unityRideID));
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReturnRideUnityRide ", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעה: GetReturnRideUnityRide");
+        }
+
+    }
+
+
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string getMyRides(int volunteerId)

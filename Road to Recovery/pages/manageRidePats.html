@@ -56,6 +56,7 @@
         let treatmentFinished;
         let driverIsAssigned;
         let listRowstoColor = [];
+        hospitals = [];
         //#endregion
 
         //#region Functions to Reuse
@@ -1873,7 +1874,21 @@
             $("#editTimeModal").attr("w3-include-html", "editTimeModal.html");
             $("#editPatientStatusModal").attr("w3-include-html", "editPatientStatusModal.html");
             $("#editRemarkModal").attr("w3-include-html", "editRemarkModal.html");
-
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getHospitalView",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                //  async: false,
+                data: JSON.stringify({ active: true }),
+                success: function (data) {
+                    arr_hospitals = JSON.parse(data.d);
+                    for (i in arr_hospitals) {
+                        hospitals.push(arr_hospitals[i].Name)
+                    }
+                },
+                error: function (err) { alert("Error in getHospitalView: " + err.responseText); }
+            });
 
 
             wiringDataTables();
@@ -2468,7 +2483,7 @@
                         Origin: ridePat.Origin,
                         Pat: ridePat.Pat
                     }
-
+                    //retturn ride part.
                     $.ajax({
                         dataType: "json",
                         url: "WebService.asmx/getReturnRidePat",
@@ -2533,6 +2548,7 @@
             listIds.push(ridePat.RidePatNum);
             let request = { ListIDs: listIds };
             //console.log('check request -->', request)
+            console.log('Gilad check -->', ridePat);
                 $.ajax({
                     dataType: "json",
                     url: "WebService.asmx/deleteUnityRide",
@@ -2546,7 +2562,6 @@
                             type: "success",
                             showConfirmButton: false
                         });
-
                         if (thistable && deleteBtn) {
                             //console.log('Check This table and btn', thistable, deleteBtn, thistable.row($(deleteBtn).parents('tr')))
                             //console.log('Gilad check from deleteRidePat --> ', deleteBtn,)
@@ -2556,6 +2571,63 @@
                             location.reload();
                         }
                         $('#wait').hide();
+                        //retturn ride part.
+                        // only non anonymous and destination==hospital
+                        if (isThisReturnNonAnonymousRide(ridePat)) {
+                          $.ajax({
+                            dataType: "json",
+                            url: "WebService.asmx/GetReturnRideUnityRide",
+                            contentType: "application/json; charset=utf-8",
+                            type: "POST",
+                            async: false,
+                            data: JSON.stringify({ unityRideID:ridePat.RidePatNum }),
+                            success: function (data) {
+
+                                returnRidePat = JSON.parse(data.d);
+                                returnRidePat = CustomRideObject(returnRidePat);
+
+                                if (returnRidePat && returnRidePat.Status !== 'נמחקה') {
+                                    $('#wait').hide();
+
+                                    let patientName = 'חולה';
+                                    if (!returnRidePat.Pat.DisplayName.includes("אנונימי")) {
+                                        patientName = returnRidePat.Pat.DisplayName;
+                                    }
+                                    let frontEndDate = convertDBDate2FrontEndDate(returnRidePat.Date);
+
+                                    if (frontEndDate.getMinutes() === 14) {//afternoon
+                                        frontEndDate = `תאריך ${frontEndDate.toLocaleDateString('he-IL')} בשעות אחה"צ`;
+                                    } else {
+                                        frontEndDate = frontEndDate.toLocaleString('he-IL', { dateStyle: 'short', timeStyle: 'short' });
+                                    }
+
+                                    returnRidePatMsg = `האם למחוק גם את ההחזרה של ${patientName} מ${returnRidePat.Origin.Name} ל${returnRidePat.Destination.Name} ב${frontEndDate}`;
+                                    $('#DriverReturnRidePatMsg').html("");
+                                    if (returnRidePat.Drivers.length != 0) {
+                                        returnDriverMsg = returnRidePat.Drivers[0].DisplayName + " נרשם להחזרה הזו!";
+                                        $('#DriverReturnRidePatMsg').html("<h5 style='color:red; font-weight: bold;'>שימו לב!</h5><h5>" + returnRidePat.Drivers[0].DisplayName + " נרשם להחזרה הזו!</h5>");
+                                    }
+
+                                    $('#returnRidePatMsg').html(returnRidePatMsg);
+                                    $('#messagesModal').modal('toggle');
+                                } else {
+                                    $('#wait').hide();
+                                }
+                            },
+                            error: function (err) {
+                                alert("Error in getReturnUnityRide***: " + err.responseText);
+                                console.log(err);
+                            }
+                        })
+                        }
+                        
+                      
+
+
+
+
+
+
 
                     },
                     error: function (err) {
@@ -2578,7 +2650,49 @@
             GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
             location.href = "ridePatForm.html";
         }
+        function deleteReturn_unityRide() {
+    
+            let thisTable = null;
+            let deleteBtn = null;
 
+            if (document.getElementById(`${returnRidePat.RidePatNum}`) !== null) { //DUE TO SORTING THE ROW IS NOT RENDERED
+
+
+                deleteBtn = document.getElementById(`${returnRidePat.RidePatNum}`);
+
+                switch ($(deleteBtn).parents("table:first")[0].id) {
+                    case tableNames.MORNING:
+                        thisTable = tMorning;
+                        break;
+                    case tableNames.AFTERNOON:
+                        thisTable = tAfternoon;
+                        break;
+                    case tableNames.TOMORROW_MORNING:
+                        thisTable = tTomorrowMorning
+                        break;
+                    case tableNames.TOMORROW_AFTERNOON:
+                        thisTable = tTomorrowAfternoon
+                        break;
+                    case tableNames.FUTURE:
+                        thisTable = tFuture;
+                        break;
+                }
+
+            }
+            let ridepat = returnRidePat;
+            returnRidePat = null;
+            $('#messagesModal').modal('toggle');
+            $('#DriverReturnRidePatMsg').html("");
+            //if (thisTable && deleteBtn) {
+            //    console.log('Gilad check from deleteReturn --> ', deleteBtn.children[10].children[0].children[1],$(deleteBtn).parents('tr'), $('#' + RidePat.RidePatNum).parents('tr'));
+            //    thisTable.row($(deleteBtn).parents('tr')).remove().draw();
+            //}
+            //console.log('Gilad check from deleteReturn --> ', deleteBtn, deleteBtn.children[deleteBtn.children.length-1].children[0].children[1]);
+            //deleteBtn = deleteBtn.children[10].children[0].children[1];
+            deleteBtn = deleteBtn.children[deleteBtn.children.length - 1].children[0].children[1]
+
+            deleteUnityRide(ridepat, deleteBtn, thisTable);
+        }
         function deleteReturn() {
 
             var RidePat = new Object();
@@ -2645,6 +2759,19 @@
 
             deleteRidePat(RidePat, deleteBtn, thisTable);
         }
+
+        const isThisReturnNonAnonymousRide = (ride) => {
+            console.log('parms-->', ride);
+            if (hospitals.includes(ride.Destination) && !ride.IsAnonymous) {
+                return true;
+            }
+            else {
+                return false;
+            }
+           
+
+        }
+
 
         function closeModal() {
             $('#messagesModal').modal('hide');
@@ -5662,7 +5789,7 @@
                 <div class="modal-footer">
                     <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">ביטול</button>-->
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">ביטול</button>
-                    <button type="button" class="btn btn-warning" onclick="deleteReturn()">מחיקה</button>
+                    <button type="button" class="btn btn-warning" onclick="deleteReturn_unityRide()">מחיקה</button>
                 </div>
             </div>
         </div>

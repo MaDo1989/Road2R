@@ -564,6 +564,27 @@ public class DBservice_Gilad
     }
 
 
+    public UnityRide GetReturnUnityRide(int unityRideID)
+    {
+        SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@UnityRideId", unityRideID);
+        cmd = CreateCommandWithStoredProcedureGeneral("spGetReturnRide_UnityRide", con, paramDic);
+        UnityRide u = reciveUnityRideDB(cmd, "GetReturnRideUnityRide GetReturnDrive GetReturnUnityRide spGetReturnRide_UnityRide");
+        return u;
+
+    }
     public List <object> GetTomorrowRides()
     {
         SqlCommand cmd;
