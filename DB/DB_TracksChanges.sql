@@ -10,14 +10,11 @@ GO
 -- Create Date: <21/04/2024>
 -- Description: <to get return ride after delete some ride, to ask the user if delete the return ride.>
 -- =============================================
-CREATE PROCEDURE spGetReturnRide_UnityRide
+ALTER  PROCEDURE spGetReturnRide_UnityRide
 (
     -- Add the parameters for the stored procedure here
     -- the originals parametes without switch!!! 
-	@origin nvarchar(55),
-	@dest nvarchar(55),
-	@patinetName nvarchar(55),
-	@pickupTime datetime
+		@UnityRideID int 
 )
 AS
 BEGIN
@@ -26,9 +23,19 @@ BEGIN
     SET NOCOUNT ON
 
     -- Insert statements for procedure here
-    select * from unityRide where destination like @origin
-	and origin like @dest
+
+
+	--THE SWITCH IS HERE !!!!
+	DECLARE @dest nvarchar(55) = (select origin from UnityRide where RidePatNum = @UnityRideID)
+	DECLARE @origin nvarchar(55) = (select destination from UnityRide where RidePatNum = @UnityRideID)
+	--THE SWITCH IS HERE !!!!
+	DECLARE @pickupTime datetime = (select pickupTime from UnityRide where RidePatNum = @UnityRideID)
+	DECLARE @patientName nvarchar(55) = (select patientName from UnityRide where RidePatNum = @UnityRideID)
+
+    select * from unityRide where destination like @dest
+	and origin like @origin
 	and CONVERT(date, pickupTime) like CONVERT(date, @pickupTime)
-	and patientName like @patinetName
+	and patientName like @patientName
+	and Status not like N'נמחקה'
 END
 GO
