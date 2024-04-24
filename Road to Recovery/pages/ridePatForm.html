@@ -840,6 +840,7 @@
             unityRide.AmountOfEscorts = dataobj.RidePat.Escorts.length;
             let request = { unityRide: unityRide, func: dataobj.func, numOfRide: dataobj.numberOfRides, repeatEvery: dataobj.repeatRideEvery, firstTry:true };
             //console.log('After Custom',request);
+            isThisAReturnDriveFunc(dataobj.RidePat);
             let dataString = JSON.stringify(request);
 
              $.ajax({
@@ -1056,7 +1057,7 @@
 
         const fillPage_withPatientData = (patient, markThe1stEscort = false) => {
 
-            //console.log('inside fillPage_withPatientData --> patient-', patient)
+            //console.log('inside fillPage_withPatientData --> patient-', patient, hospitals);
             isAnonymous = patient.IsAnonymous === "True";
             localStorage.PatID = patient.Id;
             $('#pat').val(patient.DisplayName);
@@ -1084,7 +1085,7 @@
             $('#PatientIdentity').val(patient.PatientIdentity);
 
             if (allowChangeOf_originAndDestination) {
-                console.log('come on : ', allowChangeOf_originAndDestination, patient.Barrier.Name, patient.Hospital.Name)
+                //console.log('come on : ', allowChangeOf_originAndDestination, patient.Barrier.Name, patient.Hospital.Name)
                 $('#Origin').val(patient.Barrier.Name);
                 $('#Destination').val(patient.Hospital.Name);
             } else {
@@ -1683,6 +1684,7 @@
                 $("#coordinator").attr('disabled', 'disabled');
                 $("#statusRidePat").attr('disabled', 'disabled');
                 $("#Equipment").attr('disabled', 'disabled');
+                //console.log('new console -->', arr_customer, hospitals);
                 if (arr_customer.func == "edit" || arr_customer.func == "show") {
 
                     if (localStorage.getItem("duplicateRidePat") != null) {
@@ -1719,7 +1721,7 @@
                     }
                 }
                 else {
-                    console.log('?impor ', arr_customer, arr_customer.RidePatNum)
+                    //console.log( arr_customer, arr_customer.RidePatNum)
                     if (arr_customer.func == 'new' && arr_customer.RidePatNum != undefined) {
                        // uploadData_new(arr_customer.RidePatNum);
                         allowChangeOf_originAndDestination = true;
@@ -2647,6 +2649,16 @@
             $('#wait').show();
 
         }
+
+        const isThisAReturnDriveFunc = (ride) => {
+            if (hospitals.includes(ride.Origin.Name)) {
+                isThisAReturnDrive = true;
+               
+            }
+            return isThisAReturnDrive;
+
+        }
+
 
         function createReturnRide() {
 
