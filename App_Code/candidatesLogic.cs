@@ -24,8 +24,8 @@ public class CandidatesLogic
     {
 
         Dictionary<string, Candidate> newbies;
-
-        string query = "exec spGetCandidatesForRidePat @RidePatNum=" + ridePatNum;
+        //before sp name = spGetCandidatesForRidePat
+        string query = "exec spGetCandidatesForUnityRide @RidePatNum=" + ridePatNum;
         query += ",@NumOfDaysToThePast=" + Constants.Candidate.NumOfDaysToThePast;
         query += ",@NUmOfDaysToTheFuture=" + Constants.Candidate.NUmOfDaysToTheFuture;
         query += ",@NumOfDaysToThePast_CheckRides_Regular=" + Constants.Candidate.NumOfDaysToThePast_CheckRides_Regular;
@@ -100,7 +100,8 @@ public class CandidatesLogic
 
     public Dictionary<string, Candidate> GetNewbiesCandidates(int ridePatNum, int numOfCandidates)
     {
-        string query = "exec spGetNoobsCandidatesForRidePat @RidePatNum=" + ridePatNum;
+        //sp name before = spGetNoobsCandidatesForRidePat
+        string query = "exec spGetNoobsCandidatesForUnityRide @RidePatNum=" + ridePatNum;
         query += ",@NumOfDaysToThePast=" + Constants.Candidate.NumOfDaysToThePast;
         query += ",@NUmOfDaysToTheFuture=" + Constants.Candidate.NUmOfDaysToTheFuture;
         query += ",@NumOfDaysToThePast_CheckRides_Regular=" + Constants.Candidate.NumOfDaysToThePast_CheckRides_Regular;

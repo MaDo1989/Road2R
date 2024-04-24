@@ -284,10 +284,15 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+//    {
+//    "ridePatNum": 183192,
+//    "numOfCandidates": 25,
+//    "newFlag": false,
+//    "dayInWeek": 3
+//}
 
-
-    //Benny Candidates
-    [WebMethod(EnableSession = true)]
+//Benny Candidates
+[WebMethod(EnableSession = true)]
     public string GetCandidates(int ridePatNum, int numOfCandidates, bool newFlag, int dayInWeek)
     {
 
