@@ -1724,7 +1724,7 @@
                     if (arr_customer.func == 'new' && arr_customer.RidePatNum != undefined) {
                        // uploadData_new(arr_customer.RidePatNum);
                         allowChangeOf_originAndDestination = true;
-                        
+                        console.log('gilad check -->', arr_customer)
                         getPatients_slim();
                         generateLocation()
                             .then((result) => {
