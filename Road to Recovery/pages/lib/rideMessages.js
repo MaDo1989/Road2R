@@ -248,7 +248,7 @@ const patientMessage = (patient) => {
         agePrefix += ` שנה `;
     }
     else if (patient.Age == 2) {
-        agePrefix += `שנתיים `;
+        agePrefix += ` שנתיים `;
     }
     else if (patient.Age > 2) {
         agePrefix += ` ${patient.Age}`;

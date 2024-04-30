@@ -3074,11 +3074,11 @@
 
                     for (let i = 0; i < arr_rides.length; i++)
                     {
-                        if (arr_rides[i].Status == 'שובץ נהג') {
-                            //console.log(arr_rides[i], document.getElementById(arr_rides[i].RidePatNum), $(`#${arr_rides[i].RidePatNum}`));
-                            listRowstoColor.push(arr_rides[i].RidePatNum);
+                        //if (arr_rides[i].Status == 'שובץ נהג') {
+                        //    //console.log(arr_rides[i], document.getElementById(arr_rides[i].RidePatNum), $(`#${arr_rides[i].RidePatNum}`));
+                        //    listRowstoColor.push(arr_rides[i].RidePatNum);
 
-                        }
+                        //}
 
                         if (allSortsSwitch && areasToShow_arr !== null) {
                             if (areasToShow_arr.length !== 0) {
@@ -3204,6 +3204,19 @@
                             thisRidePat.date = thisRidePatDate.toLocaleString('he-IL', { dateStyle: 'short' });
                             futureRidePats.push(thisRidePat);
                         }
+
+                        //here need to be the logic of coloring the row
+                        
+                        const hourRide = convertDBDate2FrontEndDate(arr_rides[i].PickupTime).getHours();
+                        //console.log('checking:', arr_rides[i].MainDriver, hourRide, arr_rides[i].IsAnonymous);
+                        const anonymous = arr_rides[i].PatientName.includes('אנונימי') || arr_rides[i].IsAnonymous;
+                        //console.log('params:', !anonymous && arr_rides[i].MainDriver > 0 && hourRide <= 21);
+                        if (!anonymous && arr_rides[i].MainDriver > 0 && hourRide <= 21) {
+                            console.log('colord row', arr_rides[i].RidePatNum)
+                            listRowstoColor.push(arr_rides[i].RidePatNum);
+                            //$(`#${arr_rides[i].RidePatNum}`).addClass('statusComplete');
+                        }
+
 
                     }
                     let arrayOf_IHaveSeenAllready = localStorage.getItem('arrayOf_IHaveSeenAllready') ?
@@ -3741,7 +3754,8 @@
                     //            || ↑DATATABLES PROPERTIES↑||
                     //            ============================
 
-                    colorRowWithDriver(listRowstoColor);
+                    //colorRowWithDriver(listRowstoColor);
+                    colorRowBeige(listRowstoColor);
                     $(".dataTables_empty").html("אין הסעות لا توجد سفريات No drives");
 
 
@@ -4507,7 +4521,7 @@
                 }
                 let thisRide = findRideByNumber(rideID);
 
-                //console.log('checking:', 'timespan:', timespan, 'PatientNameSpan: ', PatientNameSpan, 'The Ride:', thisRide);
+                console.log('checking:', 'timespan:', timespan, 'PatientNameSpan: ', PatientNameSpan, 'The Ride:', thisRide);
                 if (timespan != 'אחה"צ' && PatientNameSpan != 'חולה' && thisRide.MainDriver!=-1) {
                     $(`#${rideID}`).addClass('statusComplete');
                 }
@@ -4515,6 +4529,11 @@
                     $(`#${rideID}`).removeClass('statusComplete');
 
                 }
+            })
+        }
+        const colorRowBeige = (rideArray) => {
+            rideArray.forEach(rideID => {
+                $(`#${rideID}`).addClass('statusComplete');
             })
         }
 
