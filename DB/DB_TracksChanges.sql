@@ -1,4 +1,27 @@
-﻿-- =======================================================
+﻿
+ALTER TABLE UnityRide
+DROP CONSTRAINT FK__UnityRide__Patie__4D1564AE; -- Drop the existing foreign key constraint
+
+ALTER TABLE UnityRide
+ADD CONSTRAINT FK__UnityRide__Patie__4D1564AE
+FOREIGN KEY (PatientName) REFERENCES Patient(displayName)
+ON UPDATE CASCADE; -- Add the foreign key constraint with cascade update
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- =======================================================
 -- Create Stored Procedure Template for Azure SQL Database
 -- =======================================================
 SET ANSI_NULLS ON
