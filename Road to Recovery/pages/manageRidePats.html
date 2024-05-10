@@ -3212,7 +3212,7 @@
                         const anonymous = arr_rides[i].PatientName.includes('אנונימי') || arr_rides[i].IsAnonymous;
                         //console.log('params:', !anonymous && arr_rides[i].MainDriver > 0 && hourRide <= 21);
                         if (!anonymous && arr_rides[i].MainDriver > 0 && hourRide <= 21) {
-                            console.log('colord row', arr_rides[i].RidePatNum)
+                            //console.log('colord row', arr_rides[i].RidePatNum)
                             listRowstoColor.push(arr_rides[i].RidePatNum);
                             //$(`#${arr_rides[i].RidePatNum}`).addClass('statusComplete');
                         }
