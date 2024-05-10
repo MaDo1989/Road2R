@@ -284,10 +284,15 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+//    {
+//    "ridePatNum": 183192,
+//    "numOfCandidates": 25,
+//    "newFlag": false,
+//    "dayInWeek": 3
+//}
 
-
-    //Benny Candidates
-    [WebMethod(EnableSession = true)]
+//Benny Candidates
+[WebMethod(EnableSession = true)]
     public string GetCandidates(int ridePatNum, int numOfCandidates, bool newFlag, int dayInWeek)
     {
 
@@ -1225,6 +1230,25 @@ public class WebService : System.Web.Services.WebService
         {
             Log.Error("Error in GetUnityRide_RidePat", ex);
             throw new Exception("שגיאה בשליפת נתוני הסעה");
+        }
+
+    }
+
+
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetReturnRideUnityRide(int unityRideID)
+    {
+        try
+        {
+            UnityRide ur = new UnityRide();
+            return j.Serialize(ur.GetReturnDrive(unityRideID));
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetReturnRideUnityRide ", ex);
+            throw new Exception("שגיאה בשליפת נתוני הסעה: GetReturnRideUnityRide");
         }
 
     }

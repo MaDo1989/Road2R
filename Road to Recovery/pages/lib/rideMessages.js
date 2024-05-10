@@ -84,7 +84,7 @@ function buildMessage(message) {
     let firstName = message.driver.split(" ")[0];
     //let txt = `שלום ${message.driver}` + sep;
     let txt = `,שלום ${firstName}` + sep;
-
+    console.log('message.totalPeople', message.totalPeople)
     txt += `הסעה מ${message.origin} ל${message.destination}` + sep;
     if (message.totalPeople === 1) txt += `סה"כ אדם אחד` + sep;
     else txt += `סה"כ ${message.totalPeople} אנשים` + sep;
@@ -248,7 +248,7 @@ const patientMessage = (patient) => {
         agePrefix += ` שנה `;
     }
     else if (patient.Age == 2) {
-        agePrefix += `שנתיים `;
+        agePrefix += ` שנתיים `;
     }
     else if (patient.Age > 2) {
         agePrefix += ` ${patient.Age}`;

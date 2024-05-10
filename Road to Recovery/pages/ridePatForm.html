@@ -191,6 +191,7 @@
         var rideNumberForNo;
         // var secondModal = false;
         var CoordinatorForReturn;
+        ThisRide = null;
 
         let escorts_inthisRidePat = [];
         let patients_JSONArray = [];
@@ -537,6 +538,8 @@
                         Escorts.push(Escort);
                     });
 
+
+                    Pat.DisplayName.includes('אנונימי')? isAnonymous = true : isAnonymous = false;
                     //in case of different equipment than declared for anonymous ridepat.
                     var str = "";
 
@@ -819,8 +822,7 @@
 
 
         });
-
-
+              
         // new func for new way to save rides in the DB -Gilad
         const setUnityRideNew = (data) => {
             //console.log('from test CheckAPI_Gilad ', JSON.parse(data));
@@ -840,6 +842,8 @@
             unityRide.AmountOfEscorts = dataobj.RidePat.Escorts.length;
             let request = { unityRide: unityRide, func: dataobj.func, numOfRide: dataobj.numberOfRides, repeatEvery: dataobj.repeatRideEvery, firstTry:true };
             //console.log('After Custom',request);
+            ThisRide = request;
+            isThisAReturnDriveFunc(dataobj.RidePat);
             let dataString = JSON.stringify(request);
 
              $.ajax({
@@ -911,6 +915,8 @@
 
                                 else
                                 {
+                                    //console.log('res:', result);
+                                    ThisRide.unityRide.RidePatNum = result;
                                     showButtonsModal(isThisAReturnDrive);
 
                                 }
@@ -946,20 +952,6 @@
 
             
 
-            ///////////////////////////////////////////////////////////////////////////
-
-            //paramDic.Add("@patientName", unityRide.PatientName);
-            //paramDic.Add("@patientId", unityRide.PatientId);
-            //paramDic.Add("@origin", unityRide.Origin);
-            //paramDic.Add("@destination", unityRide.Destination);
-            //paramDic.Add("@pickupTime", unityRide.PickupTime);
-            //paramDic.Add("@remark", unityRide.Remark);
-            //paramDic.Add("@onlyEscort", unityRide.OnlyEscort);
-            //paramDic.Add("@area", unityRide.Area);
-            //paramDic.Add("@isAnonymous", unityRide.IsAnonymous);
-            //paramDic.Add("@coorName", unityRide.CoorName);
-            //paramDic.Add("@driverName", unityRide.DriverName);
-            //paramDic.Add("@amountOfEscorts", unityRide.AmountOfEscorts);
         }
         //this is for the swal error modal if somethinggo wrong or already exist.
         const showErrorSwal = (date) => {
@@ -1056,7 +1048,7 @@
 
         const fillPage_withPatientData = (patient, markThe1stEscort = false) => {
 
-            //console.log('inside fillPage_withPatientData --> patient-', patient)
+            //console.log('inside fillPage_withPatientData --> patient-', patient, hospitals);
             isAnonymous = patient.IsAnonymous === "True";
             localStorage.PatID = patient.Id;
             $('#pat').val(patient.DisplayName);
@@ -1084,7 +1076,7 @@
             $('#PatientIdentity').val(patient.PatientIdentity);
 
             if (allowChangeOf_originAndDestination) {
-                console.log('come on : ', allowChangeOf_originAndDestination, patient.Barrier.Name, patient.Hospital.Name)
+                //console.log('come on : ', allowChangeOf_originAndDestination, patient.Barrier.Name, patient.Hospital.Name)
                 $('#Origin').val(patient.Barrier.Name);
                 $('#Destination').val(patient.Hospital.Name);
             } else {
@@ -1671,6 +1663,7 @@
             }
             if (JSON.parse(GENERAL.RIDEPAT.getRidePatList()).length != 0) {
                 arr_customer = JSON.parse(GENERAL.RIDEPAT.getRidePatList());
+                console.log('TEST', arr_customer)
                 if (
                     performance.navigation.type == performance.navigation.TYPE_RELOAD
                     &&
@@ -1683,6 +1676,7 @@
                 $("#coordinator").attr('disabled', 'disabled');
                 $("#statusRidePat").attr('disabled', 'disabled');
                 $("#Equipment").attr('disabled', 'disabled');
+                //console.log('new console -->', arr_customer, hospitals);
                 if (arr_customer.func == "edit" || arr_customer.func == "show") {
 
                     if (localStorage.getItem("duplicateRidePat") != null) {
@@ -1719,11 +1713,11 @@
                     }
                 }
                 else {
-                    console.log('?impor ', arr_customer, arr_customer.RidePatNum)
+                    //console.log( arr_customer, arr_customer.RidePatNum)
                     if (arr_customer.func == 'new' && arr_customer.RidePatNum != undefined) {
                        // uploadData_new(arr_customer.RidePatNum);
                         allowChangeOf_originAndDestination = true;
-                        
+                        console.log('gilad check -->', arr_customer)
                         getPatients_slim();
                         generateLocation()
                             .then((result) => {
@@ -1741,6 +1735,7 @@
                             });
                     }
                     else {
+                        console.log('im here ? 1738');
                         //check on בדיקה.
                         $("#afterNoon").attr('disabled', 'disabled');
                         $("#Origin").attr('disabled', 'disabled');
@@ -1847,7 +1842,80 @@
 
             return CustomObj;
         }
+        //make the flat object to complex object like the old API
+        const CustomRideObject = (thisRide) => {
 
+            let CustomObj = {};
+            CustomObj.RidePatNum = thisRide.RidePatNum;
+            CustomObj.Status = thisRide.Status;
+            CustomObj.Remark = thisRide.Remark;
+            CustomObj.OnlyEscort = thisRide.OnlyEscort;
+            CustomObj.LastModified = thisRide.LastModified;
+            CustomObj.Date = thisRide.PickupTime;
+
+            CustomObj.Pat = {};
+            CustomObj.Pat.DisplayName = thisRide.PatientName;
+            CustomObj.Pat.Id = thisRide.PatientId;
+            CustomObj.Pat.DisplayNameA = ''
+            CustomObj.Pat.EnglishName = ''
+            CustomObj.Pat.PatientIdentity = 0;
+            CustomObj.Pat.Equipment = thisRide.PatientEquipments == null ? [] : thisRide.PatientEquipments;
+            CustomObj.Pat.IsAnonymous = thisRide.IsAnonymous;
+            CustomObj.Pat.RidePatPatientStatus = {};
+            CustomObj.Pat.RidePatPatientStatus.Status = (thisRide.PatientStatus == "" || thisRide.PatientStatus == "Not Finished") ? -1 : 1;
+            CustomObj.Pat.RidePatPatientStatus.EditTimeStamp = thisRide.PatientStatusEditTime
+
+            CustomObj.Pat.EscortedList = [];
+            CustomObj.Escorts = [];
+            //for (var i = 0; i < thisRide[18].Value.length; i++) {
+            //    let oneEscort = {}
+            //    oneEscort.Id = thisRide[18].Value[i][0].Value;
+            //    oneEscort.DisplayName = thisRide[18].Value[i][1].Value;
+            //    CustomObj.Escorts.push(oneEscort);
+            //}
+            for (var i = 0; i < thisRide.AmountOfEscorts; i++) {
+                let oneEscort = {}
+                oneEscort.Id = 0
+                oneEscort.DisplayName = ''
+                CustomObj.Pat.EscortedList.push(oneEscort);
+            }
+
+            for (var i = 0; i < thisRide.AmountOfEscorts; i++) {
+                let oneEscort = {}
+                oneEscort.Id = 0
+                oneEscort.DisplayName = ''
+                CustomObj.Escorts.push(oneEscort);
+            }
+
+            CustomObj.Drivers = [];
+            let Maindriver = {};
+            Maindriver.DisplayName = thisRide.DriverName;
+            Maindriver.Id = thisRide.MainDriver;
+            Maindriver.CellPhone = thisRide.DriverCellPhone
+            CustomObj.Drivers.push(Maindriver);
+            if (Maindriver.Id == null || Maindriver.Id == -1) {
+                CustomObj.Drivers = [];
+            }
+
+            CustomObj.Destination = {};
+            CustomObj.Destination.Name = thisRide.Destination
+            CustomObj.Origin = {};
+            CustomObj.Origin.Name = thisRide.Origin;
+
+            CustomObj.Pat.Barrier = {}
+            CustomObj.Pat.Hospital = {}
+            CustomObj.Pat.Age = thisRide.PatientAge;
+            CustomObj.Pat.cellPhone = thisRide.PatientCellPhone;
+            CustomObj.Pat.GenderAsEnum = thisRide.PatientGender;
+            CustomObj.Pat.Barrier.Name = CustomObj.Destination.Name;
+            CustomObj.Pat.Hospital.Name = CustomObj.Origin.Name;
+
+            CustomObj.Coordinator = {};
+            CustomObj.Coordinator.DisplayName = thisRide.CoorName
+            CustomObj.Coordinator.Id = thisRide.CoorId
+
+            return CustomObj;
+        }
 
         //Test the New Api for load data in this page
         const Check_test_API = (ridePatNum) => {
@@ -2637,16 +2705,47 @@
             }
         }
 
-        function createNewRide() {
+       async function  createNewRide() {
 
             let ridepat = JSON.parse(GENERAL.RIDEPAT.getRidePatList());
-            ridePat = { ...ridePat, func: 'new' }
-            GENERAL.RIDEPAT.setRidePatList(JSON.stringify(ridePat));
-           
-            location.reload();
+
+            //console.log('the first obj ', ridepat);
+            //console.log('before custom', ThisRide);
+            //let customRide = CustomRideObject(ThisRide.unityRide);
+            //console.log('After custom', customRide);
+            //ridePat = customRide
+            //ridePat = { ...ridePat, func: 'new' }
+            //console.log('what im save , then reload', ridePat)
+
+            //GENERAL.RIDEPAT.setRidePatList(JSON.stringify(ridePat));
+
             $('#wait').show();
+            let patientObj = patients_JSONArray.find(p => p.DisplayName.trim() === $('#pat').val().trim());
+            if (patientObj) {
+                let targetPatient = await getPatientById(patientObj.Id);
+                request2updateData(targetPatient);
+                request2TurnOffLoader([getPatientByIdPromise]);
+            } else {
+                $('#wait').hide();
+                swal(NOT_EXIST, '', 'error');
+             }
+           $('#Modal').modal('hide');
+           $('#wait').hide();
+           $('#dateRide').val('');
+            //location.reload();
+            //$('#wait').show();
 
         }
+
+        const isThisAReturnDriveFunc = (ride) => {
+            if (hospitals.includes(ride.Origin.Name)) {
+                isThisAReturnDrive = true;
+               
+            }
+            return isThisAReturnDrive;
+
+        }
+
 
         function createReturnRide() {
 
