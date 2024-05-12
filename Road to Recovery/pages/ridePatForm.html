@@ -213,6 +213,11 @@
         let arr_locations = [];
         let generateLocationPromise;
         let getPatientByIdPromise;
+        let isCreateNewRideButtonClicked = false;
+        const lastRide = {
+            dest: null,
+            ori: null
+        }
 
         const showMyModal = (id) => {
 
@@ -371,6 +376,7 @@
                 if (existingOrigion.Type === 'כללית' && targetLocationObj.Type !== 'כללית') {
                     if (existingOrigion.Area !== targetLocationObj.Area) {
                         $('#Origin').val(existingOrigion.Name);
+                        //console.log(existingOrigion, targetLocationObj,)
                         swal(DIFFER_AREAS_MSG, '', 'error');
                     } else {
                         $('#Origin').val(targetLocationObj.Name);
@@ -392,6 +398,7 @@
                 if (existingDestination.Type === 'כללית' && targetLocationObj.Type !== 'כללית') {
                     if (existingDestination.Area !== targetLocationObj.Area) {
                         $('#Destination').val(existingDestination.Name);
+                        //console.log(existingDestination, targetLocationObj,)
                         swal(DIFFER_AREAS_MSG, '', 'error');
                     } else {
                         $('#Destination').val(targetLocationObj.Name);
@@ -840,6 +847,8 @@
             unityRide.DriverName = $('#driver').val() == '' ? null : $('#driver').val()
             unityRide.RidePatNum = dataobj.func == 'edit' ? dataobj.RidePat.RidePatNum : 0;
             unityRide.AmountOfEscorts = dataobj.RidePat.Escorts.length;
+
+            lastRide.Escorts = dataobj.RidePat.Escorts;
             let request = { unityRide: unityRide, func: dataobj.func, numOfRide: dataobj.numberOfRides, repeatEvery: dataobj.repeatRideEvery, firstTry:true };
             //console.log('After Custom',request);
             ThisRide = request;
@@ -1024,6 +1033,7 @@
                         if (isSameArea(existingPatient, targetPatient)) {
                             return fillPage_withPatientData(targetPatient, true);
                         } else {
+                            //console.log(existingPatient, targetPatient,)
                             swal(DIFFER_AREAS_MSG, '', 'error');
                             return fillPage_withPatientData(existingPatient);
                         }
@@ -1038,7 +1048,15 @@
                     if (isSameArea(existingPatient, targetPatient)) {
                         return fillPage_withPatientData(targetPatient);
                     } else {
-                        swal(DIFFER_AREAS_MSG, '', 'error');
+                        //console.log(existingPatient, targetPatient,)
+                        //swal(DIFFER_AREAS_MSG, '', 'error');
+                        if (isCreateNewRideButtonClicked) {
+                            existingPatient.Barrier.Name = lastRide.ori;
+                            existingPatient.Hospital.Name = lastRide.dest;
+                            //console.log('lastRide:', lastRide.Escorts);
+                            existingPatient.ActiveEscorts = lastRide.Escorts;
+                        }
+
                         return fillPage_withPatientData(existingPatient);
                     }
                 }
@@ -1048,7 +1066,8 @@
 
         const fillPage_withPatientData = (patient, markThe1stEscort = false) => {
 
-            //console.log('inside fillPage_withPatientData --> patient-', patient, hospitals);
+            isCreateNewRideButtonClicked = false;
+            //console.log('inside fillPage_withPatientData --> patient-', patient);
             isAnonymous = patient.IsAnonymous === "True";
             localStorage.PatID = patient.Id;
             $('#pat').val(patient.DisplayName);
@@ -1061,7 +1080,11 @@
                 EscortedList = patient.EscortedList;
                 let str = '';
                 for (var i = 0; i < EscortedList.length; i++) {
-                    str += `<input id='escortCB${EscortedList[i].Id}' type=checkbox name='${EscortedList[i].DisplayName}' ${i === 0 && markThe1stEscort ? 'checked' : ''} >&nbsp`;
+                    let flagCheck = false;
+                    if (patient.ActiveEscorts!=undefined && i < patient.ActiveEscorts.length) {
+                        flagCheck = true;
+                    }
+                    str += `<input id='escortCB${EscortedList[i].Id}' type=checkbox name='${EscortedList[i].DisplayName}' ${flagCheck ? 'checked' : ''} >&nbsp`;
                     str += `<label data-toggle='tooltip' title='${EscortedList[i].DisplayName}' for='escortCB${EscortedList[i].Id}'>${EscortedList[i].DisplayName}</label>&nbsp&nbsp</br>`;
                 }
                 $("#selectEscort").html(str);
@@ -1663,7 +1686,7 @@
             }
             if (JSON.parse(GENERAL.RIDEPAT.getRidePatList()).length != 0) {
                 arr_customer = JSON.parse(GENERAL.RIDEPAT.getRidePatList());
-                console.log('TEST', arr_customer)
+                //console.log('TEST', arr_customer)
                 if (
                     performance.navigation.type == performance.navigation.TYPE_RELOAD
                     &&
@@ -1717,7 +1740,7 @@
                     if (arr_customer.func == 'new' && arr_customer.RidePatNum != undefined) {
                        // uploadData_new(arr_customer.RidePatNum);
                         allowChangeOf_originAndDestination = true;
-                        console.log('gilad check -->', arr_customer)
+                        //console.log('gilad check -->', arr_customer)
                         getPatients_slim();
                         generateLocation()
                             .then((result) => {
@@ -1735,7 +1758,7 @@
                             });
                     }
                     else {
-                        console.log('im here ? 1738');
+                        //console.log('im here ? 1738');
                         //check on בדיקה.
                         $("#afterNoon").attr('disabled', 'disabled');
                         $("#Origin").attr('disabled', 'disabled');
@@ -2706,6 +2729,7 @@
         }
 
        async function  createNewRide() {
+           isCreateNewRideButtonClicked = true;
 
             let ridepat = JSON.parse(GENERAL.RIDEPAT.getRidePatList());
 
@@ -2718,11 +2742,20 @@
             //console.log('what im save , then reload', ridePat)
 
             //GENERAL.RIDEPAT.setRidePatList(JSON.stringify(ridePat));
+           const Dest = $('#Destination').val();
+           const Origin = $('#Origin').val();  
+            
+           if (Dest != '' && Origin != '' && Dest != undefined && Origin != undefined) {
+               lastRide.dest = Dest;
+               lastRide.ori = Origin;
+
+           }
 
             $('#wait').show();
             let patientObj = patients_JSONArray.find(p => p.DisplayName.trim() === $('#pat').val().trim());
             if (patientObj) {
                 let targetPatient = await getPatientById(patientObj.Id);
+                //console.log('from create btn -->', targetPatient);
                 request2updateData(targetPatient);
                 request2TurnOffLoader([getPatientByIdPromise]);
             } else {
