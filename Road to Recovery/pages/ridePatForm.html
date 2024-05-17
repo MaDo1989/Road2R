@@ -854,7 +854,7 @@
             ThisRide = request;
             isThisAReturnDriveFunc(dataobj.RidePat);
             let dataString = JSON.stringify(request);
-
+            console.log('data send', request);
              $.ajax({
                         dataType: "json",
                         url: "WebService.asmx/setUnityRide",
@@ -1067,7 +1067,7 @@
         const fillPage_withPatientData = (patient, markThe1stEscort = false) => {
 
             isCreateNewRideButtonClicked = false;
-            //console.log('inside fillPage_withPatientData --> patient-', patient);
+            console.log('inside fillPage_withPatientData --> patient-', patient);
             isAnonymous = patient.IsAnonymous === "True";
             localStorage.PatID = patient.Id;
             $('#pat').val(patient.DisplayName);
@@ -1076,6 +1076,7 @@
 
             $('#patArabic').val(arabicDisplayName === 0 ? '' : arabicDisplayName);
 
+            //console.log('??', patient.EscortedList)
             if (patient.EscortedList.length > 0) {
                 EscortedList = patient.EscortedList;
                 let str = '';
@@ -1084,6 +1085,10 @@
                     if (patient.ActiveEscorts!=undefined && i < patient.ActiveEscorts.length) {
                         flagCheck = true;
                     }
+                    if (patient.ActiveEscorts == undefined && i ==0) {
+                        flagCheck = true;
+                    }
+
                     str += `<input id='escortCB${EscortedList[i].Id}' type=checkbox name='${EscortedList[i].DisplayName}' ${flagCheck ? 'checked' : ''} >&nbsp`;
                     str += `<label data-toggle='tooltip' title='${EscortedList[i].DisplayName}' for='escortCB${EscortedList[i].Id}'>${EscortedList[i].DisplayName}</label>&nbsp&nbsp</br>`;
                 }
@@ -1099,7 +1104,7 @@
             $('#PatientIdentity').val(patient.PatientIdentity);
 
             if (allowChangeOf_originAndDestination) {
-                //console.log('come on : ', allowChangeOf_originAndDestination, patient.Barrier.Name, patient.Hospital.Name)
+                console.log('come on : ', allowChangeOf_originAndDestination, patient.Barrier.Name, patient.Hospital.Name)
                 $('#Origin').val(patient.Barrier.Name);
                 $('#Destination').val(patient.Hospital.Name);
             } else {
@@ -1108,13 +1113,15 @@
 
             if (patient.IsAnonymous &&
                 (patient.Barrier.Type === 'כללית' || patient.Hospital.Type === 'כללית')
-            ) {
+            )
+            {
 
                 $('#Origin').prop('disabled', true);
                 $("#Origin").wrap(`<span style='background: yellow;' data-toggle="tooltip" title="השדה לא ניתן לשינוי כשהנסיעה היא של חולה אנונימי בציר כללי" class="d-inline-block" tabindex="0"></span>`);
                 $('#Destination').prop('disabled', true);
                 $("#Destination").wrap(`<span data-toggle="tooltip" title="השדה לא ניתן לשינוי כשהנסיעה היא של חולה אנונימי בציר כללי" class="d-inline-block" tabindex="0"></span>`);
-            } else {
+            }
+            else {
                 $('#Origin').prop('disabled', false);
                 $('#Destination').prop('disabled', false);
             }
@@ -1680,18 +1687,15 @@
             if (userType != "מנהל") {
                 $("#coorDiv").hide();
                 $("#ph").show();
-            } else {
+            }
+            else {
                 $("#coorDiv").show();
                 $("#ph").hide();
             }
             if (JSON.parse(GENERAL.RIDEPAT.getRidePatList()).length != 0) {
                 arr_customer = JSON.parse(GENERAL.RIDEPAT.getRidePatList());
-                //console.log('TEST', arr_customer)
-                if (
-                    performance.navigation.type == performance.navigation.TYPE_RELOAD
-                    &&
-                    typeof arr_customer.func === 'undefined'
-                ) {
+                console.log('TEST', arr_customer)
+                if (performance.navigation.type == performance.navigation.TYPE_RELOAD && typeof arr_customer.func === 'undefined') {
                     alert('נא לשים לב, הדף נטען מחדש ולכן הפעולה הבאה תהיה יצירת הסעה חדשה');
                     arr_customer.func = 'new';
                 }
@@ -1740,7 +1744,7 @@
                     if (arr_customer.func == 'new' && arr_customer.RidePatNum != undefined) {
                        // uploadData_new(arr_customer.RidePatNum);
                         allowChangeOf_originAndDestination = true;
-                        //console.log('gilad check -->', arr_customer)
+                        console.log('gilad check -->', arr_customer)
                         getPatients_slim();
                         generateLocation()
                             .then((result) => {
@@ -1965,7 +1969,7 @@
 
         //function to fill form for edit
         async function uploadData_new(ridePatNum) {
-            //console.log('Gilad check i just clicked', ridePatNum)
+            console.log('Gilad check i just clicked', ridePatNum)
             //  generatePat();
             getPatients_slim();
             generateLocation()
@@ -2099,7 +2103,7 @@
 
 
                             //this ↓ function also among other things draw the patient's escorts checkboxes
-                            //console.log('???--> ', ridePat.Pat)
+                            console.log('???--> ', ridePat.Pat)
                             fillPage_withPatientData(ridePat.Pat);
 
                             //this code incharge to mark which escorts to checked in.
@@ -2732,8 +2736,9 @@
            isCreateNewRideButtonClicked = true;
 
             let ridepat = JSON.parse(GENERAL.RIDEPAT.getRidePatList());
-
-            //console.log('the first obj ', ridepat);
+            arr_customer.func = 'new';
+           console.log('the first obj ', ridepat);
+           console.log('the arr_customer ', arr_customer);
             //console.log('before custom', ThisRide);
             //let customRide = CustomRideObject(ThisRide.unityRide);
             //console.log('After custom', customRide);
@@ -2765,6 +2770,9 @@
            $('#Modal').modal('hide');
            $('#wait').hide();
            $('#dateRide').val('');
+
+           $('#ridePatNum').val('');
+           $("#ridePatNum").prop('disabled', true);
             //location.reload();
             //$('#wait').show();
 
