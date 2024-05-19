@@ -1678,7 +1678,7 @@
             let ridepatToManipulate = arr_rides.find(r => r.RidePatNum === _ridepatToManipulate);
             let dateToManipulate = convertDBDate2FrontEndDate(ridepatToManipulate.PickupTime);
             dateToManipulate.setHours(hours, minutes);
-
+            console.log('check -->', ridepatToManipulate);
             let data = {
                 unityRideId: _ridepatToManipulate,
                 pickupTime: dateToManipulate
@@ -1700,7 +1700,28 @@
                 $('#wait').hide();
                 removeClass('highlightRow');
                 $('#editTimeModal').modal('hide');
-                alert(err);
+                console.log('in --> updateUnityRideTime_ECB', err);
+                if (err.responseJSON.Message.includes('error code: -2')) {
+                    const patientName = ridepatToManipulate.PatientName
+                    const PickupTime = convertDBDate2FrontEndDate(ridepatToManipulate.PickupTime);
+                    const date = formatDate(PickupTime);
+                    const time = formatTime(PickupTime);
+                    const origin = ridepatToManipulate.Origin;
+                    const destination = ridepatToManipulate.Destination;
+                    const textmessage = `החולה ${patientName} רשום להסעה בתאריך ${date} בשעה ${time} מ${origin} ל${destination}`;
+                    swal({
+                        title: "קוד שגיאה 2-",
+                        text: textmessage,
+                        type: "error",
+                        confirmButtonText: "אישור",
+                        confirmButtonClass: 'btn btn-danger',
+                        closeOnConfirm: true
+                    })
+                }
+                else {
+                    alert(err);
+
+                }
             }
 
             //console.log('From NEW updateUnityRideTime NEW func--> send this-->', data);
@@ -1708,8 +1729,25 @@
             ajaxCall('UpdateUnityRideTime', JSON.stringify(data), updateUnityRideTime_SCB, updateUnityRideTime_ECB);
 
         }
+        function formatTime(date) {
+            let hours = date.getHours();
+            let minutes = date.getMinutes();
 
+            hours = hours < 10 ? '0' + hours : hours;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
 
+            return hours + ':' + minutes;
+        }
+        function formatDate(date) {
+            let day = date.getDate();
+            let month = date.getMonth() + 1; // Months are zero based
+            let year = date.getFullYear();
+
+            day = day < 10 ? '0' + day : day;
+            month = month < 10 ? '0' + month : month;
+
+            return day + '/' + month + '/' + year;
+        }
         //new API to update remark by Gilad
         const updateRemark_UnityRide = () => {
             $('#wait').show();

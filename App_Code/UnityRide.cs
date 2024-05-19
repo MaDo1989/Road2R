@@ -551,7 +551,12 @@ public class UnityRide
         DBservice_Gilad db = new DBservice_Gilad();
         UnityRide unityRide = new UnityRide();
         unityRide = db.updateUnityRideTime(unityRideNum, editedTime);
-        if(unityRide.RidePatNum!=-1)
+        if (unityRide.RidePatNum==-2)
+        {
+            throw new Exception("error code: -2 , duplicated values in different rides");
+            
+        }
+        if (unityRide.RidePatNum!=-1)
         {
             BroadCast.BroadCast2Clients_UnityRideUpdated(unityRide);
         }
