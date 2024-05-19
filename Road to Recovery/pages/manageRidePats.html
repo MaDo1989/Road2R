@@ -1703,7 +1703,7 @@
                 console.log('in --> updateUnityRideTime_ECB', err);
                 if (err.responseJSON.Message.includes('error code: -2')) {
                     const patientName = ridepatToManipulate.PatientName
-                    const PickupTime = convertDBDate2FrontEndDate(ridepatToManipulate.PickupTime);
+                    const PickupTime = dateToManipulate;
                     const date = formatDate(PickupTime);
                     const time = formatTime(PickupTime);
                     const origin = ridepatToManipulate.Origin;
