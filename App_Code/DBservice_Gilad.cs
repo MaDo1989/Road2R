@@ -2139,6 +2139,7 @@ public class DBservice_Gilad
             while (dataReader.Read())
             {
                 int rideId = Convert.ToInt32(dataReader["RidePatNum"]);
+                unityRide.RidePatNum = rideId;
                 if (rideId > -1)
                 {
                     unityRide.RidePatNum = rideId;
