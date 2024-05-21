@@ -1678,7 +1678,7 @@
             let ridepatToManipulate = arr_rides.find(r => r.RidePatNum === _ridepatToManipulate);
             let dateToManipulate = convertDBDate2FrontEndDate(ridepatToManipulate.PickupTime);
             dateToManipulate.setHours(hours, minutes);
-            console.log('check -->', ridepatToManipulate);
+            //console.log('check -->', ridepatToManipulate);
             let data = {
                 unityRideId: _ridepatToManipulate,
                 pickupTime: dateToManipulate
@@ -1700,7 +1700,7 @@
                 $('#wait').hide();
                 removeClass('highlightRow');
                 $('#editTimeModal').modal('hide');
-                console.log('in --> updateUnityRideTime_ECB', err);
+                //console.log('in --> updateUnityRideTime_ECB', err);
                 if (err.responseJSON.Message.includes('error code: -2')) {
                     const patientName = ridepatToManipulate.PatientName
                     const PickupTime = dateToManipulate;
@@ -2586,7 +2586,7 @@
             listIds.push(ridePat.RidePatNum);
             let request = { ListIDs: listIds };
             //console.log('check request -->', request)
-            console.log('Gilad check -->', ridePat);
+            //console.log('Gilad check -->', ridePat);
                 $.ajax({
                     dataType: "json",
                     url: "WebService.asmx/deleteUnityRide",
