@@ -3,6 +3,149 @@
 
 
 
+
+
+
+
+
+
+/****** Object:  StoredProcedure [dbo].[spSetNewUnityRide]    Script Date: 03/06/2024 18:02:41 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad>
+-- Create Date: <09/12/23>
+-- Description: <this sp is for insert data to unity ride and [PatientEscort_PatientInRide (RidePat)] if need to. >
+-- ALTER Date: <03/06/24>
+-- ALTER Description: < add status to ride (fix some bug)>
+-- =============================================
+ALTER PROCEDURE [dbo].[spSetNewUnityRide]
+(
+    -- Add the parameters for the stored procedure here
+	@patientName nvarchar(255),
+	@patientId int,
+	@origin nvarchar(255),
+	@destination nvarchar(255),
+	@pickupTime dateTime,
+	@remark nvarchar(255),
+	@onlyEscort bit,
+	@area nvarchar(50),
+	@isAnonymous bit,
+	@coorName nvarchar(255),
+	@driverName nvarchar(255),
+	@amountOfEscorts int
+
+	
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+    
+
+    -- Insert statements for procedure here
+DECLARE @patientCellPhone varchar(50) = (select CellPhone from patient where Id = @patientId)
+DECLARE @patientGender nvarchar(50) = (select Gender from patient where Id = @patientId)
+DECLARE @patientBirthDate date = (select BirthDate from patient where Id = @patientId)
+DECLARE @coorId int = (select id from volunteer where displayName like @coorName)
+DECLARE @driverId int = case when @driverName is null then null else (select id from volunteer where displayName like @driverName) end
+DECLARE @driverPhone varchar(11) = (select cellphone from volunteer where id= @driverId)
+DECLARE @NoOfDocumentedRides int = (select NoOfDocumentedRides from volunteer where id= @driverId)
+DECLARE @isNewDriver bit = case when (select count(*) from UnityRide where pickupTime<=GETDATE() and MainDriver=@driverId)<=3 then 1 else 0 end
+DECLARE @status Nvarchar(50) = case when @driverId is null then N'ממתינה לשיבוץ' else N'שובץ נהג' end
+
+DECLARE @AmountOfEquipments int = 0
+SET @AmountOfEquipments  = case when(select count(PatientId) from Equipment_Patient where PatientId = @patientId group by PatientId) is null then 0 ELSE 
+(select count(PatientId) from Equipment_Patient where PatientId = @patientId group by PatientId)
+end
+
+	IF(@driverId is not null)
+	Update Volunteer
+	SET NoOfDocumentedRides = NoOfDocumentedRides + 1
+	where Id = @driverId
+
+
+	DECLARE @FlagVar int =-1
+	set @FlagVar= (select top 1 RidepatNum
+	from unityRide
+	where PatientId = @patientId and pickupTime = @pickupTime and Origin like @origin
+	and Destination like @destination and IsAnonymous = 0 and Status not like N'נמחקה' )
+if @FlagVar is null 
+BEGIN
+set @driverName = case when @driverName='' then null else @driverName end
+
+Insert into UnityRide
+(
+PatientName,
+PatientCellPhone,
+PatientId,
+PatientGender,
+PatientBirthDate,
+AmountOfEscorts,
+AmountOfEquipments,
+Origin,
+Destination,
+pickupTime,
+Coordinator,
+Remark,
+Area,
+OnlyEscort,
+lastModified,
+CoordinatorID,
+MainDriver,
+DriverName,
+DriverCellPhone,
+NoOfDocumentedRides,
+IsAnonymous,
+IsNewDriver,
+Status
+)
+values (
+@patientName,
+@patientCellPhone,
+@patientId,
+@patientGender,
+@patientBirthDate,
+@amountOfEscorts,
+@AmountOfEquipments,
+@origin,
+@destination,
+@pickupTime,
+@coorName,
+@remark,
+@area,
+@onlyEscort,
+GETDATE(),
+@coorId,
+@driverId,
+@driverName,
+@driverPhone,
+@NoOfDocumentedRides,
+@isAnonymous,
+@isNewDriver,
+@status
+)
+Select SCOPE_IDENTITY() 'RidePatNum'
+END
+else
+select -1 'RidePatNum'
+
+END
+
+
+
+
+
+
+
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------
+
 /****** Object:  StoredProcedure [dbo].[spUnityRide_UpdateDateAndTime]    Script Date: 19/05/2024 14:09:54 ******/
 SET ANSI_NULLS ON
 GO
