@@ -2,11 +2,77 @@
 
 
 
+/****** Object:  StoredProcedure [dbo].[spUnityRide_UpdateDateAndTime]    Script Date: 06/06/2024 19:44:15 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      Gilad
+-- Create Date: 08/12/23
+-- Description: to update the time of spesific ride in unityride
+-- ALTER Date 19/05/24 - try to avoid duplicated rides when change time values. - Gilad
+-- =============================================
+ALTER PROCEDURE [dbo].[spUnityRide_UpdateDateAndTime]
+(
+    -- Add the parameters for the stored procedure here
+	@editedTime DATETIME,
+	@unityRideId INT
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+	DECLARE @PatientId INT;
+    DECLARE @Origin NVARCHAR(255);
+    DECLARE @Destination NVARCHAR(255);
+
+	SELECT 
+        @PatientId = PatientId,
+        @Origin = Origin,
+        @Destination = Destination
+	FROM UnityRide
+	WHERE RidePatNum = @unityRideId;
+
+
+			  -- Check for duplicates
+    IF EXISTS (
+        SELECT 1
+        FROM UnityRide
+        WHERE 
+            PatientId = @PatientId AND 
+            pickupTime =@editedTime  AND 
+            RidePatNum != @unityRideId  -- Exclude the current ride
+    )
+    BEGIN
+        SELECT -2 AS 'RidePatNum', 'Duplicate ride exists with the same values' AS 'Message';
+        RETURN;
+    END
+
+
+BEGIN TRAN UpdateUnityRideTime
+
+UPDATE UnityRide
+SET PickupTime = @editedTime, lastModified = GETDATE()
+where RidePatNum=@unityRideId
+
+DECLARE @rowCount INT = 0 ;
+SET @rowCount = @@ROWCOUNT;
+
+
+
+IF @rowCount>0
+select * from UnityRide where RidePatNum=@unityRideId
+ELSE
+select -1 as 'RidePatNum'
+
+COMMIT TRAN UpdateUnityRideTime
+END
 
 
 
 
-
+---------------------------------------------------------------------------------------------------------------------------------
 
 
 /****** Object:  StoredProcedure [dbo].[spSetNewUnityRide]    Script Date: 03/06/2024 18:02:41 ******/
