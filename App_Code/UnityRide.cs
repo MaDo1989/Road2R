@@ -586,14 +586,14 @@ public class UnityRide
         BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
     }
 
-    public void updateDriver(int driverId, int unityRideId, bool isDelete)
+    public int updateDriver(int driverId, int unityRideId, bool isDelete)
     {
         DBservice_Gilad db = new DBservice_Gilad();
         UnityRide ur = new UnityRide();
         if (isDelete)
         {
             ur = db.updateDriver(-1, unityRideId);
-
+          
             //?
             //send push notification to coordinator phone
             //Message m = new Message();
@@ -606,9 +606,14 @@ public class UnityRide
         else
         {
             ur = db.updateDriver(driverId, unityRideId);
+            if (ur.RidePatNum == -5)
+            {
+                return ur.RidePatNum;
+            }
 
         }
         BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
+        return 1;
 
     }
 

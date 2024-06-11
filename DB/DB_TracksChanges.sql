@@ -1,13 +1,601 @@
 ﻿
 
+---------------------------------------------------------------------------------------------------------------------------------
 
 
+
+
+/****** Object:  StoredProcedure [dbo].[spUpdateDriverUnityRide]    Script Date: 11/06/2024 16:35:54 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad>
+-- Create Date: <25/12/23>
+-- ALTER Date : 11/06/24 -- to fix the duplicate Driver bug 
+
+-- Description: <update a driver to spesific unity ride also to delete driver from ride>
+-- =============================================
+ALTER PROCEDURE [dbo].[spUpdateDriverUnityRide]
+(
+    -- Add the parameters for the stored procedure here
+	@driverID int,
+	@unityRideID int
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+
+    -- Insert statements for procedure here
+	DECLARE @driverName nvarchar(255) = (select displayname from volunteer where Id=@driverID)
+	Declare @This_origin Nvarchar(55) = (select Origin from UnityRide where RidePatNum=@UnityRideID)
+	DECLARE @pickupTime DateTime = (select pickupTime from UnityRide where RidePatNum = @unityRideID)
+	DECLARE @driverPhone varchar(11) = (select cellphone from volunteer where id= @driverID)
+	DECLARE @isNewDriver bit = case when (select count(*) from UnityRide where pickupTime<=GETDATE() and MainDriver=@driverID)<=3 then 1 else 0 end
+	DECLARE @oldDriver int = (select MainDriver from UnityRide where RidePatNum = @unityRideID)
+
+-- care of the NoOfDocumentedRides in volunteer table.
+	--switch drivers
+	IF(@oldDriver is not null AND @driverID!=-1)
+		begin
+			update Volunteer
+			SET NoOfDocumentedRides = NoOfDocumentedRides-1
+			where Id = @oldDriver
+
+			update Volunteer
+			SET NoOfDocumentedRides = NoOfDocumentedRides+1
+			where Id = @driverID
+		end
+	--add driver
+	IF(@oldDriver is null AND @driverID!=-1)
+		begin
+			update Volunteer
+			SET NoOfDocumentedRides = NoOfDocumentedRides+1
+			where Id = @driverID
+		end
+	-- remove driver
+	IF(@oldDriver is not null AND @driverID = -1)
+		begin
+			update Volunteer
+			SET NoOfDocumentedRides = NoOfDocumentedRides-1
+			where Id = @oldDriver
+		end
+
+
+
+DECLARE @NoOfDocumentedRides int = (select NoOfDocumentedRides from volunteer where id= @driverID)
+
+	-- for assign driver to unity ride
+	IF @driverID!=-1
+	BEGIN
+	-- check if the driver got any ride in this time
+	IF EXISTS(select 1
+	from UnityRide
+	where RidePatNum != @UnityRideID and
+		  pickupTime = @pickupTime and 
+		  MainDriver = @driverId and
+		  status!=N'נמחקה' and 
+		  Origin!=@This_origin
+		  )
+	begin
+	select -5 as 'RidePatNum'
+	Return
+	end
+
+	ELSE
+	begin
+	UPDATE UnityRide
+	set MainDriver = @driverID,
+		DriverName = @driverName,
+		DriverCellPhone = @driverPhone,
+		NoOfDocumentedRides = @NoOfDocumentedRides,
+		IsNewDriver = @isNewDriver,
+		lastModified = GETDATE(),
+		Status = N'שובץ נהג'
+	where RidePatNum = @unityRideID
+	end
+	END
+	
+	-- for delete driver from unity ride
+	ELSE 
+		UPDATE UnityRide
+	set MainDriver = NULL,
+		DriverName = NULL,
+		DriverCellPhone = NULL,
+		NoOfDocumentedRides = NULL,
+		IsNewDriver = 1,
+		lastModified = GETDATE(),
+		Status = N'ממתינה לשיבוץ'
+	where RidePatNum = @unityRideID
+
+select * from UnityRide where RidePatNum = @unityRideID
+END
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+
+
+/****** Object:  StoredProcedure [dbo].[spUpdateRideInUnityRide]    Script Date: 09/06/2024 15:01:41 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad>
+-- Create Date: <11/12/23>
+-- Description: <this sp is for update spesific ride in the table (edit in the client)>
+-- =============================================
+ALTER PROCEDURE [dbo].[spUpdateRideInUnityRide]
+(
+    -- Add the parameters for the stored procedure here
+	@unityRideId int ,
+	@patientName nvarchar(255),
+	@patientId int,
+	@origin nvarchar(255),
+	@destination nvarchar(255),
+	@pickupTime dateTime,
+	@remark nvarchar(255),
+	@onlyEscort bit,
+	@area nvarchar(50),
+	@isAnonymous bit,
+	@coorName nvarchar(255),
+	@driverName nvarchar(255),
+	@amountOfEscorts int
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+	
+    -- Insert statements for procedure here
+	DECLARE @patientCellPhone varchar(50) = (select CellPhone from patient where Id = @patientId)
+	DECLARE @patientGender nvarchar(50) = (select Gender from patient where Id = @patientId)
+	DECLARE @patientBirthDate date = (select BirthDate from patient where Id = @patientId)
+	DECLARE @coorId int = (select id from volunteer where displayName like @coorName)
+	DECLARE @driverId int = case when @driverName is null then null else (select id from volunteer where displayName like @driverName) end
+	DECLARE @driverPhone varchar(11) = (select cellphone from volunteer where id= @driverId)
+	DECLARE @isNewDriver bit = case when (select count(*) from UnityRide where pickupTime<=GETDATE() and MainDriver=@driverId)<=3 then 1 else 0 end
+	DECLARE @oldDriver int = (select mainDriver from UnityRide where RidePatNum = @unityRideId)
+
+	DECLARE @AmountOfEquipments int = 0
+	SET @AmountOfEquipments  = case when(select count(PatientId) from Equipment_Patient where PatientId = @patientId group by PatientId) is null then 0 ELSE 
+	(select count(PatientId) from Equipment_Patient where PatientId = @patientId group by PatientId)end
+	set @driverName = case when @driverName='' then null else @driverName end
+
+
+	DECLARE @FlagVar int =-1
+	set @FlagVar= (select top 1 RidepatNum
+	from unityRide
+	where PatientId = @patientId and pickupTime = @pickupTime and IsAnonymous = 0 and RidePatNum!=@unityRideId )
+
+	--DECLARE @isDuplicated int = -1
+	--set @isDuplicated =(select top 1 RidePatNum
+	--from UnityRide
+	--where PatientId = @patientId and pickupTime = @pickupTime and RidePatNum!=@unityRideId
+	
+	--handle NoOfDocumentedRides in volunteer table
+	UPDATE Volunteer
+	SET NoOfDocumentedRides = NoOfDocumentedRides+1
+	where Id = @driverId
+
+	UPDATE Volunteer
+	SET NoOfDocumentedRides = NoOfDocumentedRides-1
+	where Id = @oldDriver
+
+	DECLARE @NoOfDocumentedRides int = (select NoOfDocumentedRides from volunteer where id= @driverId)
+
+	if (@FlagVar is null)
+	UPDATE UnityRide
+	SET PatientName = @patientName,
+	PatientId = @patientId,
+	Origin = @origin,
+	Destination = @destination,
+	pickupTime = @pickupTime,
+	Remark = @remark,
+	OnlyEscort = @onlyEscort,
+	Area = @area,
+	IsAnonymous = @isAnonymous,
+	Coordinator = @coorName,
+	DriverName = @driverName,
+	AmountOfEscorts = @amountOfEscorts,
+	PatientCellPhone=@patientCellPhone,
+	PatientGender=@patientGender,
+	PatientBirthDate =@patientBirthDate,
+	CoordinatorID=@coorId,
+	MainDriver=@driverId,
+	DriverCellPhone=@driverPhone,
+	NoOfDocumentedRides = @NoOfDocumentedRides,
+	IsNewDriver = @isNewDriver,
+	AmountOfEquipments = @AmountOfEquipments,
+	status = case when @driverId is null then N'ממתינה לשיבוץ' else N'שובץ נהג' end
+	WHERE RidePatNum=@unityRideId;
+	
+	ELSE 
+	return -1
+
+END
+
+
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+
+
+/****** Object:  StoredProcedure [dbo].[spVolunteerTypeView_GetVolunteersList_Gilad]    Script Date: 07/06/2024 12:20:33 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:       Gilad
+-- ALTER Date:	 16/08/2023
+-- ALTER Reason: try to add addition of absence to this sp 
+-- ALTER Reason : add status != 'נמחקה' cause the lastDrive Date was incorrecet
+-- =============================================
+ALTER procedure [dbo].[spVolunteerTypeView_GetVolunteersList_Gilad]
+
+@IsActive bit
+as
+begin
+		--Gilad addioton
+       UPDATE Absence
+    SET AbsenceStatus = CASE
+                         WHEN GETDATE() BETWEEN FromDate AND DATEADD(d,1,UntilDate) THEN 1
+                         ELSE 0
+                       END;
+
+select r.MainDriver, r.Origin, r.Destination
+into #tempNotDeletedOnly from  ridepat rp
+inner join ride r
+on r.RideNum=rp.RideId
+
+			select VolunteerId,AbsenceStatus
+			into #tempAbsence
+			from Absence
+			where  GETDATE() BETWEEN FromDate AND DATEADD(d,1,UntilDate) and isDeleted = 0
+			group by VolunteerId,AbsenceStatus
+
+--before the unity
+--SELECT v.id, MAX(r.date) AS latestDrive into #tempLatesetDrives
+--					FROM Volunteer v
+--					JOIN Ride r ON v.id = r.MainDriver
+--					GROUP BY v.id
+--after the unity
+SELECT mainDriver AS id, MAX(PickupTime) AS latestDrive into #tempLatesetDrives
+FROM UnityRide
+where [Status] not like N'נמחקה'
+GROUP BY mainDriver
+--Id,
+--DisplayName,
+--FirstNameA,
+--FirstNameH,
+--LastNameH,
+--LastNameA,
+--CellPhone,
+--CellPhone2,
+--HomePhone,
+--Remarks,
+--CityCityName,
+--Address,
+--VolunTypeType,
+--Email,
+--device,
+--NoOfDocumentedCalls,
+--NoOfDocumentedRides,
+--NumOfRides_last2Months,
+--mostCommonPath,
+--latestDrive,
+--JoinDate,
+--isAssistant,
+--IsActive,
+--KnowsArabic,
+--Gender,
+--pnRegId,
+--englishName,
+--lastModified,
+--isDriving,
+if (@IsActive = 0)
+	begin
+				select vtv.Id,vtv.DisplayName,vtv.FirstNameA,vtv.FirstNameH,
+				vtv.LastNameH,vtv.LastNameA,vtv.CellPhone,vtv.CellPhone2,
+				vtv.HomePhone,vtv.Remarks,vtv.CityCityName,vtv.Address,
+				vtv.VolunTypeType,vtv.Email,vtv.device,vtv.NoOfDocumentedCalls,
+				vtv.NoOfDocumentedRides,vtv.JoinDate,vtv.isAssistant,vtv.IsActive,
+				vtv.KnowsArabic,vtv.Gender,vtv.pnRegId,vtv.EnglishName,vtv.LastModified,vtv.isDriving,
+				(select count(*)
+					from UnityRide
+					where maindriver = vtv.Id
+					and pickuptime between DATEADD(Month, -2, GETDATE()) and  GETDATE()) as NumOfRides_last2Months
+					--gilad addition vvv
+					,(
+					select abse.AbsenceStatus
+					from #tempAbsence abse
+					where abse.VolunteerId=vtv.Id
+					) as AbsenceStatus,
+					--gilad addition ^^^
+					(
+				select origin + '-'+destination from
+													(
+														select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
+														where t.MainDriver = vtv.Id
+														group by maindriver, origin, destination
+														order by numberOfTimesDrove desc
+														) t
+					) mostCommonPath, tld.latestDrive
+		from VolunteerTypeView vtv
+		left join #tempLatesetDrives tld on tld.Id=vtv.Id
+		where IsActive = @IsActive or IsActive = 1
+		order by firstNameH
+
+	end
+else
+	begin
+	select vtv.Id,vtv.DisplayName,vtv.FirstNameA,vtv.FirstNameH,
+				vtv.LastNameH,vtv.LastNameA,vtv.CellPhone,vtv.CellPhone2,
+				vtv.HomePhone,vtv.Remarks,vtv.CityCityName,vtv.Address,
+				vtv.VolunTypeType,vtv.Email,vtv.device,vtv.NoOfDocumentedCalls,
+				vtv.NoOfDocumentedRides,vtv.JoinDate,vtv.isAssistant,vtv.IsActive,
+				vtv.KnowsArabic,vtv.Gender,vtv.pnRegId,vtv.EnglishName,vtv.LastModified,vtv.isDriving,
+				(select count(*)
+					from UnityRide
+					where maindriver = vtv.Id
+					and pickuptime between DATEADD(Month, -2, GETDATE()) and  GETDATE()) as NumOfRides_last2Months
+					--gilad addition vvv
+					,(
+					select abse.AbsenceStatus
+					from #tempAbsence abse
+					where abse.VolunteerId=vtv.Id
+					) as AbsenceStatus,
+					--gilad addition ^^^
+					(
+				select origin + '-'+destination from
+													(
+														select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
+														where t.MainDriver = vtv.Id
+														group by maindriver, origin, destination
+														order by numberOfTimesDrove desc
+														) t
+					) mostCommonPath, tld.latestDrive
+		from VolunteerTypeView vtv
+		left join #tempLatesetDrives tld on tld.Id=vtv.Id 
+		where IsActive = @IsActive
+		order by firstNameH
+	end
+
+	drop table #tempNotDeletedOnly, #tempLatesetDrives,#tempAbsence
+
+end
+
+
+
+
+
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+/****** Object:  StoredProcedure [dbo].[spUnityRide_UpdateDateAndTime]    Script Date: 06/06/2024 19:44:15 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      Gilad
+-- Create Date: 08/12/23
+-- Description: to update the time of spesific ride in unityride
+-- ALTER Date 19/05/24 - try to avoid duplicated rides when change time values. - Gilad
+-- =============================================
+ALTER PROCEDURE [dbo].[spUnityRide_UpdateDateAndTime]
+(
+    -- Add the parameters for the stored procedure here
+	@editedTime DATETIME,
+	@unityRideId INT
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+	DECLARE @PatientId INT;
+    DECLARE @Origin NVARCHAR(255);
+    DECLARE @Destination NVARCHAR(255);
+
+	SELECT 
+        @PatientId = PatientId,
+        @Origin = Origin,
+        @Destination = Destination
+	FROM UnityRide
+	WHERE RidePatNum = @unityRideId;
+
+
+			  -- Check for duplicates
+    IF EXISTS (
+        SELECT 1
+        FROM UnityRide
+        WHERE 
+            PatientId = @PatientId AND 
+            pickupTime =@editedTime  AND 
+            RidePatNum != @unityRideId  -- Exclude the current ride
+    )
+    BEGIN
+        SELECT -2 AS 'RidePatNum', 'Duplicate ride exists with the same values' AS 'Message';
+        RETURN;
+    END
+
+
+BEGIN TRAN UpdateUnityRideTime
+
+UPDATE UnityRide
+SET PickupTime = @editedTime, lastModified = GETDATE()
+where RidePatNum=@unityRideId
+
+DECLARE @rowCount INT = 0 ;
+SET @rowCount = @@ROWCOUNT;
+
+
+
+IF @rowCount>0
+select * from UnityRide where RidePatNum=@unityRideId
+ELSE
+select -1 as 'RidePatNum'
+
+COMMIT TRAN UpdateUnityRideTime
+END
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+
+
+/****** Object:  StoredProcedure [dbo].[spSetNewUnityRide]    Script Date: 09/06/2024 15:12:07 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad>
+-- Create Date: <09/12/23>
+-- Description: <this sp is for insert data to unity ride and [PatientEscort_PatientInRide (RidePat)] if need to. >
+-- =============================================
+ALTER PROCEDURE [dbo].[spSetNewUnityRide]
+(
+    -- Add the parameters for the stored procedure here
+	@patientName nvarchar(255),
+	@patientId int,
+	@origin nvarchar(255),
+	@destination nvarchar(255),
+	@pickupTime dateTime,
+	@remark nvarchar(255),
+	@onlyEscort bit,
+	@area nvarchar(50),
+	@isAnonymous bit,
+	@coorName nvarchar(255),
+	@driverName nvarchar(255),
+	@amountOfEscorts int
+
+	
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+    
+
+    -- Insert statements for procedure here
+DECLARE @patientCellPhone varchar(50) = (select CellPhone from patient where Id = @patientId)
+DECLARE @patientGender nvarchar(50) = (select Gender from patient where Id = @patientId)
+DECLARE @patientBirthDate date = (select BirthDate from patient where Id = @patientId)
+DECLARE @coorId int = (select id from volunteer where displayName like @coorName)
+DECLARE @driverId int = case when @driverName is null then null else (select id from volunteer where displayName like @driverName) end
+DECLARE @driverPhone varchar(11) = (select cellphone from volunteer where id= @driverId)
+DECLARE @NoOfDocumentedRides int = (select NoOfDocumentedRides from volunteer where id= @driverId)
+DECLARE @isNewDriver bit = case when (select count(*) from UnityRide where pickupTime<=GETDATE() and MainDriver=@driverId)<=3 then 1 else 0 end
+DECLARE @status Nvarchar(50) = case when @driverId is null then N'ממתינה לשיבוץ' else N'שובץ נהג' end
+
+DECLARE @AmountOfEquipments int = 0
+SET @AmountOfEquipments  = case when(select count(PatientId) from Equipment_Patient where PatientId = @patientId group by PatientId) is null then 0 ELSE 
+(select count(PatientId) from Equipment_Patient where PatientId = @patientId group by PatientId)
+end
+
+	IF(@driverId is not null)
+	Update Volunteer
+	SET NoOfDocumentedRides = NoOfDocumentedRides + 1
+	where Id = @driverId
+
+
+	DECLARE @FlagVar int =-1
+	set @FlagVar= (select top 1 RidepatNum
+	from unityRide
+	where PatientId = @patientId and pickupTime = @pickupTime  and IsAnonymous = 0 and Status not like N'נמחקה' )
+if @FlagVar is null 
+BEGIN
+set @driverName = case when @driverName='' then null else @driverName end
+
+Insert into UnityRide
+(
+PatientName,
+PatientCellPhone,
+PatientId,
+PatientGender,
+PatientBirthDate,
+AmountOfEscorts,
+AmountOfEquipments,
+Origin,
+Destination,
+pickupTime,
+Coordinator,
+Remark,
+Area,
+OnlyEscort,
+lastModified,
+CoordinatorID,
+MainDriver,
+DriverName,
+DriverCellPhone,
+NoOfDocumentedRides,
+IsAnonymous,
+IsNewDriver,
+Status
+)
+values (
+@patientName,
+@patientCellPhone,
+@patientId,
+@patientGender,
+@patientBirthDate,
+@amountOfEscorts,
+@AmountOfEquipments,
+@origin,
+@destination,
+@pickupTime,
+@coorName,
+@remark,
+@area,
+@onlyEscort,
+GETDATE(),
+@coorId,
+@driverId,
+@driverName,
+@driverPhone,
+@NoOfDocumentedRides,
+@isAnonymous,
+@isNewDriver,
+@status
+)
+Select SCOPE_IDENTITY() 'RidePatNum'
+END
+else
+select -1 'RidePatNum'
+
+END
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------
 
 /****** Object:  StoredProcedure [dbo].[spUnityRide_UpdateDateAndTime]    Script Date: 19/05/2024 14:09:54 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------
 -- =============================================
 -- Author:      Gilad
 -- Create Date: 08/12/23

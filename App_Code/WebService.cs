@@ -1568,14 +1568,15 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public void AssignUpdateDriverToUnityRide(int UnityRideId, int DriverId,bool isDelete) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
+    public string AssignUpdateDriverToUnityRide(int UnityRideId, int DriverId,bool isDelete) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
     {
         
 
         try
         {
             UnityRide ur = new UnityRide();
-            ur.updateDriver(DriverId, UnityRideId, isDelete);
+            int res = ur.updateDriver(DriverId, UnityRideId, isDelete);
+            return j.Serialize(res);
 
         }
         catch (Exception ex)
