@@ -1824,7 +1824,18 @@
         }
 
         const assignDriverToRidePat_SCB = (data) => {
-            //console.log('what data ? ', data);
+            
+            if (data.d == -5) {
+                console.error('duplicated driver! --> got status -5 from the server');
+
+                swal({
+                    title: " הפעולה נכשלה ,לנהג זה יש נסיעה בתאריך ובשעה שבחרת",
+                    timer: 2500,
+                    type: "error",
+                    showConfirmButton: false
+                });
+               
+            }
             $('#wait').hide();
             removeClass('highlightRow');
             $('#assignDriverModal').modal('hide');
@@ -4559,7 +4570,7 @@
                 }
                 let thisRide = findRideByNumber(rideID);
 
-                console.log('checking:', 'timespan:', timespan, 'PatientNameSpan: ', PatientNameSpan, 'The Ride:', thisRide);
+                //console.log('checking:', 'timespan:', timespan, 'PatientNameSpan: ', PatientNameSpan, 'The Ride:', thisRide);
                 if (timespan != 'אחה"צ' && PatientNameSpan != 'חולה' && thisRide.MainDriver!=-1) {
                     $(`#${rideID}`).addClass('statusComplete');
                 }

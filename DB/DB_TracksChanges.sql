@@ -1,4 +1,120 @@
 ﻿
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+/****** Object:  StoredProcedure [dbo].[spUpdateDriverUnityRide]    Script Date: 11/06/2024 16:35:54 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad>
+-- Create Date: <25/12/23>
+-- ALTER Date : 11/06/24 -- to fix the duplicate Driver bug 
+
+-- Description: <update a driver to spesific unity ride also to delete driver from ride>
+-- =============================================
+ALTER PROCEDURE [dbo].[spUpdateDriverUnityRide]
+(
+    -- Add the parameters for the stored procedure here
+	@driverID int,
+	@unityRideID int
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+
+    -- Insert statements for procedure here
+	DECLARE @driverName nvarchar(255) = (select displayname from volunteer where Id=@driverID)
+	Declare @This_origin Nvarchar(55) = (select Origin from UnityRide where RidePatNum=@UnityRideID)
+	DECLARE @pickupTime DateTime = (select pickupTime from UnityRide where RidePatNum = @unityRideID)
+	DECLARE @driverPhone varchar(11) = (select cellphone from volunteer where id= @driverID)
+	DECLARE @isNewDriver bit = case when (select count(*) from UnityRide where pickupTime<=GETDATE() and MainDriver=@driverID)<=3 then 1 else 0 end
+	DECLARE @oldDriver int = (select MainDriver from UnityRide where RidePatNum = @unityRideID)
+
+-- care of the NoOfDocumentedRides in volunteer table.
+	--switch drivers
+	IF(@oldDriver is not null AND @driverID!=-1)
+		begin
+			update Volunteer
+			SET NoOfDocumentedRides = NoOfDocumentedRides-1
+			where Id = @oldDriver
+
+			update Volunteer
+			SET NoOfDocumentedRides = NoOfDocumentedRides+1
+			where Id = @driverID
+		end
+	--add driver
+	IF(@oldDriver is null AND @driverID!=-1)
+		begin
+			update Volunteer
+			SET NoOfDocumentedRides = NoOfDocumentedRides+1
+			where Id = @driverID
+		end
+	-- remove driver
+	IF(@oldDriver is not null AND @driverID = -1)
+		begin
+			update Volunteer
+			SET NoOfDocumentedRides = NoOfDocumentedRides-1
+			where Id = @oldDriver
+		end
+
+
+
+DECLARE @NoOfDocumentedRides int = (select NoOfDocumentedRides from volunteer where id= @driverID)
+
+	-- for assign driver to unity ride
+	IF @driverID!=-1
+	BEGIN
+	-- check if the driver got any ride in this time
+	IF EXISTS(select 1
+	from UnityRide
+	where RidePatNum != @UnityRideID and
+		  pickupTime = @pickupTime and 
+		  MainDriver = @driverId and
+		  status!=N'נמחקה' and 
+		  Origin!=@This_origin
+		  )
+	begin
+	select -5 as 'RidePatNum'
+	Return
+	end
+
+	ELSE
+	begin
+	UPDATE UnityRide
+	set MainDriver = @driverID,
+		DriverName = @driverName,
+		DriverCellPhone = @driverPhone,
+		NoOfDocumentedRides = @NoOfDocumentedRides,
+		IsNewDriver = @isNewDriver,
+		lastModified = GETDATE(),
+		Status = N'שובץ נהג'
+	where RidePatNum = @unityRideID
+	end
+	END
+	
+	-- for delete driver from unity ride
+	ELSE 
+		UPDATE UnityRide
+	set MainDriver = NULL,
+		DriverName = NULL,
+		DriverCellPhone = NULL,
+		NoOfDocumentedRides = NULL,
+		IsNewDriver = 1,
+		lastModified = GETDATE(),
+		Status = N'ממתינה לשיבוץ'
+	where RidePatNum = @unityRideID
+
+select * from UnityRide where RidePatNum = @unityRideID
+END
+
+
+
 ---------------------------------------------------------------------------------------------------------------------------------
 
 
