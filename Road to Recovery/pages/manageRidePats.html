@@ -1678,7 +1678,7 @@
             let ridepatToManipulate = arr_rides.find(r => r.RidePatNum === _ridepatToManipulate);
             let dateToManipulate = convertDBDate2FrontEndDate(ridepatToManipulate.PickupTime);
             dateToManipulate.setHours(hours, minutes);
-            console.log('check -->', ridepatToManipulate);
+            //console.log('check -->', ridepatToManipulate);
             let data = {
                 unityRideId: _ridepatToManipulate,
                 pickupTime: dateToManipulate
