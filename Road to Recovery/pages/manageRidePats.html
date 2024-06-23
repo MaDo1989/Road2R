@@ -1107,6 +1107,9 @@
         var dateReturn;
         var returnDriverMsg;
 
+        let checkboxesRides = [];
+        let checkboxFlag = false;
+
         let arrayOF_areasObj = [];
         let morningRidePats = [];
         let afterNoonRidePats = [];
@@ -3207,8 +3210,9 @@
                         //#region isPatientStatusShouldPaintRow
                         isPatientStatusShouldPaintRow = callIfPatientStatusShouldPaintRow_AfterUnited(arr_rides[i]);
                         //#endregion isPatientStatusShouldPaintRow
-
+                        
                         thisRidePat = {
+                            checkBoxesStr: `<input type="checkbox" class="checkboxClass" onchange="ChangeCheckboxRides(this)" id="check${arr_rides[i].RidePatNum}">`,
                             ridePatNum: arr_rides[i].RidePatNum,
                             time: timeHTML,
                             //origin: isAssistant ? arr_rides[i].Origin.EnglishName : arr_rides[i].Origin.Name,
@@ -3236,7 +3240,8 @@
                                 afterNoonRidePats.push(thisRidePat);
                             }
 
-                        } else if (thisRidePatDate.toLocaleDateString() === tomorrowDate.toLocaleDateString()) {              //<---- tomorrow
+                        }
+                        else if (thisRidePatDate.toLocaleDateString() === tomorrowDate.toLocaleDateString()) {              //<---- tomorrow
 
                             if (thisRidePatDate.getHours() < 12) {                                                           //<---- tomorrow morning
                                 thisRidePat.date = thisRidePatDate.toLocaleString('he-IL', { dateStyle: 'short' });
@@ -3248,7 +3253,8 @@
                                 tomorrowAfternoonRidePats.push(thisRidePat);
                             }
 
-                        } else if (thisRidePatDate > tomorrowDate) {                                                         //<---- future
+                        }
+                        else if (thisRidePatDate > tomorrowDate) {                                                         //<---- future
 
                             thisRidePat.date = thisRidePatDate.toLocaleString('he-IL', { dateStyle: 'short' });
                             futureRidePats.push(thisRidePat);
@@ -3295,32 +3301,35 @@
                         autoWidth: false,
                         columns: [
                             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
-                            { data: "time" },                                //0
-                            { data: "origin" },                              //1
-                            { data: "destination" },                         //2
-                            { data: "patient" },                             //3
-                            { data: "patientAge" },                          //4
-                            { data: "driver" },                              //5
-                            { data: "status" },                              //6
-                            { data: "lastModified" },                        //7
-                            { data: "remark" },                              //8
-                            { data: "isAnonymous" },                         //9
-                            { data: "buttons" },                             //10
+                            {data:"checkBoxesStr"},                          //0
+                            { data: "time" },                                //1
+                            { data: "origin" },                              //2
+                            { data: "destination" },                         //3
+                            { data: "patient" },                             //4
+                            { data: "patientAge" },                          //5
+                            { data: "driver" },                              //6
+                            { data: "status" },                              //7
+                            { data: "lastModified" },                        //8
+                            { data: "remark" },                              //9
+                            { data: "isAnonymous" },                         //10
+                            { data: "buttons" },                             //11
+       
                         ],
                         columnDefs: [
-                            { width: '5%', "targets": [0, 1, 2, 5, 6, 7] },
-                            { width: '2%', "targets": [4] },
-                            { width: '15%', "targets": [3] },
-                            { width: '25%', "targets": [9] },
-                            { targets: 0, type: 'de_time' },
+                            { "targets": [0], "orderable": false },
+                            { width: '5%', "targets": [1, 2, 5, 6, 7,8] },
+                            { width: '2%', "targets": [5] },
+                            { width: '15%', "targets": [4] },
+                            { width: '25%', "targets": [10] },
+                            { targets: 1, type: 'de_time' },
                             {
-                                targets: [1, 2, 3, 5, 6, 7], createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {
+                                targets: [2, 3, 4, 6, 7, 8], createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {
                                     if (isAssistant) {
                                         cell.className += ' ltr';
                                     }
 
                                     switch (colIndex) {
-                                        case 5: //driver column
+                                        case 6: //driver column
 
                                             $(cell).addClass('driver_td');
                                             if (!rowData.hasDriver) {
@@ -3329,7 +3338,7 @@
                                             }
                                             break;
 
-                                        case 6://status column
+                                        case 7://status column
                                             if (
                                                 cellData.indexOf("הגענו ליעד") !== -1 ||
                                                 cellData.indexOf("Reached destination") !== -1
@@ -3344,7 +3353,7 @@
                                                 }
                                             }
                                             break;
-                                        case 7://lastModified column
+                                        case 8://lastModified column
 
                                             const thisRidePatNum = rowData.ridePatNum;
                                             const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatNum);
@@ -3362,10 +3371,10 @@
 
                                 }
                             },
-                            { targets: 7, className: 'last-modified_td' },
-                            { targets: 7, type: 'last_modifiedSort' },
-                            { "targets": [9], visible: false },
-                            { targets: [10], orderable: false }
+                            { targets: 8, className: 'last-modified_td' },
+                            { targets: 8, type: 'last_modifiedSort' },
+                            { "targets": [10], visible: false },
+                            { targets: [11], orderable: false }
 
                         ],
                         createdRow: function (row, data, dataIndex) {
@@ -5403,6 +5412,23 @@
             $(`#${id}`).focus();
         }
 
+        const ChangeCheckboxRides = (checkbox) => {
+            //console.log(checkbox.id, checkbox.checked);
+            if (checkbox.id == 'AllChecks') {
+                $('.checkboxClass').prop("checked", checkbox.checked);
+            }
+
+            let arrlocal = [];
+            $('.checkboxClass').each(function () {
+                if (this.checked && this.id !='AllChecks') {
+                    arrlocal.push(parseInt(this.id.replace("check","")));
+                }
+            });
+            checkboxesRides = arrlocal;
+            console.log(checkboxesRides);
+
+        }
+
     </script>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -5552,6 +5578,9 @@
                                                        class="table table-striped table-bordered">
                                                     <thead>
                                                         <tr>
+                                                            <th class="middle" title="Checkbox">
+                                                                <input type="checkbox" class="checkboxClass" onchange="ChangeCheckboxRides(this)" id="AllChecks">
+                                                            </th>
                                                             <th class="middle" title="Time  الساعة">שעה</th>
                                                             <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
                                                             <th class="middle" title="Destination  نقطة الوصول">יעד</th>
