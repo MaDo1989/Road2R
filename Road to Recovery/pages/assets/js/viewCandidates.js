@@ -251,7 +251,6 @@ const renderRidePatDetails = (ridepat) => {
 }
 
 const isItToday = (d) => {
-    console.log('what is d', d);
     let now = new Date(Date.now());
     let daysMatch = d.getDate() === now.getDate();
     let monthMatch = d.getMonth() === now.getMonth();
@@ -284,6 +283,7 @@ const getCandidates_SCB = (data) => {
     deceideWhichTable2Show();
 
     allCandidatedFromDB = JSON.parse(data.d);
+    console.log('what is the res:', allCandidatedFromDB);
     fillTableWithData();
 
 }

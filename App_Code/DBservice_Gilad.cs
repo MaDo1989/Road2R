@@ -564,6 +564,27 @@ public class DBservice_Gilad
     }
 
 
+    public UnityRide GetReturnUnityRide(int unityRideID)
+    {
+        SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@UnityRideId", unityRideID);
+        cmd = CreateCommandWithStoredProcedureGeneral("spGetReturnRide_UnityRide", con, paramDic);
+        UnityRide u = reciveUnityRideDB(cmd, "GetReturnRideUnityRide GetReturnDrive GetReturnUnityRide spGetReturnRide_UnityRide");
+        return u;
+
+    }
     public List <object> GetTomorrowRides()
     {
         SqlCommand cmd;
@@ -1214,7 +1235,12 @@ public class DBservice_Gilad
 		paramDic.Add("@active", active);
 
 
-		cmd = CreateCommandWithStoredProcedureGeneral("sp_PatientsAndEquipment_Gilad", con, paramDic);             // create the command
+        ///////////VERY IMPORTANT///////////
+        // Before the changes in the stored procedure, the stored procedure was sp_PatientsAndEquipment_Gilad (why equipment? I don't know)
+        // NOTE that all the comments in the data reader are the old names of the columns in the view and is not relevant anymore.
+        ///////////VERY IMPORTANT///////////
+
+        cmd = CreateCommandWithStoredProcedureGeneral("sp_GetPatientList", con, paramDic);             // create the command
 
 
 		List<Patient> PatientsList = new List<Patient>();
@@ -1232,23 +1258,23 @@ public class DBservice_Gilad
 
 
 				OnePatient.Id = int.Parse(dataReader["Id"].ToString());
-				OnePatient.IsAnonymous = dataReader["IsAnonymous"].ToString();
-				OnePatient.NumberOfEscort = dataReader["NumberOfEscort"].ToString();
+				//OnePatient.IsAnonymous = dataReader["IsAnonymous"].ToString();
+				//OnePatient.NumberOfEscort = dataReader["NumberOfEscort"].ToString();
 				OnePatient.DisplayName = dataReader["DisplayName"].ToString();
-				OnePatient.DisplayNameA = dataReader["DisplayNameA"].ToString();
-				OnePatient.FirstNameA = dataReader["FirstNameA"].ToString();
-				OnePatient.FirstNameH = dataReader["FirstNameH"].ToString();
-				OnePatient.LastNameH = dataReader["LastNameH"].ToString();
-				OnePatient.LastNameA = dataReader["LastNameA"].ToString();
+				//OnePatient.DisplayNameA = dataReader["DisplayNameA"].ToString();
+				//OnePatient.FirstNameA = dataReader["FirstNameA"].ToString();
+				//OnePatient.FirstNameH = dataReader["FirstNameH"].ToString();
+				//OnePatient.LastNameH = dataReader["LastNameH"].ToString();
+				//OnePatient.LastNameA = dataReader["LastNameA"].ToString();
 				OnePatient.CellPhone = dataReader["CellPhone"].ToString();
-				OnePatient.CellPhone1 = dataReader["CellPhone2"].ToString();
-				OnePatient.HomePhone = dataReader["HomePhone"].ToString();
-				OnePatient.City = dataReader["CityCityName"].ToString();
-				OnePatient.LivingArea = dataReader["LivingArea"].ToString();
+				//OnePatient.CellPhone1 = dataReader["CellPhone2"].ToString();
+				//OnePatient.HomePhone = dataReader["HomePhone"].ToString();
+				//OnePatient.City = dataReader["CityCityName"].ToString();
+				//OnePatient.LivingArea = dataReader["LivingArea"].ToString();
 				OnePatient.IsActive = Convert.ToBoolean(dataReader["IsACtive"].ToString());
 				OnePatient.BirthDate = dataReader["BirthDate"].ToString();
-				OnePatient.History = dataReader["History"].ToString();
-				OnePatient.Department = dataReader["Department"].ToString();
+				//OnePatient.History = dataReader["History"].ToString();
+				//OnePatient.Department = dataReader["Department"].ToString();
 				if (dataReader["PatientIdentity"].ToString() == "")
 				{
 					OnePatient.PatientIdentity = 0;
@@ -1270,14 +1296,14 @@ public class DBservice_Gilad
 				}
 				else OnePatient.Hospital.EnglishName = "";
 				OnePatient.Gender = dataReader["Gender"].ToString();
-				OnePatient.Remarks = dataReader["Remarks"].ToString();
+				//OnePatient.Remarks = dataReader["Remarks"].ToString();
 				OnePatient.EnglishName = dataReader["EnglishName"].ToString();
 				List <string> el = new List<string>();
 				//get equipment for patient from the same view
-				string e = dataReader["EquipmentName"].ToString();
+				//string e = dataReader["EquipmentName"].ToString();
 
 				OnePatient.LastModified = dataReader["lastModified"].ToString();
-				el.Add(e);
+				//el.Add(e);
 				OnePatient.Equipment = el;
 
 				PatientsList.Add(OnePatient);
@@ -2118,6 +2144,7 @@ public class DBservice_Gilad
             while (dataReader.Read())
             {
                 int rideId = Convert.ToInt32(dataReader["RidePatNum"]);
+                unityRide.RidePatNum = rideId;
                 if (rideId > -1)
                 {
                     unityRide.RidePatNum = rideId;

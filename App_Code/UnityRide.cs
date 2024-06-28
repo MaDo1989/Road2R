@@ -428,6 +428,11 @@ public class UnityRide
         return dBservice.GetUnityRide(UnityRideId);
     }
 
+    public UnityRide GetReturnDrive(int UnityRideID)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+        return db.GetReturnUnityRide(UnityRideID);
+    }
     public List <UnityRide> GetWeeklyRidesForThanks()
     {
         DBservice_Gilad db = new DBservice_Gilad();
@@ -546,7 +551,12 @@ public class UnityRide
         DBservice_Gilad db = new DBservice_Gilad();
         UnityRide unityRide = new UnityRide();
         unityRide = db.updateUnityRideTime(unityRideNum, editedTime);
-        if(unityRide.RidePatNum!=-1)
+        if (unityRide.RidePatNum==-2)
+        {
+            throw new Exception("error code: -2 , duplicated values in different rides");
+            
+        }
+        if (unityRide.RidePatNum!=-1)
         {
             BroadCast.BroadCast2Clients_UnityRideUpdated(unityRide);
         }
@@ -576,14 +586,14 @@ public class UnityRide
         BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
     }
 
-    public void updateDriver(int driverId, int unityRideId, bool isDelete)
+    public int updateDriver(int driverId, int unityRideId, bool isDelete)
     {
         DBservice_Gilad db = new DBservice_Gilad();
         UnityRide ur = new UnityRide();
         if (isDelete)
         {
             ur = db.updateDriver(-1, unityRideId);
-
+          
             //?
             //send push notification to coordinator phone
             //Message m = new Message();
@@ -596,9 +606,14 @@ public class UnityRide
         else
         {
             ur = db.updateDriver(driverId, unityRideId);
+            if (ur.RidePatNum == -5)
+            {
+                return ur.RidePatNum;
+            }
 
         }
         BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
+        return 1;
 
     }
 
