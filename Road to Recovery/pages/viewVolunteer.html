@@ -563,7 +563,7 @@
                 url: "WebService.asmx/SetVolunteerIsActive",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                data: JSON.stringify({ id: id, active: active }),
+                data: JSON.stringify({ displayName: displayName, active: active }),
                 success: function (data) {
 
                     const response = JSON.parse(data.d);

@@ -1933,7 +1933,7 @@ public class Volunteer
             if (func == "edit")
             {
                 ChangeLastUpdateBy(0, v.DisplayName);
-                IsSuccessAndReason isSuccessIsActiveToggleModel = SetVolunteerIsActive(v.Id, v.IsActive);
+                IsSuccessAndReason isSuccessIsActiveToggleModel = SetVolunteerIsActive(v.DisplayName, v.IsActive);
                 if (!isSuccessIsActiveToggleModel.IsSuccess)
                 {
                     throw new Exception(isSuccessIsActiveToggleModel.Reason);
@@ -2064,7 +2064,9 @@ public class Volunteer
         }
     }
 
-    public IsSuccessAndReason SetVolunteerIsActive(int id, bool? isActive)
+    //bug here need to be changed
+    // fixing date : 28/06/2024
+    public IsSuccessAndReason SetVolunteerIsActive(string displayName, bool? isActive)
     {
         dbs = new DbService();
         IsSuccessAndReason result = new IsSuccessAndReason();
@@ -2073,8 +2075,9 @@ public class Volunteer
             cmd = new SqlCommand();
             dbs = new DbService();
             cmd.CommandType = CommandType.StoredProcedure;
+            //here is the probalem 
             cmd.CommandText = "spVolunteer_ToggleActiveness";
-            cmd.Parameters.AddWithValue("@volunteerId", id);
+            cmd.Parameters.AddWithValue("@displayName", displayName);
             isActive = isActive ?? false;//if null then = false;
             cmd.Parameters.AddWithValue("@isActive", isActive);
 
