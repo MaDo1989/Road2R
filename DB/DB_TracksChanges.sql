@@ -1,5 +1,124 @@
 ﻿
 
+---------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+select *
+from patient 
+where id IN (
+select patientId
+from unityRide 
+group by patientId,PatientName
+having MAX(pickupTime)< '2021-01-01 00:00:00.000')
+
+--just see who need to be changed
+select *
+from TEST_Patient 
+where id IN (
+select patientId
+from unityRide 
+where origin != N'ארז' and destination!=N'ארז'
+group by patientId,PatientName
+having MAX(pickupTime)< '2021-01-01 00:00:00.000')
+
+
+select *
+from TEST_Patient 
+where id IN (
+select patientId
+from unityRide 
+where origin = N'ארז' or destination=N'ארז'
+group by patientId,PatientName)
+
+
+
+--change the values is active
+UPDATE TEST_Patient
+SET isActive = 0  
+where id IN (
+select patientId
+from unityRide 
+group by patientId,PatientName
+having MAX(pickupTime)< '2021-01-01 00:00:00.000')
+
+--change the values is active
+UPDATE TEST_Patient
+SET isActive = 0  
+where id in (
+select patientId
+from unityRide 
+where origin = N'ארז' or destination=N'ארז'
+group by patientId,PatientName)
+
+
+
+
+select * from PatientsAndEquipmentView where IsActive = 1  order by Id
+select Id,DisplayName,Cellphone,BirthDate,Gender,Hospital,Barrier,PatientIdentity,LastModified,EnglishName,isActive
+from TEST_Patient where IsActive = 1  order by Id
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------
+
+
+/****** Object:  StoredProcedure [dbo].[sp_GetPatientList]    Script Date: 28/06/2024 8:33:56 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad Meirson>
+-- Create Date: <18/06/2024>
+-- Description: <this sp is for efficiency and time tests,>
+-- =============================================
+CREATE PROCEDURE [dbo].[sp_GetPatientList]
+(
+    -- Add the parameters for the stored procedure here
+    @active bit
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+   
+
+    -- Insert statements for procedure here
+	select Id,DisplayName,Cellphone,BirthDate,Gender,Hospital,Barrier,PatientIdentity,LastModified,EnglishName,isActive
+	from TEST_Patient where IsActive = 1  order by Id
+END
+
+
+
+
+
+
+
+
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+
+
+ALTER TABLE [dbo].[UnityRide]  WITH CHECK ADD  CONSTRAINT [FK__UnityRide__Patie__4D1564AE] FOREIGN KEY([PatientName])
+REFERENCES [dbo].[Patient] ([DisplayName])
+ON UPDATE CASCADE
+GO
+
+
+
 ---------------------------------------------------------------------------------------------------------------------------------
 
 
