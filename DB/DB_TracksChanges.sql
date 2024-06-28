@@ -3,41 +3,8 @@
 ---------------------------------------------------------------------------------------------------------------------------
 
 
-
-
-
-
-select *
-from patient 
-where id IN (
-select patientId
-from unityRide 
-group by patientId,PatientName
-having MAX(pickupTime)< '2021-01-01 00:00:00.000')
-
---just see who need to be changed
-select *
-from TEST_Patient 
-where id IN (
-select patientId
-from unityRide 
-where origin != N'ארז' and destination!=N'ארז'
-group by patientId,PatientName
-having MAX(pickupTime)< '2021-01-01 00:00:00.000')
-
-
-select *
-from TEST_Patient 
-where id IN (
-select patientId
-from unityRide 
-where origin = N'ארז' or destination=N'ארז'
-group by patientId,PatientName)
-
-
-
 --change the values is active
-UPDATE TEST_Patient
+UPDATE Patient
 SET isActive = 0  
 where id IN (
 select patientId
@@ -45,24 +12,10 @@ from unityRide
 group by patientId,PatientName
 having MAX(pickupTime)< '2021-01-01 00:00:00.000')
 
---change the values is active
-UPDATE TEST_Patient
-SET isActive = 0  
-where id in (
-select patientId
-from unityRide 
-where origin = N'ארז' or destination=N'ארז'
-group by patientId,PatientName)
 
-
-
-
-select * from PatientsAndEquipmentView where IsActive = 1  order by Id
-select Id,DisplayName,Cellphone,BirthDate,Gender,Hospital,Barrier,PatientIdentity,LastModified,EnglishName,isActive
-from TEST_Patient where IsActive = 1  order by Id
-
-
-
+UPDATE Patient
+set IsActive = 0 
+where Barrier = N'ארז'
 
 
 
@@ -94,7 +47,7 @@ BEGIN
 
     -- Insert statements for procedure here
 	select Id,DisplayName,Cellphone,BirthDate,Gender,Hospital,Barrier,PatientIdentity,LastModified,EnglishName,isActive
-	from TEST_Patient where IsActive = 1  order by Id
+	from Patient where IsActive = @active  order by Id
 END
 
 
