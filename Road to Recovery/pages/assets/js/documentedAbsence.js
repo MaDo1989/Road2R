@@ -332,7 +332,7 @@ const documentAAbsence2DB = () => {
     }
    
 
-    if (dataToSend.cause == '-1' || dataToSend.from == '' || dataToSend.until == '' || $("#DocumentAAbsence_choooseCoordinator").val() == 'not selected') {
+    if (dataToSend.cause == '' || dataToSend.from == '' || dataToSend.until == '' || $("#DocumentAAbsence_choooseCoordinator").val() == 'not selected') {
         $('#DocumentAAbsence_contentErrorMsg').show();
         $('#DocumentAAbsence_CoordinatorErrorMsg').hide();
         $('#DocumentAAbsence_DatesError').hide();
