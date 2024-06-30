@@ -570,7 +570,7 @@
 
                     if (response.IsSuccess) {
                         swal({
-                            title: "המתנדב הפך ללא פעיל",
+                            title: active!="true"?'המתנדב הפך ללא פעיל':'המתנדב הפך לפעיל' ,
                             timer: 1000,
                             type: "success",
                             showConfirmButton: false
