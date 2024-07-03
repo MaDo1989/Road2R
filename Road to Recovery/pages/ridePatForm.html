@@ -109,6 +109,16 @@
         .centerHeader {
             text-align: center;
         }
+
+
+        .modal-footer .btn + .btn {
+            margin-bottom: 5px; 
+            margin-right: 5px;
+        }
+
+        .NewBtn {
+            background-color: #0193b1 !important ;
+        }
     </style>
     <!--<script src="https://code.jquery.com/jquery-1.12.4.js"></script>-->
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -945,15 +955,17 @@
             const showButtonsModal = (isReturnDrive) => {
                 if (isReturnDrive) {
                     $('#wait').hide();
-                    document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
-                    document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
+                    document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 "><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה לאותו חולה</button>&nbsp;';
+                    document.getElementById('modalButtons').innerHTML += '<button onclick="createNewRideToAnotherPatient()" class="btn btn-success NewBtn waves-effect w-md m-b-5 "><i class="ti-plus m-r-5"></i> יצירת הסעה חדשה לחולה אחר</button>&nbsp;';
+                    document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 ">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
                     showMyModal('Modal');
                 }
                 else {
                     $('#wait').hide();
-                    document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
-                    document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
-                    document.getElementById('modalButtons').innerHTML += '<button onclick="createReturnRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn">יצירת החזרה &nbsp;<i class="ti-car m-r-5"></i></button>';
+                    document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 "><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה לאותו חולה</button>&nbsp;';
+                    document.getElementById('modalButtons').innerHTML += '<button onclick="createNewRideToAnotherPatient()" class="btn btn-success NewBtn waves-effect w-md m-b-5 "><i class="ti-plus m-r-5"></i> יצירת הסעה חדשה לחולה אחר</button>&nbsp;';
+                    document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 ">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
+                    document.getElementById('modalButtons').innerHTML += '<button onclick="createReturnRide()" class="btn btn-success waves-effect w-md m-b-5 ">יצירת החזרה &nbsp;<i class="ti-car m-r-5"></i></button>';
                     showMyModal('Modal');
                 }
 
@@ -1695,7 +1707,7 @@
             }
             if (JSON.parse(GENERAL.RIDEPAT.getRidePatList()).length != 0) {
                 arr_customer = JSON.parse(GENERAL.RIDEPAT.getRidePatList());
-                console.log('TEST', arr_customer)
+                //console.log('TEST', arr_customer)
                 if (performance.navigation.type == performance.navigation.TYPE_RELOAD && typeof arr_customer.func === 'undefined') {
                     alert('נא לשים לב, הדף נטען מחדש ולכן הפעולה הבאה תהיה יצירת הסעה חדשה');
                     arr_customer.func = 'new';
@@ -2738,8 +2750,8 @@
 
             let ridepat = JSON.parse(GENERAL.RIDEPAT.getRidePatList());
             arr_customer.func = 'new';
-           console.log('the first obj ', ridepat);
-           console.log('the arr_customer ', arr_customer);
+           //console.log('the first obj ', ridepat);
+           //console.log('the arr_customer ', arr_customer);
             //console.log('before custom', ThisRide);
             //let customRide = CustomRideObject(ThisRide.unityRide);
             //console.log('After custom', customRide);
@@ -2777,7 +2789,17 @@
             //location.reload();
             //$('#wait').show();
 
+       }
+
+
+        const createNewRideToAnotherPatient = () => {
+            let ridepat = JSON.parse(GENERAL.RIDEPAT.getRidePatList());
+            ridePat = { ...ridePat, func: 'new' }
+            GENERAL.RIDEPAT.setRidePatList(JSON.stringify(ridePat));
+            location.reload();
+            $('#wait').show();
         }
+
 
         const isThisAReturnDriveFunc = (ride) => {
             if (hospitals.includes(ride.Origin.Name)) {
