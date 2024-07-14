@@ -1703,7 +1703,7 @@
                 $('#wait').hide();
                 removeClass('highlightRow');
                 $('#editTimeModal').modal('hide');
-                console.log('in --> updateUnityRideTime_ECB', err);
+                //console.log('in --> updateUnityRideTime_ECB', err);
                 if (err.responseJSON.Message.includes('error code: -2')) {
                     const patientName = ridepatToManipulate.PatientName
                     const PickupTime = dateToManipulate;
@@ -2600,7 +2600,7 @@
             listIds.push(ridePat.RidePatNum);
             let request = { ListIDs: listIds };
             //console.log('check request -->', request)
-            console.log('Gilad check -->', ridePat);
+            //console.log('Gilad check -->', ridePat);
                 $.ajax({
                     dataType: "json",
                     url: "WebService.asmx/deleteUnityRide",

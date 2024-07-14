@@ -2064,6 +2064,8 @@ public class Volunteer
         }
     }
 
+    //bug here need to be changed
+    // fixing date : 28/06/2024
     public IsSuccessAndReason SetVolunteerIsActive(string displayName, bool? isActive)
     {
         dbs = new DbService();
@@ -2073,6 +2075,7 @@ public class Volunteer
             cmd = new SqlCommand();
             dbs = new DbService();
             cmd.CommandType = CommandType.StoredProcedure;
+            //here is the probalem 
             cmd.CommandText = "spVolunteer_ToggleActiveness";
             cmd.Parameters.AddWithValue("@displayName", displayName);
             isActive = isActive ?? false;//if null then = false;
