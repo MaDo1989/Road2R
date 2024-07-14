@@ -598,16 +598,79 @@ INNER JOIN
 
 
 
+/****** Object:  StoredProcedure [dbo].[spVolunteer_ToggleIsDrive]    Script Date: 14/07/2024 11:49:54 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:      Yogev Strauber
+-- Create Date: 14/12/2022 @night
+-- Description: Active Or Deactivate Volunteer's isDriving
+-- Returns IsSuccesfullOperation bit, and optional VolunteerWithFutureRidesIncludedToday
+-- when try to deactivate volunteer
+-- =============================================
+ALTER    PROCEDURE [dbo].[spVolunteer_ToggleIsDrive]
+(
+   @displayName NVARCHAR(255),
+   @isDriving BIT
+		)
+AS
+BEGIN
+
+    SET NOCOUNT ON;
+	DECLARE @volunteerId INT = (SELECT Id from volunteer where Displayname=@displayName)
+
+	IF(@isDriving) = 0
+	BEGIN
+		IF(
+			SELECT COUNT(*) FROM UnityRide 
+			WHERE MAINDRIVER=@volunteerId
+			AND  GETDATE() <= pickupTime
+		   ) = 0
+			BEGIN
+				UPDATE Volunteer 
+				SET IsActive=@isDriving, 
+				lastModified=DATEADD(hour, 2, SYSDATETIME())
+				WHERE Id=@volunteerId
+			SELECT 
+				1 AS IsSuccesfullOperation,
+				0 AS VolunteerWithFutureRidesIncludedToday
+			END
+		ELSE
+			BEGIN
+			SELECT
+				0 AS IsSuccesfullOperation,
+				1 AS VolunteerWithFutureRidesIncludedToday
+			END
+	END
+	ELSE
+	BEGIN 
+			UPDATE Volunteer 
+			SET isDriving=@isDriving, 
+			lastModified=DATEADD(hour, 2, SYSDATETIME())
+			WHERE Id=@volunteerId
+
+			SELECT
+				1 AS IsSuccesfullOperation
+
+END
+END
 
 
 
 
-
-
-
-
-
-
+	
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
