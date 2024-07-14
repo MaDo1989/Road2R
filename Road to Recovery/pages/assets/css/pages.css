@@ -1321,3 +1321,25 @@ h3.timeline-title {
 .middle {
     vertical-align: middle !important;
 }
+
+
+.InLIne {
+    display: flex;
+    align-content: center;
+   align-items: center;
+
+}
+
+.seperator {
+    border-bottom: 1px #0000002b solid;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+
+.checkboxClass{
+    width:18px;
+    height:18px;
+    text-align:center
+}
+
+

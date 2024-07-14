@@ -84,7 +84,7 @@
             CustomObj.Pat.DisplayNameA = ''
             CustomObj.Pat.EnglishName = ''
             CustomObj.Pat.PatientIdentity = 0;
-            CustomObj.Pat.Equipment = thisRide.PatientEquipments == null ? [] : thisRide.PatientEquipments ;
+            CustomObj.Pat.Equipment = thisRide.PatientEquipments == null ? [] : thisRide.PatientEquipments;
             CustomObj.Pat.IsAnonymous = thisRide.IsAnonymous;
             CustomObj.Pat.RidePatPatientStatus = {};
             CustomObj.Pat.RidePatPatientStatus.Status = (thisRide.PatientStatus == "" || thisRide.PatientStatus == "Not Finished") ? -1 : 1;
@@ -118,7 +118,7 @@
             Maindriver.Id = thisRide.MainDriver;
             Maindriver.CellPhone = thisRide.DriverCellPhone
             CustomObj.Drivers.push(Maindriver);
-            if (Maindriver.Id == null || Maindriver.Id==-1) {
+            if (Maindriver.Id == null || Maindriver.Id == -1) {
                 CustomObj.Drivers = [];
             }
 
@@ -143,7 +143,7 @@
         }
 
 
-     
+
         const getTableName2Manipulate = (ridePatNum) => {
             let tableName2manipulate;
             if (typeof tMorning.row(`#${ridePatNum}`).data() !== 'undefined') {
@@ -336,7 +336,7 @@
                 driverIsAssigned = updated_ridePat.Drivers.length > 0;
 
                 if (!driverIsAssigned && treatmentFinished) {
-                   manipilateNodeStyle(tr_node2manipulate, updated_ridePat, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED);
+                    manipilateNodeStyle(tr_node2manipulate, updated_ridePat, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED);
                 }
 
             }
@@ -671,8 +671,8 @@
                         if (customRide.Status == 'נמחקה') {
                             tFuture.row(`#${customRide.RidePatNum}`).remove().draw()
                         }
-                        if (customRide.RidePatNum <0) {
-                            tFuture.row(`#${customRide.RidePatNum*-1}`).remove().draw()
+                        if (customRide.RidePatNum < 0) {
+                            tFuture.row(`#${customRide.RidePatNum * -1}`).remove().draw()
                         }
 
                         break;
@@ -1079,6 +1079,7 @@
 
 
 
+
     <!--<script src="lib/sorting.js"></script>-->
     <script src="lib/includeHTML.js"></script>
 
@@ -1342,7 +1343,7 @@
                 timer = setTimeout(function () {
 
                     candidate4IhaveSeen = e.target.parentElement.id;
-                   // console.log(e);
+                    // console.log(e);
                     $('.ContextMenu_dropdown').removeClass('hidden');
                     $(".ContextMenu_dropdown").css({ position: "absolute", top: e.pageY, left: e.pageX });
                 }, 500);
@@ -1458,7 +1459,7 @@
                                 setTimeout(() => {
                                     colorRowWithDriver([_ridepatToManipulate]);
 
-                                },750)
+                                }, 750)
                                 assignDriverToRidePatAbort();
 
                             }
@@ -1520,7 +1521,7 @@
             ridepatToManipulate.Pat.RidePatPatientStatus.EditTimeStamp = editTimeStamp;
 
             //update_arr_rides(ridepatToManipulate);
-            
+
             const data = {
                 patientId: ridepatToManipulate.Pat.Id,
                 unityRideID: ridepatToManipulate.RidePatNum,
@@ -1827,7 +1828,7 @@
         }
 
         const assignDriverToRidePat_SCB = (data) => {
-            
+
             if (data.d == -5) {
                 console.error('duplicated driver! --> got status -5 from the server');
 
@@ -1837,7 +1838,7 @@
                     type: "error",
                     showConfirmButton: false
                 });
-               
+
             }
             $('#wait').hide();
             removeClass('highlightRow');
@@ -2285,8 +2286,8 @@
                 closeOnConfirm: true
             }, function (userResponse) {
                 if (userResponse) {
-                   // deleteRidePat(original_deleteCandidate, deleteBtn, table);
-                   deleteUnityRide(original_deleteCandidate, deleteBtn, table)
+                    // deleteRidePat(original_deleteCandidate, deleteBtn, table);
+                    deleteUnityRide(original_deleteCandidate, deleteBtn, table)
                 }
 
             });
@@ -2308,10 +2309,10 @@
         const FixedHour = (DBdateString) => {
             let h = new Date(convertDBDate2FrontEndDate(DBdateString)).getHours()
             let m = new Date(convertDBDate2FrontEndDate(DBdateString)).getMinutes();
-            if (h.toString().length==1) {
+            if (h.toString().length == 1) {
                 h = `0${h}`;
             }
-            if (m.toString().length==1) {
+            if (m.toString().length == 1) {
                 m = `0${m}`;
             }
             return `${h}:${m}`;
@@ -2380,7 +2381,7 @@
                     console.log('from ajax to Get_Tomorrow_RidePatView_Gilad ', error);
                     $('#wait').hide();
                 }
-            
+
             });
         }
 
@@ -2388,10 +2389,10 @@
         const buildMessageString = (rideList) => {
             const d = new Date();
             const space = '\n';
-            const line = '_______________________________________________________________' + space+space;
+            const line = '_______________________________________________________________' + space + space;
             const tab = '\t';
             const sep = `  `;
-            let str = `Tomorrow-Rides${tab}${ d.getDate() + 1 } - ${ d.getMonth() + 1 } - ${ d.getFullYear() }` +space;
+            let str = `Tomorrow-Rides${tab}${d.getDate() + 1} - ${d.getMonth() + 1} - ${d.getFullYear()}` + space;
             str += line;
 
 
@@ -2427,7 +2428,7 @@
 
         }
         //gilad
-        const isSameRide = (ride1,ride2) => {
+        const isSameRide = (ride1, ride2) => {
             if (ride1.At == ride2.At && ride1.From == ride2.From && ride1.To == ride2.To && ride1.Driver == ride2.Driver) {
                 return true
             }
@@ -2601,38 +2602,38 @@
             let request = { ListIDs: listIds };
             //console.log('check request -->', request)
             //console.log('Gilad check -->', ridePat);
-                $.ajax({
-                    dataType: "json",
-                    url: "WebService.asmx/deleteUnityRide",
-                    contentType: "application/json; charset=utf-8",
-                    type: "POST",
-                    data: JSON.stringify(request),
-                    success: function (data) {
-                        swal({
-                            title: "لقد تم حذف السفرية\nההסעה נמחקה",
-                            timer: 1000,
-                            type: "success",
-                            showConfirmButton: false
-                        });
-                        if (thistable && deleteBtn) {
-                            //console.log('Check This table and btn', thistable, deleteBtn, thistable.row($(deleteBtn).parents('tr')))
-                            //console.log('Gilad check from deleteRidePat --> ', deleteBtn,)
-                            let stam = thistable.row($(deleteBtn).parents('tr')).remove().draw();
-                            //console.log(stam);
-                        } else {
-                            location.reload();
-                        }
-                        $('#wait').hide();
-                        //retturn ride part.
-                        // only non anonymous and destination==hospital
-                        if (isThisReturnNonAnonymousRide(ridePat)) {
-                          $.ajax({
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/deleteUnityRide",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                data: JSON.stringify(request),
+                success: function (data) {
+                    swal({
+                        title: "لقد تم حذف السفرية\nההסעה נמחקה",
+                        timer: 1000,
+                        type: "success",
+                        showConfirmButton: false
+                    });
+                    if (thistable && deleteBtn) {
+                        //console.log('Check This table and btn', thistable, deleteBtn, thistable.row($(deleteBtn).parents('tr')))
+                        //console.log('Gilad check from deleteRidePat --> ', deleteBtn,)
+                        let stam = thistable.row($(deleteBtn).parents('tr')).remove().draw();
+                        //console.log(stam);
+                    } else {
+                        location.reload();
+                    }
+                    $('#wait').hide();
+                    //retturn ride part.
+                    // only non anonymous and destination==hospital
+                    if (isThisReturnNonAnonymousRide(ridePat)) {
+                        $.ajax({
                             dataType: "json",
                             url: "WebService.asmx/GetReturnRideUnityRide",
                             contentType: "application/json; charset=utf-8",
                             type: "POST",
                             async: false,
-                            data: JSON.stringify({ unityRideID:ridePat.RidePatNum }),
+                            data: JSON.stringify({ unityRideID: ridePat.RidePatNum }),
                             success: function (data) {
 
                                 returnRidePat = JSON.parse(data.d);
@@ -2671,28 +2672,28 @@
                                 console.log(err);
                             }
                         })
-                        }
-                        
-                      
-
-
-
-
-
-
-
-                    },
-                    error: function (err) {
-                        alert("Error in deleteUnityRide: " + err.responseText);
-                        $('#wait').hide();
-                        console.log(err);
                     }
-                })
-            
 
-      
 
-        
+
+
+
+
+
+
+
+                },
+                error: function (err) {
+                    alert("Error in deleteUnityRide: " + err.responseText);
+                    $('#wait').hide();
+                    console.log(err);
+                }
+            })
+
+
+
+
+
         }
 
 
@@ -2703,7 +2704,7 @@
             location.href = "ridePatForm.html";
         }
         function deleteReturn_unityRide() {
-    
+
             let thisTable = null;
             let deleteBtn = null;
 
@@ -2820,7 +2821,7 @@
             else {
                 return false;
             }
-           
+
 
         }
 
@@ -3038,7 +3039,7 @@
                     xhr.setRequestHeader("Content-Encoding", "gzip");
                 },
                 type: "POST",
-                data: JSON.stringify({days: 7 }),
+                data: JSON.stringify({ days: 7 }),
                 success: function (data) {
                     $('#wait').hide();
                     const test = JSON.parse(data.d);
@@ -3054,7 +3055,7 @@
         }
 
 
-        //This one take from unityRide the data *work* 
+        //This one take from unityRide the data *work*
         function refreshTable_UnityRide(timeInterval = 7) {
             $('#wait').show();
 
@@ -3124,8 +3125,7 @@
                     listRowstoColor = [];
 
 
-                    for (let i = 0; i < arr_rides.length; i++)
-                    {
+                    for (let i = 0; i < arr_rides.length; i++) {
                         //if (arr_rides[i].Status == 'שובץ נהג') {
                         //    //console.log(arr_rides[i], document.getElementById(arr_rides[i].RidePatNum), $(`#${arr_rides[i].RidePatNum}`));
                         //    listRowstoColor.push(arr_rides[i].RidePatNum);
@@ -3175,7 +3175,7 @@
                         //custom for buildstatusString function
                         let statusObj = {}
                         //console.log('Check here -->', arr_rides[i])
-                        if (arr_rides[i].PatientStatus == '' || arr_rides[i].PatientStatus =='Not Finished') {
+                        if (arr_rides[i].PatientStatus == '' || arr_rides[i].PatientStatus == 'Not Finished') {
                             statusObj.Status = -1;
                         }
                         else {
@@ -3210,7 +3210,7 @@
                         //#region isPatientStatusShouldPaintRow
                         isPatientStatusShouldPaintRow = callIfPatientStatusShouldPaintRow_AfterUnited(arr_rides[i]);
                         //#endregion isPatientStatusShouldPaintRow
-                        
+
                         thisRidePat = {
                             checkBoxesStr: `<input type="checkbox" class="checkboxClass" onchange="ChangeCheckboxRides(this)" id="check${arr_rides[i].RidePatNum}">`,
                             ridePatNum: arr_rides[i].RidePatNum,
@@ -3229,14 +3229,15 @@
                             hasDriver: arr_rides[i].MainDriver != -1,
                             buttons: btnStr,
                             isPatientStatusShouldPaintRow: isPatientStatusShouldPaintRow,
+                            type: 0
                         }
 
                         if (thisRidePatDate.toLocaleDateString() === new Date().toLocaleDateString()) {                         //<---- today
                             if (thisRidePatDate.getHours() < 12) {                                                              //<---- today morning
-
+                                thisRidePat.type = 1;
                                 morningRidePats.push(thisRidePat);
                             } else {                                                                                           //<---- today afternoon
-
+                                thisRidePat.type = 2;
                                 afterNoonRidePats.push(thisRidePat);
                             }
 
@@ -3245,11 +3246,11 @@
 
                             if (thisRidePatDate.getHours() < 12) {                                                           //<---- tomorrow morning
                                 thisRidePat.date = thisRidePatDate.toLocaleString('he-IL', { dateStyle: 'short' });
-
+                                thisRidePat.type = 3
                                 tomorrowMorningRidePats.push(thisRidePat);
                             } else {                                                                                         //<---- tomorrow afternoon
                                 thisRidePat.date = thisRidePatDate.toLocaleString('he-IL', { dateStyle: 'short' });
-
+                                thisRidePat.type = 4
                                 tomorrowAfternoonRidePats.push(thisRidePat);
                             }
 
@@ -3257,11 +3258,12 @@
                         else if (thisRidePatDate > tomorrowDate) {                                                         //<---- future
 
                             thisRidePat.date = thisRidePatDate.toLocaleString('he-IL', { dateStyle: 'short' });
+                            thisRidePat.type = 5;
                             futureRidePats.push(thisRidePat);
                         }
 
                         //here need to be the logic of coloring the row
-                        
+
                         const hourRide = convertDBDate2FrontEndDate(arr_rides[i].PickupTime).getHours();
                         //console.log('checking:', arr_rides[i].MainDriver, hourRide, arr_rides[i].IsAnonymous);
                         const anonymous = arr_rides[i].PatientName.includes('אנונימי') || arr_rides[i].IsAnonymous;
@@ -3288,20 +3290,14 @@
                         data: morningRidePats,
                         rowId: 'ridePatNum',
                         dom: controllersLayout,
-                        buttons: [
-                            {
-                                extend: 'excelHtml5',
-                                text: 'ייצוא לאקסל',
-                                title: `ניהול הסעות - בוקר ${getNext_X_DaysDateAsString(0)}`,
-                            }
-                        ],
+                        buttons: [],
                         pageLength: 100,
                         stateSave: true,
                         destroy: true,
                         autoWidth: false,
                         columns: [
                             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
-                            {data:"checkBoxesStr"},                          //0
+                            { data: "checkBoxesStr" },                          //0
                             { data: "time" },                                //1
                             { data: "origin" },                              //2
                             { data: "destination" },                         //3
@@ -3313,11 +3309,11 @@
                             { data: "remark" },                              //9
                             { data: "isAnonymous" },                         //10
                             { data: "buttons" },                             //11
-       
+
                         ],
                         columnDefs: [
                             { "targets": [0], "orderable": false },
-                            { width: '5%', "targets": [1, 2, 5, 6, 7,8] },
+                            { width: '5%', "targets": [0, 1, 2, 5, 6, 7, 8] },
                             { width: '2%', "targets": [5] },
                             { width: '15%', "targets": [4] },
                             { width: '25%', "targets": [10] },
@@ -3374,7 +3370,8 @@
                             { targets: 8, className: 'last-modified_td' },
                             { targets: 8, type: 'last_modifiedSort' },
                             { "targets": [10], visible: false },
-                            { targets: [11], orderable: false }
+                            { targets: [11], orderable: false },
+                            { targets: [0], className: 'text-center' }
 
                         ],
                         createdRow: function (row, data, dataIndex) {
@@ -3389,47 +3386,56 @@
                     tAfternoon = $(`#${tableNames.AFTERNOON}`).DataTable({
                         rowId: 'ridePatNum',
                         dom: controllersLayout,
-                        buttons: [
-                            {
-                                extend: 'excelHtml5',
-                                text: 'ייצוא לאקסל',
-                                title: `ניהול הסעות -  אחה"צ ${getNext_X_DaysDateAsString(0)}`,
-                            }
-                        ],
+                        buttons: [],
                         pageLength: 100,
                         data: afterNoonRidePats,
                         stateSave: true,
                         destroy: true,
                         columns: [
                             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
-                            { data: "time" },                                //0
-                            { data: "origin" },                              //1
-                            { data: "destination" },                         //2
-                            { data: "patient" },                             //3
-                            { data: "patientAge" },                          //4
-                            { data: "driver" },                              //5
-                            { data: "status" },                              //6
-                            { data: "lastModified" },                        //7
-                            { data: "remark" },                              //8
-                            { data: "isAnonymous" },                         //9
-                            { data: "buttons" },                             //10
+
+                            { data: "checkBoxesStr" },                       //0
+                            { data: "time" },                                //1
+                            { data: "origin" },                              //2
+                            { data: "destination" },                         //3
+                            { data: "patient" },                             //4
+                            { data: "patientAge" },                          //5
+                            { data: "driver" },                              //6
+                            { data: "status" },                              //7
+                            { data: "lastModified" },                        //8
+                            { data: "remark" },                              //9
+                            { data: "isAnonymous" },                         //10
+                            { data: "buttons" },                             //11
+                            //{ data: "time" },                                //0
+                            //{ data: "origin" },                              //1
+                            //{ data: "destination" },                         //2
+                            //{ data: "patient" },                             //3
+                            //{ data: "patientAge" },                          //4
+                            //{ data: "driver" },                              //5
+                            //{ data: "status" },                              //6
+                            //{ data: "lastModified" },                        //7
+                            //{ data: "remark" },                              //8
+                            //{ data: "isAnonymous" },                         //9
+                            //{ data: "buttons" },                             //10
                         ],
                         columnDefs: [
-                            { width: '5%', "targets": [0, 1, 2, 5, 6, 7, 8] },
-                            { width: '2%', "targets": [4] },
-                            { width: '15%', "targets": [3] },
-                            { width: '25%', "targets": [10] },
-                            { targets: 0, type: 'de_time' },
-                            { targets: [0], createdCell: (td) => { $(td).attr('id', 'rideTiming') } },
+                            { "targets": [0], "orderable": false },
+                            { width: '5%', "targets": [0, 1, 2, 3, 6, 7, 8, 9] },
+                            { width: '2%', "targets": [5] },
+                            { width: '15%', "targets": [4] },
+                            { width: '25%', "targets": [11] },
+                            { targets: 1, type: 'de_time' },
+                            { targets: [0], className: 'text-center' },
+                            { targets: [1], createdCell: (td) => { $(td).attr('id', 'rideTiming') } },
                             {
-                                targets: [1, 2, 3, 5, 6, 7], createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {
+                                targets: [2, 3, 4, 6, 7, 8], createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {
                                     if (isAssistant) {
                                         cell.className += ' ltr';
                                     }
 
                                     switch (colIndex) {
 
-                                        case 1: //origin
+                                        case 2: //origin
                                             $(cell).attr('id', 'OriginName');
                                             if (cellData.indexOf('מרכז') !== -1
                                                 || cellData.indexOf('center') !== -1
@@ -3440,11 +3446,11 @@
                                             }
                                             break;
 
-                                        case 2://destination
+                                        case 3://destination
                                             createdCell: (td) => { $(td).attr('id', 'DestinationName') }
                                             break;
 
-                                        case 5: //driver
+                                        case 6: //driver
                                             //this code is identical to the one in datatable-tomorrow-morning when can need to change to 1 function
                                             $(cell).addClass('driver_td');
                                             if (!rowData.hasDriver) {
@@ -3452,7 +3458,7 @@
                                                 let ridePatTime_td;
                                                 if (rowData['time'] === 'אחה"צ') {
 
-                                                    ridePatTime_td = [12, 0];
+                                                    ridePatTime_td = [13, 1];
                                                 } else {
 
                                                     ridePatTime_td = $.trim(rowData['time']).split(':');
@@ -3467,7 +3473,7 @@
                                             }
                                             break;
 
-                                        case 6://status
+                                        case 7://status
                                             if (cellData.indexOf("הגענו ליעד") !== -1 ||
                                                 cellData.indexOf("Reached destination") !== -1) {
 
@@ -3480,7 +3486,7 @@
                                                 }
                                             }
                                             break;
-                                        case 7://lastModified column
+                                        case 8://lastModified column
 
                                             const thisRidePatNum = rowData.ridePatNum;
                                             const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatNum);
@@ -3498,10 +3504,10 @@
 
                                 }
                             },
-                            { targets: 7, className: 'last-modified_td' },
-                            { targets: 7, type: 'last_modifiedSort' },
-                            { targets: [9], visible: false },
-                            { targets: [10], orderable: false }
+                            { targets: 8, className: 'last-modified_td' },
+                            { targets: 8, type: 'last_modifiedSort' },
+                            { targets: [10], visible: false },
+                            { targets: [11], orderable: false }
                         ],
                         autoWidth: false,
                         createdRow: function (row, data, dataIndex) {
@@ -3516,43 +3522,54 @@
                     tTomorrowMorning = $(`#${tableNames.TOMORROW_MORNING}`).DataTable({
                         rowId: 'ridePatNum',
                         dom: controllersLayout,
-                        buttons: [
-                            {
-                                extend: 'excelHtml5',
-                                text: 'ייצוא לאקסל',
-                                title: `ניהול הסעות למחר ${getNext_X_DaysDateAsString(1)}`,
-                            }
-                        ],
+                        buttons: [],
                         data: tomorrowMorningRidePats,
                         stateSave: true,
                         destroy: true,
                         "pageLength": 100,
                         columns: [
                             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
-                            { data: "date" },                                //0
-                            { data: "time" },                                //1
-                            { data: "origin" },                              //2
-                            { data: "destination" },                         //3
-                            { data: "patient" },                             //4
-                            { data: "patientAge" },                          //5
-                            { data: "driver" },                              //6
-                            { data: "status" },                              //7
-                            { data: "lastModified" },                        //8
-                            { data: "remark" },                              //9
-                            { data: "isAnonymous" },                         //10
-                            { data: "buttons" },                             //11
+
+                            { data: "checkBoxesStr" },                       //0
+                            { data: "date" },                                //1
+                            { data: "time" },                                //2
+                            { data: "origin" },                              //3
+                            { data: "destination" },                         //4
+                            { data: "patient" },                             //5
+                            { data: "patientAge" },                          //6
+                            { data: "driver" },                              //7
+                            { data: "status" },                              //8
+                            { data: "lastModified" },                        //9
+                            { data: "remark" },                              //10
+                            { data: "isAnonymous" },                         //11
+                            { data: "buttons" },                             //12
+
+                            //{ data: "date" },                                //0
+                            //{ data: "time" },                                //1
+                            //{ data: "origin" },                              //2
+                            //{ data: "destination" },                         //3
+                            //{ data: "patient" },                             //4
+                            //{ data: "patientAge" },                          //5
+                            //{ data: "driver" },                              //6
+                            //{ data: "status" },                              //7
+                            //{ data: "lastModified" },                        //8
+                            //{ data: "remark" },                              //9
+                            //{ data: "isAnonymous" },                         //10
+                            //{ data: "buttons" },                             //11
                         ],
                         "columnDefs": [
-                            { targets: 1, type: 'de_time' },
-                            { width: '4%', "targets": [0, 1] },
-                            { width: '6%', "targets": [2, 3] },
-                            { width: '15%', "targets": [4] },
-                            { width: '2%', "targets": [5] },
-                            { width: '5%', "targets": [6, 7, 8, 9] },
-                            { width: '0%', "targets": [10] },
-                            { width: '25%', "targets": [11] },
+                            { targets: 2, type: 'de_time' },
+                            { "targets": [0], "orderable": false },
+                            { width: '4%', "targets": [1, 2] },
+                            { width: '6%', "targets": [3, 4] },
+                            { width: '15%', "targets": [5] },
+                            { width: '2%', "targets": [6] },
+                            { width: '5%', "targets": [0, 7, 8, 9, 10] },
+                            { width: '0%', "targets": [11] },
+                            { width: '25%', "targets": [12] },
+                            { targets: [0], className: 'text-center' },
                             {
-                                targets: 5, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //5 is driver column
+                                targets: 6, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //5 is driver column
 
                                     cell.className += ' driver_td';
                                     if (!rowData.hasDriver) {
@@ -3560,7 +3577,7 @@
                                         let ridePatTime_td;
                                         if (rowData['time'] === 'אחה"צ') {
 
-                                            ridePatTime_td = [12, 0];
+                                            ridePatTime_td = [12, 1];
                                         } else {
 
                                             ridePatTime_td = $.trim(rowData['time']).split(':');
@@ -3576,7 +3593,7 @@
                                 }
                             },
                             {
-                                targets: 7, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //6 is status column
+                                targets: 8, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //6 is status column
                                     if (cellData.indexOf("הגענו ליעד") !== -1 ||
                                         cellData.indexOf("Reached destination") !== -1) {
 
@@ -3591,7 +3608,7 @@
                                 }
                             },
                             {
-                                targets: 8, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {//lastModified column
+                                targets: 9, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {//lastModified column
 
                                     const thisRidePatNum = rowData.ridePatNum;
                                     const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatNum);
@@ -3605,11 +3622,11 @@
                                     }
                                 }
                             },
-                            { targets: 8, className: 'last-modified_td' },
-                            { targets: 8, type: 'last_modifiedSort' },
-                            { targets: 9, className: 'text-right-strong' },
-                            { targets: [10], visible: false },
-                            { targets: [11], orderable: false }
+                            { targets: 9, className: 'last-modified_td' },
+                            { targets: 9, type: 'last_modifiedSort' },
+                            { targets: 10, className: 'text-right-strong' },
+                            { targets: [11], visible: false },
+                            { targets: [12], orderable: false }
 
                         ],
                         autoWidth: false,
@@ -3626,43 +3643,55 @@
                     tTomorrowAfternoon = $(`#${tableNames.TOMORROW_AFTERNOON}`).DataTable({
                         rowId: 'ridePatNum',
                         dom: controllersLayout,
-                        buttons: [
-                            {
-                                extend: 'excelHtml5',
-                                text: 'ייצוא לאקסל',
-                                title: `ניהול הסעות למחר ${getNext_X_DaysDateAsString(1)}`,
-                            }
-                        ],
+                        buttons: [],
                         data: tomorrowAfternoonRidePats,
                         stateSave: true,
                         destroy: true,
                         "pageLength": 100,
                         columns: [
                             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
-                            { data: "date" },                                //0
-                            { data: "time" },                                //1
-                            { data: "origin" },                              //2
-                            { data: "destination" },                         //3
-                            { data: "patient" },                             //4
-                            { data: "patientAge" },                          //5
-                            { data: "driver" },                              //6
-                            { data: "status" },                              //7
-                            { data: "lastModified" },                        //8
-                            { data: "remark" },                              //9
-                            { data: "isAnonymous" },                         //10
-                            { data: "buttons" },                             //11
+
+                            { data: "checkBoxesStr" },                       //0
+                            { data: "date" },                                //1
+                            { data: "time" },                                //2
+                            { data: "origin" },                              //3
+                            { data: "destination" },                         //4
+                            { data: "patient" },                             //5
+                            { data: "patientAge" },                          //6
+                            { data: "driver" },                              //7
+                            { data: "status" },                              //8
+                            { data: "lastModified" },                        //9
+                            { data: "remark" },                              //10
+                            { data: "isAnonymous" },                         //11
+                            { data: "buttons" },                             //12
+
+
+
+
+                            //{ data: "date" },                                //0
+                            //{ data: "time" },                                //1
+                            //{ data: "origin" },                              //2
+                            //{ data: "destination" },                         //3
+                            //{ data: "patient" },                             //4
+                            //{ data: "patientAge" },                          //5
+                            //{ data: "driver" },                              //6
+                            //{ data: "status" },                              //7
+                            //{ data: "lastModified" },                        //8
+                            //{ data: "remark" },                              //9
+                            //{ data: "isAnonymous" },                         //10
+                            //{ data: "buttons" },                             //11
                         ],
                         "columnDefs": [
-                            { targets: 1, type: 'de_time' },
-                            { width: '4%', "targets": [0, 1] },
-                            { width: '6%', "targets": [2, 3] },
-                            { width: '15%', "targets": [4] },
-                            { width: '2%', "targets": [5] },
-                            { width: '5%', "targets": [6, 7, 8, 9] },
-                            { width: '0%', "targets": [10] },
-                            { width: '25%', "targets": [11] },
+                            { targets: 2, type: 'de_time' },
+                            { width: '4%', "targets": [1, 2] },
+                            { width: '6%', "targets": [3, 4] },
+                            { width: '15%', "targets": [5] },
+                            { width: '2%', "targets": [6] },
+                            { width: '5%', "targets": [0, 7, 8, 9, 10] },
+                            { width: '0%', "targets": [11] },
+                            { width: '25%', "targets": [12] },
                             {
-                                targets: 5, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //5 is driver column
+                                targets: 6, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //5 is driver column
 
                                     cell.className += ' driver_td';
                                     if (!rowData.hasDriver) {
@@ -3670,7 +3699,7 @@
                                         let ridePatTime_td;
                                         if (rowData['time'] === 'אחה"צ') {
 
-                                            ridePatTime_td = [12, 0];
+                                            ridePatTime_td = [12, 1];
                                         } else {
 
                                             ridePatTime_td = $.trim(rowData['time']).split(':');
@@ -3686,7 +3715,7 @@
                                 }
                             },
                             {
-                                targets: 7, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //6 is status column
+                                targets: 8, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //6 is status column
                                     if (cellData.indexOf("הגענו ליעד") !== -1 ||
                                         cellData.indexOf("Reached destination") !== -1) {
 
@@ -3701,7 +3730,7 @@
                                 }
                             },
                             {
-                                targets: 8, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {//lastModified column
+                                targets: 9, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {//lastModified column
 
                                     const thisRidePatNum = rowData.ridePatNum;
                                     const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatNum);
@@ -3715,11 +3744,13 @@
                                     }
                                 }
                             },
-                            { targets: 8, className: 'last-modified_td' },
-                            { targets: 8, type: 'last_modifiedSort' },
-                            { targets: 9, className: 'text-right-strong' },
-                            { targets: [10], visible: false },
-                            { targets: [11], orderable: false }
+                            { targets: 9, className: 'last-modified_td' },
+                            { targets: 9, type: 'last_modifiedSort' },
+                            { targets: 10, className: 'text-right-strong' },
+                            { targets: [11], visible: false },
+                            { targets: [12], orderable: false },
+                            { targets: [0], orderable: false },
+                            { targets: [0], className: 'text-center' }
 
                         ],
                         autoWidth: false,
@@ -3740,46 +3771,56 @@
                         fnInitComplete: function (x) {
                             buildHtmlSelectTimeInterval();
                         },
-                        buttons: [
-                            {
-                                extend: 'excelHtml5',
-                                text: 'ייצוא לאקסל',
-                                title: `ניהול הסעות עתידיות ${getNext_X_DaysDateAsString(2)} - ${getNext_X_DaysDateAsString(7)}`,
-                            }
-                        ],
+                        buttons: [],
                         data: futureRidePats,
                         stateSave: true,
                         destroy: true,
                         columns: [
                             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
-                            { data: "date" },                                //0
-                            { data: "time" },                                //1
-                            { data: "origin" },                              //2
-                            { data: "destination" },                         //3
-                            { data: "patient" },                             //4
-                            { data: "patientAge" },                          //5
-                            { data: "driver" },                              //6
-                            { data: "status" },                              //7
-                            { data: "lastModified" },                        //8
-                            { data: "remark" },                              //9
-                            { data: "isAnonymous" },                         //10
-                            { data: "buttons" },                             //11
+
+                            { data: "checkBoxesStr" },                       //0
+                            { data: "date" },                                //1
+                            { data: "time" },                                //2
+                            { data: "origin" },                              //3
+                            { data: "destination" },                         //4
+                            { data: "patient" },                             //5
+                            { data: "patientAge" },                          //6
+                            { data: "driver" },                              //7
+                            { data: "status" },                              //8
+                            { data: "lastModified" },                        //9
+                            { data: "remark" },                              //10
+                            { data: "isAnonymous" },                         //11
+                            { data: "buttons" },                             //12
+
+
+                            //{ data: "date" },                                //0
+                            //{ data: "time" },                                //1
+                            //{ data: "origin" },                              //2
+                            //{ data: "destination" },                         //3
+                            //{ data: "patient" },                             //4
+                            //{ data: "patientAge" },                          //5
+                            //{ data: "driver" },                              //6
+                            //{ data: "status" },                              //7
+                            //{ data: "lastModified" },                        //8
+                            //{ data: "remark" },                              //9
+                            //{ data: "isAnonymous" },                         //10
+                            //{ data: "buttons" },                             //11
                         ],
                         pageLength: 100,
                         columnDefs: [
-                            { targets: 0, type: 'de_date' },
-                            { targets: 1, type: 'de_time' },
-                            { targets: 7, type: 'last_modifiedSort' },
-                            { width: '4%', "targets": [0, 1] },
-                            { width: '6%', "targets": [2, 3] },
-                            { width: '10%', "targets": [4] },
-                            { width: '2%', "targets": [5] },
-                            { width: '5%', "targets": [6, 7, 8, 9] },
-                            { width: '0%', "targets": [10] },
-                            { width: '25%', "targets": [11] },
-                            { targets: 5, className: 'driver_td' },
+                            { targets: 1, type: 'de_date' },
+                            { targets: 2, type: 'de_time' },
+                            { targets: 8, type: 'last_modifiedSort' },
+                            { width: '4%', "targets": [1, 2] },
+                            { width: '6%', "targets": [3, 4] },
+                            { width: '10%', "targets": [5] },
+                            { width: '2%', "targets": [6] },
+                            { width: '5%', "targets": [0, 7, 8, 9, 10] },
+                            { width: '0%', "targets": [11] },
+                            { width: '25%', "targets": [12] },
+                            { targets: 7, className: 'driver_td' },
                             {
-                                targets: 7, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {//lastModified column
+                                targets: 9, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {//lastModified column
 
                                     const thisRidePatNum = rowData.ridePatNum;
                                     const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatNum);
@@ -3793,10 +3834,12 @@
                                     }
                                 }
                             },
-                            { targets: 8, className: 'last-modified_td' },
-                            { targets: 8, type: 'last_modifiedSort' },
-                            { targets: [10], visible: false },
-                            { targets: [11], orderable: false }
+                            { targets: 9, className: 'last-modified_td' },
+                            { targets: 9, type: 'last_modifiedSort' },
+                            { targets: [11], visible: false },
+                            { targets: [12], orderable: false },
+                            { targets: [0], orderable: false },
+                            { targets: [0], className: 'text-center' }
                         ],
                         autoWidth: false,
                         createdRow: function (row, data, dataIndex) {
@@ -3893,12 +3936,12 @@
                     let remarkHTML = '';
                     listRowstoColor = [];
 
-                    
+
                     for (let i = 0; i < arr_rides.length; i++) {
-                        if (arr_rides[i].Status=='שובץ נהג') {
+                        if (arr_rides[i].Status == 'שובץ נהג') {
                             //console.log(arr_rides[i], document.getElementById(arr_rides[i].RidePatNum), $(`#${arr_rides[i].RidePatNum}`));
                             listRowstoColor.push(arr_rides[i].RidePatNum);
-        
+
                         }
 
                         if (allSortsSwitch && areasToShow_arr !== null) {
@@ -4555,8 +4598,8 @@
 
         //gilad
         const colorRowWithDriver = (rideArray) => {
-            
-            if (rideArray.length==0) {
+
+            if (rideArray.length == 0) {
                 return;
             }
             rideArray.forEach(rideID => {
@@ -4570,7 +4613,7 @@
                     timespan = document.getElementById(rideID).children[1].children[0].children[0].innerHTML
                     PatientNameSpan = document.getElementById(rideID).children[4].children[0].innerHTML
 
-                  
+
                 }
                 else {
                     timespan = document.getElementById(rideID).children[0].children[0].children[0].innerHTML;
@@ -4580,10 +4623,10 @@
                 let thisRide = findRideByNumber(rideID);
 
                 //console.log('checking:', 'timespan:', timespan, 'PatientNameSpan: ', PatientNameSpan, 'The Ride:', thisRide);
-                if (timespan != 'אחה"צ' && PatientNameSpan != 'חולה' && thisRide.MainDriver!=-1) {
+                if (timespan != 'אחה"צ' && PatientNameSpan != 'חולה' && thisRide.MainDriver != -1) {
                     $(`#${rideID}`).addClass('statusComplete');
                 }
-                else if (timespan == 'אחה"צ' || PatientNameSpan == 'חולה' || thisRide.MainDriver==-1) {
+                else if (timespan == 'אחה"צ' || PatientNameSpan == 'חולה' || thisRide.MainDriver == -1) {
                     $(`#${rideID}`).removeClass('statusComplete');
 
                 }
@@ -4622,7 +4665,7 @@
 
             return result;
         }
-        
+
         const callIfPatientStatusShouldPaintRow = (ride) => {
 
             let result = false;
@@ -4696,13 +4739,13 @@
             //let ageNumber = patient.Age == 0 ? '' : patient.Age;
             if (patient.GenderAsEnum == -1 && !patient.IsAnonymous) {
 
-                
-                    age = `<span>בגיל ${patient.Age}</span>`;
-               
+
+                age = `<span>בגיל ${patient.Age}</span>`;
+
             }
 
             if (patient.Age == 1) {
-                
+
                 if (patient.GenderAsEnum == -1) {
                     age = `<span>בגיל שנה</span>`;
                 }
@@ -4791,7 +4834,7 @@
         }
 
         const loadFutureTable = () => {
-           
+
             const selectList = document.querySelector('#future-table-time-interval-select');
             let timeInterval = selectList.value;
             _timeinterval_G = timeInterval;
@@ -4817,7 +4860,7 @@
             refreshTable_UnityRide(timeInterval);
         }
 
-       
+
 
 
         const buildDriverHTML = (ridePatNum, driver, rideNum) => {
@@ -4916,7 +4959,7 @@
                 numOfPassengers_English = `<span class="numOfPassengers">single pasnger</span>`;
             }
 
-            if (ridepat.PatientEquipments!=null) {
+            if (ridepat.PatientEquipments != null) {
                 equipmentsAndnumOfPassengers = `<div class="equipmentsAndnumOfPassengers">`;
                 equipmentsAndnumOfPassengers += isAssistant
                     ? numOfPassengers_English
@@ -5066,7 +5109,7 @@
 
         const buildStatusString = (statusObj, ridePatNum) => {
 
-            
+
             let statusWrapper = `<div class="elementsInSameLine">`;
             //console.log('statusObj', statusObj, 'statusObj.Status', statusObj.Status)
             const status = GetPatientStatus(statusObj.Status, isAssistant);
@@ -5120,7 +5163,7 @@
             timeNum = parseInt(timeNum);
             let time = new Date(timeNum);
             //console.log("time,", timeNum, time.getHours(), ridePatNum)
-            let buttonsWrapper = `<div class='elementsInSameLine'>${editBtn} ${deleteBtn} ${(drivers.length > 0)? messageToCopyBtn : candidateBtn}</div>`;
+            let buttonsWrapper = `<div class='elementsInSameLine'>${editBtn} ${deleteBtn} ${(drivers.length > 0) ? messageToCopyBtn : candidateBtn}</div>`;
             //let buttonsWrapper = `<div class='elementsInSameLine'>${editBtn} ${deleteBtn} ${(drivers.length > 0 && time.getHours() <= 23) ? messageToCopyBtn : candidateBtn}</div>`;
 
             return buttonsWrapper;
@@ -5194,7 +5237,7 @@
 
         const BuildTimeDDLs = (hoursId, minutesId) => {
 
-            
+
             const minutesArr = [0, 15, 30, 45];
             let $hoursSelect = $(`#${hoursId}`);
             let $minutesSelect = $(`#${minutesId}`);
@@ -5252,7 +5295,7 @@
                 //console.log('editTimeStamp???', editTimeStamp);
                 $hoursSelect.val(hoursAsDoubleDigits);
                 $minutesSelect.val(minutesAsDoubleDigits);
-                if (ridePatPatientStatus==-1) {
+                if (ridePatPatientStatus == -1) {
                     $hoursSelect.val('');
                     $minutesSelect.val('');
                 }
@@ -5412,21 +5455,150 @@
             $(`#${id}`).focus();
         }
 
-        const ChangeCheckboxRides = (checkbox) => {
-            //console.log(checkbox.id, checkbox.checked);
-            if (checkbox.id == 'AllChecks') {
-                $('.checkboxClass').prop("checked", checkbox.checked);
+
+        const deleteArrayOfRides = (arrayOfRides) => {
+            checkCookie();
+            $('#wait').show();
+            let nowInUTC = new Date().toUTCString();
+            const listIds = arrayOfRides
+           
+            let request = { ListIDs: listIds };
+
+            let tablesDataArray = [];
+            for (var i = 0; i < arrayOfRides.length; i++) {
+                tablesDataArray.push({
+                    id: arrayOfRides[i],
+                    row: $(`#${arrayOfRides[i]}`),
+                    table: $(`#${arrayOfRides[i]}`).parents('table').DataTable(),
+                })
             }
 
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/deleteUnityRide",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                data: JSON.stringify(request),
+                success: function (data) {
+                    swal({
+                        title: `لقد تم حذف السفرية\n נמחקו ${listIds.length} הסעות `,
+                        timer: 1000,
+                        type: "success",
+                        showConfirmButton: false
+                    });
+
+                    for (var i = 0; i < tablesDataArray; i++) {
+                        const deletedRideObject = tablesDataArray[i];
+                        if (deletedRideObject.table && deletedRideObject.row) {
+                            let d = deletedRideObject.table.row(deletedRideObject.row).remove().draw();
+                           
+
+                        }
+                        else {
+                            location.reload();
+                        }
+                    }
+                    //reset the checkboxes
+                    checkboxesRides = [];
+                    $('.checkboxClass').prop('checked', false);
+                    $('#NumofRideChecksText').text(0);
+                    $('#wait').hide();
+
+
+                   
+                    
+                },
+                error: function (err) {
+                    alert("Error in deleteArrayOfRides -> deleteUnityRide: " + err.responseText);
+                    $('#wait').hide();
+                    console.log(err);
+                }
+            })
+        }
+
+        const ChangeCheckboxRides = (checkbox) => {
             let arrlocal = [];
+            //console.log(checkbox.id, checkbox.checked);
+            if (checkbox.id == 'AllChecks') {
+                //$('.checkboxClass').prop("checked", checkbox.checked);
+                let tableName = checkbox.parentNode.parentNode.parentNode.parentNode.id;
+                if (tableName == 'datatable-morning') {
+                    for (var i = 0; i < morningRidePats.length; i++) {
+                        $(`#check${morningRidePats[i].ridePatNum}`).prop("checked", checkbox.checked)
+                    }
+
+                }
+                if (tableName == 'datatable-afternoon') {
+                    for (var i = 0; i < afterNoonRidePats.length; i++) {
+                        $(`#check${afterNoonRidePats[i].ridePatNum}`).prop("checked", checkbox.checked)
+                    }
+
+                }
+
+                if (tableName == 'datatable-tomorrow-morning') {
+                    for (var i = 0; i < tomorrowMorningRidePats.length; i++) {
+                        $(`#check${tomorrowMorningRidePats[i].ridePatNum}`).prop("checked", checkbox.checked)
+                    }
+
+                }
+
+                if (tableName == 'datatable-tomorrow-afternoon') {
+                    for (var i = 0; i < tomorrowAfternoonRidePats.length; i++) {
+                        $(`#check${tomorrowAfternoonRidePats[i].ridePatNum}`).prop("checked", checkbox.checked)
+                    }
+
+                }
+
+                if (tableName == 'datatable-future') {
+                    for (var i = 0; i < futureRidePats.length; i++) {
+                        $(`#check${futureRidePats[i].ridePatNum}`).prop("checked", checkbox.checked)
+                    }
+
+                }
+
+            }
+
+
             $('.checkboxClass').each(function () {
-                if (this.checked && this.id !='AllChecks') {
-                    arrlocal.push(parseInt(this.id.replace("check","")));
+                if (this.checked && this.id != 'AllChecks') {
+                    arrlocal.push(parseInt(this.id.replace("check", "")));
                 }
             });
             checkboxesRides = arrlocal;
             console.log(checkboxesRides);
+            $('#NumofRideChecksText').text(checkboxesRides.length);
 
+        }
+
+
+        const DeleteMarkedRides = () => {
+            if (checkboxesRides.length == 0) {
+                swal('לא נבחרו הסעות', 'יש לבחור הסעות לפני המחיקה', 'warning');
+            }
+            else {
+                let msg2user = `האם למחוק את ה${checkboxesRides.length} ההסעות שמסומנות 
+                במידה והחולה אנונימי לא יהיה ניתן לשחזר את ההסעה לאחר המחיקה !`;
+                swal({
+                    title: "هل انت متأكد?\nהאם אתם בטוחים?",
+                    type: "warning",
+                    text: msg2user,
+                    showCancelButton: true,
+                    cancelButtonText: "الغاء\nבטל",
+                    confirmButtonClass: 'btn-warning',
+                    confirmButtonText: "حذف\nמחיקה",
+                    closeOnConfirm: true
+                }, function (userResponse) {
+                    if (userResponse) {
+                        // deleteRidePat(original_deleteCandidate, deleteBtn, table);
+                        //deleteUnityRide(original_deleteCandidate, deleteBtn, table)
+                        //console.log('to delete', checkboxesRides);
+                        //console.log($(`#${checkboxesRides[0]}`)) // the row
+                        //console.log($(`#${checkboxesRides[0]}`).parents('table').DataTable()) // the table
+                        deleteArrayOfRides(checkboxesRides);
+                    }
+
+                });
+            }
         }
 
     </script>
@@ -5517,6 +5689,18 @@
                     <div class="row">
                         <div class="col-sm-12">
                             <div id="overRideBS_card-box" class="card-box table-responsive">
+
+                                <div class="row seperator">
+                                    <div class="col-sm-6 text-left InLIne">
+                                        <h4>מספר הסעות מרובות שנבחרו: </h4> <h2 style="margin-inline:7px;" id="NumofRideChecksText"> 0 </h2>
+                                    </div>
+
+                                    <div class="col-sm-6 text-right">
+                                        <button onclick="DeleteMarkedRides()" class="btn btn-danger waves-effect w-md waves-light m-b-5">מחק הסעות מסומנות</button>
+                                    </div>
+
+                                </div>
+
                                 <div class="row">
                                     <div class="col-sm-6 text-left">
                                         <label for="refreshTime">בחירת קצב רענון:</label>
@@ -5579,7 +5763,9 @@
                                                     <thead>
                                                         <tr>
                                                             <th class="middle" title="Checkbox">
+                                                                
                                                                 <input type="checkbox" class="checkboxClass" onchange="ChangeCheckboxRides(this)" id="AllChecks">
+                                                                <span>סמן הכל</span>
                                                             </th>
                                                             <th class="middle" title="Time  الساعة">שעה</th>
                                                             <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
@@ -5636,6 +5822,11 @@
                                                        class="table table-striped table-bordered">
                                                     <thead>
                                                         <tr>
+                                                            <th class="middle" title="Checkbox">
+
+                                                                <input type="checkbox" class="checkboxClass" onchange="ChangeCheckboxRides(this)" id="AllChecks">
+                                                                <span>סמן הכל</span>
+                                                            </th>
                                                             <th class="middle" title="Time  الساعة">שעה</th>
                                                             <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
                                                             <th class="middle" title="Destination  نقطة الوصول">יעד</th>
@@ -5691,6 +5882,11 @@
                                                        class="table table-striped table-bordered hover">
                                                     <thead>
                                                         <tr>
+                                                            <th class="middle" title="Checkbox">
+
+                                                                <input type="checkbox" class="checkboxClass" onchange="ChangeCheckboxRides(this)" id="AllChecks">
+                                                                <span>סמן הכל</span>
+                                                            </th>
                                                             <th class="middle" title="Date  الساعة">תאריך</th>
                                                             <th class="middle" title="Time  الساعة">שעה</th>
                                                             <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
@@ -5747,6 +5943,11 @@
                                                        class="table table-striped table-bordered hover">
                                                     <thead>
                                                         <tr>
+                                                            <th class="middle" title="Checkbox">
+
+                                                                <input type="checkbox" class="checkboxClass" onchange="ChangeCheckboxRides(this)" id="AllChecks">
+                                                                <span>סמן הכל</span>
+                                                            </th>
                                                             <th class="middle" title="Date  الساعة">תאריך</th>
                                                             <th class="middle" title="Time  الساعة">שעה</th>
                                                             <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
@@ -5802,6 +6003,11 @@
                                                        class="table table-striped table-bordered hover">
                                                     <thead>
                                                         <tr>
+                                                            <th class="middle" title="Checkbox">
+
+                                                                <input type="checkbox" class="checkboxClass" onchange="ChangeCheckboxRides(this)" id="AllChecks">
+                                                                <span>סמן הכל</span>
+                                                            </th>
                                                             <th class="middle" title="Date  الساعة">תאריך</th>
                                                             <th class="middle" title="Time  الساعة">שעה</th>
                                                             <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>

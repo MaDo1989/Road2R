@@ -625,7 +625,12 @@ public class UnityRide
         {
             for (int i = 0; i < listIDs.Count; i++)
             {
-                dBservice.deleteUnityRide(listIDs[i]);
+               ur =  dBservice.deleteUnityRide(listIDs[i]);
+                if (ur.RidePatNum!=-1)
+                {
+                    BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
+                }
+                
             }
         }
         else
