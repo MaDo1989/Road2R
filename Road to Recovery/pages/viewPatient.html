@@ -182,6 +182,8 @@
                         if (cellPhoneCheck.indexOf(":") != -1) {
                             cellPhoneCheck = "";
                         }
+                        //console.log('test',arr_patients[i])
+                        arr_patients[i].CellPhone2 !="" ? cellPhoneCheck += " <br> " + arr_patients[i].CellPhone1 : cellPhoneCheck;
                         var Patient = {};
                         //var myDate = arr_patients[i].BirthDate.replace('/Date(', '');
                         if (arr_patients[i].BirthDate != "") {

@@ -1267,7 +1267,11 @@ public class DBservice_Gilad
 				//OnePatient.LastNameH = dataReader["LastNameH"].ToString();
 				//OnePatient.LastNameA = dataReader["LastNameA"].ToString();
 				OnePatient.CellPhone = dataReader["CellPhone"].ToString();
-				//OnePatient.CellPhone1 = dataReader["CellPhone2"].ToString();
+              
+                
+                OnePatient.CellPhone1 = dataReader["CellPhone2"].ToString();
+                
+                
 				//OnePatient.HomePhone = dataReader["HomePhone"].ToString();
 				//OnePatient.City = dataReader["CityCityName"].ToString();
 				//OnePatient.LivingArea = dataReader["LivingArea"].ToString();
