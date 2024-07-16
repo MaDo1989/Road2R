@@ -45,6 +45,11 @@
     <script src="assets/js/select2.min.js"></script>
     <script src="lib/includeHTML.js"></script>
 
+    <script>
+        AbsenceBtn = null;
+    </script>
+
+
     <script src="assets/js/documentedCalls.js"></script>
     <script src="assets/js/documentedRides.js"></script>
     <script src="assets/js/documentedAbsence.js"></script>
@@ -342,7 +347,7 @@
                     //Gilad Touch Here.
                     // to toggle the modal use this button ניהול היעדרויות.
                     if (activeChangedFlag == false) {
-                        $('#DocumentedCallsModal .modal-body')[0].innerHTML += `<button onclick="ManageAbsenceToggle()" class="AbsenceBtn btn waves-effect btn-primary">ניהול היעדרויות</button>`;
+                        $('#DocumentedCallsModal .modal-body')[0].innerHTML += `<button onclick="ManageAbsenceToggle(this)" class="AbsenceBtn btn waves-effect btn-primary">ניהול היעדרויות</button>`;
 
                     }
                 },
@@ -638,7 +643,9 @@
             });
         }
 
-        const ManageAbsenceToggle = () => {
+        const ManageAbsenceToggle = (btn) => {
+            //console.log('toggle',btn)
+            AbsenceBtn = btn;
             $('#DocumentedCallsModal').modal('toggle');
             $('#DocumentedAbsenceModal').modal('toggle');
         }

@@ -10,6 +10,7 @@ let thisRowClicked = -1;
 
 // this function render the dataTable stracture and render the data.(used also as a data refresh)
 const RenderToAbsenceModal = (VolunteerName, VolunteerId) => {
+    //console.log('RenderToAbsenceModal',AbsenceBtn);
     $('#wait').show();
     $('#DocumentedAbsenceTitle').text("היעדרויות של " + VolunteerName.split('<br>')[0]);
     VolunteerID = VolunteerId
@@ -203,11 +204,15 @@ const ColorCallBtn_afterChange = (absenceID, absencesListOfThisVolunteer, volunt
         //console.log('Gilad res :', ThisAbsencesList, resFilter, volunteerId, BtnToColor);
         if (resFilter.length == 0) {
             //blue available
-            BtnToColor.setAttribute('style', 'background-color:#3bafda !important; border: 1px solid #3bafda !important');
+            //console.log('need to color this to #3bafda blue ', AbsenceBtn)
+            AbsenceBtn != null ? AbsenceBtn.style.setProperty('background-color', '#3bafda', 'important') : null;
+            BtnToColor.setAttribute('style', 'background-color:#3bafda  !important; border: 1px solid #3bafda !important');
 
         }
         else {
             //orange busy 
+            //console.log('need to color this to #efa834 orange ', AbsenceBtn)
+            AbsenceBtn != null ? AbsenceBtn.style.setProperty('background-color', '#efa834', 'important') : null;
             BtnToColor.setAttribute('style', 'background-color:#efa834 !important; border: 1px solid #efa834 !important');
 
         }
