@@ -680,6 +680,7 @@
                     default:
                         console.log('system recognized a tempt of the server to post real-time data but failed to found the rellevant row to redraw');
                         tr_nodesAsArray = null;
+                        location.reload();
                         break;
                 }
 
@@ -1403,11 +1404,14 @@
 
 
         const assignOrUpdateAPIcall = (unityRideID, DriverId) => {
+            const UserName = GENERAL.USER.getUserDisplayName();
             const request = {
                 UnityRideId: unityRideID,
                 DriverId: DriverId,
-                isDelete: false
+                isDelete: false,
+                userName: UserName
             }
+            //console.log('Gilad check the request -->', request);
             ajaxCall('AssignUpdateDriverToUnityRide', JSON.stringify(request), assignDriverToRidePat_SCB, assignDriverToRidePat_ECB);
 
         }
@@ -1521,12 +1525,13 @@
             ridepatToManipulate.Pat.RidePatPatientStatus.EditTimeStamp = editTimeStamp;
 
             //update_arr_rides(ridepatToManipulate);
-
+            const userName = GENERAL.USER.getUserDisplayName();
             const data = {
                 patientId: ridepatToManipulate.Pat.Id,
                 unityRideID: ridepatToManipulate.RidePatNum,
                 patientStatus: isTreatmentFinished ? "Finished" : "Not Finished",
-                editTimeStamp: editTimeStamp
+                editTimeStamp: editTimeStamp,
+                userName: userName
             }
             //console.log('check it --', data)
 
@@ -1683,9 +1688,12 @@
             let dateToManipulate = convertDBDate2FrontEndDate(ridepatToManipulate.PickupTime);
             dateToManipulate.setHours(hours, minutes);
             //console.log('check -->', ridepatToManipulate);
+            const userName = GENERAL.USER.getUserDisplayName();
+
             let data = {
                 unityRideId: _ridepatToManipulate,
-                pickupTime: dateToManipulate
+                pickupTime: dateToManipulate,
+                userName: userName
             };
 
             const updateUnityRideTime_SCB = () => {
@@ -1759,10 +1767,11 @@
             let newRemark = $('#editRemarkTextEditor').val();
 
             newRemark = newRemark.replace(/\n/g, "<br>");
-
+            const userName = GENERAL.USER.getUserDisplayName();
             let data = {
                 UnityRideID: _ridepatToManipulate,
-                newRemark
+                newRemark,
+                userName
             };
             //console.log('Gilad check -->', data);
             const updateRemark_SCB = () => {
@@ -1878,10 +1887,14 @@
                 if (userResponse) {
                     $('#wait').show();
 
+                    const UserName = GENERAL.USER.getUserDisplayName();
+
                     const request = {
                         UnityRideId: _ridepatToManipulate,
                         DriverId: _driverId,
-                        isDelete: true
+                        isDelete: true,
+                        userName: UserName
+
 
                     }
                     $(`#${_ridepatToManipulate}`).removeClass('statusComplete');
@@ -3223,7 +3236,7 @@
                             patientAge: patientAge,
                             driver: driverHTML,
                             status: status2render,
-                            lastModified: convertDBDate2FrontEndDate(arr_rides[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" }),
+                            lastModified: convertDBDate2FrontEndDate(arr_rides[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" }) + '<br><p class="whochange" >'+'על ידי - '+arr_rides[i].CoorName+'</p>',
                             remark: remarkHTML,
                             isAnonymous: arr_rides[i].IsAnonymous == true,
                             hasDriver: arr_rides[i].MainDriver != -1,
@@ -4609,20 +4622,23 @@
                 }
                 let timespan = ''
                 let PatientNameSpan = '';
-                if (document.getElementById(rideID).children[0].children.length == 0) {
-                    timespan = document.getElementById(rideID).children[1].children[0].children[0].innerHTML
-                    PatientNameSpan = document.getElementById(rideID).children[4].children[0].innerHTML
+                //if (document.getElementById(rideID).children[0].children.length == 0) {
+                //    timespan = document.getElementById(rideID).children[1].children[0].children[0].innerHTML
+                //    PatientNameSpan = document.getElementById(rideID).children[4].children[0].innerHTML
 
 
-                }
-                else {
-                    timespan = document.getElementById(rideID).children[0].children[0].children[0].innerHTML;
-                    PatientNameSpan = document.getElementById(rideID).children[3].children[0].innerHTML
+                //}
+                //else {
+                //    timespan = document.getElementById(rideID).children[2].children[0].children[0].innerHTML;
+                //    PatientNameSpan = document.getElementById(rideID).children[3].children[0].innerHTML
 
-                }
+                //}
                 let thisRide = findRideByNumber(rideID);
 
-                //console.log('checking:', 'timespan:', timespan, 'PatientNameSpan: ', PatientNameSpan, 'The Ride:', thisRide);
+                const isAfterNoonRide = convertDBDate2FrontEndDate(thisRide.PickupTime).getMinutes() === afternoonIndicator;
+                timespan = isAfterNoonRide ? 'אחה"צ' : 'בוקר';
+                PatientNameSpan = thisRide.IsAnonymous ? 'חולה' : thisRide.PatientName;
+
                 if (timespan != 'אחה"צ' && PatientNameSpan != 'חולה' && thisRide.MainDriver != -1) {
                     $(`#${rideID}`).addClass('statusComplete');
                 }
@@ -5487,6 +5503,7 @@
                         showConfirmButton: false
                     });
 
+                    console.log('tablesDataArray ', tablesDataArray);
                     for (var i = 0; i < tablesDataArray; i++) {
                         const deletedRideObject = tablesDataArray[i];
                         if (deletedRideObject.table && deletedRideObject.row) {
@@ -5502,6 +5519,8 @@
                     checkboxesRides = [];
                     $('.checkboxClass').prop('checked', false);
                     $('#NumofRideChecksText').text(0);
+                    $('.toggleTitle').hide();
+                    $('#deleteFewRidesButton').prop('disabled', true);
                     $('#wait').hide();
 
 
@@ -5566,6 +5585,15 @@
             });
             checkboxesRides = arrlocal;
             console.log(checkboxesRides);
+            if (checkboxesRides.length == 0) {
+                $('.toggleTitle').hide();
+                $('#deleteFewRidesButton').prop('disabled', true);
+
+            }
+            else {
+                $('.toggleTitle').show();
+                $('#deleteFewRidesButton').prop('disabled', false);
+            }
             $('#NumofRideChecksText').text(checkboxesRides.length);
 
         }
@@ -5692,11 +5720,11 @@
 
                                 <div class="row seperator">
                                     <div class="col-sm-6 text-left InLIne">
-                                        <h4>מספר הסעות מסומנות שנבחרו: </h4> <h2 style="margin-inline:7px;" id="NumofRideChecksText"> 0 </h2>
+                                        <h4 class="toggleTitle">מספר הסעות מסומנות שנבחרו: </h4> <h2 class="toggleTitle" style="margin-inline:7px;" id="NumofRideChecksText"> 0 </h2>
                                     </div>
 
                                     <div class="col-sm-6 text-right">
-                                        <button onclick="DeleteMarkedRides()" class="btn btn-danger waves-effect w-md waves-light m-b-5">מחק הסעות מסומנות</button>
+                                        <button disabled id="deleteFewRidesButton" onclick="DeleteMarkedRides()" class="btn btn-danger waves-effect w-md waves-light m-b-5">מחק הסעות מסומנות</button>
                                     </div>
 
                                 </div>

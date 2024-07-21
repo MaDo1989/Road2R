@@ -546,11 +546,11 @@ public class UnityRide
         return rideArea;
     }
 
-    public void updateUnityRideTime(int unityRideNum, DateTime editedTime)
+    public void updateUnityRideTime(int unityRideNum, DateTime editedTime,string whoChange)
     {
         DBservice_Gilad db = new DBservice_Gilad();
         UnityRide unityRide = new UnityRide();
-        unityRide = db.updateUnityRideTime(unityRideNum, editedTime);
+        unityRide = db.updateUnityRideTime(unityRideNum, editedTime, whoChange);
         if (unityRide.RidePatNum==-2)
         {
             throw new Exception("error code: -2 , duplicated values in different rides");
@@ -562,11 +562,11 @@ public class UnityRide
         }
     }
 
-    public void updateRemark(int UnityRideID, string newRemark)
+    public void updateRemark(int UnityRideID, string newRemark,string whoChange)
     {
         DBservice_Gilad dBservice = new DBservice_Gilad();
         UnityRide returnride = new UnityRide();
-        returnride = dBservice.updateRemark(UnityRideID, newRemark);
+        returnride = dBservice.updateRemark(UnityRideID, newRemark, whoChange);
         if (returnride.RidePatNum!=-1)
         {
             BroadCast.BroadCast2Clients_UnityRideUpdated(returnride);
@@ -578,21 +578,21 @@ public class UnityRide
         }
     }
 
-    public void updatePatientStatusandTime (int patientId, int unityRideID, string patientStatus, DateTime? editTimeStamp)
+    public void updatePatientStatusandTime (int patientId, int unityRideID, string patientStatus, DateTime? editTimeStamp,string whoChange)
     {
         DBservice_Gilad db = new DBservice_Gilad();
         UnityRide ur = new UnityRide();
-        ur = db.updatePatientStatusAndTime(patientId, unityRideID, patientStatus, editTimeStamp);
+        ur = db.updatePatientStatusAndTime(patientId, unityRideID, patientStatus, editTimeStamp, whoChange);
         BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
     }
 
-    public int updateDriver(int driverId, int unityRideId, bool isDelete)
+    public int updateDriver(int driverId, int unityRideId, bool isDelete,string whoChange)
     {
         DBservice_Gilad db = new DBservice_Gilad();
         UnityRide ur = new UnityRide();
         if (isDelete)
         {
-            ur = db.updateDriver(-1, unityRideId);
+            ur = db.updateDriver(-1, unityRideId, whoChange);
           
             //?
             //send push notification to coordinator phone
@@ -605,7 +605,7 @@ public class UnityRide
         }
         else
         {
-            ur = db.updateDriver(driverId, unityRideId);
+            ur = db.updateDriver(driverId, unityRideId, whoChange);
             if (ur.RidePatNum == -5)
             {
                 return ur.RidePatNum;

@@ -879,11 +879,19 @@
 
             lastRide.Escorts = dataobj.RidePat.Escorts;
             let request = { unityRide: unityRide, func: dataobj.func, numOfRide: dataobj.numberOfRides, repeatEvery: dataobj.repeatRideEvery, firstTry: true };
+            const userName = GENERAL.USER.getUserDisplayName();
+            console.log("real user connect: ", userName)
+            console.log("what in the request: ", request.unityRide.CoorName);
+            request.unityRide.CoorName = userName;
             //console.log('After Custom',request);
+
             ThisRide = request;
             isThisAReturnDriveFunc(dataobj.RidePat);
+
+
+
             let dataString = JSON.stringify(request);
-            console.log('data send', request);
+            //console.log('data send', request);
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/setUnityRide",

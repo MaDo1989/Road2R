@@ -1342,4 +1342,11 @@ h3.timeline-title {
     text-align:center
 }
 
-
+.toggleTitle{
+    display:none;
+}
+.whochange {
+    font-size: 12px;
+    font-weight: 600;
+    color: #0e199e
+}

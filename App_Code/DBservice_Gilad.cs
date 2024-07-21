@@ -2008,7 +2008,7 @@ public class DBservice_Gilad
     }
 
 
-    public UnityRide updateUnityRideTime(int unityRideNum, DateTime editedTime)
+    public UnityRide updateUnityRideTime(int unityRideNum, DateTime editedTime,string whoChange)
     {
         SqlCommand cmd;
         try
@@ -2026,6 +2026,7 @@ public class DBservice_Gilad
         Dictionary<string, object> paramDic = new Dictionary<string, object>();
         paramDic.Add("@editedTime", editedTime);
         paramDic.Add("@unityRideId", unityRideNum);
+        paramDic.Add("@CoorName", whoChange);
         cmd = CreateCommandWithStoredProcedureGeneral("spUnityRide_UpdateDateAndTime", con, paramDic);
         UnityRide unityRide = new UnityRide();
         string ancestors = "UpdateUnityRideTime updateUnityRideTime spUnityRide_UpdateDateAndTime reciveUnityRideDB";
@@ -2035,7 +2036,7 @@ public class DBservice_Gilad
 
     }
 
-    public UnityRide updateRemark(int UnityRideID, string newRemark)
+    public UnityRide updateRemark(int UnityRideID, string newRemark,string whoChange)
     {
         SqlCommand cmd;
         try
@@ -2053,6 +2054,7 @@ public class DBservice_Gilad
         Dictionary<string, object> paramDic = new Dictionary<string, object>();
         paramDic.Add("@ridePatNum", UnityRideID);
         paramDic.Add("@newRemark", newRemark);
+        paramDic.Add("@CoorName", whoChange);
         cmd = CreateCommandWithStoredProcedureGeneral("spUnityRide_updateRemark", con, paramDic);
         UnityRide unityRide = new UnityRide();
 
@@ -2062,7 +2064,7 @@ public class DBservice_Gilad
 
     }
 
-    public UnityRide updatePatientStatusAndTime(int patientId, int unityRideID, string patientStatus, DateTime? editTimeStamp)
+    public UnityRide updatePatientStatusAndTime(int patientId, int unityRideID, string patientStatus, DateTime? editTimeStamp,string whoChange)
     {
         SqlCommand cmd;
         try
@@ -2082,6 +2084,7 @@ public class DBservice_Gilad
         paramDic.Add("@RidePatNum", unityRideID);
         paramDic.Add("@PatientStatus", patientStatus);
         paramDic.Add("@EditTimeStamp", editTimeStamp);
+        paramDic.Add("@CoorName", whoChange);
         cmd = CreateCommandWithStoredProcedureGeneral("spUpdatePatientStatusUnityRide", con, paramDic);
         UnityRide unityRide = new UnityRide();
         string ancestors = "UpdatePatientStatus_UnityRide updatePatientStatusandTime updatePatientStatusAndTime spUpdatePatientStatusUnityRide reciveUnityRideDB";
@@ -2090,7 +2093,7 @@ public class DBservice_Gilad
 
     }
 
-    public UnityRide updateDriver(int driverId,int unityRideID)
+    public UnityRide updateDriver(int driverId,int unityRideID,string whoChange)
     {
         SqlCommand cmd;
         try
@@ -2108,6 +2111,7 @@ public class DBservice_Gilad
         Dictionary<string, object> paramDic = new Dictionary<string, object>();
         paramDic.Add("@driverID", driverId);
         paramDic.Add("@unityRideID", unityRideID);
+        paramDic.Add("@CoorName", whoChange);
         cmd = CreateCommandWithStoredProcedureGeneral("spUpdateDriverUnityRide", con, paramDic);
         UnityRide unityRide = new UnityRide();
         string ancestors = "AssignUpdateDriverToUnityRide updateDriver spUpdateDriverUnityRide reciveUnityRideDB";

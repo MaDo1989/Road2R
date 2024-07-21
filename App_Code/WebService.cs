@@ -1568,14 +1568,14 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string AssignUpdateDriverToUnityRide(int UnityRideId, int DriverId,bool isDelete) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
+    public string AssignUpdateDriverToUnityRide(int UnityRideId, int DriverId,bool isDelete,string userName) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
     {
         
 
         try
         {
             UnityRide ur = new UnityRide();
-            int res = ur.updateDriver(DriverId, UnityRideId, isDelete);
+            int res = ur.updateDriver(DriverId, UnityRideId, isDelete, userName);
             return j.Serialize(res);
 
         }
@@ -2602,12 +2602,12 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
-    public void UpdateUnityRideTime(int unityRideId, DateTime pickupTime)
+    public void UpdateUnityRideTime(int unityRideId, DateTime pickupTime,string userName)
     {
         try
         {
             UnityRide unityRide = new UnityRide();
-            unityRide.updateUnityRideTime(unityRideId, pickupTime);
+            unityRide.updateUnityRideTime(unityRideId, pickupTime, userName);
         }
         catch (Exception ex)
         {
@@ -2878,12 +2878,12 @@ public class WebService : System.Web.Services.WebService
 
 
     [WebMethod(EnableSession = true)]
-    public void UpdatePatientStatus_UnityRide(int patientId, int unityRideID, string patientStatus, DateTime? editTimeStamp)
+    public void UpdatePatientStatus_UnityRide(int patientId, int unityRideID, string patientStatus, DateTime? editTimeStamp,string userName)
     {
         try
         {
             UnityRide ur = new UnityRide();
-            ur.updatePatientStatusandTime(patientId, unityRideID, patientStatus, editTimeStamp);
+            ur.updatePatientStatusandTime(patientId, unityRideID, patientStatus, editTimeStamp, userName);
         }
         catch (Exception ex)
         {
@@ -2911,12 +2911,12 @@ public class WebService : System.Web.Services.WebService
 
 
     [WebMethod(EnableSession = true)]
-    public void UpdateUnityRideRemark(int UnityRideID, string newRemark)
+    public void UpdateUnityRideRemark(int UnityRideID, string newRemark,string userName)
     {
         try
         {
             UnityRide ur = new UnityRide();
-            ur.updateRemark(UnityRideID, newRemark);
+            ur.updateRemark(UnityRideID, newRemark, userName);
         }
         catch (Exception ex)
         {
