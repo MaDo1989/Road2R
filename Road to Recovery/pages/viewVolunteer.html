@@ -72,6 +72,7 @@
             $('#skipPageButton').click(function () {
                 var pageNumber = parseInt($('#skipPageInput').val());
                 tbl.page(pageNumber - 1).draw('page');
+                $('#skipPageInput').val("")
             });
 
             $("#DocumentedCallsModal").attr("w3-include-html", "DocumentedCallsModal.html");

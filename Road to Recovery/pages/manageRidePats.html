@@ -4936,8 +4936,10 @@
                 patientPhone2render = `<span class="patientPhone2render">${addSeperator2MobileNum(
                     ridepat.PatientCellPhone,
                     "-"
-                )}</span>`;
+                )}</span>` 
             }
+
+            patientPhone2render += ridepat.PatientCellPhone2 != "0" ? `<p>${ridepat.PatientCellPhone2.replace(/(\d{3})(\d+)/, "$1-$2")}</p>` : '';
 
             if (numOfEscorts > 0) {
 

@@ -19,6 +19,7 @@ public class UnityRide
     string patientBirthdate;
     int patientAge;
 	string patientCellPhone;
+    string patientCellPhone2;
     int amountOfEscorts;
     int amountOfEquipments;
     List<string> patientEquipments;
@@ -414,6 +415,19 @@ public class UnityRide
         set
         {
             patientAge = value;
+        }
+    }
+
+    public string PatientCellPhone2
+    {
+        get
+        {
+            return patientCellPhone2;
+        }
+
+        set
+        {
+            patientCellPhone2 = value;
         }
     }
 

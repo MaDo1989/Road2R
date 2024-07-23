@@ -1412,6 +1412,32 @@ END
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
+/****** Object:  StoredProcedure [dbo].[spGetUnitedRides]    Script Date: 23/07/2024 12:53:26 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad >
+-- Create Date: <03/10/2023>
+-- Description: <Because of the United Tables try to Re-orgenaize this query>
+-- =============================================
+ALTER PROCEDURE [dbo].[spGetUnitedRides]
+(
+    -- Add the parameters for the stored procedure here
+	@days int
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+
+    -- Insert statements for procedure here
+select *,
+case when (select cellphone2 from Patient where id = PatientId) !='' then (select cellphone2 from Patient where id = PatientId) else '0' END as 'PatientCellPhone2'
+from UnityRide where DATEDIFF(day,getdate(),pickuptime)<=@days and Convert(date,pickuptime)>=CONVERT(date, getdate()) and Status <> N'נמחקה'; 
+END
+
 
 
 
