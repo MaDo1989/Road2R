@@ -919,7 +919,7 @@ public class DBservice_Gilad
     }
 
 
-    public int recoverUnityRide(int unityRideID)
+    public int recoverUnityRide(int unityRideID,string whoChange)
     {
         SqlCommand cmd;
         try
@@ -934,7 +934,9 @@ public class DBservice_Gilad
             throw (ex);
         }
         Dictionary<string, object> paramDic = new Dictionary<string, object>();
+
         paramDic.Add("@unityRideID", unityRideID);
+        paramDic.Add("@CoorName", whoChange);
 
         cmd = CreateCommandWithStoredProcedureGeneral("spRecoverUnityRide", con, paramDic);
         int res = -1;
@@ -2119,7 +2121,7 @@ public class DBservice_Gilad
         return unityRide;
     }
 
-    public UnityRide deleteUnityRide(int unityRideID)
+    public UnityRide deleteUnityRide(int unityRideID,string whoChange)
     {
         SqlCommand cmd;
         try
@@ -2136,6 +2138,8 @@ public class DBservice_Gilad
 
         Dictionary<string, object> paramDic = new Dictionary<string, object>();
         paramDic.Add("@unityRideID", unityRideID);
+        paramDic.Add("@CoorName", whoChange);
+
         cmd = CreateCommandWithStoredProcedureGeneral("spDeleteUnityRide", con, paramDic);
         UnityRide unityRide = new UnityRide();
         string ancestors = "deleteUnityRide deleteUnityRide spDeleteUnityRide reciveUnityRideDB";

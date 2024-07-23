@@ -2605,6 +2605,7 @@
         const deleteUnityRide = (ridePat, deleteBtn, thistable) => {
             checkCookie();
             $('#wait').show();
+            const UserName = GENERAL.USER.getUserDisplayName();
             // var numberOfRides = 1;
             //var repeatRide = "";
             let ridePatNums2MarkDeleted = [];
@@ -2612,7 +2613,7 @@
             let nowInUTC = new Date().toUTCString();
             const listIds = []
             listIds.push(ridePat.RidePatNum);
-            let request = { ListIDs: listIds };
+            let request = { ListIDs: listIds,userName:UserName };
             //console.log('check request -->', request)
             //console.log('Gilad check -->', ridePat);
             $.ajax({

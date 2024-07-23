@@ -1278,9 +1278,58 @@ END
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
+/****** Object:  StoredProcedure [dbo].[spRecoverUnityRide]    Script Date: 23/07/2024 11:53:51 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad>
+-- Create Date: <02/01/24>
+-- Description: <To recover a ride with status deleted>
+-- =============================================
+ALTER PROCEDURE [dbo].[spRecoverUnityRide]
+(
+    -- Add the parameters for the stored procedure here
+		@unityRideID INT,
+		@CoorName NVARCHAR(255)
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+
+		DECLARE @CoorId INT = (select id from Volunteer where DisplayName like @CoorName )
+    -- Insert statements for procedure here
+		DECLARE @driverID INT = (select MainDriver from UnityRide where RidePatNum =  @unityRideID)
+
+		IF(@driverID is null)
+		Update UnityRide
+		SET Status  = N'ממתינה לשיבוץ',
+		lastModified = GETDATE(),
+		Coordinator = @CoorName,
+		CoordinatorID = @CoorId
+		where RidePatNum = @unityRideID
+
+		ELSE
+		begin
+		Update UnityRide
+		SET Status  = N'שובץ נהג',
+		lastModified = GETDATE(),
+		Coordinator = @CoorName,
+		CoordinatorID = @CoorId
+		where RidePatNum = @unityRideID
+		Update Volunteer
+		SET NoOfDocumentedRides = NoOfDocumentedRides + 1
+		Where Id = @driverID
+		end
+
+
+END
 
 
 
+
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
@@ -1290,6 +1339,65 @@ END
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
+/****** Object:  StoredProcedure [dbo].[spDeleteUnityRide]    Script Date: 23/07/2024 12:26:14 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad>
+-- Create Date: <28/12/23>
+-- Description: <this sp is for delete spesific ride or update the status
+--				if this is anonymous ride and there is no driver -> delete 
+--				anything else only change status to -> נמחקה 
+--				then need to return the return-Ride to ask the client if delete it too.
+
+-->
+-- =============================================
+ALTER PROCEDURE [dbo].[spDeleteUnityRide]
+(
+    -- Add the parameters for the stored procedure here
+   @unityRideID INT,
+   @CoorName NVARCHAR(255)
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+
+    -- Insert statements for procedure here
+		DECLARE @DriverId INT = (select MainDriver from unityRide where ridepatnum = @unityRideID)
+		DECLARE @isAnonymous bit = (select IsAnonymous from UnityRide where ridepatnum = @unityRideID)
+		DECLARE @CoorId INT = (select id from Volunteer where DisplayName like @CoorName )
+
+
+		IF(@DriverId IS not NULL)
+		update Volunteer
+		SET NoOfDocumentedRides = NoOfDocumentedRides-1
+		where Id = @DriverId
+
+		
+		IF(@DriverId IS NULL and @isAnonymous = 1)
+
+		BEGIN
+		DELETE FROM UnityRide
+		WHERE ridepatnum = @unityRideID;
+		select @unityRideID*-1 as 'RidePatNum'
+		END
+		
+		ELSE
+
+		BEGIN
+		UPDATE UnityRide
+		set Status = N'נמחקה', lastModified = GETDATE(),Coordinator = @CoorName , CoordinatorID = @CoorId
+		where ridepatnum = @unityRideID
+		--return the update ride
+		Select * from UnityRide where  ridepatnum = @unityRideID
+		END
+
+
+
+END
 
 
 

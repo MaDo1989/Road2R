@@ -502,13 +502,13 @@ public class UnityRide
         return -9;
     }
 
-    public bool recoverUnityRides(List<int> ListIDs)
+    public bool recoverUnityRides(List<int> ListIDs,string whoChange)
     {
         DBservice_Gilad db = new DBservice_Gilad();
         bool indcation = false;
         for (int i = 0; i < ListIDs.Count; i++)
         {
-            int res = db.recoverUnityRide(ListIDs[i]);
+            int res = db.recoverUnityRide(ListIDs[i], whoChange);
            
             if (res >0)
             {
@@ -617,7 +617,7 @@ public class UnityRide
 
     }
 
-    public void deleteUnityRide(List<int> listIDs)
+    public void deleteUnityRide(List<int> listIDs,string whoChange)
     {
         DBservice_Gilad dBservice = new DBservice_Gilad();
         UnityRide ur = new UnityRide();
@@ -625,7 +625,7 @@ public class UnityRide
         {
             for (int i = 0; i < listIDs.Count; i++)
             {
-               ur =  dBservice.deleteUnityRide(listIDs[i]);
+               ur =  dBservice.deleteUnityRide(listIDs[i], whoChange);
                 if (ur.RidePatNum!=-1)
                 {
                     BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
@@ -635,7 +635,7 @@ public class UnityRide
         }
         else
         {
-            ur = dBservice.deleteUnityRide(listIDs[0]);
+            ur = dBservice.deleteUnityRide(listIDs[0], whoChange);
             BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
         }
 

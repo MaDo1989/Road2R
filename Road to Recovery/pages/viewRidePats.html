@@ -634,12 +634,14 @@
             }, function (isConfirm) {
                 if (isConfirm) {
                     $('#wait').show();
+                    const UserName = GENERAL.USER.getUserDisplayName();
+                    console.log('check-->', ridePatNums2MarkRecovered, JSON.stringify({ listIDs: ridePatNums2MarkRecovered, userName: UserName }))
                     $.ajax({
                         dataType: "json",
                         url: "WebService.asmx/recoverUnityRides",
                         contentType: "application/json; charset=utf-8",
                         type: "POST",
-                        data: JSON.stringify({ listIDs: ridePatNums2MarkRecovered }),
+                        data: JSON.stringify({ listIDs: ridePatNums2MarkRecovered, userName:UserName }),
                         success: function (data) {
                             $('#wait').hide();
                             swal({
@@ -805,13 +807,14 @@
                     closeOnConfirm: false,
                     closeOnCancel: false
                 }, function (isConfirm) {
+                    const UserName = GENERAL.USER.getUserDisplayName();
                     if (isConfirm) {
                         $.ajax({
                             dataType: "json",
                             url: "WebService.asmx/recoverUnityRides",
                             contentType: "application/json; charset=utf-8",
                             type: "POST",
-                            data: JSON.stringify({ listIDs: list }),
+                            data: JSON.stringify({ listIDs: list, userName: UserName }),
                             success: function (data) {
                                 refreshTable();
                                 swal({

@@ -1067,12 +1067,12 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
-    public bool recoverUnityRides(List<int> listIDs)
+    public bool recoverUnityRides(List<int> listIDs,string userName )
     {
         try
         {
             UnityRide ur = new UnityRide();
-            return ur.recoverUnityRides(listIDs);
+            return ur.recoverUnityRides(listIDs,userName);
         }
         catch (Exception ex)
         {
@@ -1594,14 +1594,14 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public void deleteUnityRide(List<int>ListIDs) 
+    public void deleteUnityRide(List<int>ListIDs,string userName) 
     {
 
 
         try
         {
             UnityRide ur = new UnityRide();
-            ur.deleteUnityRide(ListIDs);
+            ur.deleteUnityRide(ListIDs, userName);
 
         }
         catch (Exception ex)
