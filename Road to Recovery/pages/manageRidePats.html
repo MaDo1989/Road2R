@@ -5480,8 +5480,8 @@
             $('#wait').show();
             let nowInUTC = new Date().toUTCString();
             const listIds = arrayOfRides
-           
-            let request = { ListIDs: listIds };
+            const UserName = GENERAL.USER.getUserDisplayName();
+            let request = { ListIDs: listIds, userName: UserName };
 
             let tablesDataArray = [];
             for (var i = 0; i < arrayOfRides.length; i++) {
