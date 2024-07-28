@@ -1412,7 +1412,7 @@ END
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
-/****** Object:  StoredProcedure [dbo].[spGetUnitedRides]    Script Date: 23/07/2024 12:53:26 ******/
+/****** Object:  StoredProcedure [dbo].[spGetUnitedRides]    Script Date: 28/07/2024 14:39:03 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1434,13 +1434,16 @@ BEGIN
 
     -- Insert statements for procedure here
 select *,
-case when (select cellphone2 from Patient where id = PatientId) !='' then (select cellphone2 from Patient where id = PatientId) else '0' END as 'PatientCellPhone2'
+case when (select cellphone2 from Patient where id = PatientId) !='' then (select cellphone2 from Patient where id = PatientId)
+when (select HomePhone from Patient where id = PatientId) !='' then (select HomePhone from Patient where id = PatientId)
+else '0' END as 'PatientCellPhone2'
 from UnityRide where DATEDIFF(day,getdate(),pickuptime)<=@days and Convert(date,pickuptime)>=CONVERT(date, getdate()) and Status <> N'נמחקה'; 
 END
 
 
 
 
+
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
@@ -1451,6 +1454,47 @@ END
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
+
+/****** Object:  StoredProcedure [dbo].[sp_GetPatientList]    Script Date: 28/07/2024 14:53:27 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad Meirson>
+-- Create Date: <18/06/2024>
+-- Description: <this sp is for efficiency and time tests,>
+-- =============================================
+ALTER PROCEDURE [dbo].[sp_GetPatientList]
+(
+    -- Add the parameters for the stored procedure here
+    @active bit
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+   
+
+    -- Insert statements for procedure here
+	select Id,DisplayName,Cellphone,
+	case when CellPhone2 !='' then CellPhone2 
+	when HomePhone !='' then HomePhone 
+	else '0' end as'CellPhone2',
+	BirthDate,Gender,Hospital,Barrier,PatientIdentity,LastModified,EnglishName,isActive
+	from Patient where IsActive = @active  order by Id
+END
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
 
 
 

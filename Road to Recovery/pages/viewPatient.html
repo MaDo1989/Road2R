@@ -184,7 +184,13 @@
                             cellPhoneCheck = "";
                         }
                         //console.log('test',arr_patients[i])
-                        arr_patients[i].CellPhone2 !="" ? cellPhoneCheck += " <br> " + arr_patients[i].CellPhone1 : cellPhoneCheck;
+                        arr_patients[i].CellPhone1 != "" && arr_patients[i].CellPhone1!='0'  ? cellPhoneCheck += " <br> " + arr_patients[i].CellPhone1 : cellPhoneCheck;
+
+                        //test//test
+                        if (arr_patients[i].DisplayName == 'מורן בוחלוק' || arr_patients[i].DisplayName == 'אברהים חמדאן') {
+                            console.log('test', arr_patients[i])
+                        }
+                        //test//test
                         var Patient = {};
                         //var myDate = arr_patients[i].BirthDate.replace('/Date(', '');
                         if (arr_patients[i].BirthDate != "") {
