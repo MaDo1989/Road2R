@@ -662,6 +662,20 @@ public class UnityRide
         return db.Get_unityRide_ByTimeRange(from, until, isDeletedtoShow);
     }
 
+
+    public Dictionary<string, object> GetEnglishNamesByIds(List <int> ids)
+    {
+        Dictionary<string, object> ResDic = new Dictionary<string, object>();
+        DBservice_Gilad db = new DBservice_Gilad();
+        foreach (int id in ids)
+        {
+            ResDic.Add(id.ToString(), db.GetEnglishNamesOfPatientOriginDest(id));
+            
+        }
+        return ResDic;
+    }
+
+
     public int assignDriverMobile(int UnityRideId,int userId)
     {
         UnityRide ur = new UnityRide();

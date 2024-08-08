@@ -3225,6 +3225,11 @@
                         isPatientStatusShouldPaintRow = callIfPatientStatusShouldPaintRow_AfterUnited(arr_rides[i]);
                         //#endregion isPatientStatusShouldPaintRow
 
+                        // if need to add who change in the last modified col just add this line :
+                        // + '<br><p class="whochange" >'+'על ידי - '+arr_rides[i].CoorName+'</p>'
+                        //to this objcet "thisRidePat".
+
+
                         thisRidePat = {
                             checkBoxesStr: `<input type="checkbox" class="checkboxClass" onchange="ChangeCheckboxRides(this)" id="check${arr_rides[i].RidePatNum}">`,
                             ridePatNum: arr_rides[i].RidePatNum,
@@ -3237,7 +3242,7 @@
                             patientAge: patientAge,
                             driver: driverHTML,
                             status: status2render,
-                            lastModified: convertDBDate2FrontEndDate(arr_rides[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" }) + '<br><p class="whochange" >'+'על ידי - '+arr_rides[i].CoorName+'</p>',
+                            lastModified: convertDBDate2FrontEndDate(arr_rides[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" }),
                             remark: remarkHTML,
                             isAnonymous: arr_rides[i].IsAnonymous == true,
                             hasDriver: arr_rides[i].MainDriver != -1,
@@ -5473,7 +5478,20 @@
         const focusOnElement = (id) => {
             $(`#${id}`).focus();
         }
-
+        const transformData = (hebrewData, englishMappings) => {
+            return hebrewData.map(item => {
+                const ridePatNum = item.RidePatNum.toString();
+                if (englishMappings[ridePatNum]) {
+                    return {
+                        ...item,
+                        PatientName: englishMappings[ridePatNum].patientEnglishName,
+                        Origin: englishMappings[ridePatNum].OriginEnglishName,
+                        Destination: englishMappings[ridePatNum].DestEnglishName
+                    };
+                }
+                return item;
+            });
+        };
 
         const deleteArrayOfRides = (arrayOfRides) => {
             checkCookie();
@@ -5538,6 +5556,98 @@
             })
         }
 
+
+        const messageForPalCoor = () => {
+            //console.log('in messageForPalCoor ', checkboxesRides)
+            const choosenRides = arr_rides.filter(ride => checkboxesRides.includes(ride.RidePatNum));
+            //console.log('choosenRides', choosenRides)
+            $('#wait').show();
+
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/GetEnglishNamesByIds",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                data: JSON.stringify({ Ids:checkboxesRides }),
+
+                success: function (data) {
+                    
+                    //console.log('success', JSON.parse(data.d))
+                    const dicById = JSON.parse(data.d);
+                    translatedData = transformData(choosenRides, dicById);
+                    //console.log('translatedData', translatedData);
+                    //console.log('choosenRides', choosenRides);
+                    const grouped = groupByOriginDestinationAndTime(translatedData);
+                    //console.log('grouped', grouped)
+                    const lineBreak = '\n';
+
+
+                    let message = `Rides for ${convertToShortDateString(convertDBDate2FrontEndDate(choosenRides[0].PickupTime))} Morning.${lineBreak}`;
+                    let index = 0;
+                    for (var k in grouped) {
+
+                        let rides = grouped[k];
+                        let origin = rides[0].Origin;
+                        let destination = rides[0].Destination;
+                        let time = convertDBDate2FrontEndDate(rides[0].PickupTime).toLocaleTimeString('he-IL', { timeStyle: 'short' });
+
+                        message += `${lineBreak}From ${origin} to ${destination} at ${time} ${lineBreak}`;
+
+                        rides.forEach(ride => {
+                            index++;
+                            if (ride.OnlyEscort) {
+                                message += `   ${index}. {blanks} of ${ride.PatientName} #${ride.AmountOfEscorts} ${lineBreak}`;
+                            }
+                            else {
+                                message += `   ${index}. ${ride.PatientName} #${ride.AmountOfEscorts + 1} ${lineBreak}`;
+                            }
+                            
+                        })
+
+
+
+
+                    }
+                    $('#wait').hide();
+
+                    //console.log('final message\n', message)
+                    navigator.clipboard.writeText(message)
+                        .then(function () {
+                            swal({
+                                title: "ההודעה מוכנה בפעולת הדבק",
+                                timer: 2000,
+                                type: "success",
+                                showConfirmButton: false
+                            });
+                        }, function (err) {
+                            swal({
+                                title: "העתקת ההודעה נכשלה",
+                                timer: 2000,
+                                type: "error",
+                                showConfirmButton: false
+                            });
+                        });
+
+                },
+                error: function (err) {
+                    //alert("Error in messageForPalCoor ->  " + err.responseText);
+                    console.log("Error in messageForPalCoor ->  " + err.responseText,err);
+                }
+
+            })
+
+
+
+
+         
+
+            
+
+
+        }
+
+
+        // this is the function that rememeber and collect the checked checkboxes for any functionality.
         const ChangeCheckboxRides = (checkbox) => {
             let arrlocal = [];
             //console.log(checkbox.id, checkbox.checked);
@@ -5587,15 +5697,18 @@
                 }
             });
             checkboxesRides = arrlocal;
-            console.log(checkboxesRides);
+            //console.log(checkboxesRides);
             if (checkboxesRides.length == 0) {
                 $('.toggleTitle').hide();
                 $('#deleteFewRidesButton').prop('disabled', true);
+                $('#messageCoorBTN').prop('disabled', true);
 
             }
             else {
                 $('.toggleTitle').show();
                 $('#deleteFewRidesButton').prop('disabled', false);
+                $('#messageCoorBTN').prop('disabled', false);
+
             }
             $('#NumofRideChecksText').text(checkboxesRides.length);
 
@@ -5610,7 +5723,7 @@
                 let msg2user = `האם למחוק את ה${checkboxesRides.length} ההסעות שמסומנות 
                 במידה והחולה אנונימי לא יהיה ניתן לשחזר את ההסעה לאחר המחיקה !`;
                 swal({
-                    title: "هل انت متأكد?\nהאם אתם בטוחים?",
+                    title: `هل انت متأك?\nהאם אתם בטוחים? \n${checkboxesRides.length} הסעות ימחקו`,
                     type: "warning",
                     text: msg2user,
                     showCancelButton: true,
@@ -5632,6 +5745,38 @@
             }
         }
 
+        function groupByOriginDestinationAndTime(rides) {
+            return rides.reduce((acc, ride) => {
+                // Extract the time in HH:MM format from the PickupTime attribute
+                const timestamp = new Date(parseInt(ride.PickupTime.match(/\d+/)[0]));
+                const time = timestamp.toISOString().substr(11, 5); // Extract HH:MM
+
+                // Create a unique key for each combination of Origin, Destination, and PickupTime
+                const key = `${ride.Origin}-${ride.Destination}-${time}`;
+
+                // Initialize the group if it doesn't exist
+                if (!acc[key]) {
+                    acc[key] = [];
+                }
+
+                // Add the ride to the group
+                acc[key].push(ride);
+
+                return acc;
+            }, {});
+        }
+        function convertToShortDateString(dateString) {
+            // Create a Date object from the input string
+            const date = new Date(dateString);
+
+            // Extract the day, month, and year
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+            const year = date.getFullYear();
+
+            // Format the date as dd/mm/yyyy
+            return `${day}/${month}/${year}`;
+        }
     </script>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -5727,7 +5872,15 @@
                                     </div>
 
                                     <div class="col-sm-6 text-right">
-                                        <button disabled id="deleteFewRidesButton" onclick="DeleteMarkedRides()" class="btn btn-danger waves-effect w-md waves-light m-b-5">מחק הסעות מסומנות</button>
+                                        <button disabled id="deleteFewRidesButton" onclick="DeleteMarkedRides()" class="btn btn-danger waves-effect w-md waves-light m-b-5">
+                                            <span class="glyphicon glyphicon-trash m-r-5"></span>
+                                            מחק הסעות מסומנות
+                                        </button>
+                                        <button disabled id="messageCoorBTN" onclick="messageForPalCoor()" class="btn btn-primary waves-effect w-md waves-light m-b-5">
+                                            <span class="glyphicon glyphicon-envelope m-r-5"></span>
+                                            הודעה לרכז\ית
+                                            
+                                        </button>
                                     </div>
 
                                 </div>

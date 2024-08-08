@@ -859,6 +859,69 @@ public class DBservice_Gilad
         }
     }
 
+
+    public Dictionary<string, object> GetEnglishNamesOfPatientOriginDest(int id)
+    {
+        SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@RideID", id);
+        cmd = CreateCommandWithStoredProcedureGeneral("spGetEnglishNamePatientAndLocation", con, paramDic);
+        List<object> list = new List<object>();
+        Dictionary<string, object> res = new Dictionary<string, object>();
+
+        try
+        {
+
+
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            while (dataReader.Read())
+            {
+
+
+                res.Add("patientEnglishName", dataReader["patientEnglishName"].ToString());
+                res.Add("OriginEnglishName", dataReader["OriginEnglishName"].ToString());
+                res.Add("DestEnglishName", dataReader["DestEnglishName"].ToString());
+
+                
+
+                
+
+
+            }
+            return res;
+            
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            WriteToErrorFile("GetUnityRideToEdit GetUnityRideToEdit GetUnityRide", ex.Message + ex.ToString());
+            throw (ex);
+        }
+
+        finally
+        {
+            if (con != null)
+            {
+                // close the db connection
+                con.Close();
+            }
+        }
+    }
+
+
     public bool CheckValidDriverRides(int unityRideID,string DriverName,DateTime pickupTime) {
         SqlCommand cmd;
         try

@@ -1589,6 +1589,29 @@ public class WebService : System.Web.Services.WebService
     }
 
 
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetEnglishNamesByIds(List <int> Ids) 
+    {
+
+
+        try
+        {
+            UnityRide ur = new UnityRide();
+            Dictionary<string, object> res = ur.GetEnglishNamesByIds(Ids);
+            return j.Serialize(res);
+
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetEnglishNamesByIds", ex);
+            throw new Exception(ex.Message);
+
+        }
+
+    }
+
+
 
 
 
