@@ -192,7 +192,37 @@
             $("#rp_center_patients_rides").click(on_report_click);
             $("#rp_center_tomorrows_rides").click(on_report_click);
             
+            $(document).on('keydown', (e) => {
+                if (e.ctrlKey && e.key === 'i') {
+                    $('#wait').show();
+                    e.preventDefault();
+                    //console.log(e.ctrlKey, e.key);
+                    $.ajax({
+                        dataType: "json",
+                        url: "WebService.asmx/GetMonthlyReport",
+                        contentType: "application/json; charset=utf-8",
+                        type: "POST",
+                        data: null,
+                        success: function (data) {
+                            $('#wait').hide();
+                            
+                            const jsonArray = JSON.parse(data.d)
 
+                            jsonArray.forEach(obj => {
+                                obj.PickupTime = convertDateString(obj.PickupTime);
+                            });
+                            
+                            jsonToCSVDownload(jsonArray);
+                        },
+                        error: function (err) {
+                            $('#wait').hide();
+                            alert("Error in GetMonthlyReport: " + err.responseText);
+                        }
+                    });
+                }
+
+
+            });
 
             
             // $("#dsb_hl").click(dashboard_hl_init);
@@ -201,7 +231,47 @@
             // dashboard_hl_init();
         });
 
+        function jsonToCSVDownload(jsonArray, filename = 'data.csv') {
+            if (jsonArray.length === 0) {
+                console.error('המערך ריק');
+                return;
+            }
+            filename = new Date().toISOString().slice(0, 10);
 
+            const headers = Object.keys(jsonArray[0]);
+            let csvContent = '\uFEFF'; 
+
+           
+            csvContent += headers.join(',') + '\n';
+
+            
+            jsonArray.forEach(obj => {
+                const row = headers.map(header => {
+                    let cell = obj[header] === null || obj[header] === undefined ? '' : obj[header];
+                    cell = cell.toString().replace(/"/g, '""');
+                    if (cell.search(/("|,|\n)/g) >= 0) {
+                        cell = `"${cell}"`;
+                    }
+                    return cell;
+                });
+                csvContent += row.join(',') + '\n';
+            });
+
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+
+            
+            const url = URL.createObjectURL(blob);
+
+            
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
 
         function getDayString(num) {
             var day;    //Create a local variable to hold the string
@@ -232,7 +302,21 @@
             }
             return day;
         }
+        function convertDateString(dateString) {
+            // Extract the milliseconds from the string
+            const milliseconds = parseInt(dateString.replace(/^\/Date\((\d+)\)\/$/, '$1'), 10);
 
+            // Create a new Date object
+            const date = new Date(milliseconds);
+
+            // Get day, month, and year
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+            const year = date.getFullYear();
+
+            // Return the formatted date string
+            return `${day}/${month}/${year}`;
+        }
 
     </script>
     <style>
