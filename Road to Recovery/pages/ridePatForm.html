@@ -2792,10 +2792,12 @@
                 $('#wait').show();
                 driverMode = "delete";
                 deleteDriverFlag = true;
+                const UserName = GENERAL.USER.getUserDisplayName();
                 request = {
                     UnityRideId: ridePatId,
                     isDelete: true,
-                    DriverId: userSelected
+                    DriverId: userSelected,
+                    userName: UserName
                 }
                 var dataString = JSON.stringify(request);
                 $.ajax({ // ajax call starts
