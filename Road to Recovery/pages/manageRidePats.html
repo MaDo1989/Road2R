@@ -5596,10 +5596,10 @@
                         rides.forEach(ride => {
                             index++;
                             if (ride.OnlyEscort) {
-                                message += `   ${index}. {blanks} of ${ride.PatientName} #${ride.AmountOfEscorts} ${lineBreak}`;
+                                message += `   ${index}. {blanks} of ${ride.PatientName} (${ride.AmountOfEscorts}) ${lineBreak}`;
                             }
                             else {
-                                message += `   ${index}. ${ride.PatientName} #${ride.AmountOfEscorts + 1} ${lineBreak}`;
+                                message += `   ${index}. ${ride.PatientName} (${ride.AmountOfEscorts + 1}) ${lineBreak}`;
                             }
                             
                         })
