@@ -5452,7 +5452,7 @@
         const editTimeModal_bsModalHasShown = () => {
 
         }
-
+     
         const bsModalHasShown = async () => {
             await activateAutoComplteToModalsInput();
 
@@ -5560,7 +5560,22 @@
         const messageForPalCoor = () => {
             //console.log('in messageForPalCoor ', checkboxesRides)
             const choosenRides = arr_rides.filter(ride => checkboxesRides.includes(ride.RidePatNum));
-            //console.log('choosenRides', choosenRides)
+            const dates = [];
+            choosenRides.forEach(ride => {
+                dates.push(convertToShortDateString(convertDBDate2FrontEndDate(ride.PickupTime)));
+            })
+            const uniqueDates = [...new Set(dates)];
+            //console.log(uniqueDates)
+            if (uniqueDates.length > 1) {
+                swal({
+                    title: "לא ניתן לשלוח הודעה לרכז על הסעות בתאריכים שונים",
+                    timer: 2000,
+                    type: "error",
+                    showConfirmButton: false
+                });
+                return;
+            }
+            
             $('#wait').show();
 
             $.ajax({
