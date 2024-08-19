@@ -111,6 +111,23 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetMonthlyReport()
+    {
+        try
+        {
+            UnityRide ur = new UnityRide();
+            return j.Serialize(ur.GetMonthlyReport());
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetMonthlyReport", ex);
+            throw new Exception("שגיאה בשליפת הנתונים החודשיים לדוח");
+        }
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string getLocations()
     {
         try

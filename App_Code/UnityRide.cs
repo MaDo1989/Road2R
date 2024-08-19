@@ -676,6 +676,12 @@ public class UnityRide
     }
 
 
+    public List <object> GetMonthlyReport()
+    {
+        DBservice_Gilad dBservice = new DBservice_Gilad();
+        return dBservice.GetMonthlyReport();
+    }
+
     public int assignDriverMobile(int UnityRideId,int userId)
     {
         UnityRide ur = new UnityRide();

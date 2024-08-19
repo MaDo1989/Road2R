@@ -1567,6 +1567,58 @@ GO
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
+-- =======================================================
+-- Create Stored Procedure Template for Azure SQL Database
+-- =======================================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      Gilad
+-- Create Date: 14/08/2024
+-- Description: this is for Avital get the data to csv report.
+-- =============================================
+CREATE PROCEDURE sp_monthlyReportRides_patients
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+   
+DECLARE @PreviousMonthStart DATE = DATEADD(MONTH, DATEDIFF(MONTH, 0, GETDATE()) - 1, 0);
+DECLARE @CurrentMonthStart DATE = DATEADD(MONTH, DATEDIFF(MONTH, 0, GETDATE()), 0);
+print(@PreviousMonthStart)
+print(@CurrentMonthStart)
+SELECT 
+    CONVERT(VARCHAR, PickupTime, 103) AS PickupTime, 
+    Origin, 
+    Destination, 
+    Volunteer.DisplayName, 
+    PatName
+FROM 
+(
+    SELECT 
+        pickuptime, 
+        Origin, 
+        Destination, 
+        MainDriver, 
+        patientName AS PatName 
+    FROM UnityRide 
+    WHERE 
+        pickuptime >= '2022-01-01'
+        AND MainDriver IS NOT NULL
+        AND pickuptime >= @PreviousMonthStart
+        AND pickuptime < @CurrentMonthStart
+) AS BUFF
+INNER JOIN Volunteer ON MainDriver = Volunteer.Id
+ORDER BY Volunteer.DisplayName ASC;
+END
+GO
+
+
+
+
+
 
 
 ---------------------------------------------------------------------------------------------------------------------------------------------

@@ -922,6 +922,70 @@ public class DBservice_Gilad
     }
 
 
+    public List<object> GetMonthlyReport()
+    {
+        SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        cmd = CreateCommandWithStoredProcedureGeneral("sp_monthlyReportRides_patients", con, null);
+        List<object> list = new List<object>();
+
+
+        try
+        {
+
+
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            while (dataReader.Read())
+            {
+                //PickupTime Origin  Destination DisplayName PatName
+
+                list.Add(new
+                {
+                    PickupTime = Convert.ToDateTime(dataReader["PickupTime"]),
+                    Origin = dataReader["Origin"].ToString(),
+                    Destination = dataReader["Destination"].ToString(),
+                    DisplayName = dataReader["DisplayName"].ToString(),
+                    PatName = dataReader["PatName"].ToString(),
+                });
+
+
+
+
+
+
+            }
+            return list;
+
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            WriteToErrorFile("GetMonthlyReport sp_monthlyReportRides_patients", ex.Message + ex.ToString());
+            throw (ex);
+        }
+
+        finally
+        {
+            if (con != null)
+            {
+                // close the db connection
+                con.Close();
+            }
+        }
+    }
+
     public bool CheckValidDriverRides(int unityRideID,string DriverName,DateTime pickupTime) {
         SqlCommand cmd;
         try
