@@ -876,12 +876,29 @@
             unityRide.DriverName = $('#driver').val() == '' ? null : $('#driver').val()
             unityRide.RidePatNum = dataobj.func == 'edit' ? dataobj.RidePat.RidePatNum : 0;
             unityRide.AmountOfEscorts = dataobj.RidePat.Escorts.length;
+            console.log('before insert the real coor', unityRide)
 
             lastRide.Escorts = dataobj.RidePat.Escorts;
             let request = { unityRide: unityRide, func: dataobj.func, numOfRide: dataobj.numberOfRides, repeatEvery: dataobj.repeatRideEvery, firstTry: true };
             const userName = GENERAL.USER.getUserDisplayName();
             console.log("real user connect: ", userName)
             console.log("what in the request: ", request.unityRide.CoorName);
+            
+            if (userName == '' || userName == null || typeof userName == 'undefined' || typeof userName == 'object') {
+                swal({
+                    title: "אופס..משהו השתבש",
+                    type: "error",
+                    text: 'משהו השתבש בהעברת הנתונים - יש להתחבר מחדש למערכת ולנסות שוב',
+                    closeOnConfirm: true
+                }, function (userResponse) {
+                    if (userResponse) {
+                        location.href = 'login.html';
+                    }
+                   
+
+                });
+                return false;
+            }
             request.unityRide.CoorName = userName;
             //console.log('After Custom',request);
 
