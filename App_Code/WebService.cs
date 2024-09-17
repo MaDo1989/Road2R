@@ -109,6 +109,28 @@ public class WebService : System.Web.Services.WebService
 
     }
 
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetNewbisCandidateUnityRideV2(int RideNum,int mode)
+    {
+        try
+        {
+            CandidateV2 c = new CandidateV2();
+            List<CandidateV2> list = c.GetCandidateUnityRideV2(RideNum, mode);
+            return j.Serialize(list);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetNewbisCandidateUnityRideV2", ex);
+            throw new Exception("שגיאה בשליפת הנתונים GetNewbisCandidateUnityRideV2 api");
+        }
+
+    }
+
+
+
+
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string GetMonthlyReport()

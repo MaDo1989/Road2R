@@ -1194,7 +1194,7 @@ END
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
-/****** Object:  StoredProcedure [dbo].[spUnityRide_UpdateDateAndTime]    Script Date: 21/07/2024 21:51:03 ******/
+/****** Object:  StoredProcedure [dbo].[spUnityRide_UpdateDateAndTime]    Script Date: 15/09/2024 17:53:11 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1238,6 +1238,7 @@ BEGIN
             PatientId = @PatientId AND 
             pickupTime =@editedTime  AND
 			IsAnonymous = 0 AND
+			status not like N'נמחקה' AND
             RidePatNum != @unityRideId  -- Exclude the current ride
     )
     BEGIN
@@ -1264,8 +1265,6 @@ select -1 as 'RidePatNum'
 
 COMMIT TRAN UpdateUnityRideTime
 END
-
-
 
 
 
@@ -1614,6 +1613,455 @@ INNER JOIN Volunteer ON MainDriver = Volunteer.Id
 ORDER BY Volunteer.DisplayName ASC;
 END
 GO
+
+
+
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+/****** Object:  StoredProcedure [dbo].[sp_GetNewbisCandidateForUnityRideNEW]    Script Date: 16/09/2024 15:32:35 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad Meirson>
+-- Create Date: <01/09/2024>
+-- Description: <get newbis candidate for spesific ride>
+-- =============================================
+CREATE PROCEDURE [dbo].[sp_GetNewbisCandidateForUnityRideNEW]
+(
+    -- Add the parameters for the stored procedure here
+    @ridePatNum int
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+-- START OF QUERY NEWBIS --
+-- START OF QUERY NEWBIS --
+-- START OF QUERY NEWBIS --
+-- START OF QUERY NEWBIS --
+-- START OF QUERY NEWBIS --spGetCandidatesForUnityRide
+
+
+--Declare coefficients for score :
+------------DECLARE @C_NoOfDocumentedRides FLOAT = 0.33;
+------------DECLARE @C_SeniorityInYears FLOAT = 0.01;
+------------DECLARE @C_LastRideInDays FLOAT = 0.2;
+------------DECLARE @C_NextRideInDays FLOAT = 0.2;
+------------DECLARE @C_NumOfRidesLast2Month FLOAT = 0.33;
+------------DECLARE @C_AmountOfRidesInThisPath FLOAT =0.5;
+------------DECLARE @C_AmountOfRidesInOppositePath FLOAT =0.25;
+
+------------DECLARE @C_AmountOfRides_OriginToArea FLOAT = 0.33;
+------------DECLARE @C_AmountOfRidesAtThisTime FLOAT =0.33;
+------------DECLARE @C_AmountOfRidesAtThisDayWeek FLOAT =0.2;
+------------DECLARE @C_SumOfKM FLOAT = 2.5
+
+
+
+
+--declare basic vars 
+DECLARE @R_origin NVARCHAR(255) = (SELECT origin FROM unityRide WHERE ridePatNum = @ridePatNum);
+DECLARE @R_dest NVARCHAR(255) = (SELECT destination FROM unityRide WHERE ridePatNum = @ridePatNum);
+DECLARE @R_time DateTIme = (SELECT pickupTime FROM unityRide WHERE ridePatNum = @ridePatNum);
+DECLARE @R_isAfterNoon bit = case when (DATEPART(MINUTE, @R_time) = 14) then 1 else 0 end
+DECLARE @R_area NVARCHAR(255) = (SELECT area FROM unityRide WHERE ridePatNum = @ridePatNum);
+DECLARE @dayInWeek NVARCHAR(20);
+
+--distance vars
+DECLARE @R_origin_lat FLOAT = (SELECT lat from Location where Name like @R_origin) -- x
+DECLARE @R_origin_lng FLOAT = (SELECT lng from Location where Name like @R_origin) -- y
+DECLARE @R_destination_lat FLOAT = (SELECT lat from Location where Name like @R_dest) --x
+DECLARE @R_destination_lng FLOAT = (SELECT lng from Location where Name like @R_dest) --y
+
+--declare Geo Points
+DECLARE @Start_point GEOGRAPHY = GEOGRAPHY::Point(@R_origin_lat, @R_origin_lng, 4326); 
+DECLARE @End_point GEOGRAPHY = GEOGRAPHY::Point(@R_destination_lat, @R_destination_lng, 4326); 
+
+SET @dayInWeek = 
+    CASE DATENAME(WEEKDAY, @R_time)
+        WHEN 'Sunday' THEN N'ראשון'
+        WHEN 'Monday' THEN N'שני'
+        WHEN 'Tuesday' THEN N'שלישי'
+        WHEN 'Wednesday' THEN N'רביעי'
+        WHEN 'Thursday' THEN N'חמישי'
+        WHEN 'Friday' THEN N'שישי'
+        WHEN 'Saturday' THEN N'שבת'
+    END;
+
+-- this is query to calc the points before the main query
+WITH VolunteerCityPoints AS (
+    SELECT 
+        v.Id,
+        GEOGRAPHY::Point(ISNULL(c.lat, 32.0853), ISNULL(c.lng, 34.7818), 4326) AS VolunteerCityPoint
+    FROM 
+        Volunteer v
+    JOIN 
+        City c ON v.CityCityName = c.CityName
+),
+VolunteerMetrics AS (
+    SELECT 
+        Id, DisplayName, CellPhone, JoinDate, CityCityName, AvailableSeats, NoOfDocumentedRides,
+        (DATEDIFF(day, JoinDate, GETDATE())) / 365.0 as SeniorityInYears,
+        (SELECT TOP 1 CAST(CallRecordedDate AS DATETIME) + CAST(CallRecordedTime AS DATETIME) 
+         FROM documentedCall 
+         WHERE driverId = v.Id 
+         ORDER BY CallRecordedDate DESC) as LastCallDateTime,
+        DATEDIFF(day, (SELECT TOP 1 pickupTime 
+                       FROM unityRide 
+                       WHERE MainDriver = v.Id AND pickupTime < GETDATE() AND status NOT LIKE N'נמחקה'  
+                       ORDER BY pickupTime DESC), GETDATE()) as LastRideInDays,
+        DATEDIFF(day, GETDATE(), (SELECT TOP 1 pickupTime 
+                                  FROM unityRide 
+                                  WHERE MainDriver = v.Id AND pickupTime >= GETDATE() AND status NOT LIKE N'נמחקה'  
+                                  ORDER BY pickupTime)) as NextRideInDays,
+        (SELECT COUNT(*) 
+         FROM UnityRide 
+         WHERE MainDriver = v.Id AND status NOT LIKE N'נמחקה' AND pickupTime BETWEEN DATEADD(MONTH, -2, GETDATE()) AND GETDATE()) as NumOfRidesLast2Month,
+        (SELECT COUNT(*) 
+         FROM unityRide 
+         WHERE origin LIKE @R_origin AND destination LIKE @R_dest AND mainDriver = v.Id AND status NOT LIKE N'נמחקה') as AmountOfRidesInThisPath,
+        (SELECT COUNT(*) 
+         FROM unityRide 
+         WHERE destination LIKE @R_origin AND origin LIKE @R_dest AND mainDriver = v.Id AND status NOT LIKE N'נמחקה') as AmountOfRidesInOppositePath,
+        (SELECT COUNT(*) 
+         FROM unityRide 
+         WHERE origin LIKE @R_origin AND mainDriver = v.Id AND Area LIKE @R_area AND Area IS NOT NULL AND @R_area IS NOT NULL AND status NOT LIKE N'נמחקה') as AmountOfRides_OriginToArea,
+        (CASE WHEN @R_isAfterNoon = 1 
+              THEN (SELECT COUNT(*) FROM unityRide WHERE v.Id = mainDriver AND DATEPART(MINUTE, pickupTime) = 14 AND status NOT LIKE N'נמחקה') 
+              ELSE (SELECT COUNT(*) FROM unityRide WHERE v.Id = mainDriver AND DATEPART(MINUTE, pickupTime) != 14 AND status NOT LIKE N'נמחקה') 
+         END) as AmountOfRidesAtThisTime,
+        (SELECT COUNT(*) 
+         FROM unityRide 
+         WHERE DATENAME(WEEKDAY, @R_time) = DATENAME(WEEKDAY, pickupTime) AND MainDriver = v.Id AND status NOT LIKE N'נמחקה') as AmountOfRidesAtThisDayWeek,
+        (SELECT (SELECT VolunteerCityPoint FROM VolunteerCityPoints WHERE Id = v.Id).STDistance(@Start_point) / 1000 + 
+                (@Start_point.STDistance(@End_point) / 1000) + 
+                (@End_point.STDistance((SELECT VolunteerCityPoint FROM VolunteerCityPoints WHERE Id = v.Id)) / 1000)) as SumOfKM
+    FROM 
+        volunteer v
+    WHERE 
+        NoOfDocumentedRides <= 3 
+        AND isDriving = 1 
+        AND isActive = 1
+        AND id NOT IN (SELECT volunteerId FROM Absence WHERE @R_time >= FromDate AND @R_time <= UntilDate)
+        --AND @R_area IN (SELECT PreferredArea FROM PreferredArea_Volunteer WHERE volunteerId = id)
+        --AND @dayInWeek IN (SELECT PreferedDayDayInWeek FROM PreferedDay_Volunteer WHERE volunteerId = id)
+        AND Id NOT IN (SELECT DriverId FROM documentedCall WHERE CAST(GETDATE() AS DATE) = CallRecordedDate)
+        AND Id NOT IN (SELECT DISTINCT mainDriver FROM unityRide WHERE CAST(pickupTime AS DATE) = CAST(@R_time AS DATE) AND mainDriver IS NOT NULL AND status NOT LIKE N'נמחקה')
+        AND DATEDIFF(MONTH, (SELECT MAX(pickupTime) FROM UnityRide WHERE maindriver = Id), CAST(GETDATE() AS DATE)) <= 4
+)
+SELECT * FROM VolunteerMetrics
+
+--order by LastRideInDays desc, LastCallDateTime,NoOfDocumentedRides ,JoinDate desc , NumOfRidesLast2Month
+
+
+
+-- END OF QUERY NEWBIS --
+-- END OF QUERY NEWBIS --
+-- END OF QUERY NEWBIS --
+-- END OF QUERY NEWBIS --
+-- END OF QUERY NEWBIS --
+
+
+
+
+
+END
+
+
+
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+-- =======================================================
+-- Create Stored Procedure Template for Azure SQL Database
+-- =======================================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad Meirson>
+-- Create Date: <17/09/2024>
+-- Description: <Get regular drivers for spesific ride>
+-- =============================================
+CREATE PROCEDURE sp_getRegularCandidateUnityRideV2
+(
+     @ridePatNum int
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+   
+
+    -- Insert statements for procedure here
+    --declare basic vars 
+DECLARE @R_origin NVARCHAR(255) = (SELECT origin FROM unityRide WHERE ridePatNum = @ridePatNum);
+DECLARE @R_dest NVARCHAR(255) = (SELECT destination FROM unityRide WHERE ridePatNum = @ridePatNum);
+DECLARE @R_time DateTIme = (SELECT pickupTime FROM unityRide WHERE ridePatNum = @ridePatNum);
+DECLARE @R_isAfterNoon bit = case when (DATEPART(MINUTE, @R_time) = 14) then 1 else 0 end
+DECLARE @R_area NVARCHAR(255) = (SELECT area FROM unityRide WHERE ridePatNum = @ridePatNum);
+DECLARE @dayInWeek NVARCHAR(20);
+
+--distance vars
+DECLARE @R_origin_lat FLOAT = (SELECT lat from Location where Name like @R_origin) -- x
+DECLARE @R_origin_lng FLOAT = (SELECT lng from Location where Name like @R_origin) -- y
+DECLARE @R_destination_lat FLOAT = (SELECT lat from Location where Name like @R_dest) --x
+DECLARE @R_destination_lng FLOAT = (SELECT lng from Location where Name like @R_dest) --y
+
+--declare Geo Points
+DECLARE @Start_point GEOGRAPHY = GEOGRAPHY::Point(@R_origin_lat, @R_origin_lng, 4326); 
+DECLARE @End_point GEOGRAPHY = GEOGRAPHY::Point(@R_destination_lat, @R_destination_lng, 4326); 
+
+SET @dayInWeek = 
+    CASE DATENAME(WEEKDAY, @R_time)
+        WHEN 'Sunday' THEN N'ראשון'
+        WHEN 'Monday' THEN N'שני'
+        WHEN 'Tuesday' THEN N'שלישי'
+        WHEN 'Wednesday' THEN N'רביעי'
+        WHEN 'Thursday' THEN N'חמישי'
+        WHEN 'Friday' THEN N'שישי'
+        WHEN 'Saturday' THEN N'שבת'
+    END;
+
+-- this is query to calc the points before the main query
+WITH VolunteerCityPoints AS (
+    SELECT 
+        v.Id,
+        GEOGRAPHY::Point(ISNULL(c.lat, 32.0853), ISNULL(c.lng, 34.7818), 4326) AS VolunteerCityPoint
+    FROM 
+        Volunteer v
+    JOIN 
+        City c ON v.CityCityName = c.CityName
+),
+VolunteerMetrics AS (
+    SELECT 
+        Id, DisplayName, CellPhone, JoinDate, CityCityName, AvailableSeats, NoOfDocumentedRides,
+        (DATEDIFF(day, JoinDate, GETDATE())) / 365.0 as SeniorityInYears,
+        (SELECT TOP 1 CAST(CallRecordedDate AS DATETIME) + CAST(CallRecordedTime AS DATETIME) 
+         FROM documentedCall 
+         WHERE driverId = v.Id 
+         ORDER BY CallRecordedDate DESC) as LastCallDateTime,
+        DATEDIFF(day, (SELECT TOP 1 pickupTime 
+                       FROM unityRide 
+                       WHERE MainDriver = v.Id AND pickupTime < GETDATE() AND status NOT LIKE N'נמחקה'  
+                       ORDER BY pickupTime DESC), GETDATE()) as LastRideInDays,
+        DATEDIFF(day, GETDATE(), (SELECT TOP 1 pickupTime 
+                                  FROM unityRide 
+                                  WHERE MainDriver = v.Id AND pickupTime >= GETDATE() AND status NOT LIKE N'נמחקה'  
+                                  ORDER BY pickupTime)) as NextRideInDays,
+        (SELECT COUNT(*) 
+         FROM UnityRide 
+         WHERE MainDriver = v.Id AND status NOT LIKE N'נמחקה' AND pickupTime BETWEEN DATEADD(MONTH, -2, GETDATE()) AND GETDATE()) as NumOfRidesLast2Month,
+        (SELECT COUNT(*) 
+         FROM unityRide 
+         WHERE origin LIKE @R_origin AND destination LIKE @R_dest AND mainDriver = v.Id AND status NOT LIKE N'נמחקה') as AmountOfRidesInThisPath,
+        (SELECT COUNT(*) 
+         FROM unityRide 
+         WHERE destination LIKE @R_origin AND origin LIKE @R_dest AND mainDriver = v.Id AND status NOT LIKE N'נמחקה') as AmountOfRidesInOppositePath,
+        (SELECT COUNT(*) 
+         FROM unityRide 
+         WHERE origin LIKE @R_origin AND mainDriver = v.Id AND Area LIKE @R_area AND Area IS NOT NULL AND @R_area IS NOT NULL AND status NOT LIKE N'נמחקה') as AmountOfRides_OriginToArea,
+        (CASE WHEN @R_isAfterNoon = 1 
+              THEN (SELECT COUNT(*) FROM unityRide WHERE v.Id = mainDriver AND DATEPART(MINUTE, pickupTime) = 14 AND status NOT LIKE N'נמחקה') 
+              ELSE (SELECT COUNT(*) FROM unityRide WHERE v.Id = mainDriver AND DATEPART(MINUTE, pickupTime) != 14 AND status NOT LIKE N'נמחקה') 
+         END) as AmountOfRidesAtThisTime,
+        (SELECT COUNT(*) 
+         FROM unityRide 
+         WHERE DATENAME(WEEKDAY, @R_time) = DATENAME(WEEKDAY, pickupTime) AND MainDriver = v.Id AND status NOT LIKE N'נמחקה') as AmountOfRidesAtThisDayWeek,
+        (SELECT (SELECT VolunteerCityPoint FROM VolunteerCityPoints WHERE Id = v.Id).STDistance(@Start_point) / 1000 + 
+                (@Start_point.STDistance(@End_point) / 1000) + 
+                (@End_point.STDistance((SELECT VolunteerCityPoint FROM VolunteerCityPoints WHERE Id = v.Id)) / 1000)) as SumOfKM
+    FROM 
+        volunteer v
+    WHERE 
+        NoOfDocumentedRides >= 4 AND NoOfDocumentedRides<=100
+        AND isDriving = 1 
+        AND isActive = 1
+        AND id NOT IN (SELECT volunteerId FROM Absence WHERE @R_time >= FromDate AND @R_time <= UntilDate)
+        --AND @R_area IN (SELECT PreferredArea FROM PreferredArea_Volunteer WHERE volunteerId = id)
+        --AND @dayInWeek IN (SELECT PreferedDayDayInWeek FROM PreferedDay_Volunteer WHERE volunteerId = id)
+        AND Id NOT IN (SELECT DriverId FROM documentedCall WHERE CAST(GETDATE() AS DATE) = CallRecordedDate)
+        AND Id NOT IN (SELECT DISTINCT mainDriver FROM unityRide WHERE CAST(pickupTime AS DATE) = CAST(@R_time AS DATE) AND mainDriver IS NOT NULL AND status NOT LIKE N'נמחקה')
+        --AND DATEDIFF(MONTH, (SELECT MAX(pickupTime) FROM UnityRide WHERE maindriver = Id), CAST(GETDATE() AS DATE)) <= 4
+)
+SELECT * FROM VolunteerMetrics
+END
+GO
+
+
+
+
+
+
+
+
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+-- =======================================================
+-- Create Stored Procedure Template for Azure SQL Database
+-- =======================================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad Meirson>
+-- Create Date: <17/09/24>
+-- Description: <get a super candidate for spesific ride>
+-- =============================================
+CREATE PROCEDURE sp_getSuperCandidateUnityRideV2
+(
+    -- Add the parameters for the stored procedure here
+	@ridePatNum int
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+    
+
+    -- Insert statements for procedure here
+        --declare basic vars 
+DECLARE @R_origin NVARCHAR(255) = (SELECT origin FROM unityRide WHERE ridePatNum = @ridePatNum);
+DECLARE @R_dest NVARCHAR(255) = (SELECT destination FROM unityRide WHERE ridePatNum = @ridePatNum);
+DECLARE @R_time DateTIme = (SELECT pickupTime FROM unityRide WHERE ridePatNum = @ridePatNum);
+DECLARE @R_isAfterNoon bit = case when (DATEPART(MINUTE, @R_time) = 14) then 1 else 0 end
+DECLARE @R_area NVARCHAR(255) = (SELECT area FROM unityRide WHERE ridePatNum = @ridePatNum);
+DECLARE @dayInWeek NVARCHAR(20);
+
+--distance vars
+DECLARE @R_origin_lat FLOAT = (SELECT lat from Location where Name like @R_origin) -- x
+DECLARE @R_origin_lng FLOAT = (SELECT lng from Location where Name like @R_origin) -- y
+DECLARE @R_destination_lat FLOAT = (SELECT lat from Location where Name like @R_dest) --x
+DECLARE @R_destination_lng FLOAT = (SELECT lng from Location where Name like @R_dest) --y
+
+--declare Geo Points
+DECLARE @Start_point GEOGRAPHY = GEOGRAPHY::Point(@R_origin_lat, @R_origin_lng, 4326); 
+DECLARE @End_point GEOGRAPHY = GEOGRAPHY::Point(@R_destination_lat, @R_destination_lng, 4326); 
+
+SET @dayInWeek = 
+    CASE DATENAME(WEEKDAY, @R_time)
+        WHEN 'Sunday' THEN N'ראשון'
+        WHEN 'Monday' THEN N'שני'
+        WHEN 'Tuesday' THEN N'שלישי'
+        WHEN 'Wednesday' THEN N'רביעי'
+        WHEN 'Thursday' THEN N'חמישי'
+        WHEN 'Friday' THEN N'שישי'
+        WHEN 'Saturday' THEN N'שבת'
+    END;
+
+-- this is query to calc the points before the main query
+WITH VolunteerCityPoints AS (
+    SELECT 
+        v.Id,
+        GEOGRAPHY::Point(ISNULL(c.lat, 32.0853), ISNULL(c.lng, 34.7818), 4326) AS VolunteerCityPoint
+    FROM 
+        Volunteer v
+    JOIN 
+        City c ON v.CityCityName = c.CityName
+),
+VolunteerMetrics AS (
+    SELECT 
+        Id, DisplayName, CellPhone, JoinDate, CityCityName, AvailableSeats, NoOfDocumentedRides,
+        (DATEDIFF(day, JoinDate, GETDATE())) / 365.0 as SeniorityInYears,
+        (SELECT TOP 1 CAST(CallRecordedDate AS DATETIME) + CAST(CallRecordedTime AS DATETIME) 
+         FROM documentedCall 
+         WHERE driverId = v.Id 
+         ORDER BY CallRecordedDate DESC) as LastCallDateTime,
+        DATEDIFF(day, (SELECT TOP 1 pickupTime 
+                       FROM unityRide 
+                       WHERE MainDriver = v.Id AND pickupTime < GETDATE() AND status NOT LIKE N'נמחקה'  
+                       ORDER BY pickupTime DESC), GETDATE()) as LastRideInDays,
+        DATEDIFF(day, GETDATE(), (SELECT TOP 1 pickupTime 
+                                  FROM unityRide 
+                                  WHERE MainDriver = v.Id AND pickupTime >= GETDATE() AND status NOT LIKE N'נמחקה'  
+                                  ORDER BY pickupTime)) as NextRideInDays,
+        (SELECT COUNT(*) 
+         FROM UnityRide 
+         WHERE MainDriver = v.Id AND status NOT LIKE N'נמחקה' AND pickupTime BETWEEN DATEADD(MONTH, -2, GETDATE()) AND GETDATE()) as NumOfRidesLast2Month,
+        (SELECT COUNT(*) 
+         FROM unityRide 
+         WHERE origin LIKE @R_origin AND destination LIKE @R_dest AND mainDriver = v.Id AND status NOT LIKE N'נמחקה') as AmountOfRidesInThisPath,
+        (SELECT COUNT(*) 
+         FROM unityRide 
+         WHERE destination LIKE @R_origin AND origin LIKE @R_dest AND mainDriver = v.Id AND status NOT LIKE N'נמחקה') as AmountOfRidesInOppositePath,
+        (SELECT COUNT(*) 
+         FROM unityRide 
+         WHERE origin LIKE @R_origin AND mainDriver = v.Id AND Area LIKE @R_area AND Area IS NOT NULL AND @R_area IS NOT NULL AND status NOT LIKE N'נמחקה') as AmountOfRides_OriginToArea,
+        (CASE WHEN @R_isAfterNoon = 1 
+              THEN (SELECT COUNT(*) FROM unityRide WHERE v.Id = mainDriver AND DATEPART(MINUTE, pickupTime) = 14 AND status NOT LIKE N'נמחקה') 
+              ELSE (SELECT COUNT(*) FROM unityRide WHERE v.Id = mainDriver AND DATEPART(MINUTE, pickupTime) != 14 AND status NOT LIKE N'נמחקה') 
+         END) as AmountOfRidesAtThisTime,
+        (SELECT COUNT(*) 
+         FROM unityRide 
+         WHERE DATENAME(WEEKDAY, @R_time) = DATENAME(WEEKDAY, pickupTime) AND MainDriver = v.Id AND status NOT LIKE N'נמחקה') as AmountOfRidesAtThisDayWeek,
+        (SELECT (SELECT VolunteerCityPoint FROM VolunteerCityPoints WHERE Id = v.Id).STDistance(@Start_point) / 1000 + 
+                (@Start_point.STDistance(@End_point) / 1000) + 
+                (@End_point.STDistance((SELECT VolunteerCityPoint FROM VolunteerCityPoints WHERE Id = v.Id)) / 1000)) as SumOfKM
+    FROM 
+        volunteer v
+    WHERE 
+        NoOfDocumentedRides > 100
+        AND isDriving = 1 
+        AND isActive = 1
+        AND id NOT IN (SELECT volunteerId FROM Absence WHERE @R_time >= FromDate AND @R_time <= UntilDate)
+        --AND @R_area IN (SELECT PreferredArea FROM PreferredArea_Volunteer WHERE volunteerId = id)
+        --AND @dayInWeek IN (SELECT PreferedDayDayInWeek FROM PreferedDay_Volunteer WHERE volunteerId = id)
+        AND Id NOT IN (SELECT DriverId FROM documentedCall WHERE CAST(GETDATE() AS DATE) = CallRecordedDate)
+        AND Id NOT IN (SELECT DISTINCT mainDriver FROM unityRide WHERE CAST(pickupTime AS DATE) = CAST(@R_time AS DATE) AND mainDriver IS NOT NULL AND status NOT LIKE N'נמחקה')
+        AND DATEDIFF(MONTH, (SELECT MAX(pickupTime) FROM UnityRide WHERE maindriver = Id), CAST(GETDATE() AS DATE)) >= 8
+)
+SELECT * FROM VolunteerMetrics 
+END
+GO
+
+
+
+
+
+
 
 
 
