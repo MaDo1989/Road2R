@@ -130,7 +130,8 @@ $(document).ready(() => {
     ridePatNum = JSON.parse(getRidePatNum4_viewCandidate());
 
     getRidePat();
-    getCandidates();
+    //getCandidates();
+    getCandidatesV2();
 
 
     $('#rights').html(COPYWRITE());
@@ -226,7 +227,7 @@ const getRidePat = () => {
 }
 
 const renderRidePatDetails = (ridepat) => {
-    console.log('what is ridepat ? ',ridepat)
+    //console.log('what is ridepat ? ',ridepat)
     ridepatDate = convertDBDate2FrontEndDate(ridepat.PickupTime);
     let isToday = isItToday(ridepatDate);
     let isAfterNoon = ridepatDate.getMinutes() === 14;
@@ -268,7 +269,7 @@ const getCandidates = () => {
     let dayInWeek = ridepatDate.getDay();
 
     $('#wait').show();
-    console.log('what sent ? ', { ridePatNum, numOfCandidates, newFlag, dayInWeek })
+    //console.log('what sent ? ', { ridePatNum, numOfCandidates, newFlag, dayInWeek })
     ajaxCall(
         'GetCandidates',
         JSON.stringify({ ridePatNum, numOfCandidates, newFlag, dayInWeek }),
@@ -276,6 +277,26 @@ const getCandidates = () => {
         getCandidates_ECB
     );
 }
+
+
+const getCandidatesV2 = () => {
+    $("#wait").show();
+    console.log({ RideNum: ridePatNum, mode: 1 })
+    ajaxCall("GetCandidateUnityRideV2",
+        JSON.stringify({ RideNum: ridePatNum, mode: 1 }),
+        getCandidateV2_SCB,
+        getCandidates_ECB
+        
+    )
+}
+
+
+const getCandidateV2_SCB = (data) => {
+$('#wait').hide();
+    console.log('res v2:', data);
+
+}
+
 
 const getCandidates_SCB = (data) => {
 

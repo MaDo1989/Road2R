@@ -112,7 +112,7 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetNewbisCandidateUnityRideV2(int RideNum,int mode)
+    public string GetCandidateUnityRideV2(int RideNum,int mode)
     {
         try
         {
