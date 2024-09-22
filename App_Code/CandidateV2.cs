@@ -16,6 +16,8 @@ public class CandidateV2
     public float? SeniorityInYears { get; set; }
     public string LastCallDateTime { get; set; }
 
+    public string Vtype { get; set; }
+    public int? NoOfDocumentedCalls { get; set; }
     public int? LastRideInDays { get; set; }
     public int? NextRideInDays { get; set; }
     public int? NumOfRidesLast2Month { get; set; }
@@ -39,7 +41,7 @@ public class CandidateV2
         List<CandidateV2> list = DB.GetCandidateUnityRideV2(rideNum,mode);
         foreach (CandidateV2 c in list)
         {
-            c.calcScore(mode);
+            c.calcScore();
         }
         return list;
 
@@ -58,9 +60,9 @@ public class CandidateV2
         //------------DECLARE @C_SumOfKM FLOAT = 2.5
     }
 
-    private void calcScore(int mode)
+    private void calcScore()
     {
-        if (mode==0)
+        if (this.Vtype=="NEWBIS")
         {
             float C_NoOfDocumentedRides = 0.03f;
             float C_SeniorityInYears = 0.01f;
@@ -87,7 +89,7 @@ public class CandidateV2
             res += C_SumOfKM * ((1 / this.SumOfKM) ?? 0);
             this.Score = res;
         }
-        else if (mode == 1)
+        else if (this.Vtype=="REGULAR")
         {
             float C_NoOfDocumentedRides = 0.303f;
             float C_SeniorityInYears = 0.15f;
@@ -114,7 +116,7 @@ public class CandidateV2
             res += C_SumOfKM * ((1 / this.SumOfKM) ?? 0);
             this.Score = res;
         }
-        else if (mode ==2)
+        else if (this.Vtype=="SUPER")
         {
             float C_NoOfDocumentedRides = 0.303f;
             float C_SeniorityInYears = 0.15f;

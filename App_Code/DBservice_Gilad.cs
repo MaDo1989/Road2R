@@ -860,7 +860,7 @@ public class DBservice_Gilad
     }
 
 
-    public List <CandidateV2> GetCandidateUnityRideV2(int rideNum,int mode = 0) 
+    public List <CandidateV2> GetCandidateUnityRideV2(int rideNum,int mode = 3) 
     {
         SqlCommand cmd;
         try
@@ -891,6 +891,10 @@ public class DBservice_Gilad
         {
             sp = "sp_getSuperCandidateUnityRideV2";
         }
+        else if (mode==3)
+        {
+            sp = "sp_getALLCandidateUnityRideV2";
+        }
         cmd = CreateCommandWithStoredProcedureGeneral(sp, con, paramDic);
         List<CandidateV2> list = new List<CandidateV2>();
         try
@@ -906,9 +910,11 @@ public class DBservice_Gilad
                 CandidateV2 candidateV2 = new CandidateV2();
 
                 candidateV2.Id = SafeConvert<int>(dataReader["Id"]);
+                candidateV2.Vtype = SafeConvertString(dataReader["Vtype"]);
                 candidateV2.DisplayName = SafeConvertString(dataReader["DisplayName"]);
                 candidateV2.CellPhone = SafeConvertString(dataReader["CellPhone"]);
                 candidateV2.JoinDate = SafeConvertString(dataReader["JoinDate"]);
+                candidateV2.NoOfDocumentedCalls = SafeConvert<int>(dataReader["NoOfDocumentedCalls"]);
                 candidateV2.CityCityName = SafeConvertString(dataReader["CityCityName"]);
                 candidateV2.AvailableSeats = SafeConvert<int>(dataReader["AvailableSeats"]);
                 candidateV2.NoOfDocumentedRides = SafeConvert<int>(dataReader["NoOfDocumentedRides"]);

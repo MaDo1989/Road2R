@@ -84,17 +84,17 @@ function showCharacteristics() {
 
     let id = this.getAttribute('data-driverId');
     let c = allCandidatedFromDB[id];
+    //console.log(c);
     let boldArr = ["נסיעות בציר המדויק הזה", "הסעות ביום הזה", "הסעות בחלק הנדרש של היום"];
     let txt = {
-        "נסיעות בציר המדויק הזה": c.AmmountOfPathMatch[4],
-        "נסיעות בציר ההפוך": c.AmmountOfPathMatch[3],
-        "נסיעות מאותה נקודה לאותו איזור": c.AmmountOfPathMatch[2],
-        "נסיעות בין אותם איזורים": c.AmmountOfPathMatch[1],
-        "נסיעות נוספות": c.AmmountOfPathMatch[0],
-        "הסעות ביום הזה": c.AmmountOfMatchByDay,
-        "הסעות בימים אחרים": c.AmmountOfDisMatchByDay,
-        "הסעות בחלק הנדרש של היום": c.AmmountOfMatchDayPart,
-        "הסעות בחלקו השני של היום": c.AmmountOfDisMatchDayPart
+        "נסיעות בציר המדויק הזה": c.AmountOfRidesInThisPath,
+        "נסיעות בציר ההפוך": c.AmountOfRidesInOppositePath,
+        "נסיעות מאותה נקודה לאותו איזור": c.AmountOfRides_OriginToArea,
+        "נסיעות נוספות": c.NoOfDocumentedRides - c.AmountOfRides_OriginToArea,
+        "הסעות ביום הזה": c.AmountOfRidesAtThisDayWeek,
+        "הסעות בימים אחרים": c.NoOfDocumentedRides - c.AmountOfRidesAtThisDayWeek,
+        "הסעות בחלק הנדרש של היום": c.AmountOfRidesAtThisTime,
+        "הסעות בחלקו השני של היום": c.NoOfDocumentedRides - c.AmountOfRidesAtThisTime
     };
 
     let str = "<h3> נתוני נסיעות בחצי שנה האחרונה </h3>";
@@ -125,6 +125,7 @@ $(document).ready(() => {
     $(document).on("mouseout", ".c1", hideCharacteristics);
 
     candidatesTable = $('#datatable-candidates').DataTable({ data: [], destroy: true });
+    regularTable = $('#datatable-RegularDrivers').DataTable({ data: [], destroy: true });
     superDriversTable = $('#datatable-superDrivers').DataTable({ data: [], destroy: true });
 
     ridePatNum = JSON.parse(getRidePatNum4_viewCandidate());
@@ -214,6 +215,7 @@ const deceideWhichTable2Show = () => {
     $('#collapsed1_aTag').removeClass('collapsed');
 
     $('#collapsed2_aTag').addClass('collapsed');
+    $('#collapsed3_aTag').addClass('collapsed');
 
 }
 
@@ -281,9 +283,9 @@ const getCandidates = () => {
 
 const getCandidatesV2 = () => {
     $("#wait").show();
-    console.log({ RideNum: ridePatNum, mode: 1 })
+    //console.log({ RideNum: ridePatNum, mode: 3 })
     ajaxCall("GetCandidateUnityRideV2",
-        JSON.stringify({ RideNum: ridePatNum, mode: 1 }),
+        JSON.stringify({ RideNum: ridePatNum, mode: 3 }),
         getCandidateV2_SCB,
         getCandidates_ECB
         
@@ -291,9 +293,14 @@ const getCandidatesV2 = () => {
 }
 
 
+//new version of getCandidates
 const getCandidateV2_SCB = (data) => {
-$('#wait').hide();
-    console.log('res v2:', data);
+    $('#wait').hide();
+    
+    allCandidatedFromDB = JSON.parse(data.d);
+    //console.log('res v2:', allCandidatedFromDB);
+    //new version of fillTableWithData
+    fillTableWithDataV2();
 
 }
 
@@ -485,6 +492,249 @@ const fillTableWithData = () => {
             ]
         });
 
+
+    /*datatable - RegularDrivers*/
+    /*
+                     ============================
+                     || ↑DATATABLES PROPERTIES↑||
+                     ============================
+    */
+    //#endregion ↑DATATABLES PROPERTIES↑
+
+
+}
+
+
+
+
+
+
+
+const fillTableWithDataV2 = () => {
+
+
+    //{
+    //    "Id": 18143,
+    //        "DisplayName": "ירון שיפוני",
+    //            "CellPhone": "0526015432",
+    //                "JoinDate": "01/01/2019 00:00:00",
+    //                    "CityCityName": "בית קמה",
+    //                        "AvailableSeats": 4,
+    //                            "NoOfDocumentedRides": 0,
+    //                                "SeniorityInYears": 5.728767,
+    //                                    "LastCallDateTime": "19/08/2023 13:27:00",
+    //                                        "Vtype": "NEWBIS",
+    //                                            "LastRideInDays": null,
+    //                                                "NextRideInDays": null,
+    //                                                    "NumOfRidesLast2Month": 0,
+    //                                                        "AmountOfRidesInThisPath": 0,
+    //                                                            "AmountOfRidesInOppositePath": 0,
+    //                                                                "AmountOfRides_OriginToArea": 0,
+    //                                                                    "AmountOfRidesAtThisTime": 0,
+    //                                                                        "AmountOfRidesAtThisDayWeek": 0,
+    //                                                                            "SumOfKM": 223.152466,
+    //                                                                                "Score": 2.300149
+    //}
+
+    let thisCandidate = {};
+    regularCandidated_clientVersion = [];
+    superCandidated_clientVersion = [];
+    newCandidated_clientVersion = [];
+
+    let date2display;
+    let btnStr;
+    let showDocumentedCallsBtn;
+    let showDocumentedRidesBtn;
+    let linkableNameToRender;
+
+
+    for (let i in allCandidatedFromDB) {
+        btnStr = `<div class='elementsInSameLine'>`;
+        date2display = allCandidatedFromDB[i].LastCallDateTime
+
+        showDocumentedCallsBtn = '';
+        showDocumentedCallsBtn += `<div class='btnWrapper-left'><span id="badgeOf_${allCandidatedFromDB[i].Id}" class="badge badge-pill badge-default">${allCandidatedFromDB[i].NoOfDocumentedCalls}</span>`;
+        showDocumentedCallsBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedCallsBtn" title="שיחות מתועדות" data-backdrop="static" data-keyboard="false" data-toggle="modal" data-target="#DocumentedCallsModal"><i class="fa fa-phone" aria-hidden="true"></i></button></div>';
+
+        btnStr += showDocumentedCallsBtn;
+
+        showDocumentedRidesBtn = '';
+        showDocumentedRidesBtn += `<div><span class="badge badge-default">${allCandidatedFromDB[i].NoOfDocumentedRides}</span>`;
+        showDocumentedRidesBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedRidesBtn" title="תיעוד הסעות" data-toggle="modal" data-target="#documentedRidesModal"><i class="fa fa-car" aria-hidden="true"></i></button></div>';
+
+        btnStr += showDocumentedRidesBtn;
+        btnStr += '</div>';
+
+        linkableNameToRender = buildCandidateHTML(allCandidatedFromDB[i]);
+
+        thisCandidate = {
+            Id: allCandidatedFromDB[i].Id,
+            LinkableDisplayName: linkableNameToRender,
+            DisplayName: allCandidatedFromDB[i].DisplayName,
+            cellphone: addSeperator2MobileNum(allCandidatedFromDB[i].CellPhone, "-"),
+            city: allCandidatedFromDB[i].CityCityName,// + '<br />בדיקה',
+            daysSinceLastRide: allCandidatedFromDB[i].LastRideInDays == null ? "אין" : allCandidatedFromDB[i].LastRideInDays,
+            numOfRides_last2Months: allCandidatedFromDB[i].NumOfRidesLast2Month,
+            daysUntilNextRide: allCandidatedFromDB[i].NextRideInDays == null ? "אין" : allCandidatedFromDB[i].NextRideInDays,
+            latestDocumentedCallDate: date2display,
+            seniorityInYears: allCandidatedFromDB[i].SeniorityInYears.toFixed(1),
+            score: parseFloat(allCandidatedFromDB[i].Score.toFixed(2)),
+            buttons: btnStr
+        }
+
+        switch (allCandidatedFromDB[i].Vtype) {
+
+            case "NEWBIS":
+                newCandidated_clientVersion.push(thisCandidate);
+                break;
+            case "REGULAR":
+                regularCandidated_clientVersion.push(thisCandidate);
+                break;
+            case "SUPER":
+                superCandidated_clientVersion.push(thisCandidate);
+                break;
+            default:
+                alert("illegal DriverType");
+                break;
+        }
+
+        //allCandidatedFromDB[i].IsSuperDriver ?
+        //    superCandidated_clientVersion.push(thisCandidate) :
+        //    regularCandidated_clientVersion.push(thisCandidate);
+
+        //#region ↓DATATABLES PROPERTIES↓|
+
+        /* 
+                     ============================
+                     || ↓DATATABLES PROPERTIES↓||
+                     ============================
+        */
+    }
+
+    candidatesTable = $('#datatable-candidates').DataTable({
+        data: newCandidated_clientVersion,
+        rowId: 'Id',
+        pageLength: 10,
+        stateSave: true,
+        destroy: true,
+        "lengthChange": false, // for somereason this property must be string
+        stateDuration: 60 * 60,
+        autoWidth: false,
+        columns: [
+            //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
+            {
+                data: "LinkableDisplayName",
+                render: function (data, type, row, meta) {
+                    let did = "data-driverId='" + row.Id + "'";
+                    return '<p class="c1" ' + did + '>' + data + ' </p>';
+                }
+            },                                                      //0
+            { data: "cellphone" },                                  //1
+            { data: "city" },                                       //2
+            { data: "daysSinceLastRide" },                          //3
+            { data: "numOfRides_last2Months" },                     //4
+            { data: "daysUntilNextRide" },                          //5
+            { data: "latestDocumentedCallDate" },                   //6
+            { data: "seniorityInYears" },                           //7
+            { data: "score" },                                      //8
+            { data: "buttons" }                                     //9
+        ],
+        columnDefs: [
+            { width: '20%', "targets": [0] },
+            { width: '10%', "targets": [1] },
+            { width: '15%', "targets": [2] },
+            { width: '10%', "targets": [3] },
+            { width: '5%', "targets": [4, 5, 7] },
+            { width: '4%', "targets": [8] },
+            { width: '10%', "targets": [6, 9] },
+            { targets: [9], orderable: false }
+        ]
+    });
+
+    regularTable = $('#datatable-RegularDrivers').DataTable({
+        data: regularCandidated_clientVersion,
+        rowId: 'Id',
+        pageLength: 10,
+        stateSave: true,
+        destroy: true,
+        "lengthChange": false, // for somereason this property must be string
+        stateDuration: 60 * 60,
+        autoWidth: false,
+        columns: [
+            //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
+            {
+                data: "LinkableDisplayName",
+                render: function (data, type, row, meta) {
+                    let did = "data-driverId='" + row.Id + "'";
+                    return '<p class="c1" ' + did + '>' + data + ' </p>';
+                }
+            },                                                      //0
+            { data: "cellphone" },                                  //1
+            { data: "city" },                                       //2
+            { data: "daysSinceLastRide" },                          //3
+            { data: "numOfRides_last2Months" },                     //4
+            { data: "daysUntilNextRide" },                          //5
+            { data: "latestDocumentedCallDate" },                   //6
+            { data: "seniorityInYears" },                           //7
+            { data: "score" },                                      //8
+            { data: "buttons" }                                     //9
+        ],
+        columnDefs: [
+            { width: '20%', "targets": [0] },
+            { width: '10%', "targets": [1] },
+            { width: '15%', "targets": [2] },
+            { width: '10%', "targets": [3] },
+            { width: '5%', "targets": [4, 5, 7] },
+            { width: '4%', "targets": [8] },
+            { width: '10%', "targets": [6, 9] },
+            { targets: [9], orderable: false }
+        ]
+    });
+
+    superDriversTable = $('#datatable-superDrivers').DataTable(
+        {
+            data: superCandidated_clientVersion,
+            rowId: 'Id',
+            pageLength: 10,
+            stateSave: true,
+            destroy: true,
+            "lengthChange": false, // for somereason this property must be string
+            stateDuration: 60 * 60,
+            autoWidth: false,
+            columns: [
+                //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
+                {
+                    data: "LinkableDisplayName",
+                    render: function (data, type, row, meta) {
+                        let did = "data-driverId='" + row.Id + "'";
+                        return '<p class="c1" ' + did + '>' + data + ' </p>';
+                    }
+                },                                                      //0
+                { data: "cellphone" },                                  //1
+                { data: "city" },                                       //2
+                { data: "daysSinceLastRide" },                          //3
+                { data: "numOfRides_last2Months" },                     //4
+                { data: "daysUntilNextRide" },                          //5
+                { data: "latestDocumentedCallDate" },                   //6
+                { data: "seniorityInYears" },                           //7
+                { data: "score" },                                      //8
+                { data: "buttons" }                                     //9
+
+            ],
+            columnDefs: [
+                { width: '20%', "targets": [0] },
+                { width: '10%', "targets": [1] },
+                { width: '15%', "targets": [2] },
+                { width: '10%', "targets": [3] },
+                { width: '5%', "targets": [4, 5, 7] },
+                { width: '4%', "targets": [8] },
+                { width: '10%', "targets": [6, 9] },
+                { targets: [9], orderable: false }
+            ]
+        });
+
+
+    /*datatable - RegularDrivers*/
     /*
                      ============================
                      || ↑DATATABLES PROPERTIES↑||
