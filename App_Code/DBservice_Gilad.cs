@@ -860,6 +860,106 @@ public class DBservice_Gilad
     }
 
 
+    public List <CandidateV2> GetCandidateUnityRideV2(int rideNum,int mode = 3) 
+    {
+        SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@ridePatNum", rideNum);
+        string sp = "";
+        //newbis
+        if (mode == 0)
+        {
+             sp = "sp_GetNewbisCandidateForUnityRideNEW";
+        }
+        //regular
+        else if (mode == 1)
+        {
+            sp = "sp_getRegularCandidateUnityRideV2";
+        }
+        else if(mode == 2)
+        {
+            sp = "sp_getSuperCandidateUnityRideV2";
+        }
+        else if (mode==3)
+        {
+            sp = "sp_getALLCandidateUnityRideV2";
+        }
+        cmd = CreateCommandWithStoredProcedureGeneral(sp, con, paramDic);
+        List<CandidateV2> list = new List<CandidateV2>();
+        try
+        {
+
+
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+
+
+            while (dataReader.Read())
+            {
+                CandidateV2 candidateV2 = new CandidateV2();
+
+                candidateV2.Id = SafeConvert<int>(dataReader["Id"]);
+                candidateV2.Vtype = SafeConvertString(dataReader["Vtype"]);
+                candidateV2.DisplayName = SafeConvertString(dataReader["DisplayName"]);
+                candidateV2.CellPhone = SafeConvertString(dataReader["CellPhone"]);
+                candidateV2.JoinDate = SafeConvertString(dataReader["JoinDate"]);
+                candidateV2.NoOfDocumentedCalls = SafeConvert<int>(dataReader["NoOfDocumentedCalls"]);
+                candidateV2.CityCityName = SafeConvertString(dataReader["CityCityName"]);
+                candidateV2.AvailableSeats = SafeConvert<int>(dataReader["AvailableSeats"]);
+                candidateV2.NoOfDocumentedRides = SafeConvert<int>(dataReader["NoOfDocumentedRides"]);
+                candidateV2.SeniorityInYears = SafeConvertToFloat(dataReader["SeniorityInYears"]);
+                candidateV2.LastCallDateTime = SafeConvertString(dataReader["LastCallDateTime"]);
+                candidateV2.LastRideInDays = SafeConvert<int>(dataReader["LastRideInDays"]);
+                candidateV2.NextRideInDays = SafeConvert<int>(dataReader["NextRideInDays"]);
+                candidateV2.NumOfRidesLast2Month = SafeConvert<int>(dataReader["NumOfRidesLast2Month"]);
+                candidateV2.AmountOfRidesInThisPath = SafeConvert<int>(dataReader["AmountOfRidesInThisPath"]);
+                candidateV2.AmountOfRidesInOppositePath = SafeConvert<int>(dataReader["AmountOfRidesInOppositePath"]);
+                candidateV2.AmountOfRides_OriginToArea = SafeConvert<int>(dataReader["AmountOfRides_OriginToArea"]);
+                candidateV2.AmountOfRidesAtThisTime = SafeConvert<int>(dataReader["AmountOfRidesAtThisTime"]);
+                candidateV2.AmountOfRidesAtThisDayWeek = SafeConvert<int>(dataReader["AmountOfRidesAtThisDayWeek"]);
+                candidateV2.SumOfKM = SafeConvertToFloat(dataReader["SumOfKM"]);
+                candidateV2.Score = 0;
+
+
+
+
+                
+                list.Add(candidateV2);
+            }
+
+            return list;
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        finally
+        {
+            if (con != null)
+            {
+                // close the db connection
+                con.Close();
+            }
+        }
+
+    }
+
+
+
+
     public Dictionary<string, object> GetEnglishNamesOfPatientOriginDest(int id)
     {
         SqlCommand cmd;
@@ -2401,4 +2501,54 @@ public class DBservice_Gilad
 
 		return cmd;
 	}
+
+    private T? SafeConvert<T>(object value) where T : struct
+    {
+        return value == DBNull.Value ? null : (T?)Convert.ChangeType(value, typeof(T));
+    }
+
+    private string SafeConvertString(object value)
+    {
+        return value == DBNull.Value ? null : value.ToString();
+    }
+
+    private float? SafeConvertToFloat(object value)
+    {
+        // Check if the value is DBNull or null
+        if (value == DBNull.Value || value == null)
+        {
+            return null;
+        }
+
+        // Attempt to convert to float
+        try
+        {
+            // If the value is already a float, return it directly
+            if (value is float)
+            {
+                return (float)value;
+            }
+
+            // If the value is a string, try to parse it
+            string stringValue = value as string;
+            if (stringValue != null)
+            {
+                float result;
+                if (float.TryParse(stringValue, out result))
+                {
+                    return result;
+                }
+                return null;  // If parsing failed, return null
+            }
+
+            // For any other type, try to use Convert.ToSingle
+            return Convert.ToSingle(value);
+        }
+        catch
+        {
+            // If conversion failed for any reason, return null
+            return null;
+        }
+    }
+
 }

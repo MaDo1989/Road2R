@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.IdentityModel;
 using System.Linq;
 using System.Web;
 
@@ -37,5 +38,9 @@ public class Candidate : Volunteer
     public int? DaysUntilNextRide { get; set; }
     public DateTime? LatestDocumentedCallDate { get; set; }
     public double SeniorityInYears { get; set; }
+
+
+
+
 
 }

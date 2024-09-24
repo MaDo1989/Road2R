@@ -154,3 +154,15 @@ textarea:disabled:hover {
     display: flex;
     justify-content: space-between;
 }
+
+
+
+#col1 {
+    background-color: #3bafda;
+}
+#col2 {
+    background-color: #3096bb;
+}
+#col3 {
+    background-color: #237d9e;
+}
