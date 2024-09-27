@@ -928,6 +928,7 @@ public class DBservice_Gilad
                 candidateV2.AmountOfRides_OriginToArea = SafeConvert<int>(dataReader["AmountOfRides_OriginToArea"]);
                 candidateV2.AmountOfRidesAtThisTime = SafeConvert<int>(dataReader["AmountOfRidesAtThisTime"]);
                 candidateV2.AmountOfRidesAtThisDayWeek = SafeConvert<int>(dataReader["AmountOfRidesAtThisDayWeek"]);
+                candidateV2.AmountOfRidesFromRegionToDest = SafeConvert<int>(dataReader["AmountOfRidesFromRegionToDest"]);
                 candidateV2.SumOfKM = SafeConvertToFloat(dataReader["SumOfKM"]);
                 candidateV2.Score = 0;
 

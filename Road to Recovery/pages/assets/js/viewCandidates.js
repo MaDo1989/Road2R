@@ -83,13 +83,16 @@ function hideCharacteristics() {
 function showCharacteristics() {
 
     let id = this.getAttribute('data-driverId');
-    let c = allCandidatedFromDB[id];
+    //console.log(id)
+    let c = allCandidatedFromDB.find(ca => ca.Id == id);
+    //let c = allCandidatedFromDB[id];
     //console.log(c);
     let boldArr = ["נסיעות בציר המדויק הזה", "הסעות ביום הזה", "הסעות בחלק הנדרש של היום"];
     let txt = {
         "נסיעות בציר המדויק הזה": c.AmountOfRidesInThisPath,
         "נסיעות בציר ההפוך": c.AmountOfRidesInOppositePath,
         "נסיעות מאותה נקודה לאותו איזור": c.AmountOfRides_OriginToArea,
+        "נסיעות מאותו איזור לאותה נקודה": c.AmountOfRidesFromRegionToDest,
         "נסיעות נוספות": c.NoOfDocumentedRides - c.AmountOfRides_OriginToArea,
         "הסעות ביום הזה": c.AmountOfRidesAtThisDayWeek,
         "הסעות בימים אחרים": c.NoOfDocumentedRides - c.AmountOfRidesAtThisDayWeek,
@@ -118,6 +121,10 @@ function showCharacteristics() {
 $(document).ready(() => {
     $("#DocumentedCallsModal").attr("w3-include-html", "DocumentedCallsModal.html");
     $("#documentedRidesModal").attr("w3-include-html", "documentedRidesModal.html");
+    $('#ShowWeightsParamsPageBTN').hide();
+    if (localStorage.user =='0544890081') {
+        $('#ShowWeightsParamsPageBTN').show();
+    }
 
     $("#characteristics").css("visibility", "hidden");
 
@@ -506,7 +513,9 @@ const fillTableWithData = () => {
 
 
 
-
+const ShowWeightsParamsPage = () => {
+    location.href = "candidateConfig.html";
+}
 
 
 
