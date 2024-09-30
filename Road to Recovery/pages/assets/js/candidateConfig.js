@@ -38,7 +38,7 @@ $(document).ready(() => {
         type: 'POST',
         success: function (response) {
             $('#wait').hide();
-            console.log(response);
+            //console.log(response);
             let res = response.getElementsByTagName('string')[0].innerHTML
             const weights = JSON.parse(res);
             console.log(weights);
@@ -95,11 +95,11 @@ function saveConfiguration() {
     console.log('קונפיגורציה נשמרה:', config);
     let arrays = convertToArrays(config)
     $.ajax({
-        url: 'WebService.asmx/UpdateCandidateWeights',  // החלף זאת בנתיב המדויק לשירות שלך
+        url: 'WebService.asmx/UpdateCandidateWeights', 
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify({
-            newbis_W: arrays.newbis,  // דוגמה לערכים, החלף באלו שאתה רוצה לשלוח
+            newbis_W: arrays.newbis,  
             regular_W: arrays.regulars,
             super_W: arrays.super
         }),

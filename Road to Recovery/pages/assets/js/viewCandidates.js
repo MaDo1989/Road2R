@@ -122,7 +122,7 @@ $(document).ready(() => {
     $("#DocumentedCallsModal").attr("w3-include-html", "DocumentedCallsModal.html");
     $("#documentedRidesModal").attr("w3-include-html", "documentedRidesModal.html");
     $('#ShowWeightsParamsPageBTN').hide();
-    if (localStorage.user =='0544890081') {
+    if (localStorage.user == '0544890081' || localStorage.user == '0537738728') {
         $('#ShowWeightsParamsPageBTN').show();
     }
 
