@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>קונפיגורציית פרמטרי נסיעה</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -34,11 +37,11 @@
             background-color: #fff;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        #backBTN{
-            position:absolute;
-            right:5%;
-            top:5%;
 
+        #backBTN {
+            position: absolute;
+            right: 5%;
+            top: 5%;
         }
 
         th, td {
@@ -57,6 +60,8 @@
             padding: 5px;
             border: 1px solid #ddd;
             border-radius: 4px;
+            text-align: center;
+            font-size: 16px;
         }
 
         button {
@@ -70,9 +75,17 @@
             margin-top: 20px;
         }
 
-            button:hover {
-                background-color: #2980b9;
-            }
+        .gr-btn {
+            background-color: #428d52;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .gr-btn:hover {
+            background-color: #65a773;
+        }
     </style>
 </head>
 <body>
@@ -81,6 +94,7 @@
     <div class="explanation">
         <h2>הסבר</h2>
         <p>הערכים בטבלה מייצגים משקולות המכפילות את הערך של כל מתנדב. משקולות גבוהות יותר נותנות חשיבות רבה יותר לפרמטר המתאים בחישוב הכולל.</p>
+        <p>*שימו לב - מומלץ לא לשנות את הפרמטר של סך הקילומטרים הוא מחושב לפי הממוצע נסיעות</p>
         <button id="backBTN" onclick="BacktoCandidate()">חזרה לדף הקודם</button>
     </div>
 
@@ -99,8 +113,12 @@
         </tbody>
     </table>
 
-    <button onclick="saveConfiguration()">שמור קונפיגורציה</button>
+    <button onclick="saveConfiguration()">שמור קונפיגורציה 💾</button>
+    <button class="gr-btn" onclick="defultValues()">חזור לערכי ברירת המחדל 🔄️</button>
 
+    <div id="wait" style="display:none;width:69px;height:89px;position:absolute;top:50%;left:50%;padding:2px;">
+        <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
+    </div>
     <script src="assets/js/candidateConfig.js"></script>
 </body>
 </html>
