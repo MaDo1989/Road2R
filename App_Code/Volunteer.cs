@@ -1569,7 +1569,11 @@ public class Volunteer
 
 
 
-
+    public static List<string> getManagersVol()
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+        return db.GetManagersVolunteersCellPhones();
+    }
 
 
 

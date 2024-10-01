@@ -959,7 +959,57 @@ public class DBservice_Gilad
     }
 
 
+    public List<string> GetManagersVolunteersCellPhones()
+    {
+        SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
 
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+
+        cmd = CreateCommandWithStoredProcedureGeneral("sp_GetManagersTypeVolunteers", con, null);
+        List<string> cellphones = new List<string>();
+
+        try
+        {
+
+
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            while (dataReader.Read())
+            {
+
+                cellphones.Add(dataReader["CellPhone"].ToString());
+
+
+            }
+            return cellphones;
+
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        finally
+        {
+            if (con != null)
+            {
+                // close the db connection
+                con.Close();
+            }
+        }
+
+    }
 
     public Dictionary<string, object> GetEnglishNamesOfPatientOriginDest(int id)
     {

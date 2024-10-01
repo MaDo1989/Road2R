@@ -122,9 +122,33 @@ $(document).ready(() => {
     $("#DocumentedCallsModal").attr("w3-include-html", "DocumentedCallsModal.html");
     $("#documentedRidesModal").attr("w3-include-html", "documentedRidesModal.html");
     $('#ShowWeightsParamsPageBTN').hide();
-    if (localStorage.user == '0544890081' || localStorage.user == '0537738728') {
-        $('#ShowWeightsParamsPageBTN').show();
-    }
+
+    $.ajax({
+        url: 'WebService.asmx/getManagersVol',  // החלף זאת בנתיב המדויק לשירות שלך
+        type: 'POST',
+        contentType: "application/json; charset=utf-8",
+        success: function (response) {
+            //console.log(response.d);
+            const managersListPhones = JSON.parse(response.d);
+            for (let i = 0; i < managersListPhones.length; i++) {
+                if (localStorage.user == managersListPhones[i]) {
+                    console.log('confirmed -> is manager')
+                    $('#ShowWeightsParamsPageBTN').show();
+                }
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("error in getManagersVol api:", error);
+
+           
+        }
+    });
+
+
+
+    //if (localStorage.user == '0544890081' || localStorage.user == '0537738728') {
+    //    $('#ShowWeightsParamsPageBTN').show();
+    //}
 
     $("#characteristics").css("visibility", "hidden");
 

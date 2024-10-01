@@ -2108,6 +2108,22 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string getManagersVol()
+    {
+        try
+        {
+            return j.Serialize(Volunteer.getManagersVol());
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in getManagersVol", ex);
+            throw new Exception("שגיאה בשליפת מתנדבים מנהלים");
+        }
+
+    }
+
 
     [WebMethod(EnableSession = true)]
     // Benny changed the parameter from displayname to cellphone
