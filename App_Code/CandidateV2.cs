@@ -71,7 +71,7 @@ public class CandidateV2
 
     private static List<float> newbisWeights = new List<float>
     {
-        3f,    // C_NoOfDocumentedRides
+        0f,    // C_NoOfDocumentedRides
         0.1f,  // C_SeniorityInYears
         0.02f, // C_LastRideInDays
         0.02f, // C_NextRideInDays
@@ -82,7 +82,7 @@ public class CandidateV2
         4.5f,  // C_AmountOfRidesAtThisTime
         5f,    // C_AmountOfRidesAtThisDayWeek
         3.5f,  // C_AmountOfRidesFromRegionToDest
-        100f   // C_SumOfKM
+        4f   // C_SumOfKM
     };
     private static List<float> regularWeights = new List<float>
     {
@@ -97,7 +97,7 @@ public class CandidateV2
         5f,    // C_AmountOfRidesAtThisTime
         2.5f,  // C_AmountOfRidesAtThisDayWeek
         3f,    // C_AmountOfRidesFromRegionToDest
-        100f   // C_SumOfKM
+        1f   // C_SumOfKM
     };
 
     private static List<float> superWeights = new List<float>
@@ -113,7 +113,7 @@ public class CandidateV2
         5f,    // C_AmountOfRidesAtThisTime
         2.5f,  // C_AmountOfRidesAtThisDayWeek
         3f,    // C_AmountOfRidesFromRegionToDest
-        100f   // C_SumOfKM
+        1f   // C_SumOfKM
     };
 
 
@@ -171,7 +171,7 @@ public class CandidateV2
             res += C_AmountOfRidesAtThisTime * (this.AmountOfRidesAtThisTime != null ? (float)Math.Log(this.AmountOfRidesAtThisTime.Value + 1) : 0);
             res += C_AmountOfRidesAtThisDayWeek * (this.AmountOfRidesAtThisDayWeek != null ? (float)Math.Log(this.AmountOfRidesAtThisDayWeek.Value + 1) : 0);
             res += C_AmountOfRidesFromRegionToDest * (this.AmountOfRidesFromRegionToDest != null ? (float)Math.Log(this.AmountOfRidesFromRegionToDest.Value + 1) : 0);
-            res += (this.SumOfKM != null && this.SumOfKM.Value > 0 && C_SumOfKM != 0) ? (float)((Math.Log(this.SumOfKM.Value) / C_SumOfKM) * -1): 0;
+            res += (this.SumOfKM != null && this.SumOfKM.Value > 0 && C_SumOfKM != 0) ? (float)((Math.Log(this.SumOfKM.Value) / 100) * (-1* C_SumOfKM)): 0;
             this.Score = res;
         }
         else if (this.Vtype=="REGULAR")
@@ -200,7 +200,7 @@ public class CandidateV2
             res += C_AmountOfRidesAtThisTime * (this.AmountOfRidesAtThisTime != null ? (float)Math.Log(this.AmountOfRidesAtThisTime.Value + 1) : 0);
             res += C_AmountOfRidesAtThisDayWeek * (this.AmountOfRidesAtThisDayWeek != null ? (float)Math.Log(this.AmountOfRidesAtThisDayWeek.Value + 1) : 0);
             res += C_AmountOfRidesFromRegionToDest * (this.AmountOfRidesFromRegionToDest != null ? (float)Math.Log(this.AmountOfRidesFromRegionToDest.Value + 1) : 0);
-            res += (this.SumOfKM != null && this.SumOfKM.Value > 0 && C_SumOfKM != 0) ? (float)((Math.Log(this.SumOfKM.Value) / C_SumOfKM) * -1) : 0;
+            res += (this.SumOfKM != null && this.SumOfKM.Value > 0 && C_SumOfKM != 0) ? (float)((Math.Log(this.SumOfKM.Value) / 100) * (-1 * C_SumOfKM)) : 0;
             this.Score = res;
         }
         else if (this.Vtype=="SUPER")
@@ -229,7 +229,7 @@ public class CandidateV2
             res += C_AmountOfRidesAtThisTime * (this.AmountOfRidesAtThisTime != null ? (float)Math.Log(this.AmountOfRidesAtThisTime.Value + 1) : 0);
             res += C_AmountOfRidesAtThisDayWeek * (this.AmountOfRidesAtThisDayWeek != null ? (float)Math.Log(this.AmountOfRidesAtThisDayWeek.Value + 1) : 0);
             res += C_AmountOfRidesFromRegionToDest * (this.AmountOfRidesFromRegionToDest != null ? (float)Math.Log(this.AmountOfRidesFromRegionToDest.Value + 1) : 0);
-            res += (this.SumOfKM != null && this.SumOfKM.Value > 0 && C_SumOfKM != 0) ? (float)((Math.Log(this.SumOfKM.Value) / C_SumOfKM) * -1) : 0;
+            res += (this.SumOfKM != null && this.SumOfKM.Value > 0 && C_SumOfKM != 0) ? (float)((Math.Log(this.SumOfKM.Value) / 100) * (-1 * C_SumOfKM)) : 0;
             this.Score = res;
         }
 

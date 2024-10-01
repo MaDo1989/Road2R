@@ -15,7 +15,7 @@
 
 
 const DefulatParams = [
-    { name: 'C_NoOfDocumentedRides', description: 'מספר הנסיעות המתועדות', newbis: 3.0, regulars: 0.5, super: 0.5 },
+    { name: 'C_NoOfDocumentedRides', description: 'מספר הנסיעות המתועדות', newbis: 0, regulars: 0.5, super: 0.5 },
     { name: 'C_SeniorityInYears', description: 'ותק בשנים', newbis: 0.1, regulars: 0.25, super: 0.25 },
     { name: 'C_LastRideInDays', description: 'מספר ימים מאז הנסיעה האחרונה', newbis: 0.02, regulars: 0.1, super: 0.1 },
     { name: 'C_NextRideInDays', description: 'מספר ימים עד הנסיעה הבאה', newbis: 0.02, regulars: 0.1, super: 0.1 },
@@ -26,7 +26,7 @@ const DefulatParams = [
     { name: 'C_AmountOfRidesAtThisTime', description: 'כמות הנסיעות בשעה זו', newbis: 4.5, regulars: 5.0, super: 5.0 },
     { name: 'C_AmountOfRidesAtThisDayWeek', description: 'כמות הנסיעות ביום זה בשבוע', newbis: 5.0, regulars: 2.5, super: 2.5 },
     { name: 'C_AmountOfRidesFromRegionToDest', description: 'כמות הנסיעות מהאזור ליעד', newbis: 3.5, regulars: 3.0, super: 3.0 },
-    { name: 'C_SumOfKM', description: 'סך הקילומטרים', newbis: 100.0, regulars: 100.0, super: 100.0 }
+    { name: 'C_SumOfKM', description: 'סך הקילומטרים', newbis: 4.0, regulars: 1.0, super: 1.0 }
 ];
 
 

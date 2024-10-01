@@ -1589,6 +1589,7 @@ public class Volunteer
         v.Id = int.Parse(dr["Id"].ToString());
         v.Remarks = dr["Remarks"].ToString();
         v.DisplayName = dr["DisplayName"].ToString();
+        v.AvailableSeats = int.Parse(dr["AvailableSeats"].ToString());
         v.FirstNameA = dr["FirstNameA"].ToString();
         v.FirstNameH = dr["FirstNameH"].ToString();
         v.LastNameH = dr["LastNameH"].ToString();
@@ -1884,7 +1885,7 @@ public class Volunteer
             DbService db = new DbService();
             SqlCommand cmd = new SqlCommand();
             cmd.CommandType = CommandType.Text;
-            SqlParameter[] cmdParams = new SqlParameter[25];
+            SqlParameter[] cmdParams = new SqlParameter[26];
             cmdParams[0] = cmd.Parameters.AddWithValue("@address", v.Address);
             cmdParams[1] = cmd.Parameters.AddWithValue("@cell", v.CellPhone);
             cmdParams[2] = cmd.Parameters.AddWithValue("@cell2", v.CellPhone2);
@@ -1925,6 +1926,7 @@ public class Volunteer
             cmdParams[23] = cmd.Parameters.AddWithValue("@role", v.Role);
 
             cmdParams[24] = cmd.Parameters.AddWithValue("@isActive", v.IsActive);
+            cmdParams[25] = cmd.Parameters.AddWithValue("@availableSeats", v.AvailableSeats);
 
             string newName = v.FirstNameH + " " + v.LastNameH;
             newName = newName.Replace("'", "''");
@@ -1976,7 +1978,7 @@ public class Volunteer
                 string password = ConfigurationManager.AppSettings["password"];
                 if (v.TypeVol == "רכז" || v.TypeVol == "מנהל" || v.IsAssistant)
                 {
-                    query = "update Volunteer set Address=@address, CellPhone=@cell,";
+                    query = "update Volunteer set Address=@address, CellPhone=@cell, AvailableSeats=@availableSeats,";
                     query += "CellPhone2=@cell2, CityCityName=@city, Email=@email, FirstNameA=@firstNameA, FirstNameH=@firstNameH, VolunteerIdentity=@volunteerIdentity, ";
                     query += "Gender=@gender, JoinDate=@jDate, KnowsArabic=@knowsArabic, LastNameA=@lastNameA, ";
                     query += "EnglishFN=@englishFN, EnglishLN=@englishLN, BirthDate=@birthDate, IsDriving=@isDriving, ";
@@ -1986,7 +1988,7 @@ public class Volunteer
                 }
                 else
                 {
-                    query = "update Volunteer set Address=@address, CellPhone=@cell,";
+                    query = "update Volunteer set Address=@address, CellPhone=@cell, AvailableSeats=@availableSeats, ";
                     query += "CellPhone2=@cell2, CityCityName=@city, Email=@email, FirstNameA=@firstNameA, FirstNameH=@firstNameH, VolunteerIdentity=@volunteerIdentity, ";
                     query += "Gender=@gender, JoinDate=@jDate, KnowsArabic=@knowsArabic, LastNameA=@lastNameA, ";
                     query += "EnglishFN=@englishFN, EnglishLN=@englishLN, BirthDate=@birthDate, ";
@@ -2028,14 +2030,14 @@ public class Volunteer
                     if (v.TypeVol == "רכז" || v.TypeVol == "מנהל" || v.IsAssistant)
                     {
                         string password = ConfigurationManager.AppSettings["password"];
-                        query = "insert into Volunteer (Address, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks,EnglishName,isAssistant,UserName,Password,lastModified,EnglishFN, EnglishLN, BirthDate, IsDriving)";
-                        query += " values (@address,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks,@englishName,@isAssistant,@UserName,'" + password + "',DATEADD(hour, 2, SYSDATETIME()),@englishFN, @englishLN, @birthDate, @isDriving);SELECT SCOPE_IDENTITY();";
+                        query = "insert into Volunteer (Address, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks,EnglishName,isAssistant,UserName,Password,lastModified,EnglishFN, EnglishLN, BirthDate, IsDriving,AvailableSeats)";
+                        query += " values (@address,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks,@englishName,@isAssistant,@UserName,'" + password + "',DATEADD(hour, 2, SYSDATETIME()),@englishFN, @englishLN, @birthDate, @isDriving,@availableSeats);SELECT SCOPE_IDENTITY();";
 
                     }
                     else
                     {
-                        query = "insert into Volunteer (Address, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks,EnglishName,isAssistant,lastModified,EnglishFN, EnglishLN, BirthDate, IsDriving)";
-                        query += " values (@address,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks,@englishName,@isAssistant,DATEADD(hour, 2, SYSDATETIME()),@englishFN, @englishLN, @birthDate, @isDriving);SELECT SCOPE_IDENTITY();";
+                        query = "insert into Volunteer (Address, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks,EnglishName,isAssistant,lastModified,EnglishFN, EnglishLN, BirthDate, IsDriving,AvailableSeats)";
+                        query += " values (@address,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks,@englishName,@isAssistant,DATEADD(hour, 2, SYSDATETIME()),@englishFN, @englishLN, @birthDate, @isDriving,@availableSeats);SELECT SCOPE_IDENTITY();";
                     }
                     db = new DbService();
                     Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());

@@ -284,6 +284,7 @@
                     $("#volunteerEnglishName").val(volunteer.EnglishName);
                     $("#firstA").val(volunteer.FirstNameA);
                     $("#lastA").val(volunteer.LastNameA);
+                    $("#availableSeatsIN").val(volunteer.AvailableSeats == null ? 4 : volunteer.AvailableSeats);
 
                     if (volunteer.JoinDate) {
                         var temp = volunteer.JoinDate.substring(volunteer.JoinDate.indexOf("(") + 1, volunteer.JoinDate.indexOf(")"))
@@ -700,6 +701,14 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">מספר מקומות ברכב</label>
+                                                    <div class="col-sm-6" id="availableSeats">
+                                                        <input value="4" type="number" id="availableSeatsIN" name="availableSeats" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <div class="col-sm-6" id="RoleHiddenDiv" hidden>
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">תיאור תפקיד<!--&nbsp;<span class="required">*</span>--></label>
@@ -715,17 +724,17 @@
                                                 </div>
                                             </div>
                                             <!--<div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label class="col-sm-2 control-label">מעוניין לקבל את העדכון השבועי&nbsp;</label>
-                                                    <div class="col-sm-6" id="selectNewsLetter">
-                                                        <select id="newsLetter" name="newsLetter" class="form-control req">
-                                                            <option>בחר</option>
-                                                            <option>כן</option>
-                                                            <option>לא</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>-->
+        <div class="form-group">
+            <label class="col-sm-2 control-label">מעוניין לקבל את העדכון השבועי&nbsp;</label>
+            <div class="col-sm-6" id="selectNewsLetter">
+                <select id="newsLetter" name="newsLetter" class="form-control req">
+                    <option>בחר</option>
+                    <option>כן</option>
+                    <option>לא</option>
+                </select>
+            </div>
+        </div>
+    </div>-->
                                         </div>
                                         <!--<div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
@@ -944,7 +953,8 @@
                     else active = false;
                     var address = $("#address").val();
                     var func = arr_customer.func;
-                    var remark = $("#remarks").val();;
+                    var remark = $("#remarks").val();
+                    let availableSeats = $("#availableSeatsIN").val()==''?4:$("#availableSeatsIN").val();
                     //Gilad change here displayName.split('<br>')[0]
                     var displayName = arr_volunteer.displayName.split('<br>')[0];
                     //NEW:
@@ -983,7 +993,7 @@
                         firstNameH: firstNameH, firstNameA: nameA, lastNameH: lastNameH, lastNameA: lastNameA, cellPhone: cellPhone, cellphone2: cellphone2, /*homePhone: homePhone,*/
                         city: city, address: address, email: email, joinDate: joinDate, gender: gender, KnowsArabic: knowsArabic,
                         typeVol: typeVol, IsActive: active, Remarks: remark, DisplayName: displayName, EnglishName: englishName, IsAssistant: isHelper, VolunteerIdentity: VolunteerIdentity, //birthdate: bdate,
-                        EnglishFN: englishFN, EnglishLN: englishLN, BirthDate: birthDate, IsDriving: isDriving, Role: role
+                        EnglishFN: englishFN, EnglishLN: englishLN, BirthDate: birthDate, IsDriving: isDriving, Role: role, AvailableSeats: availableSeats
                     }
                     if (func === 'edit') {
                         volunteer.OldCellPhone = OldCellPhone;
