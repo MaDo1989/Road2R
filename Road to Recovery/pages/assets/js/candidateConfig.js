@@ -20,13 +20,13 @@ const DefulatParams = [
     { name: 'C_LastRideInDays', description: 'מספר ימים מאז הנסיעה האחרונה', newbis: 0.02, regulars: 0.1, super: 0.1 },
     { name: 'C_NextRideInDays', description: 'מספר ימים עד הנסיעה הבאה', newbis: 0.02, regulars: 0.1, super: 0.1 },
     { name: 'C_NumOfRidesLast2Month', description: 'מספר הנסיעות בחודשיים האחרונים', newbis: 3.5, regulars: 0.5, super: 0.5 },
-    { name: 'C_AmountOfRidesInThisPath', description: 'כמות הנסיעות במסלול זה', newbis: 5.0, regulars: 7.5, super: 7.5 },
-    { name: 'C_AmountOfRidesInOppositePath', description: 'כמות הנסיעות במסלול ההפוך', newbis: 4.0, regulars: 3.0, super: 3.0 },
+    { name: 'C_AmountOfRidesInThisPath', description: 'כמות הנסיעות במסלול זה', newbis: 5.0, regulars: 7.5, super: 9.5 },
+    { name: 'C_AmountOfRidesInOppositePath', description: 'כמות הנסיעות במסלול ההפוך', newbis: 4.0, regulars: 5.5, super: 7.0 },
     { name: 'C_AmountOfRides_OriginToArea', description: 'כמות הנסיעות מנקודת המוצא לאזור', newbis: 3.5, regulars: 3.0, super: 3.0 },
     { name: 'C_AmountOfRidesAtThisTime', description: 'כמות הנסיעות בשעה זו', newbis: 4.5, regulars: 5.0, super: 5.0 },
     { name: 'C_AmountOfRidesAtThisDayWeek', description: 'כמות הנסיעות ביום זה בשבוע', newbis: 5.0, regulars: 2.5, super: 2.5 },
     { name: 'C_AmountOfRidesFromRegionToDest', description: 'כמות הנסיעות מהאזור ליעד', newbis: 3.5, regulars: 3.0, super: 3.0 },
-    { name: 'C_SumOfKM', description: 'סך הקילומטרים', newbis: 4.0, regulars: 1.0, super: 1.0 }
+    { name: 'C_SumOfKM', description: 'סך הקילומטרים', newbis: 13.0, regulars: 3.0, super: 2.0 }
 ];
 
 
@@ -34,7 +34,7 @@ const DefulatParams = [
 $(document).ready(() => {
     $('#wait').show();
     $.ajax({
-        url: 'WebService.asmx/GetWeightsOfCandidateV2',  // החלף זאת בנתיב המדויק לשירות שלך
+        url: 'WebService.asmx/GetWeightsOfCandidateV2',  
         type: 'POST',
         success: function (response) {
             $('#wait').hide();
@@ -73,9 +73,9 @@ function createParameterTable(parms) {
         tr.innerHTML = `
                     <td>${param.name}</td>
                     <td>${param.description}</td>
-                    <td><input type="number" id="${param.name}_newbis" value="${param.newbis}" step="0.001"></td>
-                    <td><input type="number" id="${param.name}_regulars" value="${param.regulars}" step="0.001"></td>
-                    <td><input type="number" id="${param.name}_super" value="${param.super}" step="0.001"></td>
+                    <td><input onchange="valueChanged(this,'newbis')" type="number" id="${param.name}_newbis" value="${param.newbis}" step="0.001"></td>
+                    <td><input onchange="valueChanged(this,'regulars')" type="number" id="${param.name}_regulars" value="${param.regulars}" step="0.001"></td>
+                    <td><input onchange="valueChanged(this,'super')" type="number" id="${param.name}_super" value="${param.super}" step="0.001"></td>
                 `;
         tbody.appendChild(tr);
     });
@@ -140,8 +140,26 @@ const BacktoCandidate = () => {
 
 
 
-
-
+const valueChanged = (input, category) => {
+    //console.log(extractBeforeLastUnderscore(input.id), input.parentNode, category);
+    let realval = input.value;
+    console.log(realval);
+    let val = DefulatParams.find(x => x.name === extractBeforeLastUnderscore(input.id))[category];
+    //console.log(val);
+    let defultValueSpan = `<span class="styled-span">ערך ברירת המחדל : ${val}</span>`;
+    if (input.parentNode.innerHTML.includes('span')==false) {
+        input.parentNode.innerHTML += defultValueSpan;
+        input.value = realval;
+    }
+    
+}
+function extractBeforeLastUnderscore(str) {
+    const lastUnderscoreIndex = str.lastIndexOf('_');
+    if (lastUnderscoreIndex !== -1) {
+        return str.substring(0, lastUnderscoreIndex);
+    }
+    return str; // Return the original string if no underscore is found
+}
 
 function convertDataStructure(inputData) {
     const names = [

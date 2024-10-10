@@ -122,7 +122,7 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
-            Log.Error("Error in GetNewbisCandidateUnityRideV2", ex);
+            Log.Error("Error in GetCandidateUnityRideV2", ex);
             throw new Exception("שגיאה בשליפת הנתונים GetNewbisCandidateUnityRideV2 api");
         }
 

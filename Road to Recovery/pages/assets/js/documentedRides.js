@@ -184,6 +184,7 @@ function manipulateDocumentedRidesModal(button, tableToWithdrawDataFrom) {
                 ]
             });
             $('#wait').hide();
+            $('#documentedRidesTable').css('width', '100%');
 
         },
         error: function (err) {

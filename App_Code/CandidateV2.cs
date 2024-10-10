@@ -82,7 +82,7 @@ public class CandidateV2
         4.5f,  // C_AmountOfRidesAtThisTime
         5f,    // C_AmountOfRidesAtThisDayWeek
         3.5f,  // C_AmountOfRidesFromRegionToDest
-        4f   // C_SumOfKM
+        13f   // C_SumOfKM
     };
     private static List<float> regularWeights = new List<float>
     {
@@ -92,12 +92,12 @@ public class CandidateV2
         0.1f,  // C_NextRideInDays
         0.5f,  // C_NumOfRidesLast2Month
         7.5f,  // C_AmountOfRidesInThisPath
-        3f,    // C_AmountOfRidesInOppositePath
+        5.5f,    // C_AmountOfRidesInOppositePath
         3f,    // C_AmountOfRides_OriginToArea
         5f,    // C_AmountOfRidesAtThisTime
         2.5f,  // C_AmountOfRidesAtThisDayWeek
         3f,    // C_AmountOfRidesFromRegionToDest
-        1f   // C_SumOfKM
+        3f   // C_SumOfKM
     };
 
     private static List<float> superWeights = new List<float>
@@ -107,13 +107,13 @@ public class CandidateV2
         0.1f,  // C_LastRideInDays
         0.1f,  // C_NextRideInDays
         0.5f,  // C_NumOfRidesLast2Month
-        7.5f,  // C_AmountOfRidesInThisPath
-        3f,    // C_AmountOfRidesInOppositePath
+        9.5f,  // C_AmountOfRidesInThisPath
+        7f,    // C_AmountOfRidesInOppositePath
         3f,    // C_AmountOfRides_OriginToArea
         5f,    // C_AmountOfRidesAtThisTime
         2.5f,  // C_AmountOfRidesAtThisDayWeek
         3f,    // C_AmountOfRidesFromRegionToDest
-        1f   // C_SumOfKM
+        2f   // C_SumOfKM
     };
 
 
@@ -171,7 +171,7 @@ public class CandidateV2
             res += C_AmountOfRidesAtThisTime * (this.AmountOfRidesAtThisTime != null ? (float)Math.Log(this.AmountOfRidesAtThisTime.Value + 1) : 0);
             res += C_AmountOfRidesAtThisDayWeek * (this.AmountOfRidesAtThisDayWeek != null ? (float)Math.Log(this.AmountOfRidesAtThisDayWeek.Value + 1) : 0);
             res += C_AmountOfRidesFromRegionToDest * (this.AmountOfRidesFromRegionToDest != null ? (float)Math.Log(this.AmountOfRidesFromRegionToDest.Value + 1) : 0);
-            res += (this.SumOfKM != null && this.SumOfKM.Value > 0 && C_SumOfKM != 0) ? (float)((Math.Log(this.SumOfKM.Value) / 100) * (-1* C_SumOfKM)): 0;
+            res += (this.SumOfKM != null && this.SumOfKM.Value > 0 && C_SumOfKM != 0) ? (float)((Math.Log(this.SumOfKM.Value / 100) ) * (-1* C_SumOfKM)): 0;
             this.Score = res;
         }
         else if (this.Vtype=="REGULAR")
@@ -200,7 +200,7 @@ public class CandidateV2
             res += C_AmountOfRidesAtThisTime * (this.AmountOfRidesAtThisTime != null ? (float)Math.Log(this.AmountOfRidesAtThisTime.Value + 1) : 0);
             res += C_AmountOfRidesAtThisDayWeek * (this.AmountOfRidesAtThisDayWeek != null ? (float)Math.Log(this.AmountOfRidesAtThisDayWeek.Value + 1) : 0);
             res += C_AmountOfRidesFromRegionToDest * (this.AmountOfRidesFromRegionToDest != null ? (float)Math.Log(this.AmountOfRidesFromRegionToDest.Value + 1) : 0);
-            res += (this.SumOfKM != null && this.SumOfKM.Value > 0 && C_SumOfKM != 0) ? (float)((Math.Log(this.SumOfKM.Value) / 100) * (-1 * C_SumOfKM)) : 0;
+            res += (this.SumOfKM != null && this.SumOfKM.Value > 0 && C_SumOfKM != 0) ? (float)((Math.Log(this.SumOfKM.Value / 100) ) * (-1 * C_SumOfKM)) : 0;
             this.Score = res;
         }
         else if (this.Vtype=="SUPER")
@@ -229,7 +229,7 @@ public class CandidateV2
             res += C_AmountOfRidesAtThisTime * (this.AmountOfRidesAtThisTime != null ? (float)Math.Log(this.AmountOfRidesAtThisTime.Value + 1) : 0);
             res += C_AmountOfRidesAtThisDayWeek * (this.AmountOfRidesAtThisDayWeek != null ? (float)Math.Log(this.AmountOfRidesAtThisDayWeek.Value + 1) : 0);
             res += C_AmountOfRidesFromRegionToDest * (this.AmountOfRidesFromRegionToDest != null ? (float)Math.Log(this.AmountOfRidesFromRegionToDest.Value + 1) : 0);
-            res += (this.SumOfKM != null && this.SumOfKM.Value > 0 && C_SumOfKM != 0) ? (float)((Math.Log(this.SumOfKM.Value) / 100) * (-1 * C_SumOfKM)) : 0;
+            res += (this.SumOfKM != null && this.SumOfKM.Value > 0 && C_SumOfKM != 0) ? (float)((Math.Log(this.SumOfKM.Value / 100) ) * (-1 * C_SumOfKM)) : 0;
             this.Score = res;
         }
 

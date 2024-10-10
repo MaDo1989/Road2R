@@ -3,7 +3,7 @@
     left: 550px;
     top: 150px;
     position: fixed;
-    height: 300px;
+    height: auto;
     width: 320px;
     background-color: yellow;
     z-index: 1;

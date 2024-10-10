@@ -22,6 +22,16 @@ const wiringDataTables = () => {
     $('#datatable-superDrivers tbody').on('click', '#showDocumentedCallsBtn', function () {
         manipulateDocumentedCallsModal(this, superDriversTable);
     });
+
+    ////regularTable datatable-RegularDrivers
+    $('#datatable-RegularDrivers tbody').on('click', '#showDocumentedCallsBtn', function () {
+        manipulateDocumentedCallsModal(this, regularTable);
+    });
+    $('#datatable-RegularDrivers tbody').on('click', '#showDocumentedRidesBtn', function () {
+        manipulateDocumentedRidesModal(this, regularTable);
+    });
+
+
     //#endregion showDocumentedCallsBtn
 
     //#region showDocumentedRidesBtn
@@ -93,11 +103,12 @@ function showCharacteristics() {
         "נסיעות בציר ההפוך": c.AmountOfRidesInOppositePath,
         "נסיעות מאותה נקודה לאותו איזור": c.AmountOfRides_OriginToArea,
         "נסיעות מאותו איזור לאותה נקודה": c.AmountOfRidesFromRegionToDest,
-        "נסיעות נוספות": c.NoOfDocumentedRides - c.AmountOfRides_OriginToArea,
+        "נסיעות נוספות": c.NoOfDocumentedRides - c.AmountOfRides_OriginToArea - c.AmountOfRidesFromRegionToDest - c.AmountOfRidesInOppositePath - c.AmountOfRidesInThisPath,
         "הסעות ביום הזה": c.AmountOfRidesAtThisDayWeek,
         "הסעות בימים אחרים": c.NoOfDocumentedRides - c.AmountOfRidesAtThisDayWeek,
         "הסעות בחלק הנדרש של היום": c.AmountOfRidesAtThisTime,
-        "הסעות בחלקו השני של היום": c.NoOfDocumentedRides - c.AmountOfRidesAtThisTime
+        "הסעות בחלקו השני של היום": c.NoOfDocumentedRides - c.AmountOfRidesAtThisTime,
+        "אורך הנסיעה בקילומטרים (מרחק אווירי)": c.SumOfKM.toFixed(0),
     };
 
     let str = "<h3> נתוני נסיעות בחצי שנה האחרונה </h3>";
@@ -108,6 +119,9 @@ function showCharacteristics() {
                 str += "<p class='boldC'>" + k + " : " + txt[k] + "</p>";
             else
                 str += "<p>" + k + " : " + txt[k] + "</p>";
+        if (k == "נסיעות נוספות" || k == "הסעות בימים אחרים" || k =="הסעות בחלקו השני של היום") {
+            str += '--------------------';
+        }
     }
     let position = $(this).position();
 
@@ -653,6 +667,7 @@ const fillTableWithDataV2 = () => {
         "lengthChange": false, // for somereason this property must be string
         stateDuration: 60 * 60,
         autoWidth: false,
+        order: [[8, 'desc']],
         columns: [
             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
             {
@@ -693,6 +708,7 @@ const fillTableWithDataV2 = () => {
         "lengthChange": false, // for somereason this property must be string
         stateDuration: 60 * 60,
         autoWidth: false,
+        order: [[8, 'desc']],
         columns: [
             //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
             {
@@ -734,6 +750,7 @@ const fillTableWithDataV2 = () => {
             "lengthChange": false, // for somereason this property must be string
             stateDuration: 60 * 60,
             autoWidth: false,
+            order: [[8, 'desc']],
             columns: [
                 //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
                 {

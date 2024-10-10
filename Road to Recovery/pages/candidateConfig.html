@@ -29,6 +29,7 @@
             padding: 15px;
             margin-bottom: 20px;
             text-align: center;
+            box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
         }
 
         table {
@@ -73,7 +74,26 @@
             cursor: pointer;
             font-size: 16px;
             margin-top: 20px;
+            box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
         }
+        .styled-span {
+            display: inline-block;
+            padding: 8px 12px;
+            margin: 5px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #ffffff;
+            background-color: #3498db;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+            .styled-span:hover {
+                background-color: #2980b9;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                transform: translateY(-2px);
+            }
 
         .gr-btn {
             background-color: #428d52;
@@ -94,7 +114,6 @@
     <div class="explanation">
         <h2>הסבר</h2>
         <p>הערכים בטבלה מייצגים משקולות המכפילות את הערך של כל מתנדב. משקולות גבוהות יותר נותנות חשיבות רבה יותר לפרמטר המתאים בחישוב הכולל.</p>
-        <p>*שימו לב - מומלץ לא לשנות את הפרמטר של סך הקילומטרים הוא מחושב לפי הממוצע נסיעות</p>
         <button id="backBTN" onclick="BacktoCandidate()">חזרה לדף הקודם</button>
     </div>
 

@@ -262,6 +262,12 @@ const openDocumentAAbsenceModal = () => {
                 cordinatorsOptions += `${allCordinatorsFromDB[i].DisplayName}</option >`;
             }
             document.getElementById('DocumentAAbsence_choooseCoordinator').innerHTML = cordinatorsOptions;
+
+            let thisCoor = allCordinatorsFromDB.find((coordinator) => {
+                return coordinator.DisplayName === localStorage.userCell;
+            });
+            //console.log('thisCoor: ', thisCoor);
+            $('#DocumentAAbsence_choooseCoordinator').val(thisCoor.Id);
         }
     });
  
