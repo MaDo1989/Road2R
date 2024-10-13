@@ -9,6 +9,7 @@ let superDriversTable;
 let regularCandidated_clientVersion = [];
 let superCandidated_clientVersion = [];
 let ridePatNum;
+let weightsParams = null;
 
 
 const wiringDataTables = () => {
@@ -90,28 +91,51 @@ function hideCharacteristics() {
     $("#characteristics").css("visibility", "hidden");
 }
 
+
+function getScoreString(candidate,paramName) {
+
+    //console.log(candidate, paramName)
+    //console.log(` ניקוד: (${(Math.log(candidate[paramName.replace("C_","")] + 1) * getWeight(paramName, candidate.Vtype.toLowerCase())).toFixed(2)})`)
+    if (paramName == "C_LastRideInDays" || paramName == "C_NextRideInDays") {
+       let param =  candidate[paramName.replace("C_", "")]==null ?365: candidate[paramName.replace("C_", "")]+1;
+        return ` ניקוד: (${(Math.log(param) * getWeight(paramName, candidate.Vtype.toLowerCase())).toFixed(2)})`;
+    }
+    if (paramName == "C_SumOfKM") {
+        return ` ניקוד: (${(Math.log(candidate[paramName.replace("C_", "")]/100) *-1 * getWeight(paramName, candidate.Vtype.toLowerCase())).toFixed(2)})`
+    }
+    return ` ניקוד: (${(Math.log(candidate[paramName.replace("C_", "")] + 1) * getWeight(paramName, candidate.Vtype.toLowerCase())).toFixed(2)})`
+}
+
+
 function showCharacteristics() {
 
     let id = this.getAttribute('data-driverId');
     //console.log(id)
     let c = allCandidatedFromDB.find(ca => ca.Id == id);
+    //getScoreString(c,'C_AmountOfRidesInThisPath')
     //let c = allCandidatedFromDB[id];
     //console.log(c);
+    //console.log(getWeight("C_AmountOfRidesInThisPath", c.Vtype.toLowerCase()), c);
     let boldArr = ["נסיעות בציר המדויק הזה", "הסעות ביום הזה", "הסעות בחלק הנדרש של היום"];
     let txt = {
-        "נסיעות בציר המדויק הזה": c.AmountOfRidesInThisPath,
-        "נסיעות בציר ההפוך": c.AmountOfRidesInOppositePath,
-        "נסיעות מאותה נקודה לאותו איזור": c.AmountOfRides_OriginToArea,
-        "נסיעות מאותו איזור לאותה נקודה": c.AmountOfRidesFromRegionToDest,
-        "נסיעות נוספות": c.NoOfDocumentedRides - c.AmountOfRides_OriginToArea - c.AmountOfRidesFromRegionToDest - c.AmountOfRidesInOppositePath - c.AmountOfRidesInThisPath,
-        "הסעות ביום הזה": c.AmountOfRidesAtThisDayWeek,
+        "נסיעות בציר המדויק הזה": c.AmountOfRidesInThisPath==0?0: c.AmountOfRidesInThisPath + getScoreString(c,"C_AmountOfRidesInThisPath"),
+        "נסיעות בציר ההפוך": c.AmountOfRidesInOppositePath==0?0: c.AmountOfRidesInOppositePath + getScoreString(c, "C_AmountOfRidesInOppositePath"),
+        "נסיעות מאותה נקודה לאותו איזור": c.AmountOfRides_OriginToArea==0?0: c.AmountOfRides_OriginToArea + getScoreString(c, "C_AmountOfRides_OriginToArea"),
+        "נסיעות מאותו איזור לאותה נקודה": c.AmountOfRidesFromRegionToDest==0?0: c.AmountOfRidesFromRegionToDest + getScoreString(c, "C_AmountOfRidesFromRegionToDest"),
+        "נסיעות נוספות": (c.NoOfDocumentedRides - c.AmountOfRides_OriginToArea - c.AmountOfRidesFromRegionToDest - c.AmountOfRidesInOppositePath - c.AmountOfRidesInThisPath) == 0 ? 0 : (c.NoOfDocumentedRides - c.AmountOfRides_OriginToArea - c.AmountOfRidesFromRegionToDest - c.AmountOfRidesInOppositePath - c.AmountOfRidesInThisPath) + getScoreString(c, "C_NoOfDocumentedRides"),
+        "הסעות ביום הזה": c.AmountOfRidesAtThisDayWeek==0?0: c.AmountOfRidesAtThisDayWeek + getScoreString(c, "C_AmountOfRidesAtThisDayWeek"),
         "הסעות בימים אחרים": c.NoOfDocumentedRides - c.AmountOfRidesAtThisDayWeek,
-        "הסעות בחלק הנדרש של היום": c.AmountOfRidesAtThisTime,
+        "הסעות בחלק הנדרש של היום": c.AmountOfRidesAtThisTime==0?0: c.AmountOfRidesAtThisTime + getScoreString(c, "C_AmountOfRidesAtThisTime"),
         "הסעות בחלקו השני של היום": c.NoOfDocumentedRides - c.AmountOfRidesAtThisTime,
-        "אורך הנסיעה בקילומטרים (מרחק אווירי)": c.SumOfKM.toFixed(0),
+        "אורך הנסיעה בקילומטרים (מרחק אווירי)": c.SumOfKM.toFixed(0) + getScoreString(c, "C_SumOfKM"),
+        "ימים מאז ההסעה האחרונה": c.LastRideInDays == null ? " -אין- " + getScoreString(c, "C_LastRideInDays") : c.LastRideInDays + getScoreString(c, "C_LastRideInDays"),
+        "ימים עד ההסעה הבאה": c.NextRideInDays == null ? " -אין- " + getScoreString(c, "C_NextRideInDays") : c.LastRideInDays + getScoreString(c, "C_NextRideInDays"),
+        "מספר הסעות בחודשיים האחרונים": c.NumOfRidesLast2Month==0?0: c.NumOfRidesLast2Month + getScoreString(c, "C_NumOfRidesLast2Month"),
+        "וותק בעמותה": c.SeniorityInYears.toFixed(1) + getScoreString(c, "C_SeniorityInYears"),
+
     };
 
-    let str = "<h3> נתוני נסיעות בחצי שנה האחרונה </h3>";
+    let str = "<h3> נתוני נסיעות  בשנה האחרונה </h3>";
     str += "<h3>" + c.DisplayName + "</h3>";
     for (k in txt) {
         if (txt[k] != 0)
@@ -158,7 +182,7 @@ $(document).ready(() => {
         }
     });
 
-
+   
 
     //if (localStorage.user == '0544890081' || localStorage.user == '0537738728') {
     //    $('#ShowWeightsParamsPageBTN').show();
@@ -255,6 +279,37 @@ $(document).ready(() => {
 });
 
 
+
+const GetWeightParams = () => {
+
+    $.ajax({
+        url: 'WebService.asmx/GetWeightsOfCandidateV2',
+        type: 'POST',
+        success: function (response) {
+            $('#wait').hide();
+            //console.log(response);
+            let res = response.getElementsByTagName('string')[0].innerHTML
+            const weights = JSON.parse(res);
+            //console.log(weights);
+            parameters = convertDataStructure(weights);
+            //console.log(parameters);
+            weightsParams = parameters
+
+
+        },
+        error: function (xhr, status, error) {
+            $('#wait').hide();
+            console.error("error in GetWeightsOfCandidateV2 api:", error);
+            Swal.fire({
+                title: "שגיאה בAPI ",
+                text: "יש שגיאה בקבלת המשקולות",
+                icon: "error"
+            });
+            //var errorMessage = xhr.responseText;
+            //console.error("error in UpdateCandidateWeights api details", errorMessage);
+        }
+    });
+}
 const deceideWhichTable2Show = () => {
     $('#collapse1').addClass("in");
     $('#collapsed1_aTag').removeClass('collapsed');
@@ -346,6 +401,7 @@ const getCandidateV2_SCB = (data) => {
     //console.log('res v2:', allCandidatedFromDB);
     //new version of fillTableWithData
     fillTableWithDataV2();
+    GetWeightParams();
 
 }
 
@@ -793,4 +849,35 @@ const fillTableWithDataV2 = () => {
     //#endregion ↑DATATABLES PROPERTIES↑
 
 
+}
+
+
+
+function convertDataStructure(inputData) {
+    const names = [
+        'C_NoOfDocumentedRides', 'C_SeniorityInYears', 'C_LastRideInDays', 'C_NextRideInDays',
+        'C_NumOfRidesLast2Month', 'C_AmountOfRidesInThisPath', 'C_AmountOfRidesInOppositePath',
+        'C_AmountOfRides_OriginToArea', 'C_AmountOfRidesAtThisTime', 'C_AmountOfRidesAtThisDayWeek',
+        'C_AmountOfRidesFromRegionToDest', 'C_SumOfKM'
+    ];
+
+    const descriptions = [
+        'מספר הנסיעות המתועדות', 'ותק בשנים', 'מספר ימים מאז הנסיעה האחרונה', 'מספר ימים עד הנסיעה הבאה',
+        'מספר הנסיעות בחודשיים האחרונים', 'כמות הנסיעות במסלול זה', 'כמות הנסיעות במסלול ההפוך',
+        'כמות הנסיעות מנקודת המוצא לאזור', 'כמות הנסיעות בשעה זו', 'כמות הנסיעות ביום זה בשבוע',
+        'כמות הנסיעות מהאזור ליעד', 'סך הקילומטרים'
+    ];
+
+    return names.map((name, index) => ({
+        name: name,
+        description: descriptions[index],
+        newbis: inputData.Item1[index],
+        regular: inputData.Item2[index],
+        super: inputData.Item3[index]
+    }));
+}
+
+function getWeight(paramName, volunteerType) {
+    const weight = weightsParams.find(w => w.name === paramName);
+    return weight ? weight[volunteerType] : 0;
 }

@@ -143,7 +143,7 @@ const BacktoCandidate = () => {
 const valueChanged = (input, category) => {
     //console.log(extractBeforeLastUnderscore(input.id), input.parentNode, category);
     let realval = input.value;
-    console.log(realval);
+    //console.log(realval);
     let val = DefulatParams.find(x => x.name === extractBeforeLastUnderscore(input.id))[category];
     //console.log(val);
     let defultValueSpan = `<span class="styled-span">ערך ברירת המחדל : ${val}</span>`;
