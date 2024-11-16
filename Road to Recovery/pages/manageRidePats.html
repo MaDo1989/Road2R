@@ -5593,7 +5593,7 @@
                     //console.log('translatedData', translatedData);
                     //console.log('choosenRides', choosenRides);
                     const grouped = groupByOriginDestinationAndTime(translatedData);
-                    //console.log('grouped', grouped)
+                    console.log('grouped', grouped)
                     const lineBreak = '\n';
 
 
@@ -5608,16 +5608,53 @@
 
                         message += `${lineBreak}From ${origin} to ${destination} at ${time} ${lineBreak}`;
 
+                        //rides.forEach(ride => {
+                        //    index++;
+                        //    if (ride.OnlyEscort) {
+                        //        message += `   ${index}. {blanks} of ${ride.PatientName} (${ride.AmountOfEscorts}) ${lineBreak}`;
+                        //    }
+                        //    else {
+                        //        //console.log('each ride', ride);
+                        //        message += `   ${index}. ${ride.PatientName} (${ride.AmountOfEscorts + 1}) ${lineBreak}`;
+                        //    }
+
+                        //})
+
+
+
+                        const ridesByDriver = {};
                         rides.forEach(ride => {
+                            const driverId = ride.MainDriver; 
+                            if (!ridesByDriver[driverId]) {
+                                ridesByDriver[driverId] = [];
+                            }
+                            ridesByDriver[driverId].push(ride);
+                        });
+
+                        
+                        for (const driverId in ridesByDriver) {
                             index++;
-                            if (ride.OnlyEscort) {
-                                message += `   ${index}. {blanks} of ${ride.PatientName} (${ride.AmountOfEscorts}) ${lineBreak}`;
+                            const driverRides = ridesByDriver[driverId];
+
+                            if (driverRides.length === 1) {
+                                
+                                const ride = driverRides[0];
+                                if (ride.OnlyEscort) {
+                                    message += `   ${index}. {blanks} of ${ride.PatientName} (${ride.AmountOfEscorts}) ${lineBreak}`;
+                                } else {
+                                    message += `   ${index}. ${ride.PatientName} (${ride.AmountOfEscorts + 1}) ${lineBreak}`;
+                                }
+                            } else {
+                                
+                                message += `   ${index}. ` + driverRides.map(ride => {
+                                    if (ride.OnlyEscort) {
+                                        return `{blanks} of ${ride.PatientName} (${ride.AmountOfEscorts})`;
+                                    } else {
+                                        return `${ride.PatientName} (${ride.AmountOfEscorts + 1})`;
+                                    }
+                                }).join(' + ') + lineBreak;
                             }
-                            else {
-                                message += `   ${index}. ${ride.PatientName} (${ride.AmountOfEscorts + 1}) ${lineBreak}`;
-                            }
-                            
-                        })
+                        }
 
 
 
@@ -5893,7 +5930,7 @@
                                         </button>
                                         <button disabled id="messageCoorBTN" onclick="messageForPalCoor()" class="btn btn-primary waves-effect w-md waves-light m-b-5">
                                             <span class="glyphicon glyphicon-envelope m-r-5"></span>
-                                            הודעה לרכז\ית
+                                            הודעה למתאמת
                                             
                                         </button>
                                     </div>

@@ -142,7 +142,13 @@
             arr_volTypes = JSON.parse(data.d);
             $select = $("#typeVolunteer");
             for (i in arr_volTypes) {
-                $('<option>', { value: arr_volTypes[i], text: arr_volTypes[i] }).appendTo($select);
+                if (arr_volTypes[i] == 'רכז') {
+                    $('<option>', { value: arr_volTypes[i], text: 'מתאם' }).appendTo($select);
+                }
+                else {
+                    $('<option>', { value: arr_volTypes[i], text: arr_volTypes[i] }).appendTo($select);
+                }
+                
             }
         }
 
