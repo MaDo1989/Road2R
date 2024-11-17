@@ -54,6 +54,7 @@ public class Volunteer
     string englishFN;
     string englishLN;
     bool? isDriving;
+    bool isBooster;
     string howCanHelp;
     string feedback;
     string birthDate;
@@ -62,7 +63,7 @@ public class Volunteer
     string roleInR2R;
     string joinYear;
     string postalCode;
-
+    int no_of_rides;
     string workingWithCoor;
     string workingWithPat;
     string howToRecruit;
@@ -1343,6 +1344,32 @@ public class Volunteer
         }
     }
 
+    public int No_of_rides
+    {
+        get
+        {
+            return no_of_rides;
+        }
+
+        set
+        {
+            no_of_rides = value;
+        }
+    }
+
+    public bool IsBooster
+    {
+        get
+        {
+            return isBooster;
+        }
+
+        set
+        {
+            isBooster = value;
+        }
+    }
+
     public Volunteer()
     {
         //
@@ -1606,6 +1633,7 @@ public class Volunteer
         v.Email = dr["Email"].ToString();
         v.EnglishName = dr["EnglishName"].ToString();
         v.VolunteerIdentity = dr["VolunteerIdentity"].ToString();
+        
         string date = dr["JoinDate"].ToString();
         bool isAssistant = Convert.ToBoolean(dr["isAssistant"].ToString());
         if (date == "")
@@ -1889,7 +1917,7 @@ public class Volunteer
             DbService db = new DbService();
             SqlCommand cmd = new SqlCommand();
             cmd.CommandType = CommandType.Text;
-            SqlParameter[] cmdParams = new SqlParameter[26];
+            SqlParameter[] cmdParams = new SqlParameter[27];
             cmdParams[0] = cmd.Parameters.AddWithValue("@address", v.Address);
             cmdParams[1] = cmd.Parameters.AddWithValue("@cell", v.CellPhone);
             cmdParams[2] = cmd.Parameters.AddWithValue("@cell2", v.CellPhone2);
@@ -1931,6 +1959,7 @@ public class Volunteer
 
             cmdParams[24] = cmd.Parameters.AddWithValue("@isActive", v.IsActive);
             cmdParams[25] = cmd.Parameters.AddWithValue("@availableSeats", v.AvailableSeats);
+            cmdParams[26] = cmd.Parameters.AddWithValue("@IsBooster", v.IsBooster);
 
             string newName = v.FirstNameH + " " + v.LastNameH;
             newName = newName.Replace("'", "''");
@@ -1982,7 +2011,7 @@ public class Volunteer
                 string password = ConfigurationManager.AppSettings["password"];
                 if (v.TypeVol == "רכז" || v.TypeVol == "מנהל" || v.IsAssistant)
                 {
-                    query = "update Volunteer set Address=@address, CellPhone=@cell, AvailableSeats=@availableSeats,";
+                    query = "update Volunteer set Address=@address, CellPhone=@cell, AvailableSeats=@availableSeats,IsBooster=@IsBooster,";
                     query += "CellPhone2=@cell2, CityCityName=@city, Email=@email, FirstNameA=@firstNameA, FirstNameH=@firstNameH, VolunteerIdentity=@volunteerIdentity, ";
                     query += "Gender=@gender, JoinDate=@jDate, KnowsArabic=@knowsArabic, LastNameA=@lastNameA, ";
                     query += "EnglishFN=@englishFN, EnglishLN=@englishLN, BirthDate=@birthDate, IsDriving=@isDriving, ";
@@ -1992,7 +2021,7 @@ public class Volunteer
                 }
                 else
                 {
-                    query = "update Volunteer set Address=@address, CellPhone=@cell, AvailableSeats=@availableSeats, ";
+                    query = "update Volunteer set Address=@address, CellPhone=@cell, AvailableSeats=@availableSeats,IsBooster=@IsBooster, ";
                     query += "CellPhone2=@cell2, CityCityName=@city, Email=@email, FirstNameA=@firstNameA, FirstNameH=@firstNameH, VolunteerIdentity=@volunteerIdentity, ";
                     query += "Gender=@gender, JoinDate=@jDate, KnowsArabic=@knowsArabic, LastNameA=@lastNameA, ";
                     query += "EnglishFN=@englishFN, EnglishLN=@englishLN, BirthDate=@birthDate, ";
@@ -2034,14 +2063,14 @@ public class Volunteer
                     if (v.TypeVol == "רכז" || v.TypeVol == "מנהל" || v.IsAssistant)
                     {
                         string password = ConfigurationManager.AppSettings["password"];
-                        query = "insert into Volunteer (Address, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks,EnglishName,isAssistant,UserName,Password,lastModified,EnglishFN, EnglishLN, BirthDate, IsDriving,AvailableSeats)";
-                        query += " values (@address,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks,@englishName,@isAssistant,@UserName,'" + password + "',DATEADD(hour, 2, SYSDATETIME()),@englishFN, @englishLN, @birthDate, @isDriving,@availableSeats);SELECT SCOPE_IDENTITY();";
+                        query = "insert into Volunteer (Address, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks,EnglishName,isAssistant,UserName,Password,lastModified,EnglishFN, EnglishLN, BirthDate, IsDriving,AvailableSeats,IsBooster)";
+                        query += " values (@address,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks,@englishName,@isAssistant,@UserName,'" + password + "',DATEADD(hour, 2, SYSDATETIME()),@englishFN, @englishLN, @birthDate, @isDriving,@availableSeats,@IsBooster);SELECT SCOPE_IDENTITY();";
 
                     }
                     else
                     {
-                        query = "insert into Volunteer (Address, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks,EnglishName,isAssistant,lastModified,EnglishFN, EnglishLN, BirthDate, IsDriving,AvailableSeats)";
-                        query += " values (@address,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks,@englishName,@isAssistant,DATEADD(hour, 2, SYSDATETIME()),@englishFN, @englishLN, @birthDate, @isDriving,@availableSeats);SELECT SCOPE_IDENTITY();";
+                        query = "insert into Volunteer (Address, CellPhone, CellPhone2, CityCityName, Email, FirstNameA, FirstNameH, Gender, IsActive, JoinDate, KnowsArabic, LastNameA, LastNameH, Remarks,EnglishName,isAssistant,lastModified,EnglishFN, EnglishLN, BirthDate, IsDriving,AvailableSeats,IsBooster)";
+                        query += " values (@address,@cell,@cell2,@city,@email,@firstNameA,@firstNameH,@gender,@IsActive,@jDate,@knowsArabic,@lastNameA,@lastNameH,@remarks,@englishName,@isAssistant,DATEADD(hour, 2, SYSDATETIME()),@englishFN, @englishLN, @birthDate, @isDriving,@availableSeats,@IsBooster);SELECT SCOPE_IDENTITY();";
                     }
                     db = new DbService();
                     Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());

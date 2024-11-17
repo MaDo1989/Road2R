@@ -289,6 +289,7 @@
                     console.log(volunteer.VolunteerIdentity)
                     $("#volunteerEnglishName").val(volunteer.EnglishName);
                     $("#firstA").val(volunteer.FirstNameA);
+                    $('#BoosterIN').attr('checked', volunteer.IsBooster);
                     $("#lastA").val(volunteer.LastNameA);
                     $("#availableSeatsIN").val(volunteer.AvailableSeats == null ? 4 : volunteer.AvailableSeats);
 
@@ -467,7 +468,7 @@
                                     <div class="row">
                                         <h4 class="m-t-0 header-title"><b>פרטי מתנדב</b></h4>
                                         <!--<p class="text-muted font-13 m-b-30">
-                                        יצירת, צפייה ועריכת מתנדב. לחץ על כפתור חזרה בכדי לצפות בכל הלקוחות.-->
+    יצירת, צפייה ועריכת מתנדב. לחץ על כפתור חזרה בכדי לצפות בכל הלקוחות.-->
                                         <br />
 
                                         <div class="col-md-6 checkbox checkbox-primary text-left">
@@ -559,6 +560,9 @@
                                                     <div class="col-sm-6">
                                                         <input id="ArabSpeaking" name="know" type="checkbox">
                                                         <label for="ArabSpeaking">דובר ערבית?</label>
+                                                        <span> || </span>
+                                                        <input id="BoosterIN" name="BoosterIN" type="checkbox">
+                                                        <label for="BoosterIN">כיסא לתינוק</label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -657,8 +661,8 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">תאריך הצטרפות </label>
                                                     <!--<div class="col-sm-6">
-                                                        <input id="joinDate" name="joinDate" type="text" placeholder="dd/mm/yyyy" class="form-control">
-                                                    </div>-->
+                    <input id="joinDate" name="joinDate" type="text" placeholder="dd/mm/yyyy" class="form-control">
+                </div>-->
                                                     <div class="col-sm-6">
                                                         <input type="date" id="joinDate" placeholder="dd/mm/yyyy" class="form-control">
                                                     </div>
@@ -698,6 +702,8 @@
                                                 </div>
                                             </div>
                                         </div>
+
+
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
@@ -730,38 +736,47 @@
                                                 </div>
                                             </div>
                                             <!--<div class="col-sm-6">
-        <div class="form-group">
-            <label class="col-sm-2 control-label">מעוניין לקבל את העדכון השבועי&nbsp;</label>
-            <div class="col-sm-6" id="selectNewsLetter">
-                <select id="newsLetter" name="newsLetter" class="form-control req">
-                    <option>בחר</option>
-                    <option>כן</option>
-                    <option>לא</option>
-                </select>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">מעוניין לקבל את העדכון השבועי&nbsp;</label>
+                <div class="col-sm-6" id="selectNewsLetter">
+                    <select id="newsLetter" name="newsLetter" class="form-control req">
+                        <option>בחר</option>
+                        <option>כן</option>
+                        <option>לא</option>
+                    </select>
+                </div>
             </div>
-        </div>
-    </div>-->
+        </div>-->
                                         </div>
+
                                         <!--<div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">כיצד תוכל.י לעזור לעמותה בדרכים נוספות (נא לפרט)</label>
-                                                    <div class="col-sm-6">
-
-                                                        <textarea id="help" name="help" class="form-control textAreaClass" rows="3"></textarea>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label class="col-sm-2 control-label">משוב על פעילותך ועל "בדרך להחלמה"</label>
-                                                    <div class="col-sm-6">
-
-                                                        <textarea id="feedback" name="feedback" class="form-control textAreaClass" rows="3"></textarea>
-                                                    </div>
+                                                    <label class="col-sm-2 control-label">כיסא לתינוק</label>
+                                                    <input id="boosterIN" name="boosterIN" class="form-control" type="checkbox" />
                                                 </div>
                                             </div>
                                         </div>-->
+                                        <!--<div class="row m-l-10 m-r-10">
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-2 control-label">כיצד תוכל.י לעזור לעמותה בדרכים נוספות (נא לפרט)</label>
+                <div class="col-sm-6">
+
+                    <textarea id="help" name="help" class="form-control textAreaClass" rows="3"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-2 control-label">משוב על פעילותך ועל "בדרך להחלמה"</label>
+                <div class="col-sm-6">
+
+                    <textarea id="feedback" name="feedback" class="form-control textAreaClass" rows="3"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>-->
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
 
@@ -922,6 +937,7 @@
                     cellPhone = cellPhone.replace(/ /g, '');
                     var email = $("#email").val();
                     var typeVol = $("#typeVolunteer").val();
+                    let isBooster = $("#BoosterIN").is(':checked');
                     var isHelper = false;
                     if (typeVol.indexOf('עוזר') !== -1) {
                         isHelper = true;
@@ -999,7 +1015,7 @@
                         firstNameH: firstNameH, firstNameA: nameA, lastNameH: lastNameH, lastNameA: lastNameA, cellPhone: cellPhone, cellphone2: cellphone2, /*homePhone: homePhone,*/
                         city: city, address: address, email: email, joinDate: joinDate, gender: gender, KnowsArabic: knowsArabic,
                         typeVol: typeVol, IsActive: active, Remarks: remark, DisplayName: displayName, EnglishName: englishName, IsAssistant: isHelper, VolunteerIdentity: VolunteerIdentity, //birthdate: bdate,
-                        EnglishFN: englishFN, EnglishLN: englishLN, BirthDate: birthDate, IsDriving: isDriving, Role: role, AvailableSeats: availableSeats
+                        EnglishFN: englishFN, EnglishLN: englishLN, BirthDate: birthDate, IsDriving: isDriving, Role: role, AvailableSeats: availableSeats, IsBooster: isBooster
                     }
                     if (func === 'edit') {
                         volunteer.OldCellPhone = OldCellPhone;

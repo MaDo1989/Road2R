@@ -2082,8 +2082,10 @@ public class DBservice_Gilad
                 v.TypeVol = dataReader["VolunTypeType"].ToString();
                 v.Email = dataReader["Email"].ToString();
                 v.Device = dataReader["device"].ToString();
+                
                 v.NoOfDocumentedCalls = Convert.ToInt32(dataReader["NoOfDocumentedCalls"]);
                 v.NoOfDocumentedRides = Convert.ToInt32(dataReader["NoOfDocumentedRides"]);
+                v.No_of_rides = Convert.ToInt32(dataReader["No_of_rides"]);
                 v.NumOfRides_last2Months = Convert.ToInt32(dataReader["NumOfRides_last2Months"]);
                 v.MostCommonPath = dataReader["mostCommonPath"].ToString();
 
@@ -2105,13 +2107,17 @@ public class DBservice_Gilad
                 {
                     v.AbsenceStatus = Convert.ToBoolean(dataReader["AbsenceStatus"].ToString());
                 }
+                if (dataReader["AvailableSeats"].ToString()!="")
+                {
+                    v.AvailableSeats = Convert.ToInt32(dataReader["AvailableSeats"]);
+                }
 
                 if (nearByCities.Keys.Contains(v.City))
                 {
                     v.NearestBigCity = nearByCities[v.City];
                 }
 
-
+                v.IsBooster = Convert.ToBoolean(dataReader["IsBooster"].ToString());
                 string date = dataReader["JoinDate"].ToString();
                 bool isAssistant = Convert.ToBoolean(dataReader["isAssistant"].ToString());
                 if (date == "")

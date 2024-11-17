@@ -5702,19 +5702,31 @@
         // this is the function that rememeber and collect the checked checkboxes for any functionality.
         const ChangeCheckboxRides = (checkbox) => {
             let arrlocal = [];
+            //console.log(checkbox.checked, checkbox.parentNode.parentNode)
+            if (checkbox.checked && checkbox.id != 'AllChecks' ) {
+                checkbox.parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important')
+                //checkbox.parentNode.parentNode.parnetNode.parnetNode.style.setProperty('border-collapse', 'none', 'important')
+            }
+            else {
+                checkbox.parentNode.parentNode.style.setProperty('border', 'none', 'important')
+            }
             //console.log(checkbox.id, checkbox.checked);
             if (checkbox.id == 'AllChecks') {
                 //$('.checkboxClass').prop("checked", checkbox.checked);
                 let tableName = checkbox.parentNode.parentNode.parentNode.parentNode.id;
                 if (tableName == 'datatable-morning') {
                     for (var i = 0; i < morningRidePats.length; i++) {
-                        $(`#check${morningRidePats[i].ridePatNum}`).prop("checked", checkbox.checked)
+                        $(`#check${morningRidePats[i].ridePatNum}`).prop("checked", checkbox.checked);
+                        //console.log($(`#check${morningRidePats[i].ridePatNum}`)[0].parentNode.parentNode)
+                        checkbox.checked ?$(`#check${morningRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important'): $(`#check${morningRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
                     }
 
                 }
                 if (tableName == 'datatable-afternoon') {
                     for (var i = 0; i < afterNoonRidePats.length; i++) {
                         $(`#check${afterNoonRidePats[i].ridePatNum}`).prop("checked", checkbox.checked)
+                        checkbox.checked ? $(`#check${afterNoonRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important') : $(`#check${afterNoonRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
+
                     }
 
                 }
@@ -5722,6 +5734,8 @@
                 if (tableName == 'datatable-tomorrow-morning') {
                     for (var i = 0; i < tomorrowMorningRidePats.length; i++) {
                         $(`#check${tomorrowMorningRidePats[i].ridePatNum}`).prop("checked", checkbox.checked)
+                        checkbox.checked ? $(`#check${tomorrowMorningRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important') : $(`#check${tomorrowMorningRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
+
                     }
 
                 }
@@ -5729,6 +5743,8 @@
                 if (tableName == 'datatable-tomorrow-afternoon') {
                     for (var i = 0; i < tomorrowAfternoonRidePats.length; i++) {
                         $(`#check${tomorrowAfternoonRidePats[i].ridePatNum}`).prop("checked", checkbox.checked)
+                        checkbox.checked ? $(`#check${tomorrowAfternoonRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important') : $(`#check${tomorrowAfternoonRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
+
                     }
 
                 }
@@ -5736,6 +5752,8 @@
                 if (tableName == 'datatable-future') {
                     for (var i = 0; i < futureRidePats.length; i++) {
                         $(`#check${futureRidePats[i].ridePatNum}`).prop("checked", checkbox.checked)
+                        checkbox.checked ? $(`#check${futureRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important') : $(`#check${futureRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
+
                     }
 
                 }
