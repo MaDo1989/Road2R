@@ -5593,7 +5593,7 @@
                     //console.log('translatedData', translatedData);
                     //console.log('choosenRides', choosenRides);
                     const grouped = groupByOriginDestinationAndTime(translatedData);
-                    //console.log('grouped', grouped)
+                    console.log('grouped', grouped)
                     const lineBreak = '\n';
 
 
@@ -5608,16 +5608,53 @@
 
                         message += `${lineBreak}From ${origin} to ${destination} at ${time} ${lineBreak}`;
 
+                        //rides.forEach(ride => {
+                        //    index++;
+                        //    if (ride.OnlyEscort) {
+                        //        message += `   ${index}. {blanks} of ${ride.PatientName} (${ride.AmountOfEscorts}) ${lineBreak}`;
+                        //    }
+                        //    else {
+                        //        //console.log('each ride', ride);
+                        //        message += `   ${index}. ${ride.PatientName} (${ride.AmountOfEscorts + 1}) ${lineBreak}`;
+                        //    }
+
+                        //})
+
+
+
+                        const ridesByDriver = {};
                         rides.forEach(ride => {
+                            const driverId = ride.MainDriver; 
+                            if (!ridesByDriver[driverId]) {
+                                ridesByDriver[driverId] = [];
+                            }
+                            ridesByDriver[driverId].push(ride);
+                        });
+
+                        
+                        for (const driverId in ridesByDriver) {
                             index++;
-                            if (ride.OnlyEscort) {
-                                message += `   ${index}. {blanks} of ${ride.PatientName} (${ride.AmountOfEscorts}) ${lineBreak}`;
+                            const driverRides = ridesByDriver[driverId];
+
+                            if (driverRides.length === 1) {
+                                
+                                const ride = driverRides[0];
+                                if (ride.OnlyEscort) {
+                                    message += `   ${index}. {blanks} of ${ride.PatientName} (${ride.AmountOfEscorts}) ${lineBreak}`;
+                                } else {
+                                    message += `   ${index}. ${ride.PatientName} (${ride.AmountOfEscorts + 1}) ${lineBreak}`;
+                                }
+                            } else {
+                                
+                                message += `   ${index}. ` + driverRides.map(ride => {
+                                    if (ride.OnlyEscort) {
+                                        return `{blanks} of ${ride.PatientName} (${ride.AmountOfEscorts})`;
+                                    } else {
+                                        return `${ride.PatientName} (${ride.AmountOfEscorts + 1})`;
+                                    }
+                                }).join(' + ') + lineBreak;
                             }
-                            else {
-                                message += `   ${index}. ${ride.PatientName} (${ride.AmountOfEscorts + 1}) ${lineBreak}`;
-                            }
-                            
-                        })
+                        }
 
 
 
@@ -5665,19 +5702,31 @@
         // this is the function that rememeber and collect the checked checkboxes for any functionality.
         const ChangeCheckboxRides = (checkbox) => {
             let arrlocal = [];
+            //console.log(checkbox.checked, checkbox.parentNode.parentNode)
+            if (checkbox.checked && checkbox.id != 'AllChecks' ) {
+                checkbox.parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important')
+                //checkbox.parentNode.parentNode.parnetNode.parnetNode.style.setProperty('border-collapse', 'none', 'important')
+            }
+            else {
+                checkbox.parentNode.parentNode.style.setProperty('border', 'none', 'important')
+            }
             //console.log(checkbox.id, checkbox.checked);
             if (checkbox.id == 'AllChecks') {
                 //$('.checkboxClass').prop("checked", checkbox.checked);
                 let tableName = checkbox.parentNode.parentNode.parentNode.parentNode.id;
                 if (tableName == 'datatable-morning') {
                     for (var i = 0; i < morningRidePats.length; i++) {
-                        $(`#check${morningRidePats[i].ridePatNum}`).prop("checked", checkbox.checked)
+                        $(`#check${morningRidePats[i].ridePatNum}`).prop("checked", checkbox.checked);
+                        //console.log($(`#check${morningRidePats[i].ridePatNum}`)[0].parentNode.parentNode)
+                        checkbox.checked ?$(`#check${morningRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important'): $(`#check${morningRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
                     }
 
                 }
                 if (tableName == 'datatable-afternoon') {
                     for (var i = 0; i < afterNoonRidePats.length; i++) {
                         $(`#check${afterNoonRidePats[i].ridePatNum}`).prop("checked", checkbox.checked)
+                        checkbox.checked ? $(`#check${afterNoonRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important') : $(`#check${afterNoonRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
+
                     }
 
                 }
@@ -5685,6 +5734,8 @@
                 if (tableName == 'datatable-tomorrow-morning') {
                     for (var i = 0; i < tomorrowMorningRidePats.length; i++) {
                         $(`#check${tomorrowMorningRidePats[i].ridePatNum}`).prop("checked", checkbox.checked)
+                        checkbox.checked ? $(`#check${tomorrowMorningRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important') : $(`#check${tomorrowMorningRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
+
                     }
 
                 }
@@ -5692,6 +5743,8 @@
                 if (tableName == 'datatable-tomorrow-afternoon') {
                     for (var i = 0; i < tomorrowAfternoonRidePats.length; i++) {
                         $(`#check${tomorrowAfternoonRidePats[i].ridePatNum}`).prop("checked", checkbox.checked)
+                        checkbox.checked ? $(`#check${tomorrowAfternoonRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important') : $(`#check${tomorrowAfternoonRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
+
                     }
 
                 }
@@ -5699,6 +5752,8 @@
                 if (tableName == 'datatable-future') {
                     for (var i = 0; i < futureRidePats.length; i++) {
                         $(`#check${futureRidePats[i].ridePatNum}`).prop("checked", checkbox.checked)
+                        checkbox.checked ? $(`#check${futureRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important') : $(`#check${futureRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
+
                     }
 
                 }
@@ -5893,7 +5948,7 @@
                                         </button>
                                         <button disabled id="messageCoorBTN" onclick="messageForPalCoor()" class="btn btn-primary waves-effect w-md waves-light m-b-5">
                                             <span class="glyphicon glyphicon-envelope m-r-5"></span>
-                                            הודעה לרכז\ית
+                                            הודעה למתאמת
                                             
                                         </button>
                                     </div>

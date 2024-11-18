@@ -38,6 +38,10 @@
     margin-left: 10px;
 }
 
+table.table-bordered.dataTable {
+    border-collapse: collapse !important;
+}
+
 
 .overRideBS_label {
     font-weight: normal;
