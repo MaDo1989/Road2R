@@ -2085,7 +2085,15 @@ public class DBservice_Gilad
                 
                 v.NoOfDocumentedCalls = Convert.ToInt32(dataReader["NoOfDocumentedCalls"]);
                 v.NoOfDocumentedRides = Convert.ToInt32(dataReader["NoOfDocumentedRides"]);
-                v.No_of_rides = Convert.ToInt32(dataReader["No_of_rides"]);
+                if (dataReader["No_of_rides"].ToString()=="")
+                {
+                    v.No_of_rides = 0;
+                }
+                else
+                {
+                    v.No_of_rides = Convert.ToInt32(dataReader["No_of_rides"]);
+                }
+                
                 v.NumOfRides_last2Months = Convert.ToInt32(dataReader["NumOfRides_last2Months"]);
                 v.MostCommonPath = dataReader["mostCommonPath"].ToString();
 
