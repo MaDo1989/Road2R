@@ -1633,6 +1633,7 @@ public class Volunteer
         v.Email = dr["Email"].ToString();
         v.EnglishName = dr["EnglishName"].ToString();
         v.VolunteerIdentity = dr["VolunteerIdentity"].ToString();
+        v.IsBooster = Convert.ToBoolean(dr["isBooster"].ToString());
         
         string date = dr["JoinDate"].ToString();
         bool isAssistant = Convert.ToBoolean(dr["isAssistant"].ToString());

@@ -2884,3 +2884,245 @@ end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
+
+update Location 
+set EnglishName = 'Sheeba'
+where Name like N'שיבא'
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+/****** Object:  StoredProcedure [dbo].[spVolunteer_ToggleIsDrive]    Script Date: 16/01/2025 11:36:54 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:      Yogev Strauber
+-- Create Date: 14/12/2022 @night
+-- Description: Active Or Deactivate Volunteer's isDriving
+-- Returns IsSuccesfullOperation bit, and optional VolunteerWithFutureRidesIncludedToday
+-- when try to deactivate volunteer
+--ALTER by Gilad - there is a bug --> SET isActive=@isDriving, cause to confusing in volunteer active status.
+-- it is change to be --> SET isDriving=@isDriving,
+-- =============================================
+ALTER    PROCEDURE [dbo].[spVolunteer_ToggleIsDrive]
+(
+   @displayName NVARCHAR(255),
+   @isDriving BIT
+		)
+AS
+BEGIN
+
+    SET NOCOUNT ON;
+	DECLARE @volunteerId INT = (SELECT Id from volunteer where Displayname=@displayName)
+
+	IF(@isDriving) = 0
+	BEGIN
+		IF(
+			SELECT COUNT(*) FROM UnityRide 
+			WHERE MAINDRIVER=@volunteerId
+			AND  GETDATE() <= pickupTime
+		   ) = 0
+			BEGIN
+				UPDATE Volunteer 
+				SET isDriving=@isDriving, 
+				lastModified=DATEADD(hour, 2, SYSDATETIME())
+				WHERE Id=@volunteerId
+			SELECT 
+				1 AS IsSuccesfullOperation,
+				0 AS VolunteerWithFutureRidesIncludedToday
+			END
+		ELSE
+			BEGIN
+			SELECT
+				0 AS IsSuccesfullOperation,
+				1 AS VolunteerWithFutureRidesIncludedToday
+			END
+	END
+	ELSE
+	BEGIN 
+			UPDATE Volunteer 
+			SET isDriving=@isDriving, 
+			lastModified=DATEADD(hour, 2, SYSDATETIME())
+			WHERE Id=@volunteerId
+
+			SELECT
+				1 AS IsSuccesfullOperation
+
+END
+END
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+/****** Object:  StoredProcedure [dbo].[spVolunteerTypeView_GetVolunteersList_Gilad]    Script Date: 16/01/2025 13:00:53 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:       Gilad
+-- ALTER Date:	 16/08/2023
+-- ALTER Reason: try to add addition of absence to this sp 
+-- ALTER Reason : add status != 'נמחקה' cause the lastDrive Date was incorrecet
+-- =============================================
+ALTER procedure [dbo].[spVolunteerTypeView_GetVolunteersList_Gilad] 
+
+@IsActive bit
+as
+begin
+		--Gilad addioton
+       UPDATE Absence
+    SET AbsenceStatus = CASE
+                         WHEN GETDATE() BETWEEN FromDate AND DATEADD(d,1,UntilDate) THEN 1
+                         ELSE 0
+                       END;
+
+select r.MainDriver, r.Origin, r.Destination, r.pickupTime
+into #tempNotDeletedOnly from  UnityRide r
+
+			select VolunteerId,AbsenceStatus
+			into #tempAbsence
+			from Absence
+			where  GETDATE() BETWEEN FromDate AND DATEADD(d,1,UntilDate) and isDeleted = 0
+			group by VolunteerId,AbsenceStatus
+
+--before the unity
+--SELECT v.id, MAX(r.date) AS latestDrive into #tempLatesetDrives
+--					FROM Volunteer v
+--					JOIN Ride r ON v.id = r.MainDriver
+--					GROUP BY v.id
+--after the unity
+SELECT mainDriver AS id, MAX(PickupTime) AS latestDrive into #tempLatesetDrives
+FROM UnityRide
+where [Status] not like N'נמחקה'
+GROUP BY mainDriver
+--Id,
+--DisplayName,
+--FirstNameA,
+--FirstNameH,
+--LastNameH,
+--LastNameA,
+--CellPhone,
+--CellPhone2,
+--HomePhone,
+--Remarks,
+--CityCityName,
+--Address,
+--VolunTypeType,
+--Email,
+--device,
+--NoOfDocumentedCalls,
+--NoOfDocumentedRides,
+--NumOfRides_last2Months,
+--mostCommonPath,
+--latestDrive,
+--JoinDate,
+--isAssistant,
+--IsActive,
+--KnowsArabic,
+--Gender,
+--pnRegId,
+--englishName,
+--lastModified,
+--isDriving,
+if (@IsActive = 0)
+	begin
+				select vtv.Id,vtv.DisplayName,vtv.FirstNameA,vtv.FirstNameH,
+				vtv.LastNameH,vtv.LastNameA,vtv.CellPhone,vtv.CellPhone2,
+				vtv.HomePhone,vtv.Remarks,vtv.CityCityName,vtv.Address,
+				vtv.VolunTypeType,vtv.Email,vtv.device,vtv.NoOfDocumentedCalls,
+				vtv.NoOfDocumentedRides,vtv.No_of_Rides,vtv.JoinDate,vtv.isAssistant,vtv.IsActive,
+				vtv.KnowsArabic,vtv.Gender,vtv.pnRegId,vtv.EnglishName,DATEADD(HOUR, -2, vtv.LastModified) as LastModified,vtv.isDriving,vtv.AvailableSeats,vtv.IsBooster,
+				(select count(*)
+					from UnityRide
+					where maindriver = vtv.Id  and Status != N'נמחקה'
+					and pickuptime between DATEADD(Month, -2, GETDATE()) and  GETDATE()) as NumOfRides_last2Months
+					--gilad addition vvv
+					,(
+					select abse.AbsenceStatus
+					from #tempAbsence abse
+					where abse.VolunteerId=vtv.Id
+					) as AbsenceStatus,
+					--gilad addition ^^^
+					(
+				select origin + '-'+destination from
+													(
+														select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove
+														FROM #tempNotDeletedOnly t
+														where t.MainDriver = vtv.Id AND t.pickupTime>=DATEADD(MONTH, -6, GETDATE())
+														group by maindriver, origin, destination
+														order by numberOfTimesDrove desc
+														) t
+					) mostCommonPath, tld.latestDrive
+		from VolunteerTypeView vtv
+		left join #tempLatesetDrives tld on tld.Id=vtv.Id
+		where IsActive = @IsActive --or IsActive = 1
+		order by firstNameH
+
+	end
+else
+	begin
+	select vtv.Id,vtv.DisplayName,vtv.FirstNameA,vtv.FirstNameH,
+				vtv.LastNameH,vtv.LastNameA,vtv.CellPhone,vtv.CellPhone2,
+				vtv.HomePhone,vtv.Remarks,vtv.CityCityName,vtv.Address,
+				vtv.VolunTypeType,vtv.Email,vtv.device,vtv.NoOfDocumentedCalls,
+				vtv.NoOfDocumentedRides,vtv.No_of_Rides,vtv.JoinDate,vtv.isAssistant,vtv.IsActive,
+				vtv.KnowsArabic,vtv.Gender,vtv.pnRegId,vtv.EnglishName,DATEADD(HOUR, -2, vtv.LastModified)  as LastModified,vtv.isDriving,vtv.AvailableSeats,vtv.IsBooster,
+				(select count(*)
+					from UnityRide
+					where maindriver = vtv.Id and Status != N'נמחקה'
+					and pickuptime between DATEADD(Month, -2, GETDATE()) and  GETDATE()) as NumOfRides_last2Months
+					--gilad addition vvv
+					,(
+					select abse.AbsenceStatus
+					from #tempAbsence abse
+					where abse.VolunteerId=vtv.Id
+					) as AbsenceStatus,
+					--gilad addition ^^^
+					(
+				select origin + '-'+destination from
+													(
+														select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
+														where t.MainDriver = vtv.Id AND t.pickupTime>=DATEADD(MONTH, -6, GETDATE())
+														group by maindriver, origin, destination
+														order by numberOfTimesDrove desc
+														) t
+					) mostCommonPath, tld.latestDrive
+		from VolunteerTypeView vtv
+		left join #tempLatesetDrives tld on tld.Id=vtv.Id 
+		where IsActive = @IsActive
+		order by firstNameH
+	end
+
+	drop table #tempNotDeletedOnly, #tempLatesetDrives,#tempAbsence
+
+end
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------

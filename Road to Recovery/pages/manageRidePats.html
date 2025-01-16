@@ -165,10 +165,11 @@
         const getTableNameToBeRenderedIn = (ridepatDate) => {
 
             let tableName = '';
+            
 
             if (ridepatDate.toLocaleDateString() === new Date().toLocaleDateString()) {//<---- today
 
-                if (ridepatDate.getHours() < 12) {
+                if (ridepatDate.getHours() < 12 && ridepatDate.getMinutes() != 14) {
 
                     tableName = tableNames.MORNING;
                 } else {
@@ -179,8 +180,19 @@
             } else {
 
                 tableName = tableNames.NOT_RELEVANT;
-            }
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                if (ridepatDate.toLocaleDateString() === tomorrow.toLocaleDateString()) { //<---- tomorrow
+                    if (ridepatDate.getHours() < 12 && ridepatDate.getMinutes() != 14) {
 
+                        tableName = tableNames.TOMORROW_MORNING;
+                    } else {
+
+                        tableName = tableNames.TOMORROW_AFTERNOON;
+                    }
+                }
+            }
+            console.log(' in getTableNameToBeRenderedIn', ridepatDate, tableName,);
             return tableName;
         }
 
@@ -249,31 +261,38 @@
         }
 
         const removeRidePatFromOldTable = (tableNameRidePatIsNowIn, updated_ridePat) => {
+            //console.log('im here ? ', tableNameRidePatIsNowIn, updated_ridePat);
 
             switch (tableNameRidePatIsNowIn) {
                 case tableNames.MORNING:
-
-                    row2manipulate = tMorning.row(`#${updated_ridePat.RidePatNum}`).data();
-                    tMorning.row(row2manipulate).remove().draw();
+                    row2manipulate = tMorning.row(`#${ updated_ridePat.RidePatNum }`).data();
+                    tMorning.row(`#${updated_ridePat.RidePatNum}`).remove().draw(false);
+                    break;
+                case tableNames.AFTERNOON:
+                    row2manipulate = tAfternoon.row(`#${ updated_ridePat.RidePatNum }`).data();
+                    tAfternoon.row(`#${updated_ridePat.RidePatNum}`).remove().draw(false);
                     break;
 
-                case tableNames.AFTERNOON:
-
-                    row2manipulate = tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data();
-                    tAfternoon.row(row2manipulate).remove().draw();
+                case tableNames.TOMORROW_MORNING:
+                    row2manipulate = tTomorrowMorning.row(`#${updated_ridePat.RidePatNum}`).data();
+                    tTomorrowMorning.row(`#${updated_ridePat.RidePatNum}`).remove().draw(false);
+                    break;
+                case tableNames.TOMORROW_AFTERNOON:
+                    row2manipulate = tTomorrowAfternoon.row(`#${updated_ridePat.RidePatNum}`).data();
+                    tTomorrowAfternoon.row(`#${updated_ridePat.RidePatNum}`).remove().draw(false);
                     break;
             }
-
         }
 
         const rePaintRidePatToNewTable = (tableNameRidePatShouldBeRender, updated_ridePat) => {
 
             let ridePat2Draw = {};
+            ridePat2Draw.checkBoxesStr = `<input type="checkbox" class="checkboxClass" onchange="ChangeCheckboxRides(this)" id="check${updated_ridePat.RidePatNum}">`;
             ridePat2Draw.time = buildTimeHTML(thisRidePatDate, updated_ridePat.RidePatNum);
             ridePat2Draw.origin = !isAssistant ? updated_ridePat.Origin.Name : updated_ridePat.Origin.EnglishName;
             ridePat2Draw.destination = !isAssistant ? updated_ridePat.Destination.Name : updated_ridePat.Destination.EnglishName;
             ridePat2Draw.patient = buildPatientHTML(updated_ridePat);
-            row2manipulate.patientAge = buildPatientAgeHTML_AfterUnited(updated_ridePat.Pat);
+            ridePat2Draw.patientAge = buildPatientAgeHTML_AfterUnited(updated_ridePat.Pat);
             ridePat2Draw.driver = buildDriverHTML(updated_ridePat.RidePatNum, updated_ridePat.Drivers[0], updated_ridePat.RidePatNum);
             ridePat2Draw.status = buildStatusString(updated_ridePat.Pat.RidePatPatientStatus, updated_ridePat.RidePatNum);
             ridePat2Draw.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
@@ -287,12 +306,13 @@
 
                     tMorning.row.add(
                         {
+                            checkBoxesStr: ridePat2Draw.checkBoxesStr,
                             ridePatNum: updated_ridePat.RidePatNum,
                             time: ridePat2Draw.time,
                             origin: ridePat2Draw.origin,
                             destination: ridePat2Draw.destination,
                             patient: ridePat2Draw.patient,
-                            patientAge: row2manipulate.patientAge,
+                            patientAge: ridePat2Draw.patientAge,
                             driver: ridePat2Draw.driver,
                             status: ridePat2Draw.status,
                             lastModified: ridePat2Draw.lastModified,
@@ -309,12 +329,13 @@
 
                     tAfternoon.row.add(
                         {
+                            checkBoxesStr: ridePat2Draw.checkBoxesStr,
                             ridePatNum: updated_ridePat.RidePatNum,
                             time: ridePat2Draw.time,
                             origin: ridePat2Draw.origin,
                             destination: ridePat2Draw.destination,
                             patient: ridePat2Draw.patient,
-                            patientAge: row2manipulate.patientAge,
+                            patientAge: ridePat2Draw.patientAge,
                             driver: ridePat2Draw.driver,
                             status: ridePat2Draw.status,
                             lastModified: ridePat2Draw.lastModified,
@@ -325,6 +346,54 @@
                     ).draw(false);
 
                     tr_nodesAsArray = Array.from(tAfternoon.rows().nodes());
+                    break;
+
+                case tableNames.TOMORROW_MORNING:
+
+                    tTomorrowMorning.row.add(
+                        {
+                            checkBoxesStr: ridePat2Draw.checkBoxesStr,
+                            ridePatNum: updated_ridePat.RidePatNum,
+                            time: ridePat2Draw.time,
+                            date: thisRidePatDate.toLocaleDateString('he-IL'),
+                            origin: ridePat2Draw.origin,
+                            destination: ridePat2Draw.destination,
+                            patient: ridePat2Draw.patient,
+                            patientAge: ridePat2Draw.patientAge,
+                            driver: ridePat2Draw.driver,
+                            status: ridePat2Draw.status,
+                            lastModified: ridePat2Draw.lastModified,
+                            remark: ridePat2Draw.remark,
+                            isAnonymous: ridePat2Draw.isAnonymous,
+                            buttons: ridePat2Draw.buttons
+                        }
+                    ).draw(false);
+
+                    tr_nodesAsArray = Array.from(tTomorrowMorning.rows().nodes());
+                    break;
+
+                case tableNames.TOMORROW_AFTERNOON:
+
+                    tTomorrowAfternoon.row.add(
+                        {
+                            checkBoxesStr: ridePat2Draw.checkBoxesStr,
+                            ridePatNum: updated_ridePat.RidePatNum,
+                            time: ridePat2Draw.time,
+                            date: thisRidePatDate.toLocaleDateString('he-IL'),
+                            origin: ridePat2Draw.origin,
+                            destination: ridePat2Draw.destination,
+                            patient: ridePat2Draw.patient,
+                            patientAge: ridePat2Draw.patientAge,
+                            driver: ridePat2Draw.driver,
+                            status: ridePat2Draw.status,
+                            lastModified: ridePat2Draw.lastModified,
+                            remark: ridePat2Draw.remark,
+                            isAnonymous: ridePat2Draw.isAnonymous,
+                            buttons: ridePat2Draw.buttons
+                        }
+                    ).draw(false);
+
+                    tr_nodesAsArray = Array.from(tTomorrowAfternoon.rows().nodes());
                     break;
             }
 
@@ -542,6 +611,9 @@
             thisRidePatLastModified = fixDate_WhichComeFromOpenConnection(customRide.LastModified);
             tableNameRidePatShouldBeRender = getTableNameToBeRenderedIn(thisRidePatDate);
 
+            console.log('need to call shiftRidePatToSuitableTable ???', tableName2manipulate, tableNameRidePatShouldBeRender,
+                tableNames.NOT_RELEVANT,
+                tableName2manipulate !== tableNameRidePatShouldBeRender && tableNameRidePatShouldBeRender !== tableNames.NOT_RELEVANT);
             if (tableName2manipulate !== tableNameRidePatShouldBeRender && tableNameRidePatShouldBeRender !== tableNames.NOT_RELEVANT) {
 
                 shiftRidePatToSuitableTable(tableName2manipulate, tableNameRidePatShouldBeRender, customRide);
@@ -552,7 +624,7 @@
                     case tableNames.MORNING:
 
                         row2manipulate = tMorning.row(`#${customRide.RidePatNum}`).data();
-
+                        row2manipulate.checkBoxesStr = `<input type="checkbox" class="checkboxClass" onchange="ChangeCheckboxRides(this)" id="check${customRide.RidePatNum}">`;
                         row2manipulate.time = buildTimeHTML(thisRidePatDate, customRide.RidePatNum);
                         row2manipulate.origin = !isAssistant ? customRide.Origin.Name : customRide.Origin.EnglishName;
                         row2manipulate.destination = !isAssistant ? customRide.Destination.Name : customRide.Destination.EnglishName;
@@ -562,7 +634,6 @@
                         row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
                         row2manipulate.remark = buildRemarkHTML(customRide.Remark, customRide.RidePatNum);
                         row2manipulate.buttons = buildAcionsButtonsHTML(customRide.RidePatNum, customRide.Drivers);
-
                         tMorning.row(`#${customRide.RidePatNum}`).data(row2manipulate).draw('page');
                         increaseCounter(tableNames.MORNING, customRide.RidePatNum);
 
@@ -576,7 +647,7 @@
                     case tableNames.AFTERNOON:
 
                         row2manipulate = tAfternoon.row(`#${customRide.RidePatNum}`).data();
-
+                        row2manipulate.checkBoxesStr = `<input type="checkbox" class="checkboxClass" onchange="ChangeCheckboxRides(this)" id="check${customRide.RidePatNum}">`;
                         row2manipulate.time = buildTimeHTML(thisRidePatDate, customRide.RidePatNum);
                         row2manipulate.origin = !isAssistant ? customRide.Origin.Name : customRide.Origin.EnglishName;
                         row2manipulate.destination = !isAssistant ? customRide.Destination.Name : customRide.Destination.EnglishName;
@@ -599,7 +670,7 @@
                     case tableNames.TOMORROW_MORNING:
 
                         row2manipulate = tTomorrowMorning.row(`#${customRide.RidePatNum}`).data();
-
+                        row2manipulate.checkBoxesStr = `<input type="checkbox" class="checkboxClass" onchange="ChangeCheckboxRides(this)" id="check${customRide.RidePatNum}">`;
                         row2manipulate.date = thisRidePatDate.toLocaleDateString('he-IL');
                         row2manipulate.time = buildTimeHTML(thisRidePatDate, customRide.RidePatNum);
                         row2manipulate.origin = !isAssistant ? customRide.Origin.Name : customRide.Origin.EnglishName;
@@ -624,7 +695,7 @@
                     case tableNames.TOMORROW_AFTERNOON:
 
                         row2manipulate = tTomorrowAfternoon.row(`#${customRide.RidePatNum}`).data();
-
+                        row2manipulate.checkBoxesStr = `<input type="checkbox" class="checkboxClass" onchange="ChangeCheckboxRides(this)" id="check${customRide.RidePatNum}">`;
                         row2manipulate.date = thisRidePatDate.toLocaleDateString('he-IL');
                         row2manipulate.time = buildTimeHTML(thisRidePatDate, customRide.RidePatNum);
                         row2manipulate.origin = !isAssistant ? customRide.Origin.Name : customRide.Origin.EnglishName;
@@ -650,7 +721,7 @@
                     case tableNames.FUTURE:
 
                         row2manipulate = tFuture.row(`#${customRide.RidePatNum}`).data();
-
+                        row2manipulate.checkBoxesStr = `<input type="checkbox" class="checkboxClass" onchange="ChangeCheckboxRides(this)" id="check${customRide.RidePatNum}">`;
                         row2manipulate.date = thisRidePatDate.toLocaleDateString('he-IL');
                         row2manipulate.time = buildTimeHTML(thisRidePatDate, customRide.RidePatNum);
                         row2manipulate.origin = !isAssistant ? customRide.Origin.Name : customRide.Origin.EnglishName;
@@ -1670,7 +1741,7 @@
             const isAfterNoon = $("#editTimeAfterNoonCB").is(':checked');
 
             if (isAfterNoon) {
-                hours = 22;
+                hours = 20;
                 minutes = 14;
             } else {
                 hours = $("#hours").val();
@@ -5640,13 +5711,14 @@
                                 
                                 const ride = driverRides[0];
                                 if (ride.OnlyEscort) {
-                                    message += `   ${index}. {blanks} of ${ride.PatientName} (${ride.AmountOfEscorts}) ${lineBreak}`;
-                                } else {
-                                    message += `   ${index}. ${ride.PatientName} (${ride.AmountOfEscorts + 1}) ${lineBreak}`;
+                                    message += `    {blanks} of ${ride.PatientName} (${ride.AmountOfEscorts}) ${lineBreak}`;
+                                }
+                                else {
+                                    message += `    ${ride.PatientName} (${ride.AmountOfEscorts + 1}) ${lineBreak}`;
                                 }
                             } else {
                                 
-                                message += `   ${index}. ` + driverRides.map(ride => {
+                                message += `    ` + driverRides.map(ride => {
                                     if (ride.OnlyEscort) {
                                         return `{blanks} of ${ride.PatientName} (${ride.AmountOfEscorts})`;
                                     } else {

@@ -205,9 +205,12 @@
                     $('#wait').hide();
                     var arr_volunteers = JSON.parse(data.d);
                     
-                    //console.log(arr_volunteers);
+                    console.log(arr_volunteers);
                     GENERAL.VOLUNTEERS.setVolunteersList(JSON.stringify(arr_volunteers));
                     for (i in arr_volunteers) {
+                        if (arr_volunteers[i].Id == 24041) {
+                            console.log(arr_volunteers[i])
+                        }
                         if (driveVol === true && (!arr_volunteers[i].IsDriving)) continue;
                         var btnStr = '';
                         //כפתור צפייה כרגע מוסתר
@@ -282,6 +285,13 @@
                             englishNameVolunteer = ' <br> ' + arr_volunteers[i].EnglishName;
                         }
 
+                        if (volunteerTypeAndGender == "רכזת") {
+                            volunteerTypeAndGender = "מתאמת"
+                        }
+                        if (volunteerTypeAndGender == "רכז") {
+                            volunteerTypeAndGender = "מתאם"
+                        }
+
                         var Volunteer = {
                             Id: arr_volunteers[i].Id,
                             DisplayName: arr_volunteers[i].DisplayName + englishNameVolunteer,
@@ -327,6 +337,21 @@
                             { targets: 6, type: 'de_datetime' },
                             { targets: 8, type: 'de_date' },
                             { targets: 10, type: 'de_date' },
+                            {
+                                targets: 11,
+                                render: function (data, type, row) {
+                                    if (type === 'sort') {
+                                        // אם הערך הוא "לא ידוע"
+                                        if (data === "לא ידוע") {
+                                            return 999999;
+                                        }
+                                        // המרה למספר עם הבטחה שזה יהיה מספר שלם
+                                        return parseInt(data, 10) || 0;  // בסיס 10 להמרה נכונה
+                                    }
+                                    return data;
+                                },
+                                type: 'numeric'  // הגדרה מפורשת של העמודה כמספרית
+                            }
 
 
                         ],
