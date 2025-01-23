@@ -601,7 +601,9 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">יישוב&nbsp;</label>
+                                                    <label class="col-sm-2 control-label">יישוב&nbsp;
+                                                        <span class="required" aria-required="true">*</span>
+                                                    </label>
                                                     <div class="col-sm-6">
                                                         <input id="city" name="city" type="text" class="form-control">
                                                     </div>
@@ -927,6 +929,17 @@
 
                     var valid = validateVolunteerInputs();
                     if (!valid) return false;
+
+                    
+                    if ($('#city').val() == '') {
+                            swal({
+                                title: "שדה יישוב חובה",
+                                type: "error",
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        return false;
+                    }
 
                     var firstNameH = $("#volunteerFirstName").val();
                     var lastNameH = $("#volunteerLastName").val();
