@@ -72,7 +72,23 @@ const CustomRideObject = (thisRide) => {
     return CustomObj;
 }
 
+function getHebrewDayOfWeek(date) {
+    //console.log('in getHebrewDayOfWeek',date)
+    // Array of Hebrew day names, indexed to match JavaScript's getDay() (0 = Sunday)
+    const hebrewDays = [
+        'ראשון',   // Sunday    (First Day)
+        'שני',     // Monday    (Second Day)
+        'שלישי',   // Tuesday   (Third Day)
+        'רביעי',   // Wednesday (Fourth Day)
+        'חמישי',   // Thursday  (Fifth Day)
+        'שישי',    // Friday    (Sixth Day)
+        'שבת'      // Saturday  (Sabbath)
+    ];
 
+    // Get the day index (0-6) and return the corresponding Hebrew day name
+    //console.log('in getHebrewDayOfWeek', hebrewDays[date.getDay()])
+    return hebrewDays[date.getDay()];
+}
 function manipulateDocumentedRidesModal(button, tableToWithdrawDataFrom) {
 
     $('#wait').show();
@@ -96,20 +112,33 @@ function manipulateDocumentedRidesModal(button, tableToWithdrawDataFrom) {
             }
             //console.log('Gilad Need check after - >', arrRes)
             data = arrRes; 
-
-            if (historyTable != null) {
-                historyTable.destroy();
+            //console.log('history table =>',historyTable)
+            //if (historyTable != null) {
+            //    console.log('in destroy');
+            //    historyTable.destroy();
+            //    historyTable.clear();
+            //}
+            if ($.fn.DataTable.isDataTable('#documentedRidesTable')) {
+                $('#documentedRidesTable').DataTable().destroy();
             }
 
+            // ניקוי ה-HTML של הטבלה
+            $('#documentedRidesTable tbody').empty();
 
+            //console.log('before insert to data table data =>',data)
             historyTable = $('#documentedRidesTable').DataTable({
-                order: [[5, "desc"]],
+                order: [[6, "desc"]],
                 pageLength: 10,
                 data: data,
                 columns: [
                     {
                         data: (data) => {
                             return ConvertDBDate2UIDate(data.Date);
+                        }
+                    },
+                    {
+                        data: (data) => {
+                            return getHebrewDayOfWeek(convertDBDate2FrontEndDate(data.Date));
                         }
                     },
                     {
@@ -160,7 +189,7 @@ function manipulateDocumentedRidesModal(button, tableToWithdrawDataFrom) {
                      2. render and sort by this column
                      3. not showing it to the user
                       ↓*/
-                    { "targets": [5], visible: false },
+                    { "targets": [6], visible: false },
                     //↑
                     {
                         "targets": [0],
@@ -175,11 +204,12 @@ function manipulateDocumentedRidesModal(button, tableToWithdrawDataFrom) {
                             }
                         }
                     },
-                    { "targets": 0, width: "10%" },
-                    { "targets": 1, width: "10%" },
-                    { "targets": 2, width: "20%" },
-                    { "targets": 3, width: "25%" },
-                    { "targets": 4, width: "35%" }
+                    { "targets": 0, width: "5%" },
+                    { "targets": 1, width: "5%" },
+                    { "targets": 2, width: "10%" },
+                    { "targets": 3, width: "20%" },
+                    { "targets": 4, width: "25%" },
+                    { "targets": 5, width: "35%" }
 
                 ]
             });

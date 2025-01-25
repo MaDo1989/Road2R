@@ -265,7 +265,7 @@
                 data: JSON.stringify({ displayName: displayName }),
                 success: function (data) {
                     var volunteer = JSON.parse(data.d);
-                    console.log(volunteer)
+                    //console.log(volunteer)
                     OldCellPhone = volunteer.CellPhone;
                     GENERAL.VOLUNTEERS.setVolunteersList(volunteer);
                     var location = "";

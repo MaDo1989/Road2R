@@ -205,11 +205,11 @@
                     $('#wait').hide();
                     var arr_volunteers = JSON.parse(data.d);
                     
-                    console.log(arr_volunteers);
+                    //console.log(arr_volunteers);
                     GENERAL.VOLUNTEERS.setVolunteersList(JSON.stringify(arr_volunteers));
                     for (i in arr_volunteers) {
                         if (arr_volunteers[i].Id == 24041) {
-                            console.log(arr_volunteers[i])
+                           // console.log(arr_volunteers[i])
                         }
                         if (driveVol === true && (!arr_volunteers[i].IsDriving)) continue;
                         var btnStr = '';
