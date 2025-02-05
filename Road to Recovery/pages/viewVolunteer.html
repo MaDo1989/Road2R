@@ -308,7 +308,8 @@
                             NearestBigCity: arr_volunteers[i].NearestBigCity,
                             JoinDate: joinDate,
                             AvailableSeats: arr_volunteers[i].AvailableSeats == 0 ? 'לא ידוע' : arr_volunteers[i].AvailableSeats,
-                            isBooster: arr_volunteers[i].IsBooster?'✅':'❌',
+                            isBooster: arr_volunteers[i].IsBooster ? '✅' : '❌',
+                            isBabySeat: arr_volunteers[i].IsBabySeat ? '✅' : '❌',
                         }
                         allVolunteersFromDb.push(Volunteer);
                     }
@@ -333,7 +334,7 @@
                                 targets: 3,
                                 className: 'text-left-strong'
                             },
-                            { "targets": [13], "orderable": false },
+                            { "targets": [14], "orderable": false },
                             { targets: 6, type: 'de_datetime' },
                             { targets: 8, type: 'de_date' },
                             { targets: 10, type: 'de_date' },
@@ -368,8 +369,9 @@
                             { data: "MostCommonPath", width: "3%" },           //9
                             { data: "JoinDate", width: "4%" },                 //10 
                             { data: "AvailableSeats", width: "4%" },            //11
-                            { data: "isBooster", width: "1%" },                 //12
-                            { data: "Buttons", width: "25%" },                 //13
+                            { data: "isBooster", width: "1%" },                 //12 
+                            { data: "isBabySeat", width: "1%" },                 //13
+                            { data: "Buttons", width: "25%" },                 //14
                         ],
                     });
 
@@ -830,9 +832,10 @@
                                     <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(11, this.checked)" data-column="11">
                                     <label>מספר מקומות ברכב</label> |
                                     <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(12, this.checked)" data-column="12">
-                                    <label>יש כיסא לתינוק</label> |
-
-                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(13, this.checked)" data-column="13">
+                                    <label>בוסטר</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(13, this.checked)" data-column="12">
+                                    <label>כיסא תינוק</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(14, this.checked)" data-column="13">
                                     <label>פעולות</label>
                                 </div>
                                 <table id="datatable-buttons" class="table table-striped table-bordered">
@@ -850,7 +853,8 @@
                                             <th>מסלול שכיח: נקודה לנקודה</th>
                                             <th>תאריך הצטרפות</th>
                                             <th>מספר מקומות ברכב</th>
-                                            <th>יש כיסא לתינוק</th>
+                                            <th>בוסטר ?</th>
+                                            <th>כיסא תינוק ?</th>
                                             <th>פעולות</th>
                                         </tr>
                                     </thead>

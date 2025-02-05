@@ -55,6 +55,7 @@ public class Volunteer
     string englishLN;
     bool? isDriving;
     bool isBooster;
+    bool isBabySeat;
     string howCanHelp;
     string feedback;
     string birthDate;
@@ -1370,6 +1371,19 @@ public class Volunteer
         }
     }
 
+    public bool IsBabySeat
+    {
+        get
+        {
+            return isBabySeat;
+        }
+
+        set
+        {
+            isBabySeat = value;
+        }
+    }
+
     public Volunteer()
     {
         //
@@ -1634,7 +1648,8 @@ public class Volunteer
         v.EnglishName = dr["EnglishName"].ToString();
         v.VolunteerIdentity = dr["VolunteerIdentity"].ToString();
         v.IsBooster = Convert.ToBoolean(dr["isBooster"].ToString());
-        
+        v.IsBabySeat = Convert.ToBoolean(dr["IsBabyChair"].ToString());
+
         string date = dr["JoinDate"].ToString();
         bool isAssistant = Convert.ToBoolean(dr["isAssistant"].ToString());
         if (date == "")
@@ -1918,7 +1933,7 @@ public class Volunteer
             DbService db = new DbService();
             SqlCommand cmd = new SqlCommand();
             cmd.CommandType = CommandType.Text;
-            SqlParameter[] cmdParams = new SqlParameter[27];
+            SqlParameter[] cmdParams = new SqlParameter[28];
             cmdParams[0] = cmd.Parameters.AddWithValue("@address", v.Address);
             cmdParams[1] = cmd.Parameters.AddWithValue("@cell", v.CellPhone);
             cmdParams[2] = cmd.Parameters.AddWithValue("@cell2", v.CellPhone2);
@@ -1961,6 +1976,7 @@ public class Volunteer
             cmdParams[24] = cmd.Parameters.AddWithValue("@isActive", v.IsActive);
             cmdParams[25] = cmd.Parameters.AddWithValue("@availableSeats", v.AvailableSeats);
             cmdParams[26] = cmd.Parameters.AddWithValue("@IsBooster", v.IsBooster);
+            cmdParams[27] = cmd.Parameters.AddWithValue("@IsBabySeat", v.IsBabySeat);
 
             string newName = v.FirstNameH + " " + v.LastNameH;
             newName = newName.Replace("'", "''");
@@ -2012,7 +2028,7 @@ public class Volunteer
                 string password = ConfigurationManager.AppSettings["password"];
                 if (v.TypeVol == "רכז" || v.TypeVol == "מנהל" || v.IsAssistant)
                 {
-                    query = "update Volunteer set Address=@address, CellPhone=@cell, AvailableSeats=@availableSeats,IsBooster=@IsBooster,";
+                    query = "update Volunteer set Address=@address, CellPhone=@cell, AvailableSeats=@availableSeats,IsBooster=@IsBooster, IsBabyChair = @IsBabySeat,";
                     query += "CellPhone2=@cell2, CityCityName=@city, Email=@email, FirstNameA=@firstNameA, FirstNameH=@firstNameH, VolunteerIdentity=@volunteerIdentity, ";
                     query += "Gender=@gender, JoinDate=@jDate, KnowsArabic=@knowsArabic, LastNameA=@lastNameA, ";
                     query += "EnglishFN=@englishFN, EnglishLN=@englishLN, BirthDate=@birthDate, IsDriving=@isDriving, ";
@@ -2022,7 +2038,7 @@ public class Volunteer
                 }
                 else
                 {
-                    query = "update Volunteer set Address=@address, CellPhone=@cell, AvailableSeats=@availableSeats,IsBooster=@IsBooster, ";
+                    query = "update Volunteer set Address=@address, CellPhone=@cell, AvailableSeats=@availableSeats,IsBooster=@IsBooster, IsBabyChair = @IsBabySeat, ";
                     query += "CellPhone2=@cell2, CityCityName=@city, Email=@email, FirstNameA=@firstNameA, FirstNameH=@firstNameH, VolunteerIdentity=@volunteerIdentity, ";
                     query += "Gender=@gender, JoinDate=@jDate, KnowsArabic=@knowsArabic, LastNameA=@lastNameA, ";
                     query += "EnglishFN=@englishFN, EnglishLN=@englishLN, BirthDate=@birthDate, ";

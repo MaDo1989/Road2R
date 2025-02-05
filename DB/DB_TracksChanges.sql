@@ -1626,6 +1626,14 @@ from volunteer
 
 UPDATE volunteer
 SET IsBooster = 0
+
+
+ALTER TABLE volunteer
+ADD IsBabyChair bit;
+
+
+UPDATE volunteer
+SET IsBabyChair = 0
  
 
 UPDATE volunteer
@@ -1656,7 +1664,7 @@ SELECT        dbo.Volunteer.Id, dbo.Volunteer.DisplayName, dbo.Volunteer.FirstNa
                          dbo.Volunteer.JoinDate, dbo.Volunteer.IsActive, dbo.Volunteer.KnowsArabic, dbo.Volunteer.BirthDate, dbo.Volunteer.Gender, dbo.Volunteer.Remarks, dbo.Volunteer.Department, dbo.Volunteer.UserName, dbo.Volunteer.Password, 
                          dbo.Volunteer.CityCityName, dbo.Volunteer.pnRegId, dbo.Volunteer.FirstNameA, dbo.Volunteer.LastNameA, dbo.Volunteer.AvailableSeats, dbo.VolunType_Volunteer.VolunTypeType, dbo.Volunteer.device, 
                          dbo.Volunteer.EnglishName, dbo.Volunteer.isAssistant, dbo.Volunteer.LastModified, dbo.Volunteer.VolunteerIdentity, dbo.Volunteer.EnglishFN, dbo.Volunteer.EnglishLN, dbo.Volunteer.isDriving, dbo.Volunteer.howCanHelp, 
-                         dbo.Volunteer.feedback, dbo.Volunteer.NewsLetter, dbo.Volunteer.Refered, dbo.Volunteer.RoleInR2R, dbo.Volunteer.NoOfDocumentedCalls, dbo.Volunteer.NoOfDocumentedRides,dbo.Volunteer.No_of_Rides,dbo.Volunteer.IsBooster
+                         dbo.Volunteer.feedback, dbo.Volunteer.NewsLetter, dbo.Volunteer.Refered, dbo.Volunteer.RoleInR2R, dbo.Volunteer.NoOfDocumentedCalls, dbo.Volunteer.NoOfDocumentedRides,dbo.Volunteer.No_of_Rides,dbo.Volunteer.IsBooster,dbo.volunteer.IsBabyChair
 FROM            dbo.Volunteer INNER JOIN
                          dbo.VolunType_Volunteer ON dbo.Volunteer.Id = dbo.VolunType_Volunteer.VolunteerId
 
@@ -2429,7 +2437,7 @@ END
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
-/****** Object:  StoredProcedure [dbo].[spVolunteerTypeView_GetVolunteersList_Gilad]    Script Date: 16/01/2025 13:00:53 ******/
+/****** Object:  StoredProcedure [dbo].[spVolunteerTypeView_GetVolunteersList_Gilad]    Script Date: 05/02/2025 21:44:22 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2507,7 +2515,7 @@ if (@IsActive = 0)
 				vtv.HomePhone,vtv.Remarks,vtv.CityCityName,vtv.Address,
 				vtv.VolunTypeType,vtv.Email,vtv.device,vtv.NoOfDocumentedCalls,
 				vtv.NoOfDocumentedRides,vtv.No_of_Rides,vtv.JoinDate,vtv.isAssistant,vtv.IsActive,
-				vtv.KnowsArabic,vtv.Gender,vtv.pnRegId,vtv.EnglishName,DATEADD(HOUR, -2, vtv.LastModified) as LastModified,vtv.isDriving,vtv.AvailableSeats,vtv.IsBooster,
+				vtv.KnowsArabic,vtv.Gender,vtv.pnRegId,vtv.EnglishName,DATEADD(HOUR, -2, vtv.LastModified) as LastModified,vtv.isDriving,vtv.AvailableSeats,vtv.IsBooster,vtv.IsBabyChair,
 				(select count(*)
 					from UnityRide
 					where maindriver = vtv.Id  and Status != N'נמחקה'
@@ -2520,15 +2528,20 @@ if (@IsActive = 0)
 					) as AbsenceStatus,
 					--gilad addition ^^^
 					(
-				select origin + '-'+destination from
-													(
-														select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove
-														FROM #tempNotDeletedOnly t
-														where t.MainDriver = vtv.Id AND t.pickupTime>=DATEADD(MONTH, -6, GETDATE())
-														group by maindriver, origin, destination
-														order by numberOfTimesDrove desc
-														) t
-					) mostCommonPath, tld.latestDrive
+				select origin + '-' + destination from
+											(
+												select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove
+												FROM (
+													select top 50 *
+													from #tempNotDeletedOnly t
+													where t.MainDriver = vtv.Id
+													order by pickupTime desc
+												) last50Rides
+												group by maindriver, origin, destination
+												order by numberOfTimesDrove desc
+											) t
+					) 
+											mostCommonPath, tld.latestDrive
 		from VolunteerTypeView vtv
 		left join #tempLatesetDrives tld on tld.Id=vtv.Id
 		where IsActive = @IsActive --or IsActive = 1
@@ -2542,7 +2555,7 @@ else
 				vtv.HomePhone,vtv.Remarks,vtv.CityCityName,vtv.Address,
 				vtv.VolunTypeType,vtv.Email,vtv.device,vtv.NoOfDocumentedCalls,
 				vtv.NoOfDocumentedRides,vtv.No_of_Rides,vtv.JoinDate,vtv.isAssistant,vtv.IsActive,
-				vtv.KnowsArabic,vtv.Gender,vtv.pnRegId,vtv.EnglishName,DATEADD(HOUR, -2, vtv.LastModified)  as LastModified,vtv.isDriving,vtv.AvailableSeats,vtv.IsBooster,
+				vtv.KnowsArabic,vtv.Gender,vtv.pnRegId,vtv.EnglishName,DATEADD(HOUR, -2, vtv.LastModified)  as LastModified,vtv.isDriving,vtv.AvailableSeats,vtv.IsBooster,vtv.IsBabyChair,
 				(select count(*)
 					from UnityRide
 					where maindriver = vtv.Id and Status != N'נמחקה'
@@ -2555,13 +2568,18 @@ else
 					) as AbsenceStatus,
 					--gilad addition ^^^
 					(
-				select origin + '-'+destination from
-													(
-														select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove FROM #tempNotDeletedOnly t
-														where t.MainDriver = vtv.Id AND t.pickupTime>=DATEADD(MONTH, -6, GETDATE())
-														group by maindriver, origin, destination
-														order by numberOfTimesDrove desc
-														) t
+				select origin + '-' + destination from
+										(
+											select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove
+											FROM (
+												select top 50 *
+												from #tempNotDeletedOnly t
+												where t.MainDriver = vtv.Id
+												order by pickupTime desc
+											) last50Rides
+											group by maindriver, origin, destination
+											order by numberOfTimesDrove desc
+										) t
 					) mostCommonPath, tld.latestDrive
 		from VolunteerTypeView vtv
 		left join #tempLatesetDrives tld on tld.Id=vtv.Id 
@@ -2572,8 +2590,6 @@ else
 	drop table #tempNotDeletedOnly, #tempLatesetDrives,#tempAbsence
 
 end
-
-
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------

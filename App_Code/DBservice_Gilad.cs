@@ -2126,6 +2126,7 @@ public class DBservice_Gilad
                 }
 
                 v.IsBooster = Convert.ToBoolean(dataReader["IsBooster"].ToString());
+                v.IsBabySeat = Convert.ToBoolean(dataReader["IsBabyChair"].ToString());
                 string date = dataReader["JoinDate"].ToString();
                 bool isAssistant = Convert.ToBoolean(dataReader["isAssistant"].ToString());
                 if (date == "")

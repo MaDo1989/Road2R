@@ -290,6 +290,7 @@
                     $("#volunteerEnglishName").val(volunteer.EnglishName);
                     $("#firstA").val(volunteer.FirstNameA);
                     $('#BoosterIN').attr('checked', volunteer.IsBooster);
+                    $('#BabySeatIN').attr('checked', volunteer.IsBabySeat);
                     $("#lastA").val(volunteer.LastNameA);
                     $("#availableSeatsIN").val(volunteer.AvailableSeats == null ? 4 : volunteer.AvailableSeats);
 
@@ -562,7 +563,10 @@
                                                         <label for="ArabSpeaking">דובר ערבית?</label>
                                                         <span> || </span>
                                                         <input id="BoosterIN" name="BoosterIN" type="checkbox">
-                                                        <label for="BoosterIN">כיסא לתינוק</label>
+                                                        <label for="BoosterIN">בוסטר ?</label>
+                                                        <span> || </span>
+                                                        <input id="BabySeatIN" name="BabySeatIN" type="checkbox">
+                                                        <label for="BabySeatIN">כיסא תינוק ?</label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -951,6 +955,7 @@
                     var email = $("#email").val();
                     var typeVol = $("#typeVolunteer").val();
                     let isBooster = $("#BoosterIN").is(':checked');
+                    let isBabySeat = $("#BabySeatIN").is(':checked');
                     var isHelper = false;
                     if (typeVol.indexOf('עוזר') !== -1) {
                         isHelper = true;
@@ -1028,7 +1033,7 @@
                         firstNameH: firstNameH, firstNameA: nameA, lastNameH: lastNameH, lastNameA: lastNameA, cellPhone: cellPhone, cellphone2: cellphone2, /*homePhone: homePhone,*/
                         city: city, address: address, email: email, joinDate: joinDate, gender: gender, KnowsArabic: knowsArabic,
                         typeVol: typeVol, IsActive: active, Remarks: remark, DisplayName: displayName, EnglishName: englishName, IsAssistant: isHelper, VolunteerIdentity: VolunteerIdentity, //birthdate: bdate,
-                        EnglishFN: englishFN, EnglishLN: englishLN, BirthDate: birthDate, IsDriving: isDriving, Role: role, AvailableSeats: availableSeats, IsBooster: isBooster
+                        EnglishFN: englishFN, EnglishLN: englishLN, BirthDate: birthDate, IsDriving: isDriving, Role: role, AvailableSeats: availableSeats, IsBooster: isBooster, IsBabySeat: isBabySeat
                     }
                     if (func === 'edit') {
                         volunteer.OldCellPhone = OldCellPhone;
