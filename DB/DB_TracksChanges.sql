@@ -2069,6 +2069,37 @@ SELECT COUNT(DISTINCT pickuptime)
 )
 
 
+-- IMPORTANT --  -- IMPORTANT --  -- IMPORTANT -- -- IMPORTANT --  -- IMPORTANT --  -- IMPORTANT -- -- IMPORTANT --  -- IMPORTANT --  -- IMPORTANT -- 
+-- IMPORTANT --  -- IMPORTANT --  -- IMPORTANT -- -- IMPORTANT --  -- IMPORTANT --  -- IMPORTANT -- -- IMPORTANT --  -- IMPORTANT --  -- IMPORTANT -- 
+-- the ALTER of the view !!!! 
+
+/****** Object:  View [dbo].[VolunteerTypeView]    Script Date: 05/02/2025 17:02:24 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+
+ALTER view [dbo].[VolunteerTypeView]
+as
+SELECT        dbo.Volunteer.Id, dbo.Volunteer.DisplayName, dbo.Volunteer.FirstNameH, dbo.Volunteer.LastNameH, dbo.Volunteer.CellPhone, dbo.Volunteer.CellPhone2, dbo.Volunteer.HomePhone, dbo.Volunteer.Address, dbo.Volunteer.Email, 
+                         dbo.Volunteer.JoinDate, dbo.Volunteer.IsActive, dbo.Volunteer.KnowsArabic, dbo.Volunteer.BirthDate, dbo.Volunteer.Gender, dbo.Volunteer.Remarks, dbo.Volunteer.Department, dbo.Volunteer.UserName, dbo.Volunteer.Password, 
+                         dbo.Volunteer.CityCityName, dbo.Volunteer.pnRegId, dbo.Volunteer.FirstNameA, dbo.Volunteer.LastNameA, dbo.Volunteer.AvailableSeats, dbo.VolunType_Volunteer.VolunTypeType, dbo.Volunteer.device, 
+                         dbo.Volunteer.EnglishName, dbo.Volunteer.isAssistant, dbo.Volunteer.LastModified, dbo.Volunteer.VolunteerIdentity, dbo.Volunteer.EnglishFN, dbo.Volunteer.EnglishLN, dbo.Volunteer.isDriving, dbo.Volunteer.howCanHelp, 
+                         dbo.Volunteer.feedback, dbo.Volunteer.NewsLetter, dbo.Volunteer.Refered, dbo.Volunteer.RoleInR2R, dbo.Volunteer.NoOfDocumentedCalls, dbo.Volunteer.NoOfDocumentedRides,dbo.Volunteer.No_of_Rides,dbo.Volunteer.IsBooster
+FROM            dbo.Volunteer INNER JOIN
+                         dbo.VolunType_Volunteer ON dbo.Volunteer.Id = dbo.VolunType_Volunteer.VolunteerId
+
+GO
+
+
+-- IMPORTANT --  -- IMPORTANT --  -- IMPORTANT -- -- IMPORTANT --  -- IMPORTANT --  -- IMPORTANT -- -- IMPORTANT --  -- IMPORTANT --  -- IMPORTANT -- 
+-- IMPORTANT --  -- IMPORTANT --  -- IMPORTANT -- -- IMPORTANT --  -- IMPORTANT --  -- IMPORTANT -- -- IMPORTANT --  -- IMPORTANT --  -- IMPORTANT -- 
+
+
+
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
