@@ -652,8 +652,20 @@ public class UnityRide
             ur = dBservice.deleteUnityRide(listIDs[0], whoChange);
             BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
         }
+        writeWhoDeleteRides(ur, whoChange);
 
+    }
 
+    private void writeWhoDeleteRides(UnityRide ur,string user) {
+        string strToWrite = "*******************************************************************************"+ Environment.NewLine;
+        strToWrite += "*******************************************************************************"+ Environment.NewLine;
+        strToWrite += "User: " + user + " deleted ride: " + ur.RidePatNum + " at: " + DateTime.Now.ToString()+ Environment.NewLine;
+        strToWrite+="from : " + ur.Origin + " to: " + ur.Destination + " at: " + ur.PickupTime.ToString()+ Environment.NewLine;
+        strToWrite+="with driver: " + ur.DriverName + " and patient: " + ur.patientName+ Environment.NewLine;
+        strToWrite += "*******************************************************************************"+ Environment.NewLine;
+        strToWrite += "*******************************************************************************"+ Environment.NewLine;
+        DBservice_Gilad.StringToTextFile(strToWrite, "Who_Deleted_Rides");
+    
     }
 
     public List<UnityRide> Get_unityRide_ByTimeRange(int from, int until, bool isDeletedtoShow)

@@ -584,12 +584,13 @@
             }, function (isConfirm) {
                 if (isConfirm) {
                     $('#wait').show();
+                    const username = GENERAL.USER.getUserDisplayName();
                     $.ajax({
                         dataType: "json",
                         url: "WebService.asmx/deleteUnityRide",
                         contentType: "application/json; charset=utf-8",
                         type: "POST",
-                        data: JSON.stringify({ ListIDs: ridePatNums2MarkDeleted }),
+                        data: JSON.stringify({ ListIDs: ridePatNums2MarkDeleted, userName: username }),
                         success: function (data) {
                             $('#wait').hide();
                             swal({
@@ -880,12 +881,13 @@
                 }, function (isConfirm) {
                     if (isConfirm) {
                         $('#wait').show();
+                        const username = GENERAL.USER.getUserDisplayName();
                         $.ajax({
                             dataType: "json",
                             url: "WebService.asmx/deleteUnityRide",
                             contentType: "application/json; charset=utf-8",
                             type: "POST",
-                            data: JSON.stringify({ ListIDs: deleteMe }),
+                            data: JSON.stringify({ ListIDs: deleteMe, userName: username }),
                             success: function (data) {
                                 $('#wait').hide();
                                 swal({

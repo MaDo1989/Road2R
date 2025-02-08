@@ -2599,3 +2599,335 @@ end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+/****** Object:  StoredProcedure [dbo].[sp_getALLCandidateUnityRideV2]    Script Date: 08/02/2025 16:37:33 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad Meirson>
+-- Create Date: <17/09/2024>
+-- Description: <get all type of volunteer to unit Table for candidate moudle>
+-- =============================================
+ALTER PROCEDURE [dbo].[sp_getALLCandidateUnityRideV2]
+(
+    -- Add the parameters for the stored procedure here
+    @ridePatNum INT
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+    
+
+    -- Insert statements for procedure here
+    --declare basic vars 
+DECLARE @R_origin NVARCHAR(255) = (SELECT origin FROM unityRide WHERE ridePatNum = @ridePatNum);
+DECLARE @R_dest NVARCHAR(255) = (SELECT destination FROM unityRide WHERE ridePatNum = @ridePatNum);
+DECLARE @R_time DateTIme = (SELECT pickupTime FROM unityRide WHERE ridePatNum = @ridePatNum);
+DECLARE @R_isAfterNoon bit = case when (DATEPART(HOUR, @R_time) >=15) then 1 else 0 end
+DECLARE @R_area NVARCHAR(255) = (SELECT area FROM unityRide WHERE ridePatNum = @ridePatNum);
+DECLARE @dayInWeek NVARCHAR(20);
+DECLARE @R_regionID_origin INT = (select RegionId from location where Name Like @R_origin)
+DECLARE @R_regionID_dest INT = (select RegionId from location where Name Like @R_dest)
+
+--distance vars
+DECLARE @R_origin_lat FLOAT = (SELECT lat from Location where Name like @R_origin) -- x
+DECLARE @R_origin_lng FLOAT = (SELECT lng from Location where Name like @R_origin) -- y
+DECLARE @R_destination_lat FLOAT = (SELECT lat from Location where Name like @R_dest) --x
+DECLARE @R_destination_lng FLOAT = (SELECT lng from Location where Name like @R_dest) --y
+
+
+
+
+
+--declare Geo Points
+DECLARE @Start_point GEOGRAPHY = GEOGRAPHY::Point(@R_origin_lat, @R_origin_lng, 4326); 
+DECLARE @End_point GEOGRAPHY = GEOGRAPHY::Point(@R_destination_lat, @R_destination_lng, 4326); 
+
+SET @dayInWeek = 
+    CASE DATENAME(WEEKDAY, @R_time)
+        WHEN 'Sunday' THEN N'ראשון'
+        WHEN 'Monday' THEN N'שני'
+        WHEN 'Tuesday' THEN N'שלישי'
+        WHEN 'Wednesday' THEN N'רביעי'
+        WHEN 'Thursday' THEN N'חמישי'
+        WHEN 'Friday' THEN N'שישי'
+        WHEN 'Saturday' THEN N'שבת'
+    END;
+
+
+
+-- Attempt to optimize the query
+
+select *
+into #tempUnity
+from UnityRide
+where pickuptime >=DATEADD(year, -1, GETDATE()) and pickuptime<= DATEADD(DAY, 30, GETDATE()) AND status not like N'נמחקה'
+
+
+-- Attempt to optimize the query
+	select * 
+	into #ShortenDriversTable
+	from Volunteer v
+	--only volunteers that active and driving.
+	where isActive =1 AND isDriving = 1 
+	--only volunteers that not in absence
+	AND v.Id NOT IN (SELECT volunteerId FROM Absence WHERE @R_time >= FromDate AND @R_time <= UntilDate)
+	--volunteers that didnt talk with them today*
+    AND v.Id NOT IN (SELECT DriverId FROM documentedCall WHERE CAST(GETDATE() AS DATE) = CallRecordedDate)
+	--volunteers who isnt drive in this day (ride day)
+    AND v.Id NOT IN (SELECT DISTINCT mainDriver FROM #tempUnity WHERE CAST(pickupTime AS DATE) = CAST(@R_time AS DATE) AND mainDriver IS NOT NULL )
+	--volunteers who isnt drive day before the ride day
+	AND v.Id NOT IN (SELECT DISTINCT MainDriver FROM #tempUnity WHERE CAST(pickupTime AS DATE)= DATEADD(day, -1, CAST(@R_time AS DATE)) AND MainDriver is NOT NULL  )
+	--volunteers who isnt drive day after the ride day
+	AND v.Id NOT IN (SELECT DISTINCT MainDriver FROM #tempUnity WHERE CAST(pickupTime AS DATE)= DATEADD(day, 1, CAST(@R_time AS DATE)) AND MainDriver is NOT NULL  )
+	--volunteers who isnt managers
+	AND v.Id NOT IN (select VolunteerId from VolunType_Volunteer where VolunTypeType not like N'מתנדב');
+
+
+
+
+	--NEWBIS
+	select * ,'NEWBIS' as Vtype
+	into #newbis
+	from #ShortenDriversTable
+	where DATEDIFF(DAY,JoinDate,GETDATE())<=260
+
+	--Regular
+	select * ,'REGULAR' as Vtype
+	into #regular
+	from #ShortenDriversTable
+	where NoOfDocumentedRides >3 AND NoOfDocumentedRides<100 AND  DATEDIFF(DAY,JoinDate,GETDATE())>=60
+
+
+	--SUPER
+	select * ,'SUPER' as Vtype
+	into #super
+	from #ShortenDriversTable
+	where NoOfDocumentedRides>=100;
+
+
+
+-- this is query to calc the points before the main query
+WITH VolunteerCityPoints AS (
+    SELECT 
+        v.Id,
+        GEOGRAPHY::Point(ISNULL(c.lat, 32.0853), ISNULL(c.lng, 34.7818), 4326) AS VolunteerCityPoint
+    FROM 
+        #ShortenDriversTable v
+    JOIN 
+        City c ON v.CityCityName = c.CityName
+),
+
+
+newbisCTE AS (
+
+	SELECT  Id, DisplayName, CellPhone, JoinDate, CityCityName, AvailableSeats, NoOfDocumentedRides,Vtype,
+			(DATEDIFF(day, JoinDate, GETDATE())) / 365.0 as 'SeniorityInYears',
+			(SELECT TOP 1 CAST(CallRecordedDate AS DATETIME) + CAST(CallRecordedTime AS DATETIME) 
+			FROM documentedCall 
+			WHERE driverId = n.Id 
+			ORDER BY CallRecordedDate DESC) as 'LastCallDateTime',
+			DATEDIFF(day, (SELECT TOP 1 pickupTime 
+                       FROM #tempUnity 
+                       WHERE MainDriver = n.Id AND pickupTime < GETDATE()   
+                       ORDER BY pickupTime DESC), GETDATE()) as 'LastRideInDays',
+
+			DATEDIFF(day, GETDATE(), (SELECT TOP 1 pickupTime 
+                                  FROM #tempUnity 
+                                  WHERE MainDriver = n.Id AND pickupTime >= GETDATE()   
+                                  ORDER BY pickupTime)) as 'NextRideInDays',
+
+			(SELECT COUNT(*) 
+			 FROM #tempUnity 
+			 WHERE MainDriver = n.Id  AND pickupTime BETWEEN DATEADD(MONTH, -2, GETDATE()) AND GETDATE()) as 'NumOfRidesLast2Month',
+			(SELECT COUNT(*) 
+			 FROM #tempUnity 
+			 WHERE origin LIKE @R_origin AND destination LIKE @R_dest AND mainDriver = n.Id ) as 'AmountOfRidesInThisPath',
+			 (SELECT COUNT(*)
+				 FROM #tempUnity tu
+				 JOIN Location l ON tu.Origin = l.Name
+				 WHERE tu.mainDriver = n.Id AND tu.destination LIKE @R_dest AND tu.Origin NOT LIKE @R_origin   AND l.RegionId = @R_regionID_origin) AS 'AmountOfRidesFromRegionToDest',
+			(SELECT COUNT(*) 
+			 FROM #tempUnity 
+			 WHERE destination LIKE @R_origin AND origin LIKE @R_dest AND mainDriver = n.Id ) as 'AmountOfRidesInOppositePath',
+			(SELECT COUNT(*)
+				 FROM #tempUnity tu
+				 JOIN Location l ON tu.Origin = l.Name
+				 WHERE tu.mainDriver = n.Id AND tu.Origin LIKE @R_origin AND tu.Destination NOT LIKE @R_dest   AND l.RegionId = @R_regionID_dest) as 'AmountOfRides_OriginToArea',
+			 (CASE WHEN @R_isAfterNoon = 1 
+              THEN (SELECT COUNT(*) FROM #tempUnity WHERE n.Id = mainDriver AND DATEPART(HOUR, pickupTime) >= 15 ) 
+              ELSE (SELECT COUNT(*) FROM #tempUnity WHERE n.Id = mainDriver AND DATEPART(HOUR, pickupTime) < 15 ) END) as 'AmountOfRidesAtThisTime',
+			 (SELECT COUNT(*) 
+			 FROM #tempUnity 
+			 WHERE DATENAME(WEEKDAY, @R_time) = DATENAME(WEEKDAY, pickupTime) AND MainDriver = n.Id ) as 'AmountOfRidesAtThisDayWeek',
+
+			 (SELECT(
+			 (SELECT VolunteerCityPoint FROM VolunteerCityPoints WHERE Id = n.Id).STDistance(@Start_point)
+			 + 
+             @Start_point.STDistance(@End_point)
+			 + 
+             @End_point.STDistance((SELECT VolunteerCityPoint FROM VolunteerCityPoints WHERE Id = n.Id))
+			 )/1000
+			 ) as 'SumOfKM'
+
+	FROM #newbis n
+
+),
+
+
+RegularCTE AS (
+
+	SELECT  Id, DisplayName, CellPhone, JoinDate, CityCityName, AvailableSeats, NoOfDocumentedRides,Vtype,
+			(DATEDIFF(day, JoinDate, GETDATE())) / 365.0 as 'SeniorityInYears',
+			(SELECT TOP 1 CAST(CallRecordedDate AS DATETIME) + CAST(CallRecordedTime AS DATETIME) 
+			FROM documentedCall 
+			WHERE driverId = r.Id 
+			ORDER BY CallRecordedDate DESC) as 'LastCallDateTime',
+			DATEDIFF(day, (SELECT TOP 1 pickupTime 
+                       FROM #tempUnity 
+                       WHERE MainDriver = r.Id AND pickupTime < GETDATE()   
+                       ORDER BY pickupTime DESC), GETDATE()) as 'LastRideInDays',
+
+			DATEDIFF(day, GETDATE(), (SELECT TOP 1 pickupTime 
+                                  FROM #tempUnity 
+                                  WHERE MainDriver = r.Id AND pickupTime >= GETDATE()   
+                                  ORDER BY pickupTime)) as 'NextRideInDays',
+			(SELECT COUNT(*)
+				 FROM #tempUnity tu
+				 JOIN Location l ON tu.Origin = l.Name
+				 WHERE tu.mainDriver = r.Id AND tu.destination LIKE @R_dest AND tu.Origin NOT LIKE @R_origin   AND l.RegionId = @R_regionID_origin) AS 'AmountOfRidesFromRegionToDest',
+
+			(SELECT COUNT(*) 
+			 FROM #tempUnity 
+			 WHERE MainDriver = r.Id  AND pickupTime BETWEEN DATEADD(MONTH, -2, GETDATE()) AND GETDATE()) as 'NumOfRidesLast2Month',
+			(SELECT COUNT(*) 
+			 FROM #tempUnity 
+			 WHERE origin LIKE @R_origin AND destination LIKE @R_dest AND mainDriver = r.Id ) as 'AmountOfRidesInThisPath',
+			(SELECT COUNT(*) 
+			 FROM #tempUnity 
+			 WHERE destination LIKE @R_origin AND origin LIKE @R_dest AND mainDriver = r.Id ) as 'AmountOfRidesInOppositePath',
+			(SELECT COUNT(*)
+				 FROM #tempUnity tu
+				 JOIN Location l ON tu.Origin = l.Name
+				 WHERE tu.mainDriver = r.Id AND tu.Origin LIKE @R_origin AND tu.Destination NOT LIKE @R_dest   AND l.RegionId = @R_regionID_dest) as 'AmountOfRides_OriginToArea',
+			 (CASE WHEN @R_isAfterNoon = 1 
+              THEN (SELECT COUNT(*) FROM #tempUnity WHERE r.Id = mainDriver AND DATEPART(HOUR, pickupTime) >= 15 ) 
+              ELSE (SELECT COUNT(*) FROM #tempUnity WHERE r.Id = mainDriver AND DATEPART(HOUR, pickupTime) < 15  ) END) as 'AmountOfRidesAtThisTime',
+			 (SELECT COUNT(*) 
+			 FROM #tempUnity 
+			 WHERE DATENAME(WEEKDAY, @R_time) = DATENAME(WEEKDAY, pickupTime) AND MainDriver = r.Id ) as 'AmountOfRidesAtThisDayWeek',
+			 (SELECT (SELECT VolunteerCityPoint FROM VolunteerCityPoints WHERE Id = r.Id).STDistance(@Start_point) / 1000 + 
+             (@Start_point.STDistance(@End_point) / 1000) + 
+             (@End_point.STDistance((SELECT VolunteerCityPoint FROM VolunteerCityPoints WHERE Id = r.Id)) / 1000)) as 'SumOfKM'
+	FROM #regular r
+
+),
+
+
+SuperCTE AS (
+
+	SELECT  Id, DisplayName, CellPhone, JoinDate, CityCityName, AvailableSeats, NoOfDocumentedRides,Vtype,
+			(DATEDIFF(day, JoinDate, GETDATE())) / 365.0 as 'SeniorityInYears',
+			(SELECT TOP 1 CAST(CallRecordedDate AS DATETIME) + CAST(CallRecordedTime AS DATETIME) 
+			FROM documentedCall 
+			WHERE driverId = s.Id 
+			ORDER BY CallRecordedDate DESC) as 'LastCallDateTime',
+			DATEDIFF(day, (SELECT TOP 1 pickupTime 
+                       FROM #tempUnity 
+                       WHERE MainDriver = s.Id AND pickupTime < GETDATE()   
+                       ORDER BY pickupTime DESC), GETDATE()) as 'LastRideInDays',
+
+			DATEDIFF(day, GETDATE(), (SELECT TOP 1 pickupTime 
+                                  FROM #tempUnity 
+                                  WHERE MainDriver = s.Id AND pickupTime >= GETDATE()   
+                                  ORDER BY pickupTime)) as 'NextRideInDays',
+			(SELECT COUNT(*)
+				 FROM #tempUnity tu
+				 JOIN Location l ON tu.Origin = l.Name
+				 WHERE tu.mainDriver = s.Id AND tu.destination LIKE @R_dest AND tu.Origin NOT LIKE @R_origin   AND l.RegionId = @R_regionID_origin) AS 'AmountOfRidesFromRegionToDest',
+			(SELECT COUNT(*) 
+			 FROM #tempUnity 
+			 WHERE MainDriver = s.Id  AND pickupTime BETWEEN DATEADD(MONTH, -2, GETDATE()) AND GETDATE()) as 'NumOfRidesLast2Month',
+			(SELECT COUNT(*) 
+			 FROM #tempUnity tu
+			 WHERE tu.Origin LIKE @R_origin AND tu.Destination LIKE @R_dest AND tu.MainDriver = Id ) as 'AmountOfRidesInThisPath',
+			(SELECT COUNT(*) 
+			 FROM #tempUnity 
+			 WHERE destination LIKE @R_origin AND origin LIKE @R_dest AND mainDriver = s.Id ) as 'AmountOfRidesInOppositePath',
+			(SELECT COUNT(*)
+				 FROM #tempUnity tu
+				 JOIN Location l ON tu.Origin = l.Name
+				 WHERE tu.mainDriver = s.Id AND tu.Origin LIKE @R_origin AND tu.Destination NOT LIKE @R_dest   AND l.RegionId = @R_regionID_dest) as 'AmountOfRides_OriginToArea',
+			(CASE WHEN @R_isAfterNoon = 1 
+              THEN (SELECT COUNT(*) FROM #tempUnity WHERE s.Id = mainDriver AND DATEPART(HOUR, pickupTime) >= 15 ) 
+              ELSE (SELECT COUNT(*) FROM #tempUnity WHERE s.Id = mainDriver AND DATEPART(HOUR, pickupTime) < 15  ) END) as 'AmountOfRidesAtThisTime',
+			 (SELECT COUNT(*) 
+			 FROM #tempUnity 
+			 WHERE DATENAME(WEEKDAY, @R_time) = DATENAME(WEEKDAY, pickupTime) AND MainDriver = s.Id ) as 'AmountOfRidesAtThisDayWeek',
+			 (SELECT (SELECT VolunteerCityPoint FROM VolunteerCityPoints WHERE Id = s.Id).STDistance(@Start_point) / 1000 + 
+             (@Start_point.STDistance(@End_point) / 1000) + 
+             (@End_point.STDistance((SELECT VolunteerCityPoint FROM VolunteerCityPoints WHERE Id = s.Id)) / 1000)) as 'SumOfKM'
+	FROM #super s
+
+),
+
+
+newbis_25_Temp AS (
+    SELECT TOP 25 *
+    FROM newbisCTE
+    ORDER BY SumOfKM
+),
+reg_25_Temp AS (
+    SELECT TOP 25 *
+    FROM RegularCTE
+    ORDER BY AmountOfRidesInThisPath DESC
+),
+super_25_Temp AS (
+    SELECT TOP 25 *
+    FROM SuperCTE
+    ORDER BY AmountOfRidesInThisPath DESC
+)
+
+SELECT Id, DisplayName, CellPhone, JoinDate, CityCityName, AvailableSeats, NoOfDocumentedRides, Vtype,
+       SeniorityInYears, LastCallDateTime, LastRideInDays, NextRideInDays,
+       AmountOfRidesFromRegionToDest, NumOfRidesLast2Month, AmountOfRidesInThisPath,
+       AmountOfRidesInOppositePath, AmountOfRides_OriginToArea, AmountOfRidesAtThisTime,
+       AmountOfRidesAtThisDayWeek, SumOfKM,(select  count(*) from DocumentedCall where DriverId = Id) as 'NoOfDocumentedCalls'
+FROM newbis_25_Temp
+UNION ALL
+SELECT Id, DisplayName, CellPhone, JoinDate, CityCityName, AvailableSeats, NoOfDocumentedRides, Vtype,
+       SeniorityInYears, LastCallDateTime, LastRideInDays, NextRideInDays,
+       AmountOfRidesFromRegionToDest, NumOfRidesLast2Month, AmountOfRidesInThisPath,
+       AmountOfRidesInOppositePath, AmountOfRides_OriginToArea, AmountOfRidesAtThisTime,
+       AmountOfRidesAtThisDayWeek, SumOfKM,(select  count(*) from DocumentedCall where DriverId = Id) as 'NoOfDocumentedCalls'
+FROM reg_25_Temp
+UNION ALL
+SELECT Id, DisplayName, CellPhone, JoinDate, CityCityName, AvailableSeats, NoOfDocumentedRides, Vtype,
+       SeniorityInYears, LastCallDateTime, LastRideInDays, NextRideInDays,
+       AmountOfRidesFromRegionToDest, NumOfRidesLast2Month, AmountOfRidesInThisPath,
+       AmountOfRidesInOppositePath, AmountOfRides_OriginToArea, AmountOfRidesAtThisTime,
+       AmountOfRidesAtThisDayWeek, SumOfKM,(select  count(*) from DocumentedCall where DriverId = Id) as 'NoOfDocumentedCalls'
+FROM super_25_Temp;
+
+
+
+
+
+	--drop tables
+	drop table #ShortenDriversTable,#newbis,#regular,#super,#tempUnity
+END
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
