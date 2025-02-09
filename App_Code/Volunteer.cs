@@ -1634,7 +1634,7 @@ public class Volunteer
         v.Id = int.Parse(dr["Id"].ToString());
         v.Remarks = dr["Remarks"].ToString();
         v.DisplayName = dr["DisplayName"].ToString();
-        v.AvailableSeats = int.Parse(dr["AvailableSeats"].ToString());
+        //v.AvailableSeats = int.Parse(dr["AvailableSeats"].ToString());
         v.FirstNameA = dr["FirstNameA"].ToString();
         v.FirstNameH = dr["FirstNameH"].ToString();
         v.LastNameH = dr["LastNameH"].ToString();
@@ -1671,13 +1671,9 @@ public class Volunteer
         v.KnowsArabic = arabic;
         // v.BirthDate = Convert.ToDateTime(dr["BirthDate"].ToString());
         v.Gender = dr["Gender"].ToString();
-        try
+        if (dr["AvailableSeats"].ToString() != "")
         {
-            v.AvailableSeats = int.Parse(dr["AvailableSeats"].ToString());
-        }
-        catch (Exception)
-        {
-
+            v.AvailableSeats = Convert.ToInt32(dr["AvailableSeats"]);
         }
         v.TypeVol = dr["VolunTypeType"].ToString();
         v.EnglishFN = dr["EnglishFN"].ToString();

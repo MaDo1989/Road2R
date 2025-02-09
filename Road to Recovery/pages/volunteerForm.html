@@ -292,8 +292,12 @@
                     $('#BoosterIN').attr('checked', volunteer.IsBooster);
                     $('#BabySeatIN').attr('checked', volunteer.IsBabySeat);
                     $("#lastA").val(volunteer.LastNameA);
-                    $("#availableSeatsIN").val(volunteer.AvailableSeats == null ? 4 : volunteer.AvailableSeats);
+                    $("#availableSeatsIN").val((volunteer.AvailableSeats == null) ? 4 : volunteer.AvailableSeats);
+                    if (volunteer.AvailableSeats == null || volunteer.AvailableSeats == 0 ) {
+                        $("#availableSeatsIN").attr("title", "לא ידוע כמה מקומות פנויים ברכב");
 
+                    }
+                    //console.log(volunteer);
                     if (volunteer.JoinDate) {
                         var temp = volunteer.JoinDate.substring(volunteer.JoinDate.indexOf("(") + 1, volunteer.JoinDate.indexOf(")"))
                         var jdate = new Date(parseInt(temp));
@@ -723,7 +727,7 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">מספר מקומות ברכב</label>
                                                     <div class="col-sm-6" id="availableSeats">
-                                                        <input value="4" type="number" id="availableSeatsIN" name="availableSeats" class="form-control">
+                                                        <input value="4" min="0" type="number" id="availableSeatsIN" name="availableSeats" class="form-control">
                                                     </div>
                                                 </div>
                                             </div>
