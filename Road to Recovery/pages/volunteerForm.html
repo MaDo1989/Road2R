@@ -1038,6 +1038,7 @@
                     if (func === 'edit') {
                         volunteer.OldCellPhone = OldCellPhone;
                     }
+                    console.log(volunteer);
                     $.ajax({
                         dataType: "json",
                         url: "WebService.asmx/setVolunteer",
