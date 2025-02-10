@@ -5778,6 +5778,7 @@
             if (checkbox.checked && checkbox.id != 'AllChecks' ) {
                 checkbox.parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important')
                 //checkbox.parentNode.parentNode.parnetNode.parnetNode.style.setProperty('border-collapse', 'none', 'important')
+                
             }
             else {
                 checkbox.parentNode.parentNode.style.setProperty('border', 'none', 'important')
@@ -5786,6 +5787,7 @@
             if (checkbox.id == 'AllChecks') {
                 //$('.checkboxClass').prop("checked", checkbox.checked);
                 let tableName = checkbox.parentNode.parentNode.parentNode.parentNode.id;
+                //console.log('im here', tableName, checkbox.id);
                 if (tableName == 'datatable-morning') {
                     for (var i = 0; i < morningRidePats.length; i++) {
                         $(`#check${morningRidePats[i].ridePatNum}`).prop("checked", checkbox.checked);
@@ -5821,14 +5823,83 @@
 
                 }
 
-                if (tableName == 'datatable-future') {
-                    for (var i = 0; i < futureRidePats.length; i++) {
-                        $(`#check${futureRidePats[i].ridePatNum}`).prop("checked", checkbox.checked)
-                        checkbox.checked ? $(`#check${futureRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important') : $(`#check${futureRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
 
+
+                if (tableName == 'datatable-future') {
+                    var table = $('#datatable-future').DataTable();
+
+                    // מקבל את השורות בעמוד הנוכחי
+                    var currentPageNodes = table.rows({ page: 'current' }).nodes();
+
+                    $(currentPageNodes).each(function (index, node) {
+                        for (var i = 0; i < futureRidePats.length; i++) {
+                            var checkboxId = `#check${futureRidePats[i].ridePatNum}`;
+                            var rowCheckbox = $(node).find(checkboxId);
+
+                            if (rowCheckbox.length) {
+                                rowCheckbox.prop("checked", checkbox.checked);
+                                if (checkbox.checked) {
+                                    rowCheckbox[0].parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important');
+                                } else {
+                                    rowCheckbox[0].parentNode.parentNode.style.setProperty('border', 'none', 'important');
+                                }
+                            }
+                        }
+                    });
+                    if (checkbox.checked) {
+                        swal({
+                            title: "שימו לב",
+                            text: 'כי הבחירה היא רק על ההסעות בעמוד הנוכחי (הסעות בעמודים האחרים לא נכללות בבחירה)',
+                            timer: 2200,
+                            type: "info",
+                            showConfirmButton: false
+                        });
                     }
 
+
+                    
                 }
+
+
+
+
+                // in this way all the checkboxes in all pages will be mark !!!! but i dont know if it is good idea
+                //if (tableName == 'datatable-future') {
+                //    var table = $('#datatable-future').DataTable();
+
+                //    // עובר על כל השורות בטבלה, לא משנה באיזה עמוד הן נמצאות
+                //    table.rows().every(function () {
+                //        var rowNode = this.node();
+                //        var rowData = this.data();
+
+                //        // מחפש את ה-checkbox בשורה הנוכחית
+                //        var rowCheckbox = $(rowNode).find(`#check${rowData.ridePatNum}`);
+
+                //        if (rowCheckbox.length) {
+                //            // מעדכן את מצב ה-checkbox
+                //            rowCheckbox.prop("checked", checkbox.checked);
+
+                //            // מעדכן את הבורדר
+                //            if (checkbox.checked) {
+                //                rowCheckbox[0].parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important');
+                //            } else {
+                //                rowCheckbox[0].parentNode.parentNode.style.setProperty('border', 'none', 'important');
+                //            }
+                //        }
+                //    });
+                //}
+
+
+
+                // the old way for future rides
+                //if (tableName == 'datatable-future') {
+                //    for (var i = 0; i < futureRidePats.length; i++) {
+                //        $(`#check${futureRidePats[i].ridePatNum}`).prop("checked", checkbox.checked)
+                //        checkbox.checked ? $(`#check${futureRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important') : $(`#check${futureRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
+
+                //    }
+
+                //}
 
             }
 

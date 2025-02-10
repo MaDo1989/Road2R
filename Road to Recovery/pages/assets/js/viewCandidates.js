@@ -98,12 +98,12 @@ function getScoreString(candidate,paramName) {
     //console.log(` ניקוד: (${(Math.log(candidate[paramName.replace("C_","")] + 1) * getWeight(paramName, candidate.Vtype.toLowerCase())).toFixed(2)})`)
     if (paramName == "C_LastRideInDays" || paramName == "C_NextRideInDays") {
        let param =  candidate[paramName.replace("C_", "")]==null ?365: candidate[paramName.replace("C_", "")]+1;
-        return ` ניקוד: (${(Math.log(param) * getWeight(paramName, candidate.Vtype.toLowerCase())).toFixed(2)})`;
+        return ` (ניקוד: ${(Math.log(param) * getWeight(paramName, candidate.Vtype.toLowerCase())).toFixed(2)})`;
     }
     if (paramName == "C_SumOfKM") {
-        return ` ניקוד: (${(Math.log(candidate[paramName.replace("C_", "")]/100) *-1 * getWeight(paramName, candidate.Vtype.toLowerCase())).toFixed(2)})`
+        return ` (ניקוד: ${(Math.log(candidate[paramName.replace("C_", "")]/100) *-1 * getWeight(paramName, candidate.Vtype.toLowerCase())).toFixed(2)})`
     }
-    return ` ניקוד: (${(Math.log(candidate[paramName.replace("C_", "")] + 1) * getWeight(paramName, candidate.Vtype.toLowerCase())).toFixed(2)})`
+    return ` (ניקוד: ${(Math.log(candidate[paramName.replace("C_", "")] + 1) * getWeight(paramName, candidate.Vtype.toLowerCase())).toFixed(2)})`
 }
 
 
@@ -678,7 +678,7 @@ const fillTableWithDataV2 = () => {
             city: allCandidatedFromDB[i].CityCityName,// + '<br />בדיקה',
             daysSinceLastRide: allCandidatedFromDB[i].LastRideInDays == null ? "אין" : allCandidatedFromDB[i].LastRideInDays,
             numOfRides_last2Months: allCandidatedFromDB[i].NumOfRidesLast2Month,
-            daysUntilNextRide: allCandidatedFromDB[i].NextRideInDays == null ? "אין" : allCandidatedFromDB[i].NextRideInDays,
+            daysUntilNextRide: allCandidatedFromDB[i].NextRideInDays == null ? "אין רישום להסעה עתידית" : allCandidatedFromDB[i].NextRideInDays,
             latestDocumentedCallDate: date2display,
             seniorityInYears: allCandidatedFromDB[i].SeniorityInYears.toFixed(1),
             score: parseFloat(allCandidatedFromDB[i].Score.toFixed(2)),

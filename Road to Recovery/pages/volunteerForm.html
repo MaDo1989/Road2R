@@ -295,7 +295,7 @@
                     $("#availableSeatsIN").val((volunteer.AvailableSeats == null) ? 4 : volunteer.AvailableSeats);
                     if (volunteer.AvailableSeats == null || volunteer.AvailableSeats == 0 ) {
                         $("#availableSeatsIN").attr("title", "לא ידוע כמה מקומות פנויים ברכב");
-
+                        $("#availableSeatsIN").val('')
                     }
                     //console.log(volunteer);
                     if (volunteer.JoinDate) {
@@ -998,7 +998,16 @@
                     var address = $("#address").val();
                     var func = arr_customer.func;
                     var remark = $("#remarks").val();
-                    let availableSeats = $("#availableSeatsIN").val()==''?4:$("#availableSeatsIN").val();
+                    let availableSeats = $("#availableSeatsIN").val() == '' ? 4 : $("#availableSeatsIN").val();
+                    if (availableSeats<0) {
+                        swal({
+                            title: "לא ניתן לשים ערך שקטן מ0 במספר מקומות פנויים ברכב",
+                            type: "error",
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                        return false;
+                    }
                     //Gilad change here displayName.split('<br>')[0]
                     var displayName = arr_volunteer.displayName.split('<br>')[0];
                     //NEW:
