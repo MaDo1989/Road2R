@@ -2600,8 +2600,7 @@ end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
-
-/****** Object:  StoredProcedure [dbo].[sp_getALLCandidateUnityRideV2]    Script Date: 08/02/2025 16:37:33 ******/
+/****** Object:  StoredProcedure [dbo].[sp_getALLCandidateUnityRideV2]    Script Date: 11/02/2025 9:28:34 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2694,7 +2693,7 @@ where pickuptime >=DATEADD(year, -1, GETDATE()) and pickuptime<= DATEADD(DAY, 30
 	select * ,'NEWBIS' as Vtype
 	into #newbis
 	from #ShortenDriversTable
-	where DATEDIFF(DAY,JoinDate,GETDATE())<=260
+	where DATEDIFF(DAY,JoinDate,GETDATE())<=60 AND No_of_Rides<=5
 
 	--Regular
 	select * ,'REGULAR' as Vtype
@@ -2920,6 +2919,8 @@ FROM super_25_Temp;
 	--drop tables
 	drop table #ShortenDriversTable,#newbis,#regular,#super,#tempUnity
 END
+
+
 
 
 ---------------------------------------------------------------------------------------------------------------------------------------------

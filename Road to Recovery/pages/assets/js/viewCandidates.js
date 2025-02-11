@@ -11,6 +11,8 @@ let superCandidated_clientVersion = [];
 let ridePatNum;
 let weightsParams = null;
 
+//https://giladmeirson.github.io/maps/ - to debug the distances between points on the map 
+
 
 const wiringDataTables = () => {
     //manage button clicks on tables
