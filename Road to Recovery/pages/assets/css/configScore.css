@@ -1,0 +1,90 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&display=swap');
+
+body {
+    font-family: 'Heebo', Arial, sans-serif;
+    direction: rtl;
+    background-color: #eef2f7;
+    padding: 20px;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #3367d6;
+}
+
+#tables-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+table {
+    width: 48%;
+    margin-bottom: 20px;
+    border-collapse: collapse;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+    table th {
+        background-color: #3367d6;
+        color: white;
+        padding: 10px;
+        font-weight: 500;
+        font-size: 16px;
+    }
+.percentage_td{
+
+}
+.score_td {
+    width: 30%;
+}
+
+table td {
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+    border-right: 1px solid #ddd;
+}
+
+        table td input {
+            width: 80%;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+            font-size:18px;
+        }
+            table td input:hover{
+                background-color:lightgoldenrodyellow;
+            }
+
+            button#save-btn {
+                background-color: #00a884;
+                color: white;
+                border: none;
+                padding: 10px 25px;
+                border-radius: 6px;
+                cursor: pointer;
+                margin: 20px auto 0;
+                display: block;
+                transition: background-color 0.3s;
+                font-size: 16px;
+            }
+
+    button#save-btn:hover {
+        background-color: #008f70;
+    }

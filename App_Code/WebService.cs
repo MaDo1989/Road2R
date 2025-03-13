@@ -127,6 +127,48 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetAllConfigDetails()
+    {
+        try
+        {
+            List<ScoreConfigDic> list = ScoreConfigDic.GetAllScoreConfigDictionary();
+            return j.Serialize(list);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetAllConfigDetails", ex);
+            throw new Exception("שגיאה בשליפת הנתונים GetAllConfigDetails api" + ex.Message);
+        }
+
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public bool UpdateScoreConfig(List<ScoreConfigDic>listToUpdate)
+    {
+        try
+        {
+            bool issuccess = ScoreConfigDic.updateScoreConfigDic(listToUpdate);
+            if (issuccess)
+            {
+                return issuccess;
+            }
+            else
+            {
+                throw new Exception("לא עודכנו כל הפרמטרים יש לרענן את הדף ולנסות שוב");
+            }
+            
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in UpdateScoreConfig", ex);
+            throw new Exception("שגיאה בשליפת הנתונים UpdateScoreConfig api" + ex.Message);
+        }
+
+    }
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string GetWeightsOfCandidateV2()

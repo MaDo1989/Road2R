@@ -18,6 +18,7 @@ using System.Dynamic;
 using System.IO;
 using System.Web;
 using System.Web.Caching;
+using System.IdentityModel;
 //using static Constants.Enums;
 //using static ReportService;
 
@@ -1864,6 +1865,96 @@ public class DBservice_Gilad
         return dataReader;
     }
 
+
+    public List<ScoreConfigDic> GetAllConfigList()
+    {
+          SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        cmd = CreateCommandWithStoredProcedureGeneral("sp_getParamDic", con, paramDic);
+        List<ScoreConfigDic> list2Return = new List<ScoreConfigDic>();
+        try
+        {
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+            while (dataReader.Read())
+            {
+                ScoreConfigDic scoreConfigDic = new ScoreConfigDic();
+                scoreConfigDic.Id = Convert.ToInt32(dataReader["id"]);
+                scoreConfigDic.Parameter = dataReader["parameter"].ToString();
+                scoreConfigDic.MaxRangeValue = (float)Convert.ToDouble(dataReader["maxRangeValue"]);
+                scoreConfigDic.MinRangeValue = (float)Convert.ToDouble(dataReader["minRangeValue"]);
+                scoreConfigDic.Score = (float)Convert.ToDouble(dataReader["score"]);
+
+
+                list2Return.Add(scoreConfigDic);
+            }
+            return list2Return;
+        }
+        catch (Exception ex)
+        {
+            WriteToErrorFile("GetAllConfigList sp_getParamDic", "Error to get GetAllConfigList \n" + ex.Message);
+            throw new Exception("Error to get GetAllConfigList dbservice_gilad" + ex.Message);
+        }
+        finally
+        {
+            if (con != null)
+            {
+
+                con.Close();
+
+            }
+        }
+    }
+
+    public int updateScoreConfigDic(int id, float score)
+    {
+        SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@id", id);
+        paramDic.Add("@newScore", score);
+        cmd = CreateCommandWithStoredProcedureGeneral("sp_updateScoreById", con, paramDic);
+        int numEffected = 0;
+        try
+        {
+            numEffected = cmd.ExecuteNonQuery();
+            return numEffected;
+        }
+        catch (Exception ex)
+        {
+            WriteToErrorFile("updateScoreConfigDic sp_updateScoreConfigDic", "Error to get updateScoreConfigDic \n" + ex.Message);
+            throw new Exception("Error to get updateScoreConfigDic dbservice_gilad" + ex.Message);
+        }
+        finally
+        {
+            if (con != null)
+            {
+
+                con.Close();
+
+            }
+        }
+    }   
 
     public List<Absence> GetAbsenceByVolunteerId(int volunteerId)
     {

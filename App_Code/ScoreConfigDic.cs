@@ -89,11 +89,24 @@ public class ScoreConfigDic
 
 
 
-    public List<ScoreConfigDic> GetAllScoreConfigDictionary()
+    static public List<ScoreConfigDic> GetAllScoreConfigDictionary()
     {
         //return the all list from the DBservice -> sp = sp_getParamDic
-        return null;
+        DBservice_Gilad db = new DBservice_Gilad();
+        return db.GetAllConfigList();
+      
 
+    }
+
+    static public bool updateScoreConfigDic(List<ScoreConfigDic> listToUpdate)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+        int sumOfres = 0;
+        foreach (var item in listToUpdate)
+        {
+            sumOfres+= db.updateScoreConfigDic(item.id,item.score);
+        }
+        return sumOfres == listToUpdate.Count;
     }
 
     //this method will return the accurate score for the percentage for example:
