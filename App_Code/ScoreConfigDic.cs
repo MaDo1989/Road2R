@@ -109,23 +109,18 @@ public class ScoreConfigDic
         return sumOfres == listToUpdate.Count;
     }
 
-    //this method will return the accurate score for the percentage for example:
-    // percentage = 0.5 and the range is 0.4-0.6 and the score of this range is 3 so his accurate score will be
-    // 3 + (0.5-0.4)/(0.6-0.4) * (3-1) = 4 (the 1 is the score of range 0.2-0.4)
-    public float GetAccurateScoring(float percentage,List<ScoreConfigDic> paramsList)
+    
+
+    static public List<ScoreConfigDic> GetConfigByParameterName(string parameter,List<ScoreConfigDic> scoreConfigList)
     {
-        float AccurateScore = 0;
-        float theScoreOfOneRowBefore = 0;
-        foreach (var row in paramsList)
+        List<ScoreConfigDic> listToReturn = new List<ScoreConfigDic>();
+        foreach (var item in scoreConfigList)
         {
-            if (percentage> row.MinRangeValue && percentage<=row.MaxRangeValue)
+            if (item.Parameter == parameter)
             {
-                AccurateScore = row.Score+ ((percentage-row.MinRangeValue)/(row.MaxRangeValue-row.MinRangeValue))*(row.Score-theScoreOfOneRowBefore);
-                return AccurateScore;
+                listToReturn.Add(item);
             }
-            theScoreOfOneRowBefore = row.Score;
         }
-        return AccurateScore;
-        
+        return listToReturn;
     }
 }

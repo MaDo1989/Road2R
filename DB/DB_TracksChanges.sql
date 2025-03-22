@@ -3053,7 +3053,7 @@ GO
 ---------------------------------------------------------------------------------------------------------------------------------------------
 Create TABLE ScoreConfigDictionary (
 id int identity(1,1) primary key,
-parameter nvarchar(15),
+parameter nvarchar(50),
 score float,
 maxRangeValue float,
 minRangeValue float,
@@ -3104,3 +3104,199 @@ VALUES
 ('area_to_area',0.4,0.6,3),
 ('area_to_area',0.6,0.8,6),
 ('area_to_area',0.8,1,10)
+
+
+
+INSERT INTO ScoreConfigDictionary(parameter,minRangeValue,maxRangeValue,score)
+VALUES
+('Time_since_last_ride',0,1,0),
+('Time_since_last_ride',1,2,1),
+('Time_since_last_ride',2,3,2),
+('Time_since_last_ride',3,4,3),
+('Time_since_last_ride',4,5,4),
+('Time_since_last_ride',5,6,5),
+('Time_since_last_ride',6,7,6),
+('Time_since_last_ride',7,999,0) -- 999 is infinity
+
+
+
+INSERT INTO ScoreConfigDictionary(parameter,minRangeValue,maxRangeValue,score)
+VALUES
+('is_future_Ride',1,1,0), -- there is a ride in the future
+('is_future_Ride',0,0,5) -- there is no ride in the future
+
+
+INSERT INTO ScoreConfigDictionary(parameter,minRangeValue,maxRangeValue,score)
+VALUES
+('AVG_rides_week',0,1,0),
+('AVG_rides_week',1,2,2),
+('AVG_rides_week',2,3,5),
+('AVG_rides_week',3,999,8) -- 999 is infinity
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+-- =======================================================
+-- Create Stored Procedure Template for Azure SQL Database
+-- =======================================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad Meirson>
+-- Create Date: <21/03/2025>
+-- Description: <get all candidate and params for spesific ride verion 3>
+-- =============================================
+ALTER PROCEDURE sp_getALLCandidateUnityRideV3
+(
+    -- Add the parameters for the stored procedure here
+    @ridePatNum INT
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+   
+
+    -- Insert statements for procedure here
+--declare basic vars 
+DECLARE @R_origin NVARCHAR(255) = (SELECT origin FROM unityRide WHERE ridePatNum = @ridePatNum);
+DECLARE @R_dest NVARCHAR(255) = (SELECT destination FROM unityRide WHERE ridePatNum = @ridePatNum);
+DECLARE @R_time DateTIme = (SELECT pickupTime FROM unityRide WHERE ridePatNum = @ridePatNum);
+DECLARE @R_isAfterNoon bit = case when (DATEPART(HOUR, @R_time) >=15) then 1 else 0 end
+DECLARE @R_area NVARCHAR(255) = (SELECT area FROM unityRide WHERE ridePatNum = @ridePatNum);
+DECLARE @dayInWeek NVARCHAR(20);
+DECLARE @R_regionID_origin INT = (select RegionId from location where Name Like @R_origin)
+DECLARE @R_regionID_dest INT = (select RegionId from location where Name Like @R_dest)
+
+
+
+SET @dayInWeek = 
+    CASE DATENAME(WEEKDAY, @R_time)
+        WHEN 'Sunday' THEN N'ראשון'
+        WHEN 'Monday' THEN N'שני'
+        WHEN 'Tuesday' THEN N'שלישי'
+        WHEN 'Wednesday' THEN N'רביעי'
+        WHEN 'Thursday' THEN N'חמישי'
+        WHEN 'Friday' THEN N'שישי'
+        WHEN 'Saturday' THEN N'שבת'
+    END;
+
+
+
+-- Attempt to optimize the query
+select *,
+(select RegionId from Location where Name like Origin) as 'origin_regionID',
+(select RegionId from Location where Name like Destination) as 'destination_regionID'
+into #tempUnity
+from UnityRide 
+where pickuptime >=DATEADD(year, -1.2, GETDATE()) and pickuptime<= DATEADD(DAY, 30, GETDATE()) AND status not like N'נמחקה'
+
+
+-- Attempt to optimize the query
+	select * 
+	into #ShortenDriversTable
+	from Volunteer v
+	--only volunteers that active and driving.
+	where isActive =1 AND isDriving = 1 
+	--only volunteers that not in absence
+	AND v.Id NOT IN (SELECT volunteerId FROM Absence WHERE @R_time >= FromDate AND @R_time <= UntilDate)
+	--volunteers that didnt talk with them today*
+    AND v.Id NOT IN (SELECT DriverId FROM documentedCall WHERE CAST(GETDATE() AS DATE) = CallRecordedDate)
+	--volunteers who isnt drive in this day (ride day)
+    AND v.Id NOT IN (SELECT DISTINCT mainDriver FROM #tempUnity WHERE CAST(pickupTime AS DATE) = CAST(@R_time AS DATE) AND mainDriver IS NOT NULL )
+	--volunteers who isnt drive day before the ride day
+	AND v.Id NOT IN (SELECT DISTINCT MainDriver FROM #tempUnity WHERE CAST(pickupTime AS DATE)= DATEADD(day, -1, CAST(@R_time AS DATE)) AND MainDriver is NOT NULL  )
+	--volunteers who isnt drive day after the ride day
+	AND v.Id NOT IN (SELECT DISTINCT MainDriver FROM #tempUnity WHERE CAST(pickupTime AS DATE)= DATEADD(day, 1, CAST(@R_time AS DATE)) AND MainDriver is NOT NULL  )
+	--volunteers who isnt managers
+	AND v.Id NOT IN (select VolunteerId from VolunType_Volunteer where VolunTypeType not like N'מתנדב');
+
+
+	--Regular
+	select * 
+	into #regular
+	from #ShortenDriversTable
+	where NoOfDocumentedRides >3 AND NoOfDocumentedRides<200 AND  DATEDIFF(DAY,JoinDate,GETDATE())>=60;
+
+
+
+
+	WITH RegularCTE AS (
+	SELECT  Id, DisplayName, CellPhone, JoinDate, CityCityName, AvailableSeats, NoOfDocumentedRides,
+			
+			(SELECT TOP 1 CAST(CallRecordedDate AS DATETIME) + CAST(CallRecordedTime AS DATETIME) 
+			FROM documentedCall 
+			WHERE driverId = r.Id 
+			ORDER BY CallRecordedDate DESC) as 'LastCallDateTime',
+			DATEDIFF(day, (SELECT TOP 1 pickupTime 
+                       FROM #tempUnity 
+                       WHERE MainDriver = r.Id AND pickupTime < GETDATE()   
+                       ORDER BY pickupTime DESC), GETDATE()) as 'LastRideInDays',
+
+			DATEDIFF(day, GETDATE(), (SELECT TOP 1 pickupTime 
+                                  FROM #tempUnity 
+                                  WHERE MainDriver = r.Id AND pickupTime >= GETDATE()   
+                                  ORDER BY pickupTime)) as 'NextRideInDays',
+			(SELECT CAST(COUNT(*) AS FLOAT) / (DATEDIFF(DAY, DATEADD(MONTH, -6, GETDATE()), GETDATE()) / 7.0)
+			 FROM #tempUnity
+			 WHERE MainDriver = r.Id AND pickupTime BETWEEN DATEADD(MONTH, -6, GETDATE()) AND GETDATE()) AS 'AvgRidesPerWeek_Last6Months',
+			(SELECT COUNT(*) 
+			 FROM #tempUnity 
+			 WHERE origin LIKE @R_origin AND destination LIKE @R_dest AND mainDriver = r.Id ) as 'AmountOfRidesInThisPath',
+			(SELECT COUNT(*)
+				 FROM #tempUnity tu
+				 WHERE tu.mainDriver = r.Id AND tu.Origin LIKE @R_origin AND tu.Destination NOT LIKE @R_dest AND tu.destination_regionID = @R_regionID_dest) as 'AmountOfRides_OriginToArea',
+			(SELECT COUNT(*)
+				 FROM #tempUnity tu
+				 WHERE tu.mainDriver = r.Id AND @R_regionID_dest = destination_regionID AND @R_regionID_origin = origin_regionID and 
+				 tu.Destination not like @R_dest AND tu.Origin not like @R_origin) as 'AmountOfRides_AreaToArea',
+			 (CASE WHEN @R_isAfterNoon = 1 
+              THEN (SELECT COUNT(*) FROM #tempUnity WHERE r.Id = mainDriver AND DATEPART(HOUR, pickupTime) >= 15 ) 
+              ELSE (SELECT COUNT(*) FROM #tempUnity WHERE r.Id = mainDriver AND DATEPART(HOUR, pickupTime) < 15  ) END) as 'AmountOfRidesAtThisTime',
+			 (SELECT COUNT(*) 
+			 FROM #tempUnity 
+			 WHERE DATENAME(WEEKDAY, @R_time) = DATENAME(WEEKDAY, pickupTime) AND MainDriver = r.Id ) as 'AmountOfRidesAtThisDayWeek'
+			FROM #regular r
+),
+
+
+reg_70_Temp AS (
+    SELECT TOP 70 *
+    FROM RegularCTE
+    ORDER BY AmountOfRidesInThisPath DESC, AmountOfRidesAtThisTime DESC , AvgRidesPerWeek_Last6Months DESC , AmountOfRidesAtThisDayWeek DESC, AmountOfRides_OriginToArea DESC
+)
+
+
+
+SELECT Id, DisplayName, CellPhone, JoinDate, CityCityName, AvailableSeats, NoOfDocumentedRides,
+       LastCallDateTime, LastRideInDays, NextRideInDays,AvgRidesPerWeek_Last6Months,
+       AmountOfRidesInThisPath,AmountOfRides_AreaToArea,
+       AmountOfRides_OriginToArea, AmountOfRidesAtThisTime,
+       AmountOfRidesAtThisDayWeek,(select  count(*) from DocumentedCall where DriverId = Id) as 'NoOfDocumentedCalls'
+FROM reg_70_Temp
+
+drop table #ShortenDriversTable,#regular,#tempUnity
+
+
+END
+GO
+--parameter
+--area_to_area
+--AVG_rides_week
+--is_future_Ride
+--point_to_area
+--point_to_point
+--this_day_week
+--this_time_inDay
+--Time_since_last_ride

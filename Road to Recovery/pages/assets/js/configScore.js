@@ -1,4 +1,15 @@
 ﻿GlobalScoresObjectListChange = {};
+EnglishToHebrewDictionary = {
+    this_day_week: 'יום בשבוע',
+    point_to_point: 'מנקודה לנקודה',
+    point_to_area: 'מנקודה לאזור',
+    area_to_area: 'מאזור לאזור',
+    this_time_inDay: 'החלק הזה ביום',
+    Time_since_last_ride: 'זמן מהסעה אחרונה (בשבועות)',
+    is_future_Ride: 'האם יש הסעה עתידית',
+    AVG_rides_week: 'ממוצע הסעות בשבוע',
+
+}
 $(document).ready(function () {
     const apiGetUrl = 'WebService.asmx/GetAllConfigDetails';
     const apiSaveUrl = 'WebService.asmx/UpdateScoreConfig';
@@ -34,24 +45,38 @@ $(document).ready(function () {
             const table = $(
                 `<table>
                     <thead>
-                        <tr><th colspan=\"2\">${param}</th></tr>
+                        <tr><th class="paramTitle" colspan=\"2\">${EnglishToHebrewDictionary[param]}</th></tr>
                         <tr>
                             <th>ניקוד</th>
-                            <th>אחוז מהסעות</th>
+                            <th>${param == `Time_since_last_ride` ? `שבועות מהסעה האחרונה` : param == `AVG_rides_week` ? `ממוצע הסעות בשבוע` : param ==`is_future_Ride`?`יש הסעה עתידית?`:`אחוז מהסעות`}</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
                 </table>`
             );
-
-            params[param].forEach(row => {
-                table.find('tbody').append(`
+            //console.log(params[param]);
+            if (param == 'is_future_Ride') {
+                params[param].forEach(row => {
+                    table.find('tbody').append(`
                     <tr data-id="${row.Id}">
                         <td class="score_td"><input onchange="changeTheColor(this)" class="score_in" type="number" value="${row.Score}" step="0.2"></td>
-                        <td class="percentage_td">${row.MinRangeValue*100}%</td>
+                        <td class="percentage_td">${row.MinRangeValue==1 ? `יש` : `אין`}</td>
                     </tr>
-                `);
-            });
+                    `);
+                });
+            }
+            else {
+                params[param].forEach(row => {
+                    console.log(row)
+                    table.find('tbody').append(`
+                    <tr data-id="${row.Id}">
+                        <td class="score_td"><input onchange="changeTheColor(this)" class="score_in" type="number" value="${row.Score}" step="0.2"></td>
+                        <td class="percentage_td">${row.Parameter == `Time_since_last_ride` || row.Parameter == `AVG_rides_week`  ? row.MinRangeValue : row.MinRangeValue*100+`%` } ${row.MaxRangeValue==999?`+`:``}</td>
+                    </tr>
+                    `);
+                });
+            }
+
 
             $('#tables-container').append(table);
         });
@@ -117,4 +142,8 @@ const changeTheColor = (input) => {
     input.parentNode.parentNode.style.backgroundColor = 'lightpink';
     GlobalScoresObjectListChange[input.parentNode.parentNode.getAttribute('data-id').toString()]=input.value;
    
+}
+
+const BacktoCandidate = () => {
+    window.location.href = "viewCandidates.html";
 }

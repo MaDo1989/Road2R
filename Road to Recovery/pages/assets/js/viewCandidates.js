@@ -1,4 +1,6 @@
-﻿checkCookie();
+﻿//const { param } = require("jquery");
+
+checkCookie();
 let { getHebrew_WeekDay, addSeperator2MobileNum, showMe, convertDBDate2FrontEndDate } = GENERAL.USEFULL_FUNCTIONS;
 let { getRidePatNum4_viewCandidate } = GENERAL.RIDEPAT;
 let { ajaxCall } = GENERAL.FETCH_DATA;
@@ -17,41 +19,14 @@ let weightsParams = null;
 const wiringDataTables = () => {
     //manage button clicks on tables
 
-    //#region showDocumentedCallsBtn
     $('#datatable-candidates tbody').on('click', '#showDocumentedCallsBtn', function () {
         manipulateDocumentedCallsModal(this, candidatesTable);
     });
 
-    $('#datatable-superDrivers tbody').on('click', '#showDocumentedCallsBtn', function () {
-        manipulateDocumentedCallsModal(this, superDriversTable);
-    });
-
-    ////regularTable datatable-RegularDrivers
-    $('#datatable-RegularDrivers tbody').on('click', '#showDocumentedCallsBtn', function () {
-        manipulateDocumentedCallsModal(this, regularTable);
-    });
-    $('#datatable-RegularDrivers tbody').on('click', '#showDocumentedRidesBtn', function () {
-        manipulateDocumentedRidesModal(this, regularTable);
-    });
-
-
-    //#endregion showDocumentedCallsBtn
-
-    //#region showDocumentedRidesBtn
     $('#datatable-candidates tbody').on('click', '#showDocumentedRidesBtn', function () {
         manipulateDocumentedRidesModal(this, candidatesTable);
     });
 
-    $('#datatable-superDrivers tbody').on('click', '#showDocumentedRidesBtn', function () {
-        manipulateDocumentedRidesModal(this, superDriversTable);
-    });
-    //#endregion showDocumentedRidesBtn
-
-    //#region showMe
-    /*
-    IMPORTANT NOTE
-    the event is mouseup in order to catch all scenarios.
-    */
     $('#datatable-candidates tbody').on('mouseup', '.showMe', function () {
         let targetObj = {};
         targetObj.objName = $(this).attr("data-obj");
@@ -59,16 +34,6 @@ const wiringDataTables = () => {
 
         showMe(targetObj);
     });
-
-    $('#datatable-superDrivers tbody').on('mouseup', '.showMe', function () {
-        let targetObj = {};
-        targetObj.objName = $(this).attr("data-obj");
-        targetObj.displayName = this.text;
-
-        showMe(targetObj);
-    });
-    //#endregion showMe
-
 }
 
 const ConvertDBDate2UIDate = (fullTimeStempStr) => {
@@ -97,15 +62,86 @@ function hideCharacteristics() {
 function getScoreString(candidate,paramName) {
 
     //console.log(candidate, paramName)
-    //console.log(` ניקוד: (${(Math.log(candidate[paramName.replace("C_","")] + 1) * getWeight(paramName, candidate.Vtype.toLowerCase())).toFixed(2)})`)
-    if (paramName == "C_LastRideInDays" || paramName == "C_NextRideInDays") {
-       let param =  candidate[paramName.replace("C_", "")]==null ?365: candidate[paramName.replace("C_", "")]+1;
-        return ` (ניקוד: ${(Math.log(param) * getWeight(paramName, candidate.Vtype.toLowerCase())).toFixed(2)})`;
+    const filterdParams = AllConfigParams.filter(param => param.Parameter === paramName);
+    //console.log(filterdParams);
+    //this method will return the accurate score for the percentage for example:
+    // percentage = 0.5 and the range is 0.4-0.6 and the score of this range is 3 so his accurate score will be
+    // 3 + (0.5-0.4)/(0.6-0.4) * (3-1) = 4 (the 1 is the score of range 0.2-0.4)
+    let accurateScore = 0;
+    if (paramName == "point_to_point") {
+
+        for (var i = 0; i < filterdParams.length; i++) {
+            if (candidate.PercentageOfRidesInThisPath >= filterdParams[i].MinRangeValue && candidate.PercentageOfRidesInThisPath <= filterdParams[i].MaxRangeValue ) {
+                accurateScore = filterdParams[i].Score + ((candidate.PercentageOfRidesInThisPath - filterdParams[i].MinRangeValue) / (filterdParams[i].MaxRangeValue - filterdParams[i].MinRangeValue) * filterdParams[i].Score);
+                return `${(candidate.PercentageOfRidesInThisPath * 100).toFixed(2)}%<br>ניקוד : ${(accurateScore).toFixed(2)}`;
+            }
+        }
     }
-    if (paramName == "C_SumOfKM") {
-        return ` (ניקוד: ${(Math.log(candidate[paramName.replace("C_", "")]/100) *-1 * getWeight(paramName, candidate.Vtype.toLowerCase())).toFixed(2)})`
+    if (paramName == "point_to_area") {
+
+        for (var i = 0; i < filterdParams.length; i++) {
+            if (candidate.PercentageOfRidesOriginToArea >= filterdParams[i].MinRangeValue && candidate.PercentageOfRidesOriginToArea <= filterdParams[i].MaxRangeValue) {
+                accurateScore = filterdParams[i].Score + ((candidate.PercentageOfRidesOriginToArea - filterdParams[i].MinRangeValue) / (filterdParams[i].MaxRangeValue - filterdParams[i].MinRangeValue) * filterdParams[i].Score);
+                return `${(candidate.PercentageOfRidesOriginToArea * 100).toFixed(2)}%<br>ניקוד : ${(accurateScore).toFixed(2)}`;
+            }
+        }
     }
-    return ` (ניקוד: ${(Math.log(candidate[paramName.replace("C_", "")] + 1) * getWeight(paramName, candidate.Vtype.toLowerCase())).toFixed(2)})`
+    if (paramName == "area_to_area") {
+        for (var i = 0; i < filterdParams.length; i++) {
+            if (candidate.PercentageOfRidesAreaToArea >= filterdParams[i].MinRangeValue && candidate.PercentageOfRidesAreaToArea <= filterdParams[i].MaxRangeValue) {
+                accurateScore = filterdParams[i].Score + ((candidate.PercentageOfRidesAreaToArea - filterdParams[i].MinRangeValue) / (filterdParams[i].MaxRangeValue - filterdParams[i].MinRangeValue) * filterdParams[i].Score);
+                return `${(candidate.PercentageOfRidesAreaToArea * 100).toFixed(2)}%<br>ניקוד : ${(accurateScore).toFixed(2)}`;
+            }
+        }
+
+    }
+    if (paramName == "this_day_week") {
+        for (var i = 0; i < filterdParams.length; i++) {
+            if (candidate.PercentageOfRidesAtThisDayWeek >= filterdParams[i].MinRangeValue && candidate.PercentageOfRidesAtThisDayWeek <= filterdParams[i].MaxRangeValue) {
+                accurateScore = filterdParams[i].Score + ((candidate.PercentageOfRidesAtThisDayWeek - filterdParams[i].MinRangeValue) / (filterdParams[i].MaxRangeValue - filterdParams[i].MinRangeValue) * filterdParams[i].Score);
+                return `${(candidate.PercentageOfRidesAtThisDayWeek * 100).toFixed(2)}%<br>ניקוד : ${(accurateScore).toFixed(2)}`;
+            }
+        }
+
+    }
+    if (paramName == "this_time_inDay") {
+
+        for (var i = 0; i < filterdParams.length; i++) {
+            if (candidate.PercentageOfRidesAtThisTime >= filterdParams[i].MinRangeValue && candidate.PercentageOfRidesAtThisTime <= filterdParams[i].MaxRangeValue) {
+                accurateScore = filterdParams[i].Score + ((candidate.PercentageOfRidesAtThisTime - filterdParams[i].MinRangeValue) / (filterdParams[i].MaxRangeValue - filterdParams[i].MinRangeValue) * filterdParams[i].Score);
+                return `${(candidate.PercentageOfRidesAtThisTime * 100).toFixed(2)}%<br>ניקוד : ${(accurateScore).toFixed(2)}`;
+            }
+        }
+    }
+
+    if (paramName =="Time_since_last_ride") {
+        for (var i = 0; i < filterdParams.length; i++) {
+            if (candidate.LastRideinWeeks >= filterdParams[i].MinRangeValue && candidate.LastRideinWeeks <= filterdParams[i].MaxRangeValue ) {
+                accurateScore = filterdParams[i].Score
+                return accurateScore;
+            }
+        }
+    }
+    if (paramName == "AVG_rides_week") {
+        for (var i = 0; i < filterdParams.length; i++) {
+            if (candidate.AvgRidesPerWeekLast6Months >= filterdParams[i].MinRangeValue && candidate.AvgRidesPerWeekLast6Months <= filterdParams[i].MaxRangeValue) {
+                accurateScore = filterdParams[i].Score
+                return `${(candidate.AvgRidesPerWeekLast6Months).toFixed(2)}<br>ניקוד : ${(accurateScore).toFixed(2)}`;
+            }
+        }
+    }
+
+    if (paramName == "is_future_Ride") {
+        if (candidate.NextRideInDays == null) {
+            accurateScore = filterdParams[1].Score;
+            return accurateScore;
+        }
+        else {
+            accurateScore = filterdParams[0].Score;
+            return accurateScore;
+        }
+    }
+
 }
 
 
@@ -114,27 +150,16 @@ function showCharacteristics() {
     let id = this.getAttribute('data-driverId');
     //console.log(id)
     let c = allCandidatedFromDB.find(ca => ca.Id == id);
-    //getScoreString(c,'C_AmountOfRidesInThisPath')
-    //let c = allCandidatedFromDB[id];
-    //console.log(c);
-    //console.log(getWeight("C_AmountOfRidesInThisPath", c.Vtype.toLowerCase()), c);
-    let boldArr = ["נסיעות בציר המדויק הזה", "הסעות ביום הזה", "הסעות בחלק הנדרש של היום"];
+    let boldArr = ["אחוז מהנסיעות בציר המדויק הזה", "אחוז מהנסיעות בחלק הזה של היום", "אחוז מהנסיעות ביום הזה בשבוע"];
     let txt = {
-        "נסיעות בציר המדויק הזה": c.AmountOfRidesInThisPath==0?0: c.AmountOfRidesInThisPath + getScoreString(c,"C_AmountOfRidesInThisPath"),
-        "נסיעות בציר ההפוך": c.AmountOfRidesInOppositePath==0?0: c.AmountOfRidesInOppositePath + getScoreString(c, "C_AmountOfRidesInOppositePath"),
-        "נסיעות מאותה נקודה לאותו איזור": c.AmountOfRides_OriginToArea==0?0: c.AmountOfRides_OriginToArea + getScoreString(c, "C_AmountOfRides_OriginToArea"),
-        "נסיעות מאותו איזור לאותה נקודה": c.AmountOfRidesFromRegionToDest==0?0: c.AmountOfRidesFromRegionToDest + getScoreString(c, "C_AmountOfRidesFromRegionToDest"),
-        "נסיעות נוספות": (c.NoOfDocumentedRides - c.AmountOfRides_OriginToArea - c.AmountOfRidesFromRegionToDest - c.AmountOfRidesInOppositePath - c.AmountOfRidesInThisPath) == 0 ? 0 : (c.NoOfDocumentedRides - c.AmountOfRides_OriginToArea - c.AmountOfRidesFromRegionToDest - c.AmountOfRidesInOppositePath - c.AmountOfRidesInThisPath) + getScoreString(c, "C_NoOfDocumentedRides"),
-        "הסעות ביום הזה": c.AmountOfRidesAtThisDayWeek==0?0: c.AmountOfRidesAtThisDayWeek + getScoreString(c, "C_AmountOfRidesAtThisDayWeek"),
-        "הסעות בימים אחרים": c.NoOfDocumentedRides - c.AmountOfRidesAtThisDayWeek,
-        "הסעות בחלק הנדרש של היום": c.AmountOfRidesAtThisTime==0?0: c.AmountOfRidesAtThisTime + getScoreString(c, "C_AmountOfRidesAtThisTime"),
-        "הסעות בחלקו השני של היום": c.NoOfDocumentedRides - c.AmountOfRidesAtThisTime,
-        "אורך הנסיעה בקילומטרים (מרחק אווירי)": c.SumOfKM.toFixed(0) + getScoreString(c, "C_SumOfKM"),
-        "ימים מאז ההסעה האחרונה": c.LastRideInDays == null ? " -אין- " + getScoreString(c, "C_LastRideInDays") : c.LastRideInDays + getScoreString(c, "C_LastRideInDays"),
-        "ימים עד ההסעה הבאה": c.NextRideInDays == null ? " -אין- " + getScoreString(c, "C_NextRideInDays") : c.LastRideInDays + getScoreString(c, "C_NextRideInDays"),
-        "מספר הסעות בחודשיים האחרונים": c.NumOfRidesLast2Month==0?0: c.NumOfRidesLast2Month + getScoreString(c, "C_NumOfRidesLast2Month"),
-        "וותק בעמותה": c.SeniorityInYears.toFixed(1) + getScoreString(c, "C_SeniorityInYears"),
-
+        "אחוז מהנסיעות בציר המדויק הזה": getScoreString(c,"point_to_point"),
+        "אחוז מהנסיעות מאותה נקודה לאותו איזור": getScoreString(c, "point_to_area"),
+        "אחוז מהנסיעות מאותו אזור לאותו אזור": getScoreString(c, "area_to_area"),
+        "אחוז מהנסיעות ביום הזה בשבוע":  getScoreString(c, "this_day_week"),
+        "אחוז מהנסיעות בחלק הזה של היום": getScoreString(c, "this_time_inDay"),
+        "ממוצע הסעות בשבוע (חצי שנתי)": getScoreString(c, "AVG_rides_week"),
+        "שבועות מאז ההסעה האחרונה": c.LastRideinWeeks == null ? " -אין- " + "<br>ניקוד: " + getScoreString(c, "Time_since_last_ride") : c.LastRideinWeeks + "<br>ניקוד: " + getScoreString(c, "Time_since_last_ride"),
+        "ימים עד ההסעה הבאה": c.NextRideInDays == null ? " -אין- " + "<br>ניקוד:" + getScoreString(c, "is_future_Ride") : c.NextRideInDays +  "<br>ניקוד:" + getScoreString(c, "is_future_Ride"),
     };
 
     let str = "<h3> נתוני נסיעות  בשנה האחרונה </h3>";
@@ -196,14 +221,13 @@ $(document).ready(() => {
     $(document).on("mouseout", ".c1", hideCharacteristics);
 
     candidatesTable = $('#datatable-candidates').DataTable({ data: [], destroy: true });
-    regularTable = $('#datatable-RegularDrivers').DataTable({ data: [], destroy: true });
-    superDriversTable = $('#datatable-superDrivers').DataTable({ data: [], destroy: true });
 
     ridePatNum = JSON.parse(getRidePatNum4_viewCandidate());
 
     getRidePat();
     //getCandidates();
-    getCandidatesV2();
+    //getCandidatesV2();
+    getCandidateV3();
 
 
     $('#rights').html(COPYWRITE());
@@ -383,16 +407,39 @@ const getCandidates = () => {
 }
 
 
+const getCandidateV3 = () => {
+    $("#wait").show();
+    ajaxCall("GetCandidateUnityRideV3",
+        JSON.stringify({ RideNum: ridePatNum}),
+        getCandidateV3SCB,
+        getCandidates_ECB
+
+    )
+}
+
+const getCandidateV3SCB = (data) => {
+
+    $("#wait").hide();
+    console.log('res v3:', JSON.parse(data.d));
+    allCandidatedFromDB = JSON.parse(data.d);
+    fillTableWithDataV3();
+    getAllConfigParams();
+
+}
+
+
+
 const getCandidatesV2 = () => {
     $("#wait").show();
     //console.log({ RideNum: ridePatNum, mode: 3 })
     ajaxCall("GetCandidateUnityRideV2",
         JSON.stringify({ RideNum: ridePatNum, mode: 3 }),
-        getCandidateV2_SCB,
+        getCandidateV3SCB,
         getCandidates_ECB
         
     )
 }
+
 
 
 //new version of getCandidates
@@ -610,7 +657,7 @@ const fillTableWithData = () => {
 
 
 const ShowWeightsParamsPage = () => {
-    location.href = "candidateConfig.html";
+    location.href = "configScoreParameters.html";
 }
 
 
@@ -855,6 +902,106 @@ const fillTableWithDataV2 = () => {
 
 
 
+
+
+const fillTableWithDataV3 = () => {
+
+
+    
+
+    let thisCandidate = {};
+    candidateList = [];
+
+    let date2display;
+    let btnStr;
+    let showDocumentedCallsBtn;
+    let showDocumentedRidesBtn;
+    let linkableNameToRender;
+
+
+    for (let i in allCandidatedFromDB) {
+        btnStr = `<div class='elementsInSameLine'>`;
+        date2display = parseDotNetDate(allCandidatedFromDB[i].LastCallDateTime)
+
+        showDocumentedCallsBtn = '';
+        showDocumentedCallsBtn += `<div class='btnWrapper-left'><span id="badgeOf_${allCandidatedFromDB[i].Id}" class="badge badge-pill badge-default">${allCandidatedFromDB[i].NoOfDocumentedCalls}</span>`;
+        showDocumentedCallsBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedCallsBtn" title="שיחות מתועדות" data-backdrop="static" data-keyboard="false" data-toggle="modal" data-target="#DocumentedCallsModal"><i class="fa fa-phone" aria-hidden="true"></i></button></div>';
+
+        btnStr += showDocumentedCallsBtn;
+
+        showDocumentedRidesBtn = '';
+        showDocumentedRidesBtn += `<div><span class="badge badge-default">${allCandidatedFromDB[i].NoOfDocumentedRides}</span>`;
+        showDocumentedRidesBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedRidesBtn" title="תיעוד הסעות" data-toggle="modal" data-target="#documentedRidesModal"><i class="fa fa-car" aria-hidden="true"></i></button></div>';
+
+        btnStr += showDocumentedRidesBtn;
+        btnStr += '</div>';
+
+        linkableNameToRender = buildCandidateHTML(allCandidatedFromDB[i]);
+
+        thisCandidate = {
+            Id: allCandidatedFromDB[i].Id,
+            LinkableDisplayName: linkableNameToRender,
+            DisplayName: allCandidatedFromDB[i].DisplayName,
+            cellphone: addSeperator2MobileNum(allCandidatedFromDB[i].CellPhone, "-"),
+            city: allCandidatedFromDB[i].CityCityName,// + '<br />בדיקה',
+            weeksSinceLastRide: allCandidatedFromDB[i].LastRideinWeeks == null ? "אין" : allCandidatedFromDB[i].LastRideinWeeks.toFixed(1),
+            daysUntilNextRide: allCandidatedFromDB[i].NextRideInDays == null ? "אין רישום להסעה עתידית" : allCandidatedFromDB[i].NextRideInDays,
+            latestDocumentedCallDate: date2display,
+            AvailableSeats: allCandidatedFromDB[i].AvailableSeats ? allCandidatedFromDB[i].AvailableSeats:'לא ידוע',
+            score: parseFloat(allCandidatedFromDB[i].Score.toFixed(2)),
+            buttons: btnStr
+        }
+        candidateList.push(thisCandidate)
+
+    }
+
+    candidatesTable = $('#datatable-candidates').DataTable({
+        data: candidateList,
+        rowId: 'Id',
+        pageLength: 10,
+        stateSave: true,
+        destroy: true,
+        "lengthChange": false, // for somereason this property must be string
+        stateDuration: 60 * 60,
+        autoWidth: false,
+        order: [[7, 'desc']],
+        columns: [
+            //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
+            {
+                data: "LinkableDisplayName",
+                render: function (data, type, row, meta) {
+                    let did = "data-driverId='" + row.Id + "'";
+                    return '<p class="c1" ' + did + '>' + data + ' </p>';
+                }
+            },                                                      //0
+            { data: "cellphone" },                                  //1
+            { data: "city" },                                       //2
+            { data: "weeksSinceLastRide" },                          //3
+            { data: "daysUntilNextRide" },                          //4
+            { data: "latestDocumentedCallDate" },                   //5
+            { data: "AvailableSeats" },                           //6
+            { data: "score" },                                      //7
+            { data: "buttons" }                                     //8
+        ],
+        columnDefs: [
+            { width: '15%', "targets": [0] },
+            { width: '15%', "targets": [1] },
+            { width: '15%', "targets": [2] },
+            { width: '10%', "targets": [3] },
+            { width: '5%', "targets": [4, 6] },
+            { width: '4%', "targets": [7] },
+            { width: '10%', "targets": [5, 8] },
+            { targets: [8], orderable: false }
+        ]
+    });
+}
+
+
+
+
+
+
+
 function convertDataStructure(inputData) {
     const names = [
         'C_NoOfDocumentedRides', 'C_SeniorityInYears', 'C_LastRideInDays', 'C_NextRideInDays',
@@ -882,4 +1029,41 @@ function convertDataStructure(inputData) {
 function getWeight(paramName, volunteerType) {
     const weight = weightsParams.find(w => w.name === paramName);
     return weight ? weight[volunteerType] : 0;
+}
+
+
+const getAllConfigParams = () => {
+    $("#wait").show();
+    ajaxCall("GetAllConfigDetails",
+        null,
+        getAllConfigParams_SCB,
+        getAllConfigParams_ECB
+
+    )
+}
+
+const getAllConfigParams_SCB = (data) => {
+    $("#wait").hide();
+    console.log(JSON.parse(data.d));
+    AllConfigParams = JSON.parse(data.d);
+}
+const getAllConfigParams_ECB = (data) => {
+    $("#wait").hide();
+
+    console.error("error to fetch the params weight : " + data);
+}
+
+function parseDotNetDate(dateString) {
+    const timestamp = parseInt(dateString.match(/\/Date\((\d+)\)\//)[1]);
+    const date = new Date(timestamp);
+
+    const pad = num => num.toString().padStart(2, '0');
+
+    const day = pad(date.getDate());
+    const month = pad(date.getMonth() + 1);
+    const year = date.getFullYear();
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
 }

@@ -128,6 +128,28 @@ public class WebService : System.Web.Services.WebService
 
     }
 
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetCandidateUnityRideV3(int RideNum)
+    {
+        try
+        {
+            CandidateV3 c = new CandidateV3();
+            List<CandidateV3> list = c.GetCandidatesWithCalc(RideNum);
+            return j.Serialize(list);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetCandidateUnityRideV3", ex);
+            throw new Exception("שגיאה בשליפת הנתונים GetNewbisCandidateUnityRideV3 api" + ex.Message);
+        }
+
+    }
+
+
+
+
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string GetAllConfigDetails()

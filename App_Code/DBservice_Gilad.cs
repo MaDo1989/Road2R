@@ -959,6 +959,71 @@ public class DBservice_Gilad
 
     }
 
+    public List<CandidateV3> GetCandidateUnityRideV3(int ridenum)
+    {
+          SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
+
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@ridePatNum", ridenum);
+        cmd = CreateCommandWithStoredProcedureGeneral("sp_getALLCandidateUnityRideV3", con, paramDic);
+        List<CandidateV3> list = new List<CandidateV3>();
+        try
+        {
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            while(dataReader.Read())
+            {
+                CandidateV3 candidateV3 = new CandidateV3();
+
+                candidateV3.Id = Convert.ToInt32(dataReader["Id"]);
+                candidateV3.DisplayName = dataReader["DisplayName"].ToString();
+                candidateV3.CellPhone = dataReader["CellPhone"].ToString();
+                candidateV3.JoinDate = Convert.ToDateTime(dataReader["JoinDate"]);
+                candidateV3.NoOfDocumentedCalls = Convert.ToInt32(dataReader["NoOfDocumentedCalls"]);
+                candidateV3.CityCityName = dataReader["CityCityName"].ToString();
+                candidateV3.AvailableSeats = SafeConvert<int>(dataReader["AvailableSeats"]);
+                candidateV3.NoOfDocumentedRides = Convert.ToInt32(dataReader["NoOfDocumentedRides"]);
+                candidateV3.LastCallDateTime = Convert.ToDateTime(dataReader["LastCallDateTime"].ToString());
+                candidateV3.AvgRidesPerWeekLast6Months = (float)Convert.ToDouble(dataReader["AvgRidesPerWeek_Last6Months"]);
+                candidateV3.LastRideInDays = SafeConvert<int>(dataReader["LastRideInDays"]);
+                candidateV3.NextRideInDays = SafeConvert<int>(dataReader["NextRideInDays"]);
+                candidateV3.AmountOfRidesInThisPath = Convert.ToInt32(dataReader["AmountOfRidesInThisPath"]);
+                candidateV3.AmountOfRidesAtThisTime = Convert.ToInt32(dataReader["AmountOfRidesAtThisTime"]);
+                candidateV3.AmountOfRidesAtThisDayWeek = Convert.ToInt32(dataReader["AmountOfRidesAtThisDayWeek"]);
+
+
+                list.Add(candidateV3);
+            
+            }
+            return list;
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        finally
+        {
+            if (con != null)
+            {
+                // close the db connection
+                con.Close();
+            }
+        }
+    }
+
+
 
     public List<string> GetManagersVolunteersCellPhones()
     {
