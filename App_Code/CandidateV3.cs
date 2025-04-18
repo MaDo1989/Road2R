@@ -367,8 +367,10 @@ public class CandidateV3
         List<ScoreConfigDic> scoreDictionary = ScoreConfigDic.GetAllScoreConfigDictionary();
 
         List<ScoreConfigDic> p2pList = scoreDictionary.Where(x => x.Parameter == "point_to_point").ToList();
-        List<ScoreConfigDic> a2aList = scoreDictionary.Where(x => x.Parameter == "area_to_area").ToList();
-        List<ScoreConfigDic> p2aList = scoreDictionary.Where(x => x.Parameter == "point_to_area").ToList();
+        //List<ScoreConfigDic> a2aList = scoreDictionary.Where(x => x.Parameter == "area_to_area").ToList();
+        //List<ScoreConfigDic> p2aList = scoreDictionary.Where(x => x.Parameter == "point_to_area").ToList();
+
+
         List<ScoreConfigDic> dayWeekList = scoreDictionary.Where(x => x.Parameter == "this_day_week").ToList();
         List<ScoreConfigDic> timeInDayList = scoreDictionary.Where(x => x.Parameter == "this_time_inDay").ToList();
 
@@ -381,15 +383,16 @@ public class CandidateV3
             candid.Score = 0;
             if (candid.NoOfDocumentedRides>0)
             {
-                candid.PercentageOfRidesInThisPath = (float)candid.AmountOfRidesInThisPath / candid.NoOfDocumentedRides;
-                candid.PercentageOfRidesAreaToArea = (float)candid.AmountOfRidesAreaToArea / candid.NoOfDocumentedRides;
-                candid.PercentageOfRidesOriginToArea = (float)candid.AmountOfRidesOriginToArea / candid.NoOfDocumentedRides;
+                //NOTE : according to abraham, the percentage of rides in this path is the sum of the rides in this path and the rides area to area and the rides origin to area
+                candid.PercentageOfRidesInThisPath = (float)((candid.AmountOfRidesInThisPath+candid.AmountOfRidesAreaToArea+candid.AmountOfRidesOriginToArea) / candid.NoOfDocumentedRides);
+                //candid.PercentageOfRidesAreaToArea = (float)candid.AmountOfRidesAreaToArea / candid.NoOfDocumentedRides;
+                //candid.PercentageOfRidesOriginToArea = (float)candid.AmountOfRidesOriginToArea / candid.NoOfDocumentedRides;
                 candid.PercentageOfRidesAtThisTime = (float)candid.AmountOfRidesAtThisTime / candid.NoOfDocumentedRides;
                 candid.PercentageOfRidesAtThisDayWeek = (float)candid.AmountOfRidesAtThisDayWeek / candid.NoOfDocumentedRides;
 
                 candid.Score += GetAccurateScoringByPercentage(candid.PercentageOfRidesInThisPath, p2pList);
-                candid.Score += GetAccurateScoringByPercentage(candid.PercentageOfRidesAreaToArea, a2aList);
-                candid.Score += GetAccurateScoringByPercentage(candid.PercentageOfRidesOriginToArea, p2aList);
+                //candid.Score += GetAccurateScoringByPercentage(candid.PercentageOfRidesAreaToArea, a2aList);
+                //candid.Score += GetAccurateScoringByPercentage(candid.PercentageOfRidesOriginToArea, p2aList);
                 candid.Score += GetAccurateScoringByPercentage(candid.PercentageOfRidesAtThisTime, timeInDayList);
                 candid.Score += GetAccurateScoringByPercentage(candid.PercentageOfRidesAtThisDayWeek, dayWeekList);
             }

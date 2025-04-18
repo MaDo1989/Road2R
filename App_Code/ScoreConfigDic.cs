@@ -93,9 +93,9 @@ public class ScoreConfigDic
     {
         //return the all list from the DBservice -> sp = sp_getParamDic
         DBservice_Gilad db = new DBservice_Gilad();
-        return db.GetAllConfigList();
-      
-
+        List<ScoreConfigDic> listToReturn = db.GetAllConfigList();
+        listToReturn.RemoveAll(item => item.parameter == "point_to_area" || item.parameter == "area_to_area");
+        return listToReturn;
     }
 
     static public bool updateScoreConfigDic(List<ScoreConfigDic> listToUpdate)

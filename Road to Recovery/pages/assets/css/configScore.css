@@ -25,6 +25,13 @@ button {
     box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
 }
 
+.inline {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
 .container {
     max-width: 1200px;
     margin: auto;
@@ -103,12 +110,27 @@ table td {
                 padding: 10px 25px;
                 border-radius: 6px;
                 cursor: pointer;
-                margin: 20px auto 0;
+/*                margin: 20px auto 0;
+*/                display: block;
+                transition: background-color 0.3s;
+                font-size: 26px;
+            }
+            button#defult-value-btn {
+                background-color: #e2742a;
+                color: white;
+                border: none;
+                padding: 10px 25px;
+                border-radius: 6px;
+                cursor: pointer;
                 display: block;
                 transition: background-color 0.3s;
                 font-size: 26px;
             }
 
-    button#save-btn:hover {
-        background-color: #008f70;
-    }
+
+            button#save-btn:hover {
+                background-color: #008f70;
+            }
+            button#defult-value-btn:hover {
+                background-color: #b65e22;
+            }

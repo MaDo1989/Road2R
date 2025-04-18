@@ -657,7 +657,7 @@ const fillTableWithData = () => {
 
 
 const ShowWeightsParamsPage = () => {
-    location.href = "configScoreParameters.html";
+    window.open("configScoreParameters.html", "_blank");
 }
 
 

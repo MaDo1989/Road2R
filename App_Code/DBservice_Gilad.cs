@@ -997,7 +997,11 @@ public class DBservice_Gilad
                 candidateV3.AvgRidesPerWeekLast6Months = (float)Convert.ToDouble(dataReader["AvgRidesPerWeek_Last6Months"]);
                 candidateV3.LastRideInDays = SafeConvert<int>(dataReader["LastRideInDays"]);
                 candidateV3.NextRideInDays = SafeConvert<int>(dataReader["NextRideInDays"]);
+
                 candidateV3.AmountOfRidesInThisPath = Convert.ToInt32(dataReader["AmountOfRidesInThisPath"]);
+                candidateV3.AmountOfRidesAreaToArea = Convert.ToInt32(dataReader["AmountOfRides_AreaToArea"]);
+                candidateV3.AmountOfRidesOriginToArea = Convert.ToInt32(dataReader["AmountOfRides_OriginToArea"]);
+
                 candidateV3.AmountOfRidesAtThisTime = Convert.ToInt32(dataReader["AmountOfRidesAtThisTime"]);
                 candidateV3.AmountOfRidesAtThisDayWeek = Convert.ToInt32(dataReader["AmountOfRidesAtThisDayWeek"]);
 
