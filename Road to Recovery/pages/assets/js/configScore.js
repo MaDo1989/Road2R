@@ -306,7 +306,7 @@ $(document).ready(function () {
             }
             else {
                 params[param].forEach(row => {
-                    console.log(row)
+                    //console.log(row)
                     table.find('tbody').append(`
                     <tr data-id="${row.Id}">
                         <td class="score_td"><input onchange="changeTheColor(this)" class="score_in" type="number" value="${row.Score}" step="0.2"></td>
@@ -363,7 +363,9 @@ $(document).ready(function () {
                     title: '👌השינויים נשמרו בהצלחה!',
                     icon: 'success',
                     confirmButtonText: 'אישור'
-                });
+                }).then(() => {
+                    location.reload();
+                })
             },
             error: function (err) {
                 console.log(err);

@@ -384,7 +384,7 @@ public class CandidateV3
             if (candid.NoOfDocumentedRides>0)
             {
                 //NOTE : according to abraham, the percentage of rides in this path is the sum of the rides in this path and the rides area to area and the rides origin to area
-                candid.PercentageOfRidesInThisPath = (float)((candid.AmountOfRidesInThisPath+candid.AmountOfRidesAreaToArea+candid.AmountOfRidesOriginToArea) / candid.NoOfDocumentedRides);
+                candid.PercentageOfRidesInThisPath =((float)(candid.AmountOfRidesInThisPath + candid.AmountOfRidesAreaToArea + candid.AmountOfRidesOriginToArea))/ candid.NoOfDocumentedRides;
                 //candid.PercentageOfRidesAreaToArea = (float)candid.AmountOfRidesAreaToArea / candid.NoOfDocumentedRides;
                 //candid.PercentageOfRidesOriginToArea = (float)candid.AmountOfRidesOriginToArea / candid.NoOfDocumentedRides;
                 candid.PercentageOfRidesAtThisTime = (float)candid.AmountOfRidesAtThisTime / candid.NoOfDocumentedRides;

@@ -153,13 +153,13 @@ function showCharacteristics() {
     let boldArr = ["אחוז מהנסיעות בציר המדויק הזה", "אחוז מהנסיעות בחלק הזה של היום", "אחוז מהנסיעות ביום הזה בשבוע"];
     let txt = {
         "אחוז מהנסיעות בציר המדויק הזה": getScoreString(c,"point_to_point"),
-        "אחוז מהנסיעות מאותה נקודה לאותו איזור": getScoreString(c, "point_to_area"),
-        "אחוז מהנסיעות מאותו אזור לאותו אזור": getScoreString(c, "area_to_area"),
+        /*"אחוז מהנסיעות מאותה נקודה לאותו איזור": getScoreString(c, "point_to_area"),*/
+        /*"אחוז מהנסיעות מאותו אזור לאותו אזור": getScoreString(c, "area_to_area"),*/
         "אחוז מהנסיעות ביום הזה בשבוע":  getScoreString(c, "this_day_week"),
         "אחוז מהנסיעות בחלק הזה של היום": getScoreString(c, "this_time_inDay"),
         "ממוצע הסעות בשבוע (חצי שנתי)": getScoreString(c, "AVG_rides_week"),
         "שבועות מאז ההסעה האחרונה": c.LastRideinWeeks == null ? " -אין- " + "<br>ניקוד: " + getScoreString(c, "Time_since_last_ride") : c.LastRideinWeeks + "<br>ניקוד: " + getScoreString(c, "Time_since_last_ride"),
-        "ימים עד ההסעה הבאה": c.NextRideInDays == null ? " -אין- " + "<br>ניקוד:" + getScoreString(c, "is_future_Ride") : c.NextRideInDays +  "<br>ניקוד:" + getScoreString(c, "is_future_Ride"),
+        "ימים עד ההסעה הבאה": c.NextRideInDays == null ? " -אין- " + "<br>ניקוד:" + getScoreString(c, "is_future_Ride") : c.NextRideInDays +  "<br>ניקוד: " + getScoreString(c, "is_future_Ride"),
     };
 
     let str = "<h3> נתוני נסיעות  בשנה האחרונה </h3>";
