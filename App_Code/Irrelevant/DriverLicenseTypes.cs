@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 
 
 /// <summary>
@@ -107,7 +103,7 @@ public class DriverLicenseTypes
     public List<DriverLicenseTypes> getDriverLicenseTypesList(string LicenseORCertification)
     {
         #region DB functions
-        string query = "select * from DriverLicenseTypes where PermissionORCertification = '"+ LicenseORCertification + "' order by DriverLicenseTypeName";
+        string query = "select * from DriverLicenseTypes where PermissionORCertification = '" + LicenseORCertification + "' order by DriverLicenseTypeName";
 
         List<DriverLicenseTypes> list = new List<DriverLicenseTypes>();
         DbService db = new DbService();
@@ -137,7 +133,7 @@ public class DriverLicenseTypes
         {
             query = "select * from DriverLicenseTypes dlt inner join Drivers d on dlt.DriverLicenseTypeID = d.DriverCertificationID where d.DriverID =" + driverID + "";
         }
-        
+
 
         DriverLicenseTypes dlt = new DriverLicenseTypes();
         DbService db = new DbService();
@@ -159,7 +155,7 @@ public class DriverLicenseTypes
     {
         #region DB functions
         string query = "";
-        
+
         query = "select * from DriverLicenseTypes dlt where dlt.DriverLicenseTypeID =" + driverLicenseTypeID + "";
 
 

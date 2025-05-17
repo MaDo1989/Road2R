@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Data;
-using System.Data.SqlClient;
 
 /// <summary>
 /// Summary description for Drivers
@@ -461,7 +458,7 @@ public class Drivers
         + "from Drivers d left join "
 + "(select * "
 + "from DriverConstraints "
-+ "where Date ='" + sqlDate+"' "
++ "where Date ='" + sqlDate + "' "
 + "and Active = 'Y') as dc on d.DriverID = dc.DriverID "
 + "inner join City c on d.CityID = c.CityID inner join Trucks t on d.TruckID=t.TruckID inner join TruckTypes tp on t.TruckTypeID = tp.TruckTypeID "
 + "where d.Active = 'Y' "

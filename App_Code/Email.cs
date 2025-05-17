@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.IO;
-using System.Net.Mail;
-using System.Web.Security;
 using System.Configuration;
+using System.Net;
+using System.Net.Mail;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-using System.Net;
 using System.Text;
- 
+
 
 /// <summary>
 /// Summary description for Email
@@ -25,21 +21,23 @@ public class Email
       {"New volunteer","הרשמת מתנדב.ת חדש.ה" }
     };
 
-	public Email()
-	{
-		//
-		// TODO: Add constructor logic here
-		//
-	}
-
-    private void sendMail(MailMessage message){
-            SmtpClient smtp = new SmtpClient();
-            if(smtp.EnableSsl == true)
-                ServicePointManager.ServerCertificateValidationCallback = delegate(object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) { return true; };
-            smtp.Send(message);
+    public Email()
+    {
+        //
+        // TODO: Add constructor logic here
+        //
     }
-  
-    public void sendMessage(string type, string userName, string phoneNumber, string messageText) {
+
+    private void sendMail(MailMessage message)
+    {
+        SmtpClient smtp = new SmtpClient();
+        if (smtp.EnableSsl == true)
+            ServicePointManager.ServerCertificateValidationCallback = delegate (object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) { return true; };
+        smtp.Send(message);
+    }
+
+    public void sendMessage(string type, string userName, string phoneNumber, string messageText)
+    {
 
         MailMessage message = new MailMessage();
         string systemMail = ConfigurationManager.AppSettings["systemMail"];
@@ -51,7 +49,8 @@ public class Email
         {
             message.Subject = subjects[type];
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             throw new Exception("no such type: " + type + ", " + ex.Message);
         }
         StringBuilder sb = new StringBuilder();
@@ -80,7 +79,7 @@ public class Email
         MailMessage message = new MailMessage();
         string systemMail = ConfigurationManager.AppSettings["systemMail"];
         string adminMail = ConfigurationManager.AppSettings["adminMail"];
-        message.To.Add(toEmail); 
+        message.To.Add(toEmail);
 
         message.IsBodyHtml = true;
         try

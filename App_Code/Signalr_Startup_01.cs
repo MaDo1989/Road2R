@@ -1,8 +1,5 @@
 ﻿using Microsoft.Owin;
 using Owin;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 [assembly: OwinStartup("ProductionConfiguration", typeof(Signalr_Startup_01))]
 

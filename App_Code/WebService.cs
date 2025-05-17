@@ -1,18 +1,11 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Configuration;
 using System.Web;
 using System.Web.Script.Serialization;
-using System.Web.Services;
-using System.Globalization;
 using System.Web.Script.Services;
-using log4net;
-using System.Web.UI;
-using System.Configuration;
-using System.Collections;
-using System.Activities.Statements;
-using Microsoft.AspNet.SignalR;
-using Newtonsoft.Json.Linq;
+using System.Web.Services;
 
 /// <summary>
 /// Summary description for WebService
@@ -302,15 +295,15 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
-//    {
-//    "ridePatNum": 183192,
-//    "numOfCandidates": 25,
-//    "newFlag": false,
-//    "dayInWeek": 3
-//}
+    //    {
+    //    "ridePatNum": 183192,
+    //    "numOfCandidates": 25,
+    //    "newFlag": false,
+    //    "dayInWeek": 3
+    //}
 
-//Benny Candidates
-[WebMethod(EnableSession = true)]
+    //Benny Candidates
+    [WebMethod(EnableSession = true)]
     public string GetCandidates(int ridePatNum, int numOfCandidates, bool newFlag, int dayInWeek)
     {
 
@@ -352,12 +345,12 @@ public class WebService : System.Web.Services.WebService
 
     //Gilad try to set UnityRide 
     [WebMethod(EnableSession = true)]
-    public int setUnityRide(UnityRide unityRide,string func,int numOfRide,string repeatEvery,bool firstTry)
+    public int setUnityRide(UnityRide unityRide, string func, int numOfRide, string repeatEvery, bool firstTry)
     {
         try
         {
-            int res = unityRide.SetUnityRide(unityRide,func,numOfRide,repeatEvery, firstTry);
-            return res; 
+            int res = unityRide.SetUnityRide(unityRide, func, numOfRide, repeatEvery, firstTry);
+            return res;
         }
         catch (Exception ex)
         {
@@ -985,7 +978,7 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string CheckRideBeforePost(int volunteerId,DateTime start,DateTime end)
+    public string CheckRideBeforePost(int volunteerId, DateTime start, DateTime end)
     {
         try
         {
@@ -1084,17 +1077,17 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
-    public bool recoverUnityRides(List<int> listIDs,string userName )
+    public bool recoverUnityRides(List<int> listIDs, string userName)
     {
         try
         {
             UnityRide ur = new UnityRide();
-            return ur.recoverUnityRides(listIDs,userName);
+            return ur.recoverUnityRides(listIDs, userName);
         }
         catch (Exception ex)
         {
 
-            throw new Exception("error in recoverUnityRides API" +ex);
+            throw new Exception("error in recoverUnityRides API" + ex);
         }
 
     }
@@ -1181,7 +1174,7 @@ public class WebService : System.Web.Services.WebService
         {
             HttpResponse response = GzipMe();
             UnityRide ur = new UnityRide();
-            List <UnityRide> List = ur.GetWeeklyRidesForThanks();
+            List<UnityRide> List = ur.GetWeeklyRidesForThanks();
             j.MaxJsonLength = Int32.MaxValue;
             return j.Serialize(List);
 
@@ -1585,9 +1578,9 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string AssignUpdateDriverToUnityRide(int UnityRideId, int DriverId,bool isDelete,string userName) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
+    public string AssignUpdateDriverToUnityRide(int UnityRideId, int DriverId, bool isDelete, string userName) //Get RidePatId & UserId, Create a new Ride with this info - then return RideId
     {
-        
+
 
         try
         {
@@ -1608,7 +1601,7 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetEnglishNamesByIds(List <int> Ids) 
+    public string GetEnglishNamesByIds(List<int> Ids)
     {
 
 
@@ -1634,7 +1627,7 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public void deleteUnityRide(List<int>ListIDs,string userName) 
+    public void deleteUnityRide(List<int> ListIDs, string userName)
     {
 
 
@@ -1916,7 +1909,7 @@ public class WebService : System.Web.Services.WebService
     }
 
 
-    
+
     // this one is not in use the new one is down below ! 
     [WebMethod(EnableSession = true)]
     public string getVolunteers(bool active)
@@ -1958,7 +1951,7 @@ public class WebService : System.Web.Services.WebService
     }
 
     //Gilad Touch here
-    [WebMethod(EnableSession=true)]
+    [WebMethod(EnableSession = true)]
     public string GetAbsenceByVolunteerId(int volunteerId)
     {
         try
@@ -1970,7 +1963,7 @@ public class WebService : System.Web.Services.WebService
         catch (Exception ex)
         {
             Log.Error("Error in GetAbsenceByVolunteerId", ex);
-            throw new Exception("שגיאה בשליפת היעדרויות"+ex.Message);
+            throw new Exception("שגיאה בשליפת היעדרויות" + ex.Message);
         }
     }
     [WebMethod(EnableSession = true)]
@@ -1979,7 +1972,7 @@ public class WebService : System.Web.Services.WebService
         try
         {
             Absence absence = new Absence();
-            return j.Serialize( absence.UpdateAbsenceById(AbsenceId, coorId, from, until, cause, note));
+            return j.Serialize(absence.UpdateAbsenceById(AbsenceId, coorId, from, until, cause, note));
 
         }
         catch (Exception ex)
@@ -2011,7 +2004,7 @@ public class WebService : System.Web.Services.WebService
         try
         {
             Absence absence = new Absence();
-            return j.Serialize(absence.InsertNewAbsence(volunteerId,  coorId,  from,  until,  cause,  note));
+            return j.Serialize(absence.InsertNewAbsence(volunteerId, coorId, from, until, cause, note));
 
         }
         catch (Exception ex)
@@ -2348,7 +2341,7 @@ public class WebService : System.Web.Services.WebService
     //}
 
 
-    
+
 
     [WebMethod(EnableSession = true)]
     public string loginDriver(string uName, string password)
@@ -2661,7 +2654,7 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
-    public void UpdateUnityRideTime(int unityRideId, DateTime pickupTime,string userName)
+    public void UpdateUnityRideTime(int unityRideId, DateTime pickupTime, string userName)
     {
         try
         {
@@ -2914,7 +2907,8 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod(EnableSession = true)]
-    public void mapNearestCities() {
+    public void mapNearestCities()
+    {
 
         City c = new City();
         c.writeNearestMainCities();
@@ -2937,7 +2931,7 @@ public class WebService : System.Web.Services.WebService
 
 
     [WebMethod(EnableSession = true)]
-    public void UpdatePatientStatus_UnityRide(int patientId, int unityRideID, string patientStatus, DateTime? editTimeStamp,string userName)
+    public void UpdatePatientStatus_UnityRide(int patientId, int unityRideID, string patientStatus, DateTime? editTimeStamp, string userName)
     {
         try
         {
@@ -2970,7 +2964,7 @@ public class WebService : System.Web.Services.WebService
 
 
     [WebMethod(EnableSession = true)]
-    public void UpdateUnityRideRemark(int UnityRideID, string newRemark,string userName)
+    public void UpdateUnityRideRemark(int UnityRideID, string newRemark, string userName)
     {
         try
         {

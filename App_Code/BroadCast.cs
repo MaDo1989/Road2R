@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNet.SignalR;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 /// <summary>
 /// Summary description for BroadCast
@@ -49,7 +46,7 @@ public class BroadCast
     }
     public static void BroadCast2Clients_UnityRideUpdated(UnityRide ur)
     {
-        if (ShouldClientsBeUpdated(ur.PickupTime,30))
+        if (ShouldClientsBeUpdated(ur.PickupTime, 30))
         {
             IHubContext hubContext = GlobalHost.ConnectionManager.GetHubContext<UnityRideHub>();
             hubContext.Clients.All.UnityRideUpdated(ur);
@@ -58,7 +55,7 @@ public class BroadCast
 
     private static bool ShouldClientsBeUpdated(DateTime rpDate, int maxNumOfDays)
     {
-        bool shouldClientsBeUpdated =  (rpDate - DateTime.Now).Days <= maxNumOfDays;
+        bool shouldClientsBeUpdated = (rpDate - DateTime.Now).Days <= maxNumOfDays;
 
         return shouldClientsBeUpdated;
     }

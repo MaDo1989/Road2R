@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Data;
-using System.Data.SqlClient;
 
 /// <summary>
 /// Summary description for Trucks
@@ -322,7 +319,7 @@ public class Trucks
         }
         else if (func == "new")
         {
-            query = "insert into Trucks values (" + TruckLicense + ",'" + Manufacturer+"','" + Model + "','Y','" + KMToDate + "','"+Hand+"'," + PurchaseCost + ",'" + PurchaseYear+"'," + TruckType.TruckTypeID + ", '" + Urea + "', '" + sqlFormattedOnRoadDate + "', '" + sqlFormattedInsuranceExpiredDate + "')";
+            query = "insert into Trucks values (" + TruckLicense + ",'" + Manufacturer + "','" + Model + "','Y','" + KMToDate + "','" + Hand + "'," + PurchaseCost + ",'" + PurchaseYear + "'," + TruckType.TruckTypeID + ", '" + Urea + "', '" + sqlFormattedOnRoadDate + "', '" + sqlFormattedInsuranceExpiredDate + "')";
         }
         db.ExecuteQuery(query);
     }
@@ -346,7 +343,7 @@ public class Trucks
 + "(select * "
 + "from TruckHandlings "
 + "where Active = 'Y' "
-+ "and Date = '"+ sqlDate + "') as th on t.TruckID = th.TruckID "
++ "and Date = '" + sqlDate + "') as th on t.TruckID = th.TruckID "
 + "where th.Date is null "
 + "and t.Active = 'Y'";
 

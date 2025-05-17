@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Web;
 
 /// <summary>
 /// 
@@ -18,8 +15,8 @@ public class Version
     public DateTime UpdateDate { get; set; }
     public string VersionName { get; set; }
     public bool IsMandatory { get; set; }
-    public Version()  {   }
-    public Version(string userName,string google,string appstore,DateTime date,string version,bool mandatory)
+    public Version() { }
+    public Version(string userName, string google, string appstore, DateTime date, string version, bool mandatory)
     {
         UserName = userName;
         GoogleStoreURL = google;
@@ -29,7 +26,7 @@ public class Version
         IsMandatory = mandatory;
     }
 
-    public void setNewVersion(string userName, string google, string appstore, DateTime date, string version,bool mandatory)
+    public void setNewVersion(string userName, string google, string appstore, DateTime date, string version, bool mandatory)
     {
         int Id;
         DbService db = new DbService();
@@ -37,20 +34,20 @@ public class Version
         cmd.CommandType = CommandType.Text;
         SqlParameter[] cmdParams = new SqlParameter[6];
 
-        string versionCheck = version.Replace(".","");
+        string versionCheck = version.Replace(".", "");
 
         try
         {
-            List<Version> lv =  this.getVersions();
-            if (int.Parse(lv[0].VersionName)>=int.Parse(versionCheck))
+            List<Version> lv = this.getVersions();
+            if (int.Parse(lv[0].VersionName) >= int.Parse(versionCheck))
             {
                 return;
-            } 
+            }
         }
         catch (Exception)
         {
 
-            
+
         }
 
 
@@ -67,7 +64,7 @@ public class Version
         db = new DbService();
         try
         {
-            
+
             //getting the id of this version.
             Id = int.Parse(db.GetObjectScalarByQuery(query, cmd.CommandType, cmdParams).ToString());
 

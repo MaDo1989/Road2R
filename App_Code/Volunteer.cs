@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Web;
-using System.Web.Script.Serialization;
-using WhatsAppApi;
 
 /// <summary>
 /// Summary description for Volunteer
@@ -580,7 +576,7 @@ public class Volunteer
 
     public int hasFutureRides(int volunteerID)
     {
-        DBservice_Gilad db  = new DBservice_Gilad();
+        DBservice_Gilad db = new DBservice_Gilad();
         return db.hasFutureRides(volunteerID);
     }
 
@@ -1602,7 +1598,7 @@ public class Volunteer
         return list;
     }
 
-    public List <Volunteer> getVolunteersList_V2_WebOnly_Gilad(bool active)
+    public List<Volunteer> getVolunteersList_V2_WebOnly_Gilad(bool active)
     {
         DBservice_Gilad dBservice_Gilad = new DBservice_Gilad();
         return dBservice_Gilad.getVolunteersList_V2_WebOnly_Gilad(active);
@@ -1962,7 +1958,7 @@ public class Volunteer
             cmdParams[20] = cmd.Parameters.AddWithValue("@englishLN", v.EnglishLN);
             cmdParams[21] = cmd.Parameters.AddWithValue("@birthDate", v.BirthDate);
             cmdParams[22] = cmd.Parameters.AddWithValue("@isDriving", v.IsDriving);
-            
+
 
 
             if (v.Role == null)

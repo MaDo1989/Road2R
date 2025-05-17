@@ -1,13 +1,10 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Web;
 using System.Web.Script.Serialization;
-using System.Web.Services;
-using System.Globalization;
 using System.Web.Script.Services;
-using log4net;
-using System.Web.UI;
+using System.Web.Services;
 
 /// <summary>
 /// Summary description for WebService
@@ -155,7 +152,7 @@ public class ReportsWebService : System.Web.Services.WebService
     }
 
 
-    
+
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -199,7 +196,7 @@ public class ReportsWebService : System.Web.Services.WebService
     }
 
 
-    
+
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -252,9 +249,9 @@ public class ReportsWebService : System.Web.Services.WebService
         try
         {
             HttpResponse response = GzipMe();
-            int delta_start =  0 - Int32.Parse(start_number);
+            int delta_start = 0 - Int32.Parse(start_number);
             int delta_end = 0 - Int32.Parse(end_number);
-            
+
             ReportService report = new ReportService();
             List<ReportService.VolunteersInPeriod> r = report.GetReportSliceVolunteersInPeriod(delta_start, delta_end);
             return r;
@@ -291,7 +288,7 @@ public class ReportsWebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-        public List<string> GetCurrentUserEntitlements()
+    public List<string> GetCurrentUserEntitlements()
     {
         try
         {
@@ -372,7 +369,7 @@ public class ReportsWebService : System.Web.Services.WebService
     }
 
 
-    
+
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -476,7 +473,7 @@ public class ReportsWebService : System.Web.Services.WebService
 
     }
 
-        
+
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -500,7 +497,7 @@ public class ReportsWebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public List<ReportService.MetricMonthlyInfo> GetReportWithPeriodDigestMetrics(string start_date, string end_date, 
+    public List<ReportService.MetricMonthlyInfo> GetReportWithPeriodDigestMetrics(string start_date, string end_date,
         string prev_start, string prev_end, string span)
     {
         try

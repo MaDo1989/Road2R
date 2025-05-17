@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Configuration;
-using PushSharp.Core;
+﻿using Newtonsoft.Json.Linq;
 using PushSharp.Google;
-using System.Web.Script.Serialization;
-using System.Web.Script.Services;
-using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 /// <summary>
 /// Summary description for myPushNot
@@ -86,7 +79,7 @@ public class myPushNot
         sound = _sound;
     }
 
-    public void RunPushNotificationAll(List<Volunteer> userList, JObject data,JObject notification_)
+    public void RunPushNotificationAll(List<Volunteer> userList, JObject data, JObject notification_)
     {
         List<string> registrationIDs = new List<string>();
 
@@ -148,7 +141,7 @@ public class myPushNot
         gcmBroker.Stop();
     }
 
-    public void RunPushNotificationOne(Volunteer user, JObject data,JObject notification_)
+    public void RunPushNotificationOne(Volunteer user, JObject data, JObject notification_)
     {
 
         // Configuration
@@ -161,27 +154,27 @@ public class myPushNot
         // Wire up events
         gcmBroker.OnNotificationFailed += (notification, aggregateEx) =>
         {
-        //Console.WriteLine("GCM Notification Failed!");
-    };
+            //Console.WriteLine("GCM Notification Failed!");
+        };
 
         gcmBroker.OnNotificationSucceeded += (notification) =>
         {
-        //Console.WriteLine("GCM Notification Sent!");
-    };
+            //Console.WriteLine("GCM Notification Sent!");
+        };
 
         return;
 
-                                                                            /*
-                                                                     =======================================================
-                                                                     ||       --- !!!  IMPORTANT NOTE !!! ---             ||
-                                                                     ||                                                   ||
-                                                                     ||         AS FOR 26.02.2021 Yogev&Benny Canceled    ||
-                                                                     ||          all PUSH NOTIFICATIONS FOLLOWED BY       ||
-                                                                     ||                  AMIR'S REQUEST                   ||
-                                                                     ||                                                   ||
-                                                                     ||       --- !!!  IMPORTANT NOTE !!! ---             ||
-                                                                     =======================================================
-                                                                     */
+        /*
+ =======================================================
+ ||       --- !!!  IMPORTANT NOTE !!! ---             ||
+ ||                                                   ||
+ ||         AS FOR 26.02.2021 Yogev&Benny Canceled    ||
+ ||          all PUSH NOTIFICATIONS FOLLOWED BY       ||
+ ||                  AMIR'S REQUEST                   ||
+ ||                                                   ||
+ ||       --- !!!  IMPORTANT NOTE !!! ---             ||
+ =======================================================
+ */
 
         // Start the broker
 

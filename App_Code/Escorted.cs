@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
 using System.Web;
-using System.Web.Script.Serialization;
 
 public class Escorted
 {
@@ -369,7 +366,7 @@ public class Escorted
         {
             dbs = new DbService();
             SqlDataReader sdr = dbs.GetDataReader(query);
-            Escorted escort = new Escorted(); 
+            Escorted escort = new Escorted();
             if (sdr.Read())
             {
                 escort.Id = int.Parse(sdr["Id"].ToString());
@@ -377,8 +374,8 @@ public class Escorted
                 escort.FirstNameH = sdr["FirstNameH"].ToString();
                 escort.LastNameH = sdr["LastNameH"].ToString();
                 escort.CellPhone = sdr["CellPhone"].ToString();
-                escort.IsAnonymous =  String.IsNullOrEmpty(sdr["IsAnonymous"].ToString());
-                escort.IsActive =  String.IsNullOrEmpty(sdr["IsActive"].ToString());
+                escort.IsAnonymous = String.IsNullOrEmpty(sdr["IsAnonymous"].ToString());
+                escort.IsActive = String.IsNullOrEmpty(sdr["IsActive"].ToString());
             }
             return escort;
         }

@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Globalization;
 using System.Linq;
-using System.Web;
 
 /* Notes:
  * 
@@ -67,7 +64,7 @@ public class ReportService
         public override int GetHashCode()
         {
             return Date.GetHashCode() ^ OriginName.GetHashCode() ^ Time.GetHashCode()
-                    ^ PatDisplayName.GetHashCode() ^ Drivers.GetHashCode() 
+                    ^ PatDisplayName.GetHashCode() ^ Drivers.GetHashCode()
                     ^ Day.GetHashCode() ^ Status.GetHashCode();
         }
     }
@@ -234,7 +231,7 @@ public class ReportService
         }
         public override int GetHashCode()
         {
-            return this.DisplayName.GetHashCode() ^ this.City.GetHashCode() 
+            return this.DisplayName.GetHashCode() ^ this.City.GetHashCode()
                 ^ this.CellPhone.GetHashCode() ^ this.JoinDate.GetHashCode()
                 ^ this.Jan.GetHashCode() ^ this.Feb.GetHashCode() ^ this.Mar.GetHashCode()
                 ^ this.Apr.GetHashCode() ^ this.May.GetHashCode() ^ this.Jun.GetHashCode()
@@ -243,7 +240,7 @@ public class ReportService
         }
     }
 
-    public class SliceVolunteersCountInMonthInfo  : IEquatable<SliceVolunteersCountInMonthInfo>
+    public class SliceVolunteersCountInMonthInfo : IEquatable<SliceVolunteersCountInMonthInfo>
     {
         public string Volunteer { get; set; }
         public string Count { get; set; }
@@ -296,7 +293,7 @@ public class ReportService
         }
         public override int GetHashCode()
         {
-            return Id.GetHashCode() ^ Volunteer.GetHashCode() 
+            return Id.GetHashCode() ^ Volunteer.GetHashCode()
                 ^ CityCityName.GetHashCode() ^ CellPhone.GetHashCode();
         }
     }
@@ -595,24 +592,24 @@ public class ReportService
         while (reader.Read())
         {
             SliceVolunteersPerMonthInfo obj = new SliceVolunteersPerMonthInfo();
-                obj.DisplayName = reader["DisplayName"].ToString();
-                obj.City = reader["CityName"].ToString();
-                obj.CellPhone = reader["CellPhone"].ToString();
-                obj.JoinDate = reader["JoinDate"].ToString();
-                obj.Jan = reader["Jan"].ToString();
-                obj.Feb = reader["Feb"].ToString();
-                obj.Mar = reader["Mar"].ToString();
-                obj.Apr = reader["Apr"].ToString();
-                obj.May = reader["May"].ToString();
-                obj.Jun = reader["Jun"].ToString();
-                obj.Jul = reader["Jul"].ToString();
-                obj.Aug = reader["Aug"].ToString();
-                obj.Sep = reader["Sep"].ToString();
-                obj.Oct = reader["Oct"].ToString();
-                obj.Nov = reader["Nov"].ToString();
-                obj.Dec = reader["Dec"].ToString();
+            obj.DisplayName = reader["DisplayName"].ToString();
+            obj.City = reader["CityName"].ToString();
+            obj.CellPhone = reader["CellPhone"].ToString();
+            obj.JoinDate = reader["JoinDate"].ToString();
+            obj.Jan = reader["Jan"].ToString();
+            obj.Feb = reader["Feb"].ToString();
+            obj.Mar = reader["Mar"].ToString();
+            obj.Apr = reader["Apr"].ToString();
+            obj.May = reader["May"].ToString();
+            obj.Jun = reader["Jun"].ToString();
+            obj.Jul = reader["Jul"].ToString();
+            obj.Aug = reader["Aug"].ToString();
+            obj.Sep = reader["Sep"].ToString();
+            obj.Oct = reader["Oct"].ToString();
+            obj.Nov = reader["Nov"].ToString();
+            obj.Dec = reader["Dec"].ToString();
 
-                result.Add(obj);
+            result.Add(obj);
         }
         reader.Close();
         return result;
@@ -1140,7 +1137,7 @@ GROUP BY inner_select.DisplayName
             {
                 int raw_count = helper_unsafe_ParseIntger(dr["COUNT_DEMAND_RAW"].ToString());
                 int actual_count = raw_count - helper_unsafe_ParseIntger(dr["MULTI_SEG_TO_SUBSTRACT_C"].ToString());
-                obj.Demands = actual_count.ToString(); 
+                obj.Demands = actual_count.ToString();
             }
             result.Add(obj);
         }
@@ -1508,7 +1505,7 @@ GROUP BY inner_select.DisplayName
         cmd.Parameters.Add("@start_date", SqlDbType.Date).Value = start_date;
 
         SqlDataReader reader = db.GetDataReaderBySqlCommand(cmd);
-        
+
         List<VolunteersPerMonthInfo> result = new List<VolunteersPerMonthInfo>();
 
         while (reader.Read())
@@ -1735,7 +1732,7 @@ ORDER BY Volunteer.DisplayName ASC
         cmd.Parameters.Add("@end_date", SqlDbType.Date).Value = end_date;
 
         SqlDataReader reader = db.GetDataReaderBySqlCommand(cmd);
-        
+
 
         List<VolunteerKM> result = new List<ReportService.VolunteerKM>();
 
@@ -1757,7 +1754,7 @@ ORDER BY Volunteer.DisplayName ASC
     internal List<VolunteerKM> GetReportVolunteersKM(string start_date, string end_date)
     {
         List<VolunteerKM> u = U_GetReportVolunteersKM(start_date, end_date);  // << New implementation using United
-        return u;   
+        return u;
     }
 
     internal List<NameIDPair> GetPatientsDisplayNames()
@@ -2482,7 +2479,7 @@ group by CONVERT(date, pickuptime) ";
         cmd.CommandText = query;
 
         SqlDataReader reader = db.GetDataReaderBySqlCommand(cmd);
-        
+
         List<CenterPatientsRidesInfo> result = new List<CenterPatientsRidesInfo>();
 
         while (reader.Read())
@@ -2504,7 +2501,7 @@ group by CONVERT(date, pickuptime) ";
     internal List<CenterPatientsRidesInfo> GetReportCenterPatientsRides(string volunteer, string start_date, string end_date,
     string origin, string destination)
     {
-        List<CenterPatientsRidesInfo> u = U_GetReportCenterPatientsRides(volunteer, start_date, end_date, origin, destination);  
+        List<CenterPatientsRidesInfo> u = U_GetReportCenterPatientsRides(volunteer, start_date, end_date, origin, destination);
         return u;                                                         // return results
     }
 
@@ -2565,7 +2562,7 @@ string origin, string destination)
 string origin, string destination)
     {
         string u = U_GetReportCenterPatientsRidesCount(volunteer, start_date, end_date, origin, destination);
-        return u;      
+        return u;
     }
 
     private int helper_unsafe_ParseIntger(string s)
@@ -2588,11 +2585,11 @@ string origin, string destination)
         DbService db = new DbService();
 
         // Create Temporary Table, counting escorts per Ride
-        string query = 
+        string query =
             @"select RidePatNum, COUNT(*) AS COUNT_C INTO #ESCORTS_PER_RIDE
                 from RidePatEscortView
                 GROUP BY RidePatNum ";
-        db.GetDataSetByQuery(query,false);  // do not close the connection.
+        db.GetDataSetByQuery(query, false);  // do not close the connection.
 
         // Find the records, using LEFT joins to get English names of Orig/Dest
         // Also use the temporary table to count escorts per ride
@@ -2686,5 +2683,5 @@ string origin, string destination)
     }
 
 
-   
+
 }

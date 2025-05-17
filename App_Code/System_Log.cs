@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
 
 /// <summary>
 /// this class is for GET the logs from the table LogTable_AutoTrackChanges
@@ -46,7 +44,7 @@ public class System_Log
                 log.TableName = Convert.ToString(sdr["TableName"]);
                 log.Recorde_UniqueId = Convert.ToInt32(sdr["Recorde_UniqueId"]);
                 log.ColumnName = Convert.ToString(sdr["ColumnName"]);
-                
+
                 valueIsDate = DateTime.TryParse(Convert.ToString(sdr["OldValue"]), out temp4values_asDate);
                 if (valueIsDate) { log.OldValue_AsDate = temp4values_asDate; }
                 else log.OldValue = Convert.ToString(sdr["OldValue"]);

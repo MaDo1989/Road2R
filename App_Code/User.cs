@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -133,7 +130,8 @@ public class User
 
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
-        if (ds.Tables[0].Rows.Count == 0) {
+        if (ds.Tables[0].Rows.Count == 0)
+        {
             throw new Exception("user not found");
         }
         DataRow dr = ds.Tables[0].Rows[0];
@@ -196,7 +194,7 @@ public class User
         cmdParams[0] = cmd.Parameters.AddWithValue("@user", userName);
         string query = "select VolunTypeType from VolunteerTypeView where UserName =@user";
         DbService db = new DbService();
-        DataSet ds = db.GetDataSetByQuery(query,true, cmd.CommandType, cmdParams);
+        DataSet ds = db.GetDataSetByQuery(query, true, cmd.CommandType, cmdParams);
         DataRow dr = ds.Tables[0].Rows[0];
         string type = dr["VolunTypeType"].ToString();
         return type;
@@ -251,7 +249,7 @@ public class User
         DataSet ds = db.GetDataSetByQuery(query);
         DataRow dr = ds.Tables[0].Rows[0];
         string Id = dr["Id"].ToString();
-        
+
         return Id;
         #endregion
     }
