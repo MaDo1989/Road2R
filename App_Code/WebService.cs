@@ -112,42 +112,6 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetCandidateUnityRideV2(int RideNum,int mode)
-    {
-        try
-        {
-            CandidateV2 c = new CandidateV2();
-            List<CandidateV2> list = c.GetCandidateUnityRideV2(RideNum, mode);
-            return j.Serialize(list);
-        }
-        catch (Exception ex)
-        {
-            Log.Error("Error in GetCandidateUnityRideV2", ex);
-            throw new Exception("שגיאה בשליפת הנתונים GetNewbisCandidateUnityRideV2 api");
-        }
-
-    }
-    [WebMethod(EnableSession = true)]
-    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetWeightsOfCandidateV2()
-    {
-        try
-        {
-            
-            return j.Serialize(CandidateV2.GetWeights());
-        }
-        catch (Exception ex)
-        {
-            Log.Error("Error in GetWeightsOfCandidateV2", ex);
-            throw new Exception("שגיאה בשליפת הנתונים GetWeightsOfCandidateV2 api");
-        }
-
-    }
-
-
-
-    [WebMethod(EnableSession = true)]
-    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string GetMonthlyReport()
     {
         try
@@ -365,26 +329,6 @@ public class WebService : System.Web.Services.WebService
 
         }
     }
-
-
-    [WebMethod(EnableSession = true)]
-    public string UpdateCandidateWeights(List<float> newbis_W, List<float> regular_W, List<float> super_W)
-    {
-
-        try
-        {
-            CandidateV2.UpdateWeights(newbis_W, regular_W, super_W);
-            return "success";
-            
-        }
-        catch (Exception ex)
-        {
-            Log.Error("Error in UpdateCandidateWeights", ex);
-            throw new Exception("שגיאה בעת עדכון המשקולות : " + ex.Message);
-
-        }
-    }
-
 
 
 
