@@ -1627,14 +1627,15 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public void deleteUnityRide(List<int> ListIDs, string userName)
+    public List<UnityRide> deleteUnityRide(List<int> ListIDs, string userName)
     {
 
 
         try
         {
             UnityRide ur = new UnityRide();
-            ur.deleteUnityRide(ListIDs, userName);
+            var returnRides = ur.deleteUnityRide(ListIDs, userName);
+            return returnRides;
 
         }
         catch (Exception ex)

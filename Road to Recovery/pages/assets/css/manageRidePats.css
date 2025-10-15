@@ -324,3 +324,7 @@ tr td .ToRight {
     display: flex;
     justify-content: flex-start;
 }
+
+#wrapper table tr td .phones-patient-p {
+    margin: 0;
+}

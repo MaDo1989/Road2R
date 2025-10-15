@@ -76,13 +76,13 @@ function getHebrewDayOfWeek(date) {
     //console.log('in getHebrewDayOfWeek',date)
     // Array of Hebrew day names, indexed to match JavaScript's getDay() (0 = Sunday)
     const hebrewDays = [
-        'ראשון',   // Sunday    (First Day)
-        'שני',     // Monday    (Second Day)
-        'שלישי',   // Tuesday   (Third Day)
-        'רביעי',   // Wednesday (Fourth Day)
-        'חמישי',   // Thursday  (Fifth Day)
-        'שישי',    // Friday    (Sixth Day)
-        'שבת'      // Saturday  (Sabbath)
+        'א',   // Sunday    (First Day)
+        'ב',     // Monday    (Second Day)
+        'ג',   // Tuesday   (Third Day)
+        'ד',   // Wednesday (Fourth Day)
+        'ה',   // Thursday  (Fifth Day)
+        'ו',    // Friday    (Sixth Day)
+        'ש'      // Saturday  (Sabbath)
     ];
 
     // Get the day index (0-6) and return the corresponding Hebrew day name

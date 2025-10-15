@@ -287,7 +287,7 @@ public class CandidatesLogic
     public Dictionary<string, Candidate> FillExtraDetails(Dictionary<string, Candidate> candidates)
     {
         HashSet<string> ids = candidates.Select(i => i.Key).ToHashSet();
-        string query = "DECLARE @CandidatesIds [IntList] INSERT INTO @CandidatesIds VALUES";
+        string query = "DECLARE @CandidatesIds [IntList] INSERT INTO @CandidatesIds VALUES ";
 
         foreach (string id in ids)
         {

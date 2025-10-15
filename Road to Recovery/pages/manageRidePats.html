@@ -165,7 +165,7 @@
         const getTableNameToBeRenderedIn = (ridepatDate) => {
 
             let tableName = '';
-            
+
 
             if (ridepatDate.toLocaleDateString() === new Date().toLocaleDateString()) {//<---- today
 
@@ -192,7 +192,6 @@
                     }
                 }
             }
-            console.log(' in getTableNameToBeRenderedIn', ridepatDate, tableName,);
             return tableName;
         }
 
@@ -265,11 +264,11 @@
 
             switch (tableNameRidePatIsNowIn) {
                 case tableNames.MORNING:
-                    row2manipulate = tMorning.row(`#${ updated_ridePat.RidePatNum }`).data();
+                    row2manipulate = tMorning.row(`#${updated_ridePat.RidePatNum}`).data();
                     tMorning.row(`#${updated_ridePat.RidePatNum}`).remove().draw(false);
                     break;
                 case tableNames.AFTERNOON:
-                    row2manipulate = tAfternoon.row(`#${ updated_ridePat.RidePatNum }`).data();
+                    row2manipulate = tAfternoon.row(`#${updated_ridePat.RidePatNum}`).data();
                     tAfternoon.row(`#${updated_ridePat.RidePatNum}`).remove().draw(false);
                     break;
 
@@ -610,10 +609,6 @@
             thisRidePatDate = fixDate_WhichComeFromOpenConnection(customRide.Date);
             thisRidePatLastModified = fixDate_WhichComeFromOpenConnection(customRide.LastModified);
             tableNameRidePatShouldBeRender = getTableNameToBeRenderedIn(thisRidePatDate);
-
-            console.log('need to call shiftRidePatToSuitableTable ???', tableName2manipulate, tableNameRidePatShouldBeRender,
-                tableNames.NOT_RELEVANT,
-                tableName2manipulate !== tableNameRidePatShouldBeRender && tableNameRidePatShouldBeRender !== tableNames.NOT_RELEVANT);
             if (tableName2manipulate !== tableNameRidePatShouldBeRender && tableNameRidePatShouldBeRender !== tableNames.NOT_RELEVANT) {
 
                 shiftRidePatToSuitableTable(tableName2manipulate, tableNameRidePatShouldBeRender, customRide);
@@ -2684,7 +2679,7 @@
             let nowInUTC = new Date().toUTCString();
             const listIds = []
             listIds.push(ridePat.RidePatNum);
-            let request = { ListIDs: listIds,userName:UserName };
+            let request = { ListIDs: listIds, userName: UserName };
             //console.log('check request -->', request)
             //console.log('Gilad check -->', ridePat);
             $.ajax({
@@ -2723,8 +2718,7 @@
 
                                 returnRidePat = JSON.parse(data.d);
                                 returnRidePat = CustomRideObject(returnRidePat);
-
-                                if (returnRidePat && returnRidePat.Status !== 'נמחקה') {
+                                if (returnRidePat && returnRidePat.Status != null && returnRidePat.Status !== 'נמחקה') {
                                     $('#wait').hide();
 
                                     let patientName = 'חולה';
@@ -5015,10 +5009,12 @@
                 patientPhone2render = `<span class="patientPhone2render">${addSeperator2MobileNum(
                     ridepat.PatientCellPhone,
                     "-"
-                )}</span>` 
+                )}</span>`
             }
 
-            patientPhone2render += ridepat.PatientCellPhone2 != "0" ? `<p>${ridepat.PatientCellPhone2.replace(/(\d{3})(\d+)/, "$1-$2")}</p>` : '';
+            patientPhone2render += ridepat.PatientCellPhone2 != "0" ? `<p class="phones-patient-p">${ridepat.PatientCellPhone2.replace(/(\d{3})(\d+)/, "$1-$2")}</p>` : '';
+            patientPhone2render += ridepat.PatientCellPhone3 != null ? `<p class="phones-patient-p">${ridepat.PatientCellPhone3.replace(/(\d{3})(\d+)/, "$1-$2")}</p>` : '';
+
 
             if (numOfEscorts > 0) {
 
@@ -5526,7 +5522,7 @@
         const editTimeModal_bsModalHasShown = () => {
 
         }
-     
+
         const bsModalHasShown = async () => {
             await activateAutoComplteToModalsInput();
 
@@ -5591,9 +5587,11 @@
                 type: "POST",
                 data: JSON.stringify(request),
                 success: function (data) {
+                    console.log('AFTER delete rides : ', data);
+                    const detectedReturnRides = data.d.filter((ur) => { return ur.RidePatNum != 0 });
+                    console.log('detectedReturnRides ->', detectedReturnRides);
                     swal({
                         title: `لقد تم حذف السفرية\n נמחקו ${listIds.length} הסעות `,
-                        timer: 1000,
                         type: "success",
                         showConfirmButton: false
                     });
@@ -5603,7 +5601,7 @@
                         const deletedRideObject = tablesDataArray[i];
                         if (deletedRideObject.table && deletedRideObject.row) {
                             let d = deletedRideObject.table.row(deletedRideObject.row).remove().draw();
-                           
+
 
                         }
                         else {
@@ -5617,10 +5615,86 @@
                     $('.toggleTitle').hide();
                     $('#deleteFewRidesButton').prop('disabled', true);
                     $('#wait').hide();
+                    if (detectedReturnRides.length > 0) {
+                        let textToDisplay = `האם תרצו למחוק גם את הסעות החזרה של ההסעות ?`;
+                        textToDisplay += '\n';
+                        textToDisplay += `להלן הפירוט: \n\n`;
+                        let ReturnlistIdsToRemove = [];
+                        detectedReturnRides.forEach((ur) => {
+                            textToDisplay += `הסעה של חולה : ${ur.PatientName} \n`;
+                            textToDisplay += `בתאריך: ${convertToShortDateString(convertDBDate2FrontEndDate(ur.PickupTime))} \n`;
+                            textToDisplay += `מוצא: ${ur.Origin} \n`;
+                            textToDisplay += `יעד: ${ur.Destination} \n\n`;
+                            ReturnlistIdsToRemove.push(ur.RidePatNum);
+                        })
+                        swal({
+                            title: 'המערכת זיהתה שיש הסעות החזרה להסעות שמחקת הרגע',
+                            type: 'info',
+                            text: (textToDisplay || '').trim(),
+                            showCancelButton: true,
+                            confirmButtonText: "حذف\nמחיקה",
+                            cancelButtonText: "الغاء\nבטל",
+                            closeOnConfirm: false,
+                            showLoaderOnConfirm: true,
+                            confirmButtonColor: '#ff6d5d'
+                        }, function (isConfirm) {
+                            if (!isConfirm) return;
+                            const returnRequest = { ListIDs: ReturnlistIdsToRemove, userName: UserName }
+                            $.ajax({
+                                dataType: "json",
+                                url: "WebService.asmx/deleteUnityRide",
+                                contentType: "application/json; charset=utf-8",
+                                type: "POST",
+                                data: JSON.stringify(returnRequest),
+                                success: function (data) {
+                                    swal({
+                                        title: 'لقد تم حذف السفرية',
+                                        text: 'נמחקו ' + listIds.length + ' הסעות',
+                                        type: 'success',
+                                        timer: 1200,
+                                        showConfirmButton: false
+                                    });
+                                    let tablesDataArray = [];
+                                    for (var i = 0; i < ReturnlistIdsToRemove.length; i++) {
+                                        tablesDataArray.push({
+                                            id: ReturnlistIdsToRemove[i],
+                                            row: $(`#${ReturnlistIdsToRemove[i]}`),
+                                            table: $(`#${ReturnlistIdsToRemove[i]}`).parents('table').DataTable(),
+                                        })
+                                    }
+                                    console.log('tablesDataArray ', tablesDataArray);
+                                    for (var i = 0; i < (tablesDataArray ? tablesDataArray.length : 0); i++) {
+                                        var deletedRideObject = tablesDataArray[i];
+                                        if (deletedRideObject && deletedRideObject.table && deletedRideObject.row != null) {
+                                            deletedRideObject.table.row(deletedRideObject.row).remove().draw();
+                                        } else {
+                                            // שים לב: reload יסגור מיד את המודאל. השאר רק אם באמת חייבים.
+                                            // location.reload();
+                                        }
+                                    }
+                                    checkboxesRides = [];
+                                    $('.checkboxClass').prop('checked', false);
+                                    $('#NumofRideChecksText').text(0);
+                                    $('.toggleTitle').hide();
+                                    $('#deleteFewRidesButton').prop('disabled', true);
+                                    $('#wait').hide();
+                                },
+                                error: function (err) {
+                                    $('#wait').hide();
+                                    console.error(err);
+                                    swal({
+                                        title: 'שגיאה במחיקה',
+                                        text: (err && err.responseText) ? err.responseText : 'שגיאה לא ידועה',
+                                        type: 'error'
+                                    });
+                                }
+                            });
+                        });
+
+                    }
 
 
-                   
-                    
+
                 },
                 error: function (err) {
                     alert("Error in deleteArrayOfRides -> deleteUnityRide: " + err.responseText);
@@ -5649,7 +5723,7 @@
                 });
                 return;
             }
-            
+
             $('#wait').show();
 
             $.ajax({
@@ -5657,10 +5731,10 @@
                 url: "WebService.asmx/GetEnglishNamesByIds",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                data: JSON.stringify({ Ids:checkboxesRides }),
+                data: JSON.stringify({ Ids: checkboxesRides }),
 
                 success: function (data) {
-                    
+
                     //console.log('success', JSON.parse(data.d))
                     const dicById = JSON.parse(data.d);
                     translatedData = transformData(choosenRides, dicById);
@@ -5698,20 +5772,20 @@
 
                         const ridesByDriver = {};
                         rides.forEach(ride => {
-                            const driverId = ride.MainDriver; 
+                            const driverId = ride.MainDriver;
                             if (!ridesByDriver[driverId]) {
                                 ridesByDriver[driverId] = [];
                             }
                             ridesByDriver[driverId].push(ride);
                         });
 
-                        
+
                         for (const driverId in ridesByDriver) {
                             index++;
                             const driverRides = ridesByDriver[driverId];
 
                             if (driverRides.length === 1) {
-                                
+
                                 const ride = driverRides[0];
                                 if (ride.OnlyEscort) {
                                     message += `    {blanks} of ${ride.PatientName} (${ride.AmountOfEscorts}) ${lineBreak}`;
@@ -5720,7 +5794,7 @@
                                     message += `    ${ride.PatientName} (${ride.AmountOfEscorts + 1}) ${lineBreak}`;
                                 }
                             } else {
-                                
+
                                 message += `    ` + driverRides.map(ride => {
                                     if (ride.OnlyEscort) {
                                         return `{blanks} of ${ride.PatientName} (${ride.AmountOfEscorts})`;
@@ -5758,7 +5832,7 @@
                 },
                 error: function (err) {
                     //alert("Error in messageForPalCoor ->  " + err.responseText);
-                    console.log("Error in messageForPalCoor ->  " + err.responseText,err);
+                    console.log("Error in messageForPalCoor ->  " + err.responseText, err);
                 }
 
             })
@@ -5766,9 +5840,9 @@
 
 
 
-         
 
-            
+
+
 
 
         }
@@ -5778,10 +5852,10 @@
         const ChangeCheckboxRides = (checkbox) => {
             let arrlocal = [];
             //console.log(checkbox.checked, checkbox.parentNode.parentNode)
-            if (checkbox.checked && checkbox.id != 'AllChecks' ) {
+            if (checkbox.checked && checkbox.id != 'AllChecks') {
                 checkbox.parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important')
                 //checkbox.parentNode.parentNode.parnetNode.parnetNode.style.setProperty('border-collapse', 'none', 'important')
-                
+
             }
             else {
                 checkbox.parentNode.parentNode.style.setProperty('border', 'none', 'important')
@@ -5795,7 +5869,7 @@
                     for (var i = 0; i < morningRidePats.length; i++) {
                         $(`#check${morningRidePats[i].ridePatNum}`).prop("checked", checkbox.checked);
                         //console.log($(`#check${morningRidePats[i].ridePatNum}`)[0].parentNode.parentNode)
-                        checkbox.checked ?$(`#check${morningRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important'): $(`#check${morningRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
+                        checkbox.checked ? $(`#check${morningRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important') : $(`#check${morningRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
                     }
 
                 }
@@ -5860,7 +5934,7 @@
                     }
 
 
-                    
+
                 }
 
 
@@ -5936,8 +6010,8 @@
                 swal('לא נבחרו הסעות', 'יש לבחור הסעות לפני המחיקה', 'warning');
             }
             else {
-                let msg2user = `האם למחוק את ה${checkboxesRides.length} ההסעות שמסומנות 
-                במידה והחולה אנונימי לא יהיה ניתן לשחזר את ההסעה לאחר המחיקה !`;
+                let msg2user = `האם למחוק את ה${checkboxesRides.length} ההסעות שמסומנות
+                    במידה והחולה אנונימי לא יהיה ניתן לשחזר את ההסעה לאחר המחיקה !`;
                 swal({
                     title: `هل انت متأك?\nהאם אתם בטוחים? \n${checkboxesRides.length} הסעות ימחקו`,
                     type: "warning",

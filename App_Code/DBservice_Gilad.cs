@@ -287,6 +287,7 @@ public class DBservice_Gilad
                 oneRide.PatientGender = Convert.ToInt32(Convertions.ConvertStringToGender(dataReader["PatientGender"].ToString()));
                 oneRide.PatientCellPhone = dataReader["PatientCellPhone"].ToString();
                 oneRide.PatientCellPhone2 = dataReader["PatientCellPhone2"].ToString();
+                oneRide.PatientCellPhone3 = dataReader["PatientCellPhone3"].ToString();
                 oneRide.PatientStatus = dataReader["PatientStatus"].ToString();
                 if (oneRide.PatientStatus != "")
                 {

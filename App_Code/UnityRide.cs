@@ -14,6 +14,7 @@ public class UnityRide
     int patientAge;
     string patientCellPhone;
     string patientCellPhone2;
+    string patientCellPhone3;
     int amountOfEscorts;
     int amountOfEquipments;
     List<string> patientEquipments;
@@ -425,6 +426,19 @@ public class UnityRide
         }
     }
 
+    public string PatientCellPhone3
+    {
+        get
+        {
+            return patientCellPhone3;
+        }
+
+        set
+        {
+            patientCellPhone3 = value;
+        }
+    }
+
     public List<UnityRide> GetUnityRideView(int days)
     {
         DBservice_Gilad dBservice_Gilad = new DBservice_Gilad();
@@ -626,15 +640,21 @@ public class UnityRide
 
     }
 
-    public void deleteUnityRide(List<int> listIDs, string whoChange)
+    public List<UnityRide> deleteUnityRide(List<int> listIDs, string whoChange)
     {
         DBservice_Gilad dBservice = new DBservice_Gilad();
         UnityRide ur = new UnityRide();
+        List<UnityRide> returnRides = new List<UnityRide>();
         if (listIDs.Count > 1)
         {
             for (int i = 0; i < listIDs.Count; i++)
             {
                 ur = dBservice.deleteUnityRide(listIDs[i], whoChange);
+                var returnUr = ur.GetReturnDrive(listIDs[i]);
+                if (returnUr!=null)
+                {
+                    returnRides.Add(returnUr);
+                }
                 if (ur.RidePatNum != -1)
                 {
                     BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
@@ -645,9 +665,16 @@ public class UnityRide
         else
         {
             ur = dBservice.deleteUnityRide(listIDs[0], whoChange);
+            var returnUr = ur.GetReturnDrive(listIDs[0]);
+            if (returnUr != null)
+            {
+                returnRides.Add(returnUr);
+            }
             BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
         }
+
         writeWhoDeleteRides(ur, whoChange);
+        return returnRides;
 
     }
 

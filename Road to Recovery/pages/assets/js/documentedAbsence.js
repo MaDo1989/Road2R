@@ -194,7 +194,8 @@ const ColorCallBtn_afterChange = (absenceID, absencesListOfThisVolunteer, volunt
     //console.log('Gilad check -->', absenceID, absencesListOfThisVolunteer, volunteerId)
 
     if (absencesListOfThisVolunteer != undefined && absenceID!=-1) {
-        const BtnToColor = document.getElementById(`${volunteerId}`).childNodes[11].childNodes[2].childNodes[1];
+        const parent_tr = document.getElementById(`${volunteerId}`);
+        const BtnToColor = parent_tr.querySelector('#showDocumentedCallsBtn');
         //console.log('BtnToColor', BtnToColor, 'volunteerId', volunteerId,)
         // becarful i changed the condition here----> was--> (absence.id!=ThisAbsenceId)
         const resFilter = absencesListOfThisVolunteer.filter((absence) => {
