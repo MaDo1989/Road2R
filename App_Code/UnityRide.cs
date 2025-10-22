@@ -678,6 +678,12 @@ public class UnityRide
 
     }
 
+    static public List<UnityRide> GetSplitRides(DateTime rideDate, bool isAfternoon, bool isFutureTable, int days)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+        return db.GetSplitRides(rideDate, isAfternoon, isFutureTable, days);
+    }
+
     private void writeWhoDeleteRides(UnityRide ur, string user)
     {
         string strToWrite = "*******************************************************************************" + Environment.NewLine;
