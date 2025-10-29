@@ -651,7 +651,7 @@ public class UnityRide
             {
                 ur = dBservice.deleteUnityRide(listIDs[i], whoChange);
                 var returnUr = ur.GetReturnDrive(listIDs[i]);
-                if (returnUr!=null)
+                if (returnUr!=null && returnUr.RidePatNum>0)
                 {
                     returnRides.Add(returnUr);
                 }
@@ -666,7 +666,7 @@ public class UnityRide
         {
             ur = dBservice.deleteUnityRide(listIDs[0], whoChange);
             var returnUr = ur.GetReturnDrive(listIDs[0]);
-            if (returnUr != null)
+            if (returnUr != null && returnUr.RidePatNum > 0)
             {
                 returnRides.Add(returnUr);
             }
