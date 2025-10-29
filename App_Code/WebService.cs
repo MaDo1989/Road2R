@@ -1585,8 +1585,8 @@ public class WebService : System.Web.Services.WebService
         try
         {
             UnityRide ur = new UnityRide();
-            int res = ur.updateDriver(DriverId, UnityRideId, isDelete, userName);
-            return j.Serialize(res);
+            ur = ur.updateDriver(DriverId, UnityRideId, isDelete, userName);
+            return j.Serialize(ur);
 
         }
         catch (Exception ex)

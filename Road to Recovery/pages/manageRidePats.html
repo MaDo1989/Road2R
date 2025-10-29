@@ -1538,10 +1538,6 @@
                     }
                     else {
                         assignOrUpdateAPIcall(_ridepatToManipulate, userSelected.Id);
-                        setTimeout(() => {
-                            colorRowWithDriver([_ridepatToManipulate]);
-
-                        }, 750)
                         assignDriverToRidePatAbort();
 
                     }
@@ -1903,8 +1899,9 @@
         }
 
         const assignDriverToRidePat_SCB = (data) => {
-
-            if (data.d == -5) {
+            console.log('data from assignDriverToRidePat_SCB : ', data.d)
+            const ur = JSON.parse(data.d);
+            if (ur.RidePatNum == -5) {
                 console.error('duplicated driver! --> got status -5 from the server');
 
                 swal({
@@ -1915,6 +1912,10 @@
                 });
 
             }
+            update_arr_rides(ur);
+            setTimeout(() => {
+             colorRowWithDriver([_ridepatToManipulate]);
+            }, 750)
             $('#wait').hide();
             removeClass('highlightRow');
             $('#assignDriverModal').modal('hide');
@@ -4712,7 +4713,7 @@
                 const isAfterNoonRide = convertDBDate2FrontEndDate(thisRide.PickupTime).getMinutes() === afternoonIndicator;
                 timespan = isAfterNoonRide ? 'אחה"צ' : 'בוקר';
                 PatientNameSpan = thisRide.IsAnonymous ? 'חולה' : thisRide.PatientName;
-
+                console.log(timespan, PatientNameSpan, thisRide.MainDriver, rideID);
                 if (timespan != 'אחה"צ' && PatientNameSpan != 'חולה' && thisRide.MainDriver != -1) {
                     $(`#${rideID}`).addClass('statusComplete');
                 }

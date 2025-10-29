@@ -609,7 +609,7 @@ public class UnityRide
         BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
     }
 
-    public int updateDriver(int driverId, int unityRideId, bool isDelete, string whoChange)
+    public UnityRide updateDriver(int driverId, int unityRideId, bool isDelete, string whoChange)
     {
         DBservice_Gilad db = new DBservice_Gilad();
         UnityRide ur = new UnityRide();
@@ -631,12 +631,12 @@ public class UnityRide
             ur = db.updateDriver(driverId, unityRideId, whoChange);
             if (ur.RidePatNum == -5)
             {
-                return ur.RidePatNum;
+                return ur;
             }
 
         }
         BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
-        return 1;
+        return ur;
 
     }
 
