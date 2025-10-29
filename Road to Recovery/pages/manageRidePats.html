@@ -5005,16 +5005,22 @@
                 '<span class="numOfPassengers">single passenger</span>';
             let escortsPhone2render = "";
             let equipmentsAndnumOfPassengers = "";
+            if (ridepat.PatientCellPhone != "0500000000") {
+                if (validateMobileNumFullVersion(ridepat.PatientCellPhone)) {
+                    patientPhone2render = `<span class="patientPhone2render">${addSeperator2MobileNum(
+                        ridepat.PatientCellPhone,
+                        "-"
+                    )}</span>`
+                }
+                if (ridepat.PatientCellPhone != ridepat.PatientCellPhone2) {
+                    patientPhone2render += ridepat.PatientCellPhone2 != "0" ? `<p class="phones-patient-p">${ridepat.PatientCellPhone2.replace(/(\d{3})(\d+)/, "$1-$2")}</p>` : '';
+                }
+                if (ridepat.PatientCellPhone2 != ridepat.PatientCellPhone3 && ridepat.PatientCellPhone != ridepat.PatientCellPhone3) {
+                    patientPhone2render += ridepat.PatientCellPhone3 != null ? `<p class="phones-patient-p">${ridepat.PatientCellPhone3.replace(/(\d{3})(\d+)/, "$1-$2")}</p>` : '';
 
-            if (validateMobileNumFullVersion(ridepat.PatientCellPhone)) {
-                patientPhone2render = `<span class="patientPhone2render">${addSeperator2MobileNum(
-                    ridepat.PatientCellPhone,
-                    "-"
-                )}</span>`
+                }
             }
-
-            patientPhone2render += ridepat.PatientCellPhone2 != "0" ? `<p class="phones-patient-p">${ridepat.PatientCellPhone2.replace(/(\d{3})(\d+)/, "$1-$2")}</p>` : '';
-            patientPhone2render += ridepat.PatientCellPhone3 != null ? `<p class="phones-patient-p">${ridepat.PatientCellPhone3.replace(/(\d{3})(\d+)/, "$1-$2")}</p>` : '';
+           
 
 
             if (numOfEscorts > 0) {
