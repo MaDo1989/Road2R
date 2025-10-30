@@ -439,11 +439,36 @@ public class UnityRide
         }
     }
 
+    public enum DateMode
+    {
+        Today = 0,
+        Tomorrow = 1,
+        Future =2,
+    }
 
-    static public List<UnityRide> GetSplitRides(DateTime rideDate, bool isAfternoon, bool isFutureTable, int days)
+    private static DateTime GetDateByMode(DateMode mode)
+    {
+        switch (mode)
+        {
+            case DateMode.Today:
+                return DateTime.Today;
+
+            case DateMode.Tomorrow:
+                return DateTime.Today.AddDays(1);
+
+            case DateMode.Future:
+                return DateTime.Today.AddDays(2);
+
+            default:
+                throw new ArgumentOutOfRangeException("mode", mode, "Invalid DateMode value");
+        }
+    }
+
+    static public List<UnityRide> GetSplitRides(DateMode dayMode, bool isAfternoon, bool isFutureTable, int days)
     {
         DBservice_Gilad db = new DBservice_Gilad();
-        return db.GetSplitRides(rideDate, isAfternoon, isFutureTable, days);
+        DateTime d = GetDateByMode(dayMode);
+        return db.GetSplitRides(d,isAfternoon, isFutureTable, days);
     }
 
 

@@ -51,6 +51,7 @@ const {
     IsNullOrUndefined
 
 } = GENERAL.USEFULL_FUNCTIONS;
+const DateMode = { Today: 0, Tomorrow: 1, Future: 2 };
 
 const { GetPatientGender, GetPatientStatus } = GENERAL.PATIENTS;
 
@@ -1980,7 +1981,114 @@ const CHECK_TEST_NOT_REAL = () => {
         }
     });
 }
+const refreshTable_splitRide = () => {
+    //DateTime rideDate, bool isAfternoon, bool isFutureTable, int days
+    $.ajax({
+        dataType: "json",
+        url: "WebService.asmx/GetSplitRides",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify({ dateMode: DateMode.Today, isAfternoon: false, isFutureTable: false, days: 0 }),
+        success: function (data) {
+            $('#wait').hide();
+            const test = JSON.parse(data.d);
+            console.log('Gilad check this today morning -->', test)
 
+
+        },
+        error: function (err) {
+            $('#wait').hide();
+            alert("Error in refreshTable_splitRide: " + err.responseText);
+        }
+    });
+    $.ajax({
+        dataType: "json",
+        url: "WebService.asmx/GetSplitRides",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify({ dateMode: DateMode.Today, isAfternoon: true, isFutureTable: false, days: 0 }),
+        success: function (data) {
+            $('#wait').hide();
+            const test = JSON.parse(data.d);
+            console.log('Gilad check this today afternoon -->', test)
+
+
+        },
+        error: function (err) {
+            $('#wait').hide();
+            alert("Error in refreshTable_splitRide: " + err.responseText);
+        }
+    });
+    $.ajax({
+        dataType: "json",
+        url: "WebService.asmx/GetSplitRides",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify({ dateMode: DateMode.Tomorrow, isAfternoon: false, isFutureTable: false, days: 0 }),
+        success: function (data) {
+            $('#wait').hide();
+            const test = JSON.parse(data.d);
+            console.log('Gilad check this Tomorrow morning -->', test)
+
+
+        },
+        error: function (err) {
+            $('#wait').hide();
+            alert("Error in refreshTable_splitRide: " + err.responseText);
+        }
+    });
+    $.ajax({
+        dataType: "json",
+        url: "WebService.asmx/GetSplitRides",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify({ dateMode: DateMode.Tomorrow, isAfternoon: true, isFutureTable: false, days: 0 }),
+        success: function (data) {
+            $('#wait').hide();
+            const test = JSON.parse(data.d);
+            console.log('Gilad check this Tomorrow afternoon -->', test)
+
+
+        },
+        error: function (err) {
+            $('#wait').hide();
+            alert("Error in refreshTable_splitRide: " + err.responseText);
+        }
+    });
+    $.ajax({
+        dataType: "json",
+        url: "WebService.asmx/GetSplitRides",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify({ dateMode: DateMode.Future, isAfternoon: false, isFutureTable: true, days: 7 }),
+        success: function (data) {
+            $('#wait').hide();
+            const test = JSON.parse(data.d);
+            console.log('Gilad check this Future -->', test)
+
+
+        },
+        error: function (err) {
+            $('#wait').hide();
+            alert("Error in refreshTable_splitRide: " + err.responseText);
+        }
+    });
+}
 
 //This one take from unityRide the data *work*
 function refreshTable_UnityRide(timeInterval = 7) {

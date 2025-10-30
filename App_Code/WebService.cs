@@ -1096,11 +1096,11 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetSplitRides(DateTime rideDate, bool isAfternoon, bool isFutureTable, int days)
+    public string GetSplitRides(UnityRide.DateMode dateMode,bool isAfternoon, bool isFutureTable, int days)
     {
         try
         {
-            List<UnityRide> list2Return = UnityRide.GetSplitRides(rideDate, isAfternoon, isFutureTable, days);
+            List<UnityRide> list2Return = UnityRide.GetSplitRides(dateMode,isAfternoon, isFutureTable, days);
             return j.Serialize(list2Return);
         }
         catch (Exception ex)
