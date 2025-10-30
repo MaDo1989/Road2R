@@ -1092,6 +1092,26 @@ public class WebService : System.Web.Services.WebService
 
     }
 
+
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetSplitRides(DateTime rideDate, bool isAfternoon, bool isFutureTable, int days)
+    {
+        try
+        {
+            List<UnityRide> list2Return = UnityRide.GetSplitRides(rideDate, isAfternoon, isFutureTable, days);
+            return j.Serialize(list2Return);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetSplitRides", ex);
+            throw new Exception("שגיאה בלקבל נסיעות בקריאה של GetSplitRides");
+        }
+    }
+
+
+
     //Gilad update 03/10/23
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]

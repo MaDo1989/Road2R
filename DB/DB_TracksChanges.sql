@@ -3191,6 +3191,75 @@ end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
+-- =======================================================
+-- Create Stored Procedure Template for Azure SQL Database
+-- =======================================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad Meirson>
+-- Create Date: <21/10/2025>
+-- Description: <try to split the unityRide packs to improve load times>
+-- =============================================
+CREATE PROCEDURE sp_getUnityRidesSplit
+(
+    -- Add the parameters for the stored procedure here
+    @ride_date datetime,
+	@isAfternoon bit,
+	@isFutureTable bit,
+	@days smallint
+)
+AS
+BEGIN
+
+
+    -- Insert statements for procedure here
+    IF(@isFutureTable=0)
+		BEGIN
+			SELECT u.*,
+				NULLIF(p.CellPhone, '') AS CellPhone,
+				NULLIF(p.CellPhone2, '') AS PatientCellPhone2,
+				NULLIF(p.HomePhone, '') AS PatientCellPhone3
+			FROM UnityRide AS u
+			LEFT JOIN Patient AS p ON p.Id = u.PatientId
+			WHERE u.Status <> N'נמחקה'
+			AND CONVERT(DATE, @ride_date) = CONVERT(DATE, u.PickupTime)
+			AND CASE WHEN DATEPART(MINUTE, u.PickupTime) = 14 THEN 1 ELSE 0 END = ISNULL(@isAfternoon, 0)
+			
+
+		END
+
+	ELSE IF(@isFutureTable=1)
+		BEGIN
+			SELECT 
+				u.*,
+				NULLIF(p.CellPhone, '') AS CellPhone,
+				NULLIF(p.CellPhone2, '') AS PatientCellPhone2,
+				NULLIF(p.HomePhone, '') AS PatientCellPhone3
+			FROM UnityRide AS u
+			LEFT JOIN Patient AS p ON p.Id = u.PatientId
+			WHERE 
+				CONVERT(DATE, u.PickupTime) BETWEEN
+				CONVERT(DATE, DATEADD(DAY, 2, GETDATE())) AND
+				CONVERT(DATE, DATEADD(DAY, @days,  GETDATE()))
+				AND u.Status <> N'נמחקה';
+		END
+
+	ELSE
+	SELECT -1 as RidePatNum, 'Error @isFutureTable is not defind' as error
+
+
+END
+GO
+
+
+
+
+
+
+
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------

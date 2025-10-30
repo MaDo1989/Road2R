@@ -439,6 +439,15 @@ public class UnityRide
         }
     }
 
+
+    static public List<UnityRide> GetSplitRides(DateTime rideDate, bool isAfternoon, bool isFutureTable, int days)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+        return db.GetSplitRides(rideDate, isAfternoon, isFutureTable, days);
+    }
+
+
+
     public List<UnityRide> GetUnityRideView(int days)
     {
         DBservice_Gilad dBservice_Gilad = new DBservice_Gilad();
