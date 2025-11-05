@@ -2180,6 +2180,7 @@ function refreshTable_UnityRide(timeInterval = 7) {
 
                 //#region adjust patient column
                 patientHTML = buildPatientHTML_AfterUnited(arr_rides[i]);
+                console.log('patientHTML ', patientHTML)
                 //#endregion
 
                 //#region adjust driver column
@@ -3952,7 +3953,7 @@ const buildDriverHTML = (ridePatNum, driver, rideNum) => {
 
 //this is for check after gilad changes to united tabels with new api 3/12
 const buildPatientHTML_AfterUnited = (ridepat) => {
-
+    console.log('buildPatientHTML_AfterUnited', ridepat )
     let patientPhone2render = "";
     let numOfEscorts = ridepat.AmountOfEscorts;
     let numOfPassengers = '<span class="numOfPassengers">נוסע יחיד</span>';
@@ -3967,10 +3968,10 @@ const buildPatientHTML_AfterUnited = (ridepat) => {
                 "-"
             )}</span>`
         }
-        if (ridepat.PatientCellPhone != ridepat.PatientCellPhone2) {
+        if (ridepat.PatientCellPhone != ridepat.PatientCellPhone2 && ridepat.PatientCellPhone2!=null) {
             patientPhone2render += ridepat.PatientCellPhone2 != "0" ? `<p class="phones-patient-p">${ridepat.PatientCellPhone2.replace(/(\d{3})(\d+)/, "$1-$2")}</p>` : '';
         }
-        if (ridepat.PatientCellPhone2 != ridepat.PatientCellPhone3 && ridepat.PatientCellPhone != ridepat.PatientCellPhone3) {
+        if (ridepat.PatientCellPhone2 != ridepat.PatientCellPhone3 && ridepat.PatientCellPhone != ridepat.PatientCellPhone3 && ridepat.PatientCellPhone3!=null) {
             patientPhone2render += ridepat.PatientCellPhone3 != null ? `<p class="phones-patient-p">${ridepat.PatientCellPhone3.replace(/(\d{3})(\d+)/, "$1-$2")}</p>` : '';
 
         }
@@ -3985,30 +3986,7 @@ const buildPatientHTML_AfterUnited = (ridepat) => {
         numOfPassengers_English = `<span class="numOfPassengers">${numOfEscorts + (ridepat.OnlyEscort ? 0 : 1)
             } passengers</span>`;
 
-
-
-        // Gilad comment out it --> avraham doesnt want the phone Number of Escorts its no needed !!
-        //escortsPhone2render = '<span class="escortsPhone2render block">מלווים: ';
         numOfRealEscorts = 0;
-
-        //ridepat.Escorts.map((es, i) => {
-        //    if (validateMobileNumFullVersion(es.CellPhone)) {
-        //        numOfRealEscorts++;
-        //        escortsPhone2render += `${addSeperator2MobileNum(
-        //            es.CellPhone,
-        //            "-"
-        //        )}, `;
-
-        //        if (i === numOfEscorts - 1) {
-        //            escortsPhone2render = escortsPhone2render.substring(
-        //                0,
-        //                escortsPhone2render.length - 2
-        //            );
-        //            escortsPhone2render += "</span>";
-        //        }
-
-        //    }
-        //});
         if (numOfRealEscorts === 0) escortsPhone2render = "";
     } else {
         numOfPassengers = `<span class="numOfPassengers">נוסע יחיד</span>`;
