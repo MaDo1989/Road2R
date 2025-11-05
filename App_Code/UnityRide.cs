@@ -676,6 +676,7 @@ public class UnityRide
 
     public List<UnityRide> deleteUnityRide(List<int> listIDs, string whoChange)
     {
+        // i need to improve this code ! 
         DBservice_Gilad dBservice = new DBservice_Gilad();
         UnityRide ur = new UnityRide();
         List<UnityRide> returnRides = new List<UnityRide>();
@@ -686,7 +687,7 @@ public class UnityRide
                 var returnUr = ur.GetReturnDrive(listIDs[i]);
                 ur = dBservice.deleteUnityRide(listIDs[i], whoChange);
 
-                if (returnUr != null && returnUr.RidePatNum > 0)
+                if (returnUr != null && returnUr.RidePatNum > 0 && !ur.IsAnonymous)
                 {
                     returnRides.Add(returnUr);
                 }
@@ -702,7 +703,7 @@ public class UnityRide
             var returnUr = ur.GetReturnDrive(listIDs[0]);
             ur = dBservice.deleteUnityRide(listIDs[0], whoChange);
 
-            if (returnUr != null && returnUr.RidePatNum > 0)
+            if (returnUr != null && returnUr.RidePatNum > 0 && !ur.IsAnonymous)
             {
                 returnRides.Add(returnUr);
             }

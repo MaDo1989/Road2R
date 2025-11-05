@@ -36,6 +36,9 @@ hospitals = [];
 
 const update_arr_rides = (updated_ridePat) => {
     const index = arr_rides.findIndex(r => r.RidePatNum === updated_ridePat.RidePatNum);
+    if (index == -1) {
+        console.error("in (update_arr_rides) \n not found ride with id : ", updated_ridePat.RidePatNum)
+    }
     ridePatBeforeUpdate = arr_rides[index];
     arr_rides[index] = updated_ridePat;
 }
@@ -619,7 +622,7 @@ notification2.client.UnityRideUpdated = function (updatedUnityRide) {
                 row2manipulate.time = buildTimeHTML(thisRidePatDate, customRide.RidePatNum);
                 row2manipulate.origin = !isAssistant ? customRide.Origin.Name : customRide.Origin.EnglishName;
                 row2manipulate.destination = !isAssistant ? customRide.Destination.Name : customRide.Destination.EnglishName;
-                row2manipulate.patient = buildPatientHTML(customRide);
+                row2manipulate.patient = buildPatientHTML_AfterUnited(updatedUnityRide);
                 row2manipulate.driver = buildDriverHTML(customRide.RidePatNum, customRide.Drivers[0], customRide.RidePatNum);
                 row2manipulate.status = buildStatusString(customRide.Pat.RidePatPatientStatus, customRide.RidePatNum);
                 row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
@@ -643,7 +646,7 @@ notification2.client.UnityRideUpdated = function (updatedUnityRide) {
                 row2manipulate.time = buildTimeHTML(thisRidePatDate, customRide.RidePatNum);
                 row2manipulate.origin = !isAssistant ? customRide.Origin.Name : customRide.Origin.EnglishName;
                 row2manipulate.destination = !isAssistant ? customRide.Destination.Name : customRide.Destination.EnglishName;
-                row2manipulate.patient = buildPatientHTML(customRide);
+                row2manipulate.patient = buildPatientHTML_AfterUnited(updatedUnityRide);
                 row2manipulate.driver = buildDriverHTML(customRide.RidePatNum, customRide.Drivers[0], customRide.RidePatNum);
                 row2manipulate.status = buildStatusString(customRide.Pat.RidePatPatientStatus, customRide.RidePatNum);
                 row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
@@ -668,7 +671,7 @@ notification2.client.UnityRideUpdated = function (updatedUnityRide) {
                 row2manipulate.time = buildTimeHTML(thisRidePatDate, customRide.RidePatNum);
                 row2manipulate.origin = !isAssistant ? customRide.Origin.Name : customRide.Origin.EnglishName;
                 row2manipulate.destination = !isAssistant ? customRide.Destination.Name : customRide.Destination.EnglishName;
-                row2manipulate.patient = buildPatientHTML(customRide);
+                row2manipulate.patient = buildPatientHTML_AfterUnited(updatedUnityRide);
                 row2manipulate.driver = buildDriverHTML(customRide.RidePatNum, customRide.Drivers[0], customRide.RidePatNum);
                 row2manipulate.status = buildStatusString(customRide.Pat.RidePatPatientStatus, customRide.RidePatNum);
                 row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
@@ -694,7 +697,7 @@ notification2.client.UnityRideUpdated = function (updatedUnityRide) {
                 row2manipulate.time = buildTimeHTML(thisRidePatDate, customRide.RidePatNum);
                 row2manipulate.origin = !isAssistant ? customRide.Origin.Name : customRide.Origin.EnglishName;
                 row2manipulate.destination = !isAssistant ? customRide.Destination.Name : customRide.Destination.EnglishName;
-                row2manipulate.patient = buildPatientHTML(customRide);
+                row2manipulate.patient = buildPatientHTML_AfterUnited(customRide);
                 row2manipulate.driver = buildDriverHTML(customRide.RidePatNum, customRide.Drivers[0], customRide.RidePatNum);
                 row2manipulate.status = buildStatusString(customRide.Pat.RidePatPatientStatus, customRide.RidePatNum);
                 row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
@@ -719,7 +722,7 @@ notification2.client.UnityRideUpdated = function (updatedUnityRide) {
             default:
                 console.log('system recognized a tempt of the server to post real-time data but failed to found the rellevant row to redraw');
                 tr_nodesAsArray = null;
-                location.reload();
+                //location.reload();
                 break;
         }
 

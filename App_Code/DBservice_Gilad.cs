@@ -2491,6 +2491,8 @@ public class DBservice_Gilad
                     unityRide.PatientId = Convert.ToInt32(dataReader["PatientId"]);
                     unityRide.PatientGender = Convert.ToInt32(Convertions.ConvertStringToGender(dataReader["PatientGender"].ToString()));
                     unityRide.PatientCellPhone = dataReader["PatientCellPhone"].ToString();
+                    unityRide.PatientCellPhone2 = dataReader["PatientCellPhone2"].ToString();
+                    unityRide.PatientCellPhone3 = dataReader["PatientCellPhone3"].ToString();
                     unityRide.PatientStatus = dataReader["PatientStatus"].ToString();
                     if (unityRide.PatientStatus != "")
                     {

@@ -2180,7 +2180,6 @@ function refreshTable_UnityRide(timeInterval = 7) {
 
                 //#region adjust patient column
                 patientHTML = buildPatientHTML_AfterUnited(arr_rides[i]);
-                console.log('patientHTML ', patientHTML)
                 //#endregion
 
                 //#region adjust driver column
@@ -3953,7 +3952,6 @@ const buildDriverHTML = (ridePatNum, driver, rideNum) => {
 
 //this is for check after gilad changes to united tabels with new api 3/12
 const buildPatientHTML_AfterUnited = (ridepat) => {
-    console.log('buildPatientHTML_AfterUnited', ridepat )
     let patientPhone2render = "";
     let numOfEscorts = ridepat.AmountOfEscorts;
     let numOfPassengers = '<span class="numOfPassengers">נוסע יחיד</span>';
@@ -4519,7 +4517,9 @@ const deleteArrayOfRides = (arrayOfRides) => {
             table: $(`#${arrayOfRides[i]}`).parents('table').DataTable(),
         })
     }
-
+    listIds.forEach((l) => {
+        console.log('RIDES send to Delete !! --> ',findRideByNumber(l))
+    })
     $.ajax({
         dataType: "json",
         url: "WebService.asmx/deleteUnityRide",
@@ -4533,7 +4533,7 @@ const deleteArrayOfRides = (arrayOfRides) => {
             swal({
                 title: `لقد تم حذف السفرية\n נמחקו ${listIds.length} הסעות `,
                 type: "success",
-                showConfirmButton: false
+                showConfirmButton: true
             });
 
             console.log('tablesDataArray ', tablesDataArray);
@@ -4545,7 +4545,7 @@ const deleteArrayOfRides = (arrayOfRides) => {
 
                 }
                 else {
-                    location.reload();
+                    //location.reload();
                 }
             }
             //reset the checkboxes

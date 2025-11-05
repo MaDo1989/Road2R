@@ -3269,6 +3269,188 @@ GO
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
+/****** Object:  StoredProcedure [dbo].[spUnityRide_updateRemark]    Script Date: 05/11/2025 17:54:31 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad>
+-- Create Date: <24/12/23>
+-- Description: <according to unity rides need to update remark in the same way like ridepat>
+-- =============================================
+ALTER PROCEDURE [dbo].[spUnityRide_updateRemark]
+(
+    -- Add the parameters for the stored procedure here
+	@ridePatNum int,
+	@newRemark nvarchar(255),
+	@CoorName nvarchar(255)
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+		DECLARE @coorId int = (select id from volunteer where displayName like @CoorName)
+
+    -- Insert statements for procedure here
+	UPDATE UnityRide
+	SET Remark=@newRemark,
+	lastModified = GETDATE(),
+	Coordinator = @CoorName,
+	CoordinatorID = @coorId
+	WHERE RidePatNum=@ridePatNum
+
+	if @@ROWCOUNT>0
+	select u.*, 
+	NULLIF(p.CellPhone, '') AS CellPhone,
+    NULLIF(p.CellPhone2, '') AS PatientCellPhone2,
+    NULLIF(p.HomePhone, '') AS PatientCellPhone3
+	FROM UnityRide AS u
+	LEFT JOIN Patient AS p ON p.Id = u.PatientId
+	where RidePatNum=@ridePatNum
+	else
+	select -1 as 'RidePatNum'
+	
+END
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+/****** Object:  StoredProcedure [dbo].[spUnityRide_UpdateDateAndTime]    Script Date: 05/11/2025 18:05:03 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      Gilad
+-- Create Date: 08/12/23
+-- Description: to update the time of spesific ride in unityride
+-- ALTER Date 19/05/24 - try to avoid duplicated rides when change time values. - Gilad
+-- =============================================
+ALTER PROCEDURE [dbo].[spUnityRide_UpdateDateAndTime]
+(
+    -- Add the parameters for the stored procedure here
+	@editedTime DATETIME,
+	@unityRideId INT,
+	@CoorName NVARCHAR(255)
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+	DECLARE @PatientId INT;
+    DECLARE @Origin NVARCHAR(255);
+    DECLARE @Destination NVARCHAR(255);
+	DECLARE @coorId int = (select id from volunteer where displayName like @CoorName)
+
+
+	SELECT 
+        @PatientId = PatientId,
+        @Origin = Origin,
+        @Destination = Destination
+	FROM UnityRide
+	WHERE RidePatNum = @unityRideId;
+
+
+			  -- Check for duplicates
+    IF EXISTS (
+        SELECT 1
+        FROM UnityRide
+        WHERE 
+            PatientId = @PatientId AND 
+            pickupTime =@editedTime  AND
+			IsAnonymous = 0 AND
+			status not like N'נמחקה' AND
+            RidePatNum != @unityRideId  -- Exclude the current ride
+    )
+    BEGIN
+        SELECT -2 AS 'RidePatNum', 'Duplicate ride exists with the same values' AS 'Message';
+        RETURN;
+    END
+
+
+BEGIN TRAN UpdateUnityRideTime
+
+UPDATE UnityRide
+SET PickupTime = @editedTime, lastModified = GETDATE(), Coordinator = @CoorName, CoordinatorID = @coorId
+where RidePatNum=@unityRideId
+
+DECLARE @rowCount INT = 0 ;
+SET @rowCount = @@ROWCOUNT;
+
+
+
+IF @rowCount>0
+SELECT 
+    u.*,
+    NULLIF(p.CellPhone, '') AS CellPhone,
+    NULLIF(p.CellPhone2, '') AS PatientCellPhone2,
+    NULLIF(p.HomePhone, '') AS PatientCellPhone3
+FROM UnityRide AS u
+LEFT JOIN Patient AS p ON p.Id = u.PatientId
+where RidePatNum=@unityRideId
+ELSE
+select -1 as 'RidePatNum'
+
+COMMIT TRAN UpdateUnityRideTime
+END
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+/****** Object:  StoredProcedure [dbo].[spUpdatePatientStatusUnityRide]    Script Date: 05/11/2025 18:07:56 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad>
+-- Create Date: <24/12/23>
+-- Description: <for update the status of patiet in a ride update in 2 tables because of the unity>
+-- =============================================
+ALTER PROCEDURE [dbo].[spUpdatePatientStatusUnityRide]
+(
+    -- Add the parameters for the stored procedure here
+	@PatientId INT,
+	@RidePatNum INT,
+	@PatientStatus nvarchar(55),
+	@EditTimeStamp datetime,
+	@CoorName nvarchar(255)
+)
+AS
+BEGIN
+
+		DECLARE @coorId int = (select id from volunteer where displayName like @CoorName)
+
+		UPDATE UnityRide
+		SET LastModified=GETDATE(),PatientStatus=@PatientStatus,patientStatusTime=@EditTimeStamp,Coordinator = @CoorName,CoordinatorID=@coorId
+		WHERE RidePatNum=@RidePatNum
+
+		SELECT 
+			u.*,
+			NULLIF(p.CellPhone, '') AS CellPhone,
+			NULLIF(p.CellPhone2, '') AS PatientCellPhone2,
+			NULLIF(p.HomePhone, '') AS PatientCellPhone3
+		FROM UnityRide AS u
+		LEFT JOIN Patient AS p ON p.Id = u.PatientId
+		where RidePatNum=@RidePatNum
+END
+
+
 
 
 ---------------------------------------------------------------------------------------------------------------------------------------------
@@ -3280,6 +3462,657 @@ GO
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
+/****** Object:  StoredProcedure [dbo].[spUpdateDriverUnityRide]    Script Date: 05/11/2025 18:10:34 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad>
+-- Create Date: <25/12/23>
+-- ALTER Date : 11/06/24 -- to fix the duplicate Driver bug 
+
+-- Description: <update a driver to spesific unity ride also to delete driver from ride>
+-- =============================================
+ALTER PROCEDURE [dbo].[spUpdateDriverUnityRide]
+(
+    -- Add the parameters for the stored procedure here
+	@driverID int,
+	@unityRideID int,
+	@CoorName nvarchar(255)
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+
+    -- Insert statements for procedure here
+	DECLARE @driverName nvarchar(255) = (select displayname from volunteer where Id=@driverID)
+	Declare @This_origin Nvarchar(55) = (select Origin from UnityRide where RidePatNum=@UnityRideID)
+	DECLARE @pickupTime DateTime = (select pickupTime from UnityRide where RidePatNum = @unityRideID)
+	DECLARE @driverPhone varchar(11) = (select cellphone from volunteer where id= @driverID)
+	DECLARE @isNewDriver bit = case when (select count(*) from UnityRide where pickupTime<=GETDATE() and MainDriver=@driverID)<=3 then 1 else 0 end
+	DECLARE @oldDriver int = (select MainDriver from UnityRide where RidePatNum = @unityRideID)
+	DECLARE @coorId int = (select id from volunteer where displayName like @CoorName)
+	DECLARE @origin Nvarchar(55) = (select origin from UnityRide where RidePatNum = @unityRideID)
+	DECLARE @dest Nvarchar(55) = (select Destination from UnityRide where RidePatNum = @unityRideID)
+
+-- care of the NoOfDocumentedRides in volunteer table.
+	--switch drivers
+	IF(@oldDriver is not null AND @driverID!=-1)
+		begin
+			update Volunteer
+			SET NoOfDocumentedRides = NoOfDocumentedRides-1
+			where Id = @oldDriver
+
+			IF NOT EXISTS (select 1 from UnityRide where Origin = @origin and @dest =Destination and @pickupTime = pickupTime and MainDriver = @oldDriver and RidePatNum!=@unityRideID)
+			update Volunteer
+			SET No_of_Rides = No_of_Rides-1
+			Where Id = @oldDriver
+
+
+			update Volunteer
+			SET NoOfDocumentedRides = NoOfDocumentedRides+1
+			where Id = @driverID
+
+			IF NOT EXISTS (select 1 from UnityRide where Origin = @origin and @dest =Destination and @pickupTime = pickupTime and MainDriver = @driverID)
+			update Volunteer
+			SET No_of_Rides = No_of_Rides+1
+			Where Id = @driverID
+
+
+		end
+	--add driver
+	IF(@oldDriver is null AND @driverID!=-1)
+		begin
+			update Volunteer
+			SET NoOfDocumentedRides = NoOfDocumentedRides+1
+			where Id = @driverID
+
+			IF NOT EXISTS (select 1 from UnityRide where Origin = @origin and @dest =Destination and @pickupTime = pickupTime and MainDriver = @driverID)
+			update Volunteer
+			SET No_of_Rides = No_of_Rides+1
+			Where Id = @driverID
+
+		end
+	-- remove driver
+	IF(@oldDriver is not null AND @driverID = -1)
+		begin
+			update Volunteer
+			SET NoOfDocumentedRides = NoOfDocumentedRides-1
+			where Id = @oldDriver
+
+			IF NOT EXISTS (select 1 from UnityRide where Origin = @origin and @dest =Destination and @pickupTime = pickupTime and MainDriver = @oldDriver and RidePatNum!=@unityRideID)
+			update Volunteer
+			SET No_of_Rides = No_of_Rides-1
+			Where Id = @oldDriver
+		end
+
+
+
+DECLARE @NoOfDocumentedRides int = (select NoOfDocumentedRides from volunteer where id= @driverID)
+
+	-- for assign driver to unity ride
+	IF @driverID!=-1
+	BEGIN
+	-- check if the driver got any ride in this time
+	IF EXISTS(select 1
+	from UnityRide
+	where RidePatNum != @UnityRideID and
+		  pickupTime = @pickupTime and 
+		  MainDriver = @driverId and
+		  status!=N'נמחקה' and 
+		  Origin!=@This_origin
+		  )
+	begin
+	select -5 as 'RidePatNum'
+	Return
+	end
+
+	ELSE
+	begin
+	UPDATE UnityRide
+	set MainDriver = @driverID,
+		DriverName = @driverName,
+		DriverCellPhone = @driverPhone,
+		NoOfDocumentedRides = @NoOfDocumentedRides,
+		IsNewDriver = @isNewDriver,
+		lastModified = GETDATE(),
+		Coordinator = @CoorName,
+		CoordinatorID = @coorId,
+		Status = N'שובץ נהג'
+	where RidePatNum = @unityRideID
+	end
+	END
+	
+	-- for delete driver from unity ride
+	ELSE 
+		UPDATE UnityRide
+	set MainDriver = NULL,
+		DriverName = NULL,
+		DriverCellPhone = NULL,
+		NoOfDocumentedRides = NULL,
+		IsNewDriver = 1,
+		lastModified = GETDATE(),
+		Coordinator = @CoorName,
+		CoordinatorID = @coorId,
+		Status = N'ממתינה לשיבוץ'
+	where RidePatNum = @unityRideID
+
+SELECT 
+	u.*,
+	NULLIF(p.CellPhone, '') AS CellPhone,
+	NULLIF(p.CellPhone2, '') AS PatientCellPhone2,
+	NULLIF(p.HomePhone, '') AS PatientCellPhone3
+FROM UnityRide AS u
+LEFT JOIN Patient AS p ON p.Id = u.PatientId
+where RidePatNum = @unityRideID
+END
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+/****** Object:  StoredProcedure [dbo].[spVolunteerTypeView_GetVolunteersList_Gilad]    Script Date: 05/11/2025 18:26:29 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:       Gilad
+-- ALTER Date:	 16/08/2023
+-- ALTER Reason: try to add addition of absence to this sp 
+-- ALTER Reason : add status != 'נמחקה' cause the lastDrive Date was incorrecet
+-- =============================================
+ALTER procedure [dbo].[spVolunteerTypeView_GetVolunteersList_Gilad] 
+
+@IsActive bit
+as
+begin
+		--Gilad addioton
+       UPDATE Absence
+    SET AbsenceStatus = CASE
+                         WHEN GETDATE() BETWEEN FromDate AND DATEADD(d,1,UntilDate) THEN 1
+                         ELSE 0
+                       END;
+
+select r.MainDriver, r.Origin, r.Destination, r.pickupTime
+into #tempNotDeletedOnly from  UnityRide r
+
+			select VolunteerId,AbsenceStatus
+			into #tempAbsence
+			from Absence
+			where  GETDATE() BETWEEN FromDate AND DATEADD(d,1,UntilDate) and isDeleted = 0
+			group by VolunteerId,AbsenceStatus
+
+--before the unity
+--SELECT v.id, MAX(r.date) AS latestDrive into #tempLatesetDrives
+--					FROM Volunteer v
+--					JOIN Ride r ON v.id = r.MainDriver
+--					GROUP BY v.id
+--after the unity
+SELECT mainDriver AS id, MAX(PickupTime) AS latestDrive into #tempLatesetDrives
+FROM UnityRide
+where [Status] not like N'נמחקה'
+GROUP BY mainDriver
+--Id,
+--DisplayName,
+--FirstNameA,
+--FirstNameH,
+--LastNameH,
+--LastNameA,
+--CellPhone,
+--CellPhone2,
+--HomePhone,
+--Remarks,
+--CityCityName,
+--Address,
+--VolunTypeType,
+--Email,
+--device,
+--NoOfDocumentedCalls,
+--NoOfDocumentedRides,
+--NumOfRides_last2Months,
+--mostCommonPath,
+--latestDrive,
+--JoinDate,
+--isAssistant,
+--IsActive,
+--KnowsArabic,
+--Gender,
+--pnRegId,
+--englishName,
+--lastModified,
+--isDriving,
+if (@IsActive = 0)
+	begin
+				select vtv.Id,vtv.DisplayName,vtv.FirstNameA,vtv.FirstNameH,
+				vtv.LastNameH,vtv.LastNameA,vtv.CellPhone,vtv.CellPhone2,
+				vtv.HomePhone,vtv.Remarks,vtv.CityCityName,vtv.Address,
+				vtv.VolunTypeType,vtv.Email,vtv.device,vtv.NoOfDocumentedCalls,
+				vtv.NoOfDocumentedRides,vtv.No_of_Rides,vtv.JoinDate,vtv.isAssistant,vtv.IsActive,
+				vtv.KnowsArabic,vtv.Gender,vtv.pnRegId,vtv.EnglishName,DATEADD(HOUR, -2, vtv.LastModified) as LastModified,vtv.isDriving,vtv.AvailableSeats,vtv.IsBooster,vtv.IsBabyChair,
+				(select count(distinct pickuptime)
+					from UnityRide
+					where maindriver = vtv.Id  and Status != N'נמחקה'
+					and pickuptime between DATEADD(Month, -2, GETDATE()) and  GETDATE()) as NumOfRides_last2Months
+					--gilad addition vvv
+					,(
+					select abse.AbsenceStatus
+					from #tempAbsence abse
+					where abse.VolunteerId=vtv.Id
+					) as AbsenceStatus,
+					--gilad addition ^^^
+					(
+				select origin + '-' + destination from
+											(
+												select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove
+												FROM (
+													select top 50 *
+													from #tempNotDeletedOnly t
+													where t.MainDriver = vtv.Id
+													order by pickupTime desc
+												) last50Rides
+												group by maindriver, origin, destination
+												order by numberOfTimesDrove desc
+											) t
+					) 
+											mostCommonPath, tld.latestDrive
+		from VolunteerTypeView vtv
+		left join #tempLatesetDrives tld on tld.Id=vtv.Id
+		where IsActive = @IsActive --or IsActive = 1
+		order by firstNameH
+
+	end
+else
+	begin
+	select vtv.Id,vtv.DisplayName,vtv.FirstNameA,vtv.FirstNameH,
+				vtv.LastNameH,vtv.LastNameA,vtv.CellPhone,vtv.CellPhone2,
+				vtv.HomePhone,vtv.Remarks,vtv.CityCityName,vtv.Address,
+				vtv.VolunTypeType,vtv.Email,vtv.device,vtv.NoOfDocumentedCalls,
+				vtv.NoOfDocumentedRides,vtv.No_of_Rides,vtv.JoinDate,vtv.isAssistant,vtv.IsActive,
+				vtv.KnowsArabic,vtv.Gender,vtv.pnRegId,vtv.EnglishName,DATEADD(HOUR, -2, vtv.LastModified)  as LastModified,vtv.isDriving,vtv.AvailableSeats,vtv.IsBooster,vtv.IsBabyChair,
+				(select count(distinct pickuptime)
+					from UnityRide
+					where maindriver = vtv.Id  and Status != N'נמחקה'
+					and pickuptime between DATEADD(Month, -2, GETDATE()) and  GETDATE()) as NumOfRides_last2Months
+					--gilad addition vvv
+					,(
+					select abse.AbsenceStatus
+					from #tempAbsence abse
+					where abse.VolunteerId=vtv.Id
+					) as AbsenceStatus,
+					--gilad addition ^^^
+					(
+				select origin + '-' + destination from
+										(
+											select top 1 maindriver, origin, destination, count(*) as numberOfTimesDrove
+											FROM (
+												select top 50 *
+												from #tempNotDeletedOnly t
+												where t.MainDriver = vtv.Id
+												order by pickupTime desc
+											) last50Rides
+											group by maindriver, origin, destination
+											order by numberOfTimesDrove desc
+										) t
+					) mostCommonPath, tld.latestDrive
+		from VolunteerTypeView vtv
+		left join #tempLatesetDrives tld on tld.Id=vtv.Id 
+		where IsActive = @IsActive
+		order by firstNameH
+	end
+
+	drop table #tempNotDeletedOnly, #tempLatesetDrives,#tempAbsence
+
+end
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+/****** Object:  StoredProcedure [dbo].[spGetReturnRide_UnityRide]    Script Date: 05/11/2025 18:40:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad>
+-- Create Date: <21/04/2024>
+-- Description: <to get return ride after delete some ride, to ask the user if delete the return ride.>
+-- =============================================
+ALTER  PROCEDURE [dbo].[spGetReturnRide_UnityRide]
+(
+    -- Add the parameters for the stored procedure here
+    -- the originals parametes without switch!!! 
+		@UnityRideID int 
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+    SET NOCOUNT ON
+
+    -- Insert statements for procedure here
+
+
+	--THE SWITCH IS HERE !!!!
+	DECLARE @dest nvarchar(55) = (select origin from UnityRide where RidePatNum = @UnityRideID)
+	DECLARE @origin nvarchar(55) = (select destination from UnityRide where RidePatNum = @UnityRideID)
+	--THE SWITCH IS HERE !!!!
+	DECLARE @pickupTime datetime = (select pickupTime from UnityRide where RidePatNum = @UnityRideID)
+	DECLARE @patientName nvarchar(55) = (select patientName from UnityRide where RidePatNum = @UnityRideID)
+
+    select u.*,
+	NULLIF(p.CellPhone, '') AS CellPhone,
+	NULLIF(p.CellPhone2, '') AS PatientCellPhone2,
+	NULLIF(p.HomePhone, '') AS PatientCellPhone3
+	FROM UnityRide AS u
+	LEFT JOIN Patient AS p ON p.Id = u.PatientId
+	where destination like @dest
+	and origin like @origin
+	and CONVERT(date, pickupTime) like CONVERT(date, @pickupTime)
+	and patientName like @patientName
+	and Status not like N'נמחקה'
+END
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+/****** Object:  StoredProcedure [dbo].[spDeleteUnityRide]    Script Date: 05/11/2025 18:42:05 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad>
+-- Create Date: <28/12/23>
+-- Description: <this sp is for delete spesific ride or update the status
+--				if this is anonymous ride and there is no driver -> delete 
+--				anything else only change status to -> נמחקה 
+--				then need to return the return-Ride to ask the client if delete it too.
+
+-->
+-- =============================================
+ALTER PROCEDURE [dbo].[spDeleteUnityRide]
+(
+    -- Add the parameters for the stored procedure here
+   @unityRideID INT,
+   @CoorName NVARCHAR(255)
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+
+    -- Insert statements for procedure here
+		DECLARE @DriverId INT = (select MainDriver from unityRide where ridepatnum = @unityRideID)
+		DECLARE @isAnonymous bit = (select IsAnonymous from UnityRide where ridepatnum = @unityRideID)
+		DECLARE @origin Nvarchar(55) = (select origin from UnityRide where RidePatNum = @unityRideID)
+		DECLARE @dest Nvarchar(55) = (select Destination from UnityRide where RidePatNum = @unityRideID)
+		DECLARE @pickupTime dateTime = (select pickupTime from UnityRide where  RidePatNum = @unityRideID)
+
+		DECLARE @CoorId INT = (select id from Volunteer where DisplayName like @CoorName )
+
+
+		IF(@DriverId IS not NULL)
+		update Volunteer
+		SET NoOfDocumentedRides = NoOfDocumentedRides-1
+		where Id = @DriverId
+
+		IF NOT EXISTS (select 1 from UnityRide where Origin = @origin and @dest =Destination and @pickupTime = pickupTime and MainDriver = @DriverId)
+		update Volunteer
+		SET No_of_Rides = No_of_Rides-1
+		Where Id = @DriverId
+
+		
+		IF(@DriverId IS NULL and @isAnonymous = 1)
+
+		BEGIN
+		DELETE FROM UnityRide
+		WHERE ridepatnum = @unityRideID;
+		select @unityRideID*-1 as 'RidePatNum'
+		END
+		
+		ELSE
+
+		BEGIN
+		UPDATE UnityRide
+		set Status = N'נמחקה', lastModified = GETDATE(),Coordinator = @CoorName , CoordinatorID = @CoorId
+		where ridepatnum = @unityRideID
+		--return the update ride
+		Select u.*,
+		NULLIF(p.CellPhone, '') AS CellPhone,
+		NULLIF(p.CellPhone2, '') AS PatientCellPhone2,
+		NULLIF(p.HomePhone, '') AS PatientCellPhone3
+		FROM UnityRide AS u
+		LEFT JOIN Patient AS p ON p.Id = u.PatientId
+		where  ridepatnum = @unityRideID
+		END
+
+
+
+END
+
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+/****** Object:  StoredProcedure [dbo].[spDeleteUnityRide]    Script Date: 05/11/2025 18:42:05 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad>
+-- Create Date: <28/12/23>
+-- Description: <this sp is for delete spesific ride or update the status
+--				if this is anonymous ride and there is no driver -> delete 
+--				anything else only change status to -> נמחקה 
+--				then need to return the return-Ride to ask the client if delete it too.
+
+-->
+-- =============================================
+ALTER PROCEDURE [dbo].[spDeleteUnityRide]
+(
+    -- Add the parameters for the stored procedure here
+   @unityRideID INT,
+   @CoorName NVARCHAR(255)
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+
+    -- Insert statements for procedure here
+		DECLARE @DriverId INT = (select MainDriver from unityRide where ridepatnum = @unityRideID)
+		DECLARE @isAnonymous bit = (select IsAnonymous from UnityRide where ridepatnum = @unityRideID)
+		DECLARE @origin Nvarchar(55) = (select origin from UnityRide where RidePatNum = @unityRideID)
+		DECLARE @dest Nvarchar(55) = (select Destination from UnityRide where RidePatNum = @unityRideID)
+		DECLARE @pickupTime dateTime = (select pickupTime from UnityRide where  RidePatNum = @unityRideID)
+
+		DECLARE @CoorId INT = (select id from Volunteer where DisplayName like @CoorName )
+
+
+		IF(@DriverId IS not NULL)
+		update Volunteer
+		SET NoOfDocumentedRides = NoOfDocumentedRides-1
+		where Id = @DriverId
+
+		IF NOT EXISTS (select 1 from UnityRide where Origin = @origin and @dest =Destination and @pickupTime = pickupTime and MainDriver = @DriverId)
+		update Volunteer
+		SET No_of_Rides = No_of_Rides-1
+		Where Id = @DriverId
+
+		
+		IF(@DriverId IS NULL and @isAnonymous = 1)
+		BEGIN
+		IF OBJECT_ID('tempdb..#DeletedUnityRide') IS NOT NULL
+            DROP TABLE #DeletedUnityRide;
+
+         -- טבלת יעד זמנית ללא IDENTITY
+    CREATE TABLE #DeletedUnityRide
+    (
+        RidePatNum            INT,
+        PatientName           NVARCHAR(255),
+        PatientCellPhone      NVARCHAR(50),
+        PatientId             INT,
+        PatientGender         NVARCHAR(50),
+        PatientStatus         NVARCHAR(50),
+        patientStatusTime     DATETIME,
+        PatientBirthDate      DATETIME,
+        AmountOfEscorts       INT,
+        AmountOfEquipments    INT,
+        Origin                NVARCHAR(55),
+        Destination           NVARCHAR(55),
+        pickupTime            DATETIME,
+        Coordinator           NVARCHAR(255),
+        Remark                NVARCHAR(MAX),
+        Status                NVARCHAR(50),
+        Area                  NVARCHAR(50),
+        Shift                 NVARCHAR(50),
+        OnlyEscort            BIT,
+        lastModified          DATETIME,
+        CoordinatorID         INT,
+        MainDriver            INT,
+        DriverName            NVARCHAR(255),
+        DriverCellPhone       NVARCHAR(50),
+        NoOfDocumentedRides   INT,
+        IsAnonymous           BIT,
+        IsNewDriver           BIT
+    );
+
+    -- מוחקים מהטבלה האמיתית ומזרימים את הנתונים שנמחקו לטבלה הזמנית
+    UPDATE UnityRide
+		set Status = N'נמחקה', lastModified = GETDATE(),Coordinator = @CoorName , CoordinatorID = @CoorId
+		where ridepatnum = @unityRideID
+	DELETE FROM UnityRide
+    OUTPUT
+        deleted.RidePatNum,
+        deleted.PatientName,
+        deleted.PatientCellPhone,
+        deleted.PatientId,
+        deleted.PatientGender,
+        deleted.PatientStatus,
+        deleted.patientStatusTime,
+        deleted.PatientBirthDate,
+        deleted.AmountOfEscorts,
+        deleted.AmountOfEquipments,
+        deleted.Origin,
+        deleted.Destination,
+        deleted.pickupTime,
+        deleted.Coordinator,
+        deleted.Remark,
+        deleted.Status,
+        deleted.Area,
+        deleted.Shift,
+        deleted.OnlyEscort,
+        deleted.lastModified,
+        deleted.CoordinatorID,
+        deleted.MainDriver,
+        deleted.DriverName,
+        deleted.DriverCellPhone,
+        deleted.NoOfDocumentedRides,
+        deleted.IsAnonymous,
+        deleted.IsNewDriver
+    INTO #DeletedUnityRide
+    WHERE RidePatNum = @unityRideID;
+
+    -- מחזירים את כל הנתונים + טלפונים נוספים מה-Patient
+    SELECT
+        d.*,
+        NULLIF(p.CellPhone2, '') AS PatientCellPhone2,
+        NULLIF(p.HomePhone,  '') AS PatientCellPhone3
+    FROM #DeletedUnityRide AS d
+    LEFT JOIN Patient AS p ON p.Id = d.PatientId;
+
+
+		END
+		
+		ELSE
+		BEGIN
+		UPDATE UnityRide
+		set Status = N'נמחקה', lastModified = GETDATE(),Coordinator = @CoorName , CoordinatorID = @CoorId
+		where ridepatnum = @unityRideID
+		--return the update ride
+		Select u.*,
+		NULLIF(p.CellPhone, '') AS CellPhone,
+		NULLIF(p.CellPhone2, '') AS PatientCellPhone2,
+		NULLIF(p.HomePhone, '') AS PatientCellPhone3
+		FROM UnityRide AS u
+		LEFT JOIN Patient AS p ON p.Id = u.PatientId
+		where  ridepatnum = @unityRideID
+		END
+
+
+
+END
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+--make abrham manager ! 
+UPDATE VolunType_Volunteer
+SET VolunTypeType = N'מנהל'
+WHERE VolunteerId = 22136
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+
 
 ---------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------
