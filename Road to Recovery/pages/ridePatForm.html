@@ -1007,20 +1007,20 @@
                 if (isReturnDrive) {
                     $('#wait').hide();
 
-                    document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRideToAnotherPatient()" class="btn btn-success NewBtn waves-effect w-md m-b-5 "><i class="ti-plus m-r-5"></i> יצירת הסעה חדשה</button>&nbsp;';
+                    //document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRideToAnotherPatient()" class="btn btn-success NewBtn waves-effect w-md m-b-5 "><i class="ti-plus m-r-5"></i> יצירת הסעה חדשה</button>&nbsp;';
+                    document.getElementById('modalButtons').innerHTML = '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 ">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
                     if (localStorage.getItem('userType') != undefined && localStorage.getItem('userType') == 'מנהל') {
                         document.getElementById('modalButtons').innerHTML += '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 "><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה לאותו חולה</button>&nbsp;';
                     }
-                    document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 ">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
                     showMyModal('Modal');
                 }
                 else {
                     $('#wait').hide();
-                    document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRideToAnotherPatient()" class="btn btn-success NewBtn waves-effect w-md m-b-5 "><i class="ti-plus m-r-5"></i> יצירת הסעה חדשה</button>&nbsp;';
+                    //document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRideToAnotherPatient()" class="btn btn-success NewBtn waves-effect w-md m-b-5 "><i class="ti-plus m-r-5"></i> יצירת הסעה חדשה</button>&nbsp;';
+                    document.getElementById('modalButtons').innerHTML = '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 ">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
                     if (localStorage.getItem('userType') != undefined && localStorage.getItem('userType') == 'מנהל') {
                         document.getElementById('modalButtons').innerHTML += '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 "><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה לאותו חולה</button>&nbsp;';
                     }
-                    document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 ">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
                     document.getElementById('modalButtons').innerHTML += '<button onclick="createReturnRide()" class="btn btn-success waves-effect w-md m-b-5 ">יצירת החזרה &nbsp;<i class="ti-car m-r-5"></i></button>';
                     showMyModal('Modal');
                 }
@@ -1144,7 +1144,6 @@
 
             $('#patArabic').val(arabicDisplayName === 0 ? '' : arabicDisplayName);
 
-            //console.log('??', patient.EscortedList)
             if (patient.EscortedList.length > 0) {
                 EscortedList = patient.EscortedList;
                 let str = '';
@@ -2847,19 +2846,9 @@
 
         async function createNewRide() {
             isCreateNewRideButtonClicked = true;
-
+            isThisAReturnDrive = false;
             let ridepat = JSON.parse(GENERAL.RIDEPAT.getRidePatList());
             arr_customer.func = 'new';
-            //console.log('the first obj ', ridepat);
-            //console.log('the arr_customer ', arr_customer);
-            //console.log('before custom', ThisRide);
-            //let customRide = CustomRideObject(ThisRide.unityRide);
-            //console.log('After custom', customRide);
-            //ridePat = customRide
-            //ridePat = { ...ridePat, func: 'new' }
-            //console.log('what im save , then reload', ridePat)
-
-            //GENERAL.RIDEPAT.setRidePatList(JSON.stringify(ridePat));
             const Dest = $('#Destination').val();
             const Origin = $('#Origin').val();
 
@@ -2883,9 +2872,16 @@
             $('#Modal').modal('hide');
             $('#wait').hide();
             $('#dateRide').val('');
-
+            $('#saveCustomer').removeClass("saveHighlight");
             $('#ridePatNum').val('');
             $("#ridePatNum").prop('disabled', true);
+            $('#minute').prop('disabled', false);
+            $('#hour').prop('disabled', false);
+            $('#afterNoon').prop('disabled', false);
+            $('#afterNoon').prop('checked', false);
+            $('#minute').val('00');
+            $('#hour').val('06');
+
             //location.reload();
             //$('#wait').show();
 
@@ -2922,7 +2918,7 @@
             localStorage.setItem("ReturnRidePatFlag", true);
 
             returnRide();
-            $("#afterNoon").attr('checked', 'checked');
+            $("#afterNoon").prop("checked", true);
             $("#afterNoon").prop('disabled', false);
             checkAfternoon();
 
