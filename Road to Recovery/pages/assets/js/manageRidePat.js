@@ -190,7 +190,6 @@ const manipilateNodeStyle = (tr_node2manipulate, updated_ridePat, functionlity, 
     lastModified_td = nodechilds.find(x => x.className.includes('last-modified_td'));
     driver_td = nodechilds.find(x => x.className.includes('driver_td'));
     $(lastModified_td).addClass('within2HoursSinceChange');
-    //console.log('CHECK COLOR-->', driver_td)
     $(driver_td).removeClass('withIn12HoursDrive withIn24HoursDrive');
 
     switch (functionlity) {
@@ -236,8 +235,6 @@ const shiftRidePatToSuitableTable = (tableNameRidePatIsNowIn, tableNameRidePatSh
 }
 
 const removeRidePatFromOldTable = (tableNameRidePatIsNowIn, updated_ridePat) => {
-    //console.log('im here ? ', tableNameRidePatIsNowIn, updated_ridePat);
-
     switch (tableNameRidePatIsNowIn) {
         case tableNames.MORNING:
             row2manipulate = tMorning.row(`#${updated_ridePat.RidePatNum}`).data();
@@ -409,7 +406,6 @@ notification.client.ridePatUpdated = function (updated_ridePat) {
     /*  *********↑↑↑*********
         * !!! IMPORTANT !!! *
         *********************/
-    //console.log('From notification.client.ridePatUpdated--> get this-->', updated_ridePat);
     tableName2manipulate = getTableName2Manipulate(updated_ridePat.RidePatNum);
     thisRidePatDate = fixDate_WhichComeFromOpenConnection(updated_ridePat.Date);
     thisRidePatLastModified = fixDate_WhichComeFromOpenConnection(updated_ridePat.LastModified);
@@ -567,7 +563,6 @@ notification.client.ridePatUpdated = function (updated_ridePat) {
 
 //Gilad addition use signalR
 notification2.client.UnityRideUpdated = function (updatedUnityRide) {
-    //console.log('From server to client in notification2.client.ridePatUpdated get this --> ', updatedUnityRide);
     /*   *********************
          * !!! IMPORTANT !!! *
          ********↓↓↓**********/
@@ -578,8 +573,6 @@ notification2.client.UnityRideUpdated = function (updatedUnityRide) {
         *********************/
 
     let customRide = CustomRideObject(updatedUnityRide); // to ajust the object
-
-    //console.log('After Custom object look like this-->', customRide)
 
     tableName2manipulate = getTableName2Manipulate(customRide.RidePatNum);
     thisRidePatDate = fixDate_WhichComeFromOpenConnection(customRide.Date);
@@ -735,7 +728,6 @@ notification2.client.UnityRideUpdated = function (updatedUnityRide) {
             driverIsAssigned = customRide.Drivers.length > 0;
 
             if (treatmentFinished) {
-                //console.log('color check -->', tr_node2manipulate, customRide, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED)
                 if (!driverIsAssigned) {
 
                     manipilateNodeStyle(tr_node2manipulate, customRide, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED);
@@ -747,7 +739,6 @@ notification2.client.UnityRideUpdated = function (updatedUnityRide) {
                     $(tr_node2manipulate).removeClass('highlightRow-after-patientStatusModal');
                 }
             } else {
-                //console.log('color check -->', tr_node2manipulate, customRide, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED)
                 manipilateNodeStyle(tr_node2manipulate, customRide, RIDEPAT_PATIENT_STATUS_EDITTIME_CHANGED);
                 $(tr_node2manipulate).removeClass('highlightRow-after-patientStatusModal');
             }

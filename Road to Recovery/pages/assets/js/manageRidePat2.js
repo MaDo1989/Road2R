@@ -258,7 +258,6 @@ function wiringDataTables() {
         timer = setTimeout(function () {
 
             candidate4IhaveSeen = e.target.parentElement.id;
-            // console.log(e);
             $('.ContextMenu_dropdown').removeClass('hidden');
             $(".ContextMenu_dropdown").css({ position: "absolute", top: e.pageY, left: e.pageX });
         }, 500);
@@ -325,7 +324,6 @@ const assignOrUpdateAPIcall = (unityRideID, DriverId) => {
         isDelete: false,
         userName: UserName
     }
-    //console.log('Gilad check the request -->', request);
     ajaxCall('AssignUpdateDriverToUnityRide', JSON.stringify(request), assignDriverToRidePat_SCB, assignDriverToRidePat_ECB);
 
 }
@@ -355,7 +353,6 @@ const assignDriverToRidePat = () => {
             $('#wait').hide();
             Absences = JSON.parse(data.d);
             let absenceStatus = false;
-            //console.log('Gilad check -- > ', Absences)
             for (var i = 0; i < Absences.length; i++) {
                 if (Absences[i].AbsenceStatus) {
                     absenceStatus = true;
@@ -443,8 +440,6 @@ const updateUnityridePatientStatus = () => {
         editTimeStamp: editTimeStamp,
         userName: userName
     }
-    //console.log('check it --', data)
-
     const updatePatientStatus_SCB = () => {
 
         $('#wait').hide();
@@ -459,7 +454,6 @@ const updateUnityridePatientStatus = () => {
         alert(err);
     }
 
-    //console.log('Gilad check the data send -->', data);
     ajaxCall('UpdatePatientStatus_UnityRide', JSON.stringify(data), updatePatientStatus_SCB, updatePatientStatus_ECB);
 }
 
@@ -509,8 +503,6 @@ const updateRidePatPatientStatus = () => {
         console.log(err);
         alert(err);
     }
-
-    //console.log('Gilad check the data send -->', data);
     ajaxCall('UpdatePatientStatus', JSON.stringify(data), updatePatientStatus_SCB, updatePatientStatus_ECB);
 
 
@@ -565,9 +557,6 @@ const updateRidePatTime = () => {
         $('#editTimeModal').modal('hide');
         alert(err);
     }
-
-    //console.log('From updateRidePatTime func--> send this-->', data);
-
     ajaxCall('UpdateRidePatTime', JSON.stringify(data), updateRidePatTime_SCB, updateRidePatTime_ECB);
 
 }
@@ -597,7 +586,6 @@ const updateUnityRideTime = () => {
     let ridepatToManipulate = arr_rides.find(r => r.RidePatNum === _ridepatToManipulate);
     let dateToManipulate = convertDBDate2FrontEndDate(ridepatToManipulate.PickupTime);
     dateToManipulate.setHours(hours, minutes);
-    //console.log('check -->', ridepatToManipulate);
     const userName = GENERAL.USER.getUserDisplayName();
 
     let data = {
@@ -622,7 +610,6 @@ const updateUnityRideTime = () => {
         $('#wait').hide();
         removeClass('highlightRow');
         $('#editTimeModal').modal('hide');
-        //console.log('in --> updateUnityRideTime_ECB', err);
         if (err.responseJSON.Message.includes('error code: -2')) {
             const patientName = ridepatToManipulate.PatientName
             const PickupTime = dateToManipulate;
@@ -645,9 +632,6 @@ const updateUnityRideTime = () => {
 
         }
     }
-
-    //console.log('From NEW updateUnityRideTime NEW func--> send this-->', data);
-
     ajaxCall('UpdateUnityRideTime', JSON.stringify(data), updateUnityRideTime_SCB, updateUnityRideTime_ECB);
 
 }
@@ -683,7 +667,6 @@ const updateRemark_UnityRide = () => {
         newRemark,
         userName
     };
-    //console.log('Gilad check -->', data);
     const updateRemark_SCB = () => {
 
         $('#wait').hide();
@@ -747,7 +730,6 @@ const removeClass = (className) => {
 }
 
 const assignDriverToRidePat_SCB = (data) => {
-    console.log('data from assignDriverToRidePat_SCB : ', data.d)
     const ur = JSON.parse(data.d);
     if (ur.RidePatNum == -5) {
         console.error('duplicated driver! --> got status -5 from the server');
@@ -1183,7 +1165,6 @@ function confirmDelete(deleteBtn, table) {
     }
     deleteCandidate = CustomRideObject(deleteCandidate);
     deleteCandidate.Date = new Date(convert2DBDateToInt(deleteCandidate.Date));
-    //console.log('check delete--=>', deleteCandidate);
     let isAfterNoon = deleteCandidate.Date.getMinutes() === 14;
     let isToday = table.context[0].sTableId === "datatable-afternoon" || table.context[0].sTableId === "datatable-morning";
 
@@ -1266,7 +1247,6 @@ const MessageToPalestinianCoor = () => {
             let listToExcel = [];
             let rideNum = 1;
             tomorrowListExcel.forEach(row => {
-                //console.log('Gilad check this -->', FixedHour(row.pickupTime), row.pickupTime);
                 let rowToExcel = {
                     Row: rideNum,
                     From: row.OriginE,
@@ -1297,14 +1277,6 @@ const MessageToPalestinianCoor = () => {
                         showConfirmButton: false
                     });
                 });
-
-
-
-            //was excel
-            //console.log('res Gilad ', listToExcel);
-            //jsonToExcelAndDownload(listToExcel, `Tomorrow-Ride ${d.getDate()+1}-${d.getMonth() + 1}-${d.getFullYear()}`);
-
-
         },
         error: (error) => {
             console.log('from ajax to Get_Tomorrow_RidePatView_Gilad ', error);
@@ -1373,10 +1345,7 @@ function copyMessageButton(copyMsgBtn, table) {
         const dateTicks = fixDate_WhichComeFromOpenConnection(messageObject.date, false);
         messageObject.date = repaireDateForMeesageModule(dateTicks);
     }
-    //console.log('what im send here ? ', messageObject);
     let textMessageToCopy = buildMessage(messageObject);
-    //console.log(textMessageToCopy);
-
     navigator.clipboard.writeText(textMessageToCopy)
         .then(function () {
             swal({
@@ -1452,7 +1421,6 @@ function deleteRidePat(ridePat, deleteBtn, thistable) {
 
 
             if (thistable && deleteBtn) {
-                //console.log('Gilad check from deleteRidePat --> ', deleteBtn,)
                 thistable.row($(deleteBtn).parents('tr')).remove().draw();
             } else {
                 location.reload();
@@ -1529,8 +1497,6 @@ const deleteUnityRide = (ridePat, deleteBtn, thistable) => {
     const listIds = []
     listIds.push(ridePat.RidePatNum);
     let request = { ListIDs: listIds, userName: UserName };
-    //console.log('check request -->', request)
-    //console.log('Gilad check -->', ridePat);
     $.ajax({
         dataType: "json",
         url: "WebService.asmx/deleteUnityRide",
@@ -1545,10 +1511,7 @@ const deleteUnityRide = (ridePat, deleteBtn, thistable) => {
                 showConfirmButton: false
             });
             if (thistable && deleteBtn) {
-                //console.log('Check This table and btn', thistable, deleteBtn, thistable.row($(deleteBtn).parents('tr')))
-                //console.log('Gilad check from deleteRidePat --> ', deleteBtn,)
                 let stam = thistable.row($(deleteBtn).parents('tr')).remove().draw();
-                //console.log(stam);
             } else {
                 location.reload();
             }
@@ -1664,12 +1627,6 @@ function deleteReturn_unityRide() {
     returnRidePat = null;
     $('#messagesModal').modal('toggle');
     $('#DriverReturnRidePatMsg').html("");
-    //if (thisTable && deleteBtn) {
-    //    console.log('Gilad check from deleteReturn --> ', deleteBtn.children[10].children[0].children[1],$(deleteBtn).parents('tr'), $('#' + RidePat.RidePatNum).parents('tr'));
-    //    thisTable.row($(deleteBtn).parents('tr')).remove().draw();
-    //}
-    //console.log('Gilad check from deleteReturn --> ', deleteBtn, deleteBtn.children[deleteBtn.children.length-1].children[0].children[1]);
-    //deleteBtn = deleteBtn.children[10].children[0].children[1];
     deleteBtn = deleteBtn.children[deleteBtn.children.length - 1].children[0].children[1]
 
     deleteUnityRide(ridepat, deleteBtn, thisTable);
@@ -1730,19 +1687,12 @@ function deleteReturn() {
     returnRidePat = null;
     $('#messagesModal').modal('toggle');
     $('#DriverReturnRidePatMsg').html("");
-    //if (thisTable && deleteBtn) {
-    //    console.log('Gilad check from deleteReturn --> ', deleteBtn.children[10].children[0].children[1],$(deleteBtn).parents('tr'), $('#' + RidePat.RidePatNum).parents('tr'));
-    //    thisTable.row($(deleteBtn).parents('tr')).remove().draw();
-    //}
-    //console.log('Gilad check from deleteReturn --> ', deleteBtn, deleteBtn.children[deleteBtn.children.length-1].children[0].children[1]);
-    //deleteBtn = deleteBtn.children[10].children[0].children[1];
     deleteBtn = deleteBtn.children[deleteBtn.children.length - 1].children[0].children[1]
 
     deleteRidePat(RidePat, deleteBtn, thisTable);
 }
 
 const isThisReturnNonAnonymousRide = (ride) => {
-    //console.log('parms-->', ride);
     if (hospitals.includes(ride.Destination) && !ride.IsAnonymous) {
         return true;
     }
@@ -1971,8 +1921,6 @@ const CHECK_TEST_NOT_REAL = () => {
         success: function (data) {
             $('#wait').hide();
             const test = JSON.parse(data.d);
-            //console.log('Gilad check this -->', test)
-
 
         },
         error: function (err) {
@@ -2119,10 +2067,6 @@ function refreshTable_UnityRide(timeInterval = 7) {
         tFuture = $(`#${tableNames.FUTURE}`).DataTable({ data: [], destroy: true });
         return;
     }
-
-    var volunteerId = -1 // VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
-    //gilad check
-    //console.log('Gilad check this new func* -->', volunteerId, timeInterval)
     $.ajax({
         dataType: "json",
         url: "WebService.asmx/GetUnityRide",
@@ -2135,7 +2079,6 @@ function refreshTable_UnityRide(timeInterval = 7) {
         success: function (data) {
             $('#wait').hide();
             arr_rides = JSON.parse(data.d);
-            //console.log('Gilad check this new func*  -->', arr_rides)
             GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
 
             let thisRidePatDate;
@@ -2161,12 +2104,6 @@ function refreshTable_UnityRide(timeInterval = 7) {
 
 
             for (let i = 0; i < arr_rides.length; i++) {
-                //if (arr_rides[i].Status == 'שובץ נהג') {
-                //    //console.log(arr_rides[i], document.getElementById(arr_rides[i].RidePatNum), $(`#${arr_rides[i].RidePatNum}`));
-                //    listRowstoColor.push(arr_rides[i].RidePatNum);
-
-                //}
-
                 if (allSortsSwitch && areasToShow_arr !== null) {
                     if (areasToShow_arr.length !== 0) {
                         if (!areasToShow_arr.includes(arr_rides[i].Area)) {
@@ -2209,7 +2146,6 @@ function refreshTable_UnityRide(timeInterval = 7) {
                 //#region Status
                 //custom for buildstatusString function
                 let statusObj = {}
-                //console.log('Check here -->', arr_rides[i])
                 if (arr_rides[i].PatientStatus == '' || arr_rides[i].PatientStatus == 'Not Finished') {
                     statusObj.Status = -1;
                 }
@@ -2305,13 +2241,9 @@ function refreshTable_UnityRide(timeInterval = 7) {
                 //here need to be the logic of coloring the row
 
                 const hourRide = convertDBDate2FrontEndDate(arr_rides[i].PickupTime).getHours();
-                //console.log('checking:', arr_rides[i].MainDriver, hourRide, arr_rides[i].IsAnonymous);
                 const anonymous = arr_rides[i].PatientName.includes('אנונימי') || arr_rides[i].IsAnonymous;
-                //console.log('params:', !anonymous && arr_rides[i].MainDriver > 0 && hourRide <= 21);
                 if (!anonymous && arr_rides[i].MainDriver > 0 && hourRide <= 21) {
-                    //console.log('colord row', arr_rides[i].RidePatNum)
                     listRowstoColor.push(arr_rides[i].RidePatNum);
-                    //$(`#${arr_rides[i].RidePatNum}`).addClass('statusComplete');
                 }
 
 
@@ -2325,7 +2257,6 @@ function refreshTable_UnityRide(timeInterval = 7) {
             //           || ↓DATATABLES PROPERTIES↓||
             //           ============================
 
-            //console.log('Morning table data-->', morningRidePats);
             tMorning = $(`#${tableNames.MORNING}`).DataTable({
                 data: morningRidePats,
                 rowId: 'ridePatNum',
@@ -2910,721 +2841,6 @@ function refreshTable_UnityRide(timeInterval = 7) {
         }
     });
 }
-
-function refreshTable(timeInterval = 7) {
-    $('#wait').show();
-
-    morningRidePats = [];
-    afterNoonRidePats = [];
-    tomorrowMorningRidePats = [];
-    tomorrowAfternoonRidePats = [];
-    futureRidePats = [];
-
-    let areasToShow_arr = JSON.parse(localStorage.getItem('areasToShow_arr'));
-    let allSortsSwitch = JSON.parse(localStorage.getItem('allSortsSwitch'));
-
-    checkCookie();
-
-    if (areasToShow_arr !== null && areasToShow_arr.length === 0 && allSortsSwitch) { //dont show any
-        $('#wait').hide();
-
-        tMorning = $(`#${tableNames.MORNING}`).DataTable({ data: [], destroy: true });
-
-        tAfternoon = $(`#${tableNames.AFTERNOON}`).DataTable({ data: [], destroy: true });
-
-        tTomorrowMorning = $(`#${tableNames.TOMORROW_MORNING}`).DataTable({ data: [], destroy: true });
-
-        tTomorrowAfternoon = $(`#${tableNames.TOMORROW_AFTERNOON}`).DataTable({ data: [], destroy: true });
-
-        tFuture = $(`#${tableNames.FUTURE}`).DataTable({ data: [], destroy: true });
-        return;
-    }
-
-    var volunteerId = -1 // VolunteerId - 1 means get ALL FUTURE ridePats // VolunteerId -2 means get ALL ridePats
-    //gilad check
-    //console.log('Gilad check this regular refresh* -->', volunteerId, timeInterval)
-    $.ajax({
-        dataType: "json",
-        url: "WebService.asmx/GetRidePatView",
-        contentType: "application/json; charset=utf-8",
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader("Content-Encoding", "gzip");
-        },
-        type: "POST",
-        data: JSON.stringify({ volunteerId: volunteerId, maxDays: timeInterval }),
-        success: function (data) {
-            $('#wait').hide();
-            arr_rides = JSON.parse(data.d);
-            //console.log('Gilad check this -->', arr_rides)
-            GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
-
-            let thisRidePatDate;
-            let thisRidePat = {};
-            let editBtn;
-            let deleteBtn;
-            let messageToCopyBtn;
-            let candidateBtn;
-            let btnStr = '';
-            //     let lastModified = convertDBDate2FrontEndDate(arr_rides[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
-            let numOfRealEscorts = 0; //not anonymous
-            let driverColumnContent = '';
-            let englishStatus = '';
-            let patientHTML;
-            let driverHTML;
-            let status2render;
-            let timeHTML;
-            let patientGender = null;
-            let patientAge = null;
-            let isPatientStatusShouldPaintRow = false;
-            let remarkHTML = '';
-            listRowstoColor = [];
-
-
-            for (let i = 0; i < arr_rides.length; i++) {
-                if (arr_rides[i].Status == 'שובץ נהג') {
-                    //console.log(arr_rides[i], document.getElementById(arr_rides[i].RidePatNum), $(`#${arr_rides[i].RidePatNum}`));
-                    listRowstoColor.push(arr_rides[i].RidePatNum);
-
-                }
-
-                if (allSortsSwitch && areasToShow_arr !== null) {
-                    if (areasToShow_arr.length !== 0) {
-                        if (!areasToShow_arr.includes(arr_rides[i].Area)) {
-                            continue;
-                        }
-                    }
-                }
-                thisRidePatDate = convertDBDate2FrontEndDate(arr_rides[i].Date);
-                timeHTML = buildTimeHTML(thisRidePatDate, arr_rides[i].RidePatNum);
-                numOfEscorts = arr_rides[i].Escorts.length;
-
-                //#region adjust patient column
-                patientHTML = buildPatientHTML(arr_rides[i]);
-                //#endregion
-
-                //#region adjust driver column
-                driverHTML = '';
-
-                if (arr_rides[i].Drivers.length > 0) {
-
-                    driverHTML = buildDriverHTML(arr_rides[i].RidePatNum, arr_rides[i].Drivers[0], arr_rides[i].RideNum);
-                } else {
-
-                    driverHTML = buildDriverHTML(arr_rides[i].RidePatNum);
-                }
-                //#endregion adjust driver column
-
-                //#region Status
-                status2render = buildStatusString(arr_rides[i].Pat.RidePatPatientStatus, arr_rides[i].RidePatNum);
-                //#endregion Status
-
-                //#region remarkHTML
-                remarkHTML = buildRemarkHTML(arr_rides[i].Remark, arr_rides[i].RidePatNum);
-                //#endregion remarkHTML
-
-                //#region patient age
-                patientAge = buildPatientAgeHTML(arr_rides[i].Pat);
-                //#endregion
-
-
-                //#region buttons
-                btnStr = buildAcionsButtonsHTML(arr_rides[i].RidePatNum, arr_rides[i].Drivers)
-                //#endregion buttons
-
-                //#region isPatientStatusShouldPaintRow
-                isPatientStatusShouldPaintRow = callIfPatientStatusShouldPaintRow(arr_rides[i]);
-                //#endregion isPatientStatusShouldPaintRow
-
-                thisRidePat = {
-                    ridePatNum: arr_rides[i].RidePatNum,
-                    time: timeHTML,
-                    origin: isAssistant ? arr_rides[i].Origin.EnglishName : arr_rides[i].Origin.Name,
-                    destination: isAssistant ? arr_rides[i].Destination.EnglishName : arr_rides[i].Destination.Name,
-                    patient: patientHTML,
-                    patientAge: patientAge,
-                    driver: driverHTML,
-                    status: status2render,
-                    lastModified: convertDBDate2FrontEndDate(arr_rides[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" }),
-                    remark: remarkHTML,
-                    isAnonymous: arr_rides[i].Pat.IsAnonymous === 'True',
-                    hasDriver: arr_rides[i].Drivers.length > 0,
-                    buttons: btnStr,
-                    isPatientStatusShouldPaintRow: isPatientStatusShouldPaintRow,
-                }
-
-                if (thisRidePatDate.toLocaleDateString() === new Date().toLocaleDateString()) {                         //<---- today
-                    if (thisRidePatDate.getHours() < 12) {                                                              //<---- today morning
-
-                        morningRidePats.push(thisRidePat);
-                    } else {                                                                                           //<---- today afternoon
-
-                        afterNoonRidePats.push(thisRidePat);
-                    }
-
-                } else if (thisRidePatDate.toLocaleDateString() === tomorrowDate.toLocaleDateString()) {              //<---- tomorrow
-
-                    if (thisRidePatDate.getHours() < 12) {                                                           //<---- tomorrow morning
-                        thisRidePat.date = thisRidePatDate.toLocaleString('he-IL', { dateStyle: 'short' });
-
-                        tomorrowMorningRidePats.push(thisRidePat);
-                    } else {                                                                                         //<---- tomorrow afternoon
-                        thisRidePat.date = thisRidePatDate.toLocaleString('he-IL', { dateStyle: 'short' });
-
-                        tomorrowAfternoonRidePats.push(thisRidePat);
-                    }
-
-                } else if (thisRidePatDate > tomorrowDate) {                                                         //<---- future
-
-                    thisRidePat.date = thisRidePatDate.toLocaleString('he-IL', { dateStyle: 'short' });
-                    futureRidePats.push(thisRidePat);
-                }
-
-            }
-            let arrayOf_IHaveSeenAllready = localStorage.getItem('arrayOf_IHaveSeenAllready') ?
-                JSON.parse(localStorage.getItem('arrayOf_IHaveSeenAllready'))
-                :
-                [];
-
-            //           ============================
-            //           || ↓DATATABLES PROPERTIES↓||
-            //           ============================
-
-            tMorning = $(`#${tableNames.MORNING}`).DataTable({
-                data: morningRidePats,
-                rowId: 'ridePatNum',
-                dom: controllersLayout,
-                buttons: [
-                    {
-                        extend: 'excelHtml5',
-                        text: 'ייצוא לאקסל',
-                        title: `ניהול הסעות - בוקר ${getNext_X_DaysDateAsString(0)}`,
-                    }
-                ],
-                pageLength: 100,
-                stateSave: true,
-                destroy: true,
-                autoWidth: false,
-                columns: [
-                    //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
-                    { data: "time" },                                //0
-                    { data: "origin" },                              //1
-                    { data: "destination" },                         //2
-                    { data: "patient" },                             //3
-                    { data: "patientAge" },                          //4
-                    { data: "driver" },                              //5
-                    { data: "status" },                              //6
-                    { data: "lastModified" },                        //7
-                    { data: "remark" },                              //8
-                    { data: "isAnonymous" },                         //9
-                    { data: "buttons" },                             //10
-                ],
-                columnDefs: [
-                    { width: '5%', "targets": [0, 1, 2, 5, 6, 7] },
-                    { width: '2%', "targets": [4] },
-                    { width: '15%', "targets": [3] },
-                    { width: '25%', "targets": [9] },
-                    { targets: 0, type: 'de_time' },
-                    {
-                        targets: [1, 2, 3, 5, 6, 7], createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {
-                            if (isAssistant) {
-                                cell.className += ' ltr';
-                            }
-
-                            switch (colIndex) {
-                                case 5: //driver column
-
-                                    $(cell).addClass('driver_td');
-                                    if (!rowData.hasDriver) {
-                                        const suitableClass = classManager.getSuitableClassS_4thisTime("datatable-morning");
-                                        $(cell).addClass(suitableClass);
-                                    }
-                                    break;
-
-                                case 6://status column
-                                    if (
-                                        cellData.indexOf("הגענו ליעד") !== -1 ||
-                                        cellData.indexOf("Reached destination") !== -1
-                                    ) {
-                                        cell.style.backgroundColor = "green";
-                                        cell.style.color = "white";
-                                    }
-                                    else if (cellData.includes('שובץ נהג') || cellData.includes('Driver registered')) {
-
-                                        if (rowData["isAnonymous"]) {
-                                            $(cell.parentElement).addClass('driverAssign2AnonymousRide');
-                                        }
-                                    }
-                                    break;
-                                case 7://lastModified column
-
-                                    const thisRidePatNum = rowData.ridePatNum;
-                                    const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatNum);
-                                    const intValue = convert2DBDateToInt(thisridePatObj.LastModified);//the reasone why we get the origial obj is to support pc with english date
-                                    const thisRidePatLastModified = new Date(intValue)
-                                    const isSeenAllReady = arrayOf_IHaveSeenAllready.includes(thisRidePatNum);
-
-                                    if (isWithin2HoursSinceChange(thisRidePatLastModified) && !isSeenAllReady) {
-                                        cell.classList.add('within2HoursSinceChange');
-                                        increaseCounter(tableNames.MORNING, thisRidePatNum);
-                                    }
-                                    break;
-
-                            }
-
-                        }
-                    },
-                    { targets: 7, className: 'last-modified_td' },
-                    { targets: 7, type: 'last_modifiedSort' },
-                    { "targets": [9], visible: false },
-                    { targets: [10], orderable: false }
-
-                ],
-                createdRow: function (row, data, dataIndex) {
-
-                    if (data.isPatientStatusShouldPaintRow) {
-
-                        $(row).addClass("highlightRow-after-patientStatusModal");
-                    }
-                },
-            });
-
-            tAfternoon = $(`#${tableNames.AFTERNOON}`).DataTable({
-                rowId: 'ridePatNum',
-                dom: controllersLayout,
-                buttons: [
-                    {
-                        extend: 'excelHtml5',
-                        text: 'ייצוא לאקסל',
-                        title: `ניהול הסעות -  אחה"צ ${getNext_X_DaysDateAsString(0)}`,
-                    }
-                ],
-                pageLength: 100,
-                data: afterNoonRidePats,
-                stateSave: true,
-                destroy: true,
-                columns: [
-                    //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
-                    { data: "time" },                                //0
-                    { data: "origin" },                              //1
-                    { data: "destination" },                         //2
-                    { data: "patient" },                             //3
-                    { data: "patientAge" },                          //4
-                    { data: "driver" },                              //5
-                    { data: "status" },                              //6
-                    { data: "lastModified" },                        //7
-                    { data: "remark" },                              //8
-                    { data: "isAnonymous" },                         //9
-                    { data: "buttons" },                             //10
-                ],
-                columnDefs: [
-                    { width: '5%', "targets": [0, 1, 2, 5, 6, 7, 8] },
-                    { width: '2%', "targets": [4] },
-                    { width: '15%', "targets": [3] },
-                    { width: '25%', "targets": [10] },
-                    { targets: 0, type: 'de_time' },
-                    { targets: [0], createdCell: (td) => { $(td).attr('id', 'rideTiming') } },
-                    {
-                        targets: [1, 2, 3, 5, 6, 7], createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {
-                            if (isAssistant) {
-                                cell.className += ' ltr';
-                            }
-
-                            switch (colIndex) {
-
-                                case 1: //origin
-                                    $(cell).attr('id', 'OriginName');
-                                    if (cellData.indexOf('מרכז') !== -1
-                                        || cellData.indexOf('center') !== -1
-                                        || rowData['destination'].indexOf('מרכז') !== -1
-                                        || rowData['destination'].indexOf('center') !== -1
-                                    ) {
-                                        $(cell.parentElement).addClass('driverAssign2AnonymousRide');
-                                    }
-                                    break;
-
-                                case 2://destination
-                                    createdCell: (td) => { $(td).attr('id', 'DestinationName') }
-                                    break;
-
-                                case 5: //driver
-                                    //this code is identical to the one in datatable-tomorrow-morning when can need to change to 1 function
-                                    $(cell).addClass('driver_td');
-                                    if (!rowData.hasDriver) {
-
-                                        let ridePatTime_td;
-                                        if (rowData['time'] === 'אחה"צ') {
-
-                                            ridePatTime_td = [12, 0];
-                                        } else {
-
-                                            ridePatTime_td = $.trim(rowData['time']).split(':');
-                                        }
-
-                                        const hh = parseInt(ridePatTime_td[0]);
-                                        const mm = parseInt(ridePatTime_td[1]);
-
-                                        const suitableClass = classManager.getSuitableClassS_4thisTime("datatable-afternoon", hh, mm);
-                                        $(cell).addClass(suitableClass);
-
-                                    }
-                                    break;
-
-                                case 6://status
-                                    if (cellData.indexOf("הגענו ליעד") !== -1 ||
-                                        cellData.indexOf("Reached destination") !== -1) {
-
-                                        $(cell).addClass('reached2destination');
-                                    } else if (cellData.includes('שובץ נהג') || cellData.includes('Driver registered')) {
-
-                                        if (rowData["isAnonymous"]) {
-
-                                            $(cell.parentElement).addClass('driverAssign2AnonymousRide');
-                                        }
-                                    }
-                                    break;
-                                case 7://lastModified column
-
-                                    const thisRidePatNum = rowData.ridePatNum;
-                                    const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatNum);
-                                    const intValue = convert2DBDateToInt(thisridePatObj.LastModified);//the reasone why we get the origial obj is to support pc with english date
-                                    const thisRidePatLastModified = new Date(intValue)
-                                    const isSeenAllReady = arrayOf_IHaveSeenAllready.includes(thisRidePatNum);
-
-                                    if (isWithin2HoursSinceChange(thisRidePatLastModified) && !isSeenAllReady) {
-                                        cell.classList.add('within2HoursSinceChange');
-                                        increaseCounter(tableNames.AFTERNOON, thisRidePatNum);
-                                    }
-                                    break;
-
-                            }
-
-                        }
-                    },
-                    { targets: 7, className: 'last-modified_td' },
-                    { targets: 7, type: 'last_modifiedSort' },
-                    { targets: [9], visible: false },
-                    { targets: [10], orderable: false }
-                ],
-                autoWidth: false,
-                createdRow: function (row, data, dataIndex) {
-
-                    if (data.isPatientStatusShouldPaintRow) {
-
-                        $(row).addClass("highlightRow-after-patientStatusModal");
-                    }
-                },
-            });
-
-            tTomorrowMorning = $(`#${tableNames.TOMORROW_MORNING}`).DataTable({
-                rowId: 'ridePatNum',
-                dom: controllersLayout,
-                buttons: [
-                    {
-                        extend: 'excelHtml5',
-                        text: 'ייצוא לאקסל',
-                        title: `ניהול הסעות למחר ${getNext_X_DaysDateAsString(1)}`,
-                    }
-                ],
-                data: tomorrowMorningRidePats,
-                stateSave: true,
-                destroy: true,
-                "pageLength": 100,
-                columns: [
-                    //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
-                    { data: "date" },                                //0
-                    { data: "time" },                                //1
-                    { data: "origin" },                              //2
-                    { data: "destination" },                         //3
-                    { data: "patient" },                             //4
-                    { data: "patientAge" },                          //5
-                    { data: "driver" },                              //6
-                    { data: "status" },                              //7
-                    { data: "lastModified" },                        //8
-                    { data: "remark" },                              //9
-                    { data: "isAnonymous" },                         //10
-                    { data: "buttons" },                             //11
-                ],
-                "columnDefs": [
-                    { targets: 1, type: 'de_time' },
-                    { width: '4%', "targets": [0, 1] },
-                    { width: '6%', "targets": [2, 3] },
-                    { width: '15%', "targets": [4] },
-                    { width: '2%', "targets": [5] },
-                    { width: '5%', "targets": [6, 7, 8, 9] },
-                    { width: '0%', "targets": [10] },
-                    { width: '25%', "targets": [11] },
-                    {
-                        targets: 5, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //5 is driver column
-
-                            cell.className += ' driver_td';
-                            if (!rowData.hasDriver) {
-
-                                let ridePatTime_td;
-                                if (rowData['time'] === 'אחה"צ') {
-
-                                    ridePatTime_td = [12, 0];
-                                } else {
-
-                                    ridePatTime_td = $.trim(rowData['time']).split(':');
-                                }
-
-                                const hh = parseInt(ridePatTime_td[0]);
-                                const mm = parseInt(ridePatTime_td[1]);
-
-                                const suitableClass = classManager.getSuitableClassS_4thisTime("datatable-tomorrow-morning", hh, mm);
-                                $(cell).addClass(suitableClass);
-
-                            }
-                        }
-                    },
-                    {
-                        targets: 7, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //6 is status column
-                            if (cellData.indexOf("הגענו ליעד") !== -1 ||
-                                cellData.indexOf("Reached destination") !== -1) {
-
-                                $(cell).addClass('reached2destination');
-                            } else if (cellData.includes('שובץ נהג') || cellData.includes('Driver registered')) {
-
-                                if (rowData["isAnonymous"]) {
-
-                                    $(cell.parentElement).addClass('driverAssign2AnonymousRide');
-                                }
-                            }
-                        }
-                    },
-                    {
-                        targets: 8, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {//lastModified column
-
-                            const thisRidePatNum = rowData.ridePatNum;
-                            const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatNum);
-                            const intValue = convert2DBDateToInt(thisridePatObj.LastModified);//the reasone why we get the origial obj is to support pc with english date
-                            const thisRidePatLastModified = new Date(intValue)
-                            const isSeenAllReady = arrayOf_IHaveSeenAllready.includes(thisRidePatNum);
-
-                            if (isWithin2HoursSinceChange(thisRidePatLastModified) && !isSeenAllReady) {
-                                cell.classList.add('within2HoursSinceChange');
-                                increaseCounter(tableNames.TOMORROW_MORNING, thisRidePatNum);
-                            }
-                        }
-                    },
-                    { targets: 8, className: 'last-modified_td' },
-                    { targets: 8, type: 'last_modifiedSort' },
-                    { targets: 9, className: 'text-right-strong' },
-                    { targets: [10], visible: false },
-                    { targets: [11], orderable: false }
-
-                ],
-                autoWidth: false,
-                createdRow: function (row, data, dataIndex) {
-
-                    if (data.isPatientStatusShouldPaintRow) {
-
-                        $(row).addClass("highlightRow-after-patientStatusModal");
-                    }
-                },
-
-            });
-
-            tTomorrowAfternoon = $(`#${tableNames.TOMORROW_AFTERNOON}`).DataTable({
-                rowId: 'ridePatNum',
-                dom: controllersLayout,
-                buttons: [
-                    {
-                        extend: 'excelHtml5',
-                        text: 'ייצוא לאקסל',
-                        title: `ניהול הסעות למחר ${getNext_X_DaysDateAsString(1)}`,
-                    }
-                ],
-                data: tomorrowAfternoonRidePats,
-                stateSave: true,
-                destroy: true,
-                "pageLength": 100,
-                columns: [
-                    //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
-                    { data: "date" },                                //0
-                    { data: "time" },                                //1
-                    { data: "origin" },                              //2
-                    { data: "destination" },                         //3
-                    { data: "patient" },                             //4
-                    { data: "patientAge" },                          //5
-                    { data: "driver" },                              //6
-                    { data: "status" },                              //7
-                    { data: "lastModified" },                        //8
-                    { data: "remark" },                              //9
-                    { data: "isAnonymous" },                         //10
-                    { data: "buttons" },                             //11
-                ],
-                "columnDefs": [
-                    { targets: 1, type: 'de_time' },
-                    { width: '4%', "targets": [0, 1] },
-                    { width: '6%', "targets": [2, 3] },
-                    { width: '15%', "targets": [4] },
-                    { width: '2%', "targets": [5] },
-                    { width: '5%', "targets": [6, 7, 8, 9] },
-                    { width: '0%', "targets": [10] },
-                    { width: '25%', "targets": [11] },
-                    {
-                        targets: 5, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //5 is driver column
-
-                            cell.className += ' driver_td';
-                            if (!rowData.hasDriver) {
-
-                                let ridePatTime_td;
-                                if (rowData['time'] === 'אחה"צ') {
-
-                                    ridePatTime_td = [12, 0];
-                                } else {
-
-                                    ridePatTime_td = $.trim(rowData['time']).split(':');
-                                }
-
-                                const hh = parseInt(ridePatTime_td[0]);
-                                const mm = parseInt(ridePatTime_td[1]);
-
-                                const suitableClass = classManager.getSuitableClassS_4thisTime("datatable-tomorrow-morning", hh, mm);
-                                $(cell).addClass(suitableClass);
-
-                            }
-                        }
-                    },
-                    {
-                        targets: 7, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => { //6 is status column
-                            if (cellData.indexOf("הגענו ליעד") !== -1 ||
-                                cellData.indexOf("Reached destination") !== -1) {
-
-                                $(cell).addClass('reached2destination');
-                            } else if (cellData.includes('שובץ נהג') || cellData.includes('Driver registered')) {
-
-                                if (rowData["isAnonymous"]) {
-
-                                    $(cell.parentElement).addClass('driverAssign2AnonymousRide');
-                                }
-                            }
-                        }
-                    },
-                    {
-                        targets: 8, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {//lastModified column
-
-                            const thisRidePatNum = rowData.ridePatNum;
-                            const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatNum);
-                            const intValue = convert2DBDateToInt(thisridePatObj.LastModified);//the reasone why we get the origial obj is to support pc with english date
-                            const thisRidePatLastModified = new Date(intValue)
-                            const isSeenAllReady = arrayOf_IHaveSeenAllready.includes(thisRidePatNum);
-
-                            if (isWithin2HoursSinceChange(thisRidePatLastModified) && !isSeenAllReady) {
-                                cell.classList.add('within2HoursSinceChange');
-                                increaseCounter(tableNames.TOMORROW_MORNING, thisRidePatNum);
-                            }
-                        }
-                    },
-                    { targets: 8, className: 'last-modified_td' },
-                    { targets: 8, type: 'last_modifiedSort' },
-                    { targets: 9, className: 'text-right-strong' },
-                    { targets: [10], visible: false },
-                    { targets: [11], orderable: false }
-
-                ],
-                autoWidth: false,
-                createdRow: function (row, data, dataIndex) {
-
-                    if (data.isPatientStatusShouldPaintRow) {
-
-                        $(row).addClass("highlightRow-after-patientStatusModal");
-                    }
-                },
-
-            });
-
-
-            tFuture = $(`#${tableNames.FUTURE}`).DataTable({
-                rowId: 'ridePatNum',
-                dom: controllersLayoutForFutureTable,
-                fnInitComplete: function (x) {
-                    buildHtmlSelectTimeInterval();
-                },
-                buttons: [
-                    {
-                        extend: 'excelHtml5',
-                        text: 'ייצוא לאקסל',
-                        title: `ניהול הסעות עתידיות ${getNext_X_DaysDateAsString(2)} - ${getNext_X_DaysDateAsString(7)}`,
-                    }
-                ],
-                data: futureRidePats,
-                stateSave: true,
-                destroy: true,
-                columns: [
-                    //when add column be aware of columnDefs refernces [i] IMPORTANT !!!
-                    { data: "date" },                                //0
-                    { data: "time" },                                //1
-                    { data: "origin" },                              //2
-                    { data: "destination" },                         //3
-                    { data: "patient" },                             //4
-                    { data: "patientAge" },                          //5
-                    { data: "driver" },                              //6
-                    { data: "status" },                              //7
-                    { data: "lastModified" },                        //8
-                    { data: "remark" },                              //9
-                    { data: "isAnonymous" },                         //10
-                    { data: "buttons" },                             //11
-                ],
-                pageLength: 100,
-                columnDefs: [
-                    { targets: 0, type: 'de_date' },
-                    { targets: 1, type: 'de_time' },
-                    { targets: 7, type: 'last_modifiedSort' },
-                    { width: '4%', "targets": [0, 1] },
-                    { width: '6%', "targets": [2, 3] },
-                    { width: '10%', "targets": [4] },
-                    { width: '2%', "targets": [5] },
-                    { width: '5%', "targets": [6, 7, 8, 9] },
-                    { width: '0%', "targets": [10] },
-                    { width: '25%', "targets": [11] },
-                    { targets: 5, className: 'driver_td' },
-                    {
-                        targets: 7, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {//lastModified column
-
-                            const thisRidePatNum = rowData.ridePatNum;
-                            const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatNum);
-                            const intValue = convert2DBDateToInt(thisridePatObj.LastModified);
-                            const thisRidePatLastModified = new Date(intValue)
-                            const isSeenAllReady = arrayOf_IHaveSeenAllready.includes(thisRidePatNum);
-
-                            if (isWithin2HoursSinceChange(thisRidePatLastModified) && !isSeenAllReady) {
-                                cell.classList.add('within2HoursSinceChange');
-                                increaseCounter(tableNames.FUTURE, thisRidePatNum);
-                            }
-                        }
-                    },
-                    { targets: 8, className: 'last-modified_td' },
-                    { targets: 8, type: 'last_modifiedSort' },
-                    { targets: [10], visible: false },
-                    { targets: [11], orderable: false }
-                ],
-                autoWidth: false,
-                createdRow: function (row, data, dataIndex) {
-
-                    if (data.isPatientStatusShouldPaintRow) {
-
-                        $(row).addClass("highlightRow-after-patientStatusModal");
-                    }
-                },
-            });
-
-            //            ============================
-            //            || ↑DATATABLES PROPERTIES↑||
-            //            ============================
-
-            colorRowWithDriver(listRowstoColor);
-            $(".dataTables_empty").html("אין הסעות لا توجد سفريات No drives");
-
-
-        },
-        error: function (err) {
-            $('#wait').hide();
-            alert("Error in GetRidePatView: " + err.responseText);
-        }
-    });
-}
 function findRideByNumber(rideNumber) {
     // Iterate through each ride object in the array
     for (let i = 0; i < arr_rides.length; i++) {
@@ -3636,6 +2852,7 @@ function findRideByNumber(rideNumber) {
         }
     }
     // If the ride is not found, return null or handle it as needed
+    console.warn(`Ride with number ${rideNumber} not found.`);
     return null;
 }
 
@@ -3646,7 +2863,6 @@ const colorRowWithDriver = (rideArray) => {
         return;
     }
     rideArray.forEach(rideID => {
-        //console.log('Gilad--->', document.getElementById(rideID), rideID);
         if (document.getElementById(rideID) == null) {
             return
         }
@@ -3668,7 +2884,6 @@ const colorRowWithDriver = (rideArray) => {
         const isAfterNoonRide = convertDBDate2FrontEndDate(thisRide.PickupTime).getMinutes() === afternoonIndicator;
         timespan = isAfterNoonRide ? 'אחה"צ' : 'בוקר';
         PatientNameSpan = thisRide.IsAnonymous ? 'חולה' : thisRide.PatientName;
-        console.log(timespan, PatientNameSpan, thisRide.MainDriver, rideID);
         if (timespan != 'אחה"צ' && PatientNameSpan != 'חולה' && thisRide.MainDriver != -1) {
             $(`#${rideID}`).addClass('statusComplete');
         }
@@ -3806,13 +3021,10 @@ const buildPatientAgeHTML_AfterUnited = (patient) => {
     if (patient.Age == 0 || patient.IsAnonymous) {
         age = `<span></span>`;
     }
-    //console.log(patient)
 
     return age;
 }
 const buildPatientAgeHTML = (patient) => {
-    console.log('use me ? ');
-
     let age = '';
     const boy = 'בן ', girl = 'בת ';
     const gender = GetPatientGender(patient.GenderAsEnum, isAssistant)
@@ -3912,7 +3124,6 @@ const loadFutureTable = () => {
 const buildDriverHTML = (ridePatNum, driver, rideNum) => {
     let driverWrapper = '';
     let isDriverReplacement;
-    //console.log('this is what i got -->', ridePatNum, driver, rideNum)
     if (typeof driver !== 'undefined' && typeof rideNum !== 'undefined') {
 
         isDriverReplacement = true;
@@ -4143,10 +3354,7 @@ const buildStatusString = (statusObj, ridePatNum) => {
 
 
     let statusWrapper = `<div class="elementsInSameLine">`;
-    //console.log('statusObj', statusObj, 'statusObj.Status', statusObj.Status)
     const status = GetPatientStatus(statusObj.Status, isAssistant);
-    //console.log('status', status, 'ridePatNum', ridePatNum)
-
     const editTimeStamp = convertDBDate2FrontEndDate(statusObj.EditTimeStamp);
     const editBtn = `<button type='button' data-toggle="modal" data-target="#editPatientStatusModal" onclick="prepreparationEditPatientStatusModal(this, ${ridePatNum})" class='btn btn-icon waves-effect waves-light btn-secondary' title='עריכה'><i class='ti-pencil'></i></button>`;
 
@@ -4194,7 +3402,6 @@ const buildAcionsButtonsHTML = (ridePatNum, drivers) => {
     let timeNum = thisRide.PickupTime.replace('/', '').replace('/', '').replace('Date(', '').replace(')', '');
     timeNum = parseInt(timeNum);
     let time = new Date(timeNum);
-    //console.log("time,", timeNum, time.getHours(), ridePatNum)
     let buttonsWrapper = `<div class='elementsInSameLine'>${editBtn} ${deleteBtn} ${(drivers.length > 0) ? messageToCopyBtn : candidateBtn}</div>`;
     //let buttonsWrapper = `<div class='elementsInSameLine'>${editBtn} ${deleteBtn} ${(drivers.length > 0 && time.getHours() <= 23) ? messageToCopyBtn : candidateBtn}</div>`;
 
@@ -4312,19 +3519,14 @@ function prepreparationEditPatientStatusModal(thisBtn, ridepatNum, EditTimeStamp
     let $minutesSelect = $('#editPatientStatusModalMinutes');
 
     let ridepatObject = arr_rides.find(r => r.RidePatNum === ridepatNum);
-    //console.log('before!!!', ridepatObject)
     ridepatObject = CustomRideObject(ridepatObject);
-    //console.log('after!!!', ridepatObject)
     const ridePatPatientStatus = ridepatObject.Pat.RidePatPatientStatus.Status;
     let editTimeStamp = ridepatObject.Pat.RidePatPatientStatus.EditTimeStamp;
-    //console.log('test ', editTimeStamp)
-    //ridePatPatientStatus == -1 ? editTimeStamp = null : editTimeStamp = editTimeStamp;
     if (ridePatPatientStatus != -1) {
 
         editTimeStamp = convertDBDate2FrontEndDate(editTimeStamp);
         let hoursAsDoubleDigits = createDoubleDigit(editTimeStamp.getHours());
         let minutesAsDoubleDigits = createDoubleDigit(editTimeStamp.getMinutes());
-        //console.log('editTimeStamp???', editTimeStamp);
         $hoursSelect.val(hoursAsDoubleDigits);
         $minutesSelect.val(minutesAsDoubleDigits);
         if (ridePatPatientStatus == -1) {
@@ -4517,9 +3719,6 @@ const deleteArrayOfRides = (arrayOfRides) => {
             table: $(`#${arrayOfRides[i]}`).parents('table').DataTable(),
         })
     }
-    listIds.forEach((l) => {
-        console.log('RIDES send to Delete !! --> ',findRideByNumber(l))
-    })
     $.ajax({
         dataType: "json",
         url: "WebService.asmx/deleteUnityRide",
@@ -4527,16 +3726,13 @@ const deleteArrayOfRides = (arrayOfRides) => {
         type: "POST",
         data: JSON.stringify(request),
         success: function (data) {
-            console.log('AFTER delete rides : ', data);
             const detectedReturnRides = data.d.filter((ur) => { return ur.RidePatNum != 0 });
-            console.log('detectedReturnRides ->', detectedReturnRides);
             swal({
                 title: `لقد تم حذف السفرية\n נמחקו ${listIds.length} הסעות `,
                 type: "success",
                 showConfirmButton: true
             });
 
-            console.log('tablesDataArray ', tablesDataArray);
             for (var i = 0; i < tablesDataArray; i++) {
                 const deletedRideObject = tablesDataArray[i];
                 if (deletedRideObject.table && deletedRideObject.row) {
@@ -4602,7 +3798,6 @@ const deleteArrayOfRides = (arrayOfRides) => {
                                     table: $(`#${ReturnlistIdsToRemove[i]}`).parents('table').DataTable(),
                                 })
                             }
-                            console.log('tablesDataArray ', tablesDataArray);
                             for (var i = 0; i < (tablesDataArray ? tablesDataArray.length : 0); i++) {
                                 var deletedRideObject = tablesDataArray[i];
                                 if (deletedRideObject && deletedRideObject.table && deletedRideObject.row != null) {
@@ -4776,7 +3971,6 @@ const messageForPalCoor = () => {
 // this is the function that rememeber and collect the checked checkboxes for any functionality.
 const ChangeCheckboxRides = (checkbox) => {
     let arrlocal = [];
-    //console.log(checkbox.checked, checkbox.parentNode.parentNode)
     if (checkbox.checked && checkbox.id != 'AllChecks') {
         checkbox.parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important')
         //checkbox.parentNode.parentNode.parnetNode.parnetNode.style.setProperty('border-collapse', 'none', 'important')
@@ -4785,15 +3979,11 @@ const ChangeCheckboxRides = (checkbox) => {
     else {
         checkbox.parentNode.parentNode.style.setProperty('border', 'none', 'important')
     }
-    //console.log(checkbox.id, checkbox.checked);
     if (checkbox.id == 'AllChecks') {
-        //$('.checkboxClass').prop("checked", checkbox.checked);
         let tableName = checkbox.parentNode.parentNode.parentNode.parentNode.id;
-        //console.log('im here', tableName, checkbox.id);
         if (tableName == 'datatable-morning') {
             for (var i = 0; i < morningRidePats.length; i++) {
                 $(`#check${morningRidePats[i].ridePatNum}`).prop("checked", checkbox.checked);
-                //console.log($(`#check${morningRidePats[i].ridePatNum}`)[0].parentNode.parentNode)
                 checkbox.checked ? $(`#check${morningRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important') : $(`#check${morningRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
             }
 
@@ -4912,7 +4102,6 @@ const ChangeCheckboxRides = (checkbox) => {
         }
     });
     checkboxesRides = arrlocal;
-    //console.log(checkboxesRides);
     if (checkboxesRides.length == 0) {
         $('.toggleTitle').hide();
         $('#deleteFewRidesButton').prop('disabled', true);
@@ -4948,11 +4137,6 @@ const DeleteMarkedRides = () => {
             closeOnConfirm: true
         }, function (userResponse) {
             if (userResponse) {
-                // deleteRidePat(original_deleteCandidate, deleteBtn, table);
-                //deleteUnityRide(original_deleteCandidate, deleteBtn, table)
-                //console.log('to delete', checkboxesRides);
-                //console.log($(`#${checkboxesRides[0]}`)) // the row
-                //console.log($(`#${checkboxesRides[0]}`).parents('table').DataTable()) // the table
                 deleteArrayOfRides(checkboxesRides);
             }
 
