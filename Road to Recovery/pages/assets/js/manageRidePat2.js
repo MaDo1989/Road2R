@@ -1248,6 +1248,7 @@ const FixedHour = (DBdateString) => {
 
 
 
+// not in use right now.
 const MessageToPalestinianCoor = () => {
     //const dest = tomorrowMorningRidePats[0].destination
     //const origin = tomorrowMorningRidePats[0].origin
@@ -1355,9 +1356,8 @@ const buildMessageString = (rideList) => {
     return str;
 
 }
-//gilad
 const isSameRide = (ride1, ride2) => {
-    if (ride1.At == ride2.At && ride1.From == ride2.From && ride1.To == ride2.To && ride1.Driver == ride2.Driver) {
+    if (ride1.At == ride2.At && ride1.From == ride2.From && ride1.Driver == ride2.Driver) {
         return true
     }
     return false;
@@ -4646,14 +4646,12 @@ const deleteArrayOfRides = (arrayOfRides) => {
 
 
 const messageForPalCoor = () => {
-    //console.log('in messageForPalCoor ', checkboxesRides)
     const choosenRides = arr_rides.filter(ride => checkboxesRides.includes(ride.RidePatNum));
     const dates = [];
     choosenRides.forEach(ride => {
         dates.push(convertToShortDateString(convertDBDate2FrontEndDate(ride.PickupTime)));
     })
     const uniqueDates = [...new Set(dates)];
-    //console.log(uniqueDates)
     if (uniqueDates.length > 1) {
         swal({
             title: "לא ניתן לשלוח הודעה לרכז על הסעות בתאריכים שונים",
@@ -4675,83 +4673,71 @@ const messageForPalCoor = () => {
 
         success: function (data) {
 
-            //console.log('success', JSON.parse(data.d))
             const dicById = JSON.parse(data.d);
             translatedData = transformData(choosenRides, dicById);
-            //console.log('translatedData', translatedData);
-            //console.log('choosenRides', choosenRides);
-            const grouped = groupByOriginDestinationAndTime(translatedData);
-            console.log('grouped', grouped)
+
+            const groupedObj = groupByOriginAndTime(translatedData);
+
             const lineBreak = '\n';
-
-
             let message = `Rides for ${convertToShortDateString(convertDBDate2FrontEndDate(choosenRides[0].PickupTime))} Morning.${lineBreak}`;
             let index = 0;
-            for (var k in grouped) {
 
-                let rides = grouped[k];
-                let origin = rides[0].Origin;
-                let destination = rides[0].Destination;
-                let time = convertDBDate2FrontEndDate(rides[0].PickupTime).toLocaleTimeString('he-IL', { timeStyle: 'short' });
+            const groups = Object.values(groupedObj).sort((a, b) => {
+                if (a.timeKey !== b.timeKey) return a.timeKey.localeCompare(b.timeKey);
+                return a.origin.localeCompare(b.origin);
+            });
 
-                message += `${lineBreak}From ${origin} to ${destination} at ${time} ${lineBreak}`;
+            for (const group of groups) {
+                const rides = group.rides;
 
-                //rides.forEach(ride => {
-                //    index++;
-                //    if (ride.OnlyEscort) {
-                //        message += `   ${index}. {blanks} of ${ride.PatientName} (${ride.AmountOfEscorts}) ${lineBreak}`;
-                //    }
-                //    else {
-                //        //console.log('each ride', ride);
-                //        message += `   ${index}. ${ride.PatientName} (${ride.AmountOfEscorts + 1}) ${lineBreak}`;
-                //    }
+                const destList = Array.from(group.destinations);
+                let destStr = '';
+                if (destList.length === 1) {
+                    destStr = destList[0];
+                } else if (destList.length === 2) {
+                    destStr = `${destList[0]} and ${destList[1]}`;
+                } else {
+                    destStr = `${destList.slice(0, -1).join(', ')} and ${destList.slice(-1)}`;
+                }
 
-                //})
+                const timeLocal = convertDBDate2FrontEndDate(rides[0].PickupTime)
+                    .toLocaleTimeString('he-IL', { timeStyle: 'short' });
 
-
+                message += `${lineBreak}From ${group.origin} to ${destStr} at ${timeLocal} ${lineBreak}`;
 
                 const ridesByDriver = {};
                 rides.forEach(ride => {
-                    const driverId = ride.MainDriver;
-                    if (!ridesByDriver[driverId]) {
-                        ridesByDriver[driverId] = [];
-                    }
+                    const driverId = ride.MainDriver ?? 'NO_DRIVER';
+                    if (!ridesByDriver[driverId]) ridesByDriver[driverId] = [];
                     ridesByDriver[driverId].push(ride);
                 });
-
 
                 for (const driverId in ridesByDriver) {
                     index++;
                     const driverRides = ridesByDriver[driverId];
 
                     if (driverRides.length === 1) {
-
                         const ride = driverRides[0];
                         if (ride.OnlyEscort) {
                             message += `    {blanks} of ${ride.PatientName} (${ride.AmountOfEscorts}) ${lineBreak}`;
-                        }
-                        else {
-                            message += `    ${ride.PatientName} (${ride.AmountOfEscorts + 1}) ${lineBreak}`;
+                        } else {
+                            message += `    ${ride.PatientName} (${(ride.AmountOfEscorts || 0) + 1}) ${lineBreak}`;
                         }
                     } else {
-
-                        message += `    ` + driverRides.map(ride => {
+                        const joined = driverRides.map(ride => {
                             if (ride.OnlyEscort) {
-                                return `{blanks} of ${ride.PatientName} (${ride.AmountOfEscorts})`;
+                                return `{blanks} of ${ride.PatientName} (${ride.AmountOfEscorts || 0})`;
                             } else {
-                                return `${ride.PatientName} (${ride.AmountOfEscorts + 1})`;
+                                return `${ride.PatientName} (${(ride.AmountOfEscorts || 0) + 1})`;
                             }
-                        }).join(' + ') + lineBreak;
+                        }).join(' + ');
+                        message += `    ${joined}${lineBreak}`;
                     }
                 }
-
-
-
-
             }
+
             $('#wait').hide();
 
-            //console.log('final message\n', message)
             navigator.clipboard.writeText(message)
                 .then(function () {
                     swal({
@@ -4771,7 +4757,6 @@ const messageForPalCoor = () => {
 
         },
         error: function (err) {
-            //alert("Error in messageForPalCoor ->  " + err.responseText);
             console.log("Error in messageForPalCoor ->  " + err.responseText, err);
         }
 
@@ -4975,23 +4960,24 @@ const DeleteMarkedRides = () => {
     }
 }
 
-function groupByOriginDestinationAndTime(rides) {
+function groupByOriginAndTime(rides) {
     return rides.reduce((acc, ride) => {
-        // Extract the time in HH:MM format from the PickupTime attribute
-        const timestamp = new Date(parseInt(ride.PickupTime.match(/\d+/)[0]));
-        const time = timestamp.toISOString().substr(11, 5); // Extract HH:MM
+        const m = String(ride.PickupTime).match(/\d+/);
+        const ts = m ? new Date(parseInt(m[0], 10)) : new Date(ride.PickupTime);
+        const timeKey = ts.toISOString().substr(11, 5); // HH:MM
 
-        // Create a unique key for each combination of Origin, Destination, and PickupTime
-        const key = `${ride.Origin}-${ride.Destination}-${time}`;
-
-        // Initialize the group if it doesn't exist
+        const key = `${ride.Origin}__${timeKey}`;
         if (!acc[key]) {
-            acc[key] = [];
+            acc[key] = {
+                origin: ride.Origin,
+                timeKey,         
+                timeDate: ts,    
+                destinations: new Set(),
+                rides: []
+            };
         }
-
-        // Add the ride to the group
-        acc[key].push(ride);
-
+        acc[key].destinations.add(ride.Destination);
+        acc[key].rides.push(ride);
         return acc;
     }, {});
 }

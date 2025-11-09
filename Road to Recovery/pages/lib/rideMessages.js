@@ -5,9 +5,7 @@
 
 const showMessage = (arr_rides, ridePatNum) => {
     let ridepat = arr_rides.find((r) => r.RidePatNum === ridePatNum);
-    //console.log('Check what i got before ->', ridepat)
     ridepat = CustomRideObject(ridepat);
-    //console.log('Check what i after ->', ridepat)
 
 
     if (ridepat.Drivers.length == 0) return;
@@ -76,15 +74,10 @@ const showMessage = (arr_rides, ridePatNum) => {
 };
 
 function buildMessage(message) {
-    //sep = `<br/>`;
-    /* console.log('Gilad-->' + JSON.stringify(message),JSON.stringify(message.Age), JSON.stringify(message.GenderAsEnum));*/
+    const rideObj = findRideByNumber(message.ridePatNum);
     sep = `\n`;
-    //console.log('what im get message ', message)
-    //let txt = `${message.ridePatNum}` + sep;
     let firstName = message.driver.split(" ")[0];
-    //let txt = `שלום ${message.driver}` + sep;
     let txt = `,שלום ${firstName}` + sep;
-    //console.log('message.totalPeople', message.totalPeople)
     txt += `הסעה מ${message.origin} ל${message.destination}` + sep;
     if (message.totalPeople === 1) txt += `סה"כ אדם אחד` + sep;
     else txt += `סה"כ ${message.totalPeople} אנשים` + sep;
@@ -92,82 +85,67 @@ function buildMessage(message) {
     if (message.patients.length === 1) {
 
         txt += sep + sep;
-        //txt += "הפרטים:" + sep;
         txt += patientMessage(message.patients[0]);
         if (!message.patients[0].isAnonymous) {
-            let phoneText = getPatientsPhonesText(message.patients[0]);
+            let phoneText = getPatientsPhonesText(message.patients[0], rideObj);
             if (phoneText !== ``) {
-                //txt += `טלפונים:` + sep;
-                /*txt += sep;*/
                 txt += phoneText;
             }
         }
-        //console.log('Gilad --- > im here only one ', message.patients.length, txt)
     }
     else {
-        //txt += `הסעת ${message.patients.length} חולים` + sep;
         for (var i = 0; i < message.patients.length; i++) {
             txt += sep;
-            //txt += `פרטי חולה ${i + 1}:` + sep;
             txt += sep;
             txt += patientMessage(message.patients[i]);
             if (!message.patients[i].isAnonymous) {
                 let phoneText = getPatientsPhonesText(message.patients[i]);
                 if (phoneText != ``) {
-                    //txt += `טלפונים:` + sep;
-                    /*txt += sep;*/
+
                     txt += phoneText;
                 }
             }
         }
-        //console.log('Gilad --- > im here multi ', message.patients.length, txt)
     }
 
-    //txt += `***********************************` + sep;
-    //txt += `***********************************` + sep;
+
     txt += sep + sep + "!תודה ונסיעה טובה";
     return txt;
-    //  $("#message").append(txt);
 }
 
-const getPatientsPhonesText = (patient) => {
+const getPatientsPhonesText = (patient, rideObj) => {
     let txt = ``;
-    if (validateMobileNumFullVersion(patient.cellPhone)) {
-        let cellphone =
-            patient.cellPhone.slice(0, 3) +
-            "-" +
-            patient.cellPhone.slice(3, patient.cellPhone.length);
-        //txt += `${patient.name}: ${cellphone}` + sep;
-        txt += `${cellphone}`;
-    }
-    if (validateMobileNumFullVersion(patient.cellPhone1)) {
-        let cellphone =
-            patient.cellPhone1.slice(0, 3) +
-            "-" +
-            patient.cellPhone1.slice(3, patient.cellPhone1.length);
-        //txt += `${patient.name}: ${cellphone}` + sep;
-        txt += sep+`${cellphone}`;
-    }
+    const seen = new Set(); 
 
-    //for (var i = 0; i < patient.escorts.length; i++) {
-    //    if (
-    //        patient.escorts[i].IsAnonymous == false &&
-    //        validateMobileNumFullVersion(patient.escorts[i].CellPhone)
-    //    ) {
+    const digitsOnly = s => String(s || '').replace(/\D/g, '');
 
-    //        let cellphone =
-    //            patient.escorts[i].CellPhone.slice(0, 3) +
-    //            "-" +
-    //            patient.escorts[i].CellPhone.slice(3, patient.escorts[i].CellPhone.length);
-    //        txt += sep +
-    //            `${patient.escorts[i].DisplayName}: ${cellphone}` +
-    //            sep;
+    
+    const addIfValid = (raw) => {
+        if (!raw) return;
+        if (typeof validateMobileNumFullVersion === 'function' && !validateMobileNumFullVersion(raw)) return;
 
-    //    }
+        const d = digitsOnly(raw);
+        if (!d) return;
+        if (seen.has(d)) return;
+        seen.add(d);
 
-    //}
+        const formatted = (d.length > 3) ? `${d.slice(0, 3)}-${d.slice(3)}` : d;
+
+        if (txt.length === 0) {
+            txt += `${formatted}`;
+        } else {
+            txt += sep + `${formatted}`;
+        }
+    };
+    addIfValid(patient?.cellPhone);
+    addIfValid(patient?.cellPhone1);
+    addIfValid(rideObj?.PatientCellPhone);
+    addIfValid(rideObj?.PatientCellPhone2);
+    addIfValid(rideObj?.PatientCellPhone3);
+
     return txt;
 };
+
 
 validateMobileNumFullVersion = (mobileNum) => {
     if (!mobileNum || isNaN(parseInt(mobileNum))) {
