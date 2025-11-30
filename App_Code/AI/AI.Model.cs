@@ -19,10 +19,10 @@ public class AIModel
     public AIModel()
     {
         apiKey = ConfigurationManager.AppSettings["GeminiApiKey"];
-        model = ConfigurationManager.AppSettings["GeminiModel"] ?? "gemini-pro";
+        model = ConfigurationManager.AppSettings["GeminiModel"] ?? "gemini-1.5-flash";
         baseUrl = ConfigurationManager.AppSettings["GeminiApiBaseUrl"];
 
-        temperature = ParseDouble(ConfigurationManager.AppSettings["GeminiTemperature"], 0.7);
+        temperature = ParseDouble(ConfigurationManager.AppSettings["GeminiTemperature"], 0.5);
         topP = ParseDouble(ConfigurationManager.AppSettings["GeminiTopP"], 0.9);
         topK = ParseInt(ConfigurationManager.AppSettings["GeminiTopK"], 40);
 

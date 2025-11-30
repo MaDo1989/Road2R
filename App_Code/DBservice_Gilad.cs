@@ -249,6 +249,34 @@ public class DBservice_Gilad
 
 
     }
+    public List<DBstracture> GetDBstractures(List<string> tableNames)
+    {
+        List<DBstracture> result = new List<DBstracture>();
+
+        using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString))
+        {
+            con.Open();
+            DataTable tvp = CreateTVP(tableNames);
+
+            SqlCommand cmd = CreateCommandForTVP("sp_getTablesStracture", con, tvp);
+
+            using (SqlDataReader reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    result.Add(new DBstracture
+                    {
+                        TableName = reader["TABLE_NAME"].ToString(),
+                        ColumnName = reader["COLUMN_NAME"].ToString(),
+                        DataType = reader["DATA_TYPE"].ToString(),
+                        
+                    });
+                }
+            }
+        }
+
+        return result;
+    }
 
 
     public List<UnityRide> GetSplitRides(DateTime rideDate, bool isAfternoon, bool isFutureTable, int days)
@@ -2650,6 +2678,33 @@ public class DBservice_Gilad
             // If conversion failed for any reason, return null
             return null;
         }
+    }
+
+
+    private DataTable CreateTVP(List<string> tableNames)
+    {
+        var dt = new DataTable("TableNameList"); // ?? ?-TYPE ?-SQL
+        dt.Columns.Add("TableName", typeof(string));
+
+        foreach (var name in tableNames)
+            dt.Rows.Add(name);
+
+        return dt;
+    }
+    private SqlCommand CreateCommandForTVP(string spName, SqlConnection con, DataTable tvp)
+    {
+        SqlCommand cmd = new SqlCommand
+        {
+            Connection = con,
+            CommandText = spName,
+            CommandType = CommandType.StoredProcedure
+        };
+
+        var p = cmd.Parameters.Add("@Tables", SqlDbType.Structured);
+        p.TypeName = "TableNameList"; // MUST MATCH SQL TYPE NAME
+        p.Value = tvp;
+
+        return cmd;
     }
 
 }
