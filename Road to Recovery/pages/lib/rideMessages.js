@@ -4,114 +4,107 @@
 
 
 const showMessage = (arr_rides, ridePatNum) => {
-    let ridepat = arr_rides.find((r) => r.RidePatNum === ridePatNum);
+    let ridepat = arr_rides.find(r => r.RidePatNum === ridePatNum);
     ridepat = CustomRideObject(ridepat);
 
+    if (!ridepat || ridepat.Drivers.length === 0) return;
 
-    if (ridepat.Drivers.length == 0) return;
-    // get all the rides going to this direction with this driver
-    const onlyRidepatsWithDriver = arr_rides.filter((r) => r.MainDriver > 0);
-    //console.log('onlyRidepatsWithDriver ->', onlyRidepatsWithDriver)
-    AllRidesForThisDriver = onlyRidepatsWithDriver.filter((r) => {
+    const onlyRidepatsWithDriver = arr_rides.filter(r => r.MainDriver > 0);
+
+    let AllRidesForThisDriver = onlyRidepatsWithDriver.filter(r => {
         const oneRide = CustomRideObject(r);
         return (
-            oneRide.Destination.Name === ridepat.Destination.Name &&
             oneRide.Origin.Name === ridepat.Origin.Name &&
             oneRide.Drivers[0].Id === ridepat.Drivers[0].Id &&
             oneRide.Date === ridepat.Date
         );
     });
-    // remove names that include _ used for unique display names
-    let driverName =
-        AllRidesForThisDriver[0].DriverName.split("_")[0];
-    message = {
+
+    let driverName = AllRidesForThisDriver[0].DriverName.split("_")[0];
+
+    let allDestinations = [...new Set(AllRidesForThisDriver.map(r => CustomRideObject(r).Destination.Name))];
+    console.log(AllRidesForThisDriver)
+    let message = {
         origin: AllRidesForThisDriver[0].Origin,
-        destination: AllRidesForThisDriver[0].Destination,
+        destinations: allDestinations,
         driver: driverName,
         date: AllRidesForThisDriver[0].PickupTime,
         patients: [],
-        totalPeople: 0
+        totalPeople: 0,
+        ridePatNum: ridePatNum
     };
 
-    for (var i = 0; i < AllRidesForThisDriver.length; i++) {
-       // console.log('before AllRidesForThisDriver[i]', AllRidesForThisDriver[i])
-        AllRidesForThisDriver[i] = CustomRideObject(AllRidesForThisDriver[i]);
-       // console.log('After AllRidesForThisDriver[i]', AllRidesForThisDriver[i])
+    for (let i = 0; i < AllRidesForThisDriver.length; i++) {
+        let ride = CustomRideObject(AllRidesForThisDriver[i]);
+        let patient;
 
-        if (AllRidesForThisDriver[i].Pat.IsAnonymous) {
+        if (ride.Pat.IsAnonymous) {
             patient = {
                 isAnonymous: true,
-                numOfEscorts: AllRidesForThisDriver[i].Pat.EscortedList.length
+                numOfEscorts: ride.Pat.EscortedList.length,
+                dest: ride.Destination.Name
             };
-        }
-        else {
-            /*console.log('Gilad-->' + JSON.stringify(AllRidesForThisDriver[i].Pat.GenderAsEnum), JSON.stringify(AllRidesForThisDriver[i].Pat.Age));*/
-            
+        } else {
             patient = {
                 isAnonymous: false,
-                name: AllRidesForThisDriver[i].Pat.DisplayName.split("_")[0],
-                EnglishName: AllRidesForThisDriver[i].Pat.EnglishName,
-                numOfescorts: AllRidesForThisDriver[i].Pat.EscortedList.length,
-                cellPhone: AllRidesForThisDriver[i].Pat.cellPhone,
-                escorts: AllRidesForThisDriver[i].Pat.EscortedList,
-                GenderAsEnum: AllRidesForThisDriver[i].Pat.GenderAsEnum,
-                Age: AllRidesForThisDriver[i].Pat.Age,
-
-
+                name: ride.Pat.DisplayName.split("_")[0],
+                EnglishName: ride.Pat.EnglishName,
+                numOfescorts: ride.Pat.EscortedList.length,
+                cellPhone: ride.Pat.cellPhone,
+                escorts: ride.Pat.EscortedList,
+                GenderAsEnum: ride.Pat.GenderAsEnum,
+                Age: ride.Pat.Age,
+                dest: ride.Destination.Name
             };
         }
 
-        patient.OnlyEscort = AllRidesForThisDriver[i].OnlyEscort;
+        patient.OnlyEscort = ride.OnlyEscort;
+
         if (patient.OnlyEscort !== true) {
-            message.totalPeople += 1; // count the patient in the ride
+            message.totalPeople += 1;
         }
 
-        message.totalPeople += AllRidesForThisDriver[i].Pat.EscortedList.length;
+        message.totalPeople += ride.Pat.EscortedList.length;
+
         message.patients.push(patient);
-        message.ridePatNum = ridePatNum;
     }
+
     return message;
 };
+
 
 function buildMessage(message) {
     const rideObj = findRideByNumber(message.ridePatNum);
     sep = `\n`;
     let firstName = message.driver.split(" ")[0];
-    let txt = `,שלום ${firstName}` + sep;
-    txt += `הסעה מ${message.origin} ל${message.destination}` + sep;
-    if (message.totalPeople === 1) txt += `סה"כ אדם אחד` + sep;
-    else txt += `סה"כ ${message.totalPeople} אנשים` + sep;
+
+    let destText = message.destinations.length === 1
+        ? `ל${message.destinations[0]}`
+        : `ל${message.destinations.join(" ול")}`;
+
+    let txt = `,שלום ${firstName}${sep}`;
+    txt += `הסעה מ${message.origin} ${destText}${sep}`;
+    txt += message.totalPeople === 1
+        ? `סה"כ אדם אחד${sep}`
+        : `סה"כ ${message.totalPeople} אנשים${sep}`;
+
     txt += messageDate(message.date);
-    if (message.patients.length === 1) {
 
+    for (let i = 0; i < message.patients.length; i++) {
+        let p = message.patients[i];
         txt += sep + sep;
-        txt += patientMessage(message.patients[0]);
-        if (!message.patients[0].isAnonymous) {
-            let phoneText = getPatientsPhonesText(message.patients[0], rideObj);
-            if (phoneText !== ``) {
-                txt += phoneText;
-            }
+        txt += patientMessage(p, p.dest);
+
+        if (!p.isAnonymous) {
+            let phoneText = getPatientsPhonesText(p, rideObj);
+            if (phoneText !== ``) txt += phoneText;
         }
     }
-    else {
-        for (var i = 0; i < message.patients.length; i++) {
-            txt += sep;
-            txt += sep;
-            txt += patientMessage(message.patients[i]);
-            if (!message.patients[i].isAnonymous) {
-                let phoneText = getPatientsPhonesText(message.patients[i]);
-                if (phoneText != ``) {
-
-                    txt += phoneText;
-                }
-            }
-        }
-    }
-
 
     txt += sep + sep + "!תודה ונסיעה טובה";
     return txt;
 }
+
 
 const getPatientsPhonesText = (patient, rideObj) => {
     let txt = ``;
@@ -202,63 +195,50 @@ const netDate = (fullTimeStempStr) => {
 
 const patientMessage = (patient) => {
     let txt = "";
-    //console.log('patient patientMessage()-->', patient)
     let agePrefix = ``;
+
     if (patient.GenderAsEnum == 0) {
         agePrefix = `בת`;
-        if (patient.Age < 1) {
-            agePrefix = `תינוקת`
-        }
+        if (patient.Age < 1) agePrefix = `תינוקת`;
     }
     else if (patient.GenderAsEnum == 1) {
         agePrefix = `בן`;
-        if (patient.Age < 1) {
-            agePrefix = `תינוק`
-        }
+        if (patient.Age < 1) agePrefix = `תינוק`;
     }
     else {
         agePrefix = `בגיל`;
-        if (patient.Age==0) {
-            agePrefix = '';
-        }
-    }
-    if (patient.Age == 1) {
-        agePrefix += ` שנה `;
-    }
-    else if (patient.Age == 2) {
-        agePrefix += ` שנתיים `;
-    }
-    else if (patient.Age > 2) {
-        agePrefix += ` ${patient.Age}`;
+        if (patient.Age == 0) agePrefix = ``;
     }
 
-    //console.log('Gilad-->', agePrefix);
+    if (patient.Age == 1) agePrefix += ` שנה `;
+    else if (patient.Age == 2) agePrefix += ` שנתיים `;
+    else if (patient.Age > 2) agePrefix += ` ${patient.Age}`;
 
     try {
-        txt = patient.isAnonymous ? `חולה` : `${patient.name}, ${agePrefix}`;
+        txt = patient.isAnonymous ? `חולה` : `${patient.name}, ${agePrefix}`.trim();
     } catch {
-        console.log("error in patientMessage");
-        console.log(patient);
+        txt = `חולה`;
     }
-    txt = patient.isAnonymous ? `חולה` : `${patient.name}, ${agePrefix}`;
+
+    txt = patient.isAnonymous ? `חולה` : `${patient.name}, ${agePrefix}`.trim();
+    if (patient.dest) txt += ` (${patient.dest})`;
     txt += sep;
-    numberOfEscorts = patient.isAnonymous
+
+    let numberOfEscorts = patient.isAnonymous
         ? patient.numOfEscorts
         : patient.escorts.length;
+
     if (numberOfEscorts === 0) txt += `בלי מלווה`;
     else if (numberOfEscorts === 1) {
-        if (patient.OnlyEscort === false)
-            txt += `עם מלווה אחד`;
-        else
-            txt += `רק המלווה`;
+        if (patient.OnlyEscort === false) txt += `עם מלווה אחד`;
+        else txt += `רק המלווה`;
     }
     else {
-        if (patient.OnlyEscort === false)
-            txt += `עם ${numberOfEscorts} מלווים`;
-        else
-            txt += `רק ${numberOfEscorts} המלווים`;
+        if (patient.OnlyEscort === false) txt += `עם ${numberOfEscorts} מלווים`;
+        else txt += `רק ${numberOfEscorts} המלווים`;
     }
 
     txt += sep;
     return txt;
 };
+
