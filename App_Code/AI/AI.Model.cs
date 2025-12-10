@@ -26,7 +26,7 @@ public class AIModel
         topP = ParseDouble(ConfigurationManager.AppSettings["GeminiTopP"], 0.9);
         topK = ParseInt(ConfigurationManager.AppSettings["GeminiTopK"], 40);
 
-        string maxTok = ConfigurationManager.AppSettings["GeminiMaxTokens"];
+        string maxTok = ConfigurationManager.AppSettings["GeminiMaxTokens"] ?? null;
         if (string.IsNullOrWhiteSpace(maxTok))
         {
             maxTokens = null;
@@ -60,12 +60,11 @@ public class AIModel
     public async Task<string> GenerateAsync(string prompt)
     {
         string url = string.Format(
-            "{0}{1}:generateContent?key={2}",
+            "{0}{1}:generateContent",
             baseUrl,
-            model,
-            apiKey
+            model
         );
-
+        http.DefaultRequestHeaders.Add("X-Goog-Api-Key", apiKey);
         var contents = new[]
         {
             new

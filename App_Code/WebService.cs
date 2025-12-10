@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Script.Serialization;
 using System.Web.Script.Services;
@@ -1928,7 +1929,25 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
-
+    [WebMethod(EnableSession = true)]
+    public string GetQueryFromAI(string prompt)
+    {
+        try
+        {
+            List<string> tables = new List<string>()
+            {
+                "unityride",
+            };
+            ManagerAIReport a = new ManagerAIReport();
+            string query = Task.Run(() => a.GetQueryFromAI(prompt, tables)).Result;
+            return j.Serialize(query);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetQueryFromAI", ex);
+            throw new Exception("שגיאה בשליפת שאילתה מ-AI");
+        }
+    }
 
 
     // this one is not in use the new one is down below ! 

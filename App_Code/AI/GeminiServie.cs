@@ -1,0 +1,76 @@
+using System;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+
+public class GeminiService
+{
+    // ??????? ?-HttpClient ???? ????????
+    private static readonly HttpClient client = new HttpClient();
+
+    // ??? ??: ?? ???? ?????? ?? ????? ??? ???
+    private const string ApiKey = "AIzaSyCyyTL2RCCycDT_bWdenpUqMYzPNGPd9-Q";
+    private const string ApiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent";
+
+    public async Task<string> AskGemini(string prompt)
+    {
+        // 1. ????? ???????? ??? ????? ???? ???? ??? (?? role)
+        var requestBody = new
+        {
+            contents = new[]
+            {
+                new
+                {
+                    role = "user",
+                    parts = new[]
+                    {
+                        new { text = prompt }
+                    }
+                }
+            }
+        };
+
+        var jsonContent = JsonConvert.SerializeObject(requestBody);
+
+        // 2. ????? ????? ???? ?????? ??? ????? ?????? Headers
+        // ?-.NET ??? ?? ???? ??? ????? ?????? Header ?????? ????? ???
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, ApiUrl);
+
+        // ????? ????? ?-HEADER (??? ???? ?????)
+        request.Headers.Add("X-Goog-Api-Key", ApiKey);
+
+        request.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+        try
+        {
+            // 3. ????? ??????? SendAsync
+            HttpResponseMessage response = await client.SendAsync(request).ConfigureAwait(false);
+
+            // ????? ?? ?????? ????? (???? 404)
+            if (!response.IsSuccessStatusCode)
+            {
+                string errorMsg = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                throw new Exception("Gemini Error: " + response.StatusCode + " - " + errorMsg);
+            }
+
+            string responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+            dynamic parsedJson = JsonConvert.DeserializeObject(responseBody);
+
+            // ????? ????? ???????
+            if (parsedJson.candidates != null && parsedJson.candidates.Count > 0)
+            {
+                string resultText = parsedJson.candidates[0].content.parts[0].text;
+                return resultText;
+            }
+
+            return "";
+        }
+        catch (Exception ex)
+        {
+            // ????? ?????? ????? ??? ????? ???? ??????
+            throw new Exception("Request Failed: " + ex.Message);
+        }
+    }
+}
