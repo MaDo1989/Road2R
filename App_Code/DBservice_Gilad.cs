@@ -253,129 +253,153 @@ public class DBservice_Gilad
 
     public List<UnityRide> GetSplitRides(DateTime rideDate, bool isAfternoon, bool isFutureTable, int days)
     {
-        SqlCommand cmd;
-        try
-        {
-            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
-            con.Open();
-        }
-
-        catch (Exception ex)
-        {
-            // write to log
-            throw (ex);
-        }
-
-        Dictionary<string, object> paramDic = new Dictionary<string, object>();
-        paramDic.Add("@days", days);
-        paramDic.Add("@ride_date", rideDate);
-        paramDic.Add("@isAfternoon", isAfternoon);
-        paramDic.Add("@isFutureTable", isFutureTable);
-
-        cmd = CreateCommandWithStoredProcedureGeneral("sp_getUnityRidesSplit", con, paramDic);
-
         List<UnityRide> list2Return = new List<UnityRide>();
-        try
+        string connectionString = ConfigurationManager.ConnectionStrings["db"].ConnectionString;
+        using (SqlConnection con = new SqlConnection(connectionString))
         {
-
-
-            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
-            while (dataReader.Read())
+            Dictionary<string, object> paramDic = new Dictionary<string, object>
             {
-                UnityRide oneRide = new UnityRide();
-                oneRide.RidePatNum = Convert.ToInt32(dataReader["RidePatNum"]);
-                if (oneRide.RidePatNum == -1)
-                {
-                    continue;
-                }
-                oneRide.PatientName = dataReader["PatientName"].ToString();
-                oneRide.PatientId = Convert.ToInt32(dataReader["PatientId"]);
-                oneRide.PatientGender = Convert.ToInt32(Convertions.ConvertStringToGender(dataReader["PatientGender"].ToString()));
-                oneRide.PatientCellPhone = dataReader["PatientCellPhone"].ToString();
-                oneRide.PatientCellPhone2 = dataReader["PatientCellPhone2"].ToString();
-                oneRide.PatientCellPhone3 = dataReader["PatientCellPhone3"].ToString();
-                oneRide.PatientStatus = dataReader["PatientStatus"].ToString();
-                if (oneRide.PatientStatus != "")
-                {
-                    oneRide.PatientStatusEditTime = Convert.ToDateTime(dataReader["patientStatusTime"]);
+                { "@days", days },
+                { "@ride_date", rideDate },
+                { "@isAfternoon", isAfternoon },
+                { "@isFutureTable", isFutureTable }
+            };
+            SqlCommand cmd = CreateCommandWithStoredProcedureGeneral("sp_getUnityRidesSplit", con, paramDic);
 
-                }
-
-                oneRide.PatientBirthdate = dataReader["PatientBirthDate"].ToString();
-                DateTime? dateOfBirth = String.IsNullOrEmpty(dataReader["PatientBirthDate"].ToString()) ? null : (DateTime?)Convert.ToDateTime(dataReader["PatientBirthDate"].ToString());
-                oneRide.PatientAge = Convert.ToInt32(Calculations.CalculateAge(dateOfBirth));
-
-                oneRide.AmountOfEquipments = Convert.ToInt32(dataReader["AmountOfEquipments"]);
-                if (oneRide.AmountOfEquipments >= 0)
-                {
-                    oneRide.PatientEquipments = GetListOfEquipmentsForPAtient(oneRide.PatientId);
-                }
-                oneRide.AmountOfEquipments = oneRide.PatientEquipments.Count();
-                oneRide.AmountOfEscorts = Convert.ToInt32(dataReader["AmountOfEscorts"]);
-                oneRide.Origin = dataReader["Origin"].ToString();
-                oneRide.Destination = dataReader["Destination"].ToString();
-                oneRide.PickupTime = Convert.ToDateTime(dataReader["pickupTime"]);
-                oneRide.CoorName = dataReader["Coordinator"].ToString();
-                oneRide.Remark = dataReader["Remark"].ToString();
-                oneRide.Status = dataReader["Status"].ToString();
-                oneRide.Area = dataReader["Area"].ToString();
-                oneRide.Shift = dataReader["Shift"].ToString();
-                oneRide.OnlyEscort = Convert.ToBoolean(dataReader["OnlyEscort"]);
-                oneRide.LastModified = Convert.ToDateTime(dataReader["lastModified"]);
-                oneRide.CoorId = Convert.ToInt32(dataReader["CoordinatorID"]);
-
-                if (dataReader.IsDBNull(dataReader.GetOrdinal("MainDriver")))
-                {
-                    oneRide.MainDriver = -1;
-                }
-                else
-                {
-                    oneRide.MainDriver = Convert.ToInt32(dataReader["MainDriver"]);
-
-                }
-                oneRide.DriverName = dataReader["DriverName"].ToString();
-                oneRide.DriverCellPhone = dataReader["DriverCellPhone"].ToString();
-                if (dataReader.IsDBNull(dataReader.GetOrdinal("NoOfDocumentedRides")))
-                {
-                    oneRide.NoOfDocumentedRides = 0;
-                }
-                else
-                {
-                    oneRide.NoOfDocumentedRides = Convert.ToInt32(dataReader["NoOfDocumentedRides"]);
-
-                }
-                if (dataReader.IsDBNull(dataReader.GetOrdinal("IsAnonymous")))
-                {
-                    oneRide.IsAnonymous = false;
-                }
-                else
-                {
-                    oneRide.IsAnonymous = Convert.ToBoolean(dataReader["IsAnonymous"]);
-
-                }
-                oneRide.IsNewDriver = Convert.ToBoolean(dataReader["IsNewDriver"]);
-                list2Return.Add(oneRide);
-
-            }
-
-            return list2Return;
-        }
-        catch (Exception ex)
-        {
-            WriteToErrorFile("GetUnityRide GetUnityRideView GetRidesForRidePatView spGetUnitedRides", ex.Message + ex.ToString());
-            throw (new Exception(ex.Message));
-        }
-
-        finally
-        {
-            if (con != null)
+            try
             {
-                con.Close();
+                con.Open();
+
+                using (SqlDataReader dataReader = cmd.ExecuteReader())
+                {
+                    int idxRidePatNum = dataReader.GetOrdinal("RidePatNum");
+                    int idxPatientName = dataReader.GetOrdinal("PatientName");
+                    int idxPatientId = dataReader.GetOrdinal("PatientId");
+                    int idxPatientGender = dataReader.GetOrdinal("PatientGender");
+                    int idxPatientCellPhone = dataReader.GetOrdinal("PatientCellPhone");
+                    int idxPatientCellPhone2 = dataReader.GetOrdinal("PatientCellPhone2");
+                    int idxPatientCellPhone3 = dataReader.GetOrdinal("PatientCellPhone3");
+                    int idxPatientStatus = dataReader.GetOrdinal("PatientStatus");
+                    int idxPatientStatusTime = dataReader.GetOrdinal("patientStatusTime");
+                    int idxPatientBirthDate = dataReader.GetOrdinal("PatientBirthDate");
+
+                    int idxEquipmentList = dataReader.GetOrdinal("EquipmentList");
+
+                    int idxAmountOfEscorts = dataReader.GetOrdinal("AmountOfEscorts");
+                    int idxOrigin = dataReader.GetOrdinal("Origin");
+                    int idxDestination = dataReader.GetOrdinal("Destination");
+                    int idxPickupTime = dataReader.GetOrdinal("pickupTime");
+                    int idxCoordinator = dataReader.GetOrdinal("Coordinator");
+                    int idxRemark = dataReader.GetOrdinal("Remark");
+                    int idxStatus = dataReader.GetOrdinal("Status");
+                    int idxArea = dataReader.GetOrdinal("Area");
+                    int idxShift = dataReader.GetOrdinal("Shift");
+                    int idxOnlyEscort = dataReader.GetOrdinal("OnlyEscort");
+                    int idxLastModified = dataReader.GetOrdinal("lastModified");
+                    int idxCoordinatorID = dataReader.GetOrdinal("CoordinatorID");
+                    int idxMainDriver = dataReader.GetOrdinal("MainDriver");
+                    int idxDriverName = dataReader.GetOrdinal("DriverName");
+                    int idxDriverCellPhone = dataReader.GetOrdinal("DriverCellPhone");
+                    int idxNoOfDocumentedRides = dataReader.GetOrdinal("NoOfDocumentedRides");
+                    int idxIsAnonymous = dataReader.GetOrdinal("IsAnonymous");
+                    int idxIsNewDriver = dataReader.GetOrdinal("IsNewDriver");
+
+                    while (dataReader.Read())
+                    {
+                        int ridePatNum = dataReader.GetInt32(idxRidePatNum);
+                        if (ridePatNum == -1) continue;
+
+                        UnityRide oneRide = new UnityRide();
+                        oneRide.RidePatNum = ridePatNum;
+                        oneRide.PatientName = dataReader[idxPatientName].ToString();
+                        oneRide.PatientId = dataReader.GetInt32(idxPatientId);
+
+                        oneRide.PatientGender = Convert.ToInt32(Convertions.ConvertStringToGender(dataReader[idxPatientGender].ToString()));
+                        oneRide.PatientCellPhone = dataReader[idxPatientCellPhone].ToString();
+                        oneRide.PatientCellPhone2 = dataReader[idxPatientCellPhone2].ToString();
+                        oneRide.PatientCellPhone3 = dataReader[idxPatientCellPhone3].ToString();
+
+                        oneRide.PatientStatus = dataReader[idxPatientStatus].ToString();
+                        if (!string.IsNullOrEmpty(oneRide.PatientStatus) && !dataReader.IsDBNull(idxPatientStatusTime))
+                        {
+                            oneRide.PatientStatusEditTime = dataReader.GetDateTime(idxPatientStatusTime);
+                        }
+
+                        string birthDateStr = dataReader[idxPatientBirthDate].ToString();
+                        oneRide.PatientBirthdate = birthDateStr;
+                        DateTime? dateOfBirth = string.IsNullOrEmpty(birthDateStr) ? null : (DateTime?)Convert.ToDateTime(birthDateStr);
+                        oneRide.PatientAge = Convert.ToInt32(Calculations.CalculateAge(dateOfBirth));
+
+                        if (!dataReader.IsDBNull(idxEquipmentList))
+                        {
+                            string equipmentString = dataReader.GetString(idxEquipmentList);
+                            oneRide.PatientEquipments = equipmentString.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                        }
+                        else
+                        {
+                            oneRide.PatientEquipments = new List<string>();
+                        }
+                        oneRide.AmountOfEquipments = oneRide.PatientEquipments.Count;
+                        // ----------------------------------------------------
+
+                        oneRide.AmountOfEscorts = dataReader.GetInt32(idxAmountOfEscorts);
+                        oneRide.Origin = dataReader[idxOrigin].ToString();
+                        oneRide.Destination = dataReader[idxDestination].ToString();
+                        oneRide.PickupTime = dataReader.GetDateTime(idxPickupTime);
+                        oneRide.CoorName = dataReader[idxCoordinator].ToString();
+                        oneRide.Remark = dataReader[idxRemark].ToString();
+                        oneRide.Status = dataReader[idxStatus].ToString();
+                        oneRide.Area = dataReader[idxArea].ToString();
+                        oneRide.Shift = dataReader[idxShift].ToString();
+                        oneRide.OnlyEscort = dataReader.GetBoolean(idxOnlyEscort);
+                        oneRide.LastModified = dataReader.GetDateTime(idxLastModified);
+                        oneRide.CoorId = dataReader.GetInt32(idxCoordinatorID);
+
+                        if (dataReader.IsDBNull(idxMainDriver))
+                        {
+                            oneRide.MainDriver = -1;
+                        }
+                        else
+                        {
+                            oneRide.MainDriver = dataReader.GetInt32(idxMainDriver);
+                        }
+
+                        oneRide.DriverName = dataReader[idxDriverName].ToString();
+                        oneRide.DriverCellPhone = dataReader[idxDriverCellPhone].ToString();
+
+                        if (dataReader.IsDBNull(idxNoOfDocumentedRides))
+                        {
+                            oneRide.NoOfDocumentedRides = 0;
+                        }
+                        else
+                        {
+                            oneRide.NoOfDocumentedRides = dataReader.GetInt32(idxNoOfDocumentedRides);
+                        }
+
+                        if (dataReader.IsDBNull(idxIsAnonymous))
+                        {
+                            oneRide.IsAnonymous = false;
+                        }
+                        else
+                        {
+                            oneRide.IsAnonymous = dataReader.GetBoolean(idxIsAnonymous);
+                        }
+
+                        oneRide.IsNewDriver = dataReader.GetBoolean(idxIsNewDriver);
+
+                        list2Return.Add(oneRide);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                WriteToErrorFile("GetSplitRides (Optimized)", ex.ToString());
+
+                throw;
             }
         }
 
-
-
+        return list2Return;
     }
 
     public List<UnityRide> GetRidesForRidePatView(int days)
@@ -603,25 +627,6 @@ public class DBservice_Gilad
                 oneRide.RidePatNum = Convert.ToInt32(dataReader["RidePatNum"]);
                 oneRide.PatientName = dataReader["PatientName"].ToString();
                 oneRide.PatientId = Convert.ToInt32(dataReader["PatientId"]);
-                //oneRide.PatientGender = Convert.ToInt32(Convertions.ConvertStringToGender(dataReader["PatientGender"].ToString()));
-                //oneRide.PatientCellPhone = dataReader["PatientCellPhone"].ToString();
-                //oneRide.PatientStatus = dataReader["PatientStatus"].ToString();
-                //if (oneRide.PatientStatus != "")
-                //{
-                //    oneRide.PatientStatusEditTime = Convert.ToDateTime(dataReader["patientStatusTime"]);
-
-                //}
-
-                //oneRide.PatientBirthdate = dataReader["PatientBirthDate"].ToString();
-                //DateTime? dateOfBirth = String.IsNullOrEmpty(dataReader["PatientBirthDate"].ToString()) ? null : (DateTime?)Convert.ToDateTime(dataReader["PatientBirthDate"].ToString());
-                //oneRide.PatientAge = Convert.ToInt32(Calculations.CalculateAge(dateOfBirth));
-
-                //oneRide.AmountOfEquipments = Convert.ToInt32(dataReader["AmountOfEquipments"]);
-                //if (oneRide.AmountOfEquipments > 0)
-                //{
-                //    oneRide.PatientEquipments = GetListOfEquipmentsForPAtient(oneRide.PatientId);
-                //}
-                //oneRide.AmountOfEscorts = Convert.ToInt32(dataReader["AmountOfEscorts"]);
                 oneRide.Origin = dataReader["Origin"].ToString();
                 oneRide.Destination = dataReader["Destination"].ToString();
                 oneRide.PickupTime = Convert.ToDateTime(dataReader["pickupTime"]);
