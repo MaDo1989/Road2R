@@ -2076,7 +2076,15 @@ public class DBservice_Gilad
 
     public List<Volunteer> getVolunteersList_V2_WebOnly_Gilad(bool active)
     {
+        // ----------------------------
+        //   1) CHECK CACHE FIRST
+        // ----------------------------
+        string cacheKey = active ? "volunteers_active" : "volunteers_inactive";
 
+        if (CacheService.Exists(cacheKey))
+        {
+            return CacheService.Get<List<Volunteer>>(cacheKey);
+        }
 
         SqlCommand cmd;
         try
@@ -2084,33 +2092,32 @@ public class DBservice_Gilad
             con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
             con.Open();
         }
-
         catch (Exception ex)
         {
-            // write to log
             throw (ex);
         }
 
         Dictionary<string, object> paramDic = new Dictionary<string, object>();
         paramDic.Add("@isActive", active);
         cmd = CreateCommandWithStoredProcedureGeneral("spVolunteerTypeView_GetVolunteersList_Gilad", con, paramDic);
+
         List<Volunteer> VolunteerList = new List<Volunteer>();
+
         try
         {
             City city = new City();
             Dictionary<string, string> nearByCities = city.getNearbyCities();
 
             SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
             while (dataReader.Read())
             {
                 Volunteer v = new Volunteer();
                 v.Id = int.Parse(dataReader["Id"].ToString());
                 v.DisplayName = dataReader["DisplayName"].ToString();
-                //v.FirstNameA = dataReader["FirstNameA"].ToString();
                 v.FirstNameH = dataReader["FirstNameH"].ToString();
                 v.LastNameH = dataReader["LastNameH"].ToString();
                 v.EnglishName = dataReader["EnglishName"].ToString();
-                //v.LastNameA = dataReader["LastNameA"].ToString();
                 v.CellPhone = dataReader["CellPhone"].ToString();
                 v.CellPhone2 = dataReader["CellPhone2"].ToString();
                 v.HomePhone = dataReader["HomePhone"].ToString();
@@ -2120,103 +2127,74 @@ public class DBservice_Gilad
                 v.TypeVol = dataReader["VolunTypeType"].ToString();
                 v.Email = dataReader["Email"].ToString();
                 v.Device = dataReader["device"].ToString();
-
                 v.NoOfDocumentedCalls = Convert.ToInt32(dataReader["NoOfDocumentedCalls"]);
                 v.NoOfDocumentedRides = Convert.ToInt32(dataReader["NoOfDocumentedRides"]);
-                if (dataReader["No_of_rides"].ToString() == "")
-                {
-                    v.No_of_rides = 0;
-                }
-                else
-                {
-                    v.No_of_rides = Convert.ToInt32(dataReader["No_of_rides"]);
-                }
+
+                v.No_of_rides = (dataReader["No_of_rides"].ToString() == "")
+                    ? 0
+                    : Convert.ToInt32(dataReader["No_of_rides"]);
 
                 v.NumOfRides_last2Months = Convert.ToInt32(dataReader["NumOfRides_last2Months"]);
                 v.MostCommonPath = dataReader["mostCommonPath"].ToString();
 
                 DateTime latestDrive;
                 DateTime.TryParse(dataReader["latestDrive"].ToString(), out latestDrive);
-                if (latestDrive == DateTime.MinValue)
-                {
-                    v.LatestDrive = null;
-                }
-                else
-                {
-                    v.LatestDrive = latestDrive;
-                }
-                if (dataReader["AbsenceStatus"].ToString() == "")
-                {
-                    v.AbsenceStatus = false;
-                }
-                else
-                {
-                    v.AbsenceStatus = Convert.ToBoolean(dataReader["AbsenceStatus"].ToString());
-                }
+                v.LatestDrive = (latestDrive == DateTime.MinValue) ? (DateTime?)null : latestDrive;
+
+                v.AbsenceStatus = dataReader["AbsenceStatus"].ToString() != "" &&
+                                  Convert.ToBoolean(dataReader["AbsenceStatus"]);
+
                 if (dataReader["AvailableSeats"].ToString() != "")
                 {
                     v.AvailableSeats = Convert.ToInt32(dataReader["AvailableSeats"]);
                 }
 
-                if (nearByCities.Keys.Contains(v.City))
+                if (nearByCities.ContainsKey(v.City))
                 {
                     v.NearestBigCity = nearByCities[v.City];
                 }
 
-                v.IsBooster = Convert.ToBoolean(dataReader["IsBooster"].ToString());
-                v.IsBabySeat = Convert.ToBoolean(dataReader["IsBabyChair"].ToString());
-                string date = dataReader["JoinDate"].ToString();
-                bool isAssistant = Convert.ToBoolean(dataReader["isAssistant"].ToString());
-                if (date == "")
-                {
+                v.IsBooster = Convert.ToBoolean(dataReader["IsBooster"]);
+                v.IsBabySeat = Convert.ToBoolean(dataReader["IsBabyChair"]);
 
-                }
-                else v.JoinDate = Convert.ToDateTime(dataReader["JoinDate"].ToString());
-                bool ac = false;
-                if (dataReader["IsActive"].ToString().ToLower() == "true")
-                {
-                    ac = true;
-                }
-                v.IsActive = ac;
-                bool arabic = false;
-                if (dataReader["KnowsArabic"].ToString().ToLower() == "true")
-                {
-                    arabic = true;
-                }
-                v.KnowsArabic = arabic;
+                if (dataReader["JoinDate"].ToString() != "")
+                    v.JoinDate = Convert.ToDateTime(dataReader["JoinDate"]);
+
+                v.IsActive = dataReader["IsActive"].ToString().ToLower() == "true";
+                v.KnowsArabic = dataReader["KnowsArabic"].ToString().ToLower() == "true";
                 v.Gender = dataReader["Gender"].ToString();
                 v.RegId = dataReader["pnRegId"].ToString();
 
                 v.EnglishName = dataReader["englishName"].ToString();
+
                 DateTime lastmodified;
                 DateTime.TryParse(dataReader["lastModified"].ToString(), out lastmodified);
                 v.DateTime_LastModified = lastmodified;
 
                 if (dataReader["isDriving"].ToString() != "")
-                {
-                    v.IsDriving = Convert.ToBoolean(dataReader["isDriving"].ToString());
-                }
+                    v.IsDriving = Convert.ToBoolean(dataReader["isDriving"]);
+
                 VolunteerList.Add(v);
             }
+
+            // ----------------------------
+            //   2) ADD TO CACHE
+            // ----------------------------
+            CacheService.Set(cacheKey, VolunteerList, 1440*4); // cache for 7 days
+
             return VolunteerList;
         }
         catch (Exception ex)
         {
-
             throw new Exception("exception in DBservice_Gilad.cs spVolunteerTypeView_GetVolunteersList_Gilad sp -->" + ex);
         }
         finally
         {
-
             if (con != null)
-            {
-                // close the db connection
                 con.Close();
-            }
-
         }
-
     }
+
 
     public UnityRide assignDriverMobile(int unityRideID, int userId)
     {
