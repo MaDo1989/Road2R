@@ -23,7 +23,7 @@ const showMessage = (arr_rides, ridePatNum) => {
     let driverName = AllRidesForThisDriver[0].DriverName.split("_")[0];
 
     let allDestinations = [...new Set(AllRidesForThisDriver.map(r => CustomRideObject(r).Destination.Name))];
-    console.log(AllRidesForThisDriver)
+
     let message = {
         origin: AllRidesForThisDriver[0].Origin,
         destinations: allDestinations,
@@ -60,6 +60,9 @@ const showMessage = (arr_rides, ridePatNum) => {
 
         patient.OnlyEscort = ride.OnlyEscort;
 
+        // Important: attach the specific ride number for this patient
+        patient.ridePatNum = ride.RidePatNum;
+
         if (patient.OnlyEscort !== true) {
             message.totalPeople += 1;
         }
@@ -73,14 +76,16 @@ const showMessage = (arr_rides, ridePatNum) => {
 };
 
 
+
 function buildMessage(message) {
-    const rideObj = findRideByNumber(message.ridePatNum);
-    sep = `\n`;
+    const sep = `\n`;
     let firstName = message.driver.split(" ")[0];
 
     let destText = message.destinations.length === 1
         ? `ל${message.destinations[0]}`
         : `ל${message.destinations.join(" ול")}`;
+
+    const shouldShowDestination = message.destinations.length > 1;
 
     let txt = `,שלום ${firstName}${sep}`;
     txt += `הסעה מ${message.origin} ${destText}${sep}`;
@@ -93,10 +98,11 @@ function buildMessage(message) {
     for (let i = 0; i < message.patients.length; i++) {
         let p = message.patients[i];
         txt += sep + sep;
-        txt += patientMessage(p, p.dest);
+        txt += patientMessage(p, shouldShowDestination, sep);
 
         if (!p.isAnonymous) {
-            let phoneText = getPatientsPhonesText(p, rideObj);
+            const rideObjForPatient = findRideByNumber(p.ridePatNum);
+            let phoneText = getPatientsPhonesText(p, rideObjForPatient, sep);
             if (phoneText !== ``) txt += phoneText;
         }
     }
@@ -106,13 +112,14 @@ function buildMessage(message) {
 }
 
 
-const getPatientsPhonesText = (patient, rideObj) => {
+
+
+const getPatientsPhonesText = (patient, rideObj, sep) => {
     let txt = ``;
-    const seen = new Set(); 
+    const seen = new Set();
 
     const digitsOnly = s => String(s || '').replace(/\D/g, '');
 
-    
     const addIfValid = (raw) => {
         if (!raw) return;
         if (typeof validateMobileNumFullVersion === 'function' && !validateMobileNumFullVersion(raw)) return;
@@ -130,6 +137,7 @@ const getPatientsPhonesText = (patient, rideObj) => {
             txt += sep + `${formatted}`;
         }
     };
+
     addIfValid(patient?.cellPhone);
     addIfValid(patient?.cellPhone1);
     addIfValid(rideObj?.PatientCellPhone);
@@ -138,6 +146,7 @@ const getPatientsPhonesText = (patient, rideObj) => {
 
     return txt;
 };
+
 
 
 validateMobileNumFullVersion = (mobileNum) => {
@@ -193,7 +202,7 @@ const netDate = (fullTimeStempStr) => {
     return parseInt(fullTimeStempNumber);
 };
 
-const patientMessage = (patient) => {
+const patientMessage = (patient, shouldShowDestination, sep) => {
     let txt = "";
     let agePrefix = ``;
 
@@ -214,14 +223,12 @@ const patientMessage = (patient) => {
     else if (patient.Age == 2) agePrefix += ` שנתיים `;
     else if (patient.Age > 2) agePrefix += ` ${patient.Age}`;
 
-    try {
-        txt = patient.isAnonymous ? `חולה` : `${patient.name}, ${agePrefix}`.trim();
-    } catch {
-        txt = `חולה`;
+    txt = patient.isAnonymous ? `חולה` : `${patient.name}, ${agePrefix}`.trim();
+
+    if (shouldShowDestination && patient.dest) {
+        txt += ` (ל${patient.dest})`;
     }
 
-    txt = patient.isAnonymous ? `חולה` : `${patient.name}, ${agePrefix}`.trim();
-    if (patient.dest) txt += ` (${patient.dest})`;
     txt += sep;
 
     let numberOfEscorts = patient.isAnonymous
@@ -241,4 +248,5 @@ const patientMessage = (patient) => {
     txt += sep;
     return txt;
 };
+
 
