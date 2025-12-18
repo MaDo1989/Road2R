@@ -3871,7 +3871,7 @@ const messageForPalCoor = () => {
             const dicById = JSON.parse(data.d);
             translatedData = transformData(choosenRides, dicById);
 
-            const groupedObj = groupByOriginAndTime(translatedData);
+            const groupedObj = groupByOriginTimeAndDriver(translatedData);
 
             const lineBreak = '\n';
             let message = `Rides for ${convertToShortDateString(convertDBDate2FrontEndDate(choosenRides[0].PickupTime))} Morning.${lineBreak}`;
@@ -4165,6 +4165,33 @@ function groupByOriginAndTime(rides) {
         return acc;
     }, {});
 }
+function groupByOriginTimeAndDriver(rides) {
+    return rides.reduce((acc, ride) => {
+        const m = String(ride.PickupTime).match(/\d+/);
+        const ts = m ? new Date(parseInt(m[0], 10)) : new Date(ride.PickupTime);
+        const timeKey = ts.toISOString().substr(11, 5); // HH:MM
+
+        const driverKey = ride.MainDriver ?? 'NO_DRIVER';
+        const key = `${ride.Origin}__${timeKey}__${driverKey}`;
+
+        if (!acc[key]) {
+            acc[key] = {
+                origin: ride.Origin,
+                timeKey,
+                timeDate: ts,
+                driverId: driverKey,
+                destinations: new Set(),
+                rides: []
+            };
+        }
+
+        acc[key].destinations.add(ride.Destination);
+        acc[key].rides.push(ride);
+
+        return acc;
+    }, {});
+}
+
 function convertToShortDateString(dateString) {
     // Create a Date object from the input string
     const date = new Date(dateString);
