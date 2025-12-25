@@ -949,13 +949,27 @@ function rp_amuta_vls_week__refresh_preview() {
         start_week_date, end_week_date);
   
 }   
+function renderYearSelect(selectSelector) {
+    const select = document.querySelector(selectSelector);
+    if (!select) return;
+
+    const currentYear = new Date().getFullYear();
+    let html = '';
+
+    for (let i = 0; i <= 5; i++) {
+        const year = currentYear - i;
+        html += `<option value="${year}"${i === 0 ? ' selected' : ''}>${year}</option>`;
+    }
+
+    select.innerHTML = html;
+}
 
 function rp_amuta_vls_km__refresh_preview() {
     var selected_date = Date.parse($("#select_year").val());
     var m = moment(selected_date);
     var start_week_date = m.startOf('year').format("YYYY-MM-DD");
     var end_week_date = m.endOf('year').format("YYYY-MM-DD");
-
+    renderYearSelect("#select_year");
     refresh_amuta_vls_km_Table(
         start_week_date, end_week_date);
 }   
