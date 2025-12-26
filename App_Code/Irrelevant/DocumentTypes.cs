@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 
 
 /// <summary>
@@ -53,8 +49,8 @@ public class DocumentTypes
         DocumentType = documentType;
     }
 
-    
-            public List<DocumentTypes> getDocumentTypesList()
+
+    public List<DocumentTypes> getDocumentTypesList()
     {
         #region DB functions
         string query = "select * from DocumentTypes order by DocumentType";

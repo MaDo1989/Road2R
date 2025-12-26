@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Data;
-using System.Data.Sql;
-using System.Data.SqlClient;
 
 /// <summary>
 /// Summary description for RideSlim
@@ -28,7 +22,7 @@ public class RideSlim
         //
     }
 
-    public RideSlim(string patientName, string driverName, int driverId, string origin, string destination, DateTime pickUpTime, int id,string cellPhone)
+    public RideSlim(string patientName, string driverName, int driverId, string origin, string destination, DateTime pickUpTime, int id, string cellPhone)
     {
         this.patientName = patientName;
         this.driverName = driverName;

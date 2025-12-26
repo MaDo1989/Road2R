@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
 
 /// <summary>
 /// Summary description for DestinationManager
@@ -23,7 +20,7 @@ public class DestinationManager
         //
 
     }
-    public DestinationManager(string managerName, string managerLastName,string managerPhones,string managerPhones2)
+    public DestinationManager(string managerName, string managerLastName, string managerPhones, string managerPhones2)
     {
         ManagerName = managerName;
         ManagerLastName = managerLastName;
@@ -104,12 +101,12 @@ public class DestinationManager
         cmd.CommandType = CommandType.Text;
         SqlParameter[] cmdParams = new SqlParameter[4];
 
-        
+
         cmdParams[0] = cmd.Parameters.AddWithValue("@FirstName", m.ManagerName);
         cmdParams[1] = cmd.Parameters.AddWithValue("@LastName", m.ManagerLastName);
         cmdParams[2] = cmd.Parameters.AddWithValue("@Phone", m.ManagerPhones);
         cmdParams[3] = cmd.Parameters.AddWithValue("@Phone2", "");
-       
+
 
         string query = "";
         if (func == "edit")
@@ -177,7 +174,7 @@ public class DestinationManager
 
         DestinationManager m = new DestinationManager();
         DbService db = new DbService();
-        DataSet ds = db.GetDataSetByQuery(query,true ,cmd.CommandType, cmdParams);
+        DataSet ds = db.GetDataSetByQuery(query, true, cmd.CommandType, cmdParams);
         DataRow dr = ds.Tables[0].Rows[0];
 
         m.Id = int.Parse(dr["Id"].ToString());

@@ -204,9 +204,13 @@
 
                     $('#wait').hide();
                     var arr_volunteers = JSON.parse(data.d);
+                    
                     //console.log(arr_volunteers);
                     GENERAL.VOLUNTEERS.setVolunteersList(JSON.stringify(arr_volunteers));
                     for (i in arr_volunteers) {
+                        if (arr_volunteers[i].Id == 24041) {
+                           // console.log(arr_volunteers[i])
+                        }
                         if (driveVol === true && (!arr_volunteers[i].IsDriving)) continue;
                         var btnStr = '';
                         //כפתור צפייה כרגע מוסתר
@@ -233,7 +237,7 @@
                         else cellphone2 = arr_volunteers[i].HomePhone;
 
                         let showDocumentedRidesBtn = '';
-                        showDocumentedRidesBtn += `<div class='btnWrapper-left'><span class="badge badge-default">${arr_volunteers[i].NoOfDocumentedRides}</span>`;
+                        showDocumentedRidesBtn += `<div class='btnWrapper-left'><span class="badge badge-default">${arr_volunteers[i].No_of_rides}</span>`;
                         showDocumentedRidesBtn += '<button type="button" class="btn btn-icon waves-effect waves-light btn-primary btn-sm m-b-5" id ="showDocumentedRidesBtn" title="תיעוד הסעות" data-toggle="modal" data-target="#documentedRidesModal"><i class="fa fa-car" aria-hidden="true"></i></button></div>';
                         btnStr += showDocumentedRidesBtn;
 
@@ -281,6 +285,13 @@
                             englishNameVolunteer = ' <br> ' + arr_volunteers[i].EnglishName;
                         }
 
+                        if (volunteerTypeAndGender == "רכזת") {
+                            volunteerTypeAndGender = "מתאמת"
+                        }
+                        if (volunteerTypeAndGender == "רכז") {
+                            volunteerTypeAndGender = "מתאם"
+                        }
+
                         var Volunteer = {
                             Id: arr_volunteers[i].Id,
                             DisplayName: arr_volunteers[i].DisplayName + englishNameVolunteer,
@@ -296,6 +307,9 @@
                             MostCommonPath: arr_volunteers[i].MostCommonPath,
                             NearestBigCity: arr_volunteers[i].NearestBigCity,
                             JoinDate: joinDate,
+                            AvailableSeats: arr_volunteers[i].AvailableSeats == 0 ? 'לא ידוע' : arr_volunteers[i].AvailableSeats,
+                            isBooster: arr_volunteers[i].IsBooster ? '✅' : '❌',
+                            isBabySeat: arr_volunteers[i].IsBabySeat ? '✅' : '❌',
                         }
                         allVolunteersFromDb.push(Volunteer);
                     }
@@ -320,10 +334,25 @@
                                 targets: 3,
                                 className: 'text-left-strong'
                             },
-                            { "targets": [11], "orderable": false },
+                            { "targets": [14], "orderable": false },
                             { targets: 6, type: 'de_datetime' },
                             { targets: 8, type: 'de_date' },
                             { targets: 10, type: 'de_date' },
+                            {
+                                targets: 11,
+                                render: function (data, type, row) {
+                                    if (type === 'sort') {
+                                        // אם הערך הוא "לא ידוע"
+                                        if (data === "לא ידוע") {
+                                            return 999999;
+                                        }
+                                        // המרה למספר עם הבטחה שזה יהיה מספר שלם
+                                        return parseInt(data, 10) || 0;  // בסיס 10 להמרה נכונה
+                                    }
+                                    return data;
+                                },
+                                type: 'numeric'  // הגדרה מפורשת של העמודה כמספרית
+                            }
 
 
                         ],
@@ -338,8 +367,11 @@
                             { data: "NumOfRides_last2Months", width: "2%" },   //7
                             { data: "LatestDrive", width: "2%" },              //8
                             { data: "MostCommonPath", width: "3%" },           //9
-                            { data: "JoinDate", width: "4%" },                 //10
-                            { data: "Buttons", width: "25%" },                 //11
+                            { data: "JoinDate", width: "4%" },                 //10 
+                            { data: "AvailableSeats", width: "4%" },            //11
+                            { data: "isBooster", width: "1%" },                 //12 
+                            { data: "isBabySeat", width: "1%" },                 //13
+                            { data: "Buttons", width: "25%" },                 //14
                         ],
                     });
 
@@ -798,6 +830,12 @@
                                     <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(10, this.checked)" data-column="10">
                                     <label>תאריך הצטרפות</label> |
                                     <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(11, this.checked)" data-column="11">
+                                    <label>מספר מקומות ברכב</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(12, this.checked)" data-column="12">
+                                    <label>בוסטר</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(13, this.checked)" data-column="13">
+                                    <label>כיסא תינוק</label> |
+                                    <input type="checkbox" checked class="toggle-vis boldFont blueFont" onchange="updateLsVisibilty(14, this.checked)" data-column="14">
                                     <label>פעולות</label>
                                 </div>
                                 <table id="datatable-buttons" class="table table-striped table-bordered">
@@ -814,7 +852,10 @@
                                             <th>תאריך הסעה אחרונה</th>
                                             <th>מסלול שכיח: נקודה לנקודה</th>
                                             <th>תאריך הצטרפות</th>
-                                            <th>פעולות</th>
+                                            <th>מספר מקומות ברכב</th>
+                                            <th>בוסטר ?</th>
+                                            <th>כיסא תינוק ?</th>
+                                            <th>פעולות <span title="המספר מעל אייקון הרכב מייצג את מספר ההסעות הייחודיות" style="cursor:help" >(ℹ️)</span></th>
                                         </tr>
                                     </thead>
                                     <tbody></tbody>

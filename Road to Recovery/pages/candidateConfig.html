@@ -1,0 +1,143 @@
+﻿<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>קונפיגורציית פרמטרי נסיעה</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+            text-align: center;
+        }
+
+        .explanation {
+            background-color: #e8f4f8;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        #backBTN {
+            position: absolute;
+            right: 5%;
+            top: 5%;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+
+        input[type="number"] {
+            width: 80px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
+        }
+        .styled-span {
+            display: inline-block;
+            padding: 8px 12px;
+            margin: 5px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #ffffff;
+            background-color: #3498db;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+            .styled-span:hover {
+                background-color: #2980b9;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                transform: translateY(-2px);
+            }
+
+        .gr-btn {
+            background-color: #428d52;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .gr-btn:hover {
+            background-color: #65a773;
+        }
+    </style>
+</head>
+<body>
+    <h1>קונפיגורציית פרמטרי נסיעה</h1>
+
+    <div class="explanation">
+        <h2>הסבר</h2>
+        <p>הערכים בטבלה מייצגים משקולות המכפילות את הערך של כל מתנדב. משקולות גבוהות יותר נותנות חשיבות רבה יותר לפרמטר המתאים בחישוב הכולל.</p>
+        <button id="backBTN" onclick="BacktoCandidate()">חזרה לדף הקודם</button>
+    </div>
+
+    <table id="parametersTable">
+        <thead>
+            <tr>
+                <th>פרמטר</th>
+                <th>תיאור</th>
+                <th>NEWBIS</th>
+                <th>REGULARS</th>
+                <th>SUPER</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- JavaScript will populate this -->
+        </tbody>
+    </table>
+
+    <button onclick="saveConfiguration()">שמור קונפיגורציה 💾</button>
+    <button class="gr-btn" onclick="defultValues()">חזור לערכי ברירת המחדל 🔄️</button>
+
+    <div id="wait" style="display:none;width:69px;height:89px;position:absolute;top:50%;left:50%;padding:2px;">
+        <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
+    </div>
+    <script src="assets/js/candidateConfig.js"></script>
+</body>
+</html>

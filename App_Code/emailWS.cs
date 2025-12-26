@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Services;
 // REMEMBER TO ADD THIS NAMESPACE
 using System.Web.Script.Serialization;
 using System.Web.Script.Services;
+using System.Web.Services;
 
 /// <summary>
 /// Summary description for WebService
@@ -14,7 +11,8 @@ using System.Web.Script.Services;
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 // To allow this Web Service to be called from script, using ASP.NET AJAX, uncomment the following line. 
 [System.Web.Script.Services.ScriptService]
-public class emailWS : System.Web.Services.WebService {
+public class emailWS : System.Web.Services.WebService
+{
 
     public emailWS()
     {
@@ -41,7 +39,8 @@ public class emailWS : System.Web.Services.WebService {
             email.sendMessage(type, name, phoneNumber, message);
             return js.Serialize("message sent");
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             throw new Exception("Error in sending email: " + ex.Message);
         }
 

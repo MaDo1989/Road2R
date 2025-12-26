@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -117,7 +115,7 @@ public class City
 
     public City(int cityID, string cityName, string area, int zone)
     {
-      // CityID = cityID;
+        // CityID = cityID;
         CityName = cityName;
         //Area = area;
         //Zone = zone;
@@ -136,7 +134,7 @@ public class City
     }
 
 
-    
+
     public List<City> getVolCitiesList()
     {
         cmd = new SqlCommand();
@@ -168,7 +166,7 @@ public class City
         return cities;
     }
 
-    
+
     public List<City> getUnmappedCitiesList()
     {
         cmd = new SqlCommand();
@@ -233,7 +231,8 @@ public class City
         {
             throw ex;
         }
-        finally {
+        finally
+        {
             if (dbs.con != null)
                 dbs.con.Close();
         }
@@ -243,7 +242,8 @@ public class City
 
 
 
-    public Dictionary<string, string> getNearbyCities() {
+    public Dictionary<string, string> getNearbyCities()
+    {
 
         Dictionary<string, string> dic = new Dictionary<string, string>();
         cmd = new SqlCommand();
@@ -268,7 +268,8 @@ public class City
         {
             throw ex;
         }
-        finally {
+        finally
+        {
             if (dbs.con != null)
                 dbs.con.Close();
         }
@@ -281,7 +282,8 @@ public class City
         return dbs.writeGoogleCities(cities);
     }
 
-    public int writeNearestMainCities() {
+    public int writeNearestMainCities()
+    {
 
         // this returns all the cities and also populates the mainCities List
         List<City> cityList = getUnmappedCitiesList();
@@ -292,9 +294,11 @@ public class City
         foreach (City c in cityList)
         {
             double dist = 1000000000000;
-            foreach (City mc in mainCities) {
+            foreach (City mc in mainCities)
+            {
                 double d = DistanceTo(c.Lat, c.Lng, mc.Lat, mc.Lng);
-                if (d < dist) {
+                if (d < dist)
+                {
                     dist = d;
                     c.NearestMainCity = mc.cityName;
                 }

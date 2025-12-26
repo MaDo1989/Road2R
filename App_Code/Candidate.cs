@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.IdentityModel;
-using System.Linq;
-using System.Web;
 
 /// <summary>
 /// Summary description for Candidate
@@ -11,7 +7,7 @@ using System.Web;
 public class Candidate : Volunteer
 {
     public Candidate() { }
-    public Candidate(int id, string displayName, int noOfDocumentedCalls,int noOfDocumentedRides,
+    public Candidate(int id, string displayName, int noOfDocumentedCalls, int noOfDocumentedRides,
                      int driverLevel, List<int> ammountOfPathMatch,
                      int ammountOfMatchByDay, int ammountOfDisMatchByDay,
                      int ammountOfMatchDayPart, int ammountOfDisMatchDayPart

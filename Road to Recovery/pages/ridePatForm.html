@@ -71,7 +71,10 @@
             width: 170px;
             margin: 0;
         }
-
+        .close-span-modal {
+            font-size: 78px;
+            color: red ;
+        }
         /*override bootstrap*/
         .page-title-box {
             background: #ffffff00; /*tranparent*/
@@ -93,6 +96,12 @@
 
         input[type=text]:focus {
             background-color: #FFE684;
+        }
+
+        ::-webkit-calendar-picker-indicator {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
         }
 
         .duplicateDisplay {
@@ -241,11 +250,12 @@
             //modal_x
             if (numberofrides_GLOBAL > 1) {
 
-                document.getElementById("modal_x").style.visibility = 'hidden';
-            } else {
-
                 document.getElementById("modal_x").style.visibility = 'visible';
             }
+            //else {
+
+            //    document.getElementById("modal_x").style.visibility = 'visible';
+            //}
 
             $(`#${id}`).modal({
                 backdrop: 'static', //prevent popup to close when clicking outside
@@ -995,18 +1005,24 @@
             });
 
             const showButtonsModal = (isReturnDrive) => {
+                document.getElementById('modal_x').style.visibility = 'visible';
                 if (isReturnDrive) {
                     $('#wait').hide();
-                    //document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 "><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה לאותו חולה</button>&nbsp;';
-                    document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRideToAnotherPatient()" class="btn btn-success NewBtn waves-effect w-md m-b-5 "><i class="ti-plus m-r-5"></i> יצירת הסעה חדשה</button>&nbsp;';
-                    document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 ">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
+
+                    //document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRideToAnotherPatient()" class="btn btn-success NewBtn waves-effect w-md m-b-5 "><i class="ti-plus m-r-5"></i> יצירת הסעה חדשה</button>&nbsp;';
+                    document.getElementById('modalButtons').innerHTML = '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 ">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
+                    if (localStorage.getItem('userType') != undefined && localStorage.getItem('userType') == 'מנהל') {
+                        document.getElementById('modalButtons').innerHTML += '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 "><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה לאותו חולה</button>&nbsp;';
+                    }
                     showMyModal('Modal');
                 }
                 else {
                     $('#wait').hide();
-                    //document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 "><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה לאותו חולה</button>&nbsp;';
-                    document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRideToAnotherPatient()" class="btn btn-success NewBtn waves-effect w-md m-b-5 "><i class="ti-plus m-r-5"></i> יצירת הסעה חדשה</button>&nbsp;';
-                    document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 ">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
+                    //document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRideToAnotherPatient()" class="btn btn-success NewBtn waves-effect w-md m-b-5 "><i class="ti-plus m-r-5"></i> יצירת הסעה חדשה</button>&nbsp;';
+                    document.getElementById('modalButtons').innerHTML = '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 ">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
+                    if (localStorage.getItem('userType') != undefined && localStorage.getItem('userType') == 'מנהל') {
+                        document.getElementById('modalButtons').innerHTML += '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 "><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה לאותו חולה</button>&nbsp;';
+                    }
                     document.getElementById('modalButtons').innerHTML += '<button onclick="createReturnRide()" class="btn btn-success waves-effect w-md m-b-5 ">יצירת החזרה &nbsp;<i class="ti-car m-r-5"></i></button>';
                     showMyModal('Modal');
                 }
@@ -1130,7 +1146,6 @@
 
             $('#patArabic').val(arabicDisplayName === 0 ? '' : arabicDisplayName);
 
-            //console.log('??', patient.EscortedList)
             if (patient.EscortedList.length > 0) {
                 EscortedList = patient.EscortedList;
                 let str = '';
@@ -2833,19 +2848,9 @@
 
         async function createNewRide() {
             isCreateNewRideButtonClicked = true;
-
+            isThisAReturnDrive = false;
             let ridepat = JSON.parse(GENERAL.RIDEPAT.getRidePatList());
             arr_customer.func = 'new';
-            //console.log('the first obj ', ridepat);
-            //console.log('the arr_customer ', arr_customer);
-            //console.log('before custom', ThisRide);
-            //let customRide = CustomRideObject(ThisRide.unityRide);
-            //console.log('After custom', customRide);
-            //ridePat = customRide
-            //ridePat = { ...ridePat, func: 'new' }
-            //console.log('what im save , then reload', ridePat)
-
-            //GENERAL.RIDEPAT.setRidePatList(JSON.stringify(ridePat));
             const Dest = $('#Destination').val();
             const Origin = $('#Origin').val();
 
@@ -2869,9 +2874,16 @@
             $('#Modal').modal('hide');
             $('#wait').hide();
             $('#dateRide').val('');
-
+            $('#saveCustomer').removeClass("saveHighlight");
             $('#ridePatNum').val('');
             $("#ridePatNum").prop('disabled', true);
+            $('#minute').prop('disabled', false);
+            $('#hour').prop('disabled', false);
+            $('#afterNoon').prop('disabled', false);
+            $('#afterNoon').prop('checked', false);
+            $('#minute').val('00');
+            $('#hour').val('06');
+
             //location.reload();
             //$('#wait').show();
 
@@ -2908,7 +2920,7 @@
             localStorage.setItem("ReturnRidePatFlag", true);
 
             returnRide();
-            $("#afterNoon").attr('checked', 'checked');
+            $("#afterNoon").prop("checked", true);
             $("#afterNoon").prop('disabled', false);
             checkAfternoon();
 
@@ -3179,7 +3191,7 @@
                                             </div>
                                             <div class="col-sm-6" id="coorDiv">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">רכז</label>
+                                                    <label class="col-sm-2 control-label">מתאם</label>
                                                     <div class="col-sm-6" id="selectCoordinator">
                                                         <input type="text" id="coordinator" name="coordinator" class="form-control">
                                                     </div>
@@ -3369,7 +3381,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" id="modal_x" class="close" data-dismiss="modal" aria-label="Close" onclick="editThisRide()">
-                        <span aria-hidden="true">&times;</span>
+                        <span class="close-span-modal" aria-hidden="true">&times;</span>
                     </button>
                     <h1 class="modal-title centerHeader" id="ModalTitle">הנסיעה נשמרה</h1>
 

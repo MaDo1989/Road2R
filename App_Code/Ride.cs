@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
 
 /// <summary>
 /// Summary description for Ride
@@ -166,7 +164,7 @@ public class Ride
         return db.ExecuteQuery(query, cmd.CommandType, cmdParams);
     }
 
-    public int UpdateDriver(int rideNum,int ridePatId, int newDriverId, int assignedFromAppId)
+    public int UpdateDriver(int rideNum, int ridePatId, int newDriverId, int assignedFromAppId)
     {
         query = "EXEC spRide_UpdateDriver @RideNum=" + rideNum + ", @NewDriverId=" + newDriverId + ", @AssignedFromAppId=" + assignedFromAppId;
         cmd = new SqlCommand();
@@ -178,7 +176,7 @@ public class Ride
             ridepat = new RidePat();
             ridepat = ridepat.GetRidePat(ridePatId);
             BroadCast.BroadCast2Clients_driverHasAssigned2RidePat(ridepat);
-            
+
             return result;
         }
         catch (Exception ex)
@@ -186,7 +184,7 @@ public class Ride
             throw new Exception(ex.Message);
         }
     }
-        
+
     public List<Ride> GetMyRides(int volunteerId)
     {
         string query = "select * from RPView where MainDriver=" + volunteerId + " or secondaryDriver=" + volunteerId;

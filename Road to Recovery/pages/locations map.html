@@ -124,7 +124,7 @@
             }
             $.ajax({
                 dataType: "json",
-                url: "WebService.asmx/getDestinationView",
+                url: "https://roadtorecovery.org.il/Gilad_test/Road%20to%20Recovery/pages/WebService.asmx/getDestinationView",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
                 async: false,
@@ -162,6 +162,9 @@
         function placeMarkers(locations) {
            
             for (k in locations) {
+                //if (locations[k].Type!="מחסום") {
+                //    continue;
+                //}
                 let lat = locations[k].Lat;
                 let lng = locations[k].Lng;
                 if (lat != -1) {
@@ -312,7 +315,7 @@
 
         }
 
-        function drawPoint(loc,name) {
+        function drawPoint(loc, name) {
             let lat = loc.Coord.Latitude;
             let lng = loc.Coord.Longitude;
             var marker = new google.maps.Marker({

@@ -31,7 +31,7 @@
 
         $(document).ready(function () {
             $("#GetCandidatesBTN").click(drawResults);
-            console.log("ready");
+            //console.log("ready");
             $('#wait').show();
             $('#GetCandidatesBTN').hide();
             //$("#GetCandidatesBTN").click(fetchData4ThisRidepat);
@@ -47,7 +47,7 @@
 
             //let ridePatNum = parseInt($("#rideId").val());
             //ridePatNum = JSON.parse(getRidePatNum4_viewCandidate());
-            let numOfCandidates = 100;
+            let numOfCandidates = 50;
 
             $.ajax({
                 dataType: "json",
@@ -66,6 +66,7 @@
                 },
                 error: function (err) {
                     alert("Error in loginUser: " + err.responseText);
+                    $('#wait').hide();
                 }
             });
         }

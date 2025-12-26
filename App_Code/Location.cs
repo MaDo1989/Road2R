@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Web;
-using System.Web.Script.Serialization;
 
 /// <summary>
 /// Summary description for Destination
@@ -241,7 +239,7 @@ public class Location
     {
         Name = _name;
     }
-    public Location(string _name,string _englishName)
+    public Location(string _name, string _englishName)
     {
         Name = _name;
         EnglishName = _englishName;
@@ -265,9 +263,9 @@ public class Location
     public List<Location> getDestinationsListForView(bool active)
     {
         #region DB functions
-        
+
         string query = "exec spGetAllLocation @isActive=" + active;
-        
+
         //if (active)
         //{
         //    query += " where IsActive = '" + active + "' order by EnglishName";
@@ -296,7 +294,7 @@ public class Location
             l.Area = dr["Area"].ToString();
             l.Direction = dr["adress"].ToString();
             l.Responsible = new Volunteer(dr["Responsible"].ToString());
-            l.IsActive =Convert.ToBoolean( dr["IsActive"].ToString());
+            l.IsActive = Convert.ToBoolean(dr["IsActive"].ToString());
             l.Remarks = dr["Remarks"].ToString();
             l.EnglishName = dr["EnglishName"].ToString();
             l.Region = new Region(Convert.ToInt32(dr["RegionId"]), dr["RegionName"].ToString());
@@ -375,7 +373,7 @@ public class Location
         {
             string hebrewName = dr["AreaName"].ToString();
             string englishName = dr["AreaEnglishName"].ToString();
-            bool isRoute =  Convert.ToBoolean(dr["IsRoute"]);
+            bool isRoute = Convert.ToBoolean(dr["IsRoute"]);
 
             area = new Area(hebrewName, englishName, isRoute);
             areas.Add(area);
@@ -389,7 +387,7 @@ public class Location
 
         List<Location> areas = new List<Location>();
         string query = "select * from Area order by AreaName";
-       
+
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
         Location location;
@@ -424,7 +422,7 @@ public class Location
     {
         string area = "";
         string pointNew = point.Replace("'", "''");
-        string query = "select * from Location where Name=N'"+ pointNew + "'";
+        string query = "select * from Location where Name=N'" + pointNew + "'";
         DbService db = new DbService();
         DataSet ds = db.GetDataSetByQuery(query);
 
@@ -489,7 +487,7 @@ public class Location
         string query = "select * from Location where Name=@name";
         Location l = new Location();
         DbService db = new DbService();
-        DataSet ds = db.GetDataSetByQuery(query,true, cmd.CommandType, cmdParams);
+        DataSet ds = db.GetDataSetByQuery(query, true, cmd.CommandType, cmdParams);
         DataRow dr = ds.Tables[0].Rows[0];
 
         l.Type = dr["Type"].ToString();
@@ -516,12 +514,12 @@ public class Location
 
             DestinationManager m = new DestinationManager();
             DbService db2 = new DbService();
-            DataSet ds2 = db2.GetDataSetByQuery(query2, true,cmd2.CommandType, cmdParams2);
+            DataSet ds2 = db2.GetDataSetByQuery(query2, true, cmd2.CommandType, cmdParams2);
             DataRow dr2 = ds2.Tables[0].Rows[0];
             l.ManagerName = dr2["FirstName"].ToString();
             l.ManagerLastName = dr2["LastName"].ToString();
             l.managerPhones = dr2["Phone"].ToString();
-           
+
         }
         l.Region = new Region(Convert.ToInt32(dr["RegionId"]));
 
@@ -533,7 +531,7 @@ public class Location
 
     public Hashtable getLocationsEnglishName()
     {
-       
+
         string query = "select Name,EnglishName from Location ";
         Hashtable list = new Hashtable();
         DbService db = new DbService();
@@ -559,9 +557,9 @@ public class Location
         SqlCommand cmd = new SqlCommand();
         cmd.CommandType = CommandType.Text;
         SqlParameter[] cmdParams = new SqlParameter[12];
-        
+
         //getting the index for the destination manager
-        DestinationManager m = new DestinationManager(v.ManagerName,v.ManagerLastName,v.ManagerPhones,v.ManagerPhones2);
+        DestinationManager m = new DestinationManager(v.ManagerName, v.ManagerLastName, v.ManagerPhones, v.ManagerPhones2);
         int managerId = m.setDestinationManager(m, func);
 
         cmdParams[0] = cmd.Parameters.AddWithValue("@type", v.Type);
@@ -585,14 +583,14 @@ public class Location
         string query = "";
         if (func == "edit")
         {
-            
+
 
             query = "update Location set Type=@type, Name=@name,";
             query += "Area=@area, Adress=@adress, IsActive=@IsActive, Remarks=@remarks, ";
             query += "RegionId=@RegionId,";
             query += "DestinationManager=@DestinationManager, CityCityName=@cityCityName,EnglishName=@EnglishName, ";
             query += "Lat=@Lat, Lng=@Lng ";
-            query += "where Name=@name"; 
+            query += "where Name=@name";
 
             res = db.ExecuteQuery(query, cmd.CommandType, cmdParams);
 
@@ -600,7 +598,7 @@ public class Location
             {
                 throw new Exception("שם האזור לא תקין");
             }
-          
+
         }
         else if (func == "new")
         {

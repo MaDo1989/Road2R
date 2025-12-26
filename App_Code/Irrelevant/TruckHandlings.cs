@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Data;
-using System.Data.SqlClient;
 
 /// <summary>
 /// Summary description for TruckHandlings
@@ -239,7 +236,7 @@ public class TruckHandlings
             {
                 try { tmp.ImgID = (int)dr["ImgID"]; }
                 catch { tmp.ImgID = 0; }
-               
+
             }
             tmp.Cost = float.Parse(dr["Cost"].ToString());
             tmp.Date = (DateTime)dr["Date"];
@@ -405,8 +402,8 @@ public class TruckHandlings
         db.ExecuteQuery(query);
     }
 
-    
-     public void setTruckHandlingApp(string func)
+
+    public void setTruckHandlingApp(string func)
     {
         string sqlFormattedDate = Date.ToString("yyyy-MM-dd");
 

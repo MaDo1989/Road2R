@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-/// <summary>
+﻿/// <summary>
 /// Summary description for Area
 /// </summary>
 public class Area
@@ -18,5 +13,5 @@ public class Area
 
     public string HebrewName { get; set; }
     public string EnglishName { get; set; }
-    public bool  IsRoute { get; set; }
+    public bool IsRoute { get; set; }
 }

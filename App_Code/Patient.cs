@@ -3,10 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
 using System.Web;
-using System.Web.Script.Serialization;
 
 /// <summary>
 /// Summary description for Patient
@@ -983,13 +980,13 @@ public class Patient
                     patientStatus = sdr["PatientStatus"].ToString();
                 }
                 p.RidePatPatientStatus.Status = Convertions.ConvertStringToPatientStatus(patientStatus);
-                
+
                 p.RidePatPatientStatus.EditTimeStamp = null;
                 if (HasColumn(sdr, "EditTimeStamp"))
                 {
                     p.RidePatPatientStatus.EditTimeStamp = String.IsNullOrEmpty(sdr["EditTimeStamp"].ToString()) ? null : (DateTime?)Convert.ToDateTime(sdr["EditTimeStamp"].ToString());
                 }
-                
+
                 if (sdr["PatientIdentity"].ToString() == "")
                 {
                     p.PatientIdentity = 0;

@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
-using System.Web;
 
 /// <summary>
 /// Summary description for Auxiliary
@@ -39,7 +37,7 @@ public class Auxiliary
         string query1 = "select MainDriver from RPView where RideNum = " + rideId;
         DataSet ds1 = db.GetDataSetByQuery(query1);
         DataRow dr1 = ds1.Tables[0].Rows[0];
-       // coor = (string)dr1[1];
+        // coor = (string)dr1[1];
         return (int)dr1[0];
     }
     public string[] GetDriverAndCoordinatorByRidePat(int ridePatId)
@@ -64,7 +62,7 @@ public class Auxiliary
 
 
 
-        string query3 = "select UserName from Volunteer where DisplayName = N'" + dr1[0]+ "'";
+        string query3 = "select UserName from Volunteer where DisplayName = N'" + dr1[0] + "'";
         DataSet ds3 = db.GetDataSetByQuery(query3);
         DataRow dr3 = ds3.Tables[0].Rows[0];
 

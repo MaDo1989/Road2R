@@ -1,8 +1,8 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using log4net;
 using System.Web;
 
 public class LogEntry
@@ -35,13 +35,13 @@ public class LogEntry
         Code = code;
         this.Write();
     }
-    public LogEntry(DateTime date, string severity, string message, int code,int ridePatId, bool isRideId)
+    public LogEntry(DateTime date, string severity, string message, int code, int ridePatId, bool isRideId)
     {
         Date = date;
         Severity = severity;
         Message = message;
         Code = code;
-        
+
         if (isRideId)
         {
             RideId = ridePatId;
@@ -58,7 +58,7 @@ public class LogEntry
     //    Severity = severity;
     //    Message = message;
     //    Code = code;
-        
+
     //    if (isRideId)
     //    {
     //        RideId = ridePatId;
@@ -69,7 +69,7 @@ public class LogEntry
     //    //write to log table inside the ctor. only need to init an LogEntry object.
     //    this.Write();
     //}
-    
+
     public void setCoordinator()
     {
         Coordinator = (string)HttpContext.Current.Session["userSession"];
@@ -96,7 +96,7 @@ public class LogEntry
             SqlCommand cmd = new SqlCommand();
             cmd.CommandType = CommandType.Text;
             SqlParameter[] cmdParams = new SqlParameter[5];
-            if (Coordinator==null)
+            if (Coordinator == null)
             {
                 Coordinator = (string)HttpContext.Current.Session["userSession"];
             }

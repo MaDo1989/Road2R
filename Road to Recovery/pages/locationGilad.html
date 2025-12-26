@@ -1,0 +1,285 @@
+﻿<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>מערכת ניהול מיקומים</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+
+    <style>
+        #map {
+            height: calc(100vh - 120px);
+            width: 100%;
+        }
+
+        .controls-panel {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .location-info {
+            display: none;
+            position: absolute;
+            background: white;
+            border: 1px solid #ccc;
+            padding: 8px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <!-- Control Panel -->
+        <div class="controls-panel mb-4 p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Load Locations Button -->
+            <div class="flex items-center">
+                <button id="loadLocations"
+                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    טען מיקומים
+                </button>
+            </div>
+
+            <!-- Location Selector -->
+            <div class="flex flex-col">
+                <label for="locationSelect" class="mb-1 text-sm font-medium text-gray-700">בחר מיקום:</label>
+                <select id="locationSelect"
+                        class="form-select mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    <option value="">בחר מיקום...</option>
+                </select>
+            </div>
+
+            <!-- Region Selector -->
+            <div class="flex flex-col">
+                <label for="regionSelect" class="mb-1 text-sm font-medium text-gray-700">בחר אזור:</label>
+                <select id="regionSelect"
+                        class="form-select mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    <option value="">בחר אזור...</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Map Container -->
+        <div class="relative">
+            <div id="map" class="rounded-lg shadow-lg"></div>
+            <div id="locationInfo" class="location-info"></div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        let map, markers = {}, locations = {};
+
+        const markerImages = {
+            "מחסום": "../images/orange_MarkerB.png",
+            "בית חולים": "../images/paleblue_MarkerH.png",
+            "כללית": "../images/yellow_MarkerG.png",
+            "נקודת אמצע": "../images/blue_MarkerM.png",
+            "מתנדב": "../images/purple_MarkerV.png",
+        };
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat: 31.7683, lng: 35.2137 },
+                zoom: 8,
+                mapTypeControl: true,
+                streetViewControl: false,
+                mapTypeControlOptions: {
+                    style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
+                }
+            });
+
+            // Initialize location info window
+            const locationInfo = document.getElementById('locationInfo');
+            map.addListener('mousemove', (e) => {
+                locationInfo.style.left = e.domEvent.pageX + 10 + 'px';
+                locationInfo.style.top = e.domEvent.pageY + 10 + 'px';
+            });
+
+            setupEventListeners();
+        }
+
+        function setupEventListeners() {
+            // Load locations button
+            document.getElementById('loadLocations').addEventListener('click', getLocations);
+
+            // Location selector
+            document.getElementById('locationSelect').addEventListener('change', (e) => {
+                highlightLocation(e.target.value);
+            });
+
+            // Region selector
+            document.getElementById('regionSelect').addEventListener('change', (e) => {
+                filterByRegion(e.target.value);
+            });
+        }
+
+        function getLocations() {
+            // For demo, using localStorage. In production, use your API
+            if (localStorage["locationsLS"]) {
+                locations = JSON.parse(localStorage["locationsLS"]);
+                processLocations(locations);
+                return;
+            }
+
+            // Fallback to API call if no cached data
+            $.ajax({
+                dataType: "json",
+                url: "WebService.asmx/getDestinationView",
+                contentType: "application/json; charset=utf-8",
+                type: "POST",
+                data: JSON.stringify({ active: true }),
+                success: function (data) {
+                    locations = {};
+                    let l = JSON.parse(data.d);
+                    for (let i = 0; i < l.length; i++) {
+                        locations[l[i].Name] = {
+                            Type: l[i].Type,
+                            Lat: l[i].Lat,
+                            Lng: l[i].Lng,
+                            Region: l[i].Region
+                        };
+                    }
+                    localStorage["locationsLS"] = JSON.stringify(locations);
+                    processLocations(locations);
+                },
+                error: function (err) {
+                    console.error("Error loading locations:", err);
+                    alert("שגיאה בטעינת המיקומים. אנא נסה שוב.");
+                }
+            });
+        }
+
+        function processLocations(locations) {
+            clearMarkers();
+            updateSelectors(locations);
+            placeMarkers(locations);
+        }
+
+        function updateSelectors(locations) {
+            // Update location selector
+            const locationSelect = document.getElementById('locationSelect');
+            const regionSelect = document.getElementById('regionSelect');
+
+            // Clear existing options
+            locationSelect.innerHTML = '<option value="">בחר מיקום...</option>';
+            regionSelect.innerHTML = '<option value="">בחר אזור...</option>';
+
+            // Get unique regions
+            const regions = new Set();
+
+            // Add locations and collect regions
+            Object.entries(locations).forEach(([name, data]) => {
+                const locationOption = document.createElement('option');
+                locationOption.value = name;
+                locationOption.textContent = name;
+                locationSelect.appendChild(locationOption);
+
+                if (data.Region && data.Region.Name) {
+                    regions.add(data.Region.Name);
+                }
+            });
+
+            // Add regions to selector
+            Array.from(regions).sort().forEach(region => {
+                const regionOption = document.createElement('option');
+                regionOption.value = region;
+                regionOption.textContent = region;
+                regionSelect.appendChild(regionOption);
+            });
+        }
+
+        function placeMarkers(locations) {
+            Object.entries(locations).forEach(([name, data]) => {
+                if (data.Lat === -1 || data.Lng === -1) return;
+
+                const marker = new google.maps.Marker({
+                    map: map,
+                    position: { lat: data.Lat, lng: data.Lng },
+                    title: name,
+                    icon: {
+                        url: markerImages[data.Type] || null,
+                        scaledSize: new google.maps.Size(40, 68)
+                    }
+                });
+
+                // Add hover effect for coordinates
+                marker.addListener('mouseover', () => {
+                    const locationInfo = document.getElementById('locationInfo');
+                    locationInfo.innerHTML = `
+                            <div class="text-sm">
+                                <div class="font-bold">${name}</div>
+                                <div>קו רוחב: ${data.Lat.toFixed(6)}</div>
+                                <div>קו אורך: ${data.Lng.toFixed(6)}</div>
+                                <div>סוג: ${data.Type}</div>
+                                <div>אזור: ${data.Region?.Name || 'לא צוין'}</div>
+                            </div>
+                        `;
+                    locationInfo.style.display = 'block';
+                });
+
+                marker.addListener('mouseout', () => {
+                    document.getElementById('locationInfo').style.display = 'none';
+                });
+
+                markers[name] = marker;
+            });
+
+            // Center map on markers
+            const bounds = new google.maps.LatLngBounds();
+            Object.values(markers).forEach(marker => bounds.extend(marker.getPosition()));
+            map.fitBounds(bounds);
+        }
+
+        function highlightLocation(locationName) {
+            // Reset all markers
+            Object.values(markers).forEach(marker => {
+                marker.setAnimation(null);
+                marker.setIcon({
+                    url: markerImages[locations[marker.getTitle()]?.Type] || null,
+                    scaledSize: new google.maps.Size(40, 68)
+                });
+            });
+
+            if (locationName && markers[locationName]) {
+                const marker = markers[locationName];
+                marker.setAnimation(google.maps.Animation.BOUNCE);
+                map.panTo(marker.getPosition());
+                map.setZoom(12);
+            }
+        }
+
+        function filterByRegion(regionName) {
+            Object.entries(markers).forEach(([name, marker]) => {
+                const location = locations[name];
+                if (!regionName || (location.Region && location.Region.Name === regionName)) {
+                    marker.setMap(map);
+                    marker.setAnimation(google.maps.Animation.DROP);
+                } else {
+                    marker.setMap(null);
+                }
+            });
+
+            // Adjust map bounds to show visible markers
+            if (regionName) {
+                const bounds = new google.maps.LatLngBounds();
+                Object.entries(markers).forEach(([name, marker]) => {
+                    if (locations[name].Region && locations[name].Region.Name === regionName) {
+                        bounds.extend(marker.getPosition());
+                    }
+                });
+                map.fitBounds(bounds);
+            }
+        }
+
+        function clearMarkers() {
+            Object.values(markers).forEach(marker => marker.setMap(null));
+            markers = {};
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBlFaOoxU9wOcacAduASYeAEVXldufDmr4&callback=initMap&libraries=geometry&v=weekly" async></script>
+</body>
+</html>

@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
-using System.Linq;
-using System.Web;
 
 /// <summary>
 /// Summary description for AnonymousPatient
@@ -39,7 +37,7 @@ public class AnonymousPatient
     bool isAnonymous;
     public AnonymousPatient()
     {
-        CellPhone = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff",CultureInfo.InvariantCulture);
+        CellPhone = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture);
         LastNameH = "";
         LastNameA = "";
         IsAnonymous = true;
@@ -413,10 +411,10 @@ public class AnonymousPatient
         cmdParams[15] = cmd.Parameters.AddWithValue("@remarks", Remarks);
         cmdParams[16] = cmd.Parameters.AddWithValue("@isAnonymous", IsAnonymous);
         cmdParams[17] = cmd.Parameters.AddWithValue("@numberOfEscort", NumberOfEscort);
-        cmdParams[18] = cmd.Parameters.AddWithValue("@englishName", EnglishName);        
+        cmdParams[18] = cmd.Parameters.AddWithValue("@englishName", EnglishName);
         string displayName = FirstNameH + " " + LastNameH;
         cmdParams[19] = cmd.Parameters.AddWithValue("@displayName", displayName.Trim());
-        
+
         string query = "";
         if (func == "edit")
         {
@@ -546,12 +544,12 @@ public class AnonymousPatient
     }
 
     //check spaces in car in case of increasing escorts (for anonymous ride)
-    public int checkSpaceInCar(int ridePatNum,int driverId)
+    public int checkSpaceInCar(int ridePatNum, int driverId)
     {
         //only if ride is not null.
         string query = "select * from RidePat where RidePatNum = " + ridePatNum;
         //count number of seats taken in each ridePat with the same ridepat num
-        string query2 = "select * from PatientEscort_PatientInRide where [PatientInRide (RidePat)RidePatNum] = " +ridePatNum;
+        string query2 = "select * from PatientEscort_PatientInRide where [PatientInRide (RidePat)RidePatNum] = " + ridePatNum;
 
         List<int> numberOfRideParForRide = new List<int>();
         int numberOfSpaces = 0;

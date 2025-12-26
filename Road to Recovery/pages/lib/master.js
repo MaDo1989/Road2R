@@ -513,7 +513,9 @@ var GENERAL = {
     },
 
     COPYWRITE: () => {
-        return "2022 - 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה";
+        //gilad add here the current year instead change it manually
+        const currentYear = new Date().getFullYear();
+        return `${currentYear} - 2018 © כל הזכויות שמורות לעמותת בדרך להחלמה`;
     },
 
     APP_ID: 1,

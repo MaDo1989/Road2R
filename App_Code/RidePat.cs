@@ -1,13 +1,9 @@
-﻿using Microsoft.AspNet.SignalR;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Threading;
 using System.Web;
-using System.Web.Script.Serialization;
 
 /// <summary>
 /// Summary description for RidePat
@@ -1439,7 +1435,7 @@ public class RidePat
 
     }
 
-    public List <RidePat> GetRifePatViewByTimeFilter_DR_Gilad(int from,int until, bool isDeletedtoShow)
+    public List<RidePat> GetRifePatViewByTimeFilter_DR_Gilad(int from, int until, bool isDeletedtoShow)
     {
         DBservice_Gilad dBservice_Gilad = new DBservice_Gilad();
         return dBservice_Gilad.GetRidePatViewByTimeFilter_Gilad_DR(from, until, isDeletedtoShow);

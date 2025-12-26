@@ -1,9 +1,4 @@
 ﻿using Microsoft.AspNet.SignalR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Web;
 
 /*
      ===============================
@@ -17,7 +12,7 @@ public class UnityRideHub : Hub
 {
     public void BroadCast_UnityUpdated(UnityRide ur)
     {
-       Clients.All.UnityRideUpdated(ur);
+        Clients.All.UnityRideUpdated(ur);
     }
 
     public void BroadCast_driverAssigningorUpdate(UnityRide ur)

@@ -142,7 +142,13 @@
             arr_volTypes = JSON.parse(data.d);
             $select = $("#typeVolunteer");
             for (i in arr_volTypes) {
-                $('<option>', { value: arr_volTypes[i], text: arr_volTypes[i] }).appendTo($select);
+                if (arr_volTypes[i] == 'רכז') {
+                    $('<option>', { value: arr_volTypes[i], text: 'מתאם' }).appendTo($select);
+                }
+                else {
+                    $('<option>', { value: arr_volTypes[i], text: arr_volTypes[i] }).appendTo($select);
+                }
+                
             }
         }
 
@@ -259,7 +265,7 @@
                 data: JSON.stringify({ displayName: displayName }),
                 success: function (data) {
                     var volunteer = JSON.parse(data.d);
-                    console.log(volunteer)
+                    //console.log(volunteer)
                     OldCellPhone = volunteer.CellPhone;
                     GENERAL.VOLUNTEERS.setVolunteersList(volunteer);
                     var location = "";
@@ -283,8 +289,15 @@
                     console.log(volunteer.VolunteerIdentity)
                     $("#volunteerEnglishName").val(volunteer.EnglishName);
                     $("#firstA").val(volunteer.FirstNameA);
+                    $('#BoosterIN').attr('checked', volunteer.IsBooster);
+                    $('#BabySeatIN').attr('checked', volunteer.IsBabySeat);
                     $("#lastA").val(volunteer.LastNameA);
-
+                    $("#availableSeatsIN").val((volunteer.AvailableSeats == null) ? 4 : volunteer.AvailableSeats);
+                    if (volunteer.AvailableSeats == null || volunteer.AvailableSeats == 0 ) {
+                        $("#availableSeatsIN").attr("title", "לא ידוע כמה מקומות פנויים ברכב");
+                        $("#availableSeatsIN").val('')
+                    }
+                    //console.log(volunteer);
                     if (volunteer.JoinDate) {
                         var temp = volunteer.JoinDate.substring(volunteer.JoinDate.indexOf("(") + 1, volunteer.JoinDate.indexOf(")"))
                         var jdate = new Date(parseInt(temp));
@@ -460,7 +473,7 @@
                                     <div class="row">
                                         <h4 class="m-t-0 header-title"><b>פרטי מתנדב</b></h4>
                                         <!--<p class="text-muted font-13 m-b-30">
-                                        יצירת, צפייה ועריכת מתנדב. לחץ על כפתור חזרה בכדי לצפות בכל הלקוחות.-->
+    יצירת, צפייה ועריכת מתנדב. לחץ על כפתור חזרה בכדי לצפות בכל הלקוחות.-->
                                         <br />
 
                                         <div class="col-md-6 checkbox checkbox-primary text-left">
@@ -552,6 +565,12 @@
                                                     <div class="col-sm-6">
                                                         <input id="ArabSpeaking" name="know" type="checkbox">
                                                         <label for="ArabSpeaking">דובר ערבית?</label>
+                                                        <span> || </span>
+                                                        <input id="BoosterIN" name="BoosterIN" type="checkbox">
+                                                        <label for="BoosterIN">בוסטר ?</label>
+                                                        <span> || </span>
+                                                        <input id="BabySeatIN" name="BabySeatIN" type="checkbox">
+                                                        <label for="BabySeatIN">כיסא תינוק ?</label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -590,7 +609,9 @@
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">יישוב&nbsp;</label>
+                                                    <label class="col-sm-2 control-label">יישוב&nbsp;
+                                                        <span class="required" aria-required="true">*</span>
+                                                    </label>
                                                     <div class="col-sm-6">
                                                         <input id="city" name="city" type="text" class="form-control">
                                                     </div>
@@ -650,8 +671,8 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">תאריך הצטרפות </label>
                                                     <!--<div class="col-sm-6">
-                                                        <input id="joinDate" name="joinDate" type="text" placeholder="dd/mm/yyyy" class="form-control">
-                                                    </div>-->
+                    <input id="joinDate" name="joinDate" type="text" placeholder="dd/mm/yyyy" class="form-control">
+                </div>-->
                                                     <div class="col-sm-6">
                                                         <input type="date" id="joinDate" placeholder="dd/mm/yyyy" class="form-control">
                                                     </div>
@@ -691,12 +712,22 @@
                                                 </div>
                                             </div>
                                         </div>
+
+
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
                                                     <label class="col-sm-2 control-label">תאריך לידה&nbsp;<!--<span class="required">*</span>--></label>
                                                     <div class="col-sm-6">
                                                         <input type="date" id="birthday" name="birthday" class="form-control req">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label">מספר מקומות ברכב</label>
+                                                    <div class="col-sm-6" id="availableSeats">
+                                                        <input value="4" min="0" type="number" id="availableSeatsIN" name="availableSeats" class="form-control">
                                                     </div>
                                                 </div>
                                             </div>
@@ -715,38 +746,47 @@
                                                 </div>
                                             </div>
                                             <!--<div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label class="col-sm-2 control-label">מעוניין לקבל את העדכון השבועי&nbsp;</label>
-                                                    <div class="col-sm-6" id="selectNewsLetter">
-                                                        <select id="newsLetter" name="newsLetter" class="form-control req">
-                                                            <option>בחר</option>
-                                                            <option>כן</option>
-                                                            <option>לא</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>-->
+            <div class="form-group">
+                <label class="col-sm-2 control-label">מעוניין לקבל את העדכון השבועי&nbsp;</label>
+                <div class="col-sm-6" id="selectNewsLetter">
+                    <select id="newsLetter" name="newsLetter" class="form-control req">
+                        <option>בחר</option>
+                        <option>כן</option>
+                        <option>לא</option>
+                    </select>
+                </div>
+            </div>
+        </div>-->
                                         </div>
+
                                         <!--<div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label class="col-sm-2 control-label">כיצד תוכל.י לעזור לעמותה בדרכים נוספות (נא לפרט)</label>
-                                                    <div class="col-sm-6">
-
-                                                        <textarea id="help" name="help" class="form-control textAreaClass" rows="3"></textarea>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label class="col-sm-2 control-label">משוב על פעילותך ועל "בדרך להחלמה"</label>
-                                                    <div class="col-sm-6">
-
-                                                        <textarea id="feedback" name="feedback" class="form-control textAreaClass" rows="3"></textarea>
-                                                    </div>
+                                                    <label class="col-sm-2 control-label">כיסא לתינוק</label>
+                                                    <input id="boosterIN" name="boosterIN" class="form-control" type="checkbox" />
                                                 </div>
                                             </div>
                                         </div>-->
+                                        <!--<div class="row m-l-10 m-r-10">
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-2 control-label">כיצד תוכל.י לעזור לעמותה בדרכים נוספות (נא לפרט)</label>
+                <div class="col-sm-6">
+
+                    <textarea id="help" name="help" class="form-control textAreaClass" rows="3"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-2 control-label">משוב על פעילותך ועל "בדרך להחלמה"</label>
+                <div class="col-sm-6">
+
+                    <textarea id="feedback" name="feedback" class="form-control textAreaClass" rows="3"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>-->
                                         <div class="row m-l-10 m-r-10">
                                             <div class="col-sm-6">
 
@@ -898,6 +938,17 @@
                     var valid = validateVolunteerInputs();
                     if (!valid) return false;
 
+                    
+                    if ($('#city').val() == '') {
+                            swal({
+                                title: "שדה יישוב חובה",
+                                type: "error",
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        return false;
+                    }
+
                     var firstNameH = $("#volunteerFirstName").val();
                     var lastNameH = $("#volunteerLastName").val();
                     var VolunteerIdentity = $("#VolunteerIdentity").val();
@@ -907,6 +958,8 @@
                     cellPhone = cellPhone.replace(/ /g, '');
                     var email = $("#email").val();
                     var typeVol = $("#typeVolunteer").val();
+                    let isBooster = $("#BoosterIN").is(':checked');
+                    let isBabySeat = $("#BabySeatIN").is(':checked');
                     var isHelper = false;
                     if (typeVol.indexOf('עוזר') !== -1) {
                         isHelper = true;
@@ -944,7 +997,17 @@
                     else active = false;
                     var address = $("#address").val();
                     var func = arr_customer.func;
-                    var remark = $("#remarks").val();;
+                    var remark = $("#remarks").val();
+                    let availableSeats = $("#availableSeatsIN").val() == '' ? 4 : $("#availableSeatsIN").val();
+                    if (availableSeats<0) {
+                        swal({
+                            title: "לא ניתן לשים ערך שקטן מ0 במספר מקומות פנויים ברכב",
+                            type: "error",
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                        return false;
+                    }
                     //Gilad change here displayName.split('<br>')[0]
                     var displayName = arr_volunteer.displayName.split('<br>')[0];
                     //NEW:
@@ -983,11 +1046,12 @@
                         firstNameH: firstNameH, firstNameA: nameA, lastNameH: lastNameH, lastNameA: lastNameA, cellPhone: cellPhone, cellphone2: cellphone2, /*homePhone: homePhone,*/
                         city: city, address: address, email: email, joinDate: joinDate, gender: gender, KnowsArabic: knowsArabic,
                         typeVol: typeVol, IsActive: active, Remarks: remark, DisplayName: displayName, EnglishName: englishName, IsAssistant: isHelper, VolunteerIdentity: VolunteerIdentity, //birthdate: bdate,
-                        EnglishFN: englishFN, EnglishLN: englishLN, BirthDate: birthDate, IsDriving: isDriving, Role: role
+                        EnglishFN: englishFN, EnglishLN: englishLN, BirthDate: birthDate, IsDriving: isDriving, Role: role, AvailableSeats: availableSeats, IsBooster: isBooster, IsBabySeat: isBabySeat
                     }
                     if (func === 'edit') {
                         volunteer.OldCellPhone = OldCellPhone;
                     }
+                    console.log(volunteer);
                     $.ajax({
                         dataType: "json",
                         url: "WebService.asmx/setVolunteer",

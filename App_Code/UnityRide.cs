@@ -1,37 +1,32 @@
 ﻿using System;
-using System.Activities.Expressions;
-using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Data;
-using System.Data.SqlClient;
-using System.Runtime.Remoting.Metadata.W3cXsd2001;
-using System.Web;
 
 public class UnityRide
 {
     int ridePatNum;
-	string patientName;
+    string patientName;
     int patientId;
     int patientGender;
     string patientStatus;
     DateTime patientStatusEditTime;
     string patientBirthdate;
     int patientAge;
-	string patientCellPhone;
+    string patientCellPhone;
     string patientCellPhone2;
+    string patientCellPhone3;
     int amountOfEscorts;
     int amountOfEquipments;
     List<string> patientEquipments;
     string origin;
-	string destination;
-	DateTime pickupTime;
-	string coorName;
-	string remark;
-	string status;
-	string area;
-	string shift;
-	bool onlyEscort;
+    string destination;
+    DateTime pickupTime;
+    string coorName;
+    string remark;
+    string status;
+    string area;
+    string shift;
+    bool onlyEscort;
     DateTime lastModified;
     int coorId;
     int mainDriver;
@@ -431,6 +426,53 @@ public class UnityRide
         }
     }
 
+    public string PatientCellPhone3
+    {
+        get
+        {
+            return patientCellPhone3;
+        }
+
+        set
+        {
+            patientCellPhone3 = value;
+        }
+    }
+
+    public enum DateMode
+    {
+        Today = 0,
+        Tomorrow = 1,
+        Future =2,
+    }
+
+    private static DateTime GetDateByMode(DateMode mode)
+    {
+        switch (mode)
+        {
+            case DateMode.Today:
+                return DateTime.Today;
+
+            case DateMode.Tomorrow:
+                return DateTime.Today.AddDays(1);
+
+            case DateMode.Future:
+                return DateTime.Today.AddDays(2);
+
+            default:
+                throw new ArgumentOutOfRangeException("mode", mode, "Invalid DateMode value");
+        }
+    }
+
+    static public List<UnityRide> GetSplitRides(DateMode dayMode, bool isAfternoon, bool isFutureTable, int days)
+    {
+        DBservice_Gilad db = new DBservice_Gilad();
+        DateTime d = GetDateByMode(dayMode);
+        return db.GetSplitRides(d,isAfternoon, isFutureTable, days);
+    }
+
+
+
     public List<UnityRide> GetUnityRideView(int days)
     {
         DBservice_Gilad dBservice_Gilad = new DBservice_Gilad();
@@ -447,7 +489,7 @@ public class UnityRide
         DBservice_Gilad db = new DBservice_Gilad();
         return db.GetReturnUnityRide(UnityRideID);
     }
-    public List <UnityRide> GetWeeklyRidesForThanks()
+    public List<UnityRide> GetWeeklyRidesForThanks()
     {
         DBservice_Gilad db = new DBservice_Gilad();
 
@@ -457,10 +499,10 @@ public class UnityRide
         return db.GetWeeklyThanks(thisSunday, endDate);
     }
 
-    public int SetUnityRide(UnityRide unityride, string func, int numOfRide, string repeatEvery,bool firstTry)
+    public int SetUnityRide(UnityRide unityride, string func, int numOfRide, string repeatEvery, bool firstTry)
     {
         DBservice_Gilad dBservice = new DBservice_Gilad();
-        if (unityride.DriverName!=null)
+        if (unityride.DriverName != null)
         {
             if (dBservice.CheckValidDriverRides(unityride.RidePatNum, unityride.DriverName, unityride.PickupTime) == true && firstTry == true)
             {
@@ -469,9 +511,9 @@ public class UnityRide
         }
 
 
-        if (func=="new")
+        if (func == "new")
         {
-            if (numOfRide==1)
+            if (numOfRide == 1)
             {
                 return dBservice.SetUnityRide(unityride);
 
@@ -499,8 +541,8 @@ public class UnityRide
                 {
                     int res = 0;
                     unityride.PickupTime = dateList[i];
-                    res=dBservice.SetUnityRide(unityride);
-                    if (i==dateList.Count-1)
+                    res = dBservice.SetUnityRide(unityride);
+                    if (i == dateList.Count - 1)
                     {
                         return res;
                     }
@@ -509,37 +551,38 @@ public class UnityRide
 
 
         }
-        else if(func=="edit"){
+        else if (func == "edit")
+        {
             return dBservice.UpdateUnityRide(unityride);
         }
         // if didnt send func name its an error = -9 ;
         return -9;
     }
 
-    public bool recoverUnityRides(List<int> ListIDs,string whoChange)
+    public bool recoverUnityRides(List<int> ListIDs, string whoChange)
     {
         DBservice_Gilad db = new DBservice_Gilad();
         bool indcation = false;
         for (int i = 0; i < ListIDs.Count; i++)
         {
             int res = db.recoverUnityRide(ListIDs[i], whoChange);
-           
-            if (res >0)
+
+            if (res > 0)
             {
-              indcation = true;
+                indcation = true;
             }
             else
             {
-              indcation = false;
+                indcation = false;
             }
-            
+
         }
         return indcation;
     }
 
     public string NEWCheckLocationForUnityRideArea(string origin, string destination)
     {
-       
+
         Location l = new Location();
         string originArea = l.GetAreaForPoint(origin);
         string destinationArea = l.GetAreaForPoint(destination);
@@ -560,28 +603,28 @@ public class UnityRide
         return rideArea;
     }
 
-    public void updateUnityRideTime(int unityRideNum, DateTime editedTime,string whoChange)
+    public void updateUnityRideTime(int unityRideNum, DateTime editedTime, string whoChange)
     {
         DBservice_Gilad db = new DBservice_Gilad();
         UnityRide unityRide = new UnityRide();
         unityRide = db.updateUnityRideTime(unityRideNum, editedTime, whoChange);
-        if (unityRide.RidePatNum==-2)
+        if (unityRide.RidePatNum == -2)
         {
             throw new Exception("error code: -2 , duplicated values in different rides");
-            
+
         }
-        if (unityRide.RidePatNum!=-1)
+        if (unityRide.RidePatNum != -1)
         {
             BroadCast.BroadCast2Clients_UnityRideUpdated(unityRide);
         }
     }
 
-    public void updateRemark(int UnityRideID, string newRemark,string whoChange)
+    public void updateRemark(int UnityRideID, string newRemark, string whoChange)
     {
         DBservice_Gilad dBservice = new DBservice_Gilad();
         UnityRide returnride = new UnityRide();
         returnride = dBservice.updateRemark(UnityRideID, newRemark, whoChange);
-        if (returnride.RidePatNum!=-1)
+        if (returnride.RidePatNum != -1)
         {
             BroadCast.BroadCast2Clients_UnityRideUpdated(returnride);
 
@@ -592,7 +635,7 @@ public class UnityRide
         }
     }
 
-    public void updatePatientStatusandTime (int patientId, int unityRideID, string patientStatus, DateTime? editTimeStamp,string whoChange)
+    public void updatePatientStatusandTime(int patientId, int unityRideID, string patientStatus, DateTime? editTimeStamp, string whoChange)
     {
         DBservice_Gilad db = new DBservice_Gilad();
         UnityRide ur = new UnityRide();
@@ -600,14 +643,14 @@ public class UnityRide
         BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
     }
 
-    public int updateDriver(int driverId, int unityRideId, bool isDelete,string whoChange)
+    public UnityRide updateDriver(int driverId, int unityRideId, bool isDelete, string whoChange)
     {
         DBservice_Gilad db = new DBservice_Gilad();
         UnityRide ur = new UnityRide();
         if (isDelete)
         {
             ur = db.updateDriver(-1, unityRideId, whoChange);
-          
+
             //?
             //send push notification to coordinator phone
             //Message m = new Message();
@@ -622,37 +665,66 @@ public class UnityRide
             ur = db.updateDriver(driverId, unityRideId, whoChange);
             if (ur.RidePatNum == -5)
             {
-                return ur.RidePatNum;
+                return ur;
             }
 
         }
         BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
-        return 1;
+        return ur;
 
     }
 
-    public void deleteUnityRide(List<int> listIDs,string whoChange)
+    public List<UnityRide> deleteUnityRide(List<int> listIDs, string whoChange)
     {
+        // i need to improve this code ! 
         DBservice_Gilad dBservice = new DBservice_Gilad();
         UnityRide ur = new UnityRide();
-        if (listIDs.Count>1)
+        List<UnityRide> returnRides = new List<UnityRide>();
+        if (listIDs.Count > 1)
         {
             for (int i = 0; i < listIDs.Count; i++)
             {
-               ur =  dBservice.deleteUnityRide(listIDs[i], whoChange);
-                if (ur.RidePatNum!=-1)
+                var returnUr = ur.GetReturnDrive(listIDs[i]);
+                ur = dBservice.deleteUnityRide(listIDs[i], whoChange);
+
+                if (returnUr != null && returnUr.RidePatNum > 0 && !ur.IsAnonymous)
+                {
+                    returnRides.Add(returnUr);
+                }
+                if (ur.RidePatNum != -1)
                 {
                     BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
                 }
-                
+
             }
         }
         else
         {
+            var returnUr = ur.GetReturnDrive(listIDs[0]);
             ur = dBservice.deleteUnityRide(listIDs[0], whoChange);
+
+            if (returnUr != null && returnUr.RidePatNum > 0 && !ur.IsAnonymous)
+            {
+                returnRides.Add(returnUr);
+            }
             BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
         }
 
+        writeWhoDeleteRides(ur, whoChange);
+        return returnRides;
+
+    }
+
+    private void writeWhoDeleteRides(UnityRide ur, string user)
+    {
+        string strToWrite = "*******************************************************************************" + Environment.NewLine;
+        strToWrite += "*******************************************************************************" + Environment.NewLine;
+        strToWrite += "User: " + user + " deleted ride: " + ur.RidePatNum + " at: " + DateTime.Now.ToString() + Environment.NewLine;
+        strToWrite += "from : " + ur.Origin + " to: " + ur.Destination + " at: " + ur.PickupTime.ToString() + Environment.NewLine;
+        strToWrite += "with driver: " + ur.DriverName + " and patient: " + ur.patientName + Environment.NewLine;
+        strToWrite += "*******************************************************************************" + Environment.NewLine;
+        strToWrite += "*******************************************************************************" + Environment.NewLine;
+        DBservice_Gilad.StringToTextFile(strToWrite, "Who_Deleted_Rides");
 
     }
 
@@ -663,31 +735,31 @@ public class UnityRide
     }
 
 
-    public Dictionary<string, object> GetEnglishNamesByIds(List <int> ids)
+    public Dictionary<string, object> GetEnglishNamesByIds(List<int> ids)
     {
         Dictionary<string, object> ResDic = new Dictionary<string, object>();
         DBservice_Gilad db = new DBservice_Gilad();
         foreach (int id in ids)
         {
             ResDic.Add(id.ToString(), db.GetEnglishNamesOfPatientOriginDest(id));
-            
+
         }
         return ResDic;
     }
 
 
-    public List <object> GetMonthlyReport()
+    public List<object> GetMonthlyReport()
     {
         DBservice_Gilad dBservice = new DBservice_Gilad();
         return dBservice.GetMonthlyReport();
     }
 
-    public int assignDriverMobile(int UnityRideId,int userId)
+    public int assignDriverMobile(int UnityRideId, int userId)
     {
         UnityRide ur = new UnityRide();
         DBservice_Gilad db = new DBservice_Gilad();
         ur = db.assignDriverMobile(UnityRideId, userId);
-        if (ur.RidePatNum>-1)
+        if (ur.RidePatNum > -1)
         {
             BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
             return ur.RidePatNum;
@@ -705,7 +777,7 @@ public class UnityRide
         return dBservice.GetUnityRideAsRidePat(UnityRideId);
     }
 
-    public int leaveUnityRideFromMobile(int UnityRideId , int driverID)
+    public int leaveUnityRideFromMobile(int UnityRideId, int driverID)
     {
         DBservice_Gilad db = new DBservice_Gilad();
         return db.leaveUnityRideForMobile(driverID, UnityRideId);
@@ -745,14 +817,14 @@ public class UnityRide
         mixedDictionary.Add("firstDate", firstDate);
         mixedDictionary.Add("israelTimeZone.id", israelTimeZone.Id);
 
-       
+
 
         for (int i = 1; i < listOfDatesAfterUTCfix.Count; i++)
         {
- 
 
-            mixedDictionary.Add("israelTimeZone.IsDaylightSavingTime(listOfDatesAfterUTCfix["+i+"])", israelTimeZone.IsDaylightSavingTime(listOfDatesAfterUTCfix[i]));
-            mixedDictionary.Add("listOfDatesAfterUTCfix["+i+"]", listOfDatesAfterUTCfix[i]);
+
+            mixedDictionary.Add("israelTimeZone.IsDaylightSavingTime(listOfDatesAfterUTCfix[" + i + "])", israelTimeZone.IsDaylightSavingTime(listOfDatesAfterUTCfix[i]));
+            mixedDictionary.Add("listOfDatesAfterUTCfix[" + i + "]", listOfDatesAfterUTCfix[i]);
             mixedDictionary.Add("listOfDatesAfterUTCfix[" + i + "] new way", IsSummerTimeInIsrael(listOfDatesAfterUTCfix[i]));
             if (isFirstRideDateDayLightSaving && !IsSummerTimeInIsrael(listOfDatesAfterUTCfix[i]))
             {

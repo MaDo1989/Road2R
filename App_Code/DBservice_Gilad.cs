@@ -1,29 +1,21 @@
-using System.Data.SqlClient;
-using System.Data;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System.Xml.Linq;
 using System;
-using System.Configuration;
 //using Microsoft.Extensions.Configuration;
 using System.Collections;
-using System.Web.UI.WebControls;
-using log4net.Util.TypeConverters;
-using System.Activities.Expressions;
-using System.Linq;
-using System.Data.Common;
-using System.Activities.Statements;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
 using System.Dynamic;
 //using static System.Net.Mime.MediaTypeNames;
 using System.IO;
+using System.Linq;
 using System.Web;
-using System.Web.Caching;
 //using static Constants.Enums;
 //using static ReportService;
 
 public class DBservice_Gilad
 {
-	public SqlConnection con;
+    public SqlConnection con;
 
     public List<string> GetListOfEquipmentsForPAtient(int patientID)
     {
@@ -71,7 +63,7 @@ public class DBservice_Gilad
             }
 
         }
-        
+
 
     }
 
@@ -126,7 +118,7 @@ public class DBservice_Gilad
 
     }
 
-    static public void WriteToErrorFile(string ancestors,string ExceptionString)
+    static public void WriteToErrorFile(string ancestors, string ExceptionString)
     {
         string Path = "\\log\\Errors.txt";
         string stackTracesfilePath = HttpContext.Current.Server.MapPath("~") + Path;
@@ -146,26 +138,27 @@ public class DBservice_Gilad
 
         try
         {
-            using (StreamWriter writer = new StreamWriter(stackTracesfilePath,true))
+            using (StreamWriter writer = new StreamWriter(stackTracesfilePath, true))
             {
                 // Write the text to the file
                 writer.WriteLine(txtToFile);
             }
         }
-        catch(Exception ex) { 
-            throw new Exception("error in write to txt file "+ex.Message);
+        catch (Exception ex)
+        {
+            throw new Exception("error in write to txt file " + ex.Message);
         }
     }
 
 
-    static public void DebugToTextFile(Dictionary<string,object> dicOfVars)
+    static public void DebugToTextFile(Dictionary<string, object> dicOfVars)
     {
         string Path = "\\log\\AnyDebug.txt";
         string stackTracesfilePath = HttpContext.Current.Server.MapPath("~") + Path;
         DateTime currentDate = DateTime.Now;
         string formattedDate = currentDate.ToString("dd/MM/yyyy HH:mm:ss");
         string linebreak = Environment.NewLine;
-        string FinalString = "***************************************Debug-"+ formattedDate + "***************************************";
+        string FinalString = "***************************************Debug-" + formattedDate + "***************************************";
 
         foreach (var item in dicOfVars)
         {
@@ -187,9 +180,9 @@ public class DBservice_Gilad
         }
     }
 
-    static public void StringToTextFile(string str,string fileName)
+    static public void StringToTextFile(string str, string fileName)
     {
-        string Path = "\\log\\"+ fileName + ".txt";
+        string Path = "\\log\\" + fileName + ".txt";
         string stackTracesfilePath = HttpContext.Current.Server.MapPath("~") + Path;
         try
         {
@@ -257,6 +250,158 @@ public class DBservice_Gilad
 
     }
 
+
+    public List<UnityRide> GetSplitRides(DateTime rideDate, bool isAfternoon, bool isFutureTable, int days)
+    {
+        List<UnityRide> list2Return = new List<UnityRide>();
+        string connectionString = ConfigurationManager.ConnectionStrings["db"].ConnectionString;
+        using (SqlConnection con = new SqlConnection(connectionString))
+        {
+            Dictionary<string, object> paramDic = new Dictionary<string, object>
+            {
+                { "@days", days },
+                { "@ride_date", rideDate },
+                { "@isAfternoon", isAfternoon },
+                { "@isFutureTable", isFutureTable }
+            };
+            SqlCommand cmd = CreateCommandWithStoredProcedureGeneral("sp_getUnityRidesSplit", con, paramDic);
+
+            try
+            {
+                con.Open();
+
+                using (SqlDataReader dataReader = cmd.ExecuteReader())
+                {
+                    int idxRidePatNum = dataReader.GetOrdinal("RidePatNum");
+                    int idxPatientName = dataReader.GetOrdinal("PatientName");
+                    int idxPatientId = dataReader.GetOrdinal("PatientId");
+                    int idxPatientGender = dataReader.GetOrdinal("PatientGender");
+                    int idxPatientCellPhone = dataReader.GetOrdinal("PatientCellPhone");
+                    int idxPatientCellPhone2 = dataReader.GetOrdinal("PatientCellPhone2");
+                    int idxPatientCellPhone3 = dataReader.GetOrdinal("PatientCellPhone3");
+                    int idxPatientStatus = dataReader.GetOrdinal("PatientStatus");
+                    int idxPatientStatusTime = dataReader.GetOrdinal("patientStatusTime");
+                    int idxPatientBirthDate = dataReader.GetOrdinal("PatientBirthDate");
+
+                    int idxEquipmentList = dataReader.GetOrdinal("EquipmentList");
+
+                    int idxAmountOfEscorts = dataReader.GetOrdinal("AmountOfEscorts");
+                    int idxOrigin = dataReader.GetOrdinal("Origin");
+                    int idxDestination = dataReader.GetOrdinal("Destination");
+                    int idxPickupTime = dataReader.GetOrdinal("pickupTime");
+                    int idxCoordinator = dataReader.GetOrdinal("Coordinator");
+                    int idxRemark = dataReader.GetOrdinal("Remark");
+                    int idxStatus = dataReader.GetOrdinal("Status");
+                    int idxArea = dataReader.GetOrdinal("Area");
+                    int idxShift = dataReader.GetOrdinal("Shift");
+                    int idxOnlyEscort = dataReader.GetOrdinal("OnlyEscort");
+                    int idxLastModified = dataReader.GetOrdinal("lastModified");
+                    int idxCoordinatorID = dataReader.GetOrdinal("CoordinatorID");
+                    int idxMainDriver = dataReader.GetOrdinal("MainDriver");
+                    int idxDriverName = dataReader.GetOrdinal("DriverName");
+                    int idxDriverCellPhone = dataReader.GetOrdinal("DriverCellPhone");
+                    int idxNoOfDocumentedRides = dataReader.GetOrdinal("NoOfDocumentedRides");
+                    int idxIsAnonymous = dataReader.GetOrdinal("IsAnonymous");
+                    int idxIsNewDriver = dataReader.GetOrdinal("IsNewDriver");
+
+                    while (dataReader.Read())
+                    {
+                        int ridePatNum = dataReader.GetInt32(idxRidePatNum);
+                        if (ridePatNum == -1) continue;
+
+                        UnityRide oneRide = new UnityRide();
+                        oneRide.RidePatNum = ridePatNum;
+                        oneRide.PatientName = dataReader[idxPatientName].ToString();
+                        oneRide.PatientId = dataReader.GetInt32(idxPatientId);
+
+                        oneRide.PatientGender = Convert.ToInt32(Convertions.ConvertStringToGender(dataReader[idxPatientGender].ToString()));
+                        oneRide.PatientCellPhone = dataReader[idxPatientCellPhone].ToString();
+                        oneRide.PatientCellPhone2 = dataReader[idxPatientCellPhone2].ToString();
+                        oneRide.PatientCellPhone3 = dataReader[idxPatientCellPhone3].ToString();
+
+                        oneRide.PatientStatus = dataReader[idxPatientStatus].ToString();
+                        if (!string.IsNullOrEmpty(oneRide.PatientStatus) && !dataReader.IsDBNull(idxPatientStatusTime))
+                        {
+                            oneRide.PatientStatusEditTime = dataReader.GetDateTime(idxPatientStatusTime);
+                        }
+
+                        string birthDateStr = dataReader[idxPatientBirthDate].ToString();
+                        oneRide.PatientBirthdate = birthDateStr;
+                        DateTime? dateOfBirth = string.IsNullOrEmpty(birthDateStr) ? null : (DateTime?)Convert.ToDateTime(birthDateStr);
+                        oneRide.PatientAge = Convert.ToInt32(Calculations.CalculateAge(dateOfBirth));
+
+                        if (!dataReader.IsDBNull(idxEquipmentList))
+                        {
+                            string equipmentString = dataReader.GetString(idxEquipmentList);
+                            oneRide.PatientEquipments = equipmentString.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                        }
+                        else
+                        {
+                            oneRide.PatientEquipments = new List<string>();
+                        }
+                        oneRide.AmountOfEquipments = oneRide.PatientEquipments.Count;
+                        // ----------------------------------------------------
+
+                        oneRide.AmountOfEscorts = dataReader.GetInt32(idxAmountOfEscorts);
+                        oneRide.Origin = dataReader[idxOrigin].ToString();
+                        oneRide.Destination = dataReader[idxDestination].ToString();
+                        oneRide.PickupTime = dataReader.GetDateTime(idxPickupTime);
+                        oneRide.CoorName = dataReader[idxCoordinator].ToString();
+                        oneRide.Remark = dataReader[idxRemark].ToString();
+                        oneRide.Status = dataReader[idxStatus].ToString();
+                        oneRide.Area = dataReader[idxArea].ToString();
+                        oneRide.Shift = dataReader[idxShift].ToString();
+                        oneRide.OnlyEscort = dataReader.GetBoolean(idxOnlyEscort);
+                        oneRide.LastModified = dataReader.GetDateTime(idxLastModified);
+                        oneRide.CoorId = dataReader.GetInt32(idxCoordinatorID);
+
+                        if (dataReader.IsDBNull(idxMainDriver))
+                        {
+                            oneRide.MainDriver = -1;
+                        }
+                        else
+                        {
+                            oneRide.MainDriver = dataReader.GetInt32(idxMainDriver);
+                        }
+
+                        oneRide.DriverName = dataReader[idxDriverName].ToString();
+                        oneRide.DriverCellPhone = dataReader[idxDriverCellPhone].ToString();
+
+                        if (dataReader.IsDBNull(idxNoOfDocumentedRides))
+                        {
+                            oneRide.NoOfDocumentedRides = 0;
+                        }
+                        else
+                        {
+                            oneRide.NoOfDocumentedRides = dataReader.GetInt32(idxNoOfDocumentedRides);
+                        }
+
+                        if (dataReader.IsDBNull(idxIsAnonymous))
+                        {
+                            oneRide.IsAnonymous = false;
+                        }
+                        else
+                        {
+                            oneRide.IsAnonymous = dataReader.GetBoolean(idxIsAnonymous);
+                        }
+
+                        oneRide.IsNewDriver = dataReader.GetBoolean(idxIsNewDriver);
+
+                        list2Return.Add(oneRide);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                WriteToErrorFile("GetSplitRides (Optimized)", ex.ToString());
+
+                throw;
+            }
+        }
+
+        return list2Return;
+    }
+
     public List<UnityRide> GetRidesForRidePatView(int days)
     {
         SqlCommand cmd;
@@ -277,7 +422,7 @@ public class DBservice_Gilad
 
         cmd = CreateCommandWithStoredProcedureGeneral("spGetUnitedRides", con, paramDic);
 
-        List <UnityRide> list2Return = new List<UnityRide>();
+        List<UnityRide> list2Return = new List<UnityRide>();
         try
         {
 
@@ -291,11 +436,12 @@ public class DBservice_Gilad
                 oneRide.RidePatNum = Convert.ToInt32(dataReader["RidePatNum"]);
                 oneRide.PatientName = dataReader["PatientName"].ToString();
                 oneRide.PatientId = Convert.ToInt32(dataReader["PatientId"]);
-                oneRide.PatientGender =Convert.ToInt32(Convertions.ConvertStringToGender(dataReader["PatientGender"].ToString()));
+                oneRide.PatientGender = Convert.ToInt32(Convertions.ConvertStringToGender(dataReader["PatientGender"].ToString()));
                 oneRide.PatientCellPhone = dataReader["PatientCellPhone"].ToString();
                 oneRide.PatientCellPhone2 = dataReader["PatientCellPhone2"].ToString();
+                oneRide.PatientCellPhone3 = dataReader["PatientCellPhone3"].ToString();
                 oneRide.PatientStatus = dataReader["PatientStatus"].ToString();
-                if (oneRide.PatientStatus!="")
+                if (oneRide.PatientStatus != "")
                 {
                     oneRide.PatientStatusEditTime = Convert.ToDateTime(dataReader["patientStatusTime"]);
 
@@ -387,7 +533,7 @@ public class DBservice_Gilad
 
     }
 
-    public List <UnityRide> GetWeeklyThanks(DateTime thisSunday,DateTime endDate)
+    public List<UnityRide> GetWeeklyThanks(DateTime thisSunday, DateTime endDate)
     {
         SqlCommand cmd;
         try
@@ -421,7 +567,7 @@ public class DBservice_Gilad
             {
                 UnityRide oneRide = new UnityRide();
 
-           
+
                 oneRide.CoorName = dataReader["Coordinator"].ToString();
                 oneRide.CoorId = Convert.ToInt32(dataReader["CoordinatorID"]);
                 oneRide.MainDriver = Convert.ToInt32(dataReader["MainDriver"]);
@@ -481,25 +627,6 @@ public class DBservice_Gilad
                 oneRide.RidePatNum = Convert.ToInt32(dataReader["RidePatNum"]);
                 oneRide.PatientName = dataReader["PatientName"].ToString();
                 oneRide.PatientId = Convert.ToInt32(dataReader["PatientId"]);
-                //oneRide.PatientGender = Convert.ToInt32(Convertions.ConvertStringToGender(dataReader["PatientGender"].ToString()));
-                //oneRide.PatientCellPhone = dataReader["PatientCellPhone"].ToString();
-                //oneRide.PatientStatus = dataReader["PatientStatus"].ToString();
-                //if (oneRide.PatientStatus != "")
-                //{
-                //    oneRide.PatientStatusEditTime = Convert.ToDateTime(dataReader["patientStatusTime"]);
-
-                //}
-
-                //oneRide.PatientBirthdate = dataReader["PatientBirthDate"].ToString();
-                //DateTime? dateOfBirth = String.IsNullOrEmpty(dataReader["PatientBirthDate"].ToString()) ? null : (DateTime?)Convert.ToDateTime(dataReader["PatientBirthDate"].ToString());
-                //oneRide.PatientAge = Convert.ToInt32(Calculations.CalculateAge(dateOfBirth));
-
-                //oneRide.AmountOfEquipments = Convert.ToInt32(dataReader["AmountOfEquipments"]);
-                //if (oneRide.AmountOfEquipments > 0)
-                //{
-                //    oneRide.PatientEquipments = GetListOfEquipmentsForPAtient(oneRide.PatientId);
-                //}
-                //oneRide.AmountOfEscorts = Convert.ToInt32(dataReader["AmountOfEscorts"]);
                 oneRide.Origin = dataReader["Origin"].ToString();
                 oneRide.Destination = dataReader["Destination"].ToString();
                 oneRide.PickupTime = Convert.ToDateTime(dataReader["pickupTime"]);
@@ -550,7 +677,7 @@ public class DBservice_Gilad
         }
         catch (Exception ex)
         {
-            WriteToErrorFile("Get_unityRide_ByTimeRange Get_unityRide_ByTimeRange spGet_UnityRide_ByTimeRange", ex.Message +ex.ToString());
+            WriteToErrorFile("Get_unityRide_ByTimeRange Get_unityRide_ByTimeRange spGet_UnityRide_ByTimeRange", ex.Message + ex.ToString());
             throw new Exception("exception in DBservice_Gilad.cs ?  Get_unityRide_ByTimeRange" + ex);
         }
 
@@ -563,6 +690,9 @@ public class DBservice_Gilad
         }
 
     }
+
+
+
 
 
     public UnityRide GetReturnUnityRide(int unityRideID)
@@ -586,7 +716,7 @@ public class DBservice_Gilad
         return u;
 
     }
-    public List <object> GetTomorrowRides()
+    public List<object> GetTomorrowRides()
     {
         SqlCommand cmd;
         try
@@ -601,7 +731,7 @@ public class DBservice_Gilad
             throw (ex);
         }
         cmd = CreateCommandWithStoredProcedureGeneral("GetTomorrowRides_Gilad", con, null);
-        List <object> list = new List<object>();
+        List<object> list = new List<object>();
 
         try
         {
@@ -611,7 +741,8 @@ public class DBservice_Gilad
 
             while (dataReader.Read())
             {
-                var rideFromRPview = new {
+                var rideFromRPview = new
+                {
                     Id = Convert.ToInt32(dataReader["Id"]),
                     pickupTime = Convert.ToDateTime(dataReader["pickupTime"]),
                     pickupHour = dataReader["pickupHour"].ToString(),
@@ -701,7 +832,7 @@ public class DBservice_Gilad
                     rp.Drivers.Add(mainDriver);
                 }
 
-           
+
 
                 Location origin = new Location();
                 origin.Name = dataReader["Origin"].ToString();
@@ -770,7 +901,7 @@ public class DBservice_Gilad
         {
             // write to log
             WriteToErrorFile("GetUnityRide_RidePat getUnityRideAsRP GetUnityRideAsRidePat GetUnityRide", ex.Message + ex.ToString());
-            throw new Exception ("error in GetUnityRideAsRidePat "+ex.Message);
+            throw new Exception("error in GetUnityRideAsRidePat " + ex.Message);
         }
 
         finally
@@ -784,7 +915,7 @@ public class DBservice_Gilad
 
     }
 
-    public List <object> GetUnityRide(int UnityRideId)
+    public List<object> GetUnityRide(int UnityRideId)
     {
         SqlCommand cmd;
         try
@@ -832,8 +963,8 @@ public class DBservice_Gilad
                 OneRideTry.PatientIdentity = dataReader["PatientIdentity"] != DBNull.Value ? Convert.ToInt32(dataReader["PatientIdentity"]) : (int?)null;
                 OneRideTry.DisplayNameArabic = dataReader["DisplayNameArabic"].ToString();
                 OneRideTry.Equipments = Convert.ToInt32(dataReader["AmountOfEquipments"]) > 0 ? GetListOfEquipmentsForPAtient(Convert.ToInt32(dataReader["PatientId"])) : new List<string>();
-                OneRideTry.Escorts = OneRideTry.AmountOfEscorts>0? GetListOfEscortsByUnityRideId(OneRideTry.RidePatNum) : new List<string>();
-                OneRideTry.IsAnonymous = dataReader["IsAnonymous"]!= DBNull.Value ? Convert.ToBoolean(dataReader["IsAnonymous"]) : false;
+                OneRideTry.Escorts = OneRideTry.AmountOfEscorts > 0 ? GetListOfEscortsByUnityRideId(OneRideTry.RidePatNum) : new List<string>();
+                OneRideTry.IsAnonymous = dataReader["IsAnonymous"] != DBNull.Value ? Convert.ToBoolean(dataReader["IsAnonymous"]) : false;
                 OneRideTry.EscortList = GetListOfEscortsByPatientId(OneRideTry.PatientId);
                 OneRideTry.CoorName = dataReader["Coordinator"].ToString();
                 OneRideTry.CoorId = Convert.ToInt32(dataReader["CoordinatorID"]);
@@ -860,7 +991,10 @@ public class DBservice_Gilad
     }
 
 
-    public List <CandidateV2> GetCandidateUnityRideV2(int rideNum,int mode = 3) 
+
+
+
+    public List<string> GetManagersVolunteersCellPhones()
     {
         SqlCommand cmd;
         try
@@ -874,71 +1008,26 @@ public class DBservice_Gilad
             // write to log
             throw (ex);
         }
-        Dictionary<string, object> paramDic = new Dictionary<string, object>();
-        paramDic.Add("@ridePatNum", rideNum);
-        string sp = "";
-        //newbis
-        if (mode == 0)
-        {
-             sp = "sp_GetNewbisCandidateForUnityRideNEW";
-        }
-        //regular
-        else if (mode == 1)
-        {
-            sp = "sp_getRegularCandidateUnityRideV2";
-        }
-        else if(mode == 2)
-        {
-            sp = "sp_getSuperCandidateUnityRideV2";
-        }
-        else if (mode==3)
-        {
-            sp = "sp_getALLCandidateUnityRideV2";
-        }
-        cmd = CreateCommandWithStoredProcedureGeneral(sp, con, paramDic);
-        List<CandidateV2> list = new List<CandidateV2>();
+
+
+        cmd = CreateCommandWithStoredProcedureGeneral("sp_GetManagersTypeVolunteers", con, null);
+        List<string> cellphones = new List<string>();
+
         try
         {
 
 
             SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
 
-
-
             while (dataReader.Read())
             {
-                CandidateV2 candidateV2 = new CandidateV2();
 
-                candidateV2.Id = SafeConvert<int>(dataReader["Id"]);
-                candidateV2.Vtype = SafeConvertString(dataReader["Vtype"]);
-                candidateV2.DisplayName = SafeConvertString(dataReader["DisplayName"]);
-                candidateV2.CellPhone = SafeConvertString(dataReader["CellPhone"]);
-                candidateV2.JoinDate = SafeConvertString(dataReader["JoinDate"]);
-                candidateV2.NoOfDocumentedCalls = SafeConvert<int>(dataReader["NoOfDocumentedCalls"]);
-                candidateV2.CityCityName = SafeConvertString(dataReader["CityCityName"]);
-                candidateV2.AvailableSeats = SafeConvert<int>(dataReader["AvailableSeats"]);
-                candidateV2.NoOfDocumentedRides = SafeConvert<int>(dataReader["NoOfDocumentedRides"]);
-                candidateV2.SeniorityInYears = SafeConvertToFloat(dataReader["SeniorityInYears"]);
-                candidateV2.LastCallDateTime = SafeConvertString(dataReader["LastCallDateTime"]);
-                candidateV2.LastRideInDays = SafeConvert<int>(dataReader["LastRideInDays"]);
-                candidateV2.NextRideInDays = SafeConvert<int>(dataReader["NextRideInDays"]);
-                candidateV2.NumOfRidesLast2Month = SafeConvert<int>(dataReader["NumOfRidesLast2Month"]);
-                candidateV2.AmountOfRidesInThisPath = SafeConvert<int>(dataReader["AmountOfRidesInThisPath"]);
-                candidateV2.AmountOfRidesInOppositePath = SafeConvert<int>(dataReader["AmountOfRidesInOppositePath"]);
-                candidateV2.AmountOfRides_OriginToArea = SafeConvert<int>(dataReader["AmountOfRides_OriginToArea"]);
-                candidateV2.AmountOfRidesAtThisTime = SafeConvert<int>(dataReader["AmountOfRidesAtThisTime"]);
-                candidateV2.AmountOfRidesAtThisDayWeek = SafeConvert<int>(dataReader["AmountOfRidesAtThisDayWeek"]);
-                candidateV2.SumOfKM = SafeConvertToFloat(dataReader["SumOfKM"]);
-                candidateV2.Score = 0;
+                cellphones.Add(dataReader["CellPhone"].ToString());
 
 
-
-
-                
-                list.Add(candidateV2);
             }
+            return cellphones;
 
-            return list;
         }
         catch (Exception ex)
         {
@@ -956,9 +1045,6 @@ public class DBservice_Gilad
         }
 
     }
-
-
-
 
     public Dictionary<string, object> GetEnglishNamesOfPatientOriginDest(int id)
     {
@@ -995,14 +1081,14 @@ public class DBservice_Gilad
                 res.Add("OriginEnglishName", dataReader["OriginEnglishName"].ToString());
                 res.Add("DestEnglishName", dataReader["DestEnglishName"].ToString());
 
-                
 
-                
+
+
 
 
             }
             return res;
-            
+
         }
         catch (Exception ex)
         {
@@ -1086,7 +1172,8 @@ public class DBservice_Gilad
         }
     }
 
-    public bool CheckValidDriverRides(int unityRideID,string DriverName,DateTime pickupTime) {
+    public bool CheckValidDriverRides(int unityRideID, string DriverName, DateTime pickupTime)
+    {
         SqlCommand cmd;
         try
         {
@@ -1114,13 +1201,13 @@ public class DBservice_Gilad
             int res = -1;
             while (dataReader.Read())
             {
-                
+
 
 
                 res = Convert.ToInt32(dataReader["res"]);
 
             }
-            if (res>0)
+            if (res > 0)
             {
                 return true;
             }
@@ -1147,7 +1234,7 @@ public class DBservice_Gilad
     }
 
 
-    public int recoverUnityRide(int unityRideID,string whoChange)
+    public int recoverUnityRide(int unityRideID, string whoChange)
     {
         SqlCommand cmd;
         try
@@ -1175,12 +1262,12 @@ public class DBservice_Gilad
 
             res = cmd.ExecuteNonQuery();
             return res;
-         
+
         }
         catch (Exception ex)
         {
             // write to log
-            WriteToErrorFile("recoverUnityRides recoverUnityRide spRecoverUnityRide",ex.Message + ex.ToString());
+            WriteToErrorFile("recoverUnityRides recoverUnityRide spRecoverUnityRide", ex.Message + ex.ToString());
             throw new Exception("exception in DBservice_Gilad.cs -> recoverUnityRide " + ex);
         }
 
@@ -1197,7 +1284,7 @@ public class DBservice_Gilad
 
 
 
-   public int leaveUnityRideForMobile(int driverID,int unityRideID)
+    public int leaveUnityRideForMobile(int driverID, int unityRideID)
     {
         SqlCommand cmd;
         try
@@ -1222,18 +1309,18 @@ public class DBservice_Gilad
         try
         {
             ur = reciveUnityRideDB(cmd, "LeaveUnityRide leaveUnityRideFromMobile leaveUnityRideForMobile spDriverLeaveUnityRide");
-            if (ur.RidePatNum>0)
+            if (ur.RidePatNum > 0)
             {
                 res = 1;
                 BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
-                
+
             }
             return res;
         }
         catch (Exception ex)
         {
 
-            
+
             throw new Exception("Error leaveUnityRideForMobile dbservice_gilad" + ex.Message);
         }
     }
@@ -1267,7 +1354,7 @@ public class DBservice_Gilad
         paramDic.Add("@area", unityRide.Area);
         paramDic.Add("@isAnonymous", unityRide.IsAnonymous);
         paramDic.Add("@coorName", unityRide.CoorName);
-        paramDic.Add("@driverName", unityRide.DriverName==null?DBNull.Value.ToString(): unityRide.DriverName);
+        paramDic.Add("@driverName", unityRide.DriverName == null ? DBNull.Value.ToString() : unityRide.DriverName);
         paramDic.Add("@amountOfEscorts", unityRide.AmountOfEscorts);
         cmd = CreateCommandWithStoredProcedureGeneral("spSetNewUnityRide", con, paramDic);
         int res = 0;
@@ -1394,7 +1481,7 @@ public class DBservice_Gilad
 
 
 
-    public int hasFutureRidesByDates(int volunteerID,DateTime start, DateTime end)
+    public int hasFutureRidesByDates(int volunteerID, DateTime start, DateTime end)
     {
         SqlCommand cmd;
         try
@@ -1442,27 +1529,27 @@ public class DBservice_Gilad
 
 
     public List<Patient> GetPatinetsByActiveStatus(bool active)
-	{
+    {
 
-		Location tmp = new Location();
-		Hashtable locations = tmp.getLocationsEnglishName();
-		//SqlConnection con;
-		SqlCommand cmd;
-		try
-		{
-			con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
-			con.Open();
-		}
+        Location tmp = new Location();
+        Hashtable locations = tmp.getLocationsEnglishName();
+        //SqlConnection con;
+        SqlCommand cmd;
+        try
+        {
+            con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString);
+            con.Open();
+        }
 
-		catch (Exception ex)
-		{
-			// write to log
-			throw (ex);
-		}
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
 
-		//String cStr = BuildUpdateCommand(student);      // helper method to build the insert string
-		Dictionary<string, object> paramDic = new Dictionary<string, object>();
-		paramDic.Add("@active", active);
+        //String cStr = BuildUpdateCommand(student);      // helper method to build the insert string
+        Dictionary<string, object> paramDic = new Dictionary<string, object>();
+        paramDic.Add("@active", active);
 
 
         ///////////VERY IMPORTANT///////////
@@ -1473,97 +1560,97 @@ public class DBservice_Gilad
         cmd = CreateCommandWithStoredProcedureGeneral("sp_GetPatientList", con, paramDic);             // create the command
 
 
-		List<Patient> PatientsList = new List<Patient>();
+        List<Patient> PatientsList = new List<Patient>();
 
-		try
-		{
-
-
-			SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
-
-			while (dataReader.Read())
-			{
-
-				Patient OnePatient = new Patient();
+        try
+        {
 
 
-				OnePatient.Id = int.Parse(dataReader["Id"].ToString());
-				//OnePatient.IsAnonymous = dataReader["IsAnonymous"].ToString();
-				//OnePatient.NumberOfEscort = dataReader["NumberOfEscort"].ToString();
-				OnePatient.DisplayName = dataReader["DisplayName"].ToString();
-				//OnePatient.DisplayNameA = dataReader["DisplayNameA"].ToString();
-				//OnePatient.FirstNameA = dataReader["FirstNameA"].ToString();
-				//OnePatient.FirstNameH = dataReader["FirstNameH"].ToString();
-				//OnePatient.LastNameH = dataReader["LastNameH"].ToString();
-				//OnePatient.LastNameA = dataReader["LastNameA"].ToString();
-				OnePatient.CellPhone = dataReader["CellPhone"].ToString();
-              
-                
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            while (dataReader.Read())
+            {
+
+                Patient OnePatient = new Patient();
+
+
+                OnePatient.Id = int.Parse(dataReader["Id"].ToString());
+                //OnePatient.IsAnonymous = dataReader["IsAnonymous"].ToString();
+                //OnePatient.NumberOfEscort = dataReader["NumberOfEscort"].ToString();
+                OnePatient.DisplayName = dataReader["DisplayName"].ToString();
+                //OnePatient.DisplayNameA = dataReader["DisplayNameA"].ToString();
+                //OnePatient.FirstNameA = dataReader["FirstNameA"].ToString();
+                //OnePatient.FirstNameH = dataReader["FirstNameH"].ToString();
+                //OnePatient.LastNameH = dataReader["LastNameH"].ToString();
+                //OnePatient.LastNameA = dataReader["LastNameA"].ToString();
+                OnePatient.CellPhone = dataReader["CellPhone"].ToString();
+
+
                 OnePatient.CellPhone1 = dataReader["CellPhone2"].ToString();
-                
-                
-				//OnePatient.HomePhone = dataReader["HomePhone"].ToString();
-				//OnePatient.City = dataReader["CityCityName"].ToString();
-				//OnePatient.LivingArea = dataReader["LivingArea"].ToString();
-				OnePatient.IsActive = Convert.ToBoolean(dataReader["IsACtive"].ToString());
-				OnePatient.BirthDate = dataReader["BirthDate"].ToString();
-				//OnePatient.History = dataReader["History"].ToString();
-				//OnePatient.Department = dataReader["Department"].ToString();
-				if (dataReader["PatientIdentity"].ToString() == "")
-				{
-					OnePatient.PatientIdentity = 0;
-				}
-				else OnePatient.PatientIdentity = int.Parse(dataReader["PatientIdentity"].ToString());
-				string barrier = dataReader["Barrier"].ToString();
-				OnePatient.Barrier = new Location(barrier);
-				if (locations[barrier] != null)
-				{
-					OnePatient.Barrier.EnglishName = locations[barrier].ToString();
-				}
-				else OnePatient.Barrier.EnglishName = "";
-				string hospital = dataReader["Hospital"].ToString();
-				OnePatient.Hospital = new Location();
-				OnePatient.Hospital.Name = hospital;
-				if (locations[hospital] != null)
-				{
-					OnePatient.Hospital.EnglishName = locations[hospital].ToString();
-				}
-				else OnePatient.Hospital.EnglishName = "";
-				OnePatient.Gender = dataReader["Gender"].ToString();
-				//OnePatient.Remarks = dataReader["Remarks"].ToString();
-				OnePatient.EnglishName = dataReader["EnglishName"].ToString();
-				List <string> el = new List<string>();
-				//get equipment for patient from the same view
-				//string e = dataReader["EquipmentName"].ToString();
 
-				OnePatient.LastModified = dataReader["lastModified"].ToString();
-				//el.Add(e);
-				OnePatient.Equipment = el;
 
-				PatientsList.Add(OnePatient);
-			}
+                //OnePatient.HomePhone = dataReader["HomePhone"].ToString();
+                //OnePatient.City = dataReader["CityCityName"].ToString();
+                //OnePatient.LivingArea = dataReader["LivingArea"].ToString();
+                OnePatient.IsActive = Convert.ToBoolean(dataReader["IsACtive"].ToString());
+                OnePatient.BirthDate = dataReader["BirthDate"].ToString();
+                //OnePatient.History = dataReader["History"].ToString();
+                //OnePatient.Department = dataReader["Department"].ToString();
+                if (dataReader["PatientIdentity"].ToString() == "")
+                {
+                    OnePatient.PatientIdentity = 0;
+                }
+                else OnePatient.PatientIdentity = int.Parse(dataReader["PatientIdentity"].ToString());
+                string barrier = dataReader["Barrier"].ToString();
+                OnePatient.Barrier = new Location(barrier);
+                if (locations[barrier] != null)
+                {
+                    OnePatient.Barrier.EnglishName = locations[barrier].ToString();
+                }
+                else OnePatient.Barrier.EnglishName = "";
+                string hospital = dataReader["Hospital"].ToString();
+                OnePatient.Hospital = new Location();
+                OnePatient.Hospital.Name = hospital;
+                if (locations[hospital] != null)
+                {
+                    OnePatient.Hospital.EnglishName = locations[hospital].ToString();
+                }
+                else OnePatient.Hospital.EnglishName = "";
+                OnePatient.Gender = dataReader["Gender"].ToString();
+                //OnePatient.Remarks = dataReader["Remarks"].ToString();
+                OnePatient.EnglishName = dataReader["EnglishName"].ToString();
+                List<string> el = new List<string>();
+                //get equipment for patient from the same view
+                //string e = dataReader["EquipmentName"].ToString();
 
-			return PatientsList;
-		}
-		catch (Exception ex)
-		{
-			// write to log
-			throw (ex);
-		}
+                OnePatient.LastModified = dataReader["lastModified"].ToString();
+                //el.Add(e);
+                OnePatient.Equipment = el;
 
-		finally
-		{
-			if (con != null)
-			{
-				// close the db connection
-				con.Close();
-			}
-		}
-	}
+                PatientsList.Add(OnePatient);
+            }
 
-    public List<RidePat> GetRidePatViewByTimeFilter_Gilad_DR(int from, int until,bool isDeletedtoShow)
+            return PatientsList;
+        }
+        catch (Exception ex)
+        {
+            // write to log
+            throw (ex);
+        }
+
+        finally
+        {
+            if (con != null)
+            {
+                // close the db connection
+                con.Close();
+            }
+        }
+    }
+
+    public List<RidePat> GetRidePatViewByTimeFilter_Gilad_DR(int from, int until, bool isDeletedtoShow)
     {
-        
+
         //Gilad_gilad_
         //this method fetches ridepat which marked removed as well
         Location tmp = new Location();
@@ -1760,8 +1847,10 @@ public class DBservice_Gilad
             WriteToErrorFile(ancestors, "Error to get rides by volunteerId \n" + ex.Message + ex.ToString());
             throw new Exception("Error to get GetRidesByVolunteer dbservice_gilad" + ex.Message);
         }
-        finally { 
-            if (con != null) {
+        finally
+        {
+            if (con != null)
+            {
 
                 con.Close();
 
@@ -1863,16 +1952,16 @@ public class DBservice_Gilad
 
             throw new Exception("exception in DBservice_Gilad.cs GetVoluntterAbsenceById sp -->" + ex);
         }
-        finally 
-        { 
+        finally
+        {
             if (con != null)
             {
                 con.Close();
-            } 
+            }
         }
     }
 
-    public int UpdateAbsenceById(int AbsenceId,int coorId, DateTime from, DateTime until , string cause,string note)
+    public int UpdateAbsenceById(int AbsenceId, int coorId, DateTime from, DateTime until, string cause, string note)
     {
         SqlCommand cmd;
         try
@@ -1898,10 +1987,10 @@ public class DBservice_Gilad
         int numEffected = 0;
         try
         {
-             numEffected = cmd.ExecuteNonQuery();
+            numEffected = cmd.ExecuteNonQuery();
             return numEffected;
         }
-        
+
         catch (Exception ex)
         {
 
@@ -1985,7 +2074,7 @@ public class DBservice_Gilad
         }
     }
 
-    public List <Volunteer> getVolunteersList_V2_WebOnly_Gilad(bool active)
+    public List<Volunteer> getVolunteersList_V2_WebOnly_Gilad(bool active)
     {
 
 
@@ -2031,8 +2120,18 @@ public class DBservice_Gilad
                 v.TypeVol = dataReader["VolunTypeType"].ToString();
                 v.Email = dataReader["Email"].ToString();
                 v.Device = dataReader["device"].ToString();
+
                 v.NoOfDocumentedCalls = Convert.ToInt32(dataReader["NoOfDocumentedCalls"]);
                 v.NoOfDocumentedRides = Convert.ToInt32(dataReader["NoOfDocumentedRides"]);
+                if (dataReader["No_of_rides"].ToString() == "")
+                {
+                    v.No_of_rides = 0;
+                }
+                else
+                {
+                    v.No_of_rides = Convert.ToInt32(dataReader["No_of_rides"]);
+                }
+
                 v.NumOfRides_last2Months = Convert.ToInt32(dataReader["NumOfRides_last2Months"]);
                 v.MostCommonPath = dataReader["mostCommonPath"].ToString();
 
@@ -2054,13 +2153,18 @@ public class DBservice_Gilad
                 {
                     v.AbsenceStatus = Convert.ToBoolean(dataReader["AbsenceStatus"].ToString());
                 }
+                if (dataReader["AvailableSeats"].ToString() != "")
+                {
+                    v.AvailableSeats = Convert.ToInt32(dataReader["AvailableSeats"]);
+                }
 
                 if (nearByCities.Keys.Contains(v.City))
                 {
                     v.NearestBigCity = nearByCities[v.City];
                 }
 
-
+                v.IsBooster = Convert.ToBoolean(dataReader["IsBooster"].ToString());
+                v.IsBabySeat = Convert.ToBoolean(dataReader["IsBabyChair"].ToString());
                 string date = dataReader["JoinDate"].ToString();
                 bool isAssistant = Convert.ToBoolean(dataReader["isAssistant"].ToString());
                 if (date == "")
@@ -2096,12 +2200,12 @@ public class DBservice_Gilad
             }
             return VolunteerList;
         }
-        catch (Exception ex )
+        catch (Exception ex)
         {
 
             throw new Exception("exception in DBservice_Gilad.cs spVolunteerTypeView_GetVolunteersList_Gilad sp -->" + ex);
         }
-        finally 
+        finally
         {
 
             if (con != null)
@@ -2238,7 +2342,7 @@ public class DBservice_Gilad
     }
 
 
-    public UnityRide updateUnityRideTime(int unityRideNum, DateTime editedTime,string whoChange)
+    public UnityRide updateUnityRideTime(int unityRideNum, DateTime editedTime, string whoChange)
     {
         SqlCommand cmd;
         try
@@ -2266,7 +2370,7 @@ public class DBservice_Gilad
 
     }
 
-    public UnityRide updateRemark(int UnityRideID, string newRemark,string whoChange)
+    public UnityRide updateRemark(int UnityRideID, string newRemark, string whoChange)
     {
         SqlCommand cmd;
         try
@@ -2294,7 +2398,7 @@ public class DBservice_Gilad
 
     }
 
-    public UnityRide updatePatientStatusAndTime(int patientId, int unityRideID, string patientStatus, DateTime? editTimeStamp,string whoChange)
+    public UnityRide updatePatientStatusAndTime(int patientId, int unityRideID, string patientStatus, DateTime? editTimeStamp, string whoChange)
     {
         SqlCommand cmd;
         try
@@ -2323,7 +2427,7 @@ public class DBservice_Gilad
 
     }
 
-    public UnityRide updateDriver(int driverId,int unityRideID,string whoChange)
+    public UnityRide updateDriver(int driverId, int unityRideID, string whoChange)
     {
         SqlCommand cmd;
         try
@@ -2349,7 +2453,7 @@ public class DBservice_Gilad
         return unityRide;
     }
 
-    public UnityRide deleteUnityRide(int unityRideID,string whoChange)
+    public UnityRide deleteUnityRide(int unityRideID, string whoChange)
     {
         SqlCommand cmd;
         try
@@ -2375,7 +2479,7 @@ public class DBservice_Gilad
         return unityRide;
     }
 
-    private UnityRide reciveUnityRideDB(SqlCommand cmd,string ancestors)
+    private UnityRide reciveUnityRideDB(SqlCommand cmd, string ancestors)
     {
         UnityRide unityRide = new UnityRide();
         try
@@ -2392,6 +2496,8 @@ public class DBservice_Gilad
                     unityRide.PatientId = Convert.ToInt32(dataReader["PatientId"]);
                     unityRide.PatientGender = Convert.ToInt32(Convertions.ConvertStringToGender(dataReader["PatientGender"].ToString()));
                     unityRide.PatientCellPhone = dataReader["PatientCellPhone"].ToString();
+                    unityRide.PatientCellPhone2 = dataReader["PatientCellPhone2"].ToString();
+                    unityRide.PatientCellPhone3 = dataReader["PatientCellPhone3"].ToString();
                     unityRide.PatientStatus = dataReader["PatientStatus"].ToString();
                     if (unityRide.PatientStatus != "")
                     {
@@ -2458,7 +2564,7 @@ public class DBservice_Gilad
         }
         catch (Exception ex)
         {
-            WriteToErrorFile(ancestors,ex.Message+ex.ToString());
+            WriteToErrorFile(ancestors, ex.Message + ex.ToString());
             throw new Exception("error in dbService_Gilad.cs in reciveUnityRideDB function -->" + ex.Message);
 
         }
@@ -2474,33 +2580,33 @@ public class DBservice_Gilad
     }
     // ---- Create Command with SP ---- \\ 
     private SqlCommand CreateCommandWithStoredProcedureGeneral(String spName, SqlConnection con, Dictionary<string, object> paramDic)
-	{
+    {
 
-		SqlCommand cmd = new SqlCommand(); // create the command object
+        SqlCommand cmd = new SqlCommand(); // create the command object
 
-		cmd.Connection = con;              // assign the connection to the command object
+        cmd.Connection = con;              // assign the connection to the command object
 
-		cmd.CommandText = spName;      // can be Select, Insert, Update, Delete 
+        cmd.CommandText = spName;      // can be Select, Insert, Update, Delete 
 
-		cmd.CommandTimeout = 30;           // Time to wait for the execution' The default is 30 seconds
+        cmd.CommandTimeout = 30;           // Time to wait for the execution' The default is 30 seconds
 
-        if (spName== "spGet_rpview_ByTimeRange_Gilad")
+        if (spName == "spGet_rpview_ByTimeRange_Gilad")
         {
             cmd.CommandTimeout = 85;  // spesific this sp taking almost 40 sec. that way change the timeout.
         }
 
         cmd.CommandType = System.Data.CommandType.StoredProcedure; // the type of the command, can also be text
 
-		if (paramDic != null)
-			foreach (KeyValuePair<string, object> param in paramDic)
-			{
-				cmd.Parameters.AddWithValue(param.Key, param.Value);
+        if (paramDic != null)
+            foreach (KeyValuePair<string, object> param in paramDic)
+            {
+                cmd.Parameters.AddWithValue(param.Key, param.Value);
 
-			}
+            }
 
 
-		return cmd;
-	}
+        return cmd;
+    }
 
     private T? SafeConvert<T>(object value) where T : struct
     {

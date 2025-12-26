@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 
 
 public class Absence
@@ -163,11 +161,11 @@ public class Absence
 
     public List<Absence> GetAbsenceByVolunteerId(int volunteerId)
     {
-        DBservice_Gilad dBservice_Gilad =new DBservice_Gilad();
+        DBservice_Gilad dBservice_Gilad = new DBservice_Gilad();
         return dBservice_Gilad.GetAbsenceByVolunteerId(volunteerId);
     }
 
-    static public int checkRidesBeforePostAbsence(int volunteerId,DateTime startDate, DateTime endDate)
+    static public int checkRidesBeforePostAbsence(int volunteerId, DateTime startDate, DateTime endDate)
     {
         DBservice_Gilad db = new DBservice_Gilad();
         return db.hasFutureRidesByDates(volunteerId, startDate, endDate);
@@ -175,13 +173,13 @@ public class Absence
 
     public int UpdateAbsenceById(int AbsenceId, int coorId, DateTime from, DateTime until, string cause, string note)
     {
-        DBservice_Gilad dBservice =new DBservice_Gilad();
+        DBservice_Gilad dBservice = new DBservice_Gilad();
         return dBservice.UpdateAbsenceById(AbsenceId, coorId, from, until, cause, note);
     }
 
     public int DeleteAbsenceById(int AbsenceId)
     {
-        DBservice_Gilad dBservice =new DBservice_Gilad();
+        DBservice_Gilad dBservice = new DBservice_Gilad();
         return dBservice.DeleteAbsenceById(AbsenceId);
     }
 

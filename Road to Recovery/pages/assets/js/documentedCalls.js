@@ -114,7 +114,6 @@ const openDocumentAcallModal = () => {
     $('#saveCallBtn').prop('disabled', false);
     $('#cancellCallBtn').prop('disabled', false);
 
-
     //get a list of all coordinators ()
     let allCordinatorsFromDB = [];
     let loggedInUser = {};
@@ -138,6 +137,7 @@ const openDocumentAcallModal = () => {
         success: function (data) {
             $('#wait').hide();
             allCordinatorsFromDB = JSON.parse(data.d);
+            console.log('allCordinatorsFromDB: ', allCordinatorsFromDB);
             let cordinatorsOptions = '<option value="not selected">בחר.י רכז.ת</option>';
 
             for (var i = 0; i < allCordinatorsFromDB.length; i++) {
@@ -166,7 +166,11 @@ const openDocumentAcallModal = () => {
             time.minutes = now.getMinutes() < 10 ? '0' + now.getMinutes() : now.getMinutes();
 
             document.getElementById('DocumentAcallTime').value = `${time.hours}:${time.minutes}`;
-
+            let thisCoor = allCordinatorsFromDB.find((coordinator) => {
+                return coordinator.DisplayName === localStorage.userCell;
+            });
+            //console.log('thisCoor: ', thisCoor);
+            $('#DocumentAcall_choooseCoordinator').val(thisCoor.Id);
 
             $('#documentAcallPlusBtn').prop('disabled', true);
         },
