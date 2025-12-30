@@ -1011,8 +1011,9 @@
 
                     //document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRideToAnotherPatient()" class="btn btn-success NewBtn waves-effect w-md m-b-5 "><i class="ti-plus m-r-5"></i> יצירת הסעה חדשה</button>&nbsp;';
                     document.getElementById('modalButtons').innerHTML = '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 ">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
+                    document.getElementById('modalButtons').innerHTML += '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 "><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה לאותו חולה</button>&nbsp;';
+
                     if (localStorage.getItem('userType') != undefined && localStorage.getItem('userType') == 'מנהל') {
-                        document.getElementById('modalButtons').innerHTML += '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 "><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה לאותו חולה</button>&nbsp;';
                     }
                     showMyModal('Modal');
                 }
@@ -1020,8 +1021,9 @@
                     $('#wait').hide();
                     //document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRideToAnotherPatient()" class="btn btn-success NewBtn waves-effect w-md m-b-5 "><i class="ti-plus m-r-5"></i> יצירת הסעה חדשה</button>&nbsp;';
                     document.getElementById('modalButtons').innerHTML = '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 ">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
+                    document.getElementById('modalButtons').innerHTML += '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 "><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה לאותו חולה</button>&nbsp;';
+
                     if (localStorage.getItem('userType') != undefined && localStorage.getItem('userType') == 'מנהל') {
-                        document.getElementById('modalButtons').innerHTML += '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 "><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה לאותו חולה</button>&nbsp;';
                     }
                     document.getElementById('modalButtons').innerHTML += '<button onclick="createReturnRide()" class="btn btn-success waves-effect w-md m-b-5 ">יצירת החזרה &nbsp;<i class="ti-car m-r-5"></i></button>';
                     showMyModal('Modal');
