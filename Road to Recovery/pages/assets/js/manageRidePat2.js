@@ -2261,7 +2261,14 @@ function refreshTable_UnityRide(timeInterval = 7) {
                 data: morningRidePats,
                 rowId: 'ridePatNum',
                 dom: controllersLayout,
-                buttons: [],
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        text: 'ייצוא לאקסל',
+                        title: `ניהול הסעות - בוקר ${getNext_X_DaysDateAsString(0)}`,
+                    }
+                ],
+
                 pageLength: 100,
                 stateSave: true,
                 destroy: true,
@@ -2357,7 +2364,14 @@ function refreshTable_UnityRide(timeInterval = 7) {
             tAfternoon = $(`#${tableNames.AFTERNOON}`).DataTable({
                 rowId: 'ridePatNum',
                 dom: controllersLayout,
-                buttons: [],
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        text: 'ייצוא לאקסל',
+                        title: `ניהול הסעות -  אחה"צ ${getNext_X_DaysDateAsString(0)}`,
+                    }
+                ],
+
                 pageLength: 100,
                 data: afterNoonRidePats,
                 stateSave: true,
@@ -2493,7 +2507,14 @@ function refreshTable_UnityRide(timeInterval = 7) {
             tTomorrowMorning = $(`#${tableNames.TOMORROW_MORNING}`).DataTable({
                 rowId: 'ridePatNum',
                 dom: controllersLayout,
-                buttons: [],
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        text: 'ייצוא לאקסל',
+                        title: `ניהול הסעות למחר ${getNext_X_DaysDateAsString(1)}`,
+                    }
+                ],
+
                 data: tomorrowMorningRidePats,
                 stateSave: true,
                 destroy: true,
@@ -2614,7 +2635,14 @@ function refreshTable_UnityRide(timeInterval = 7) {
             tTomorrowAfternoon = $(`#${tableNames.TOMORROW_AFTERNOON}`).DataTable({
                 rowId: 'ridePatNum',
                 dom: controllersLayout,
-                buttons: [],
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        text: 'ייצוא לאקסל',
+                        title: `ניהול הסעות למחר ${getNext_X_DaysDateAsString(1)}`,
+                    }
+                ],
+
                 data: tomorrowAfternoonRidePats,
                 stateSave: true,
                 destroy: true,
@@ -2742,7 +2770,14 @@ function refreshTable_UnityRide(timeInterval = 7) {
                 fnInitComplete: function (x) {
                     buildHtmlSelectTimeInterval();
                 },
-                buttons: [],
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        text: 'ייצוא לאקסל',
+                        title: `ניהול הסעות עתידיות ${getNext_X_DaysDateAsString(2)} - ${getNext_X_DaysDateAsString(7)}`,
+                    }
+                ],
+
                 data: futureRidePats,
                 stateSave: true,
                 destroy: true,
