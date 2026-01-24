@@ -1,4 +1,5 @@
 #wait {
+    display: none;
     position: fixed;
     top: 50%;
     left: 45%;
@@ -327,4 +328,78 @@ tr td .ToRight {
 
 #wrapper table tr td .phones-patient-p {
     margin: 0;
+}
+
+/* Loading indicator for split ride loading */
+.table-loading-indicator {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 20px;
+    padding: 6px 14px;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(135deg, #ff9800, #ff5722);
+    border-radius: 20px;
+    box-shadow: 0 3px 8px rgba(255, 87, 34, 0.4);
+    animation: pulseGlow 1.5s ease-in-out infinite;
+}
+
+.table-loading-indicator .spinner {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 3px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 0.7s linear infinite;
+    margin-left: 10px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        opacity: 1;
+        box-shadow: 0 3px 8px rgba(255, 87, 34, 0.4);
+    }
+    50% {
+        opacity: 0.85;
+        box-shadow: 0 3px 15px rgba(255, 87, 34, 0.7);
+    }
+}
+
+.table-loaded-indicator {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 20px;
+    padding: 6px 14px;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+    border-radius: 20px;
+    box-shadow: 0 3px 8px rgba(46, 125, 50, 0.4);
+}
+
+.table-loaded-indicator .checkmark {
+    margin-left: 8px;
+    font-size: 1.2em;
+}
+
+.table-error-indicator {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 20px;
+    padding: 6px 14px;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(135deg, #f44336, #c62828);
+    border-radius: 20px;
+    box-shadow: 0 3px 8px rgba(198, 40, 40, 0.4);
 }
