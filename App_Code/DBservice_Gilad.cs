@@ -2074,6 +2074,130 @@ public class DBservice_Gilad
         }
     }
 
+
+    public List<Volunteer> GetVolunteersList_All_Fast()
+    {
+        var volunteers = new List<Volunteer>();
+
+        using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString))
+        using (var cmd = new SqlCommand("spVolunteerTypeView_GetVolunteersList_All_FAST", con))
+        {
+            cmd.CommandType = CommandType.StoredProcedure;
+            con.Open();
+
+            City city = new City();
+            Dictionary<string, string> nearByCities = city.getNearbyCities();
+
+            using (var reader = cmd.ExecuteReader())
+            {
+                int ordId = reader.GetOrdinal("Id");
+                int ordDisplayName = reader.GetOrdinal("DisplayName");
+                int ordFirstNameH = reader.GetOrdinal("FirstNameH");
+                int ordLastNameH = reader.GetOrdinal("LastNameH");
+                int ordEnglishName = reader.GetOrdinal("EnglishName");
+                int ordCellPhone = reader.GetOrdinal("CellPhone");
+                int ordCellPhone2 = reader.GetOrdinal("CellPhone2");
+                int ordHomePhone = reader.GetOrdinal("HomePhone");
+                int ordRemarks = reader.GetOrdinal("Remarks");
+                int ordCity = reader.GetOrdinal("CityCityName");
+                int ordAddress = reader.GetOrdinal("Address");
+                int ordTypeVol = reader.GetOrdinal("VolunTypeType");
+                int ordEmail = reader.GetOrdinal("Email");
+                int ordDevice = reader.GetOrdinal("Device");
+                int ordCalls = reader.GetOrdinal("NoOfDocumentedCalls");
+                int ordRides = reader.GetOrdinal("NoOfDocumentedRides");
+                int ordNoOfRides = reader.GetOrdinal("No_of_Rides");
+                int ordRidesLast2Months = reader.GetOrdinal("NumOfRides_last2Months");
+                int ordMostCommonPath = reader.GetOrdinal("MostCommonPath");
+                int ordLatestDrive = reader.GetOrdinal("LatestDrive");
+                int ordAbsenceStatus = reader.GetOrdinal("AbsenceStatus");
+                int ordAvailableSeats = reader.GetOrdinal("AvailableSeats");
+                int ordIsBooster = reader.GetOrdinal("IsBooster");
+                int ordIsBabyChair = reader.GetOrdinal("IsBabyChair");
+                int ordJoinDate = reader.GetOrdinal("JoinDate");
+                int ordIsAssistant = reader.GetOrdinal("IsAssistant");
+                int ordIsActive = reader.GetOrdinal("IsActive");
+                int ordKnowsArabic = reader.GetOrdinal("KnowsArabic");
+                int ordGender = reader.GetOrdinal("Gender");
+                int ordPnRegId = reader.GetOrdinal("PnRegId");
+                int ordLastModified = reader.GetOrdinal("LastModified");
+                int ordIsDriving = reader.GetOrdinal("IsDriving");
+
+                while (reader.Read())
+                {
+                    try
+                    {
+                        var v = new Volunteer
+                        {
+                            Id = reader.GetInt32(ordId),
+                            DisplayName = reader[ordDisplayName] as string,
+                            FirstNameH = reader[ordFirstNameH] as string,
+                            LastNameH = reader[ordLastNameH] as string,
+                            EnglishName = reader[ordEnglishName] as string,
+                            CellPhone = reader[ordCellPhone] as string,
+                            CellPhone2 = reader[ordCellPhone2] as string,
+                            HomePhone = reader[ordHomePhone] as string,
+                            Remarks = reader[ordRemarks] as string,
+                            City = reader[ordCity] as string,
+                            Address = reader[ordAddress] as string,
+                            TypeVol = reader[ordTypeVol] as string,
+                            Email = reader[ordEmail] as string,
+                            Device = reader[ordDevice] as string,
+
+                            NoOfDocumentedCalls = reader.GetInt32(ordCalls),
+                            NoOfDocumentedRides = reader.GetInt32(ordRides),
+                            No_of_rides = reader.IsDBNull(ordNoOfRides) ? 0 : reader.GetInt32(ordNoOfRides),
+                            NumOfRides_last2Months = reader.GetInt32(ordRidesLast2Months),
+
+                            MostCommonPath = reader[ordMostCommonPath] as string,
+                            AbsenceStatus = reader.GetBoolean(ordAbsenceStatus),
+
+                            AvailableSeats = reader.IsDBNull(ordAvailableSeats) ? 0 : reader.GetInt32(ordAvailableSeats),
+                            IsBooster = reader.GetBoolean(ordIsBooster),
+                            IsBabySeat = reader.GetBoolean(ordIsBabyChair),
+
+                            IsAssistant = reader.GetBoolean(ordIsAssistant),
+                            IsActive = reader.GetBoolean(ordIsActive),
+                            KnowsArabic = reader.GetBoolean(ordKnowsArabic),
+                            Gender = reader[ordGender] as string,
+                            RegId = reader[ordPnRegId] as string,
+                            IsDriving = reader.IsDBNull(ordIsDriving) ? false : reader.GetBoolean(ordIsDriving)
+                        };
+
+                        if (!reader.IsDBNull(ordJoinDate))
+                            v.JoinDate = reader.GetDateTime(ordJoinDate);
+
+                        if (!reader.IsDBNull(ordLatestDrive))
+                            v.LatestDrive = reader.GetDateTime(ordLatestDrive);
+
+                        if (!reader.IsDBNull(ordLastModified))
+                            v.DateTime_LastModified = reader.GetDateTime(ordLastModified);
+
+                        string nearest;
+                        if (!string.IsNullOrEmpty(v.City) &&
+                            nearByCities.TryGetValue(v.City, out nearest))
+                        {
+                            v.NearestBigCity = nearest;
+                        }
+
+                        volunteers.Add(v);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log the exception
+                        Console.WriteLine("Error processing volunteer data:" + ex.Message);
+                        throw ex;
+                    }
+
+                }
+            }
+        }
+
+        return volunteers;
+    }
+
+
+
     public List<Volunteer> getVolunteersList_V2_WebOnly_Gilad(bool active)
     {
 

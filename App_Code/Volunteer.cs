@@ -1601,7 +1601,10 @@ public class Volunteer
     public List<Volunteer> getVolunteersList_V2_WebOnly_Gilad(bool active)
     {
         DBservice_Gilad dBservice_Gilad = new DBservice_Gilad();
-        return dBservice_Gilad.getVolunteersList_V2_WebOnly_Gilad(active);
+        return dBservice_Gilad.GetVolunteersList_All_Fast();
+
+        //old method (need to remove, this method is with active filter not in use anymore)
+        //return dBservice_Gilad.getVolunteersList_V2_WebOnly_Gilad(active);
     }
 
 
