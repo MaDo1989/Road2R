@@ -140,11 +140,72 @@ GO
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--NOTE HERE COMPUTING QUERY !!!!!!!
+--NOTE HERE COMPUTING QUERY !!!!!!!
+--NOTE HERE COMPUTING QUERY !!!!!!!
+--NOTE HERE COMPUTING QUERY !!!!!!!
+--NOTE HERE COMPUTING QUERY !!!!!!!
+--NOTE HERE COMPUTING QUERY !!!!!!!
+-- קודם נראה מה המצב הנוכחי לעומת מה שצריך להיות
+WITH CalculatedStats AS (
+    SELECT 
+        MainDriver,
+        COUNT(*) AS Calculated_NoOfDocumentedRides,
+        COUNT(DISTINCT CONCAT(Origin, '|', Destination, '|', CONVERT(varchar, pickupTime, 120))) AS Calculated_No_of_Rides
+    FROM UnityRide
+    WHERE MainDriver IS NOT NULL
+      AND Status != N'נמחקה'
+    GROUP BY MainDriver
+)
+SELECT 
+    v.Id,
+    v.DisplayName,
+    v.NoOfDocumentedRides AS Current_NoOfDocumentedRides,
+    v.No_of_Rides AS Current_No_of_Rides,
+    ISNULL(c.Calculated_NoOfDocumentedRides, 0) AS Should_Be_NoOfDocumentedRides,
+    ISNULL(c.Calculated_No_of_Rides, 0) AS Should_Be_No_of_Rides
+FROM Volunteer v
+LEFT JOIN CalculatedStats c ON v.Id = c.MainDriver
+WHERE v.NoOfDocumentedRides != ISNULL(c.Calculated_NoOfDocumentedRides, 0)
+   OR v.No_of_Rides != ISNULL(c.Calculated_No_of_Rides, 0)
+   OR v.No_of_Rides IS NULL
+ORDER BY v.DisplayName
 
 
 
 
 
+
+--BEFORE EXCUTE IT , INVESTIGATE THE RESULT OF THE QUERY ABOVE
+--BEFORE EXCUTE IT , INVESTIGATE THE RESULT OF THE QUERY ABOVE
+--BEFORE EXCUTE IT , INVESTIGATE THE RESULT OF THE QUERY ABOVE
+--BEFORE EXCUTE IT , INVESTIGATE THE RESULT OF THE QUERY ABOVE
+--BEFORE EXCUTE IT , INVESTIGATE THE RESULT OF THE QUERY ABOVE
+--BEFORE EXCUTE IT , INVESTIGATE THE RESULT OF THE QUERY ABOVE
+--BEFORE EXCUTE IT , INVESTIGATE THE RESULT OF THE QUERY ABOVE
+--BEFORE EXCUTE IT , INVESTIGATE THE RESULT OF THE QUERY ABOVE
+--BEFORE EXCUTE IT , INVESTIGATE THE RESULT OF THE QUERY ABOVE
+WITH CalculatedStats AS (
+    SELECT 
+        MainDriver,
+        COUNT(*) AS Calculated_NoOfDocumentedRides,
+        COUNT(DISTINCT CONCAT(Origin, '|', Destination, '|', CONVERT(varchar, pickupTime, 120))) AS Calculated_No_of_Rides
+    FROM UnityRide
+    WHERE MainDriver IS NOT NULL
+      AND Status != N'נמחקה'
+    GROUP BY MainDriver
+)
+UPDATE v
+SET 
+    v.NoOfDocumentedRides = ISNULL(c.Calculated_NoOfDocumentedRides, 0),
+    v.No_of_Rides = ISNULL(c.Calculated_No_of_Rides, 0)
+FROM Volunteer v
+LEFT JOIN CalculatedStats c ON v.Id = c.MainDriver
+
+
+ALTER TABLE Volunteer
+ADD CONSTRAINT DF_Volunteer_No_of_Rides DEFAULT 0 FOR No_of_Rides
+
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -157,7 +218,78 @@ GO
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-
+-- =============================================
+-- Author:      <Gilad Meirson>
+-- Create Date: <21/10/2025>
+-- Modified:    <10/12/2025> - Added EquipmentList to avoid N+1 problem
+-- Modified:    <31/01/2026> - Added afternoon detection for rides >= 12:00
+-- Description: <try to split the unityRide packs to improve load times>
+-- =============================================
+ALTER PROCEDURE [dbo].[sp_getUnityRidesSplit]
+(
+    @ride_date datetime,
+    @isAfternoon bit,
+    @isFutureTable bit,
+    @days smallint
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    IF(@isFutureTable = 0)
+    BEGIN
+        SELECT 
+            u.*,
+            NULLIF(p.CellPhone, '') AS CellPhone,
+            NULLIF(p.CellPhone2, '') AS PatientCellPhone2,
+            NULLIF(p.HomePhone, '') AS PatientCellPhone3,
+            (
+                SELECT STRING_AGG(EquipmentName, ',') WITHIN GROUP (ORDER BY EquipmentName)
+                FROM EquipmentForPatientView E
+                WHERE E.id = u.PatientId
+            ) AS EquipmentList
+        FROM UnityRide AS u
+        LEFT JOIN Patient AS p ON p.Id = u.PatientId
+        WHERE u.Status <> N'נמחקה'
+            AND CONVERT(DATE, @ride_date) = CONVERT(DATE, u.PickupTime)
+            AND (
+                (
+                    @isAfternoon = 1 
+                    AND (DATEPART(MINUTE, u.PickupTime) = 14 OR DATEPART(HOUR, u.PickupTime) >= 12)
+                )
+                OR
+                (
+                    ISNULL(@isAfternoon, 0) = 0 
+                    AND DATEPART(MINUTE, u.PickupTime) <> 14 
+                    AND DATEPART(HOUR, u.PickupTime) < 12
+                )
+            )
+    END
+    ELSE IF(@isFutureTable = 1)
+    BEGIN
+        SELECT 
+            u.*,
+            NULLIF(p.CellPhone, '') AS CellPhone,
+            NULLIF(p.CellPhone2, '') AS PatientCellPhone2,
+            NULLIF(p.HomePhone, '') AS PatientCellPhone3,
+            (
+                SELECT STRING_AGG(EquipmentName, ',') WITHIN GROUP (ORDER BY EquipmentName)
+                FROM EquipmentForPatientView E
+                WHERE E.id = u.PatientId
+            ) AS EquipmentList
+        FROM UnityRide AS u
+        LEFT JOIN Patient AS p ON p.Id = u.PatientId
+        WHERE 
+            CONVERT(DATE, u.PickupTime) BETWEEN
+                CONVERT(DATE, DATEADD(DAY, 2, GETDATE())) AND
+                CONVERT(DATE, DATEADD(DAY, @days, GETDATE()))
+            AND u.Status <> N'נמחקה'
+    END
+    ELSE
+    BEGIN
+        SELECT -1 AS RidePatNum, 'Error @isFutureTable is not defined' AS error
+    END
+END
 
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
