@@ -48,13 +48,13 @@
 
     <script src="dataTables.js"></script>
     <script src="moment.js"></script>
-    <script src="datetime-moment.js">
+    <script src="datetime-moment.js"></script>
 
 
 
     <!-- Select2 css+js -->
-                <link href="assets/css/select2.css" rel="stylesheet" />
-                <script src="assets/js/select2.min.js"></script>
+    <link href="assets/css/select2.css" rel="stylesheet" />
+    <script src="assets/js/select2.min.js"></script>
     <!--<script src="lib/sorting.js"></script>-->
     <script src="lib/includeHTML.js"></script>
     <!--<script src="https://cdn.datatables.net/plug-ins/1.10.19/sorting/date-de.js"></script>-->
@@ -141,9 +141,9 @@
         }
 
         .dsb_hl_legend_header {
-            height: 1em; 
-            width: 20px; 
-            display: inline-block; 
+            height: 1em;
+            width: 20px;
+            display: inline-block;
         }
     </style>
 
@@ -191,7 +191,6 @@
             $("#rp_center_monthly_by_year").click(on_report_click);
             $("#rp_center_patients_rides").click(on_report_click);
             $("#rp_center_tomorrows_rides").click(on_report_click);
-            
             $(document).on('keydown', (e) => {
                 if (e.ctrlKey && e.key === 'i') {
                     $('#wait').show();
@@ -205,13 +204,13 @@
                         data: null,
                         success: function (data) {
                             $('#wait').hide();
-                            
+
                             const jsonArray = JSON.parse(data.d)
 
                             jsonArray.forEach(obj => {
                                 obj.PickupTime = convertDateString(obj.PickupTime);
                             });
-                            
+
                             jsonToCSVDownload(jsonArray);
                         },
                         error: function (err) {
@@ -224,7 +223,7 @@
 
             });
 
-            
+
             // $("#dsb_hl").click(dashboard_hl_init);
 
             // fast-load dashboard:
@@ -239,12 +238,12 @@
             filename = new Date().toISOString().slice(0, 10);
 
             const headers = Object.keys(jsonArray[0]);
-            let csvContent = '\uFEFF'; 
+            let csvContent = '\uFEFF';
 
-           
+
             csvContent += headers.join(',') + '\n';
 
-            
+
             jsonArray.forEach(obj => {
                 const row = headers.map(header => {
                     let cell = obj[header] === null || obj[header] === undefined ? '' : obj[header];
@@ -257,13 +256,13 @@
                 csvContent += row.join(',') + '\n';
             });
 
-            
+
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
 
-            
+
             const url = URL.createObjectURL(blob);
 
-            
+
             const link = document.createElement('a');
             link.setAttribute('href', url);
             link.setAttribute('download', filename);
