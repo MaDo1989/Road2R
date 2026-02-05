@@ -303,7 +303,40 @@ END
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+-- =======================================================
+-- Create Stored Procedure Template for Azure SQL Database
+-- =======================================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad Meirson>
+-- Create Date: <11/30/25>
+-- Description: <get the stracture of spesific tables>
+-- =============================================
+CREATE PROCEDURE sp_getTablesStracture
+(
+    -- Add the parameters for the stored procedure here
+        @Tables TableNameList READONLY
 
+)
+AS
+BEGIN
+
+    -- Insert statements for procedure here
+    SELECT 
+        TABLE_SCHEMA,
+        TABLE_NAME,
+        COLUMN_NAME,
+        DATA_TYPE,
+        IS_NULLABLE,
+        CHARACTER_MAXIMUM_LENGTH
+    FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_NAME IN (SELECT TableName FROM @Tables)
+    ORDER BY TABLE_NAME, ORDINAL_POSITION;
+END
+GO
 
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
