@@ -2807,5 +2807,30 @@ public class DBservice_Gilad
             return null;
         }
     }
+    private DataTable CreateTVP(List<string> tableNames)
+    {
+        var dt = new DataTable("TableNameList"); // ?? ?-TYPE ?-SQL
+        dt.Columns.Add("TableName", typeof(string));
+
+        foreach (var name in tableNames)
+            dt.Rows.Add(name);
+
+        return dt;
+    }
+    private SqlCommand CreateCommandForTVP(string spName, SqlConnection con, DataTable tvp)
+    {
+        SqlCommand cmd = new SqlCommand
+        {
+            Connection = con,
+            CommandText = spName,
+            CommandType = CommandType.StoredProcedure
+        };
+
+        var p = cmd.Parameters.Add("@Tables", SqlDbType.Structured);
+        p.TypeName = "TableNameList"; // MUST MATCH SQL TYPE NAME
+        p.Value = tvp;
+
+        return cmd;
+    }
 
 }
