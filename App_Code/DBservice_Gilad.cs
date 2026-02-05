@@ -249,7 +249,34 @@ public class DBservice_Gilad
 
 
     }
+    public List<DBstracture> GetDBstractures(List<string> tableNames)
+    {
+        List<DBstracture> result = new List<DBstracture>();
 
+        using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString))
+        {
+            con.Open();
+            DataTable tvp = CreateTVP(tableNames);
+
+            SqlCommand cmd = CreateCommandForTVP("sp_getTablesStracture", con, tvp);
+
+            using (SqlDataReader reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    result.Add(new DBstracture
+                    {
+                        TableName = reader["TABLE_NAME"].ToString(),
+                        ColumnName = reader["COLUMN_NAME"].ToString(),
+                        DataType = reader["DATA_TYPE"].ToString(),
+
+                    });
+                }
+            }
+        }
+
+        return result;
+    }
 
     public List<UnityRide> GetSplitRides(DateTime rideDate, bool isAfternoon, bool isFutureTable, int days)
     {
