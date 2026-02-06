@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Script.Serialization;
 using System.Web.Script.Services;
@@ -82,6 +83,27 @@ public class WebService : System.Web.Services.WebService
             throw new Exception("שגיאה בבדיקה האם נהג ראשי מבוטל");
         }
 
+    }
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetStractureOfTables()
+    {
+        try
+        {
+            List<string> tables = new List<string>()
+            {
+                  "unityride",
+                  "volunteer",
+            };
+            DBstracture dBstracture = new DBstracture();
+            Dictionary<string, List<DBstracture>> stracture = dBstracture.GetStractureFromDB(tables);
+            return j.Serialize(stracture);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetQueryFromAI", ex);
+            throw new Exception("שגיאה בשליפת שאילתה מ-AI");
+        }
     }
 
     [WebMethod(EnableSession = true)]
@@ -1096,11 +1118,11 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetSplitRides(UnityRide.DateMode dateMode,bool isAfternoon, bool isFutureTable, int days)
+    public string GetSplitRides(UnityRide.DateMode dateMode, bool isAfternoon, bool isFutureTable, int days)
     {
         try
         {
-            List<UnityRide> list2Return = UnityRide.GetSplitRides(dateMode,isAfternoon, isFutureTable, days);
+            List<UnityRide> list2Return = UnityRide.GetSplitRides(dateMode, isAfternoon, isFutureTable, days);
             return j.Serialize(list2Return);
         }
         catch (Exception ex)
@@ -2528,7 +2550,8 @@ public class WebService : System.Web.Services.WebService
             {
                 string CoordinatorName = u.getUserNameByCellphone(item);
                 names.Add(CoordinatorName);
-            };
+            }
+            ;
 
 
 
