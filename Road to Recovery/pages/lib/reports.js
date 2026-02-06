@@ -690,6 +690,7 @@ function empty_func(id) {
 }
 
 function rp_amuta_vls_per_km_field_year_post_clone(id) {
+    renderYearSelect("#select_year");
     var today = new Date();
     $('#select_year').val(today.getFullYear());
     $("#select_year").change(rp_amuta_vls_km__refresh_preview);
@@ -969,7 +970,7 @@ function rp_amuta_vls_km__refresh_preview() {
     var m = moment(selected_date);
     var start_week_date = m.startOf('year').format("YYYY-MM-DD");
     var end_week_date = m.endOf('year').format("YYYY-MM-DD");
-    renderYearSelect("#select_year");
+    console.log('in rp_amuta_vls_km__refresh_preview -> ', start_week_date, end_week_date);
     refresh_amuta_vls_km_Table(
         start_week_date, end_week_date);
 }   
@@ -1209,7 +1210,7 @@ function refresh_amuta_vls_km_Table(start_date, end_date) {
         start_date: start_date,
         end_date: end_date
     };
-
+    console.log('sent --> GetReportVolunteersKM ', query_object )
     $.ajax({
         dataType: "json",
         url: "ReportsWebService.asmx/GetReportVolunteersKM",
@@ -2072,6 +2073,7 @@ function rp_center_daily_by_month__refresh_Table(start_date, end_date) {
         success: function (data) {
             $('#wait').hide();
             var records = data.d;
+
             records = rp_center_daily_by_month__fix_records(records, start_date);
 
             $('#div_table_center_daily_by_month').show();
