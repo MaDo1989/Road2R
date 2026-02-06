@@ -1,0 +1,613 @@
+﻿<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="AI Report Generator">
+    <meta name="author" content="Road to Recovery">
+
+    <link rel="shortcut icon" href="assets/images/favicon_1.ico">
+
+    <title>יצירת דוח באמצעות AI</title>
+
+    <!-- Sweet Alert css -->
+    <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
+
+    <link href="../plugins/switchery/switchery.min.css" rel="stylesheet" />
+    <link href="assets/css/bootstrap-rtl.min.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/core.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/icons.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/components.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/pages.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/menu.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/responsive.css" rel="stylesheet" type="text/css">
+
+    <script src="assets/js/CookiesFunctions.js"></script>
+    <script src="assets/js/modernizr.min.js"></script>
+
+    <!--GENERAL object and additional functions-->
+    <script src="lib/lz-string.js"></script>
+    <script src="lib/master.js"></script>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="lib/includeHTML.js"></script>
+
+    <script src="../pages/assets/js/AI_report.js"></script>
+    <style>
+        .report-container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            color: #5b69bc;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #5b69bc;
+        }
+
+        .table-selection-container {
+            background: #f7f7f7;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 25px;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #e3e3e3;
+            transition: all 0.3s ease;
+        }
+
+            .checkbox-item:hover {
+                border-color: #5b69bc;
+                box-shadow: 0 2px 5px rgba(91,105,188,0.2);
+            }
+
+            .checkbox-item input[type="checkbox"] {
+                margin-left: 10px;
+                width: 18px;
+                height: 18px;
+                cursor: pointer;
+            }
+
+            .checkbox-item label {
+                cursor: pointer;
+                margin: 0;
+                font-size: 14px;
+                color: #333;
+            }
+
+        .query-input-container {
+            margin-bottom: 25px;
+        }
+
+        .query-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid #e3e3e3;
+            border-radius: 5px;
+            font-size: 14px;
+            resize: vertical;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: border-color 0.3s ease;
+        }
+
+            .query-textarea:focus {
+                outline: none;
+                border-color: #5b69bc;
+            }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        .btn-generate {
+            background: linear-gradient(135deg, #5b69bc 0%, #4a5baf 100%);
+            color: white;
+            padding: 12px 40px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(91,105,188,0.3);
+        }
+
+            .btn-generate:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 15px rgba(91,105,188,0.4);
+            }
+
+        .btn-clear {
+            background: #f5f5f5;
+            color: #333;
+            padding: 12px 40px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .btn-clear:hover {
+                background: #e8e8e8;
+                border-color: #bbb;
+            }
+
+        .results-container {
+            margin-top: 30px;
+            padding: 25px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            border: 1px solid #e3e3e3;
+            display: none;
+        }
+
+            .results-container.active {
+                display: block;
+            }
+
+        .info-box {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-right: 4px solid #2196F3;
+        }
+
+            .info-box i {
+                color: #2196F3;
+                margin-left: 10px;
+            }
+
+        .selected-tables-preview {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+            border: 1px dashed #5b69bc;
+        }
+
+            .selected-tables-preview h4 {
+                color: #5b69bc;
+                font-size: 14px;
+                margin-bottom: 10px;
+            }
+
+        .selected-table-tag {
+            display: inline-block;
+            background: #5b69bc;
+            color: white;
+            padding: 5px 12px;
+            margin: 5px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .example-queries-container {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            border-right: 4px solid #ffc107;
+        }
+
+        .example-queries-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 5px 0;
+        }
+
+            .example-queries-header:hover {
+                opacity: 0.8;
+            }
+
+        .example-queries-toggle {
+            background: #ffc107;
+            color: #856404;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 3px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .example-queries-toggle:hover {
+                background: #e0a800;
+            }
+
+        .example-queries-list {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+            padding: 0;
+        }
+
+            .example-queries-list.expanded {
+                max-height: 500px;
+                overflow-y: auto;
+                padding: 10px 0;
+            }
+
+        .example-category {
+            margin-bottom: 15px;
+        }
+
+            .example-category h5 {
+                color: #5b69bc;
+                font-weight: bold;
+                font-size: 13px;
+                margin: 10px 0 8px 0;
+            }
+
+        .example-item {
+            background: white;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 4px;
+            border: 1px solid #e3e3e3;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 13px;
+            color: #333;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+            .example-item:hover {
+                background: #5b69bc;
+                color: white;
+                border-color: #5b69bc;
+                transform: translateX(-3px);
+                box-shadow: 0 2px 5px rgba(91,105,188,0.3);
+            }
+
+            .example-item:active {
+                transform: translateX(-3px);
+            }
+
+        .example-queries-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .example-queries-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .example-queries-list::-webkit-scrollbar-thumb {
+            background: #ffc107;
+            border-radius: 10px;
+        }
+
+            .example-queries-list::-webkit-scrollbar-thumb:hover {
+                background: #e0a800;
+            }
+    </style>
+
+
+</head>
+
+<body class="fixed-left">
+    <!-- Begin page -->
+    <div id="wrapper">
+        <!-- Top Bar Start -->
+        <div class="topbar">
+            <!-- Navbar -->
+            <div id="na" class="navbar navbar-default" role="navigation">
+                <div class="container">
+                    <div class="">
+                        <!--Expend/Collaps Side Menu-->
+                        <div class="pull-left">
+                            <button class="button-menu-mobile open-left waves-effect">
+                                <i class="md md-menu"></i>
+                            </button>
+                            <span class="clearfix"></span>
+                        </div>
+
+                        <!-- LOGO -->
+                        <div class="pull-left">
+                            <div class="text-center">
+                                <a href="manageRidePats.html" class="logo"><span>בדרך להחלמה</span></a>
+                            </div>
+                        </div>
+                        <div class="pull-right">
+                            <a href="passwordForm.html"> <span class="logo" id="userName"></span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Top Bar End -->
+        <!-- Right Sidebar Start -->
+        <div w3-include-html="menu.html"></div>
+        <!-- Right Sidebar End -->
+        <!-- Start page Content here -->
+        <div class="content-page">
+            <!-- Start content -->
+            <div class="content">
+                <div class="container">
+                    <!-- Page-Title -->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="page-title-box">
+                                <ol class="breadcrumb pull-right">
+                                    <li class="active">יצירת דוח AI</li>
+                                </ol>
+                                <h4 class="page-title">
+                                    מחולל דוחות חכם&nbsp&nbsp
+                                    <i class="fa fa-magic" style="font-size: 24px; color: #5b69bc;"></i>
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Content -->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="report-container">
+
+                                <!-- Info Box -->
+                                <div class="info-box">
+                                    <i class="fa fa-info-circle"></i>
+                                    <strong>כיצד להשתמש:</strong>
+                                    בחרו את הטבלאות הרלוונטיות מהמערכת, הזינו את השאילתה שלכם בשפה חופשית, והמערכת תייצר עבורכם דוח מותאם אישית באמצעות בינה מלאכותית.
+                                </div>
+
+                                <!-- Table Selection Section -->
+                                <div class="table-selection-container">
+                                    <div class="section-title">
+                                        <i class="fa fa-table"></i>
+                                        בחירת טבלאות מהמערכת
+                                    </div>
+
+                                    <div class="checkbox-group">
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="table_volunteers" value="volunteer" onchange="updateSelectedTablesPreview()">
+                                            <label for="table_volunteers">מתנדבים</label>
+                                        </div>
+
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="table_patients" value="patient" onchange="updateSelectedTablesPreview()">
+                                            <label for="table_patients">חולים</label>
+                                        </div>
+
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="table_rides" value="unityride" onchange="updateSelectedTablesPreview()">
+                                            <label for="table_rides">הסעות</label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Selected Tables Preview -->
+                                    <div class="selected-tables-preview">
+                                        <h4><i class="fa fa-check-circle"></i> טבלאות נבחרות:</h4>
+                                        <div id="selectedTablesPreview">
+                                            <em style="color: #999;">לא נבחרו טבלאות</em>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Example Queries Section -->
+                                <div class="example-queries-container">
+                                    <div class="example-queries-header" onclick="toggleExampleQueries()">
+                                        <div>
+                                            <i class="fa fa-lightbulb-o"></i>
+                                            <strong style="color: #856404;">דוגמאות לשאילתות</strong>
+                                            <span style="font-size: 12px; color: #856404; margin-right: 10px;">(לחצו להצגה/הסתרה)</span>
+                                        </div>
+                                        <button class="example-queries-toggle" id="toggleButton">
+                                            <i class="fa fa-chevron-down"></i>
+                                        </button>
+                                    </div>
+
+                                    <div class="example-queries-list" id="exampleQueriesList">
+                                        <!-- Volunteers Examples -->
+                                        <div class="example-category">
+                                            <h5>
+                                                <i class="fa fa-users"></i> מתנדבים:
+                                            </h5>
+                                            <div class="example-item" onclick="setExampleQuery(this.innerText)">
+                                                הצג את כל המתנדבים הפעילים כולל שם מלא, טלפון, עיר ותאריך הצטרפות
+                                            </div>
+                                            <div class="example-item" onclick="setExampleQuery(this.innerText)">
+                                                הצג מתנדבים שביצעו יותר מ-10 הסעות בחודש האחרון
+                                            </div>
+                                        </div>
+
+                                        <!-- Patients Examples -->
+                                        <div class="example-category">
+                                            <h5>
+                                                <i class="fa fa-wheelchair"></i> חולים:
+                                            </h5>
+                                            <div class="example-item" onclick="setExampleQuery(this.innerText)">
+                                                הצג חולים פעילים עם מספר טלפון וכתובת מלאה
+                                            </div>
+                                            <div class="example-item" onclick="setExampleQuery(this.innerText)">
+                                                מצא חולים שקיבלו יותר מ-15 הסעות החודש
+                                            </div>
+                                        </div>
+
+                                        <!-- Rides Examples -->
+                                        <div class="example-category">
+                                            <h5>
+                                                <i class="fa fa-car"></i> הסעות:
+                                            </h5>
+                                            <div class="example-item" onclick="setExampleQuery(this.innerText)">
+                                                הצג את כל ההסעות שבוצעו השבוע כולל תאריך, מתנדב וחולה
+                                            </div>
+                                            <div class="example-item" onclick="setExampleQuery(this.innerText)">
+                                                הצג סטטיסטיקה של הסעות לפי ערים
+                                            </div>
+                                        </div>
+
+                                        <!-- Combined Queries Examples -->
+                                        <div class="example-category">
+                                            <h5>
+                                                <i class="fa fa-link"></i> שאילתות משולבות:
+                                            </h5>
+                                            <div class="example-item" onclick="setExampleQuery(this.innerText)">
+                                                מצא את 10 המתנדבים הפעילים ביותר בחודש האחרון
+                                            </div>
+                                            <div class="example-item" onclick="setExampleQuery(this.innerText)">
+                                                הצג דוח חודשי: סך הסעות, מתנדבים פעילים, חולים ששורתו
+                                            </div>
+                                        </div>
+
+                                        <!-- Statistics Examples -->
+                                        <div class="example-category">
+                                            <h5>
+                                                <i class="fa fa-bar-chart"></i> סטטיסטיקות:
+                                            </h5>
+                                            <div class="example-item" onclick="setExampleQuery(this.innerText)">
+                                                הצג התפלגות הסעות לפי ימים בשבוע
+                                            </div>
+                                            <div class="example-item" onclick="setExampleQuery(this.innerText)">
+                                                הצג מגמת צמיחה - הסעות לפי חודשים ב-6 חודשים האחרונים
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ffc107; font-size: 12px;">
+                                        <p style="color: #856404; margin: 0;">
+                                            <i class="fa fa-database"></i>
+                                            <strong>טיפ:</strong> ניתן לשלב טבלאות ולבקש מידע מורכב בשפה טבעית
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Query Input Section -->
+                                <div class="query-input-container">
+                                    <div class="section-title">
+                                        <i class="fa fa-pencil"></i>
+                                        הזינו את שאילתת הדוח בשפה חופשית
+                                    </div>
+                                    <textarea id="queryInput"
+                                              class="query-textarea"
+                                              placeholder="לדוגמה: הצג לי את כל המתנדבים שביצעו יותר מ-10 הסעות בחודש האחרון, כולל פרטי ההסעות והחולים שהסיעו..."></textarea>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="action-buttons">
+                                    <button class="btn-generate" onclick="generateReport()">
+                                        <i class="fa fa-magic"></i>
+                                        צור דוח
+                                    </button>
+                                    <button class="btn-clear" onclick="clearSelections()">
+                                        <i class="fa fa-refresh"></i>
+                                        נקה הכל
+                                    </button>
+                                </div>
+
+                                <!-- Results Container (Initially Hidden) -->
+                                <div id="resultsContainer" class="results-container">
+                                    <div class="section-title">
+                                        <i class="fa fa-bar-chart"></i>
+                                        תוצאות הדוח
+                                    </div>
+                                    <div id="resultsContent">
+                                        <!-- Results will be displayed here -->
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loading Indicator -->
+                    <div id="wait" style="display:none;width:69px;height:89px;position:fixed;z-index:9999;top:50%;left:50%;padding:2px;transform:translate(-50%, -50%);">
+                        <img src="../../Media/Wedges-3s-200px.gif" width="64" height="64" />
+                    </div>
+
+                </div>
+                <!-- end container -->
+            </div>
+            <!-- end content -->
+            <!-- FOOTER -->
+            <footer id="rights" data-toggle="tooltip" data-placement="top" title="© All rights reserved The Road to Recovery.  جميع الحقوق محفوظة لجمعية الطريق الى الشفاء" class="footer text-right">
+            </footer>
+            <!-- End FOOTER -->
+
+        </div>
+        <!-- End page content -->
+    </div>
+    <!-- END wrapper -->
+
+    <script>
+        var resizefunc = [];
+
+        function toggleExampleQueries() {
+            const list = document.getElementById('exampleQueriesList');
+            const button = document.getElementById('toggleButton');
+
+            if (list.classList.contains('expanded')) {
+                list.classList.remove('expanded');
+                button.innerHTML = '<i class="fa fa-chevron-down"></i>';
+            } else {
+                list.classList.add('expanded');
+                button.innerHTML = '<i class="fa fa-chevron-up"></i>';
+            }
+        }
+
+        function setExampleQuery(queryText) {
+            document.getElementById('queryInput').value = queryText;
+            // Scroll to query input
+            document.getElementById('queryInput').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Optional: highlight the textarea briefly
+            const textarea = document.getElementById('queryInput');
+            textarea.style.borderColor = '#ffc107';
+            textarea.style.boxShadow = '0 0 10px rgba(255, 193, 7, 0.5)';
+            setTimeout(() => {
+                textarea.style.borderColor = '#5b69bc';
+                textarea.style.boxShadow = 'none';
+            }, 1000);
+        }
+    </script>
+
+    <!-- jQuery  -->
+    <script src="assets/js/bootstrap-rtl.min.js"></script>
+    <script src="assets/js/detect.js"></script>
+    <script src="assets/js/fastclick.js"></script>
+    <script src="assets/js/jquery.slimscroll.js"></script>
+    <script src="assets/js/jquery.blockUI.js"></script>
+    <script src="assets/js/waves.js"></script>
+    <script src="assets/js/wow.min.js"></script>
+    <script src="assets/js/jquery.nicescroll.js"></script>
+    <script src="assets/js/jquery.scrollTo.min.js"></script>
+    <script src="../plugins/switchery/switchery.min.js"></script>
+
+    <!-- Sweet Alert js -->
+    <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
+    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+
+    <script src="assets/js/jquery.core.js"></script>
+    <script src="assets/js/jquery.app.js"></script>
+
+    <!-- Sweet Alert js -->
+    <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
+    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
+    <script src="assets/js/jquery.core.js"></script>
+    <script src="assets/js/jquery.app.js"></script>
+</body>
+</html>
