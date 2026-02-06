@@ -86,17 +86,12 @@ public class WebService : System.Web.Services.WebService
     }
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetStractureOfTables()
+    public string GetStractureOfTables(List<string> tablesName)
     {
         try
         {
-            List<string> tables = new List<string>()
-            {
-                  "unityride",
-                  "volunteer",
-            };
             DBstracture dBstracture = new DBstracture();
-            Dictionary<string, List<DBstracture>> stracture = dBstracture.GetStractureFromDB(tables);
+            Dictionary<string, List<DBstracture>> stracture = dBstracture.GetStractureFromDB(tablesName);
             return j.Serialize(stracture);
         }
         catch (Exception ex)
