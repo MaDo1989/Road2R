@@ -27,42 +27,73 @@ public class System_Log
 
     public List<System_Log> GetLogs(string timeRange)
     {
-        /*day week month year*/
+        const string query = "exec spLogTable_AutoTrackChanges_GetLogs @timeRange";
 
-        query = "exec spLogTable_AutoTrackChanges_GetLogs @timeRange='" + timeRange + "'";
         try
         {
             dbs = new DbService();
             List<System_Log> logs = new List<System_Log>();
-            SqlDataReader sdr = dbs.GetDataReader(query);
-            System_Log log;
-            while (sdr.Read())
+
+            dbs.con.Open();
+
+            using (SqlCommand cmd = new SqlCommand(query, dbs.con))
             {
-                log = new System_Log();
-                log.Id = Convert.ToInt32(sdr["Id"]);
-                log.WhoChanged = Convert.ToString(sdr["WhoChanged"]);
-                log.TableName = Convert.ToString(sdr["TableName"]);
-                log.Recorde_UniqueId = Convert.ToInt32(sdr["Recorde_UniqueId"]);
-                log.ColumnName = Convert.ToString(sdr["ColumnName"]);
+                cmd.Parameters.AddWithValue("@timeRange", timeRange);
 
-                valueIsDate = DateTime.TryParse(Convert.ToString(sdr["OldValue"]), out temp4values_asDate);
-                if (valueIsDate) { log.OldValue_AsDate = temp4values_asDate; }
-                else log.OldValue = Convert.ToString(sdr["OldValue"]);
+                using (SqlDataReader sdr = cmd.ExecuteReader())
+                {
+                    int idIdx = sdr.GetOrdinal("Id");
+                    int whoChangedIdx = sdr.GetOrdinal("WhoChanged");
+                    int tableNameIdx = sdr.GetOrdinal("TableName");
+                    int recordeUniqueIdIdx = sdr.GetOrdinal("Recorde_UniqueId");
+                    int columnNameIdx = sdr.GetOrdinal("ColumnName");
+                    int oldValueIdx = sdr.GetOrdinal("OldValue");
+                    int newValueIdx = sdr.GetOrdinal("NewValue");
+                    int dateAddedIdx = sdr.GetOrdinal("DateAdded");
+                    int timeAddedIdx = sdr.GetOrdinal("TimeAdded");
 
-                valueIsDate = DateTime.TryParse(Convert.ToString(sdr["NewValue"]), out temp4values_asDate);
-                if (valueIsDate) { log.NewValue_AsDate = temp4values_asDate; }
-                else log.NewValue = Convert.ToString(sdr["NewValue"]);
+                    DateTime tempDate;
+                    string tempVal;
 
-                log.DateAdded = Convert.ToDateTime(Convert.ToString(sdr["DateAdded"]));
-                log.TimeAdded = TimeSpan.Parse(Convert.ToString(sdr["TimeAdded"]));
+                    while (sdr.Read())
+                    {
+                        System_Log log = new System_Log();
 
-                logs.Add(log);
+                        log.Id = sdr.GetInt32(idIdx);
+                        log.WhoChanged = sdr.GetString(whoChangedIdx);
+                        log.TableName = sdr.GetString(tableNameIdx);
+                        log.Recorde_UniqueId = sdr.GetInt32(recordeUniqueIdIdx);
+                        log.ColumnName = sdr.GetString(columnNameIdx);
+                        log.DateAdded = sdr.GetDateTime(dateAddedIdx);
+                        log.TimeAdded = sdr.GetTimeSpan(timeAddedIdx);
+
+                        if (!sdr.IsDBNull(oldValueIdx))
+                        {
+                            tempVal = sdr.GetString(oldValueIdx);
+                            if (DateTime.TryParse(tempVal, out tempDate))
+                                log.OldValue_AsDate = tempDate;
+                            else
+                                log.OldValue = tempVal;
+                        }
+
+                        if (!sdr.IsDBNull(newValueIdx))
+                        {
+                            tempVal = sdr.GetString(newValueIdx);
+                            if (DateTime.TryParse(tempVal, out tempDate))
+                                log.NewValue_AsDate = tempDate;
+                            else
+                                log.NewValue = tempVal;
+                        }
+
+                        logs.Add(log);
+                    }
+                }
             }
             return logs;
         }
         catch (Exception ex)
         {
-            throw new Exception(ex.Message);
+            throw ex;
         }
         finally
         {

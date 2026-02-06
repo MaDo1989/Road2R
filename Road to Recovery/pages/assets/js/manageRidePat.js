@@ -43,6 +43,33 @@ const update_arr_rides = (updated_ridePat) => {
     arr_rides[index] = updated_ridePat;
 }
 
+// Check if a ride should be filtered out based on area filter settings
+// Returns true if the ride should be HIDDEN (filtered out), false if it should be SHOWN
+const shouldFilterOutRide = (rideArea) => {
+    try {
+        const allSortsSwitch = JSON.parse(localStorage.getItem('allSortsSwitch'));
+        const areasToShow_arr = JSON.parse(localStorage.getItem('areasToShow_arr'));
+
+        // Same logic as refreshTable_UnityRide filtering
+        if (allSortsSwitch && areasToShow_arr !== null) {
+            // Filter is ON
+            if (areasToShow_arr.length === 0) {
+                // No areas selected - filter out ALL rides
+                return true;
+            }
+            if (!areasToShow_arr.includes(rideArea)) {
+                // This ride's area is not in the selected areas - filter it out
+                return true;
+            }
+        }
+        // Filter is OFF or ride matches filter - don't filter out
+        return false;
+    } catch (e) {
+        console.error('Error checking area filter:', e);
+        return false; // On error, show the ride
+    }
+}
+
 //make the flat object to complex object like the old API
 const CustomRideObject = (thisRide) => {
 
@@ -571,6 +598,12 @@ notification2.client.UnityRideUpdated = function (updatedUnityRide) {
     /*  *********↑↑↑*********
         * !!! IMPORTANT !!! *
         *********************/
+
+    // Check if this ride should be filtered out based on area filter
+    // If filtered out, don't update the table - just return
+    if (shouldFilterOutRide(updatedUnityRide.Area)) {
+        return;
+    }
 
     let customRide = CustomRideObject(updatedUnityRide); // to ajust the object
 
