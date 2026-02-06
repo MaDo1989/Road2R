@@ -327,6 +327,7 @@ GO
 -- =======================================================
 -- Create Stored Procedure Template for Azure SQL Database
 -- =======================================================
+/****** Object:  StoredProcedure [dbo].[sp_getTablesStracture]    Script Date: 2/5/2026 8:59:02 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -336,7 +337,7 @@ GO
 -- Create Date: <11/30/25>
 -- Description: <get the stracture of spesific tables>
 -- =============================================
-CREATE PROCEDURE sp_getTablesStracture
+CREATE PROCEDURE [dbo].[sp_getTablesStracture]
 (
     -- Add the parameters for the stored procedure here
         @Tables TableNameList READONLY
@@ -347,17 +348,63 @@ BEGIN
 
     -- Insert statements for procedure here
     SELECT 
-        TABLE_SCHEMA,
         TABLE_NAME,
         COLUMN_NAME,
         DATA_TYPE,
         IS_NULLABLE,
         CHARACTER_MAXIMUM_LENGTH
     FROM INFORMATION_SCHEMA.COLUMNS
-    WHERE TABLE_NAME IN (SELECT TableName FROM @Tables)
+    WHERE TABLE_NAME IN (SELECT TableName FROM @Tables) AND
+	COLUMN_NAME IN (
+	'RidePatNum',
+	'PatientName',
+	'PatientCellPhone',
+	'PatientId',
+	'PatientGender',
+	'PatientStatus',
+	'PatientBirthDate',
+	'AmountOfEscorts',
+	'AmountOfEquipments',
+	'Destination',
+	'Origin',
+	'pickupTime',
+	'Coordinator',
+	'Remark',
+	'Status',
+	'Area',
+	'OnlyEscort',
+	'lastModified',
+	'CoordinatorID',
+	'MainDriver',
+	'DriverName',
+	'DriverCellPhone',
+	'NoOfDocumentedRides',
+	'IsAnonymous',
+	'IsNewDriver',
+	'Id',
+	'DisplayName',
+	'CellPhone',
+	'CellPhone2',
+	'Address',
+	'JoinDate',
+	'IsActive',
+	'Gender',
+	'Remarks',
+	'CityCityName',
+	'AvailableSeats',
+	'VolunteerIdentity',
+	'isDriving',
+	'joinYear',
+	'NoOfDocumentedCalls',
+	'NoOfDocumentedRides',
+	'LastUpdateBy',
+	'No_of_Rides',
+	'IsBooster',
+	'IsBabyChair'
+	)
     ORDER BY TABLE_NAME, ORDINAL_POSITION;
 END
-GO
+
 
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

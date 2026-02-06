@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Runtime.Caching;
+
 
 /// <summary>
 /// Summary description for DBstracture
@@ -64,9 +66,29 @@ public class DBstracture
 
     public Dictionary<string, List<DBstracture>> GetStractureFromDB(List<string> tablesName)
     {
+        // Create a cache key based on the tables requested
+        string cacheKey = "DBStructure_" + string.Join("_", tablesName.OrderBy(t => t));
+
+        ObjectCache cache = MemoryCache.Default;
+
+        var cached = cache[cacheKey] as Dictionary<string, List<DBstracture>>;
+        if (cached != null)
+        {
+            return cached;
+        }
+
+        // Not in cache - fetch from DB
         DBservice_Gilad db = new DBservice_Gilad();
         var listDBStracture = db.GetDBstractures(tablesName);
-        return GroupByTable(listDBStracture);
+        var result = GroupByTable(listDBStracture);
+
+        // Cache for 3 days
+        CacheItemPolicy policy = new CacheItemPolicy();
+        policy.AbsoluteExpiration = DateTimeOffset.Now.AddDays(3);
+
+        cache.Set(cacheKey, result, policy);
+
+        return result;
     }
 
     private Dictionary<string, List<DBstracture>> GroupByTable(List<DBstracture> list)
