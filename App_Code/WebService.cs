@@ -96,10 +96,11 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
-            Log.Error("Error in GetQueryFromAI", ex);
-            throw new Exception("שגיאה בשליפת שאילתה מ-AI");
+            Log.Error("Error in GetStractureOfTables", ex);
+            throw new Exception("שגיאה בשליפה של מבנה הדאטה");
         }
     }
+
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
