@@ -1,297 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[spVolunteerTypeView_GetVolunteersList_All_FAST]
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    /* ===============================
-       Absence – computed, no UPDATE
-    =============================== */
-    SELECT
-        VolunteerId,
-        CAST(1 AS BIT) AS AbsenceStatus
-    INTO #tempAbsence
-    FROM Absence
-    WHERE GETDATE() BETWEEN FromDate AND DATEADD(DAY, 1, UntilDate)
-      AND IsDeleted = 0
-    GROUP BY VolunteerId;
-
-    /* ===============================
-       Latest drive per volunteer
-    =============================== */
-    SELECT
-        MainDriver AS Id,
-        MAX(PickupTime) AS LatestDrive
-    INTO #tempLatestDrives
-    FROM UnityRide
-    WHERE Status != N'נמחקה'
-    GROUP BY MainDriver;
-
-    /* ===============================
-       Rides count last 2 months
-    =============================== */
-    SELECT
-        MainDriver AS Id,
-        COUNT(DISTINCT PickupTime) AS NumOfRides_last2Months
-    INTO #tempRidesLast2Months
-    FROM UnityRide
-    WHERE Status != N'נמחקה'
-      AND PickupTime BETWEEN DATEADD(MONTH, -2, GETDATE()) AND GETDATE()
-    GROUP BY MainDriver;
-
-    /* ===============================
-       Most common path (last 50 rides)
-    =============================== */
-    WITH Last50 AS (
-        SELECT
-            MainDriver,
-            Origin,
-            Destination,
-            ROW_NUMBER() OVER (
-                PARTITION BY MainDriver
-                ORDER BY PickupTime DESC
-            ) AS rn
-        FROM UnityRide
-        WHERE Status != N'נמחקה'
-    ),
-    PathStats AS (
-        SELECT
-            MainDriver,
-            Origin + '-' + Destination AS MostCommonPath,
-            COUNT(*) AS Cnt,
-            ROW_NUMBER() OVER (
-                PARTITION BY MainDriver
-                ORDER BY COUNT(*) DESC
-            ) AS rn
-        FROM Last50
-        WHERE rn <= 50
-        GROUP BY MainDriver, Origin, Destination
-    )
-    SELECT *
-    INTO #tempMostCommonPath
-    FROM PathStats
-    WHERE rn = 1;
-
-    /* ===============================
-       Final SELECT – NULL SAFE
-    =============================== */
-    SELECT
-        vtv.Id,
-        vtv.DisplayName,
-        vtv.FirstNameA,
-        vtv.FirstNameH,
-        vtv.LastNameH,
-        vtv.LastNameA,
-        vtv.CellPhone,
-        vtv.CellPhone2,
-        vtv.HomePhone,
-        vtv.Remarks,
-        vtv.CityCityName,
-        vtv.Address,
-        vtv.VolunTypeType,
-        vtv.Email,
-        vtv.Device,
-        vtv.NoOfDocumentedCalls,
-        vtv.NoOfDocumentedRides,
-        ISNULL(vtv.No_of_Rides, 0) AS No_of_Rides,
-        vtv.JoinDate,
-
-        -- 🔒 BIT fields – NULL SAFE
-        ISNULL(vtv.IsAssistant, 0)   AS IsAssistant,
-        ISNULL(vtv.IsActive, 0)      AS IsActive,
-        ISNULL(vtv.KnowsArabic, 0)   AS KnowsArabic,
-        ISNULL(vtv.IsDriving, 0)     AS IsDriving,
-        ISNULL(vtv.IsBooster, 0)     AS IsBooster,
-        ISNULL(vtv.IsBabyChair, 0)   AS IsBabyChair,
-
-        vtv.Gender,
-        vtv.PnRegId,
-        vtv.EnglishName,
-        DATEADD(HOUR, -2, vtv.LastModified) AS LastModified,
-        ISNULL(vtv.AvailableSeats, 0) AS AvailableSeats,
-
-        ISNULL(r2m.NumOfRides_last2Months, 0) AS NumOfRides_last2Months,
-        ISNULL(a.AbsenceStatus, 0)            AS AbsenceStatus,
-        mcp.MostCommonPath,
-        ld.LatestDrive
-
-    FROM VolunteerTypeView vtv
-    LEFT JOIN #tempLatestDrives      ld  ON ld.Id = vtv.Id
-    LEFT JOIN #tempRidesLast2Months r2m ON r2m.Id = vtv.Id
-    LEFT JOIN #tempAbsence          a   ON a.VolunteerId = vtv.Id
-    LEFT JOIN #tempMostCommonPath   mcp ON mcp.MainDriver = vtv.Id
-    ORDER BY vtv.FirstNameH;
-
-    DROP TABLE #tempAbsence;
-    DROP TABLE #tempLatestDrives;
-    DROP TABLE #tempRidesLast2Months;
-    DROP TABLE #tempMostCommonPath;
-END
-GO
-
-
-
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
---NOTE HERE COMPUTING QUERY !!!!!!!
---NOTE HERE COMPUTING QUERY !!!!!!!
---NOTE HERE COMPUTING QUERY !!!!!!!
---NOTE HERE COMPUTING QUERY !!!!!!!
---NOTE HERE COMPUTING QUERY !!!!!!!
---NOTE HERE COMPUTING QUERY !!!!!!!
--- קודם נראה מה המצב הנוכחי לעומת מה שצריך להיות
-WITH CalculatedStats AS (
-    SELECT 
-        MainDriver,
-        COUNT(*) AS Calculated_NoOfDocumentedRides,
-        COUNT(DISTINCT CONCAT(Origin, '|', Destination, '|', CONVERT(varchar, pickupTime, 120))) AS Calculated_No_of_Rides
-    FROM UnityRide
-    WHERE MainDriver IS NOT NULL
-      AND Status != N'נמחקה'
-    GROUP BY MainDriver
-)
-SELECT 
-    v.Id,
-    v.DisplayName,
-    v.NoOfDocumentedRides AS Current_NoOfDocumentedRides,
-    v.No_of_Rides AS Current_No_of_Rides,
-    ISNULL(c.Calculated_NoOfDocumentedRides, 0) AS Should_Be_NoOfDocumentedRides,
-    ISNULL(c.Calculated_No_of_Rides, 0) AS Should_Be_No_of_Rides
-FROM Volunteer v
-LEFT JOIN CalculatedStats c ON v.Id = c.MainDriver
-WHERE v.NoOfDocumentedRides != ISNULL(c.Calculated_NoOfDocumentedRides, 0)
-   OR v.No_of_Rides != ISNULL(c.Calculated_No_of_Rides, 0)
-   OR v.No_of_Rides IS NULL
-ORDER BY v.DisplayName
-
-
-
-
-
-
---BEFORE EXCUTE IT , INVESTIGATE THE RESULT OF THE QUERY ABOVE
---BEFORE EXCUTE IT , INVESTIGATE THE RESULT OF THE QUERY ABOVE
---BEFORE EXCUTE IT , INVESTIGATE THE RESULT OF THE QUERY ABOVE
---BEFORE EXCUTE IT , INVESTIGATE THE RESULT OF THE QUERY ABOVE
---BEFORE EXCUTE IT , INVESTIGATE THE RESULT OF THE QUERY ABOVE
---BEFORE EXCUTE IT , INVESTIGATE THE RESULT OF THE QUERY ABOVE
---BEFORE EXCUTE IT , INVESTIGATE THE RESULT OF THE QUERY ABOVE
---BEFORE EXCUTE IT , INVESTIGATE THE RESULT OF THE QUERY ABOVE
---BEFORE EXCUTE IT , INVESTIGATE THE RESULT OF THE QUERY ABOVE
-WITH CalculatedStats AS (
-    SELECT 
-        MainDriver,
-        COUNT(*) AS Calculated_NoOfDocumentedRides,
-        COUNT(DISTINCT CONCAT(Origin, '|', Destination, '|', CONVERT(varchar, pickupTime, 120))) AS Calculated_No_of_Rides
-    FROM UnityRide
-    WHERE MainDriver IS NOT NULL
-      AND Status != N'נמחקה'
-    GROUP BY MainDriver
-)
-UPDATE v
-SET 
-    v.NoOfDocumentedRides = ISNULL(c.Calculated_NoOfDocumentedRides, 0),
-    v.No_of_Rides = ISNULL(c.Calculated_No_of_Rides, 0)
-FROM Volunteer v
-LEFT JOIN CalculatedStats c ON v.Id = c.MainDriver
-
-
-ALTER TABLE Volunteer
-ADD CONSTRAINT DF_Volunteer_No_of_Rides DEFAULT 0 FOR No_of_Rides
-
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
--- =============================================
--- Author:      <Gilad Meirson>
--- Create Date: <21/10/2025>
--- Modified:    <10/12/2025> - Added EquipmentList to avoid N+1 problem
--- Modified:    <31/01/2026> - Added afternoon detection for rides >= 12:00
--- Description: <try to split the unityRide packs to improve load times>
--- =============================================
-ALTER PROCEDURE [dbo].[sp_getUnityRidesSplit]
-(
-    @ride_date datetime,
-    @isAfternoon bit,
-    @isFutureTable bit,
-    @days smallint
-)
-AS
-BEGIN
-    SET NOCOUNT ON;
-    
-    IF(@isFutureTable = 0)
-    BEGIN
-        SELECT 
-            u.*,
-            NULLIF(p.CellPhone, '') AS CellPhone,
-            NULLIF(p.CellPhone2, '') AS PatientCellPhone2,
-            NULLIF(p.HomePhone, '') AS PatientCellPhone3,
-            (
-                SELECT STRING_AGG(EquipmentName, ',') WITHIN GROUP (ORDER BY EquipmentName)
-                FROM EquipmentForPatientView E
-                WHERE E.id = u.PatientId
-            ) AS EquipmentList
-        FROM UnityRide AS u
-        LEFT JOIN Patient AS p ON p.Id = u.PatientId
-        WHERE u.Status <> N'נמחקה'
-            AND CONVERT(DATE, @ride_date) = CONVERT(DATE, u.PickupTime)
-            AND (
-                (
-                    @isAfternoon = 1 
-                    AND (DATEPART(MINUTE, u.PickupTime) = 14 OR DATEPART(HOUR, u.PickupTime) >= 12)
-                )
-                OR
-                (
-                    ISNULL(@isAfternoon, 0) = 0 
-                    AND DATEPART(MINUTE, u.PickupTime) <> 14 
-                    AND DATEPART(HOUR, u.PickupTime) < 12
-                )
-            )
-    END
-    ELSE IF(@isFutureTable = 1)
-    BEGIN
-        SELECT 
-            u.*,
-            NULLIF(p.CellPhone, '') AS CellPhone,
-            NULLIF(p.CellPhone2, '') AS PatientCellPhone2,
-            NULLIF(p.HomePhone, '') AS PatientCellPhone3,
-            (
-                SELECT STRING_AGG(EquipmentName, ',') WITHIN GROUP (ORDER BY EquipmentName)
-                FROM EquipmentForPatientView E
-                WHERE E.id = u.PatientId
-            ) AS EquipmentList
-        FROM UnityRide AS u
-        LEFT JOIN Patient AS p ON p.Id = u.PatientId
-        WHERE 
-            CONVERT(DATE, u.PickupTime) BETWEEN
-                CONVERT(DATE, DATEADD(DAY, 2, GETDATE())) AND
-                CONVERT(DATE, DATEADD(DAY, @days, GETDATE()))
-            AND u.Status <> N'נמחקה'
-    END
-    ELSE
-    BEGIN
-        SELECT -1 AS RidePatNum, 'Error @isFutureTable is not defined' AS error
-    END
-END
-
-
+﻿
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -309,8 +16,6 @@ CREATE TYPE TableNameList AS TABLE
 );
 GO
 
-
-
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -321,8 +26,6 @@ GO
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
 
 -- =======================================================
 -- Create Stored Procedure Template for Azure SQL Database
@@ -417,9 +120,18 @@ END
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE TABLE Executions(
+	ExecId INT IDENTITY(1,1) PRIMARY KEY,
+    UserPhone NVARCHAR(20)      NULL,
+    UserName NVARCHAR(55)      NULL,
+    ExecutionTime DATETIME2     NOT NULL,
+    SqlQuery NVARCHAR(MAX)      NULL,
+    AiDescription NVARCHAR(MAX) NULL,
+    UserPrompt NVARCHAR(MAX)    NULL,
+    RelatedTables NVARCHAR(100) NULL
+)
 
 
-
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -432,6 +144,60 @@ END
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
+-- =======================================================
+-- Create Stored Procedure Template for Azure SQL Database
+-- =======================================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad Meirson>
+-- Create Date: <10/02/2026>
+-- Description: <insert values to execution table>
+-- =============================================
+CREATE PROCEDURE SP_insertValuesToExecutions
+(
+    -- Add the parameters for the stored procedure here
+	@UserPhone NVARCHAR(20) = NULL,
+    @UserName NVARCHAR(55) = NULL,
+    @ExecutionTime DATETIME2,
+    @SqlQuery NVARCHAR(MAX) = NULL,
+    @AiDescription NVARCHAR(MAX) = NULL,
+    @UserPrompt NVARCHAR(MAX) = NULL,
+    @RelatedTables NVARCHAR(100) = NULL
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+    SET NOCOUNT ON
+
+    INSERT INTO Executions
+    (
+        UserPhone,
+        UserName,
+        ExecutionTime,
+        SqlQuery,
+        AiDescription,
+        UserPrompt,
+        RelatedTables
+    )
+    VALUES
+    (
+        @UserPhone,
+        @UserName,
+        @ExecutionTime,
+        @SqlQuery,
+        @AiDescription,
+        @UserPrompt,
+        @RelatedTables
+    );
+
+    -- מחזיר את ה-ID שנוצר
+    SELECT SCOPE_IDENTITY() AS NewExecId;
+END
+GO
 
 
 

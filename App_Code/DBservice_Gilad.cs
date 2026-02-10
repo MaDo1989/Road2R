@@ -278,6 +278,52 @@ public class DBservice_Gilad
         return result;
     }
 
+    public int SaveExecution(Execution exec)
+    {
+        using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString))
+        {
+            Dictionary<string, object> paramDic = new Dictionary<string, object>
+            {
+                { "@UserPhone", exec.UserPhone },
+                { "@UserName", exec.UserName },
+                { "@ExecutionTime", exec.ExecutionTime },
+                { "@SqlQuery", exec.SqlQuery },
+                { "@@AiDescription", exec.AiDescription },
+                { "@UserPrompt", exec.UserPrompt },
+                { "@RelatedTables", exec.RelatedTables },
+            };
+            SqlCommand cmd = CreateCommandWithStoredProcedureGeneral("SP_insertValuesToExecutions", con, paramDic);
+            try
+            {
+                con.Open();
+                using (SqlDataReader dataReader = cmd.ExecuteReader())
+                {
+                    int NewExecIdIND = dataReader.GetOrdinal("NewExecId");
+                    while (dataReader.Read())
+                    {
+                        int NewExecId = dataReader.GetInt32(NewExecIdIND);
+                        return NewExecId;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                WriteToErrorFile("SaveExecution", ex.ToString());
+                throw ex;
+            }
+        }
+        return -1;
+    }
+    public DataTable ExecuteQueryByString(string sql)
+    {
+        DataTable dt = new DataTable();
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString))
+        using (SqlDataAdapter adapter = new SqlDataAdapter(sql, conn))
+        {
+            adapter.Fill(dt);
+        }
+        return dt;
+    }
     public List<UnityRide> GetSplitRides(DateTime rideDate, bool isAfternoon, bool isFutureTable, int days)
     {
         List<UnityRide> list2Return = new List<UnityRide>();
@@ -718,10 +764,6 @@ public class DBservice_Gilad
 
     }
 
-
-
-
-
     public UnityRide GetReturnUnityRide(int unityRideID)
     {
         SqlCommand cmd;
@@ -1017,10 +1059,6 @@ public class DBservice_Gilad
         }
     }
 
-
-
-
-
     public List<string> GetManagersVolunteersCellPhones()
     {
         SqlCommand cmd;
@@ -1260,7 +1298,6 @@ public class DBservice_Gilad
         }
     }
 
-
     public int recoverUnityRide(int unityRideID, string whoChange)
     {
         SqlCommand cmd;
@@ -1307,10 +1344,6 @@ public class DBservice_Gilad
             }
         }
     }
-
-
-
-
     public int leaveUnityRideForMobile(int driverID, int unityRideID)
     {
         SqlCommand cmd;
@@ -1351,10 +1384,6 @@ public class DBservice_Gilad
             throw new Exception("Error leaveUnityRideForMobile dbservice_gilad" + ex.Message);
         }
     }
-
-
-
-
     public int SetUnityRide(UnityRide unityRide)
     {
         SqlCommand cmd;

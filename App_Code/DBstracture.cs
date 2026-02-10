@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Runtime.Caching;
+using System.Data;
 
 
 /// <summary>
@@ -99,5 +100,26 @@ public class DBstracture
                 g => g.Key,
                 g => g.ToList()
             );
+    }
+
+    public DataTable ExecQuery(Execution exec)
+    {
+        if (exec.SqlQuery == null || string.IsNullOrEmpty(exec.SqlQuery))
+        {
+            throw new ArgumentNullException("the sql param is empty or null");
+        }
+        else
+        {
+            DBservice_Gilad dbs = new DBservice_Gilad();
+            DataTable results =  dbs.ExecuteQueryByString(exec.SqlQuery);
+            if (results!= null && results.Rows.Count > 0)
+            {
+                int indication = Execution.InsertExec(exec);
+                return results;
+            }
+
+        }
+        return null;
+            
     }
 }

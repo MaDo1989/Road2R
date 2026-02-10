@@ -316,6 +316,7 @@ function clearSelections() {
 function generateReport() {
     const selectedTables = getSelectedTables();
     const query = document.getElementById('queryInput').value.trim();
+    
 
     if (selectedTables.length === 0) {
         swal({
@@ -334,46 +335,68 @@ function generateReport() {
         });
         return;
     }
-
+    USER_PROMPT = query;
     // Get only the selected columns (optimized for tokens)
     const selectedColumns = getSelectedColumnsForAI();
 
-    console.log('Selected Tables:', selectedTables);
-    console.log('Selected Columns (optimized):', selectedColumns);
-    console.log('Query:', query);
+
 
     // This is what you'll send to the AI API - much smaller payload!
     const aiPayload = {
         tables: selectedColumns,
         query: query
     };
-
-    console.log('AI Payload:', JSON.stringify(aiPayload));
-
-    // TODO: Add your AI API call here with aiPayload
-    // $.ajax({
-    //     url: "your-ai-endpoint",
-    //     data: JSON.stringify(aiPayload),
-    //     ...
-    // });
+    console.log(aiPayload);
+    //console.log('AI Payload:', JSON.stringify(aiPayload));
+    console.log(PromptBuilder(selectedColumns, query))
+    const request = {
+        prompt: PromptBuilder(selectedColumns, query),
+        thinkingLevel: "LOW",
+        model: "gemini-3-flash-preview"
+    }
+    //$.ajax({
+    //    url: 'https://querymaker.onrender.com/generate',
+    //    contentType: "application/json; charset=utf-8",
+    //    type: "POST",
+    //    data: JSON.stringify(request),
+    //    success: generateReport_SCB,
+    //    error: generateReport_ECB
+    //})
 
     // Show results container (placeholder)
     document.getElementById('resultsContainer').classList.add('active');
 
-    // Display what would be sent
-    const columnsInfo = Object.entries(selectedColumns).map(([table, cols]) =>
-        `<strong>${tableHebrewNames[table]}:</strong> ${cols.map(c => c.col).join(', ')}`
-    ).join('<br>');
+}
 
-    document.getElementById('resultsContent').innerHTML = `
-        <h4>מידע שיישלח ל-AI (חסכון בטוקנים)</h4>
-        <div style="background: #f5f5f5; padding: 15px; border-radius: 5px; margin-top: 10px;">
-            <p><strong>שאילתה:</strong> ${query}</p>
-            <hr>
-            <p><strong>עמודות נבחרות:</strong></p>
-            <p>${columnsInfo}</p>
-            <hr>
-            <p><strong>גודל הפיילואד:</strong> ${JSON.stringify(aiPayload).length} תווים</p>
-        </div>
-    `;
+function generateReport_SCB(data) {
+    console.log('success , ', data);
+    //UserPhone = userPhone;
+    //UserName = userName;
+    //ExecutionTime = executionTime;
+    //SqlQuery = sqlQuery;
+    //AiDescription = aiDescription;
+    //UserPrompt = userPrompt;
+    //RelatedTables = relatedTables;
+    const Request = {
+        UserPhone: localStorage.getItem("user"),
+        UserName: localStorage.getItem("userCell"),
+        ExecutionTime: new Date().toISOString(),
+        SqlQuery: data.SQL_Query,
+        AiDescription: data.description,
+        UserPrompt: USER_PROMPT,
+
+    }
+
+}
+function generateReport_ECB(err) {
+    console.error('error , ', err);
+
+}
+function PromptBuilder(stracture, userPrompt) {
+    let FinalPrompt = `Write an SQL query according to the following instructions:
+    ${userPrompt}
+    And use the following description to help you understand the structure of the data in the database:
+    ${JSON.stringify(stracture)}
+    `
+    return FinalPrompt;
 }

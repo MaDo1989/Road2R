@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Script.Serialization;
@@ -93,6 +94,23 @@ public class WebService : System.Web.Services.WebService
             DBstracture dBstracture = new DBstracture();
             Dictionary<string, List<DBstracture>> stracture = dBstracture.GetStractureFromDB(tablesName);
             return j.Serialize(stracture);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetStractureOfTables", ex);
+            throw new Exception("שגיאה בשליפה של מבנה הדאטה");
+        }
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetQueryResults(Execution exec)
+    {
+        try
+        {
+            DBstracture dBstracture = new DBstracture();
+            DataTable results = dBstracture.ExecQuery(exec);
+            return j.Serialize(results);
         }
         catch (Exception ex)
         {
