@@ -1,4 +1,5 @@
 ﻿using log4net;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -110,7 +111,7 @@ public class WebService : System.Web.Services.WebService
         {
             DBstracture dBstracture = new DBstracture();
             DataTable results = dBstracture.ExecQuery(exec);
-            return j.Serialize(results);
+            return JsonConvert.SerializeObject(results);
         }
         catch (Exception ex)
         {

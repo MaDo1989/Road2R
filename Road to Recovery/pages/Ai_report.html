@@ -10,6 +10,20 @@
 
     <title>יצירת דוח באמצעות AI</title>
 
+    <!-- jQuery & DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+     <!-- jQuery & DataTables JS -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+
     <!-- Sweet Alert css -->
     <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
 
@@ -311,9 +325,9 @@
             display: none;
         }
 
-        .columns-selection-container.active {
-            display: block;
-        }
+            .columns-selection-container.active {
+                display: block;
+            }
 
         .table-columns-section {
             background: white;
@@ -333,25 +347,25 @@
             cursor: pointer;
         }
 
-        .table-columns-header:hover {
-            opacity: 0.95;
-        }
+            .table-columns-header:hover {
+                opacity: 0.95;
+            }
 
-        .table-columns-header h4 {
-            margin: 0;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+            .table-columns-header h4 {
+                margin: 0;
+                font-size: 14px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
 
-        .table-columns-header .toggle-icon {
-            transition: transform 0.3s ease;
-        }
+            .table-columns-header .toggle-icon {
+                transition: transform 0.3s ease;
+            }
 
-        .table-columns-header.collapsed .toggle-icon {
-            transform: rotate(-90deg);
-        }
+            .table-columns-header.collapsed .toggle-icon {
+                transform: rotate(-90deg);
+            }
 
         .table-columns-actions {
             display: flex;
@@ -369,9 +383,9 @@
             transition: all 0.2s ease;
         }
 
-        .btn-select-all:hover, .btn-clear-all:hover {
-            background: rgba(255,255,255,0.3);
-        }
+            .btn-select-all:hover, .btn-clear-all:hover {
+                background: rgba(255,255,255,0.3);
+            }
 
         .table-columns-body {
             padding: 15px;
@@ -380,11 +394,11 @@
             transition: max-height 0.3s ease, padding 0.3s ease;
         }
 
-        .table-columns-body.collapsed {
-            max-height: 0;
-            padding: 0 15px;
-            overflow: hidden;
-        }
+            .table-columns-body.collapsed {
+                max-height: 0;
+                padding: 0 15px;
+                overflow: hidden;
+            }
 
         .columns-grid {
             display: grid;
@@ -402,34 +416,34 @@
             transition: all 0.2s ease;
         }
 
-        .column-item:hover {
-            border-color: #5b69bc;
-            background: #f0f2ff;
-        }
+            .column-item:hover {
+                border-color: #5b69bc;
+                background: #f0f2ff;
+            }
 
-        .column-item input[type="checkbox"] {
-            margin-left: 8px;
-            width: 16px;
-            height: 16px;
-            cursor: pointer;
-        }
+            .column-item input[type="checkbox"] {
+                margin-left: 8px;
+                width: 16px;
+                height: 16px;
+                cursor: pointer;
+            }
 
-        .column-item label {
-            cursor: pointer;
-            margin: 0;
-            font-size: 13px;
-            color: #333;
-            flex: 1;
-        }
+            .column-item label {
+                cursor: pointer;
+                margin: 0;
+                font-size: 13px;
+                color: #333;
+                flex: 1;
+            }
 
-        .column-item .data-type {
-            font-size: 10px;
-            color: #888;
-            background: #e9e9e9;
-            padding: 2px 6px;
-            border-radius: 3px;
-            margin-right: 5px;
-        }
+            .column-item .data-type {
+                font-size: 10px;
+                color: #888;
+                background: #e9e9e9;
+                padding: 2px 6px;
+                border-radius: 3px;
+                margin-right: 5px;
+            }
 
         .selected-count-badge {
             background: rgba(255,255,255,0.3);
@@ -450,22 +464,720 @@
             gap: 10px;
         }
 
-        .token-savings-info i {
-            color: #28a745;
-            font-size: 18px;
-        }
+            .token-savings-info i {
+                color: #28a745;
+                font-size: 18px;
+            }
 
-        .token-savings-info .savings-text {
-            font-size: 13px;
-            color: #155724;
-        }
+            .token-savings-info .savings-text {
+                font-size: 13px;
+                color: #155724;
+            }
 
-        .token-savings-info .savings-number {
-            font-weight: bold;
-            color: #28a745;
-        }
+            .token-savings-info .savings-number {
+                font-weight: bold;
+                color: #28a745;
+            }
     </style>
 
+
+    <style>
+        /* ===== AI LOADER - ALL SCOPED WITH .ai-loader PREFIX ===== */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500&display=swap');
+
+        .ai-loader-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(5, 6, 15, 0.72);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            font-family: 'Orbitron', monospace;
+            transition: opacity 0.4s ease;
+        }
+
+            .ai-loader-overlay.hidden {
+                display: none;
+            }
+
+            /* Grid background */
+            .ai-loader-overlay::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(90deg, rgba(0,240,255,0.03) 1px, transparent 1px), linear-gradient(rgba(0,240,255,0.03) 1px, transparent 1px);
+                background-size: 40px 40px;
+                animation: aiL-gridPulse 4s ease-in-out infinite;
+                pointer-events: none;
+            }
+
+        @keyframes aiL-gridPulse {
+            0%, 100% {
+                opacity: 0.3;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        /* Particles */
+        .ai-loader-ambient {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .ai-loader-particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0;
+            animation: aiL-float var(--duration) var(--delay) infinite ease-in-out;
+        }
+
+        @keyframes aiL-float {
+            0% {
+                opacity: 0;
+                transform: translateY(100vh) scale(0);
+            }
+
+            10% {
+                opacity: 0.8;
+            }
+
+            90% {
+                opacity: 0.6;
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-20vh) scale(1.5);
+            }
+        }
+
+        /* Data Streams */
+        .ai-loader-stream {
+            position: absolute;
+            top: 0;
+            width: 1px;
+            height: 100%;
+            opacity: 0.06;
+            pointer-events: none;
+        }
+
+            .ai-loader-stream::before {
+                content: '01001 10110 AI 01 NEURAL 10 DEEP 01 THINK';
+                position: absolute;
+                top: 0;
+                font-family: 'Orbitron', monospace;
+                font-size: 8px;
+                color: #00f0ff;
+                writing-mode: vertical-rl;
+                white-space: nowrap;
+                animation: aiL-streamDown var(--speed) linear infinite;
+                animation-delay: var(--delay);
+            }
+
+        @keyframes aiL-streamDown {
+            0% {
+                transform: translateY(-100%);
+            }
+
+            100% {
+                transform: translateY(100vh);
+            }
+        }
+
+        /* Corners */
+        .ai-loader-corner {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            pointer-events: none;
+            opacity: 0.15;
+        }
+
+            .ai-loader-corner::before, .ai-loader-corner::after {
+                content: '';
+                position: absolute;
+                background: #00f0ff;
+            }
+
+            .ai-loader-corner::before {
+                width: 30px;
+                height: 1px;
+            }
+
+            .ai-loader-corner::after {
+                width: 1px;
+                height: 30px;
+            }
+
+            .ai-loader-corner.tl {
+                top: 20px;
+                left: 20px;
+            }
+
+            .ai-loader-corner.tr {
+                top: 20px;
+                right: 20px;
+            }
+
+                .ai-loader-corner.tr::before {
+                    right: 0;
+                }
+
+                .ai-loader-corner.tr::after {
+                    right: 0;
+                }
+
+            .ai-loader-corner.bl {
+                bottom: 20px;
+                left: 20px;
+            }
+
+                .ai-loader-corner.bl::before {
+                    bottom: 0;
+                }
+
+                .ai-loader-corner.bl::after {
+                    bottom: 0;
+                }
+
+            .ai-loader-corner.br {
+                bottom: 20px;
+                right: 20px;
+            }
+
+                .ai-loader-corner.br::before {
+                    right: 0;
+                    bottom: 0;
+                }
+
+                .ai-loader-corner.br::after {
+                    right: 0;
+                    bottom: 0;
+                }
+
+        /* Core Container */
+        .ai-loader-core {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Aura */
+        .ai-loader-aura {
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,240,255,0.06) 0%, rgba(139,92,246,0.04) 30%, rgba(255,0,229,0.02) 50%, transparent 70%);
+            animation: aiL-aura 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes aiL-aura {
+            0%, 100% {
+                transform: scale(0.9);
+                opacity: 0.6;
+            }
+
+            50% {
+                transform: scale(1.15);
+                opacity: 1;
+            }
+        }
+
+        /* Neural connections */
+        .ai-loader-neural {
+            position: absolute;
+            width: 280px;
+            height: 280px;
+        }
+
+            .ai-loader-neural svg {
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
+
+        .ai-loader-synapse {
+            stroke-width: 0.5;
+            stroke-dasharray: 5 8;
+            opacity: 0.4;
+            animation: aiL-synapse 2s linear infinite;
+        }
+
+            .ai-loader-synapse:nth-child(odd) {
+                stroke: #00f0ff;
+                animation-duration: 2.5s;
+            }
+
+            .ai-loader-synapse:nth-child(even) {
+                stroke: #ff00e5;
+                animation-duration: 1.8s;
+            }
+
+        @keyframes aiL-synapse {
+            to {
+                stroke-dashoffset: -50;
+            }
+        }
+
+        /* Hex nodes */
+        .ai-loader-hexnodes {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+        }
+
+        .ai-loader-hex {
+            position: absolute;
+            width: 12px;
+            height: 14px;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            animation: aiL-hex 2s ease-in-out infinite;
+        }
+
+            .ai-loader-hex:nth-child(1) {
+                top: 0;
+                left: 50%;
+                background: #00f0ff;
+                animation-delay: 0s;
+            }
+
+            .ai-loader-hex:nth-child(2) {
+                top: 20%;
+                right: 5%;
+                background: #ff00e5;
+                animation-delay: 0.3s;
+            }
+
+            .ai-loader-hex:nth-child(3) {
+                bottom: 20%;
+                right: 5%;
+                background: #8b5cf6;
+                animation-delay: 0.6s;
+            }
+
+            .ai-loader-hex:nth-child(4) {
+                bottom: 0;
+                left: 50%;
+                background: #00ffaa;
+                animation-delay: 0.9s;
+            }
+
+            .ai-loader-hex:nth-child(5) {
+                bottom: 20%;
+                left: 5%;
+                background: #00f0ff;
+                animation-delay: 1.2s;
+            }
+
+            .ai-loader-hex:nth-child(6) {
+                top: 20%;
+                left: 5%;
+                background: #ff00e5;
+                animation-delay: 1.5s;
+            }
+
+        @keyframes aiL-hex {
+            0%, 100% {
+                opacity: 0.3;
+                transform: scale(0.8);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.4);
+                filter: drop-shadow(0 0 8px currentColor);
+            }
+        }
+
+        /* Scan arc */
+        .ai-loader-scan {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            animation: aiL-orbit 6s linear infinite;
+        }
+
+            .ai-loader-scan::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 50%;
+                width: 50%;
+                height: 50%;
+                background: conic-gradient(from 0deg, transparent, rgba(0,240,255,0.15));
+                transform-origin: bottom left;
+                border-radius: 0 100% 0 0;
+                filter: blur(5px);
+            }
+
+        /* Orbital Rings */
+        .ai-loader-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid transparent;
+        }
+
+            .ai-loader-ring:nth-child(6) {
+                width: 280px;
+                height: 280px;
+                border-top-color: #00f0ff;
+                border-right-color: rgba(0,240,255,0.2);
+                animation: aiL-orbit 3s linear infinite;
+                filter: drop-shadow(0 0 8px #00f0ff);
+            }
+
+            .ai-loader-ring:nth-child(7) {
+                width: 240px;
+                height: 240px;
+                border-bottom-color: #ff00e5;
+                border-left-color: rgba(255,0,229,0.2);
+                animation: aiL-orbit 2.5s linear infinite reverse;
+                filter: drop-shadow(0 0 8px #ff00e5);
+            }
+
+            .ai-loader-ring:nth-child(8) {
+                width: 200px;
+                height: 200px;
+                border-top-color: #8b5cf6;
+                border-right-color: rgba(139,92,246,0.3);
+                animation: aiL-orbit 2s linear infinite;
+                filter: drop-shadow(0 0 6px #8b5cf6);
+            }
+
+            .ai-loader-ring:nth-child(9) {
+                width: 160px;
+                height: 160px;
+                border-bottom-color: #00ffaa;
+                border-left-color: rgba(0,255,170,0.2);
+                animation: aiL-orbit 4s linear infinite reverse;
+                filter: drop-shadow(0 0 6px #00ffaa);
+            }
+
+        @keyframes aiL-orbit {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Electron dots on rings */
+        .ai-loader-ring::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            top: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .ai-loader-ring:nth-child(6)::after {
+            background: #00f0ff;
+            box-shadow: 0 0 15px 5px #00f0ff, 0 0 30px 10px rgba(0,240,255,0.3);
+        }
+
+        .ai-loader-ring:nth-child(7)::after {
+            background: #ff00e5;
+            box-shadow: 0 0 15px 5px #ff00e5, 0 0 30px 10px rgba(255,0,229,0.3);
+        }
+
+        .ai-loader-ring:nth-child(8)::after {
+            background: #8b5cf6;
+            box-shadow: 0 0 15px 5px #8b5cf6;
+        }
+
+        .ai-loader-ring:nth-child(9)::after {
+            background: #00ffaa;
+            box-shadow: 0 0 15px 5px #00ffaa;
+        }
+
+        /* Brain */
+        .ai-loader-brain {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .ai-loader-brain::before {
+                content: '';
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                border-radius: 50%;
+                background: radial-gradient(circle, rgba(0,240,255,0.15) 0%, rgba(139,92,246,0.1) 40%, transparent 70%);
+                animation: aiL-core 2s ease-in-out infinite;
+            }
+
+        @keyframes aiL-core {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            50% {
+                transform: scale(1.3);
+                opacity: 1;
+            }
+        }
+
+        .ai-loader-brain-svg {
+            width: 60px;
+            height: 60px;
+            position: relative;
+            z-index: 2;
+            filter: drop-shadow(0 0 10px #00f0ff) drop-shadow(0 0 20px rgba(0,240,255,0.3));
+        }
+
+            .ai-loader-brain-svg path {
+                fill: none;
+                stroke-width: 1.5;
+                stroke-linecap: round;
+                stroke-dasharray: 200;
+                stroke-dashoffset: 200;
+                animation: aiL-draw 3s ease-in-out infinite alternate;
+            }
+
+        .ai-loader-lhemi path {
+            stroke: #00f0ff;
+        }
+
+        .ai-loader-rhemi path {
+            stroke: #ff00e5;
+            animation-delay: 0.3s;
+        }
+
+        @keyframes aiL-draw {
+            0% {
+                stroke-dashoffset: 200;
+            }
+
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .ai-loader-dots circle {
+            fill: #00f0ff;
+            opacity: 0;
+            animation: aiL-fire 1.5s ease-in-out infinite;
+        }
+
+            .ai-loader-dots circle:nth-child(2) {
+                animation-delay: 0.2s;
+                fill: #ff00e5;
+            }
+
+            .ai-loader-dots circle:nth-child(3) {
+                animation-delay: 0.4s;
+                fill: #8b5cf6;
+            }
+
+            .ai-loader-dots circle:nth-child(4) {
+                animation-delay: 0.6s;
+                fill: #00ffaa;
+            }
+
+            .ai-loader-dots circle:nth-child(5) {
+                animation-delay: 0.8s;
+                fill: #00f0ff;
+            }
+
+            .ai-loader-dots circle:nth-child(6) {
+                animation-delay: 1.0s;
+                fill: #ff00e5;
+            }
+
+        @keyframes aiL-fire {
+            0%, 100% {
+                opacity: 0.2;
+                r: 1.5;
+            }
+
+            50% {
+                opacity: 1;
+                r: 3;
+            }
+        }
+
+        /* Text */
+        .ai-loader-text {
+            position: absolute;
+            bottom: -80px;
+            text-align: center;
+            width: 350px;
+        }
+
+        .ai-loader-title {
+            font-family: 'Orbitron', monospace;
+            font-weight: 900;
+            font-size: 14px;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, #00f0ff, #ff00e5, #8b5cf6, #00ffaa);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: aiL-grad 3s ease-in-out infinite;
+            margin-bottom: 12px;
+        }
+
+        @keyframes aiL-grad {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .ai-loader-thinking {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 300;
+            font-size: 13px;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+        }
+
+        .ai-loader-word {
+            animation: aiL-wordFade 4s ease-in-out infinite;
+        }
+
+        @keyframes aiL-wordFade {
+            0%, 100% {
+                opacity: 0.4;
+            }
+
+            50% {
+                opacity: 0.9;
+            }
+        }
+
+        .ai-loader-tdots span {
+            display: inline-block;
+            animation: aiL-dotB 1.4s ease-in-out infinite;
+            color: #00f0ff;
+        }
+
+            .ai-loader-tdots span:nth-child(1) {
+                animation-delay: 0s;
+            }
+
+            .ai-loader-tdots span:nth-child(2) {
+                animation-delay: 0.2s;
+            }
+
+            .ai-loader-tdots span:nth-child(3) {
+                animation-delay: 0.4s;
+            }
+
+        @keyframes aiL-dotB {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.3;
+            }
+
+            30% {
+                transform: translateY(-6px);
+                opacity: 1;
+            }
+        }
+
+        .ai-loader-progress {
+            width: 200px;
+            height: 2px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 1px;
+            margin: 14px auto 0;
+            overflow: hidden;
+        }
+
+        .ai-loader-progress-fill {
+            height: 100%;
+            width: 40%;
+            border-radius: 1px;
+            background: linear-gradient(90deg, #00f0ff, #ff00e5);
+            animation: aiL-sweep 2s ease-in-out infinite;
+            box-shadow: 0 0 10px #00f0ff, 0 0 20px rgba(0,240,255,0.3);
+        }
+
+        @keyframes aiL-sweep {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(350%);
+            }
+        }
+
+        .ai-loader-status {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 10px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.2);
+            margin-top: 10px;
+            height: 14px;
+            overflow: hidden;
+        }
+
+        .ai-loader-status-inner {
+            animation: aiL-statusScroll 8s step-end infinite;
+        }
+
+        .ai-loader-status-item {
+            height: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes aiL-statusScroll {
+            0% {
+                transform: translateY(0);
+            }
+
+            25% {
+                transform: translateY(-14px);
+            }
+
+            50% {
+                transform: translateY(-28px);
+            }
+
+            75% {
+                transform: translateY(-42px);
+            }
+
+            100% {
+                transform: translateY(0);
+            }
+        }
+    </style>
 
 </head>
 
@@ -730,7 +1442,112 @@
         <!-- End page content -->
     </div>
     <!-- END wrapper -->
+    <!--NEW LOADER-->
 
+    <div id="ai-loader" class="ai-loader-overlay">
+        <!-- Ambient Particles -->
+        <div class="ai-loader-ambient" id="ai-loader-particles"></div>
+
+        <!-- Data Streams -->
+        <div class="ai-loader-stream" style="left: 8%; --speed: 8s; --delay: 0s;"></div>
+        <div class="ai-loader-stream" style="left: 22%; --speed: 12s; --delay: 2s;"></div>
+        <div class="ai-loader-stream" style="left: 45%; --speed: 10s; --delay: 4s;"></div>
+        <div class="ai-loader-stream" style="left: 67%; --speed: 9s; --delay: 1s;"></div>
+        <div class="ai-loader-stream" style="left: 85%; --speed: 11s; --delay: 3s;"></div>
+        <div class="ai-loader-stream" style="left: 93%; --speed: 7s; --delay: 5s;"></div>
+
+        <!-- Corner Decorations -->
+        <div class="ai-loader-corner tl"></div>
+        <div class="ai-loader-corner tr"></div>
+        <div class="ai-loader-corner bl"></div>
+        <div class="ai-loader-corner br"></div>
+
+        <!-- Core -->
+        <div class="ai-loader-core">
+            <div class="ai-loader-aura"></div>
+
+            <!-- Neural Lines -->
+            <div class="ai-loader-neural">
+                <svg viewBox="0 0 280 280">
+                    <line class="ai-loader-synapse" x1="140" y1="0" x2="70" y2="70" />
+                    <line class="ai-loader-synapse" x1="140" y1="0" x2="210" y2="70" />
+                    <line class="ai-loader-synapse" x1="280" y1="140" x2="210" y2="70" />
+                    <line class="ai-loader-synapse" x1="280" y1="140" x2="210" y2="210" />
+                    <line class="ai-loader-synapse" x1="140" y1="280" x2="210" y2="210" />
+                    <line class="ai-loader-synapse" x1="140" y1="280" x2="70" y2="210" />
+                    <line class="ai-loader-synapse" x1="0" y1="140" x2="70" y2="210" />
+                    <line class="ai-loader-synapse" x1="0" y1="140" x2="70" y2="70" />
+                    <line class="ai-loader-synapse" x1="70" y1="70" x2="210" y2="210" />
+                    <line class="ai-loader-synapse" x1="210" y1="70" x2="70" y2="210" />
+                    <line class="ai-loader-synapse" x1="140" y1="0" x2="140" y2="280" />
+                    <line class="ai-loader-synapse" x1="0" y1="140" x2="280" y2="140" />
+                </svg>
+            </div>
+
+            <!-- Hex Nodes -->
+            <div class="ai-loader-hexnodes">
+                <div class="ai-loader-hex"></div>
+                <div class="ai-loader-hex"></div>
+                <div class="ai-loader-hex"></div>
+                <div class="ai-loader-hex"></div>
+                <div class="ai-loader-hex"></div>
+                <div class="ai-loader-hex"></div>
+            </div>
+
+            <!-- Scan Arc -->
+            <div class="ai-loader-scan"></div>
+
+            <!-- Orbital Rings -->
+            <div class="ai-loader-ring"></div>
+            <div class="ai-loader-ring"></div>
+            <div class="ai-loader-ring"></div>
+            <div class="ai-loader-ring"></div>
+
+            <!-- Brain -->
+            <div class="ai-loader-brain">
+                <svg class="ai-loader-brain-svg" viewBox="0 0 50 50">
+                    <g class="ai-loader-lhemi">
+                        <path d="M25,8 Q12,8 10,18 Q8,28 14,35 Q18,40 25,42" />
+                        <path d="M25,12 Q16,14 14,22 Q12,30 18,36" />
+                        <path d="M25,18 Q19,20 18,26" />
+                    </g>
+                    <g class="ai-loader-rhemi">
+                        <path d="M25,8 Q38,8 40,18 Q42,28 36,35 Q32,40 25,42" />
+                        <path d="M25,12 Q34,14 36,22 Q38,30 32,36" />
+                        <path d="M25,18 Q31,20 32,26" />
+                    </g>
+                    <g class="ai-loader-dots">
+                        <circle cx="14" cy="20" r="2" />
+                        <circle cx="36" cy="20" r="2" />
+                        <circle cx="20" cy="30" r="2" />
+                        <circle cx="30" cy="30" r="2" />
+                        <circle cx="25" cy="15" r="2" />
+                        <circle cx="25" cy="38" r="2" />
+                    </g>
+                </svg>
+            </div>
+
+            <!-- Text -->
+            <div class="ai-loader-text">
+                <div class="ai-loader-title">AI Processing</div>
+                <div class="ai-loader-thinking">
+                    <span class="ai-loader-word">Thinking</span>
+                    <span class="ai-loader-tdots"><span>.</span><span>.</span><span>.</span></span>
+                </div>
+                <div class="ai-loader-progress"><div class="ai-loader-progress-fill"></div></div>
+                <div class="ai-loader-status">
+                    <div class="ai-loader-status-inner">
+                        <div class="ai-loader-status-item">Analyzing Neural Patterns</div>
+                        <div class="ai-loader-status-item">Processing Data Nodes</div>
+                        <div class="ai-loader-status-item">Generating Response</div>
+                        <div class="ai-loader-status-item">Optimizing Output</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--NEW LOADER-->
     <script>
         var resizefunc = [];
 
@@ -762,6 +1579,26 @@
         }
     </script>
 
+    <script>
+        // Generate particles - runs once when loaded
+        (function () {
+            var c = document.getElementById('ai-loader-particles');
+            if (!c) return;
+            var colors = ['#00f0ff', '#ff00e5', '#8b5cf6', '#00ffaa'];
+            for (var i = 0; i < 40; i++) {
+                var p = document.createElement('div');
+                p.className = 'ai-loader-particle';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.setProperty('--duration', (6 + Math.random() * 10) + 's');
+                p.style.setProperty('--delay', (Math.random() * 8) + 's');
+                var s = (1 + Math.random() * 3) + 'px';
+                p.style.width = s;
+                p.style.height = s;
+                p.style.background = colors[Math.floor(Math.random() * colors.length)];
+                c.appendChild(p);
+            }
+        })();
+    </script>
     <!-- jQuery  -->
     <script src="assets/js/bootstrap-rtl.min.js"></script>
     <script src="assets/js/detect.js"></script>

@@ -288,7 +288,7 @@ public class DBservice_Gilad
                 { "@UserName", exec.UserName },
                 { "@ExecutionTime", exec.ExecutionTime },
                 { "@SqlQuery", exec.SqlQuery },
-                { "@@AiDescription", exec.AiDescription },
+                { "@AiDescription", exec.AiDescription },
                 { "@UserPrompt", exec.UserPrompt },
                 { "@RelatedTables", exec.RelatedTables },
             };
@@ -298,10 +298,10 @@ public class DBservice_Gilad
                 con.Open();
                 using (SqlDataReader dataReader = cmd.ExecuteReader())
                 {
-                    int NewExecIdIND = dataReader.GetOrdinal("NewExecId");
                     while (dataReader.Read())
                     {
-                        int NewExecId = dataReader.GetInt32(NewExecIdIND);
+                        int NewExecId = Convert.ToInt32(dataReader["NewExecId"]);
+
                         return NewExecId;
                     }
                 }

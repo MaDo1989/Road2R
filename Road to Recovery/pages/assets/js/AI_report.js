@@ -72,9 +72,7 @@ $(document).ready(function () {
     if (window.location.hostname.toString() == 'localhost' || window.location.pathname.toLowerCase().indexOf('test') != -1) {
         $("#na").css("background-color", "#ffde89");
     }
-
     getTabelsStracture();
-    updateSelectedTablesPreview();
 });
 
 function getTabelsStracture() {
@@ -91,9 +89,12 @@ function getTabelsStracture() {
         }),
         success: function (data) {
             tableStructures = JSON.parse(data.d);
+            document.getElementById('ai-loader').classList.add('hidden');
+            updateSelectedTablesPreview();
             console.log('Table structures loaded:', tableStructures);
         },
         error: function (err) {
+            document.getElementById('ai-loader').classList.add('hidden');
             console.error('Error loading table structures:', err);
         }
     });
@@ -316,7 +317,7 @@ function clearSelections() {
 function generateReport() {
     const selectedTables = getSelectedTables();
     const query = document.getElementById('queryInput').value.trim();
-    
+
 
     if (selectedTables.length === 0) {
         swal({
@@ -338,30 +339,26 @@ function generateReport() {
     USER_PROMPT = query;
     // Get only the selected columns (optimized for tokens)
     const selectedColumns = getSelectedColumnsForAI();
-
-
-
     // This is what you'll send to the AI API - much smaller payload!
     const aiPayload = {
         tables: selectedColumns,
         query: query
     };
-    console.log(aiPayload);
-    //console.log('AI Payload:', JSON.stringify(aiPayload));
-    console.log(PromptBuilder(selectedColumns, query))
+    TABEL_NAMES = Object.keys(aiPayload.tables).join(",");
     const request = {
         prompt: PromptBuilder(selectedColumns, query),
         thinkingLevel: "LOW",
         model: "gemini-3-flash-preview"
     }
-    //$.ajax({
-    //    url: 'https://querymaker.onrender.com/generate',
-    //    contentType: "application/json; charset=utf-8",
-    //    type: "POST",
-    //    data: JSON.stringify(request),
-    //    success: generateReport_SCB,
-    //    error: generateReport_ECB
-    //})
+    document.getElementById('ai-loader').classList.remove('hidden');
+    $.ajax({
+        url: 'https://querymaker.onrender.com/generate',
+        contentType: "application/json; charset=utf-8",
+        type: "POST",
+        data: JSON.stringify(request),
+        success: generateReport_SCB,
+        error: generateReport_ECB
+    })
 
     // Show results container (placeholder)
     document.getElementById('resultsContainer').classList.add('active');
@@ -370,23 +367,18 @@ function generateReport() {
 
 function generateReport_SCB(data) {
     console.log('success , ', data);
-    //UserPhone = userPhone;
-    //UserName = userName;
-    //ExecutionTime = executionTime;
-    //SqlQuery = sqlQuery;
-    //AiDescription = aiDescription;
-    //UserPrompt = userPrompt;
-    //RelatedTables = relatedTables;
     const Request = {
         UserPhone: localStorage.getItem("user"),
         UserName: localStorage.getItem("userCell"),
         ExecutionTime: new Date().toISOString(),
-        SqlQuery: data.SQL_Query,
-        AiDescription: data.description,
+        SqlQuery: data.data.SQL_Query,
+        AiDescription: data.data.description,
         UserPrompt: USER_PROMPT,
+        RelatedTables: TABEL_NAMES
 
-    }
-
+    };
+    //console.log(Request);
+    finalExecution(Request);
 }
 function generateReport_ECB(err) {
     console.error('error , ', err);
@@ -399,4 +391,223 @@ function PromptBuilder(stracture, userPrompt) {
     ${JSON.stringify(stracture)}
     `
     return FinalPrompt;
+}
+
+function finalExecution(request) {
+
+    $.ajax({
+        dataType: "json",
+        url: "WebService.asmx/GetQueryResults",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify({ exec: request }),
+        success: function (data) {
+            document.getElementById('ai-loader').classList.add('hidden');
+            console.log('finalExecution raw results:', data.d);
+
+            try {
+                let parsedData = data.d;
+
+                // If it's a string, parse it
+                if (typeof parsedData === 'string') {
+                    parsedData = JSON.parse(parsedData);
+                }
+
+                console.log('Parsed data type:', typeof parsedData, Array.isArray(parsedData));
+                console.log('Parsed data:', parsedData);
+
+                FINAL_RESULTS = parsedData;
+                REPORT_DT = renderDataTable(FINAL_RESULTS, 'resultsContent');
+
+            } catch (parseError) {
+                console.error('Error parsing results:', parseError);
+                document.getElementById('resultsContent').innerHTML = '<p style="color: red; text-align: center;">שגיאה בעיבוד התוצאות: ' + parseError.message + '</p>';
+            }
+        },
+        error: function (err) {
+            document.getElementById('ai-loader').classList.add('hidden');
+            console.error('Error api GetQueryResults:', err);
+            document.getElementById('resultsContent').innerHTML = '<p style="color: red; text-align: center;">שגיאה בקבלת התוצאות</p>';
+        }
+    });
+}
+
+
+
+function renderDataTable(data, containerId, options = {}) {
+    const container = document.getElementById(containerId);
+
+    if (!container) {
+        console.error('Container not found:', containerId);
+        return null;
+    }
+
+    // Handle null/undefined
+    if (data === null || data === undefined) {
+        container.innerHTML = '<p style="text-align: center;">אין נתונים להצגה</p>';
+        return null;
+    }
+
+    // If data is a string, try to parse it
+    if (typeof data === 'string') {
+        try {
+            data = JSON.parse(data);
+        } catch (e) {
+            console.error('Failed to parse data string:', e);
+            container.innerHTML = '<p style="text-align: center; color: red;">שגיאה בפענוח הנתונים</p>';
+            return null;
+        }
+    }
+
+    // If data is an object but not an array, check for common wrapper properties
+    if (data && typeof data === 'object' && !Array.isArray(data)) {
+        // Try to find the array inside common wrapper properties
+        if (Array.isArray(data.results)) {
+            data = data.results;
+        } else if (Array.isArray(data.data)) {
+            data = data.data;
+        } else if (Array.isArray(data.rows)) {
+            data = data.rows;
+        } else if (Array.isArray(data.items)) {
+            data = data.items;
+        } else if (Array.isArray(data.records)) {
+            data = data.records;
+        } else {
+            // Wrap single object in array
+            data = [data];
+        }
+    }
+
+    // Final validation - must be an array
+    if (!Array.isArray(data)) {
+        console.error('Data is not an array:', typeof data, data);
+        container.innerHTML = '<p style="text-align: center; color: red;">פורמט נתונים לא תקין</p>';
+        return null;
+    }
+
+    // Check for empty array
+    if (data.length === 0) {
+        container.innerHTML = '<p style="text-align: center;">אין נתונים להצגה</p>';
+        return null;
+    }
+
+    // Extract columns from all objects (in case some rows have extra keys)
+    const colSet = new Set();
+    data.forEach(row => {
+        if (row && typeof row === 'object') {
+            Object.keys(row).forEach(k => colSet.add(k));
+        }
+    });
+    const columns = [...colSet];
+
+    if (columns.length === 0) {
+        container.innerHTML = '<p style="text-align: center;">אין עמודות להצגה</p>';
+        return null;
+    }
+
+    // Generate unique table ID
+    const tableId = `dt_${containerId}_${Date.now()}`;
+
+    // Build table HTML
+    let html = `<table id="${tableId}" class="display nowrap" style="width:100%">`;
+    html += '<thead><tr>';
+    columns.forEach(col => {
+        // Use Hebrew name if available
+        const displayName = columnHebrewNames[col] || col;
+        html += `<th>${displayName}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+
+    data.forEach(row => {
+        html += '<tr>';
+        columns.forEach(col => {
+            let val = '';
+            if (row && row[col] !== undefined && row[col] !== null) {
+                val = row[col];
+                // Escape HTML to prevent XSS
+                if (typeof val === 'string') {
+                    val = val.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                }
+            }
+            html += `<td>${val}</td>`;
+        });
+        html += '</tr>';
+    });
+
+    html += '</tbody></table>';
+    container.innerHTML = html;
+
+    // Detect date columns for sorting
+    const columnDefs = columns.map((col, i) => {
+        // Check if values look like ISO dates
+        const isDate = data.some(r => r && r[col] && /^\d{4}-\d{2}-\d{2}T/.test(String(r[col])));
+        if (isDate) {
+            return {
+                targets: i,
+                render: function (val) {
+                    if (!val) return '';
+                    const d = new Date(val);
+                    if (isNaN(d.getTime())) return val;
+                    return d.toLocaleDateString('he-IL') + ' ' + d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+                }
+            };
+        }
+        return null;
+    }).filter(Boolean);
+
+    // Check if DataTable is available
+    if (typeof $.fn.DataTable === 'undefined') {
+        console.warn('DataTables plugin not loaded - displaying basic table');
+        return null;
+    }
+
+    // Destroy existing DataTable if it exists
+    if ($.fn.DataTable.isDataTable(`#${tableId}`)) {
+        $(`#${tableId}`).DataTable().destroy();
+    }
+
+    try {
+        // Init DataTable with safe defaults
+        const dtOptions = {
+            pageLength: options.pageLength || 25,
+            scrollX: true,
+            columnDefs: columnDefs,
+            language: options.language || {
+                search: "חיפוש:",
+                lengthMenu: "הצג _MENU_ רשומות",
+                info: "מציג _START_ עד _END_ מתוך _TOTAL_ רשומות",
+                paginate: { first: "ראשון", last: "אחרון", next: "הבא", previous: "הקודם" },
+                emptyTable: "אין נתונים",
+                zeroRecords: "לא נמצאו תוצאות"
+            }
+        };
+
+        // Add buttons only if the Buttons extension is available
+        if ($.fn.DataTable.Buttons) {
+            dtOptions.dom = 'Bfrtip';
+            dtOptions.buttons = [
+                { extend: 'excelHtml5', text: 'Excel', exportOptions: { orthogonal: 'export' } },
+                { extend: 'csvHtml5', text: 'CSV' },
+                { extend: 'print', text: 'הדפסה' },
+                { extend: 'colvis', text: 'עמודות' }
+            ];
+        }
+
+        // Merge any additional options
+        if (options.dtOptions) {
+            Object.assign(dtOptions, options.dtOptions);
+        }
+
+        const dt = $(`#${tableId}`).DataTable(dtOptions);
+        console.log('DataTable initialized successfully');
+        return dt;
+
+    } catch (dtError) {
+        console.error('Error initializing DataTable:', dtError);
+        // Table HTML is already rendered, so at least data is visible
+        return null;
+    }
 }
