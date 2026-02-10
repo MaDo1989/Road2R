@@ -10,19 +10,7 @@
 
     <title>יצירת דוח באמצעות AI</title>
 
-    <!-- jQuery & DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
-     <!-- jQuery & DataTables JS -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+
 
     <!-- Sweet Alert css -->
     <link href="../plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" type="text/css" />
@@ -44,7 +32,18 @@
     <script src="lib/master.js"></script>
     <script src="assets/js/jquery.min.js"></script>
     <script src="lib/includeHTML.js"></script>
-
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+    <!-- DataTables JS (uses the local jQuery already loaded above) -->
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
     <script src="../pages/assets/js/AI_report.js"></script>
     <style>
         .report-container {
@@ -480,6 +479,141 @@
             }
     </style>
 
+    <style>
+        /* ===== DataTable Results Styling ===== */
+        #resultsContent {
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
+        .datatable-scroll-wrapper {
+            overflow-x: auto;
+            width: 100%;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Force DataTables wrapper to respect container bounds */
+        #resultsContent .dataTables_wrapper {
+            width: 100% !important;
+            overflow: visible;
+        }
+
+        /* Ensure the scrollable body stays within bounds */
+        #resultsContent .dataTables_scrollBody {
+            overflow-x: auto !important;
+        }
+
+        /* Table styling - explicit borders and padding */
+        #resultsContent table.dataTable,
+        #resultsContent table.ai-report-table {
+            border-collapse: collapse !important;
+            width: 100% !important;
+            margin: 0 !important;
+        }
+
+        #resultsContent table.dataTable thead th,
+        #resultsContent table.ai-report-table thead th {
+            background-color: #5b69bc !important;
+            color: #fff !important;
+            border: 1px solid #4a5baf !important;
+            padding: 10px 14px !important;
+            font-size: 13px;
+            font-weight: bold;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        #resultsContent table.dataTable tbody td,
+        #resultsContent table.ai-report-table tbody td {
+            border: 1px solid #ddd !important;
+            padding: 8px 12px !important;
+            font-size: 13px;
+            text-align: right;
+            vertical-align: middle;
+        }
+
+        #resultsContent table.dataTable tbody tr:nth-child(even),
+        #resultsContent table.ai-report-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        #resultsContent table.dataTable tbody tr:hover,
+        #resultsContent table.ai-report-table tbody tr:hover {
+            background-color: #eef0fb !important;
+        }
+
+        /* DataTable controls styling */
+        #resultsContent .dataTables_filter {
+            margin-bottom: 10px;
+        }
+
+        #resultsContent .dataTables_filter input {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 5px 10px;
+            margin-right: 5px;
+        }
+
+        #resultsContent .dataTables_info {
+            padding-top: 10px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        #resultsContent .dataTables_paginate {
+            padding-top: 10px;
+        }
+
+        #resultsContent .dataTables_paginate .paginate_button {
+            padding: 4px 12px !important;
+            margin: 0 2px;
+            border: 1px solid #ddd !important;
+            border-radius: 3px;
+            background: #fff !important;
+            color: #333 !important;
+            cursor: pointer;
+        }
+
+        #resultsContent .dataTables_paginate .paginate_button.current {
+            background: #5b69bc !important;
+            color: #fff !important;
+            border-color: #5b69bc !important;
+        }
+
+        #resultsContent .dataTables_paginate .paginate_button:hover:not(.current) {
+            background: #eef0fb !important;
+            border-color: #5b69bc !important;
+            color: #5b69bc !important;
+        }
+
+        /* Export buttons styling */
+        #resultsContent .dt-buttons {
+            margin-bottom: 10px;
+        }
+
+        #resultsContent .dt-buttons .dt-button {
+            background: linear-gradient(135deg, #5b69bc 0%, #4a5baf 100%) !important;
+            color: #fff !important;
+            border: none !important;
+            padding: 6px 16px !important;
+            border-radius: 4px;
+            margin-left: 5px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        #resultsContent .dt-buttons .dt-button:hover {
+            opacity: 0.85;
+        }
+
+        /* Sorting arrows override */
+        #resultsContent table.dataTable thead .sorting::after,
+        #resultsContent table.dataTable thead .sorting_asc::after,
+        #resultsContent table.dataTable thead .sorting_desc::after {
+            opacity: 0.8;
+        }
+    </style>
 
     <style>
         /* ===== AI LOADER - ALL SCOPED WITH .ai-loader PREFIX ===== */
@@ -1618,10 +1752,6 @@
     <script src="assets/js/jquery.core.js"></script>
     <script src="assets/js/jquery.app.js"></script>
 
-    <!-- Sweet Alert js -->
-    <script src="../plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
-    <script src="assets/pages/jquery.sweet-alert.init.js"></script>
-    <script src="assets/js/jquery.core.js"></script>
-    <script src="assets/js/jquery.app.js"></script>
+
 </body>
 </html>

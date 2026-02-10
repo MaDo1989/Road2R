@@ -464,7 +464,6 @@ function renderDataTable(data, containerId, options = {}) {
 
     // If data is an object but not an array, check for common wrapper properties
     if (data && typeof data === 'object' && !Array.isArray(data)) {
-        // Try to find the array inside common wrapper properties
         if (Array.isArray(data.results)) {
             data = data.results;
         } else if (Array.isArray(data.data)) {
@@ -476,7 +475,6 @@ function renderDataTable(data, containerId, options = {}) {
         } else if (Array.isArray(data.records)) {
             data = data.records;
         } else {
-            // Wrap single object in array
             data = [data];
         }
     }
@@ -511,38 +509,8 @@ function renderDataTable(data, containerId, options = {}) {
     // Generate unique table ID
     const tableId = `dt_${containerId}_${Date.now()}`;
 
-    // Build table HTML
-    let html = `<table id="${tableId}" class="display nowrap" style="width:100%">`;
-    html += '<thead><tr>';
-    columns.forEach(col => {
-        // Use Hebrew name if available
-        const displayName = columnHebrewNames[col] || col;
-        html += `<th>${displayName}</th>`;
-    });
-    html += '</tr></thead><tbody>';
-
-    data.forEach(row => {
-        html += '<tr>';
-        columns.forEach(col => {
-            let val = '';
-            if (row && row[col] !== undefined && row[col] !== null) {
-                val = row[col];
-                // Escape HTML to prevent XSS
-                if (typeof val === 'string') {
-                    val = val.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                }
-            }
-            html += `<td>${val}</td>`;
-        });
-        html += '</tr>';
-    });
-
-    html += '</tbody></table>';
-    container.innerHTML = html;
-
     // Detect date columns for sorting
     const columnDefs = columns.map((col, i) => {
-        // Check if values look like ISO dates
         const isDate = data.some(r => r && r[col] && /^\d{4}-\d{2}-\d{2}T/.test(String(r[col])));
         if (isDate) {
             return {
@@ -558,56 +526,110 @@ function renderDataTable(data, containerId, options = {}) {
         return null;
     }).filter(Boolean);
 
+    // Build DataTables column definitions for data-driven mode
+    const dtColumns = columns.map(col => ({
+        title: columnHebrewNames[col] || col,
+        data: col,
+        defaultContent: '',
+        render: function (val) {
+            if (val === null || val === undefined) return '';
+            if (typeof val === 'string') {
+                return val.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            }
+            return val;
+        }
+    }));
+
+    // Merge date renderers into dtColumns
+    columnDefs.forEach(def => {
+        if (def && def.targets !== undefined) {
+            dtColumns[def.targets].render = def.render;
+        }
+    });
+
+    // Clear container and create a wrapper with overflow support
+    container.innerHTML = `<div class="datatable-scroll-wrapper"><table id="${tableId}" class="display nowrap cell-border" style="width:100%"></table></div>`;
+
     // Check if DataTable is available
     if (typeof $.fn.DataTable === 'undefined') {
-        console.warn('DataTables plugin not loaded - displaying basic table');
+        console.warn('DataTables plugin not loaded - rendering fallback table');
+        // Fallback: build a plain HTML table inside the scroll wrapper
+        let html = `<div class="datatable-scroll-wrapper"><table id="${tableId}" class="ai-report-table"><thead><tr>`;
+        columns.forEach(col => {
+            html += `<th>${columnHebrewNames[col] || col}</th>`;
+        });
+        html += '</tr></thead><tbody>';
+        data.forEach(row => {
+            html += '<tr>';
+            columns.forEach(col => {
+                let val = '';
+                if (row && row[col] !== undefined && row[col] !== null) {
+                    val = row[col];
+                    if (typeof val === 'string') {
+                        val = val.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    }
+                }
+                html += `<td>${val}</td>`;
+            });
+            html += '</tr>';
+        });
+        html += '</tbody></table></div>';
+        container.innerHTML = html;
         return null;
     }
 
-    // Destroy existing DataTable if it exists
+    // Destroy existing DataTable on this container if any
     if ($.fn.DataTable.isDataTable(`#${tableId}`)) {
         $(`#${tableId}`).DataTable().destroy();
     }
 
-    try {
-        // Init DataTable with safe defaults
-        const dtOptions = {
-            pageLength: options.pageLength || 25,
-            scrollX: true,
-            columnDefs: columnDefs,
-            language: options.language || {
-                search: "חיפוש:",
-                lengthMenu: "הצג _MENU_ רשומות",
-                info: "מציג _START_ עד _END_ מתוך _TOTAL_ רשומות",
-                paginate: { first: "ראשון", last: "אחרון", next: "הבא", previous: "הקודם" },
-                emptyTable: "אין נתונים",
-                zeroRecords: "לא נמצאו תוצאות"
+    // Use setTimeout to let the browser complete the layout pass after innerHTML
+    setTimeout(function () {
+        try {
+            const dtOptions = {
+                data: data,
+                columns: dtColumns,
+                pageLength: options.pageLength || 25,
+                scrollX: true,
+                autoWidth: false,
+                language: options.language || {
+                    search: "חיפוש:",
+                    lengthMenu: "הצג _MENU_ רשומות",
+                    info: "מציג _START_ עד _END_ מתוך _TOTAL_ רשומות",
+                    paginate: { first: "ראשון", last: "אחרון", next: "הבא", previous: "הקודם" },
+                    emptyTable: "אין נתונים",
+                    zeroRecords: "לא נמצאו תוצאות"
+                },
+                initComplete: function () {
+                    // Adjust columns after full init
+                    this.api().columns.adjust();
+                    console.log('DataTable initialized successfully');
+                }
+            };
+
+            // Add buttons only if the Buttons extension is available
+            if ($.fn.DataTable.Buttons) {
+                dtOptions.dom = 'Bfrtip';
+                dtOptions.buttons = [
+                    { extend: 'excelHtml5', text: 'Excel', exportOptions: { orthogonal: 'export' } },
+                    { extend: 'csvHtml5', text: 'CSV' },
+                    { extend: 'print', text: 'הדפסה' },
+                    { extend: 'colvis', text: 'עמודות' }
+                ];
             }
-        };
 
-        // Add buttons only if the Buttons extension is available
-        if ($.fn.DataTable.Buttons) {
-            dtOptions.dom = 'Bfrtip';
-            dtOptions.buttons = [
-                { extend: 'excelHtml5', text: 'Excel', exportOptions: { orthogonal: 'export' } },
-                { extend: 'csvHtml5', text: 'CSV' },
-                { extend: 'print', text: 'הדפסה' },
-                { extend: 'colvis', text: 'עמודות' }
-            ];
+            // Merge any additional options
+            if (options.dtOptions) {
+                Object.assign(dtOptions, options.dtOptions);
+            }
+
+            const dt = $(`#${tableId}`).DataTable(dtOptions);
+            REPORT_DT = dt;
+
+        } catch (dtError) {
+            console.error('Error initializing DataTable:', dtError);
         }
+    }, 50);
 
-        // Merge any additional options
-        if (options.dtOptions) {
-            Object.assign(dtOptions, options.dtOptions);
-        }
-
-        const dt = $(`#${tableId}`).DataTable(dtOptions);
-        console.log('DataTable initialized successfully');
-        return dt;
-
-    } catch (dtError) {
-        console.error('Error initializing DataTable:', dtError);
-        // Table HTML is already rendered, so at least data is visible
-        return null;
-    }
+    return null;
 }
