@@ -1,7 +1,10 @@
 ﻿using log4net;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Script.Serialization;
 using System.Web.Script.Services;
@@ -83,6 +86,40 @@ public class WebService : System.Web.Services.WebService
         }
 
     }
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetStractureOfTables(List<string> tablesName)
+    {
+        try
+        {
+            DBstracture dBstracture = new DBstracture();
+            Dictionary<string, List<DBstracture>> stracture = dBstracture.GetStractureFromDB(tablesName);
+            return j.Serialize(stracture);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetStractureOfTables", ex);
+            throw new Exception("שגיאה בשליפה של מבנה הדאטה");
+        }
+    }
+
+    [WebMethod(EnableSession = true)]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetQueryResults(Execution exec)
+    {
+        try
+        {
+            DBstracture dBstracture = new DBstracture();
+            DataTable results = dBstracture.ExecQuery(exec);
+            return JsonConvert.SerializeObject(results);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error in GetStractureOfTables", ex);
+            throw new Exception("שגיאה בשליפה של מבנה הדאטה");
+        }
+    }
+
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -1096,11 +1133,11 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod(EnableSession = true)]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetSplitRides(UnityRide.DateMode dateMode,bool isAfternoon, bool isFutureTable, int days)
+    public string GetSplitRides(UnityRide.DateMode dateMode, bool isAfternoon, bool isFutureTable, int days)
     {
         try
         {
-            List<UnityRide> list2Return = UnityRide.GetSplitRides(dateMode,isAfternoon, isFutureTable, days);
+            List<UnityRide> list2Return = UnityRide.GetSplitRides(dateMode, isAfternoon, isFutureTable, days);
             return j.Serialize(list2Return);
         }
         catch (Exception ex)
@@ -2528,7 +2565,8 @@ public class WebService : System.Web.Services.WebService
             {
                 string CoordinatorName = u.getUserNameByCellphone(item);
                 names.Add(CoordinatorName);
-            };
+            }
+            ;
 
 
 

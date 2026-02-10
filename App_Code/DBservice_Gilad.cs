@@ -249,8 +249,81 @@ public class DBservice_Gilad
 
 
     }
+    public List<DBstracture> GetDBstractures(List<string> tableNames)
+    {
+        List<DBstracture> result = new List<DBstracture>();
 
+        using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString))
+        {
+            con.Open();
+            DataTable tvp = CreateTVP(tableNames);
 
+            SqlCommand cmd = CreateCommandForTVP("sp_getTablesStracture", con, tvp);
+
+            using (SqlDataReader reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    result.Add(new DBstracture
+                    {
+                        TableName = reader["TABLE_NAME"].ToString(),
+                        ColumnName = reader["COLUMN_NAME"].ToString(),
+                        DataType = reader["DATA_TYPE"].ToString(),
+
+                    });
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public int SaveExecution(Execution exec)
+    {
+        using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString))
+        {
+            Dictionary<string, object> paramDic = new Dictionary<string, object>
+            {
+                { "@UserPhone", exec.UserPhone },
+                { "@UserName", exec.UserName },
+                { "@ExecutionTime", exec.ExecutionTime },
+                { "@SqlQuery", exec.SqlQuery },
+                { "@AiDescription", exec.AiDescription },
+                { "@UserPrompt", exec.UserPrompt },
+                { "@RelatedTables", exec.RelatedTables },
+            };
+            SqlCommand cmd = CreateCommandWithStoredProcedureGeneral("SP_insertValuesToExecutions", con, paramDic);
+            try
+            {
+                con.Open();
+                using (SqlDataReader dataReader = cmd.ExecuteReader())
+                {
+                    while (dataReader.Read())
+                    {
+                        int NewExecId = Convert.ToInt32(dataReader["NewExecId"]);
+
+                        return NewExecId;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                WriteToErrorFile("SaveExecution", ex.ToString());
+                throw ex;
+            }
+        }
+        return -1;
+    }
+    public DataTable ExecuteQueryByString(string sql)
+    {
+        DataTable dt = new DataTable();
+        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["db"].ConnectionString))
+        using (SqlDataAdapter adapter = new SqlDataAdapter(sql, conn))
+        {
+            adapter.Fill(dt);
+        }
+        return dt;
+    }
     public List<UnityRide> GetSplitRides(DateTime rideDate, bool isAfternoon, bool isFutureTable, int days)
     {
         List<UnityRide> list2Return = new List<UnityRide>();
@@ -691,10 +764,6 @@ public class DBservice_Gilad
 
     }
 
-
-
-
-
     public UnityRide GetReturnUnityRide(int unityRideID)
     {
         SqlCommand cmd;
@@ -990,10 +1059,6 @@ public class DBservice_Gilad
         }
     }
 
-
-
-
-
     public List<string> GetManagersVolunteersCellPhones()
     {
         SqlCommand cmd;
@@ -1233,7 +1298,6 @@ public class DBservice_Gilad
         }
     }
 
-
     public int recoverUnityRide(int unityRideID, string whoChange)
     {
         SqlCommand cmd;
@@ -1280,10 +1344,6 @@ public class DBservice_Gilad
             }
         }
     }
-
-
-
-
     public int leaveUnityRideForMobile(int driverID, int unityRideID)
     {
         SqlCommand cmd;
@@ -1324,10 +1384,6 @@ public class DBservice_Gilad
             throw new Exception("Error leaveUnityRideForMobile dbservice_gilad" + ex.Message);
         }
     }
-
-
-
-
     public int SetUnityRide(UnityRide unityRide)
     {
         SqlCommand cmd;
@@ -2779,6 +2835,31 @@ public class DBservice_Gilad
             // If conversion failed for any reason, return null
             return null;
         }
+    }
+    private DataTable CreateTVP(List<string> tableNames)
+    {
+        var dt = new DataTable("TableNameList"); // ?? ?-TYPE ?-SQL
+        dt.Columns.Add("TableName", typeof(string));
+
+        foreach (var name in tableNames)
+            dt.Rows.Add(name);
+
+        return dt;
+    }
+    private SqlCommand CreateCommandForTVP(string spName, SqlConnection con, DataTable tvp)
+    {
+        SqlCommand cmd = new SqlCommand
+        {
+            Connection = con,
+            CommandText = spName,
+            CommandType = CommandType.StoredProcedure
+        };
+
+        var p = cmd.Parameters.Add("@Tables", SqlDbType.Structured);
+        p.TypeName = "TableNameList"; // MUST MATCH SQL TYPE NAME
+        p.Value = tvp;
+
+        return cmd;
     }
 
 }
