@@ -51,7 +51,7 @@ const {
     IsNullOrUndefined
 
 } = GENERAL.USEFULL_FUNCTIONS;
-const DateMode = { Today: 0, Tomorrow: 1, Future: 2 };
+const DateMode = { Today: 0, Tomorrow: 1, DayAfterTomorrow: 2, Future: 3 };
 
 const { GetPatientGender, GetPatientStatus } = GENERAL.PATIENTS;
 
@@ -70,7 +70,7 @@ let _isDriverReplacement;
 let _trToHighLight;
 let _driverId;
 
-let tMorning, tAfternoon, tTomorrowMorning, tTomorrowAfternoon, tFuture;
+let tMorning, tAfternoon, tTomorrowMorning, tTomorrowAfternoon, tDATMorning, tDATAfternoon, tFuture;
 
 
 function wiringDataTables() {
@@ -91,6 +91,14 @@ function wiringDataTables() {
 
     $(`#${tableNames.TOMORROW_AFTERNOON} tbody`).on('click', '.remove', function () {
         confirmDelete(this, tTomorrowAfternoon);
+    });
+
+    $(`#${tableNames.DAT_MORNING} tbody`).on('click', '.remove', function () {
+        confirmDelete(this, tDATMorning);
+    });
+
+    $(`#${tableNames.DAT_AFTERNOON} tbody`).on('click', '.remove', function () {
+        confirmDelete(this, tDATAfternoon);
     });
 
     $(`#${tableNames.FUTURE} tbody`).on('click', '.remove', function () {
@@ -117,6 +125,14 @@ function wiringDataTables() {
         editButton(this);
     });
 
+    $(`#${tableNames.DAT_MORNING} tbody`).on('click', '.edit', function () {
+        editButton(this);
+    });
+
+    $(`#${tableNames.DAT_AFTERNOON} tbody`).on('click', '.edit', function () {
+        editButton(this);
+    });
+
     $(`#${tableNames.FUTURE} tbody`).on('click', '.edit', function () {
         editButton(this);
     });
@@ -138,6 +154,14 @@ function wiringDataTables() {
 
     $(`#${tableNames.TOMORROW_AFTERNOON} tbody`).on('click', '.copyMessage', function () {
         copyMessageButton(this, tTomorrowAfternoon);
+    });
+
+    $(`#${tableNames.DAT_MORNING} tbody`).on('click', '.copyMessage', function () {
+        copyMessageButton(this, tDATMorning);
+    });
+
+    $(`#${tableNames.DAT_AFTERNOON} tbody`).on('click', '.copyMessage', function () {
+        copyMessageButton(this, tDATAfternoon);
     });
 
     $(`#${tableNames.FUTURE} tbody`).on('click', '.copyMessage', function () {
@@ -182,6 +206,20 @@ function wiringDataTables() {
 
         showMe(targetObj);
 
+    });
+
+    $(`#${tableNames.DAT_MORNING} tbody`).on('mouseup', '.showMe', function () {
+        let targetObj = {};
+        targetObj.objName = $(this).attr("data-obj");
+        targetObj.displayName = this.text;
+        showMe(targetObj);
+    });
+
+    $(`#${tableNames.DAT_AFTERNOON} tbody`).on('mouseup', '.showMe', function () {
+        let targetObj = {};
+        targetObj.objName = $(this).attr("data-obj");
+        targetObj.displayName = this.text;
+        showMe(targetObj);
     });
 
     $(`#${tableNames.FUTURE} tbody`).on('mouseup', '.showMe', function () {
@@ -252,6 +290,29 @@ function wiringDataTables() {
         $('.ContextMenu_dropdown').addClass('hidden');
     });
 
+    $(`#${tableNames.DAT_MORNING} tbody`).on('mousedown', '.within2HoursSinceChange', function (e) {
+        timer = setTimeout(function () {
+            candidate4IhaveSeen = e.target.parentElement.id;
+            $('.ContextMenu_dropdown').removeClass('hidden');
+            $(".ContextMenu_dropdown").css({ position: "absolute", top: e.pageY, left: e.pageX });
+        }, 500);
+    }).on("mouseup mouseleave", function () {
+        clearTimeout(timer);
+    }).on("click", function () {
+        $('.ContextMenu_dropdown').addClass('hidden');
+    });
+
+    $(`#${tableNames.DAT_AFTERNOON} tbody`).on('mousedown', '.within2HoursSinceChange', function (e) {
+        timer = setTimeout(function () {
+            candidate4IhaveSeen = e.target.parentElement.id;
+            $('.ContextMenu_dropdown').removeClass('hidden');
+            $(".ContextMenu_dropdown").css({ position: "absolute", top: e.pageY, left: e.pageX });
+        }, 500);
+    }).on("mouseup mouseleave", function () {
+        clearTimeout(timer);
+    }).on("click", function () {
+        $('.ContextMenu_dropdown').addClass('hidden');
+    });
 
     $(`#${tableNames.FUTURE} tbody`).on('mousedown', '.within2HoursSinceChange', function (e) {
 
@@ -283,6 +344,14 @@ function wiringDataTables() {
     });
 
     $(`#${tableNames.TOMORROW_AFTERNOON} tbody`).on('click', '.candidatesBtn', function () {
+        candidatesButton(this);
+    });
+
+    $(`#${tableNames.DAT_MORNING} tbody`).on('click', '.candidatesBtn', function () {
+        candidatesButton(this);
+    });
+
+    $(`#${tableNames.DAT_AFTERNOON} tbody`).on('click', '.candidatesBtn', function () {
         candidatesButton(this);
     });
 
@@ -1076,6 +1145,16 @@ const deceideWhichTable2Show = () => {
         case tableNames.TOMORROW_AFTERNOON:
             $('#collapse4').addClass("in");
             $('#collapse4_aTag').removeClass('collapsed');
+            break;
+
+        case tableNames.DAT_MORNING:
+            $('#collapse-dat-morning').addClass("in");
+            $('#collapsed-dat-morning_aTag').removeClass('collapsed');
+            break;
+
+        case tableNames.DAT_AFTERNOON:
+            $('#collapse-dat-afternoon').addClass("in");
+            $('#collapsed-dat-afternoon_aTag').removeClass('collapsed');
             break;
 
         case tableNames.FUTURE:
@@ -1913,6 +1992,8 @@ let splitRideLoadingState = {
     afternoon: { loaded: false, data: [] },
     tomorrowMorning: { loaded: false, data: [] },
     tomorrowAfternoon: { loaded: false, data: [] },
+    datMorning: { loaded: false, data: [] },
+    datAfternoon: { loaded: false, data: [] },
     future: { loaded: false, data: [] }
 };
 
@@ -1923,22 +2004,29 @@ const showTableLoadingIndicator = (tableName) => {
         [tableNames.AFTERNOON]: '#col2',
         [tableNames.TOMORROW_MORNING]: '#col4',
         [tableNames.TOMORROW_AFTERNOON]: '#col4',
+        [tableNames.DAT_MORNING]: '#col-dat-morning',
+        [tableNames.DAT_AFTERNOON]: '#col-dat-afternoon',
         [tableNames.FUTURE]: '#col3'
     };
 
-    // Use more specific selectors for tomorrow tables
+    // Use more specific selectors for tomorrow/DAT tables
     let headerSelector;
     if (tableName === tableNames.TOMORROW_MORNING) {
         headerSelector = '#collapse3';
     } else if (tableName === tableNames.TOMORROW_AFTERNOON) {
         headerSelector = '#collapse4';
+    } else if (tableName === tableNames.DAT_MORNING) {
+        headerSelector = '#collapse-dat-morning';
+    } else if (tableName === tableNames.DAT_AFTERNOON) {
+        headerSelector = '#collapse-dat-afternoon';
     } else {
         headerSelector = headerMap[tableName];
     }
 
     // Find the panel heading
     let panelHeading;
-    if (tableName === tableNames.TOMORROW_MORNING || tableName === tableNames.TOMORROW_AFTERNOON) {
+    if (tableName === tableNames.TOMORROW_MORNING || tableName === tableNames.TOMORROW_AFTERNOON
+        || tableName === tableNames.DAT_MORNING || tableName === tableNames.DAT_AFTERNOON) {
         panelHeading = $(headerSelector).prev('.panel-heading');
     } else {
         panelHeading = $(headerSelector);
@@ -1959,6 +2047,8 @@ const showTableLoadedIndicator = (tableName, count) => {
         [tableNames.AFTERNOON]: '#col2',
         [tableNames.TOMORROW_MORNING]: '#col4',
         [tableNames.TOMORROW_AFTERNOON]: '#col4',
+        [tableNames.DAT_MORNING]: '#col-dat-morning',
+        [tableNames.DAT_AFTERNOON]: '#col-dat-afternoon',
         [tableNames.FUTURE]: '#col3'
     };
 
@@ -1967,12 +2057,17 @@ const showTableLoadedIndicator = (tableName, count) => {
         headerSelector = '#collapse3';
     } else if (tableName === tableNames.TOMORROW_AFTERNOON) {
         headerSelector = '#collapse4';
+    } else if (tableName === tableNames.DAT_MORNING) {
+        headerSelector = '#collapse-dat-morning';
+    } else if (tableName === tableNames.DAT_AFTERNOON) {
+        headerSelector = '#collapse-dat-afternoon';
     } else {
         headerSelector = headerMap[tableName];
     }
 
     let panelHeading;
-    if (tableName === tableNames.TOMORROW_MORNING || tableName === tableNames.TOMORROW_AFTERNOON) {
+    if (tableName === tableNames.TOMORROW_MORNING || tableName === tableNames.TOMORROW_AFTERNOON
+        || tableName === tableNames.DAT_MORNING || tableName === tableNames.DAT_AFTERNOON) {
         panelHeading = $(headerSelector).prev('.panel-heading');
     } else {
         panelHeading = $(headerSelector);
@@ -1987,7 +2082,7 @@ const showTableLoadedIndicator = (tableName, count) => {
 
     // Fade out after 2 seconds
     setTimeout(() => {
-        panelHeading.find(`.table-loaded-indicator[data-table="${tableName}"]`).fadeOut(500, function() {
+        panelHeading.find(`.table-loaded-indicator[data-table="${tableName}"]`).fadeOut(500, function () {
             $(this).remove();
         });
     }, 2000);
@@ -2000,6 +2095,8 @@ const showTableErrorIndicator = (tableName) => {
         [tableNames.AFTERNOON]: '#col2',
         [tableNames.TOMORROW_MORNING]: '#col4',
         [tableNames.TOMORROW_AFTERNOON]: '#col4',
+        [tableNames.DAT_MORNING]: '#col-dat-morning',
+        [tableNames.DAT_AFTERNOON]: '#col-dat-afternoon',
         [tableNames.FUTURE]: '#col3'
     };
 
@@ -2008,12 +2105,17 @@ const showTableErrorIndicator = (tableName) => {
         headerSelector = '#collapse3';
     } else if (tableName === tableNames.TOMORROW_AFTERNOON) {
         headerSelector = '#collapse4';
+    } else if (tableName === tableNames.DAT_MORNING) {
+        headerSelector = '#collapse-dat-morning';
+    } else if (tableName === tableNames.DAT_AFTERNOON) {
+        headerSelector = '#collapse-dat-afternoon';
     } else {
         headerSelector = headerMap[tableName];
     }
 
     let panelHeading;
-    if (tableName === tableNames.TOMORROW_MORNING || tableName === tableNames.TOMORROW_AFTERNOON) {
+    if (tableName === tableNames.TOMORROW_MORNING || tableName === tableNames.TOMORROW_AFTERNOON
+        || tableName === tableNames.DAT_MORNING || tableName === tableNames.DAT_AFTERNOON) {
         panelHeading = $(headerSelector).prev('.panel-heading');
     } else {
         panelHeading = $(headerSelector);
@@ -2518,6 +2620,202 @@ const renderTomorrowAfternoonTable = (data, arrayOf_IHaveSeenAllready) => {
     });
 };
 
+// Helper: Render day-after-tomorrow morning table
+const renderDATMorningTable = (data, arrayOf_IHaveSeenAllready) => {
+    tDATMorning = $(`#${tableNames.DAT_MORNING}`).DataTable({
+        rowId: 'ridePatNum',
+        dom: controllersLayout,
+        buttons: [{
+            extend: 'excelHtml5',
+            text: 'ייצוא לאקסל',
+            title: `ניהול הסעות למחרתיים בבוקר ${getNext_X_DaysDateAsString(2)}`,
+        }],
+        data: data,
+        stateSave: true,
+        destroy: true,
+        pageLength: 100,
+        columns: [
+            { data: "checkBoxesStr" },
+            { data: "date" },
+            { data: "time" },
+            { data: "origin" },
+            { data: "destination" },
+            { data: "patient" },
+            { data: "patientAge" },
+            { data: "driver" },
+            { data: "status" },
+            { data: "lastModified" },
+            { data: "remark" },
+            { data: "isAnonymous" },
+            { data: "buttons" },
+        ],
+        columnDefs: [
+            { targets: 2, type: 'de_time' },
+            { "targets": [0], "orderable": false },
+            { width: '4%', "targets": [1, 2] },
+            { width: '6%', "targets": [3, 4] },
+            { width: '15%', "targets": [5] },
+            { width: '2%', "targets": [6] },
+            { width: '5%', "targets": [0, 7, 8, 9, 10] },
+            { width: '0%', "targets": [11] },
+            { width: '25%', "targets": [12] },
+            { targets: [0], className: 'text-center' },
+            {
+                targets: 6, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {
+                    cell.className += ' driver_td';
+                    if (!rowData.hasDriver) {
+                        let ridePatTime_td;
+                        if (rowData['time'] === 'אחה"צ') {
+                            ridePatTime_td = [12, 1];
+                        } else {
+                            ridePatTime_td = $.trim(rowData['time']).split(':');
+                        }
+                        const hh = parseInt(ridePatTime_td[0]);
+                        const mm = parseInt(ridePatTime_td[1]);
+                        const suitableClass = classManager.getSuitableClassS_4thisTime("datatable-dat-morning", hh, mm);
+                        $(cell).addClass(suitableClass);
+                    }
+                }
+            },
+            {
+                targets: 8, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {
+                    if (cellData.indexOf("הגענו ליעד") !== -1 || cellData.indexOf("Reached destination") !== -1) {
+                        $(cell).addClass('reached2destination');
+                    } else if (cellData.includes('שובץ נהג') || cellData.includes('Driver registered')) {
+                        if (rowData["isAnonymous"]) {
+                            $(cell.parentElement).addClass('driverAssign2AnonymousRide');
+                        }
+                    }
+                }
+            },
+            {
+                targets: 9, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {
+                    const thisRidePatNum = rowData.ridePatNum;
+                    const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatNum);
+                    if (thisridePatObj) {
+                        const intValue = convert2DBDateToInt(thisridePatObj.LastModified);
+                        const thisRidePatLastModified = new Date(intValue);
+                        const isSeenAllReady = arrayOf_IHaveSeenAllready.includes(thisRidePatNum);
+                        if (isWithin2HoursSinceChange(thisRidePatLastModified) && !isSeenAllReady) {
+                            cell.classList.add('within2HoursSinceChange');
+                            increaseCounter(tableNames.DAT_MORNING, thisRidePatNum);
+                        }
+                    }
+                }
+            },
+            { targets: 9, className: 'last-modified_td' },
+            { targets: 9, type: 'last_modifiedSort' },
+            { targets: 10, className: 'text-right-strong' },
+            { targets: [11], visible: false },
+            { targets: [12], orderable: false }
+        ],
+        autoWidth: false,
+        createdRow: function (row, data, dataIndex) {
+            if (data.isPatientStatusShouldPaintRow) {
+                $(row).addClass("highlightRow-after-patientStatusModal");
+            }
+        },
+    });
+};
+
+// Helper: Render day-after-tomorrow afternoon table
+const renderDATAfternoonTable = (data, arrayOf_IHaveSeenAllready) => {
+    tDATAfternoon = $(`#${tableNames.DAT_AFTERNOON}`).DataTable({
+        rowId: 'ridePatNum',
+        dom: controllersLayout,
+        buttons: [{
+            extend: 'excelHtml5',
+            text: 'ייצוא לאקסל',
+            title: `ניהול הסעות למחרתיים אחה"צ ${getNext_X_DaysDateAsString(2)}`,
+        }],
+        data: data,
+        stateSave: true,
+        destroy: true,
+        pageLength: 100,
+        columns: [
+            { data: "checkBoxesStr" },
+            { data: "date" },
+            { data: "time" },
+            { data: "origin" },
+            { data: "destination" },
+            { data: "patient" },
+            { data: "patientAge" },
+            { data: "driver" },
+            { data: "status" },
+            { data: "lastModified" },
+            { data: "remark" },
+            { data: "isAnonymous" },
+            { data: "buttons" },
+        ],
+        columnDefs: [
+            { targets: 2, type: 'de_time' },
+            { width: '4%', "targets": [1, 2] },
+            { width: '6%', "targets": [3, 4] },
+            { width: '15%', "targets": [5] },
+            { width: '2%', "targets": [6] },
+            { width: '5%', "targets": [0, 7, 8, 9, 10] },
+            { width: '0%', "targets": [11] },
+            { width: '25%', "targets": [12] },
+            {
+                targets: 6, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {
+                    cell.className += ' driver_td';
+                    if (!rowData.hasDriver) {
+                        let ridePatTime_td;
+                        if (rowData['time'] === 'אחה"צ') {
+                            ridePatTime_td = [12, 1];
+                        } else {
+                            ridePatTime_td = $.trim(rowData['time']).split(':');
+                        }
+                        const hh = parseInt(ridePatTime_td[0]);
+                        const mm = parseInt(ridePatTime_td[1]);
+                        const suitableClass = classManager.getSuitableClassS_4thisTime("datatable-dat-afternoon", hh, mm);
+                        $(cell).addClass(suitableClass);
+                    }
+                }
+            },
+            {
+                targets: 8, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {
+                    if (cellData.indexOf("הגענו ליעד") !== -1 || cellData.indexOf("Reached destination") !== -1) {
+                        $(cell).addClass('reached2destination');
+                    } else if (cellData.includes('שובץ נהג') || cellData.includes('Driver registered')) {
+                        if (rowData["isAnonymous"]) {
+                            $(cell.parentElement).addClass('driverAssign2AnonymousRide');
+                        }
+                    }
+                }
+            },
+            {
+                targets: 9, createdCell: (cell, cellData, rowData, rowIndex, colIndex) => {
+                    const thisRidePatNum = rowData.ridePatNum;
+                    const thisridePatObj = arr_rides.find((r) => r.RidePatNum === thisRidePatNum);
+                    if (thisridePatObj) {
+                        const intValue = convert2DBDateToInt(thisridePatObj.LastModified);
+                        const thisRidePatLastModified = new Date(intValue);
+                        const isSeenAllReady = arrayOf_IHaveSeenAllready.includes(thisRidePatNum);
+                        if (isWithin2HoursSinceChange(thisRidePatLastModified) && !isSeenAllReady) {
+                            cell.classList.add('within2HoursSinceChange');
+                            increaseCounter(tableNames.DAT_AFTERNOON, thisRidePatNum);
+                        }
+                    }
+                }
+            },
+            { targets: 9, className: 'last-modified_td' },
+            { targets: 9, type: 'last_modifiedSort' },
+            { targets: 10, className: 'text-right-strong' },
+            { targets: [11], visible: false },
+            { targets: [12], orderable: false },
+            { targets: [0], orderable: false },
+            { targets: [0], className: 'text-center' }
+        ],
+        autoWidth: false,
+        createdRow: function (row, data, dataIndex) {
+            if (data.isPatientStatusShouldPaintRow) {
+                $(row).addClass("highlightRow-after-patientStatusModal");
+            }
+        },
+    });
+};
+
 // Helper: Render future table
 const renderFutureTable = (data, arrayOf_IHaveSeenAllready) => {
     tFuture = $(`#${tableNames.FUTURE}`).DataTable({
@@ -2601,6 +2899,8 @@ const refreshTable_splitRide = (timeInterval = 7) => {
         afternoon: { loaded: false, data: [] },
         tomorrowMorning: { loaded: false, data: [] },
         tomorrowAfternoon: { loaded: false, data: [] },
+        datMorning: { loaded: false, data: [] },
+        datAfternoon: { loaded: false, data: [] },
         future: { loaded: false, data: [] }
     };
 
@@ -2621,6 +2921,8 @@ const refreshTable_splitRide = (timeInterval = 7) => {
         tAfternoon = $(`#${tableNames.AFTERNOON}`).DataTable({ data: [], destroy: true });
         tTomorrowMorning = $(`#${tableNames.TOMORROW_MORNING}`).DataTable({ data: [], destroy: true });
         tTomorrowAfternoon = $(`#${tableNames.TOMORROW_AFTERNOON}`).DataTable({ data: [], destroy: true });
+        tDATMorning = $(`#${tableNames.DAT_MORNING}`).DataTable({ data: [], destroy: true });
+        tDATAfternoon = $(`#${tableNames.DAT_AFTERNOON}`).DataTable({ data: [], destroy: true });
         tFuture = $(`#${tableNames.FUTURE}`).DataTable({ data: [], destroy: true });
         return;
     }
@@ -2630,6 +2932,8 @@ const refreshTable_splitRide = (timeInterval = 7) => {
     showTableLoadingIndicator(tableNames.AFTERNOON);
     showTableLoadingIndicator(tableNames.TOMORROW_MORNING);
     showTableLoadingIndicator(tableNames.TOMORROW_AFTERNOON);
+    showTableLoadingIndicator(tableNames.DAT_MORNING);
+    showTableLoadingIndicator(tableNames.DAT_AFTERNOON);
     showTableLoadingIndicator(tableNames.FUTURE);
 
     // Initialize empty tables so users can see structure
@@ -2637,6 +2941,8 @@ const refreshTable_splitRide = (timeInterval = 7) => {
     tAfternoon = $(`#${tableNames.AFTERNOON}`).DataTable({ data: [], destroy: true });
     tTomorrowMorning = $(`#${tableNames.TOMORROW_MORNING}`).DataTable({ data: [], destroy: true });
     tTomorrowAfternoon = $(`#${tableNames.TOMORROW_AFTERNOON}`).DataTable({ data: [], destroy: true });
+    tDATMorning = $(`#${tableNames.DAT_MORNING}`).DataTable({ data: [], destroy: true });
+    tDATAfternoon = $(`#${tableNames.DAT_AFTERNOON}`).DataTable({ data: [], destroy: true });
     tFuture = $(`#${tableNames.FUTURE}`).DataTable({ data: [], destroy: true });
 
     // Helper to update arr_rides and GENERAL storage
@@ -2646,6 +2952,8 @@ const refreshTable_splitRide = (timeInterval = 7) => {
             ...splitRideLoadingState.afternoon.data,
             ...splitRideLoadingState.tomorrowMorning.data,
             ...splitRideLoadingState.tomorrowAfternoon.data,
+            ...splitRideLoadingState.datMorning.data,
+            ...splitRideLoadingState.datAfternoon.data,
             ...splitRideLoadingState.future.data
         ];
         GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
@@ -2779,7 +3087,71 @@ const refreshTable_splitRide = (timeInterval = 7) => {
         }
     });
 
-    // 5. Future
+    // 5. Day-After-Tomorrow Morning
+    $.ajax({
+        dataType: "json",
+        url: "WebService.asmx/GetSplitRides",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify({ dateMode: DateMode.DayAfterTomorrow, isAfternoon: false, isFutureTable: false, days: 0 }),
+        success: function (data) {
+            const rides = JSON.parse(data.d);
+            splitRideLoadingState.datMorning.data = rides;
+            splitRideLoadingState.datMorning.loaded = true;
+            updateGlobalRides();
+
+            const { processedRides, ridesForColoring } = processRideDataForTable(rides, 6, areasToShow_arr, allSortsSwitch);
+            listRowstoColor = [...listRowstoColor, ...ridesForColoring];
+
+            renderDATMorningTable(processedRides, arrayOf_IHaveSeenAllready);
+            colorRowBeige(ridesForColoring);
+            $(".dataTables_empty").html("אין הסעות لا توجد سفريات No drives");
+            $('.checkboxClass').prop('checked', false);
+
+            showTableLoadedIndicator(tableNames.DAT_MORNING, processedRides.length);
+        },
+        error: function (err) {
+            console.error("Error loading day-after-tomorrow morning rides:", err);
+            showTableErrorIndicator(tableNames.DAT_MORNING);
+        }
+    });
+
+    // 6. Day-After-Tomorrow Afternoon
+    $.ajax({
+        dataType: "json",
+        url: "WebService.asmx/GetSplitRides",
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-Encoding", "gzip");
+        },
+        type: "POST",
+        data: JSON.stringify({ dateMode: DateMode.DayAfterTomorrow, isAfternoon: true, isFutureTable: false, days: 0 }),
+        success: function (data) {
+            const rides = JSON.parse(data.d);
+            splitRideLoadingState.datAfternoon.data = rides;
+            splitRideLoadingState.datAfternoon.loaded = true;
+            updateGlobalRides();
+
+            const { processedRides, ridesForColoring } = processRideDataForTable(rides, 7, areasToShow_arr, allSortsSwitch);
+            listRowstoColor = [...listRowstoColor, ...ridesForColoring];
+
+            renderDATAfternoonTable(processedRides, arrayOf_IHaveSeenAllready);
+            colorRowBeige(ridesForColoring);
+            $(".dataTables_empty").html("אין הסעות لا توجد سفريات No drives");
+            $('.checkboxClass').prop('checked', false);
+
+            showTableLoadedIndicator(tableNames.DAT_AFTERNOON, processedRides.length);
+        },
+        error: function (err) {
+            console.error("Error loading day-after-tomorrow afternoon rides:", err);
+            showTableErrorIndicator(tableNames.DAT_AFTERNOON);
+        }
+    });
+
+    // 7. Future
     $.ajax({
         dataType: "json",
         url: "WebService.asmx/GetSplitRides",
@@ -3986,10 +4358,10 @@ const buildPatientHTML_AfterUnited = (ridepat) => {
                 "-"
             )}</span>`
         }
-        if (ridepat.PatientCellPhone != ridepat.PatientCellPhone2 && ridepat.PatientCellPhone2!=null) {
+        if (ridepat.PatientCellPhone != ridepat.PatientCellPhone2 && ridepat.PatientCellPhone2 != null) {
             patientPhone2render += ridepat.PatientCellPhone2 != "0" ? `<p class="phones-patient-p">${ridepat.PatientCellPhone2.replace(/(\d{3})(\d+)/, "$1-$2")}</p>` : '';
         }
-        if (ridepat.PatientCellPhone2 != ridepat.PatientCellPhone3 && ridepat.PatientCellPhone != ridepat.PatientCellPhone3 && ridepat.PatientCellPhone3!=null) {
+        if (ridepat.PatientCellPhone2 != ridepat.PatientCellPhone3 && ridepat.PatientCellPhone != ridepat.PatientCellPhone3 && ridepat.PatientCellPhone3 != null) {
             patientPhone2render += ridepat.PatientCellPhone3 != null ? `<p class="phones-patient-p">${ridepat.PatientCellPhone3.replace(/(\d{3})(\d+)/, "$1-$2")}</p>` : '';
 
         }
@@ -4963,8 +5335,8 @@ function groupByOriginAndTime(rides) {
         if (!acc[key]) {
             acc[key] = {
                 origin: ride.Origin,
-                timeKey,         
-                timeDate: ts,    
+                timeKey,
+                timeDate: ts,
                 destinations: new Set(),
                 rides: []
             };

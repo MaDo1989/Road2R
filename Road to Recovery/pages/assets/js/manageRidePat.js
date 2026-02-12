@@ -18,6 +18,8 @@ const tableNames = {
     AFTERNOON: 'datatable-afternoon',
     TOMORROW_MORNING: 'datatable-tomorrow-morning',
     TOMORROW_AFTERNOON: 'datatable-tomorrow-afternoon',
+    DAT_MORNING: 'datatable-dat-morning',
+    DAT_AFTERNOON: 'datatable-dat-afternoon',
     FUTURE: 'datatable-future',
     NOT_RELEVANT: 'not-relevant'
 }

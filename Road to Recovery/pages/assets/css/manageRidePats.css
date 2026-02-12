@@ -301,19 +301,31 @@ input:checked + .slider:before {
 /*gilad addition*/
 
 #accordion .panel-primary .blue1 {
-    background-color: #0b5b79;
+    background-color: #0a4f69; /* darkest */
 }
+
 #accordion .panel-primary .blue2 {
-    background-color: #177497;
+    background-color: #0e5d79;
 }
+
 #accordion .panel-primary .blue3 {
-    background-color: #2b94bb;
+    background-color: #156b8a;
 }
+
 #accordion .panel-primary .blue4 {
-    background-color: #4bb0d5;
+    background-color: #1f7fa0;
 }
+
 #accordion .panel-primary .blue5 {
-    background-color: #6ac3e3;
+    background-color: #2b93b6;
+}
+
+#accordion .panel-primary .blue6 {
+    background-color: #46a8c9;
+}
+
+#accordion .panel-primary .blue7 {
+    background-color: #67bddb; /* lightest but not washed */
 }
 
 #accordion .panel-body .dataTables_wrapper table .statusComplete {

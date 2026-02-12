@@ -487,8 +487,130 @@
                                         </div>
                                     </div>
 
+                                    <div onclick="assignTable2lastOne(tableNames.DAT_MORNING)"
+                                         class="panel panel-primary ">
+                                        <div class="panel-heading blue5" id="col-dat-morning">
+                                            <h4 data-toggle="tooltip" data-placement="bottom" title="Day After Tomorrow Morning Rides"
+                                                class="panel-title">
+                                                <a id="collapsed-dat-morning_aTag" href="#collapse-dat-morning" data-parent="#accordion"
+                                                   data-toggle="collapse" class="dropdown active open collapsed">
+                                                    <span class="m-l-15">
+                                                        נסיעות למחרתיים בבוקר
+                                                        <span class="lastModified_counter">
+                                                            <span class="lastModified_Records"
+                                                                  onclick="sortTable_LastModifiedFirst(tableNames.DAT_MORNING)">
+                                                                רשומות שעודכנו לאחרונה:
+                                                                <span id="datatable-dat-morning_lastModified_counter">0</span>
+                                                            </span>
+                                                        </span>
+                                                    </span>
+                                                </a>
+                                            </h4>
+                                        </div>
+                                        <div class="panel-collapse collapse" id="collapse-dat-morning">
+                                            <div class="panel-body">
+                                                <table id="datatable-dat-morning"
+                                                       class="table table-striped table-bordered hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="middle" title="Checkbox">
+
+                                                                <input type="checkbox" class="checkboxClass" onchange="ChangeCheckboxRides(this)" id="AllChecks">
+                                                                <span>סמן הכל</span>
+                                                            </th>
+                                                            <th class="middle" title="Date  الساعة">תאריך</th>
+                                                            <th class="middle" title="Time  الساعة">שעה</th>
+                                                            <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
+                                                            <th class="middle" title="Destination  نقطة الوصول">יעד</th>
+                                                            <th class="customWidth4column middle"
+                                                                title="Patient  المريض">החולה</th>
+                                                            <th class="middle" title="Patient's Name">גיל</th>
+                                                            <th class="middle" title="Driver  السائق">המסיע</th>
+                                                            <th class="middle" title="Status  حالة السفرية">
+                                                                סטטוס החולה
+                                                            </th>
+                                                            <th class="customWidth middle" title="Last modified">
+                                                                עודכן
+                                                                לאחרונה
+                                                            </th>
+                                                            <th class="customWidth  middle" title="Remarks  ملاحظات">
+                                                                הערות
+                                                            </th>
+                                                            <th title="isAnonymous"></th> <!-- hidden to the user -->
+                                                            <th class="SmallcustomWidth middle" title="Actions  اعمال">
+                                                                פעולות
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div onclick="assignTable2lastOne(tableNames.DAT_AFTERNOON)"
+                                         class="panel panel-primary">
+                                        <div class="panel-heading blue6" id="col-dat-afternoon">
+                                            <h4 data-toggle="tooltip" data-placement="bottom" title="Day After Tomorrow Afternoon Rides"
+                                                class="panel-title">
+                                                <a id="collapsed-dat-afternoon_aTag" href="#collapse-dat-afternoon" data-parent="#accordion"
+                                                   data-toggle="collapse" class="dropdown active open collapsed">
+                                                    <span class="m-l-15">
+                                                        נסיעות למחרתיים אחה"צ
+                                                        <span class="lastModified_counter">
+                                                            <span class="lastModified_Records"
+                                                                  onclick="sortTable_LastModifiedFirst(tableNames.DAT_AFTERNOON)">
+                                                                רשומות שעודכנו לאחרונה:
+                                                                <span id="datatable-dat-afternoon_lastModified_counter">0</span>
+                                                            </span>
+                                                        </span>
+                                                    </span>
+                                                </a>
+                                            </h4>
+                                        </div>
+                                        <div class="panel-collapse collapse" id="collapse-dat-afternoon">
+                                            <div class="panel-body">
+                                                <table id="datatable-dat-afternoon"
+                                                       class="table table-striped table-bordered hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="middle" title="Checkbox">
+
+                                                                <input type="checkbox" class="checkboxClass" onchange="ChangeCheckboxRides(this)" id="AllChecks">
+                                                                <span>סמן הכל</span>
+                                                            </th>
+                                                            <th class="middle" title="Date  الساعة">תאריך</th>
+                                                            <th class="middle" title="Time  الساعة">שעה</th>
+                                                            <th class="middle" title="Origin  نقطة الانطلاق">מוצא</th>
+                                                            <th class="middle" title="Destination  نقطة الوصول">יעד</th>
+                                                            <th class="customWidth4column middle"
+                                                                title="Patient  المريض">החולה</th>
+                                                            <th class="middle" title="Patient's Name">גיל</th>
+                                                            <th class="middle" title="Driver  السائق">המסיע</th>
+                                                            <th class="middle" title="Status  حالة السفرية">
+                                                                סטטוס החולה
+                                                            </th>
+                                                            <th class="customWidth middle" title="Last modified">
+                                                                עודכן
+                                                                לאחרונה
+                                                            </th>
+                                                            <th class="customWidth  middle" title="Remarks  ملاحظات">
+                                                                הערות
+                                                            </th>
+                                                            <th title="isAnonymous"></th> <!-- hidden to the user -->
+                                                            <th class="SmallcustomWidth middle" title="Actions  اعمال">
+                                                                פעולות
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div onclick="assignTable2lastOne(tableNames.FUTURE)" class="panel panel-primary">
-                                        <div class="panel-heading blue5" id="col3">
+                                        <div class="panel-heading blue7" id="col3">
                                             <h4 data-toggle="tooltip" data-placement="bottom"
                                                 title="Future Rides  سفريات مستقبلية" class="panel-title">
                                                 <a id="collapsed4_aTag" href="#collapse5" data-parent="#accordion"

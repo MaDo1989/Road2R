@@ -1212,10 +1212,6 @@ public class DBservice_Gilad
                 });
 
 
-
-
-
-
             }
             return list;
 

@@ -443,7 +443,8 @@ public class UnityRide
     {
         Today = 0,
         Tomorrow = 1,
-        Future =2,
+        DayAfterTomorrow = 2,
+        Future =3,
     }
 
     private static DateTime GetDateByMode(DateMode mode)
@@ -456,8 +457,11 @@ public class UnityRide
             case DateMode.Tomorrow:
                 return DateTime.Today.AddDays(1);
 
-            case DateMode.Future:
+            case DateMode.DayAfterTomorrow:
                 return DateTime.Today.AddDays(2);
+
+            case DateMode.Future:
+                return DateTime.Today.AddDays(3);
 
             default:
                 throw new ArgumentOutOfRangeException("mode", mode, "Invalid DateMode value");
