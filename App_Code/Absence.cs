@@ -186,6 +186,7 @@ public class Absence
     public int InsertNewAbsence(int volunteerId, int coorId, DateTime from, DateTime until, string cause, string note)
     {
         DBservice_Gilad dBservice = new DBservice_Gilad();
+        VolunteersCacheServiceManager.ClearCache();
         return dBservice.InsertNewAbsence(volunteerId, coorId, from, until, cause, note);
     }
 }

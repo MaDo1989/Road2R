@@ -1990,14 +1990,14 @@ public class WebService : System.Web.Services.WebService
 
     // this one is new one and better one ! 
     [WebMethod(EnableSession = true)]
-    public string getVolunteers_Gilad(bool active)
+    public string getVolunteers_volunteersPage()
     {
         try
         {
             HttpResponse response = GzipMe();
 
             Volunteer c = new Volunteer();
-            List<Volunteer> volunteersList = c.getVolunteersList_V2_WebOnly_Gilad(active);
+            List<Volunteer> volunteersList = c.getVolunteersList_V2_WebOnly_WithCache();
             return j.Serialize(volunteersList);
         }
         catch (Exception ex)

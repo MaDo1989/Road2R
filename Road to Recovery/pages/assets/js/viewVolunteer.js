@@ -134,10 +134,9 @@ function refreshTable() {
 
     $.ajax({
         dataType: "json",
-        url: "WebService.asmx/getVolunteers_Gilad",
+        url: "WebService.asmx/getVolunteers_volunteersPage",
         contentType: "application/json; charset=utf-8",
         type: "POST",
-        data: JSON.stringify({ active: true }),
         success: function (data) {
 
             $('#wait').hide();

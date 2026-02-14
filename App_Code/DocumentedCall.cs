@@ -105,6 +105,7 @@ public class DocumentedCall
             dbs = new DbService();
 
             int res = dbs.ExecuteQuery(query);
+            VolunteersCacheServiceManager.ClearCache();
 
             return res > 0;
         }

@@ -1598,13 +1598,9 @@ public class Volunteer
         return list;
     }
 
-    public List<Volunteer> getVolunteersList_V2_WebOnly_Gilad(bool active)
+    public List<Volunteer> getVolunteersList_V2_WebOnly_WithCache()
     {
-        DBservice_Gilad dBservice_Gilad = new DBservice_Gilad();
-        return dBservice_Gilad.GetVolunteersList_All_Fast();
-
-        //old method (need to remove, this method is with active filter not in use anymore)
-        //return dBservice_Gilad.getVolunteersList_V2_WebOnly_Gilad(active);
+        return VolunteersCacheServiceManager.GetVolunteers();
     }
 
 
@@ -2066,6 +2062,7 @@ public class Volunteer
                 {
                     throw new Exception();
                 }
+                VolunteersCacheServiceManager.ClearCache();
             }
             else if (func == "new")
             {
@@ -2090,6 +2087,7 @@ public class Volunteer
                     query = "insert into VolunType_Volunteer (VolunTypeType,VolunteerId) values (@volType," + Id + ")";
                     db = new DbService();
                     db.ExecuteQuery(query, cmd.CommandType, cmdParams);
+                    VolunteersCacheServiceManager.ClearCache();
                 }
                 catch (SqlException ex)
                 {
@@ -2099,10 +2097,6 @@ public class Volunteer
                 {
                     throw e;
                 }
-
-
-
-
             }
         }
         catch (Exception e)
@@ -2146,7 +2140,7 @@ public class Volunteer
                     }
                 }
             }
-
+            VolunteersCacheServiceManager.ClearCache();
             return result;
         }
         catch (Exception ex)
