@@ -276,6 +276,11 @@
 
         const allowedLocations = ['patientform.html', 'viewpatient.html'];
 
+        function GetDateString(d) {
+            let pad = n => String(n).padStart(2, '0');
+            let str = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+            return str;
+        }
         $(document).ready(function () {
             let { COPYWRITE } = GENERAL;
             $('#rights').html(COPYWRITE());
@@ -558,8 +563,10 @@
                         Minute = 14;
                         hourForPush = "אחה\"צ"
                     }
-                    var date = new Date(Year, Month, Day, Hour, Minute).toUTCString();
-                    let nowInUTC = new Date().toUTCString();
+                    var date = new Date(Year, Month, Day, Hour, Minute);
+                    date = GetDateString(date);
+                    let nowInUTC = new Date();
+                    nowInUTC = GetDateString(nowInUTC);
                     var func = arr_customer.func;
 
 
@@ -684,147 +691,6 @@
 
                     //console.log('Gilad check || before submit the form data:', JSON.parse(dataString));
                     setUnityRideNew(dataString);
-
-                    //Before united-(old API and tables in DB)
-                    //********************************************************** */
-                    //$.ajax({
-                    //    dataType: "json",
-                    //    url: "WebService.asmx/setRidePat",
-                    //    contentType: "application/json; charset=utf-8",
-                    //    type: "POST",
-                    //    data: dataString,
-                    //    success: function (data) {
-                    //        if (data.d === 1) {
-                    //            //there is such a drive and status is not נמחקה
-
-                    //            $('#wait').hide();
-                    //            let date2present = new Date(request.RidePat.Date).toLocaleDateString('he-IL');
-                    //            swal(
-                    //                "خطأ\nשגיאה",
-                    //                "קיימת כבר הסעה בתאריך " + date2present + " עם אותו החולה ואותן נקודות האיסוף\nيوجد سفرية بالتاريخ (التاريخ) مع نفس المريض ونفس نقطة الالتقاء",
-                    //                "warning"
-                    //            );
-
-                    //        } else if (data.d < 0) { //there is such a drive and status = נמחקה
-
-                    //            let rideNumber = data.d * -1; //retriving the rideNumber back to positive number
-                    //            rideNumberForNo = rideNumber;
-                    //            let returnDriveExist = false;
-                    //            tmpOrigin = Origin;
-                    //            Origin = Destination;
-                    //            Destination = tmpOrigin;
-                    //            RidePatBack = {
-                    //                Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Remark: Remark, Escorts: Escorts, Date: date, OnlyEscort: OnlyEscort
-                    //            }
-                    //            $.ajax({
-                    //                dataType: "json",
-                    //                url: "WebService.asmx/CheckRidePat",
-                    //                contentType: "application/json; charset=utf-8",
-                    //                type: "POST",
-                    //                //  async: false,
-                    //                data: JSON.stringify({ RidePatBack }),
-                    //                success: function (data) {
-                    //                    $('#wait').hide();
-                    //                    let driverInput_hasValue = ($('#driver').val() !== "");
-
-                    //                    returnDriveExist = JSON.parse(data.d);
-                    //                    console.log(returnDriveExist)
-                    //                    var DestIsHospital = hospitals.includes(request.RidePat.Destination.Name);
-
-                    //                    if (driverInput_hasValue) {
-                    //                        currentDriverId = -1;
-                    //                        addDriver(rideNumber);
-                    //                    }
-
-                    //                    if (DestIsHospital && !returnDriveExist || DestIsHospital && isAnonymous) {//offer a return ride
-                    //                        document.getElementById('ModalTitle').innerHTML = 'הנסיעה שוחזרה בהצלחה';
-
-                    //                        document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
-                    //                        document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
-                    //                        document.getElementById('modalButtons').innerHTML += '<button onclick="createReturnRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn">יצירת החזרה &nbsp;<i class="ti-car m-r-5"></i></button>';
-
-                    //                        showMyModal('Modal');
-                    //                    } else { // dont offer return drive
-                    //                        document.getElementById('ModalTitle').innerHTML = 'הנסיעה שוחזרה בהצלחה';
-                    //                        document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
-                    //                        document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
-
-                    //                        showMyModal('Modal');
-                    //                    }
-
-                    //                },
-                    //                error: function (err) {
-                    //                    $('#wait').hide();
-                    //                    alert("Error in CheckRidePat: " + err.responseText);
-                    //                }
-                    //            });
-                    //        }
-                    //        else {
-                    //            rideNumber = data.d;
-                    //            rideNumberForNo = rideNumber;
-                    //            var returnDriveExist = false;
-
-                    //            tmpOrigin = Origin;
-                    //            Origin = Destination;
-                    //            Destination = tmpOrigin;
-                    //            RidePatBack = {
-                    //                Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Remark: Remark, Escorts: Escorts, Date: date, OnlyEscort: OnlyEscort
-                    //            }
-
-                    //            $.ajax({
-                    //                dataType: "json",
-                    //                url: "WebService.asmx/CheckRidePat",
-                    //                contentType: "application/json; charset=utf-8",
-                    //                type: "POST",
-                    //                // async: false,
-                    //                data: JSON.stringify({ RidePatBack }),
-                    //                success: function (data) {
-                    //                    $('#wait').hide();
-                    //                    let driverInput_hasValue = ($('#driver').val() !== "");
-                    //                    returnDriveExist = JSON.parse(data.d);
-                    //                    //console.log(returnDriveExist)
-                    //                    var DestIsHospital = hospitals.includes(request.RidePat.Destination.Name);
-                    //                    if (driverInput_hasValue) {
-                    //                        currentDriverId = -1;
-                    //                        addDriver(rideNumber);
-                    //                    }
-
-                    //                    if (DestIsHospital && !returnDriveExist || DestIsHospital && isAnonymous) {//offer a return ride
-                    //                        document.getElementById('ModalTitle').innerHTML = 'הנסיעה נשמרה';
-
-                    //                        document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
-                    //                        document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
-                    //                        document.getElementById('modalButtons').innerHTML += '<button onclick="createReturnRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn">יצירת החזרה &nbsp;<i class="ti-car m-r-5"></i></button>';
-
-                    //                        showMyModal('Modal');
-                    //                    } else { // dont offer return drive
-                    //                        document.getElementById('ModalTitle').innerHTML = 'הנסיעה נשמרה';
-                    //                        document.getElementById('modalButtons').innerHTML = '<button onclick="createNewRide()" class="btn btn-success waves-effect w-md m-b-5 sameWidthBtn"><i class="ti-plus m-r-5"></i>יצירת הסעה חדשה</button>&nbsp;';
-                    //                        document.getElementById('modalButtons').innerHTML += '<button onclick="return2manageRidePats()" class="btn btn-default waves-effect w-md m-b-5 sameWidthBtn">חזרה לניהול ההסעות <i class="ti-back-right m-r-5"></i></button>';
-
-                    //                        showMyModal('Modal');
-                    //                    }
-                    //                },
-                    //                error: function (err) {
-                    //                    $('#wait').hide();
-                    //                    alert("Error in CheckRidePat: " + err.responseText);
-                    //                }
-                    //            });
-
-
-                    //        }
-
-                    //    },
-                    //    error: function (err) {
-                    //        $('#wait').hide();
-                    //        console.log(err);
-                    //        swal(
-                    //            "خطأ\nשגיאה",
-                    //            "משהו השתבש, צא ונסה שנית\nحدث خطأ ما، الرجاء الخروج والدخول مرة اخرى",
-                    //            "warning"
-                    //        );
-                    //    }
-                    //});
                     return false;
                 },
 
