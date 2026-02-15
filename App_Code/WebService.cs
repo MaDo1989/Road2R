@@ -1138,7 +1138,14 @@ public class WebService : System.Web.Services.WebService
         try
         {
             List<UnityRide> list2Return = UnityRide.GetSplitRides(dateMode, isAfternoon, isFutureTable, days);
-            return j.Serialize(list2Return);
+
+            var settings = new JsonSerializerSettings
+            {
+                DateTimeZoneHandling = DateTimeZoneHandling.Local,
+                Formatting = Formatting.None
+            };
+
+            return JsonConvert.SerializeObject(list2Return, settings);
         }
         catch (Exception ex)
         {

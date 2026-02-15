@@ -418,14 +418,16 @@ public class DBservice_Gilad
                         oneRide.AmountOfEscorts = dataReader.GetInt32(idxAmountOfEscorts);
                         oneRide.Origin = dataReader[idxOrigin].ToString();
                         oneRide.Destination = dataReader[idxDestination].ToString();
-                        oneRide.PickupTime = dataReader.GetDateTime(idxPickupTime);
+                        var dt = dataReader.GetDateTime(idxPickupTime);
+                        oneRide.PickupTime = DateTime.SpecifyKind(dt, DateTimeKind.Local);
                         oneRide.CoorName = dataReader[idxCoordinator].ToString();
                         oneRide.Remark = dataReader[idxRemark].ToString();
                         oneRide.Status = dataReader[idxStatus].ToString();
                         oneRide.Area = dataReader[idxArea].ToString();
                         oneRide.Shift = dataReader[idxShift].ToString();
                         oneRide.OnlyEscort = dataReader.GetBoolean(idxOnlyEscort);
-                        oneRide.LastModified = dataReader.GetDateTime(idxLastModified);
+                        var lm = dataReader.GetDateTime(idxLastModified);
+                        oneRide.LastModified = DateTime.SpecifyKind(lm, DateTimeKind.Local);
                         oneRide.CoorId = dataReader.GetInt32(idxCoordinatorID);
 
                         if (dataReader.IsDBNull(idxMainDriver))

@@ -305,6 +305,85 @@ END
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+-- =============================================================
+-- סקריפט להמרת pickupTime מ-UTC לשעון ישראל (GMT+2 / GMT+3)
+-- =============================================================
+-- שעון קיץ (IDT, UTC+3): מיום שישי שלפני יום ראשון האחרון של מרץ
+-- שעון חורף (IST, UTC+2): מיום ראשון האחרון של אוקטובר
+-- =============================================================
+
+-- שלב 1: בדיקה בלבד (SELECT) - לראות את התוצאות לפני עדכון
+SELECT 
+    RidePatNum,
+    PatientName,
+    pickupTime AS pickupTime_UTC,
+    
+    -- חישוב תאריך תחילת שעון קיץ: יום שישי שלפני יום ראשון האחרון של מרץ
+    -- חישוב תאריך סיום שעון קיץ: יום ראשון האחרון של אוקטובר
+    CASE 
+        WHEN pickupTime >= 
+            -- תחילת שעון קיץ: יום שישי לפני יום ראשון האחרון של מרץ, בשעה 02:00
+            DATEADD(DAY, -2, -- יום שישי = יום ראשון פחות 2
+                DATEADD(DAY, 
+                    -(DATEPART(WEEKDAY, DATEFROMPARTS(YEAR(pickupTime), 3, 31)) - 1 + @@DATEFIRST - 1) % 7,
+                    DATEFROMPARTS(YEAR(pickupTime), 3, 31)
+                )
+            )
+        AND pickupTime < 
+            -- סיום שעון קיץ: יום ראשון האחרון של אוקטובר, בשעה 02:00
+            DATEADD(DAY, 
+                -(DATEPART(WEEKDAY, DATEFROMPARTS(YEAR(pickupTime), 10, 31)) - 1 + @@DATEFIRST - 1) % 7,
+                DATEFROMPARTS(YEAR(pickupTime), 10, 31)
+            )
+        THEN DATEADD(HOUR, 3, pickupTime)  -- שעון קיץ: +3
+        ELSE DATEADD(HOUR, 2, pickupTime)  -- שעון חורף: +2
+    END AS pickupTime_Israel,
+
+    CASE 
+        WHEN pickupTime >= 
+            DATEADD(DAY, -2,
+                DATEADD(DAY, 
+                    -(DATEPART(WEEKDAY, DATEFROMPARTS(YEAR(pickupTime), 3, 31)) - 1 + @@DATEFIRST - 1) % 7,
+                    DATEFROMPARTS(YEAR(pickupTime), 3, 31)
+                )
+            )
+        AND pickupTime < 
+            DATEADD(DAY, 
+                -(DATEPART(WEEKDAY, DATEFROMPARTS(YEAR(pickupTime), 10, 31)) - 1 + @@DATEFIRST - 1) % 7,
+                DATEFROMPARTS(YEAR(pickupTime), 10, 31)
+            )
+        THEN N'שעון קיץ (+3)'
+        ELSE N'שעון חורף (+2)'
+    END AS timezone_type
+
+FROM unityRide
+ORDER BY pickupTime;
+
+
+-- =============================================================
+-- שלב 2: UPDATE בפועל - להריץ רק אחרי שבדקת שה-SELECT נראה תקין!
+-- =============================================================
+
+--UPDATE unityRide
+--SET pickupTime = 
+--    CASE 
+--        WHEN pickupTime >= 
+--            DATEADD(DAY, -2,
+--                DATEADD(DAY, 
+--                    -(DATEPART(WEEKDAY, DATEFROMPARTS(YEAR(pickupTime), 3, 31)) - 1 + @@DATEFIRST - 1) % 7,
+--                    DATEFROMPARTS(YEAR(pickupTime), 3, 31)
+--                )
+--            )
+--        AND pickupTime < 
+--            DATEADD(DAY, 
+--                -(DATEPART(WEEKDAY, DATEFROMPARTS(YEAR(pickupTime), 10, 31)) - 1 + @@DATEFIRST - 1) % 7,
+--                DATEFROMPARTS(YEAR(pickupTime), 10, 31)
+--            )
+--        THEN DATEADD(HOUR, 3, pickupTime)  -- שעון קיץ: +3
+--        ELSE DATEADD(HOUR, 2, pickupTime)  -- שעון חורף: +2
+--    END;
+
+
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

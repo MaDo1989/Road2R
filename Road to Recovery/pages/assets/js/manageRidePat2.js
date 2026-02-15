@@ -41,6 +41,7 @@ const {
     validateMobileNumFullVersion,
     addSeperator2MobileNum,
     convertDBDate2FrontEndDate,
+    convertDBDatesToFEDatesUpdated,
     getHoursGap,
     convert2DBDateToInt,
     getHebrew_WeekDay,
@@ -2138,12 +2139,10 @@ const processRideDataForTable = (rides, tableType, areasToShow_arr, allSortsSwit
                 continue;
             }
         }
-
-        const thisRidePatDate = convertDBDate2FrontEndDate(rides[i].PickupTime);
+        const thisRidePatDate = convertDBDatesToFEDatesUpdated(rides[i].PickupTime);
         const timeHTML = buildTimeHTML(thisRidePatDate, rides[i].RidePatNum);
         const numOfEscorts = rides[i].AmountOfEscorts;
         const patientHTML = buildPatientHTML_AfterUnited(rides[i]);
-
         // Build driver HTML
         let driverHTML = '';
         let driversArr = [];
@@ -2202,7 +2201,7 @@ const processRideDataForTable = (rides, tableType, areasToShow_arr, allSortsSwit
             patientAge: patientAge,
             driver: driverHTML,
             status: status2render,
-            lastModified: convertDBDate2FrontEndDate(rides[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" }),
+            lastModified: convertDBDatesToFEDatesUpdated(rides[i].LastModified).toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" }),
             remark: remarkHTML,
             isAnonymous: rides[i].IsAnonymous == true,
             hasDriver: rides[i].MainDriver != -1,
@@ -4590,7 +4589,6 @@ const buildAcionsButtonsHTML = (ridePatNum, drivers) => {
 }
 
 const buildTimeHTML = (thisRidePatDate, ridePatNum) => {
-
     let timeWrapper = `<div class="elementsInSameLine">`;
 
     let time = '<span class="time">';

@@ -254,6 +254,13 @@ var GENERAL = {
             }
         },
 
+        convertDBDatesToFEDatesUpdated: (date) => {
+            if (!date) return null;
+
+            const noOffset = date.replace(/([+-]\d\d:\d\d|Z)$/, '');
+            return new Date(noOffset);
+        },
+
         fixDate_WhichComeFromOpenConnection: (date2fix, getDate = true) => {
 
             const ticks = new Date(date2fix) - new Date().getTimezoneOffset() * 60000;
