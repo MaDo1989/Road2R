@@ -321,7 +321,7 @@
                 var userName = GENERAL.USER.getUserDisplayName();
                 $("#userName").html(userName);
             }
-            
+
             loadPage();
 
             $("#pat").blur(async function () {
@@ -397,7 +397,7 @@
 
             $('#Origin').on('change', function () {
 
-                if (arr_customer.func === 'new' ) {
+                if (arr_customer.func === 'new') {
                     return;
                 }
 
@@ -420,7 +420,7 @@
             $('#Destination').on('change', function () {
 
                 if (arr_customer.func === 'new') {
-                    
+
                     return;
                 }
 
@@ -441,7 +441,7 @@
             });
 
             if (typeof arr_customer === 'undefined') {
-                console.log('arr_customer is null or undeifind !!! ')   
+                console.log('arr_customer is null or undeifind !!! ')
                 return;
             }
 
@@ -469,7 +469,7 @@
             }
             $("#wait").hide();
 
-          
+
 
             // DO NOT REMOVE : GLOBAL FUNCTIONS!
             var errorClass = 'invalid';
@@ -536,7 +536,7 @@
                     localStorage.setItem("dateForReturnRepeat", $("#dateRide").val());
 
 
-
+                    var isAfternoon = false;
                     var RidePatNum = $("#ridePatNum").val();
                     var Pat = new Object();
                     Pat.DisplayName = $("#pat").val();
@@ -562,6 +562,7 @@
                         Hour = 22;
                         Minute = 14;
                         hourForPush = "אחה\"צ"
+                        isAfternoon = true;
                     }
                     var date = new Date(Year, Month, Day, Hour, Minute);
                     date = GetDateString(date);
@@ -655,7 +656,7 @@
 
                     if (func == "new") {
                         RidePat = {
-                            Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Remark: Remark, Escorts: Escorts, Date: date, OnlyEscort: OnlyEscort, LastModified: nowInUTC
+                            Pat: Pat, Origin: Origin, Destination: Destination, Coordinator: Coordinator, Remark: Remark, Escorts: Escorts, Date: date, OnlyEscort: OnlyEscort, LastModified: nowInUTC, IsAfternoon: isAfternoon
                         }
                         var userName = GENERAL.USER.getAsistantDisplayName();
                         pushMsg = "העוזר " + userName + " הקים נסיעה חדשה עם החולה " + $("#pat").val() + " בתאריך " + dateForPush + " בשעה " + hourForPush + " מ" + $("#Origin").val() + " ל" + $("#Destination").val();
@@ -737,7 +738,7 @@
 
         // new func for new way to save rides in the DB -Gilad
         const setUnityRideNew = (data) => {
-            //console.log('from test CheckAPI_Gilad ', JSON.parse(data));
+            console.log('from test CheckAPI_Gilad ', JSON.parse(data));
             let dataobj = JSON.parse(data);
             const unityRide = {};
             unityRide.PatientName = dataobj.RidePat.Pat.DisplayName;
@@ -748,6 +749,7 @@
             unityRide.Remark = dataobj.RidePat.Remark;
             unityRide.OnlyEscort = dataobj.RidePat.OnlyEscort;
             unityRide.IsAnonymous = dataobj.isAnonymous;
+            unityRide.IsAfternoon = dataobj.RidePat.IsAfternoon;
             unityRide.CoorName = dataobj.RidePat.Coordinator.DisplayName;
             unityRide.DriverName = $('#driver').val() == '' ? null : $('#driver').val()
             unityRide.RidePatNum = dataobj.func == 'edit' ? dataobj.RidePat.RidePatNum : 0;
@@ -757,9 +759,7 @@
             lastRide.Escorts = dataobj.RidePat.Escorts;
             let request = { unityRide: unityRide, func: dataobj.func, numOfRide: dataobj.numberOfRides, repeatEvery: dataobj.repeatRideEvery, firstTry: true };
             const userName = GENERAL.USER.getUserDisplayName();
-            console.log("real user connect: ", userName)
-            console.log("what in the request: ", request.unityRide.CoorName);
-            
+
             if (userName == '' || userName == null || typeof userName == 'undefined' || typeof userName == 'object') {
                 swal({
                     title: "אופס..משהו השתבש",
@@ -770,7 +770,7 @@
                     if (userResponse) {
                         location.href = 'login.html';
                     }
-                   
+
 
                 });
                 return false;
@@ -1621,7 +1621,7 @@
         }
 
         const ClearForm = () => {
-           
+
             arr_customer = { func: "new" };
             $('#afterNoon').prop('checked', false);
             $('#onlyEscort').prop('checked', false);
@@ -1654,7 +1654,7 @@
                     $('#wait').hide();
                 })
             $('#statusRidePat').val('ממתינה לשיבוץ');
-           
+
         }
 
         function loadPage() {
@@ -1725,7 +1725,7 @@
                     if (arr_customer.func == 'new' && arr_customer.RidePatNum != undefined) {
                         // uploadData_new(arr_customer.RidePatNum);
                         allowChangeOf_originAndDestination = true;
-                       // console.log('gilad check -->', arr_customer)
+                        // console.log('gilad check -->', arr_customer)
                         getPatients_slim();
                         generateLocation()
                             .then((result) => {

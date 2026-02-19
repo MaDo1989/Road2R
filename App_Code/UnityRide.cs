@@ -35,6 +35,7 @@ public class UnityRide
     int noOfDocumentedRides;
     bool isAnonymous;
     bool isNewDriver;
+    bool isAfternoon;
 
     public int RidePatNum
     {
@@ -436,6 +437,19 @@ public class UnityRide
         set
         {
             patientCellPhone3 = value;
+        }
+    }
+
+    public bool IsAfternoon
+    {
+        get
+        {
+            return isAfternoon;
+        }
+
+        set
+        {
+            isAfternoon = value;
         }
     }
 

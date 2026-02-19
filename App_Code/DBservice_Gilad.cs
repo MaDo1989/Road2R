@@ -1410,6 +1410,7 @@ public class DBservice_Gilad
         paramDic.Add("@coorName", unityRide.CoorName);
         paramDic.Add("@driverName", unityRide.DriverName == null ? DBNull.Value.ToString() : unityRide.DriverName);
         paramDic.Add("@amountOfEscorts", unityRide.AmountOfEscorts);
+        paramDic.Add("@isAfternoon", unityRide.IsAfternoon);
         cmd = CreateCommandWithStoredProcedureGeneral("spSetNewUnityRide", con, paramDic);
         int res = 0;
         try
