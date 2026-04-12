@@ -1087,6 +1087,7 @@ function rp_center_daily_by_month___post_clone(id) {
 }
 
 function rp_center_monthly_by_year__post_clone(id) {
+    renderYearSelect("#select_year");
     var today = new Date();
     $('#select_year').val(today.getFullYear());
     $("#select_year").change(rp_center_monthly_by_year__refresh_preview);
