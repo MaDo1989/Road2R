@@ -161,7 +161,14 @@ const getTableName2Manipulate = (ridePatNum) => {
         tableName2manipulate = tableNames.TOMORROW_AFTERNOON;
     } else if (typeof tFuture.row(`#${ridePatNum}`).data() !== 'undefined') {
         tableName2manipulate = tableNames.FUTURE;
-    } else {
+    }
+    else if (typeof tDATMorning.row(`#${ridePatNum}`).data() !== 'undefined') {
+        tableName2manipulate = tableNames.DAT_MORNING
+    }
+    else if (typeof tDATAfternoon.row(`#${ridePatNum}`).data() !== 'undefined') {
+        tableName2manipulate = tableNames.DAT_AFTERNOON
+    }
+    else {
         tableName2manipulate = 'table did not found...';
     }
     return tableName2manipulate;
@@ -596,6 +603,7 @@ notification2.client.UnityRideUpdated = function (updatedUnityRide) {
          * !!! IMPORTANT !!! *
          ********↓↓↓**********/
     //update the specific ride in arr_rides:
+    console.log('from signalR server results : ', updatedUnityRide)
     update_arr_rides(updatedUnityRide);
     /*  *********↑↑↑*********
         * !!! IMPORTANT !!! *
@@ -608,10 +616,13 @@ notification2.client.UnityRideUpdated = function (updatedUnityRide) {
     }
 
     let customRide = CustomRideObject(updatedUnityRide); // to ajust the object
+    console.log('after custom results : ', customRide);
 
     tableName2manipulate = getTableName2Manipulate(customRide.RidePatNum);
-    thisRidePatDate = fixDate_WhichComeFromOpenConnection(customRide.Date);
-    thisRidePatLastModified = fixDate_WhichComeFromOpenConnection(customRide.LastModified);
+    thisRidePatDate = new Date(customRide.Date); //fixDate_WhichComeFromOpenConnection(customRide.Date);
+    console.log('after fix date(?) results : ', thisRidePatDate);
+
+    thisRidePatLastModified = new Date(customRide.LastModified); //fixDate_WhichComeFromOpenConnection(customRide.LastModified);
     tableNameRidePatShouldBeRender = getTableNameToBeRenderedIn(thisRidePatDate);
     if (tableName2manipulate !== tableNameRidePatShouldBeRender && tableNameRidePatShouldBeRender !== tableNames.NOT_RELEVANT) {
 
@@ -716,6 +727,54 @@ notification2.client.UnityRideUpdated = function (updatedUnityRide) {
                 }
                 break;
 
+
+            case tableNames.DAT_MORNING:
+                row2manipulate = tDATMorning.row(`#${customRide.RidePatNum}`).data();
+                row2manipulate.checkBoxesStr = `<input type="checkbox" class="checkboxClass" onchange="ChangeCheckboxRides(this)" id="check${customRide.RidePatNum}">`;
+                row2manipulate.date = thisRidePatDate.toLocaleDateString('he-IL');
+                row2manipulate.time = buildTimeHTML(thisRidePatDate, customRide.RidePatNum);
+                row2manipulate.origin = !isAssistant ? customRide.Origin.Name : customRide.Origin.EnglishName;
+                row2manipulate.destination = !isAssistant ? customRide.Destination.Name : customRide.Destination.EnglishName;
+                row2manipulate.patient = buildPatientHTML_AfterUnited(updatedUnityRide);
+                row2manipulate.driver = buildDriverHTML(customRide.RidePatNum, customRide.Drivers[0], customRide.RidePatNum);
+                row2manipulate.status = buildStatusString(customRide.Pat.RidePatPatientStatus, customRide.RidePatNum);
+                row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                row2manipulate.remark = buildRemarkHTML(customRide.Remark, customRide.RidePatNum);
+                row2manipulate.buttons = buildAcionsButtonsHTML(customRide.RidePatNum, customRide.Drivers);
+
+                tDATMorning.row(`#${customRide.RidePatNum}`).data(row2manipulate).draw('page');
+                increaseCounter(tableNames.DAT_MORNING, customRide.RidePatNum);
+
+                tr_nodesAsArray = Array.from(tDATMorning.rows().nodes());
+
+                if (customRide.Status == 'נמחקה') {
+                    tDATMorning.row(`#${customRide.RidePatNum}`).remove().draw()
+                }
+                break;
+
+            case tableNames.DAT_AFTERNOON:
+                row2manipulate = tDATAfternoon.row(`#${customRide.RidePatNum}`).data();
+                row2manipulate.checkBoxesStr = `<input type="checkbox" class="checkboxClass" onchange="ChangeCheckboxRides(this)" id="check${customRide.RidePatNum}">`;
+                row2manipulate.date = thisRidePatDate.toLocaleDateString('he-IL');
+                row2manipulate.time = buildTimeHTML(thisRidePatDate, customRide.RidePatNum);
+                row2manipulate.origin = !isAssistant ? customRide.Origin.Name : customRide.Origin.EnglishName;
+                row2manipulate.destination = !isAssistant ? customRide.Destination.Name : customRide.Destination.EnglishName;
+                row2manipulate.patient = buildPatientHTML_AfterUnited(updatedUnityRide);
+                row2manipulate.driver = buildDriverHTML(customRide.RidePatNum, customRide.Drivers[0], customRide.RidePatNum);
+                row2manipulate.status = buildStatusString(customRide.Pat.RidePatPatientStatus, customRide.RidePatNum);
+                row2manipulate.lastModified = thisRidePatLastModified.toLocaleString('he-IL', { dateStyle: "short", timeStyle: "short" });
+                row2manipulate.remark = buildRemarkHTML(customRide.Remark, customRide.RidePatNum);
+                row2manipulate.buttons = buildAcionsButtonsHTML(customRide.RidePatNum, customRide.Drivers);
+
+                tDATAfternoon.row(`#${customRide.RidePatNum}`).data(row2manipulate).draw('page');
+                increaseCounter(tableNames.DAT_AFTERNOON, customRide.RidePatNum);
+
+                tr_nodesAsArray = Array.from(tDATAfternoon.rows().nodes());
+
+                if (customRide.Status == 'נמחקה') {
+                    tDATAfternoon.row(`#${customRide.RidePatNum}`).remove().draw()
+                }
+                break;
 
             case tableNames.FUTURE:
 

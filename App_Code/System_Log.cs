@@ -25,20 +25,19 @@ public class System_Log
     bool valueIsDate;
     DateTime temp4values_asDate;
 
-    public List<System_Log> GetLogs(string timeRange)
+    public List<System_Log> GetLogs(string timeRange = null, DateTime? startDate = null, DateTime? endDate = null)
     {
-        const string query = "exec spLogTable_AutoTrackChanges_GetLogs @timeRange";
-
+        const string query = "exec spLogTable_AutoTrackChanges_GetLogs @startDate, @endDate, @timeRange";
         try
         {
             dbs = new DbService();
             List<System_Log> logs = new List<System_Log>();
-
             dbs.con.Open();
-
             using (SqlCommand cmd = new SqlCommand(query, dbs.con))
             {
-                cmd.Parameters.AddWithValue("@timeRange", timeRange);
+                cmd.Parameters.AddWithValue("@timeRange", (object)timeRange ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@startDate", (object)startDate ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@endDate", (object)endDate ?? DBNull.Value);
 
                 using (SqlDataReader sdr = cmd.ExecuteReader())
                 {
@@ -51,14 +50,11 @@ public class System_Log
                     int newValueIdx = sdr.GetOrdinal("NewValue");
                     int dateAddedIdx = sdr.GetOrdinal("DateAdded");
                     int timeAddedIdx = sdr.GetOrdinal("TimeAdded");
-
                     DateTime tempDate;
                     string tempVal;
-
                     while (sdr.Read())
                     {
                         System_Log log = new System_Log();
-
                         log.Id = sdr.GetInt32(idIdx);
                         log.WhoChanged = sdr.GetString(whoChangedIdx);
                         log.TableName = sdr.GetString(tableNameIdx);
@@ -66,7 +62,6 @@ public class System_Log
                         log.ColumnName = sdr.GetString(columnNameIdx);
                         log.DateAdded = sdr.GetDateTime(dateAddedIdx);
                         log.TimeAdded = sdr.GetTimeSpan(timeAddedIdx);
-
                         if (!sdr.IsDBNull(oldValueIdx))
                         {
                             tempVal = sdr.GetString(oldValueIdx);
@@ -75,7 +70,6 @@ public class System_Log
                             else
                                 log.OldValue = tempVal;
                         }
-
                         if (!sdr.IsDBNull(newValueIdx))
                         {
                             tempVal = sdr.GetString(newValueIdx);
@@ -84,7 +78,6 @@ public class System_Log
                             else
                                 log.NewValue = tempVal;
                         }
-
                         logs.Add(log);
                     }
                 }

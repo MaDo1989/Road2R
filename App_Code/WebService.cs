@@ -2836,11 +2836,14 @@ public class WebService : System.Web.Services.WebService
     #region System_Log Module
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     [WebMethod(EnableSession = true)]
-    public string GetLogs(string timeRange)
+    public string GetLogs(string timeRange = null, string startDate = null, string endDate = null)
     {
         try
         {
-            List<System_Log> logs = new System_Log().GetLogs(timeRange);
+            DateTime? start = string.IsNullOrEmpty(startDate) ? (DateTime?)null : DateTime.Parse(startDate);
+            DateTime? end = string.IsNullOrEmpty(endDate) ? (DateTime?)null : DateTime.Parse(endDate);
+
+            List<System_Log> logs = new System_Log().GetLogs(timeRange, start, end);
             return j.Serialize(logs);
         }
         catch (Exception ex)
@@ -2848,7 +2851,6 @@ public class WebService : System.Web.Services.WebService
             Log.Error("Error in GetLogs", ex);
             throw new Exception("Error in GetLogs ---> ex.Message: " + ex.Message);
         }
-
     }
     #endregion
 

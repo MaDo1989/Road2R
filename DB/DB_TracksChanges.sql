@@ -588,7 +588,32 @@ END
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+ALTER PROCEDURE [dbo].[spLogTable_AutoTrackChanges_GetLogs] 
+    @startDate datetime = NULL,
+    @endDate datetime = NULL,
+    @timeRange nvarchar(50) = NULL
+AS 
+BEGIN 
+    SET NOCOUNT ON;
 
+    -- אם נשלח timeRange, נחשב את הטווח אוטומטית
+    IF @timeRange IS NOT NULL
+    BEGIN
+        SET @endDate = GETDATE();
+        SET @startDate = 
+            CASE @timeRange
+                WHEN 'day'   THEN DATEADD(DAY,   -1, CAST(GETDATE() AS date))
+                WHEN 'week'  THEN DATEADD(WEEK,  -1, CAST(GETDATE() AS date))
+                WHEN 'month' THEN DATEADD(MONTH, -1, CAST(GETDATE() AS date))
+                WHEN 'year'  THEN DATEADD(YEAR,  -1, CAST(GETDATE() AS date))
+            END;
+    END
+
+    SELECT * 
+    FROM LogTable_AutoTrackChanges  
+    WHERE (@startDate IS NULL OR DateAdded >= @startDate)
+      AND (@endDate   IS NULL OR DateAdded <= @endDate);
+END
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

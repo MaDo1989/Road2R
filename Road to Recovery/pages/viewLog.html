@@ -31,6 +31,12 @@
     <!--sapir css-->
     <link href="assets/css/sapirCss.css" rel="stylesheet" />
     <link href="assets/css/viewLog.css" rel="stylesheet" />
+
+    <!-- Flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/he.js"></script>
+
     <script src="assets/js/CookiesFunctions.js"></script>
 
     <script src="assets/js/modernizr.min.js"></script>
@@ -59,6 +65,9 @@
         //checkCookie();
         let { convertDBDate2FrontEndDate } = GENERAL.USEFULL_FUNCTIONS;
         let { ajaxCall } = GENERAL.FETCH_DATA;
+
+        let startDatePicker, endDatePicker;
+        let datatable_systemLog;
 
         $(document).ready(function () {
 
@@ -130,6 +139,27 @@
                 }
             });
 
+            // Flatpickr initialization
+            startDatePicker = flatpickr("#startDate", {
+                locale: "he",
+                dateFormat: "Y-m-d",
+                maxDate: "today",
+                onChange: function (selectedDates, dateStr) {
+                    // מונע בחירת תאריך סיום לפני תאריך ההתחלה
+                    endDatePicker.set('minDate', dateStr);
+                }
+            });
+
+            endDatePicker = flatpickr("#endDate", {
+                locale: "he",
+                dateFormat: "Y-m-d",
+                maxDate: "today",
+                onChange: function (selectedDates, dateStr) {
+                    // מונע בחירת תאריך התחלה אחרי תאריך הסיום
+                    startDatePicker.set('maxDate', dateStr);
+                }
+            });
+
             refreshTable('day');
         });
 
@@ -166,16 +196,70 @@
         }
 
 
-        function refreshTable(timeRange) {
+        function onTimeRangeChange(value) {
+            if (value === 'custom') {
+                $('#customRangePanel').slideDown(200);
+                // לא מרעננים עד שהמשתמש יבחר תאריכים וילחץ "הצג"
+            } else {
+                $('#customRangePanel').slideUp(200);
+                refreshTable(value);
+            }
+        }
 
-            let timeRangeObj = { timeRange };
+        function applyCustomRange() {
+            let start = $('#startDate').val();
+            let end = $('#endDate').val();
+
+            if (!start || !end) {
+                swal("חסר מידע", "יש לבחור גם תאריך התחלה וגם תאריך סיום", "warning");
+                return;
+            }
+
+            // שולחים את תאריך הסיום כסוף היום כדי לכלול את כל הלוגים של אותו יום
+            let startDateTime = start + ' 00:00:00';
+            let endDateTime = end + ' 23:59:59';
+
+            // בדיקת טווח - אם יותר מחצי שנה, מציגים אזהרה
+            let startObj = new Date(start);
+            let endObj = new Date(end);
+            let diffInDays = (endObj - startObj) / (1000 * 60 * 60 * 24);
+
+            if (diffInDays > 183) { // ~6 חודשים
+                swal({
+                    title: "טווח זמן ארוך",
+                    text: "בחרת טווח של יותר מחצי שנה. שליפת מידע בטווח כזה עלולה לקחת זמן רב ולעיתים אף להיכשל עקב עומס. האם להמשיך?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "המשך בכל זאת",
+                    cancelButtonText: "ביטול",
+                    closeOnConfirm: true
+                }, function (isConfirm) {
+                    if (isConfirm) {
+                        refreshTable(null, startDateTime, endDateTime);
+                    }
+                });
+            } else {
+                refreshTable(null, startDateTime, endDateTime);
+            }
+        }
+
+
+        function refreshTable(timeRange, startDate, endDate) {
+
+            let payload = {
+                timeRange: timeRange || null,
+                startDate: startDate || null,
+                endDate: endDate || null
+            };
+
             $('#wait').show();
             $.ajax({
                 dataType: "json",
                 url: "WebService.asmx/GetLogs",
                 contentType: "application/json; charset=utf-8",
                 type: "POST",
-                data: JSON.stringify(timeRangeObj),
+                data: JSON.stringify(payload),
 
                 success: function (data) {
                     $('#wait').hide();
@@ -507,29 +591,48 @@
                             <!--check boxs for filtering-->
                             <!--  <input id="thisUser" type="checkbox" checked="checked" onchange="refreshTable(document.getElementById('hourSelect').value)">-->
                             <!--<label for="thisUser">
-                        הודעות שלי בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
-                    </label>-->
+                                הודעות שלי בלבד  &nbsp;&nbsp;|&nbsp;&nbsp;
+                            </label>-->
                             <!--<input id="canceldRides" type="checkbox" onchange="refreshTable(document.getElementById('hourSelect').value)">
-                    <label for="canceldRides">
-                        הסעות שבוטלו  &nbsp;&nbsp;|&nbsp;&nbsp;
-                    </label>
-                    <input id="changedStatus" type="checkbox" onchange="refreshTable(document.getElementById('hourSelect').value)">
-                    <label for="changedStatus">
-                        שינוי סטטוס  &nbsp;&nbsp;|&nbsp;&nbsp;
-                    </label>-->
+                            <label for="canceldRides">
+                                הסעות שבוטלו  &nbsp;&nbsp;|&nbsp;&nbsp;
+                            </label>
+                            <input id="changedStatus" type="checkbox" onchange="refreshTable(document.getElementById('hourSelect').value)">
+                            <label for="changedStatus">
+                                שינוי סטטוס  &nbsp;&nbsp;|&nbsp;&nbsp;
+                            </label>-->
 
 
                             <div class="card-box table-responsive" id="log">
-                                <div class="col-sm-1">
-                                    <p style="font-size: initial;">טווח זמן: </p>
-                                </div>
-                                <div class="col-sm-3">
-                                    <select id="hourSelect" class="form-control" aria-required="true" aria-invalid="false" onchange="refreshTable(this.value)">
-                                        <option value="day">היום</option>
-                                        <option value="week">שבוע אחורה</option>
-                                        <option value="month">חודש אחורה</option>
-                                        <option value="year">שנה אחורה</option>
-                                    </select>
+                                <div class="row" style="margin-bottom: 15px;">
+                                    <div class="col-sm-1">
+                                        <p style="font-size: initial; margin-top: 8px;">טווח זמן: </p>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <select id="hourSelect" class="form-control" aria-required="true" aria-invalid="false" onchange="onTimeRangeChange(this.value)">
+                                            <option value="day">היום</option>
+                                            <option value="week">שבוע אחורה</option>
+                                            <option value="month">חודש אחורה</option>
+                                            <option value="custom">טווח מותאם...</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- פאנל טווח מותאם - מוסתר כברירת מחדל -->
+                                    <div id="customRangePanel" class="col-sm-8" style="display:none;">
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <input type="text" id="startDate" class="form-control" placeholder="מתאריך..." readonly>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <input type="text" id="endDate" class="form-control" placeholder="עד תאריך..." readonly>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <button class="btn btn-primary waves-effect waves-light" onclick="applyCustomRange()">
+                                                    <i class="md md-search"></i> הצג
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <table id="datatable_systemLog" class="table table-striped table-bordered">

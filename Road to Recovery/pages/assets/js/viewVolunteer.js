@@ -241,6 +241,8 @@ function refreshTable() {
             if (activeChangedFlag == false) {
                 $('#DocumentedCallsModal .modal-body')[0].innerHTML += `<button onclick="ManageAbsenceToggle(this)" class="AbsenceBtn btn waves-effect btn-primary">ניהול היעדרויות</button>`;
             }
+            $('#pastePhone').focus();
+
         },
         error: function (err) {
             alert("Error in getVolunteers: " + err.responseText);

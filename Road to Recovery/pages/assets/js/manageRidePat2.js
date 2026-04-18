@@ -631,6 +631,12 @@ const updateRidePatTime = () => {
 
 }
 
+function formatDateTimeForServer(date) {
+    const pad = n => String(n).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+}
+
+
 //new Api
 const updateUnityRideTime = () => {
 
@@ -656,6 +662,7 @@ const updateUnityRideTime = () => {
     let ridepatToManipulate = arr_rides.find(r => r.RidePatNum === _ridepatToManipulate);
     let dateToManipulate = convertDBDate2FrontEndDate(ridepatToManipulate.PickupTime);
     dateToManipulate.setHours(hours, minutes);
+    dateToManipulate = formatDateTimeForServer(dateToManipulate);
     const userName = GENERAL.USER.getUserDisplayName();
 
     let data = {
@@ -664,6 +671,7 @@ const updateUnityRideTime = () => {
         userName: userName
     };
 
+    console.log('the data before send it 2 :', data);
     const updateUnityRideTime_SCB = () => {
 
         $('#wait').hide();
@@ -2902,7 +2910,6 @@ const refreshTable_splitRide = (timeInterval = 7) => {
         datAfternoon: { loaded: false, data: [] },
         future: { loaded: false, data: [] }
     };
-
     // Initialize arr_rides as empty (will be populated as data arrives)
     arr_rides = [];
     listRowstoColor = [];
@@ -4632,8 +4639,11 @@ function prepreparationEditTimeModal(thisBtn, ridepatNum) {
     BuildTimeDDLs('hours', 'minutes');
 
     const ridepatObject = arr_rides.find(r => r.RidePatNum === ridepatNum);
-    const ridePatTime = convertDBDate2FrontEndDate(ridepatObject.PickupTime);
-
+    console.log('before convert : ', ridepatObject.PickupTime);
+    const raw = ridepatObject.PickupTime; // "2026-04-19T08:15:00+00:00"
+    const withoutOffset = raw.replace(/[+-]\d{2}:\d{2}$/, '');
+    const ridePatTime = new Date(withoutOffset); //convertDBDate2FrontEndDate(ridepatObject.PickupTime);
+    console.log('after convert : ', ridePatTime);
     let hoursAsDoubleDigits = createDoubleDigit(ridePatTime.getHours());
     let minutesAsDoubleDigits = createDoubleDigit(ridePatTime.getMinutes());
     let isAfterNoon = parseInt(minutesAsDoubleDigits) === afternoonIndicator;
@@ -5151,7 +5161,7 @@ const messageForPalCoor = () => {
 const ChangeCheckboxRides = (checkbox) => {
     let arrlocal = [];
     if (checkbox.checked && checkbox.id != 'AllChecks') {
-        checkbox.parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important')
+        checkbox.parentNode.parentNode.style.setProperty('border', '3px solid #7152d3', 'important')
         //checkbox.parentNode.parentNode.parnetNode.parnetNode.style.setProperty('border-collapse', 'none', 'important')
 
     }
@@ -5161,37 +5171,40 @@ const ChangeCheckboxRides = (checkbox) => {
     if (checkbox.id == 'AllChecks') {
         let tableName = checkbox.parentNode.parentNode.parentNode.parentNode.id;
         if (tableName == 'datatable-morning') {
-            for (var i = 0; i < morningRidePats.length; i++) {
-                $(`#check${morningRidePats[i].ridePatNum}`).prop("checked", checkbox.checked);
-                checkbox.checked ? $(`#check${morningRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important') : $(`#check${morningRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
+            for (var i = 0; i < splitRideLoadingState.morning.data.length; i++) {
+                $(`#check${splitRideLoadingState.morning.data[i].RidePatNum}`).prop("checked", checkbox.checked);
+                checkbox.checked ? $(`#check${splitRideLoadingState.morning.data[i].RidePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '3px solid #7152d3', 'important') : $(`#check${splitRideLoadingState.morning.data[i].RidePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
             }
-
         }
         if (tableName == 'datatable-afternoon') {
-            for (var i = 0; i < afterNoonRidePats.length; i++) {
-                $(`#check${afterNoonRidePats[i].ridePatNum}`).prop("checked", checkbox.checked)
-                checkbox.checked ? $(`#check${afterNoonRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important') : $(`#check${afterNoonRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
-
+            for (var i = 0; i < splitRideLoadingState.afternoon.data.length; i++) {
+                $(`#check${splitRideLoadingState.afternoon.data[i].RidePatNum}`).prop("checked", checkbox.checked)
+                checkbox.checked ? $(`#check${splitRideLoadingState.afternoon.data[i].RidePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '3px solid #7152d3', 'important') : $(`#check${splitRideLoadingState.afternoon.data[i].RidePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
             }
-
         }
-
         if (tableName == 'datatable-tomorrow-morning') {
-            for (var i = 0; i < tomorrowMorningRidePats.length; i++) {
-                $(`#check${tomorrowMorningRidePats[i].ridePatNum}`).prop("checked", checkbox.checked)
-                checkbox.checked ? $(`#check${tomorrowMorningRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important') : $(`#check${tomorrowMorningRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
-
+            for (var i = 0; i < splitRideLoadingState.tomorrowMorning.data.length; i++) {
+                $(`#check${splitRideLoadingState.tomorrowMorning.data[i].RidePatNum}`).prop("checked", checkbox.checked)
+                checkbox.checked ? $(`#check${splitRideLoadingState.tomorrowMorning.data[i].RidePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '3px solid #7152d3', 'important') : $(`#check${splitRideLoadingState.tomorrowMorning.data[i].RidePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
             }
-
         }
-
         if (tableName == 'datatable-tomorrow-afternoon') {
-            for (var i = 0; i < tomorrowAfternoonRidePats.length; i++) {
-                $(`#check${tomorrowAfternoonRidePats[i].ridePatNum}`).prop("checked", checkbox.checked)
-                checkbox.checked ? $(`#check${tomorrowAfternoonRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important') : $(`#check${tomorrowAfternoonRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
-
+            for (var i = 0; i < splitRideLoadingState.tomorrowAfternoon.data.length; i++) {
+                $(`#check${splitRideLoadingState.tomorrowAfternoon.data[i].RidePatNum}`).prop("checked", checkbox.checked)
+                checkbox.checked ? $(`#check${splitRideLoadingState.tomorrowAfternoon.data[i].RidePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '3px solid #7152d3', 'important') : $(`#check${splitRideLoadingState.tomorrowAfternoon.data[i].RidePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
             }
-
+        }
+        if (tableName == "datatable-dat-morning") {
+            for (var i = 0; i < splitRideLoadingState.datMorning.data.length; i++) {
+                $(`#check${splitRideLoadingState.datMorning.data[i].RidePatNum}`).prop("checked", checkbox.checked)
+                checkbox.checked ? $(`#check${splitRideLoadingState.datMorning.data[i].RidePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '3px solid #7152d3', 'important') : $(`#check${splitRideLoadingState.datMorning.data[i].RidePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
+            }
+        }
+        if (tableName == "datatable-dat-afternoon") {
+            for (var i = 0; i < splitRideLoadingState.datAfternoon.data.length; i++) {
+                $(`#check${splitRideLoadingState.datAfternoon.data[i].RidePatNum}`).prop("checked", checkbox.checked)
+                checkbox.checked ? $(`#check${splitRideLoadingState.datAfternoon.data[i].RidePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '3px solid #7152d3', 'important') : $(`#check${splitRideLoadingState.datAfternoon.data[i].RidePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
+            }
         }
 
 
@@ -5203,14 +5216,14 @@ const ChangeCheckboxRides = (checkbox) => {
             var currentPageNodes = table.rows({ page: 'current' }).nodes();
 
             $(currentPageNodes).each(function (index, node) {
-                for (var i = 0; i < futureRidePats.length; i++) {
-                    var checkboxId = `#check${futureRidePats[i].ridePatNum}`;
+                for (var i = 0; i < splitRideLoadingState.future.data.length; i++) {
+                    var checkboxId = `#check${splitRideLoadingState.future.data[i].RidePatNum}`;
                     var rowCheckbox = $(node).find(checkboxId);
 
                     if (rowCheckbox.length) {
                         rowCheckbox.prop("checked", checkbox.checked);
                         if (checkbox.checked) {
-                            rowCheckbox[0].parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important');
+                            rowCheckbox[0].parentNode.parentNode.style.setProperty('border', '3px solid #7152d3', 'important');
                         } else {
                             rowCheckbox[0].parentNode.parentNode.style.setProperty('border', 'none', 'important');
                         }
