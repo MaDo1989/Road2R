@@ -212,7 +212,7 @@ GO
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-/****** Object:  StoredProcedure [dbo].[sp_getUnityRidesSplit]    Script Date: 2/11/2026 5:01:21 PM ******/
+/****** Object:  StoredProcedure [dbo].[sp_getUnityRidesSplit]    Script Date: 4/19/2026 6:46:19 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -254,13 +254,13 @@ BEGIN
             AND (
                 (
                     @isAfternoon = 1 
-                    AND (DATEPART(MINUTE, u.PickupTime) = 14 OR DATEPART(HOUR, u.PickupTime) >= 10)
+                    AND (DATEPART(MINUTE, u.PickupTime) = 14 OR DATEPART(HOUR, u.PickupTime) >= 12)
                 )
                 OR
                 (
                     ISNULL(@isAfternoon, 0) = 0 
                     AND DATEPART(MINUTE, u.PickupTime) <> 14 
-                    AND DATEPART(HOUR, u.PickupTime) < 10
+                    AND DATEPART(HOUR, u.PickupTime) < 12
                 )
             )
     END
@@ -289,6 +289,10 @@ BEGIN
         SELECT -1 AS RidePatNum, 'Error @isFutureTable is not defined' AS error
     END
 END
+
+
+
+
 
 
 
