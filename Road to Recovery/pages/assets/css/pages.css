@@ -1339,7 +1339,8 @@ h3.timeline-title {
 .checkboxClass{
     width:18px;
     height:18px;
-    text-align:center
+    text-align:center;
+    cursor:pointer;
 }
 
 .toggleTitle{

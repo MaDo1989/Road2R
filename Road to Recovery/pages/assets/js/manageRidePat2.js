@@ -2242,6 +2242,7 @@ const renderMorningTable = (data, arrayOf_IHaveSeenAllready) => {
         data: data,
         rowId: 'ridePatNum',
         dom: controllersLayout,
+        order: [], 
         buttons: [{
             extend: 'excelHtml5',
             text: 'ייצוא לאקסל',
@@ -2266,7 +2267,6 @@ const renderMorningTable = (data, arrayOf_IHaveSeenAllready) => {
             { data: "buttons" },
         ],
         columnDefs: [
-            { "targets": [0], "orderable": false },
             { width: '5%', "targets": [0, 1, 2, 5, 6, 7, 8] },
             { width: '2%', "targets": [5] },
             { width: '15%', "targets": [4] },
@@ -2314,7 +2314,7 @@ const renderMorningTable = (data, arrayOf_IHaveSeenAllready) => {
             { targets: 8, className: 'last-modified_td' },
             { targets: 8, type: 'last_modifiedSort' },
             { "targets": [10], visible: false },
-            { targets: [11], orderable: false },
+            { targets: [11,0], orderable: false },
             { targets: [0], className: 'text-center' }
         ],
         createdRow: function (row, data, dataIndex) {
@@ -2330,6 +2330,7 @@ const renderAfternoonTable = (data, arrayOf_IHaveSeenAllready) => {
     tAfternoon = $(`#${tableNames.AFTERNOON}`).DataTable({
         rowId: 'ridePatNum',
         dom: controllersLayout,
+        order: [], 
         buttons: [{
             extend: 'excelHtml5',
             text: 'ייצוא לאקסל',
@@ -2436,6 +2437,7 @@ const renderTomorrowMorningTable = (data, arrayOf_IHaveSeenAllready) => {
     tTomorrowMorning = $(`#${tableNames.TOMORROW_MORNING}`).DataTable({
         rowId: 'ridePatNum',
         dom: controllersLayout,
+        order: [], 
         buttons: [{
             extend: 'excelHtml5',
             text: 'ייצוא לאקסל',
@@ -2534,6 +2536,7 @@ const renderTomorrowAfternoonTable = (data, arrayOf_IHaveSeenAllready) => {
     tTomorrowAfternoon = $(`#${tableNames.TOMORROW_AFTERNOON}`).DataTable({
         rowId: 'ridePatNum',
         dom: controllersLayout,
+        order: [], 
         buttons: [{
             extend: 'excelHtml5',
             text: 'ייצוא לאקסל',
@@ -2632,6 +2635,7 @@ const renderDATMorningTable = (data, arrayOf_IHaveSeenAllready) => {
     tDATMorning = $(`#${tableNames.DAT_MORNING}`).DataTable({
         rowId: 'ridePatNum',
         dom: controllersLayout,
+        order: [], 
         buttons: [{
             extend: 'excelHtml5',
             text: 'ייצוא לאקסל',
@@ -2730,6 +2734,7 @@ const renderDATAfternoonTable = (data, arrayOf_IHaveSeenAllready) => {
     tDATAfternoon = $(`#${tableNames.DAT_AFTERNOON}`).DataTable({
         rowId: 'ridePatNum',
         dom: controllersLayout,
+        order: [], 
         buttons: [{
             extend: 'excelHtml5',
             text: 'ייצוא לאקסל',
@@ -2828,6 +2833,7 @@ const renderFutureTable = (data, arrayOf_IHaveSeenAllready) => {
     tFuture = $(`#${tableNames.FUTURE}`).DataTable({
         rowId: 'ridePatNum',
         dom: controllersLayoutForFutureTable,
+        order: [], 
         fnInitComplete: function (x) {
             buildHtmlSelectTimeInterval();
         },
@@ -2964,6 +2970,10 @@ const refreshTable_splitRide = (timeInterval = 7) => {
         ];
         GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
     };
+
+    Object.keys(localStorage)
+        .filter(k => k.startsWith('DataTables'))
+        .forEach(k => { console.log('deleting:', k); localStorage.removeItem(k); });
 
     // 1. Today Morning
     $.ajax({
@@ -5157,79 +5167,102 @@ const messageForPalCoor = () => {
 }
 
 
-// this is the function that rememeber and collect the checked checkboxes for any functionality.
+// פונקציית עזר - מטפלת בצורה בטוחה בעדכון checkbox ובורדר
+const setCheckAndBorder = (ridePatNum, isChecked) => {
+    const $cb = $(`#check${ridePatNum}`);
+    if (!$cb.length) {
+        console.warn(`Checkbox #check${ridePatNum} not found in DOM`);
+        return;
+    }
+    const row = $cb[0]?.parentNode?.parentNode;
+    if (!row) {
+        console.warn(`Could not find parent row for #check${ridePatNum}`);
+        return;
+    }
+    $cb.prop("checked", isChecked);
+    row.style.setProperty('border', isChecked ? '3px solid #7152d3' : 'none', 'important');
+};
+
 const ChangeCheckboxRides = (checkbox) => {
     let arrlocal = [];
-    if (checkbox.checked && checkbox.id != 'AllChecks') {
-        checkbox.parentNode.parentNode.style.setProperty('border', '3px solid #7152d3', 'important')
-        //checkbox.parentNode.parentNode.parnetNode.parnetNode.style.setProperty('border-collapse', 'none', 'important')
 
+    if (checkbox.checked && checkbox.id != 'AllChecks') {
+        checkbox.parentNode.parentNode.style.setProperty('border', '3px solid #7152d3', 'important');
+    } else {
+        checkbox.parentNode.parentNode.style.setProperty('border', 'none', 'important');
     }
-    else {
-        checkbox.parentNode.parentNode.style.setProperty('border', 'none', 'important')
-    }
+
     if (checkbox.id == 'AllChecks') {
         let tableName = checkbox.parentNode.parentNode.parentNode.parentNode.id;
+
         if (tableName == 'datatable-morning') {
             for (var i = 0; i < splitRideLoadingState.morning.data.length; i++) {
-                $(`#check${splitRideLoadingState.morning.data[i].RidePatNum}`).prop("checked", checkbox.checked);
-                checkbox.checked ? $(`#check${splitRideLoadingState.morning.data[i].RidePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '3px solid #7152d3', 'important') : $(`#check${splitRideLoadingState.morning.data[i].RidePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
+                const ridePatNum = splitRideLoadingState.morning.data[i]?.RidePatNum;
+                if (ridePatNum == null) continue;
+                setCheckAndBorder(ridePatNum, checkbox.checked);
             }
         }
+
         if (tableName == 'datatable-afternoon') {
             for (var i = 0; i < splitRideLoadingState.afternoon.data.length; i++) {
-                $(`#check${splitRideLoadingState.afternoon.data[i].RidePatNum}`).prop("checked", checkbox.checked)
-                checkbox.checked ? $(`#check${splitRideLoadingState.afternoon.data[i].RidePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '3px solid #7152d3', 'important') : $(`#check${splitRideLoadingState.afternoon.data[i].RidePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
+                const ridePatNum = splitRideLoadingState.afternoon.data[i]?.RidePatNum;
+                if (ridePatNum == null) continue;
+                setCheckAndBorder(ridePatNum, checkbox.checked);
             }
         }
+
         if (tableName == 'datatable-tomorrow-morning') {
             for (var i = 0; i < splitRideLoadingState.tomorrowMorning.data.length; i++) {
-                $(`#check${splitRideLoadingState.tomorrowMorning.data[i].RidePatNum}`).prop("checked", checkbox.checked)
-                checkbox.checked ? $(`#check${splitRideLoadingState.tomorrowMorning.data[i].RidePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '3px solid #7152d3', 'important') : $(`#check${splitRideLoadingState.tomorrowMorning.data[i].RidePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
+                const ridePatNum = splitRideLoadingState.tomorrowMorning.data[i]?.RidePatNum;
+                if (ridePatNum == null) continue;
+                setCheckAndBorder(ridePatNum, checkbox.checked);
             }
         }
+
         if (tableName == 'datatable-tomorrow-afternoon') {
             for (var i = 0; i < splitRideLoadingState.tomorrowAfternoon.data.length; i++) {
-                $(`#check${splitRideLoadingState.tomorrowAfternoon.data[i].RidePatNum}`).prop("checked", checkbox.checked)
-                checkbox.checked ? $(`#check${splitRideLoadingState.tomorrowAfternoon.data[i].RidePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '3px solid #7152d3', 'important') : $(`#check${splitRideLoadingState.tomorrowAfternoon.data[i].RidePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
+                const ridePatNum = splitRideLoadingState.tomorrowAfternoon.data[i]?.RidePatNum;
+                if (ridePatNum == null) continue;
+                setCheckAndBorder(ridePatNum, checkbox.checked);
             }
         }
-        if (tableName == "datatable-dat-morning") {
+
+        if (tableName == 'datatable-dat-morning') {
             for (var i = 0; i < splitRideLoadingState.datMorning.data.length; i++) {
-                $(`#check${splitRideLoadingState.datMorning.data[i].RidePatNum}`).prop("checked", checkbox.checked)
-                checkbox.checked ? $(`#check${splitRideLoadingState.datMorning.data[i].RidePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '3px solid #7152d3', 'important') : $(`#check${splitRideLoadingState.datMorning.data[i].RidePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
+                const ridePatNum = splitRideLoadingState.datMorning.data[i]?.RidePatNum;
+                if (ridePatNum == null) continue;
+                setCheckAndBorder(ridePatNum, checkbox.checked);
             }
         }
-        if (tableName == "datatable-dat-afternoon") {
+
+        if (tableName == 'datatable-dat-afternoon') {
             for (var i = 0; i < splitRideLoadingState.datAfternoon.data.length; i++) {
-                $(`#check${splitRideLoadingState.datAfternoon.data[i].RidePatNum}`).prop("checked", checkbox.checked)
-                checkbox.checked ? $(`#check${splitRideLoadingState.datAfternoon.data[i].RidePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '3px solid #7152d3', 'important') : $(`#check${splitRideLoadingState.datAfternoon.data[i].RidePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
+                const ridePatNum = splitRideLoadingState.datAfternoon.data[i]?.RidePatNum;
+                if (ridePatNum == null) continue;
+                setCheckAndBorder(ridePatNum, checkbox.checked);
             }
         }
-
-
 
         if (tableName == 'datatable-future') {
             var table = $('#datatable-future').DataTable();
-
-            // מקבל את השורות בעמוד הנוכחי
             var currentPageNodes = table.rows({ page: 'current' }).nodes();
 
             $(currentPageNodes).each(function (index, node) {
                 for (var i = 0; i < splitRideLoadingState.future.data.length; i++) {
-                    var checkboxId = `#check${splitRideLoadingState.future.data[i].RidePatNum}`;
-                    var rowCheckbox = $(node).find(checkboxId);
+                    const ridePatNum = splitRideLoadingState.future.data[i]?.RidePatNum;
+                    if (ridePatNum == null) continue;
 
-                    if (rowCheckbox.length) {
-                        rowCheckbox.prop("checked", checkbox.checked);
-                        if (checkbox.checked) {
-                            rowCheckbox[0].parentNode.parentNode.style.setProperty('border', '3px solid #7152d3', 'important');
-                        } else {
-                            rowCheckbox[0].parentNode.parentNode.style.setProperty('border', 'none', 'important');
-                        }
-                    }
+                    const $cb = $(node).find(`#check${ridePatNum}`);
+                    if (!$cb.length) continue;
+
+                    const row = $cb[0]?.parentNode?.parentNode;
+                    if (!row) continue;
+
+                    $cb.prop("checked", checkbox.checked);
+                    row.style.setProperty('border', checkbox.checked ? '3px solid #7152d3' : 'none', 'important');
                 }
             });
+
             if (checkbox.checked) {
                 swal({
                     title: "שימו לב",
@@ -5239,76 +5272,29 @@ const ChangeCheckboxRides = (checkbox) => {
                     showConfirmButton: false
                 });
             }
-
-
-
         }
-
-
-
-
-        // in this way all the checkboxes in all pages will be mark !!!! but i dont know if it is good idea
-        //if (tableName == 'datatable-future') {
-        //    var table = $('#datatable-future').DataTable();
-
-        //    // עובר על כל השורות בטבלה, לא משנה באיזה עמוד הן נמצאות
-        //    table.rows().every(function () {
-        //        var rowNode = this.node();
-        //        var rowData = this.data();
-
-        //        // מחפש את ה-checkbox בשורה הנוכחית
-        //        var rowCheckbox = $(rowNode).find(`#check${rowData.ridePatNum}`);
-
-        //        if (rowCheckbox.length) {
-        //            // מעדכן את מצב ה-checkbox
-        //            rowCheckbox.prop("checked", checkbox.checked);
-
-        //            // מעדכן את הבורדר
-        //            if (checkbox.checked) {
-        //                rowCheckbox[0].parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important');
-        //            } else {
-        //                rowCheckbox[0].parentNode.parentNode.style.setProperty('border', 'none', 'important');
-        //            }
-        //        }
-        //    });
-        //}
-
-
-
-        // the old way for future rides
-        //if (tableName == 'datatable-future') {
-        //    for (var i = 0; i < futureRidePats.length; i++) {
-        //        $(`#check${futureRidePats[i].ridePatNum}`).prop("checked", checkbox.checked)
-        //        checkbox.checked ? $(`#check${futureRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', '2px solid #7152d3', 'important') : $(`#check${futureRidePats[i].ridePatNum}`)[0].parentNode.parentNode.style.setProperty('border', 'none', 'important')
-
-        //    }
-
-        //}
-
     }
-
 
     $('.checkboxClass').each(function () {
         if (this.checked && this.id != 'AllChecks') {
             arrlocal.push(parseInt(this.id.replace("check", "")));
         }
     });
+
     checkboxesRides = arrlocal;
+
     if (checkboxesRides.length == 0) {
         $('.toggleTitle').hide();
         $('#deleteFewRidesButton').prop('disabled', true);
         $('#messageCoorBTN').prop('disabled', true);
-
-    }
-    else {
+    } else {
         $('.toggleTitle').show();
         $('#deleteFewRidesButton').prop('disabled', false);
         $('#messageCoorBTN').prop('disabled', false);
-
     }
-    $('#NumofRideChecksText').text(checkboxesRides.length);
 
-}
+    $('#NumofRideChecksText').text(checkboxesRides.length);
+};
 
 
 const DeleteMarkedRides = () => {
