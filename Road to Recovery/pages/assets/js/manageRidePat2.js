@@ -671,7 +671,7 @@ const updateUnityRideTime = () => {
         userName: userName
     };
 
-    console.log('the data before send it 2 :', data);
+    //console.log('the data before send it 2 :', data);
     const updateUnityRideTime_SCB = () => {
 
         $('#wait').hide();
@@ -2973,7 +2973,7 @@ const refreshTable_splitRide = (timeInterval = 7) => {
 
     Object.keys(localStorage)
         .filter(k => k.startsWith('DataTables'))
-        .forEach(k => { console.log('deleting:', k); localStorage.removeItem(k); });
+        .forEach(k => { localStorage.removeItem(k); });
 
     // 1. Today Morning
     $.ajax({

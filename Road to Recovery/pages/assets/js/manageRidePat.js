@@ -616,11 +616,11 @@ notification2.client.UnityRideUpdated = function (updatedUnityRide) {
     }
 
     let customRide = CustomRideObject(updatedUnityRide); // to ajust the object
-    console.log('after custom results : ', customRide);
+    //console.log('after custom results : ', customRide);
 
     tableName2manipulate = getTableName2Manipulate(customRide.RidePatNum);
     thisRidePatDate = new Date(customRide.Date); //fixDate_WhichComeFromOpenConnection(customRide.Date);
-    console.log('after fix date(?) results : ', thisRidePatDate);
+    //console.log('after fix date(?) results : ', thisRidePatDate);
 
     thisRidePatLastModified = new Date(customRide.LastModified); //fixDate_WhichComeFromOpenConnection(customRide.LastModified);
     tableNameRidePatShouldBeRender = getTableNameToBeRenderedIn(thisRidePatDate);
