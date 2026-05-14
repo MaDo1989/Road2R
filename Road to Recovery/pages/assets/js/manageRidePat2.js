@@ -660,7 +660,8 @@ const updateUnityRideTime = () => {
     }
 
     let ridepatToManipulate = arr_rides.find(r => r.RidePatNum === _ridepatToManipulate);
-    let dateToManipulate = convertDBDate2FrontEndDate(ridepatToManipulate.PickupTime);
+    let dateToManipulate = new Date(ridepatToManipulate.PickupTime) // convertDBDate2FrontEndDate(ridepatToManipulate.PickupTime);
+    //console.log('dateToManipulate ', dateToManipulate, ridepatToManipulate.PickupTime)
     dateToManipulate.setHours(hours, minutes);
     dateToManipulate = formatDateTimeForServer(dateToManipulate);
     const userName = GENERAL.USER.getUserDisplayName();
@@ -671,7 +672,7 @@ const updateUnityRideTime = () => {
         userName: userName
     };
 
-    //console.log('the data before send it 2 :', data);
+    console.log('the data before send it 2 :', data);
     const updateUnityRideTime_SCB = () => {
 
         $('#wait').hide();
@@ -1430,7 +1431,7 @@ function copyMessageButton(copyMsgBtn, table) {
 
     if (!messageObject.date.includes('Date')) {
 
-        const dateTicks = fixDate_WhichComeFromOpenConnection(messageObject.date, false);
+        const dateTicks = new Date(messageObject.date).getTime()
         messageObject.date = repaireDateForMeesageModule(dateTicks);
     }
     let textMessageToCopy = buildMessage(messageObject);
@@ -4644,29 +4645,32 @@ function prepreparationAssignDriverModal(thisBtn, ridePatNum, isDriverReplacemen
 function prepreparationEditTimeModal(thisBtn, ridepatNum) {
     _ridepatToManipulate = ridepatNum
     highLightRow(thisBtn);
-
     $('#editTimeModalTitle').text('עדכון שעת הסעה');
     BuildTimeDDLs('hours', 'minutes');
-
     const ridepatObject = arr_rides.find(r => r.RidePatNum === ridepatNum);
     console.log('before convert : ', ridepatObject.PickupTime);
-    const raw = ridepatObject.PickupTime; // "2026-04-19T08:15:00+00:00"
-    const withoutOffset = raw.replace(/[+-]\d{2}:\d{2}$/, '');
-    const ridePatTime = new Date(withoutOffset); //convertDBDate2FrontEndDate(ridepatObject.PickupTime);
+    const raw = ridepatObject.PickupTime;
+
+    let ridePatTime;
+    if (/^\/Date\((\d+)\)\/$/.test(raw)) {
+        const ms = parseInt(raw.match(/\d+/)[0]);
+        ridePatTime = new Date(ms);
+    } else {
+        const withoutOffset = raw.replace(/[+-]\d{2}:\d{2}$/, '');
+        ridePatTime = new Date(withoutOffset);
+    }
+
     console.log('after convert : ', ridePatTime);
     let hoursAsDoubleDigits = createDoubleDigit(ridePatTime.getHours());
     let minutesAsDoubleDigits = createDoubleDigit(ridePatTime.getMinutes());
     let isAfterNoon = parseInt(minutesAsDoubleDigits) === afternoonIndicator;
     let $hoursSelect = $('#hours');
     let $minutesSelect = $('#minutes');
-
     if (!isAfterNoon) {
-
         $hoursSelect.val(hoursAsDoubleDigits);
         $minutesSelect.val(minutesAsDoubleDigits);
         checkeditTimeAfterNoonCB(false);
     } else {
-
         retrieveDDLToInitial('#hours');
         retrieveDDLToInitial('#minutes');
         checkeditTimeAfterNoonCB(true);

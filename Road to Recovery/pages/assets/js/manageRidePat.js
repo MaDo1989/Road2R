@@ -194,6 +194,10 @@ const getTableNameToBeRenderedIn = (ridepatDate) => {
         tableName = tableNames.NOT_RELEVANT;
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
+
+        const dat_after_tom = new Date();
+        dat_after_tom.setDate(dat_after_tom.getDate() + 2);
+
         if (ridepatDate.toLocaleDateString() === tomorrow.toLocaleDateString()) { //<---- tomorrow
             if (ridepatDate.getHours() < 12 && ridepatDate.getMinutes() != 14) {
 
@@ -201,6 +205,15 @@ const getTableNameToBeRenderedIn = (ridepatDate) => {
             } else {
 
                 tableName = tableNames.TOMORROW_AFTERNOON;
+            }
+        }
+        else if (ridepatDate.toLocaleDateString() == dat_after_tom.toLocaleDateString()) {
+            if (ridepatDate.getHours() < 12 && ridepatDate.getMinutes() != 14) {
+
+                tableName = tableNames.DAT_MORNING
+            } else {
+
+                tableName = tableNames.DAT_AFTERNOON;
             }
         }
     }
@@ -288,6 +301,15 @@ const removeRidePatFromOldTable = (tableNameRidePatIsNowIn, updated_ridePat) => 
         case tableNames.TOMORROW_AFTERNOON:
             row2manipulate = tTomorrowAfternoon.row(`#${updated_ridePat.RidePatNum}`).data();
             tTomorrowAfternoon.row(`#${updated_ridePat.RidePatNum}`).remove().draw(false);
+            break;
+
+        case tableNames.DAT_MORNING:
+            row2manipulate = tDATMorning.row(`#${updated_ridePat.RidePatNum}`).data();
+            tDATMorning.row(`#${updated_ridePat.RidePatNum}`).remove().draw(false);
+            break;
+        case tableNames.DAT_AFTERNOON:
+            row2manipulate = tDATAfternoon.row(`#${updated_ridePat.RidePatNum}`).data();
+            tDATAfternoon.row(`#${updated_ridePat.RidePatNum}`).remove().draw(false);
             break;
     }
 }
@@ -402,6 +424,54 @@ const rePaintRidePatToNewTable = (tableNameRidePatShouldBeRender, updated_ridePa
             ).draw(false);
 
             tr_nodesAsArray = Array.from(tTomorrowAfternoon.rows().nodes());
+            break;
+
+        case tableNames.DAT_MORNING:
+
+            tDATMorning.row.add(
+                {
+                    checkBoxesStr: ridePat2Draw.checkBoxesStr,
+                    ridePatNum: updated_ridePat.RidePatNum,
+                    time: ridePat2Draw.time,
+                    date: thisRidePatDate.toLocaleDateString('he-IL'),
+                    origin: ridePat2Draw.origin,
+                    destination: ridePat2Draw.destination,
+                    patient: ridePat2Draw.patient,
+                    patientAge: ridePat2Draw.patientAge,
+                    driver: ridePat2Draw.driver,
+                    status: ridePat2Draw.status,
+                    lastModified: ridePat2Draw.lastModified,
+                    remark: ridePat2Draw.remark,
+                    isAnonymous: ridePat2Draw.isAnonymous,
+                    buttons: ridePat2Draw.buttons
+                }
+            ).draw(false);
+
+            tr_nodesAsArray = Array.from(tDATMorning.rows().nodes());
+            break;
+
+        case tableNames.DAT_AFTERNOON:
+
+            tDATAfternoon.row.add(
+                {
+                    checkBoxesStr: ridePat2Draw.checkBoxesStr,
+                    ridePatNum: updated_ridePat.RidePatNum,
+                    time: ridePat2Draw.time,
+                    date: thisRidePatDate.toLocaleDateString('he-IL'),
+                    origin: ridePat2Draw.origin,
+                    destination: ridePat2Draw.destination,
+                    patient: ridePat2Draw.patient,
+                    patientAge: ridePat2Draw.patientAge,
+                    driver: ridePat2Draw.driver,
+                    status: ridePat2Draw.status,
+                    lastModified: ridePat2Draw.lastModified,
+                    remark: ridePat2Draw.remark,
+                    isAnonymous: ridePat2Draw.isAnonymous,
+                    buttons: ridePat2Draw.buttons
+                }
+            ).draw(false);
+
+            tr_nodesAsArray = Array.from(tDATAfternoon.rows().nodes());
             break;
     }
 
@@ -619,11 +689,13 @@ notification2.client.UnityRideUpdated = function (updatedUnityRide) {
     //console.log('after custom results : ', customRide);
 
     tableName2manipulate = getTableName2Manipulate(customRide.RidePatNum);
+    console.log('what table ? 1 ', tableName2manipulate)
     thisRidePatDate = new Date(customRide.Date); //fixDate_WhichComeFromOpenConnection(customRide.Date);
     //console.log('after fix date(?) results : ', thisRidePatDate);
 
     thisRidePatLastModified = new Date(customRide.LastModified); //fixDate_WhichComeFromOpenConnection(customRide.LastModified);
     tableNameRidePatShouldBeRender = getTableNameToBeRenderedIn(thisRidePatDate);
+    console.log('what table ? 2 ', tableNameRidePatShouldBeRender);
     if (tableName2manipulate !== tableNameRidePatShouldBeRender && tableNameRidePatShouldBeRender !== tableNames.NOT_RELEVANT) {
 
         shiftRidePatToSuitableTable(tableName2manipulate, tableNameRidePatShouldBeRender, customRide);

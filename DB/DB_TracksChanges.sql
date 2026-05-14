@@ -1276,3 +1276,179 @@ END
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+/****** Object:  StoredProcedure [dbo].[spDeleteUnityRide]    Script Date: 5/14/2026 10:24:15 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad>
+-- Create Date: <28/12/23>
+-- Description: <this sp is for delete spesific ride or update the status
+--				if this is anonymous ride and there is no driver -> delete 
+--				anything else only change status to -> נמחקה 
+--				then need to return the return-Ride to ask the client if delete it too.
+
+-->
+-- =============================================
+ALTER PROCEDURE [dbo].[spDeleteUnityRide]
+(
+    -- Add the parameters for the stored procedure here
+   @unityRideID INT,
+   @CoorName NVARCHAR(255)
+)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+
+    -- Insert statements for procedure here
+		DECLARE @DriverId INT = (select MainDriver from unityRide where ridepatnum = @unityRideID)
+		DECLARE @isAnonymous bit = (select IsAnonymous from UnityRide where ridepatnum = @unityRideID)
+		DECLARE @origin Nvarchar(55) = (select origin from UnityRide where RidePatNum = @unityRideID)
+		DECLARE @dest Nvarchar(55) = (select Destination from UnityRide where RidePatNum = @unityRideID)
+		DECLARE @pickupTime dateTime = (select pickupTime from UnityRide where  RidePatNum = @unityRideID)
+
+		DECLARE @CoorId INT = (select id from Volunteer where DisplayName like @CoorName )
+
+
+		
+
+		
+		IF(@DriverId IS NULL and @isAnonymous = 1)
+		BEGIN
+		IF OBJECT_ID('tempdb..#DeletedUnityRide') IS NOT NULL
+            DROP TABLE #DeletedUnityRide;
+
+         -- טבלת יעד זמנית ללא IDENTITY
+    CREATE TABLE #DeletedUnityRide
+    (
+        RidePatNum            INT,
+        PatientName           NVARCHAR(255),
+        PatientCellPhone      NVARCHAR(50),
+        PatientId             INT,
+        PatientGender         NVARCHAR(50),
+        PatientStatus         NVARCHAR(50),
+        patientStatusTime     DATETIME,
+        PatientBirthDate      DATETIME,
+        AmountOfEscorts       INT,
+        AmountOfEquipments    INT,
+        Origin                NVARCHAR(55),
+        Destination           NVARCHAR(55),
+        pickupTime            DATETIME,
+        Coordinator           NVARCHAR(255),
+        Remark                NVARCHAR(MAX),
+        Status                NVARCHAR(50),
+        Area                  NVARCHAR(50),
+        Shift                 NVARCHAR(50),
+        OnlyEscort            BIT,
+        lastModified          DATETIME,
+        CoordinatorID         INT,
+        MainDriver            INT,
+        DriverName            NVARCHAR(255),
+        DriverCellPhone       NVARCHAR(50),
+        NoOfDocumentedRides   INT,
+        IsAnonymous           BIT,
+        IsNewDriver           BIT
+    );
+
+    -- מוחקים מהטבלה האמיתית ומזרימים את הנתונים שנמחקו לטבלה הזמנית
+    UPDATE UnityRide
+		set Status = N'נמחקה', lastModified = dbo.GetIsraelTime(),Coordinator = @CoorName , CoordinatorID = @CoorId
+		where ridepatnum = @unityRideID
+	DELETE FROM UnityRide
+    OUTPUT
+        deleted.RidePatNum,
+        deleted.PatientName,
+        deleted.PatientCellPhone,
+        deleted.PatientId,
+        deleted.PatientGender,
+        deleted.PatientStatus,
+        deleted.patientStatusTime,
+        deleted.PatientBirthDate,
+        deleted.AmountOfEscorts,
+        deleted.AmountOfEquipments,
+        deleted.Origin,
+        deleted.Destination,
+        deleted.pickupTime,
+        deleted.Coordinator,
+        deleted.Remark,
+        deleted.Status,
+        deleted.Area,
+        deleted.Shift,
+        deleted.OnlyEscort,
+        deleted.lastModified,
+        deleted.CoordinatorID,
+        deleted.MainDriver,
+        deleted.DriverName,
+        deleted.DriverCellPhone,
+        deleted.NoOfDocumentedRides,
+        deleted.IsAnonymous,
+        deleted.IsNewDriver
+    INTO #DeletedUnityRide
+    WHERE RidePatNum = @unityRideID;
+
+	
+    -- מחזירים את כל הנתונים + טלפונים נוספים מה-Patient
+    SELECT
+        d.*,
+        NULLIF(p.CellPhone2, '') AS PatientCellPhone2,
+        NULLIF(p.HomePhone,  '') AS PatientCellPhone3
+    FROM #DeletedUnityRide AS d
+    LEFT JOIN Patient AS p ON p.Id = d.PatientId;
+
+
+		END
+		
+		ELSE
+		BEGIN
+		UPDATE UnityRide
+		set Status = N'נמחקה', lastModified = dbo.GetIsraelTime(),Coordinator = @CoorName , CoordinatorID = @CoorId
+		where ridepatnum = @unityRideID
+		--return the update ride
+		Select u.*,
+		NULLIF(p.CellPhone, '') AS CellPhone,
+		NULLIF(p.CellPhone2, '') AS PatientCellPhone2,
+		NULLIF(p.HomePhone, '') AS PatientCellPhone3
+		FROM UnityRide AS u
+		LEFT JOIN Patient AS p ON p.Id = u.PatientId
+		where  ridepatnum = @unityRideID
+
+		IF(@DriverId IS not NULL)
+		update Volunteer
+		SET NoOfDocumentedRides = NoOfDocumentedRides-1
+		where Id = @DriverId
+
+		IF NOT EXISTS (select 1 from UnityRide where Origin = @origin and @dest =Destination and @pickupTime = pickupTime and MainDriver = @DriverId and status != N'נמחקה')
+		update Volunteer
+		SET No_of_Rides = No_of_Rides-1
+		Where Id = @DriverId
+		END
+
+
+
+END
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
