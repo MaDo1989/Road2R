@@ -1482,7 +1482,17 @@ const candidatesButton = (btn) => {
 function editButton(ridePat) {
     arr_details = { RidePatNum: ridePat.name, func: "edit" }; //ridePat.name=RidePatNum
     GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_details));
+    sessionStorage.setItem('RideToEdit', JSON.stringify(getRideByNum(ridePat.name)))
     location.href = "ridePatForm.html";
+}
+
+function getRideByNum(ridePatNum) {
+    const num = Number(ridePatNum);
+    for (const section of Object.values(splitRideLoadingState)) {
+        const ride = section.data?.find(r => r.RidePatNum === num);
+        if (ride) return ride;
+    }
+    return null;
 }
 
 function deleteRidePat(ridePat, deleteBtn, thistable) {

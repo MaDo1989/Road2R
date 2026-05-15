@@ -1012,7 +1012,7 @@
             $('#pat').val(patient.DisplayName);
             $('#patEnglishName').val(patient.EnglishName);
             let arabicDisplayName = patient.FirstNameA & patient.FirstNameA !== null + " " + patient.LastNameA & patient.LastNameA !== null;
-
+            const ThisRide = JSON.parse(sessionStorage.getItem('RideToEdit'))
             $('#patArabic').val(arabicDisplayName === 0 ? '' : arabicDisplayName);
 
             if (patient.EscortedList.length > 0) {
@@ -1020,10 +1020,13 @@
                 let str = '';
                 for (var i = 0; i < EscortedList.length; i++) {
                     let flagCheck = false;
-                    if (patient.ActiveEscorts != undefined && i < patient.ActiveEscorts.length) {
-                        flagCheck = true;
-                    }
-                    if (patient.ActiveEscorts == undefined && i == 0) {
+                    //if (patient.ActiveEscorts != undefined && i < patient.ActiveEscorts.length) {
+                    //    flagCheck = true;
+                    //}
+                    //if (patient.ActiveEscorts == undefined && i == 0) {
+                    //    flagCheck = true;
+                    //}
+                    if (ThisRide.AmountOfEscorts != 0 && i <= ThisRide.AmountOfEscorts-1) {
                         flagCheck = true;
                     }
 
