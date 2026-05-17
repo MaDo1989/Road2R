@@ -1020,15 +1020,20 @@
                 let str = '';
                 for (var i = 0; i < EscortedList.length; i++) {
                     let flagCheck = false;
-                    //if (patient.ActiveEscorts != undefined && i < patient.ActiveEscorts.length) {
-                    //    flagCheck = true;
-                    //}
-                    //if (patient.ActiveEscorts == undefined && i == 0) {
-                    //    flagCheck = true;
-                    //}
-                    if (ThisRide.AmountOfEscorts != 0 && i <= ThisRide.AmountOfEscorts-1) {
-                        flagCheck = true;
+                    if (ThisRide?.AmountOfEscorts == null || ThisRide?.AmountOfEscorts == undefined) {
+                        if (patient.ActiveEscorts != undefined && i < patient.ActiveEscorts.length) {
+                            flagCheck = true;
+                        }
+                        if (patient.ActiveEscorts == undefined && i == 0) {
+                            flagCheck = true;
+                        }
                     }
+                    else {
+                        if (ThisRide.AmountOfEscorts != 0 && i <= ThisRide.AmountOfEscorts - 1) {
+                            flagCheck = true;
+                        }
+                    }
+
 
                     str += `<input id='escortCB${EscortedList[i].Id}' type=checkbox name='${EscortedList[i].DisplayName}' ${flagCheck ? 'checked' : ''} >&nbsp`;
                     str += `<label data-toggle='tooltip' title='${EscortedList[i].DisplayName}' for='escortCB${EscortedList[i].Id}'>${EscortedList[i].DisplayName}</label>&nbsp&nbsp</br>`;
