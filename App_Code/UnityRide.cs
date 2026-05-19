@@ -522,6 +522,7 @@ public class UnityRide
         DBservice_Gilad dBservice = new DBservice_Gilad();
         if (unityride.DriverName != null)
         {
+            VolunteersCacheServiceManager.ClearCache();
             if (dBservice.CheckValidDriverRides(unityride.RidePatNum, unityride.DriverName, unityride.PickupTime) == true && firstTry == true)
             {
                 return -5;
@@ -665,6 +666,7 @@ public class UnityRide
     {
         DBservice_Gilad db = new DBservice_Gilad();
         UnityRide ur = new UnityRide();
+        VolunteersCacheServiceManager.ClearCache();
         if (isDelete)
         {
             ur = db.updateDriver(-1, unityRideId, whoChange);
@@ -698,6 +700,7 @@ public class UnityRide
         DBservice_Gilad dBservice = new DBservice_Gilad();
         UnityRide ur = new UnityRide();
         List<UnityRide> returnRides = new List<UnityRide>();
+        VolunteersCacheServiceManager.ClearCache();
         if (listIDs.Count > 1)
         {
             for (int i = 0; i < listIDs.Count; i++)
@@ -777,6 +780,7 @@ public class UnityRide
         UnityRide ur = new UnityRide();
         DBservice_Gilad db = new DBservice_Gilad();
         ur = db.assignDriverMobile(UnityRideId, userId);
+        VolunteersCacheServiceManager.ClearCache();
         if (ur.RidePatNum > -1)
         {
             BroadCast.BroadCast2Clients_UnityRideUpdated(ur);
@@ -798,6 +802,7 @@ public class UnityRide
     public int leaveUnityRideFromMobile(int UnityRideId, int driverID)
     {
         DBservice_Gilad db = new DBservice_Gilad();
+        VolunteersCacheServiceManager.ClearCache();
         return db.leaveUnityRideForMobile(driverID, UnityRideId);
     }
 

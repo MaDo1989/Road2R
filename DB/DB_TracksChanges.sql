@@ -1442,6 +1442,265 @@ END
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+/****** Object:  StoredProcedure [dbo].[spUpdateDriverUnityRide]    Script Date: 5/19/2026 1:40:42 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER PROCEDURE [dbo].[spUpdateDriverUnityRide]
+(
+	@driverID int,
+	@unityRideID int,
+	@CoorName nvarchar(255)
+)
+AS
+BEGIN
+
+	DECLARE @driverName nvarchar(255) = (select displayname from volunteer where Id=@driverID)
+	DECLARE @This_origin Nvarchar(55) = (select Origin from UnityRide where RidePatNum=@UnityRideID)
+	DECLARE @pickupTime DateTime = (select pickupTime from UnityRide where RidePatNum = @unityRideID)
+	DECLARE @driverPhone varchar(11) = (select cellphone from volunteer where id= @driverID)
+	DECLARE @isNewDriver bit = case when (select count(*) from UnityRide where pickupTime<=GETDATE() and MainDriver=@driverID)<=3 then 1 else 0 end
+	DECLARE @oldDriver int = (select MainDriver from UnityRide where RidePatNum = @unityRideID)
+	DECLARE @coorId int = (select id from volunteer where displayName like @CoorName)
+	DECLARE @origin Nvarchar(55) = (select origin from UnityRide where RidePatNum = @unityRideID)
+	DECLARE @dest Nvarchar(55) = (select Destination from UnityRide where RidePatNum = @unityRideID)
+
+	-- care of the NoOfDocumentedRides in volunteer table.
+	-- switch drivers
+	IF(@oldDriver is not null AND @driverID!=-1)
+	BEGIN
+		update Volunteer
+		SET NoOfDocumentedRides = NoOfDocumentedRides-1
+		where Id = @oldDriver
+
+		update Volunteer
+		SET NoOfDocumentedRides = NoOfDocumentedRides+1
+		where Id = @driverID
+	END
+
+	-- add driver
+	IF(@oldDriver is null AND @driverID!=-1)
+	BEGIN
+		update Volunteer
+		SET NoOfDocumentedRides = NoOfDocumentedRides+1
+		where Id = @driverID
+	END
+
+	-- remove driver
+	IF(@oldDriver is not null AND @driverID = -1)
+	BEGIN
+		update Volunteer
+		SET NoOfDocumentedRides = NoOfDocumentedRides-1
+		where Id = @oldDriver
+	END
+
+	DECLARE @NoOfDocumentedRides int = (select NoOfDocumentedRides from volunteer where id= @driverID)
+
+	-- for assign driver to unity ride
+	IF @driverID!=-1
+	BEGIN
+
+		-- check if the driver got any ride in this time
+		IF EXISTS
+		(
+			select 1
+			from UnityRide
+			where RidePatNum != @UnityRideID 
+			  and pickupTime = @pickupTime 
+			  and MainDriver = @driverId
+			  and status != N'נמחקה' 
+			  and Origin != @This_origin
+		)
+		BEGIN
+			select -5 as 'RidePatNum'
+			Return
+		END
+
+		ELSE
+		BEGIN
+			UPDATE UnityRide
+			set MainDriver = @driverID,
+				DriverName = @driverName,
+				DriverCellPhone = @driverPhone,
+				NoOfDocumentedRides = @NoOfDocumentedRides,
+				IsNewDriver = @isNewDriver,
+				lastModified = dbo.GetIsraelTime(),
+				Coordinator = @CoorName,
+				CoordinatorID = @coorId,
+				Status = N'שובץ נהג'
+			where RidePatNum = @unityRideID
+
+			-- No_of_Rides fix: update only after the ride was actually assigned
+
+			IF(@oldDriver is not null AND @oldDriver <> @driverID)
+			BEGIN
+				IF NOT EXISTS 
+				(
+					select 1 
+					from UnityRide 
+					where Origin = @origin 
+					  and Destination = @dest 
+					  and pickupTime = @pickupTime 
+					  and MainDriver = @oldDriver 
+					  and RidePatNum != @unityRideID
+					  and status != N'נמחקה'
+				)
+				BEGIN
+					update Volunteer
+					SET No_of_Rides = No_of_Rides - 1
+					Where Id = @oldDriver
+				END
+			END
+
+			IF(@oldDriver is null OR @oldDriver <> @driverID)
+			BEGIN
+				IF NOT EXISTS 
+				(
+					select 1 
+					from UnityRide 
+					where Origin = @origin 
+					  and Destination = @dest 
+					  and pickupTime = @pickupTime 
+					  and MainDriver = @driverID
+					  and RidePatNum != @unityRideID
+					  and status != N'נמחקה'
+				)
+				BEGIN
+					update Volunteer
+					SET No_of_Rides = No_of_Rides + 1
+					Where Id = @driverID
+				END
+			END
+		END
+	END
+	
+	-- for delete driver from unity ride
+	ELSE 
+	BEGIN
+		UPDATE UnityRide
+		set MainDriver = NULL,
+			DriverName = NULL,
+			DriverCellPhone = NULL,
+			NoOfDocumentedRides = NULL,
+			IsNewDriver = 1,
+			lastModified = dbo.GetIsraelTime(),
+			Coordinator = @CoorName,
+			CoordinatorID = @coorId,
+			Status = N'ממתינה לשיבוץ'
+		where RidePatNum = @unityRideID
+
+		-- No_of_Rides fix: update only after the driver was actually removed
+
+		IF(@oldDriver is not null)
+		BEGIN
+			IF NOT EXISTS 
+			(
+				select 1 
+				from UnityRide 
+				where Origin = @origin 
+				  and Destination = @dest 
+				  and pickupTime = @pickupTime 
+				  and MainDriver = @oldDriver 
+				  and RidePatNum != @unityRideID
+				  and status != N'נמחקה'
+			)
+			BEGIN
+				update Volunteer
+				SET No_of_Rides = No_of_Rides - 1
+				Where Id = @oldDriver
+			END
+		END
+	END
+
+	SELECT 
+		u.*,
+		NULLIF(p.CellPhone, '') AS CellPhone,
+		NULLIF(p.CellPhone2, '') AS PatientCellPhone2,
+		NULLIF(p.HomePhone, '') AS PatientCellPhone3
+	FROM UnityRide AS u
+	LEFT JOIN Patient AS p ON p.Id = u.PatientId
+	where RidePatNum = @unityRideID
+
+END
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--TEST BEFORE RUNNING THE UPDATE QUERY !
+--TEST BEFORE RUNNING THE UPDATE QUERY !
+--TEST BEFORE RUNNING THE UPDATE QUERY !
+
+SELECT 
+    r.MainDriver                                          AS DriverID,
+    MAX(r.DriverName)                                     AS DriverName,
+    MAX(r.DriverCellPhone)                                AS DriverCellPhone,
+    COUNT(DISTINCT r.pickupTime)                          AS UniqueRides_Calc,
+    MAX(v.No_of_Rides)                                    AS No_of_Rides_DB,
+    COUNT(DISTINCT r.pickupTime) - MAX(v.No_of_Rides)    AS DIFF
+FROM unityRide r
+LEFT JOIN volunteer v ON v.id = r.MainDriver
+WHERE r.Status <> N'נמחקה'
+  AND r.MainDriver IS NOT NULL
+GROUP BY r.MainDriver
+ORDER BY ABS(COUNT(DISTINCT r.pickupTime) - MAX(v.No_of_Rides)) DESC;
+
+
+
+
+UPDATE v
+SET v.No_of_Rides = calc.UniqueRides_Calc
+FROM volunteer v
+INNER JOIN (
+    SELECT 
+        r.MainDriver,
+        COUNT(DISTINCT r.pickupTime) AS UniqueRides_Calc
+    FROM unityRide r
+    WHERE r.Status <> N'נמחקה'
+      AND r.MainDriver IS NOT NULL
+    GROUP BY r.MainDriver
+) AS calc ON calc.MainDriver = v.Id
+WHERE calc.UniqueRides_Calc <> v.No_of_Rides
+   OR v.No_of_Rides IS NULL;
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
