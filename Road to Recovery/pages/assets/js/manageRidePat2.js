@@ -660,8 +660,7 @@ const updateUnityRideTime = () => {
     }
 
     let ridepatToManipulate = arr_rides.find(r => r.RidePatNum === _ridepatToManipulate);
-    let dateToManipulate = new Date(ridepatToManipulate.PickupTime) // convertDBDate2FrontEndDate(ridepatToManipulate.PickupTime);
-    //console.log('dateToManipulate ', dateToManipulate, ridepatToManipulate.PickupTime)
+    let dateToManipulate = new Date(ridepatToManipulate.PickupTime.replace('+00:00', '')) // convertDBDate2FrontEndDate(ridepatToManipulate.PickupTime);
     dateToManipulate.setHours(hours, minutes);
     dateToManipulate = formatDateTimeForServer(dateToManipulate);
     const userName = GENERAL.USER.getUserDisplayName();
@@ -672,7 +671,6 @@ const updateUnityRideTime = () => {
         userName: userName
     };
 
-    console.log('the data before send it 2 :', data);
     const updateUnityRideTime_SCB = () => {
 
         $('#wait').hide();
@@ -2253,7 +2251,7 @@ const renderMorningTable = (data, arrayOf_IHaveSeenAllready) => {
         data: data,
         rowId: 'ridePatNum',
         dom: controllersLayout,
-        order: [], 
+        order: [],
         buttons: [{
             extend: 'excelHtml5',
             text: 'ייצוא לאקסל',
@@ -2325,7 +2323,7 @@ const renderMorningTable = (data, arrayOf_IHaveSeenAllready) => {
             { targets: 8, className: 'last-modified_td' },
             { targets: 8, type: 'last_modifiedSort' },
             { "targets": [10], visible: false },
-            { targets: [11,0], orderable: false },
+            { targets: [11, 0], orderable: false },
             { targets: [0], className: 'text-center' }
         ],
         createdRow: function (row, data, dataIndex) {
@@ -2341,7 +2339,7 @@ const renderAfternoonTable = (data, arrayOf_IHaveSeenAllready) => {
     tAfternoon = $(`#${tableNames.AFTERNOON}`).DataTable({
         rowId: 'ridePatNum',
         dom: controllersLayout,
-        order: [], 
+        order: [],
         buttons: [{
             extend: 'excelHtml5',
             text: 'ייצוא לאקסל',
@@ -2448,7 +2446,7 @@ const renderTomorrowMorningTable = (data, arrayOf_IHaveSeenAllready) => {
     tTomorrowMorning = $(`#${tableNames.TOMORROW_MORNING}`).DataTable({
         rowId: 'ridePatNum',
         dom: controllersLayout,
-        order: [], 
+        order: [],
         buttons: [{
             extend: 'excelHtml5',
             text: 'ייצוא לאקסל',
@@ -2547,7 +2545,7 @@ const renderTomorrowAfternoonTable = (data, arrayOf_IHaveSeenAllready) => {
     tTomorrowAfternoon = $(`#${tableNames.TOMORROW_AFTERNOON}`).DataTable({
         rowId: 'ridePatNum',
         dom: controllersLayout,
-        order: [], 
+        order: [],
         buttons: [{
             extend: 'excelHtml5',
             text: 'ייצוא לאקסל',
@@ -2646,7 +2644,7 @@ const renderDATMorningTable = (data, arrayOf_IHaveSeenAllready) => {
     tDATMorning = $(`#${tableNames.DAT_MORNING}`).DataTable({
         rowId: 'ridePatNum',
         dom: controllersLayout,
-        order: [], 
+        order: [],
         buttons: [{
             extend: 'excelHtml5',
             text: 'ייצוא לאקסל',
@@ -2745,7 +2743,7 @@ const renderDATAfternoonTable = (data, arrayOf_IHaveSeenAllready) => {
     tDATAfternoon = $(`#${tableNames.DAT_AFTERNOON}`).DataTable({
         rowId: 'ridePatNum',
         dom: controllersLayout,
-        order: [], 
+        order: [],
         buttons: [{
             extend: 'excelHtml5',
             text: 'ייצוא לאקסל',
@@ -2844,7 +2842,7 @@ const renderFutureTable = (data, arrayOf_IHaveSeenAllready) => {
     tFuture = $(`#${tableNames.FUTURE}`).DataTable({
         rowId: 'ridePatNum',
         dom: controllersLayoutForFutureTable,
-        order: [], 
+        order: [],
         fnInitComplete: function (x) {
             buildHtmlSelectTimeInterval();
         },
@@ -4658,7 +4656,6 @@ function prepreparationEditTimeModal(thisBtn, ridepatNum) {
     $('#editTimeModalTitle').text('עדכון שעת הסעה');
     BuildTimeDDLs('hours', 'minutes');
     const ridepatObject = arr_rides.find(r => r.RidePatNum === ridepatNum);
-    console.log('before convert : ', ridepatObject.PickupTime);
     const raw = ridepatObject.PickupTime;
 
     let ridePatTime;
@@ -4670,7 +4667,6 @@ function prepreparationEditTimeModal(thisBtn, ridepatNum) {
         ridePatTime = new Date(withoutOffset);
     }
 
-    console.log('after convert : ', ridePatTime);
     let hoursAsDoubleDigits = createDoubleDigit(ridePatTime.getHours());
     let minutesAsDoubleDigits = createDoubleDigit(ridePatTime.getMinutes());
     let isAfterNoon = parseInt(minutesAsDoubleDigits) === afternoonIndicator;

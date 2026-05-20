@@ -441,12 +441,11 @@
             });
 
             if (typeof arr_customer === 'undefined') {
-                console.log('arr_customer is null or undeifind !!! ')
+                console.error('arr_customer is null or undeifind !!! ')
                 return;
             }
 
             if (typeof arr_customer != 'undefined') {
-                console.log('not undeifnd', arr_customer)
                 if (arr_customer.func === 'new' && isAllowedLocation(document.referrer.toLocaleLowerCase())) {
 
                     let patientFrom_patientForm = JSON.parse(localStorage.getItem('PatientNameForRide'));
@@ -738,7 +737,6 @@
 
         // new func for new way to save rides in the DB -Gilad
         const setUnityRideNew = (data) => {
-            console.log('from test CheckAPI_Gilad ', JSON.parse(data));
             let dataobj = JSON.parse(data);
             const unityRide = {};
             unityRide.PatientName = dataobj.RidePat.Pat.DisplayName;
@@ -754,7 +752,6 @@
             unityRide.DriverName = $('#driver').val() == '' ? null : $('#driver').val()
             unityRide.RidePatNum = dataobj.func == 'edit' ? dataobj.RidePat.RidePatNum : 0;
             unityRide.AmountOfEscorts = dataobj.RidePat.Escorts.length;
-            console.log('before insert the real coor', unityRide)
 
             lastRide.Escorts = dataobj.RidePat.Escorts;
             let request = { unityRide: unityRide, func: dataobj.func, numOfRide: dataobj.numberOfRides, repeatEvery: dataobj.repeatRideEvery, firstTry: true };
@@ -871,7 +868,6 @@
             });
 
             const showButtonsModal = (isReturnDrive) => {
-                console.log('in showButtonsModal', isReturnDrive);
                 document.getElementById('modal_x').style.visibility = 'visible';
                 if (isReturnDrive) {
                     $('#wait').hide();
@@ -1006,7 +1002,6 @@
         const fillPage_withPatientData = (patient, markThe1stEscort = false) => {
 
             isCreateNewRideButtonClicked = false;
-            console.log('inside fillPage_withPatientData --> patient-', patient);
             isAnonymous = patient.IsAnonymous === "True";
             localStorage.PatID = patient.Id;
             $('#pat').val(patient.DisplayName);
@@ -1051,7 +1046,6 @@
             $('#PatientIdentity').val(patient.PatientIdentity);
 
             if (allowChangeOf_originAndDestination) {
-                console.log('come on : ', allowChangeOf_originAndDestination, patient.Barrier.Name, patient.Hospital.Name)
                 $('#Origin').val(patient.Barrier.Name);
                 $('#Destination').val(patient.Hospital.Name);
             } else {
@@ -1958,7 +1952,6 @@
 
         //function to fill form for edit
         async function uploadData_new(ridePatNum) {
-            console.log('Gilad check i just clicked', ridePatNum)
             //  generatePat();
             getPatients_slim();
             generateLocation()
@@ -2092,7 +2085,6 @@
 
 
                             //this ↓ function also among other things draw the patient's escorts checkboxes
-                            console.log('???--> ', ridePat.Pat)
                             fillPage_withPatientData(ridePat.Pat);
 
                             //this code incharge to mark which escorts to checked in.
@@ -2770,7 +2762,6 @@
         const createNewRideToAnotherPatient = () => {
             let ridepat = JSON.parse(GENERAL.RIDEPAT.getRidePatList());
             ridepat = {};
-            console.log('TEST -->', ridepat);
             ridePat = { ...ridePat, func: 'new' }
             GENERAL.RIDEPAT.setRidePatList(JSON.stringify(ridePat));
 

@@ -169,13 +169,14 @@ validateMobileNumFullVersion = (mobileNum) => {
 
 function messageDate(date) {
     // let jsDate = convertDBDate2FrontEndDate(date);
+
     let txt = ``;
     let currentDate = new Date();
     let rideDate = new Date(netDate(date));
     let dayInWeek = days[rideDate.getDay()];
     let sameDay = datesAreOnSameDay(currentDate, rideDate);
-    let hour = rideDate.getHours();
-    let min = rideDate.getMinutes();
+    let hour = location.href.includes('localhost') ? rideDate.getHours() : rideDate.getUTCHours();
+    let min = location.href.includes('localhost') ? rideDate.getMinutes() : rideDate.getUTCMinutes();
     if (min == "0") min = "00";
     let afternoonRide = false;
     if (min == 14) afternoonRide = true;
