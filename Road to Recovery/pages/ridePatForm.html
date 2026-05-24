@@ -1949,7 +1949,22 @@
                 }
             });
         }
+        function parseMSDateNoOffset(msDateString) {
+            // שולף את המספר מתוך "/Date(1779660840000)/"
+            const ticks = parseInt(msDateString.replace('/Date(', '').replace(')/', ''));
 
+            const d = new Date(ticks);
+
+            // בונה תאריך חדש עם הערכים ה-UTC כאילו הם local
+            return new Date(
+                d.getUTCFullYear(),
+                d.getUTCMonth(),
+                d.getUTCDate(),
+                d.getUTCHours(),
+                d.getUTCMinutes(),
+                d.getUTCSeconds()
+            );
+        }
         //function to fill form for edit
         async function uploadData_new(ridePatNum) {
             //  generatePat();
@@ -1985,6 +2000,9 @@
 
                             var temp = ridePat.Date.substring(ridePat.Date.indexOf("(") + 1, ridePat.Date.indexOf(")"))
                             var date = new Date(parseInt(temp));
+                            date = location.href.includes('localhost') ? date : parseMSDateNoOffset(ridePat.Date);
+                            console.log('date is: ', date, temp);
+                            
                             day = date.getDay();
                             var dayArr = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
                             var dayName = dayArr[day];
@@ -1992,8 +2010,8 @@
                             var month = date.getMonth() + 1;
                             var year = date.getFullYear();
 
-                            var hours = location.href.includes('localhost')? date.getHours():date.getUTCHours();
-                            var minutes = location.href.includes('localhost') ? date.getMinutes() : date.getUTCMinutes();
+                            var hours = date.getHours() 
+                            var minutes = date.getMinutes() 
                             if (hours < 10) hours = "0" + hours;
                             if (minutes < 10) minutes = minutes + "0";
                             if (day < 10) day = "0" + day;
