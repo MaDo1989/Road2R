@@ -1,5 +1,27 @@
 ﻿let historyTable;
 
+function parseMSDateNoOffset(msDateString) {
+    // שולף את המספר מתוך "/Date(1779660840000)/"
+    const ticks = parseInt(msDateString.replace('/Date(', '').replace(')/', ''));
+
+    // יוצר Date לפי UTC, ואז מחזיר תאריך "naive" בלי offset
+    const d = new Date(ticks);
+
+    // בונה תאריך חדש עם הערכים ה-UTC כאילו הם local
+    const fixDate =  new Date(
+        d.getUTCFullYear(),
+        d.getUTCMonth(),
+        d.getUTCDate(),
+        d.getUTCHours(),
+        d.getUTCMinutes(),
+        d.getUTCSeconds()
+    );
+    return `/Date(${fixDate.getTime()})/`;
+}
+
+
+
+
 //make the flat object to complex object like the old API
 const CustomRideObject = (thisRide) => {
 
@@ -9,7 +31,7 @@ const CustomRideObject = (thisRide) => {
     CustomObj.Remark = thisRide.Remark;
     CustomObj.OnlyEscort = thisRide.OnlyEscort;
     CustomObj.LastModified = thisRide.LastModified;
-    CustomObj.Date = thisRide.PickupTime;
+    CustomObj.Date = location.href.includes('localhost') ? thisRide.PickupTime : parseMSDateNoOffset(thisRide.PickupTime);
 
     CustomObj.Pat = {};
     CustomObj.Pat.DisplayName = thisRide.PatientName;
@@ -110,7 +132,7 @@ function manipulateDocumentedRidesModal(button, tableToWithdrawDataFrom) {
                 let ur = CustomRideObject(data[i]);
                 arrRes.push(ur);
             }
-            //console.log('Gilad Need check after - >', arrRes)
+            console.log('Gilad Need check after - >', arrRes)
             data = arrRes; 
             //console.log('history table =>',historyTable)
             //if (historyTable != null) {

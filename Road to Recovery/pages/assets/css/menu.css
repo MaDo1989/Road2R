@@ -233,7 +233,7 @@ input.app-search-input:-ms-input-placeholder {
 .side-menu {
     bottom: 0;
     top: 0;
-    width: 240px;
+    width: 335px;
     z-index: 2;
 }
 
@@ -254,7 +254,7 @@ body.fixed-left .side-menu.left {
 }
 
 .content-page {
-    margin-right: 240px;
+    margin-right: 335px;
     overflow: hidden;
 }
 
@@ -382,7 +382,10 @@ body.fixed-left .side-menu.left {
 
         #sidebar-menu > ul > li > a > span {
             vertical-align: middle;
-            font-size: 16px;
+            font-size: 18px;
+            color: #efff9b;
+            letter-spacing: 2px;
+            font-weight: 600;
         }
 
         #sidebar-menu > ul > li > a > i {
