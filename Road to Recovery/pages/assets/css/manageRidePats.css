@@ -43,9 +43,9 @@ table.table-bordered.dataTable {
     border-collapse: collapse !important;
 }
 
-.bold{
-    font-weight:900 !important;
-    font-size:16px;
+.bold {
+    font-weight: 900 !important;
+    font-size: 16px;
 }
 
 .overRideBS_label {
@@ -313,7 +313,7 @@ input:checked + .slider:before {
 }
 
 #accordion .panel-primary .blue3 {
-    background-color: #4e6cd1;
+    background-color: #156b8a;
 }
 
 #accordion .panel-primary .blue4 {
@@ -321,7 +321,7 @@ input:checked + .slider:before {
 }
 
 #accordion .panel-primary .blue5 {
-    background-color: #645dd7;
+    background-color: #2b93b6;
 }
 
 #accordion .panel-primary .blue6 {
@@ -333,7 +333,7 @@ input:checked + .slider:before {
 }
 
 #accordion .panel-body .dataTables_wrapper table .statusComplete {
-    background-color:beige;
+    background-color: beige;
 }
 
 
@@ -361,16 +361,16 @@ tr td .ToRight {
     animation: pulseGlow 1.5s ease-in-out infinite;
 }
 
-.table-loading-indicator .spinner {
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    border: 3px solid rgba(255, 255, 255, 0.4);
-    border-radius: 50%;
-    border-top-color: #fff;
-    animation: spin 0.7s linear infinite;
-    margin-left: 10px;
-}
+    .table-loading-indicator .spinner {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        border: 3px solid rgba(255, 255, 255, 0.4);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 0.7s linear infinite;
+        margin-left: 10px;
+    }
 
 @keyframes spin {
     to {
@@ -383,6 +383,7 @@ tr td .ToRight {
         opacity: 1;
         box-shadow: 0 3px 8px rgba(255, 87, 34, 0.4);
     }
+
     50% {
         opacity: 0.85;
         box-shadow: 0 3px 15px rgba(255, 87, 34, 0.7);
@@ -402,10 +403,10 @@ tr td .ToRight {
     box-shadow: 0 3px 8px rgba(46, 125, 50, 0.4);
 }
 
-.table-loaded-indicator .checkmark {
-    margin-left: 8px;
-    font-size: 1.2em;
-}
+    .table-loaded-indicator .checkmark {
+        margin-left: 8px;
+        font-size: 1.2em;
+    }
 
 .table-error-indicator {
     display: inline-flex;

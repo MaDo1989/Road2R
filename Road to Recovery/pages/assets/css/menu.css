@@ -233,7 +233,7 @@ input.app-search-input:-ms-input-placeholder {
 .side-menu {
     bottom: 0;
     top: 0;
-    width: 335px;
+    width: 240px;
     z-index: 2;
 }
 
@@ -254,7 +254,7 @@ body.fixed-left .side-menu.left {
 }
 
 .content-page {
-    margin-right: 335px;
+    margin-right: 240px;
     overflow: hidden;
 }
 
@@ -382,22 +382,24 @@ body.fixed-left .side-menu.left {
 
         #sidebar-menu > ul > li > a > span {
             vertical-align: middle;
-            font-size: 18px;
-            color: #efff9b;
-            letter-spacing: 2px;
+            font-size: 16px;
+            color: #ffffff;
             font-weight: 600;
         }
+            #sidebar-menu > ul > li > a > span:hover {
+                color: #fff2a7;
+            }
 
-        #sidebar-menu > ul > li > a > i {
-            display: inline-block;
-            font-size: 18px;
-            line-height: 17px;
-            margin-right: 3px;
-            margin-left: 12px;
-            text-align: center;
-            vertical-align: middle;
-            width: 20px;
-        }
+            #sidebar-menu > ul > li > a > i {
+                display: inline-block;
+                font-size: 18px;
+                line-height: 17px;
+                margin-right: 3px;
+                margin-left: 12px;
+                text-align: center;
+                vertical-align: middle;
+                width: 20px;
+            }
 
             #sidebar-menu > ul > li > a > i.i-right {
                 float: right;
