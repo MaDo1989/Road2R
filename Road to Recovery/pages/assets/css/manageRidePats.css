@@ -305,7 +305,7 @@ input:checked + .slider:before {
 /*gilad addition*/
 
 #accordion .panel-primary .blue1 {
-    background-color: #0a4f69; /* darkest */
+    background-color: #0b5b79; /* darkest */
 }
 
 #accordion .panel-primary .blue2 {
@@ -313,7 +313,7 @@ input:checked + .slider:before {
 }
 
 #accordion .panel-primary .blue3 {
-    background-color: #156b8a;
+    background-color: #2a7f9f;
 }
 
 #accordion .panel-primary .blue4 {
@@ -321,7 +321,7 @@ input:checked + .slider:before {
 }
 
 #accordion .panel-primary .blue5 {
-    background-color: #2b93b6;
+    background-color: #4ca1c1;
 }
 
 #accordion .panel-primary .blue6 {
@@ -329,7 +329,7 @@ input:checked + .slider:before {
 }
 
 #accordion .panel-primary .blue7 {
-    background-color: #67bddb; /* lightest but not washed */
+    background-color: #79c8e6; /* lightest but not washed */
 }
 
 #accordion .panel-body .dataTables_wrapper table .statusComplete {

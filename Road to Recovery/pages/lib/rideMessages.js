@@ -70,6 +70,7 @@ const showMessage = (arr_rides, ridePatNum) => {
         message.totalPeople += ride.Pat.EscortedList.length;
 
         message.patients.push(patient);
+        console.log('from show message : ', message);
     }
 
     return message;
