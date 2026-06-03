@@ -304,6 +304,10 @@ input:checked + .slider:before {
 
 /*gilad addition*/
 
+.margin-top-s {
+    margin-top: 14px;
+}
+
 #accordion .panel-primary .blue1 {
     background-color: #0b5b79; /* darkest */
 }
