@@ -5047,7 +5047,30 @@ const deleteArrayOfRides = (arrayOfRides) => {
         }
     })
 }
+function parseMSDateNoOffset(dateInput) {
+    let d;
 
+    if (typeof dateInput === 'string' && dateInput.startsWith('/Date(')) {
+        // פורמט מקורי: /Date(1779660840000)/
+        const ticks = parseInt(dateInput.replace('/Date(', '').replace(')/', ''));
+        d = new Date(ticks);
+        // שימוש ב-UTC getters כי ה-ticks מגיעים "naive" מהשרת
+        return `/Date(${new Date(
+            d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(),
+            d.getUTCHours(), d.getUTCMinutes(), d.getUTCSeconds()
+        ).getTime()})/`;
+
+    } else if (typeof dateInput === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(dateInput)) {
+        // פורמט ISO 8601: 2026-06-09T07:00:00+03:00 או 2026-06-09T07:00:00
+        // קורעים את ה-offset ולוקחים את הזמן המקומי כפשוטו
+        const withoutOffset = dateInput.replace(/([+-]\d{2}:\d{2}|Z)$/, '');
+        d = new Date(withoutOffset); // ייפורס כ-local time ללא offset
+        return `/Date(${d.getTime()})/`;
+
+    } else {
+        throw new Error(`parseMSDateNoOffset: פורמט לא מוכר: ${dateInput}`);
+    }
+}
 
 const messageForPalCoor = () => {
     const choosenRides = arr_rides.filter(ride => checkboxesRides.includes(ride.RidePatNum));
@@ -5081,9 +5104,10 @@ const messageForPalCoor = () => {
             translatedData = transformData(choosenRides, dicById);
 
             const groupedObj = groupByOriginTimeAndDriver(translatedData);
-
+            let date = location.href.includes('localhost') ? convertToShortDateString(convertDBDate2FrontEndDate(choosenRides[0].PickupTime)) : convertToShortDateString(convertDBDate2FrontEndDate(parseMSDateNoOffset(choosenRides[0].PickupTime)));
+            console.log('date for coor localhost : ', date, 'date for coor envir: ', convertToShortDateString(convertDBDate2FrontEndDate(parseMSDateNoOffset(choosenRides[0].PickupTime))), choosenRides[0].PickupTime);
             const lineBreak = '\n';
-            let message = `Rides for ${convertToShortDateString(convertDBDate2FrontEndDate(choosenRides[0].PickupTime))} Morning.${lineBreak}`;
+            let message = `Rides for ${date} Morning.${lineBreak}`;
             let index = 0;
 
             const groups = Object.values(groupedObj).sort((a, b) => {
@@ -5104,9 +5128,8 @@ const messageForPalCoor = () => {
                     destStr = `${destList.slice(0, -1).join(', ')} and ${destList.slice(-1)}`;
                 }
 
-                const timeLocal = convertDBDate2FrontEndDate(rides[0].PickupTime)
-                    .toLocaleTimeString('he-IL', { timeStyle: 'short' });
-
+                const timeLocal = convertDBDate2FrontEndDate(parseMSDateNoOffset(rides[0].PickupTime)).toLocaleTimeString('he-IL', { timeStyle: 'short' });
+                console.log('time localhost :', timeLocal, "\ntime envir: ", convertDBDate2FrontEndDate(parseMSDateNoOffset(rides[0].PickupTime)).toLocaleTimeString('he-IL', { timeStyle: 'short' }))
                 message += `${lineBreak}From ${group.origin} to ${destStr} at ${timeLocal} ${lineBreak}`;
 
                 const ridesByDriver = {};
