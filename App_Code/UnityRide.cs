@@ -636,6 +636,10 @@ public class UnityRide
         {
             BroadCast.BroadCast2Clients_UnityRideUpdated(unityRide);
         }
+        if (unityRide == null)
+        {
+            throw new Exception("there is an unkown Error in UpdateUnityRideTime api, please check the Errors.txt file for more info.");
+        }
     }
 
     public void updateRemark(int UnityRideID, string newRemark, string whoChange)

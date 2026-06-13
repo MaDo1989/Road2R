@@ -2536,16 +2536,27 @@ public class DBservice_Gilad
             // write to log
             throw (ex);
         }
+        string ancestors = "";
+        try
+        {
+            Dictionary<string, object> paramDic = new Dictionary<string, object>();
+            paramDic.Add("@editedTime", editedTime);
+            paramDic.Add("@unityRideId", unityRideNum);
+            paramDic.Add("@CoorName", whoChange);
+            cmd = CreateCommandWithStoredProcedureGeneral("spUnityRide_UpdateDateAndTime", con, paramDic);
+            UnityRide unityRide = new UnityRide();
+            ancestors = "UpdateUnityRideTime updateUnityRideTime spUnityRide_UpdateDateAndTime reciveUnityRideDB";
+            unityRide = reciveUnityRideDB(cmd, ancestors);
 
-        Dictionary<string, object> paramDic = new Dictionary<string, object>();
-        paramDic.Add("@editedTime", editedTime);
-        paramDic.Add("@unityRideId", unityRideNum);
-        paramDic.Add("@CoorName", whoChange);
-        cmd = CreateCommandWithStoredProcedureGeneral("spUnityRide_UpdateDateAndTime", con, paramDic);
-        UnityRide unityRide = new UnityRide();
-        string ancestors = "UpdateUnityRideTime updateUnityRideTime spUnityRide_UpdateDateAndTime reciveUnityRideDB";
-        unityRide = reciveUnityRideDB(cmd, ancestors);
-        return unityRide;
+            return unityRide;
+        }
+        catch (Exception ex)
+        {
+
+            WriteToErrorFile(ancestors, ex.Message);
+            return null;
+        }
+
 
 
     }
