@@ -705,8 +705,7 @@ const updateUnityRideTime = () => {
             })
         }
         else {
-            alert(err);
-
+            alert(JSON.stringify(err));
         }
     }
     ajaxCall('UpdateUnityRideTime', JSON.stringify(data), updateUnityRideTime_SCB, updateUnityRideTime_ECB);
