@@ -2730,6 +2730,7 @@ public class WebService : System.Web.Services.WebService
         catch (Exception ex)
         {
             Log.Error("Error in UpdateUnityRideTime", ex);
+            DBservice_Gilad.WriteToErrorFile("UpdateUnityRideTime api ", ex.Message);
             throw new Exception(ex.Message);
         }
     }

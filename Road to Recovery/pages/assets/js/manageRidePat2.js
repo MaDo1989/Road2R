@@ -2980,9 +2980,9 @@ const refreshTable_splitRide = (timeInterval = 7) => {
         GENERAL.RIDEPAT.setRidePatList(JSON.stringify(arr_rides));
     };
 
-    Object.keys(localStorage)
-        .filter(k => k.startsWith('DataTables'))
-        .forEach(k => { localStorage.removeItem(k); });
+    //Object.keys(localStorage)
+    //    .filter(k => k.startsWith('DataTables'))
+    //    .forEach(k => { localStorage.removeItem(k); });
 
     // 1. Today Morning
     $.ajax({

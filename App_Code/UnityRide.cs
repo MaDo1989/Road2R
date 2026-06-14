@@ -624,21 +624,28 @@ public class UnityRide
 
     public void updateUnityRideTime(int unityRideNum, DateTime editedTime, string whoChange)
     {
-        DBservice_Gilad db = new DBservice_Gilad();
-        UnityRide unityRide = new UnityRide();
-        unityRide = db.updateUnityRideTime(unityRideNum, editedTime, whoChange);
-        if (unityRide.RidePatNum == -2)
+        try
         {
-            throw new Exception("error code: -2 , duplicated values in different rides");
+            DBservice_Gilad db = new DBservice_Gilad();
+            UnityRide unityRide = new UnityRide();
+            unityRide = db.updateUnityRideTime(unityRideNum, editedTime, whoChange);
+            if (unityRide.RidePatNum == -2)
+            {
+                throw new Exception("error code: -2 , duplicated values in different rides");
 
+            }
+            if (unityRide.RidePatNum != -1)
+            {
+                BroadCast.BroadCast2Clients_UnityRideUpdated(unityRide);
+            }
+            if (unityRide == null)
+            {
+                throw new Exception("there is an unkown Error in UpdateUnityRideTime api, please check the Errors.txt file for more info.");
+            }
         }
-        if (unityRide.RidePatNum != -1)
+        catch (Exception ex)
         {
-            BroadCast.BroadCast2Clients_UnityRideUpdated(unityRide);
-        }
-        if (unityRide == null)
-        {
-            throw new Exception("there is an unkown Error in UpdateUnityRideTime api, please check the Errors.txt file for more info.");
+            DBservice_Gilad.WriteToErrorFile("from updateUnityRideTime api to BL layer ", ex.Message);
         }
     }
 
