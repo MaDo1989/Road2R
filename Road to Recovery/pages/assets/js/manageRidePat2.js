@@ -495,7 +495,7 @@ const updateUnityridePatientStatus = () => {
 
     let ridepatToManipulate = arr_rides.find(r => r.RidePatNum === _ridepatToManipulate);
     const now = new Date();
-    const editTimeStamp = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
+    const editTimeStamp = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), hours, minutes);
 
     ridepatToManipulate = CustomRideObject(ridepatToManipulate);
     ridepatToManipulate.Pat.RidePatPatientStatus.Status = isTreatmentFinished;
@@ -510,6 +510,7 @@ const updateUnityridePatientStatus = () => {
         editTimeStamp: editTimeStamp,
         userName: userName
     }
+    console.log('data to update patient status: ' + JSON.stringify(data));
     const updatePatientStatus_SCB = () => {
 
         $('#wait').hide();
@@ -4560,7 +4561,8 @@ const buildStatusString = (statusObj, ridePatNum) => {
 
     let statusWrapper = `<div class="elementsInSameLine">`;
     const status = GetPatientStatus(statusObj.Status, isAssistant);
-    const editTimeStamp = convertDBDate2FrontEndDate(statusObj.EditTimeStamp);
+    const timestampEditWithoutOffset = parseMSDateNoOffset(statusObj.EditTimeStamp);
+    const editTimeStamp = convertDBDate2FrontEndDate(timestampEditWithoutOffset);
     const editBtn = `<button type='button' data-toggle="modal" data-target="#editPatientStatusModal" onclick="prepreparationEditPatientStatusModal(this, ${ridePatNum})" class='btn btn-icon waves-effect waves-light btn-secondary' title='עריכה'><i class='ti-pencil'></i></button>`;
 
     statusHTML = `<span>${status}</span>`;
