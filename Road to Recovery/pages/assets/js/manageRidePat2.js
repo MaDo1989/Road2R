@@ -4739,8 +4739,8 @@ function prepreparationEditPatientStatusModal(thisBtn, ridepatNum, EditTimeStamp
     const ridePatPatientStatus = ridepatObject.Pat.RidePatPatientStatus.Status;
     let editTimeStamp = ridepatObject.Pat.RidePatPatientStatus.EditTimeStamp;
     if (ridePatPatientStatus != -1) {
-
-        editTimeStamp = convertDBDate2FrontEndDate(editTimeStamp);
+        const editTimeStampWithNoOffset = location.href.includes('localhost') ? editTimeStamp : parseMSDateNoOffset(editTimeStamp);
+        editTimeStamp = convertDBDate2FrontEndDate(editTimeStampWithNoOffset);
         let hoursAsDoubleDigits = createDoubleDigit(editTimeStamp.getHours());
         let minutesAsDoubleDigits = createDoubleDigit(editTimeStamp.getMinutes());
         $hoursSelect.val(hoursAsDoubleDigits);
