@@ -667,9 +667,13 @@ const updateUnityRideTime = () => {
     }
 
     let ridepatToManipulate = arr_rides.find(r => r.RidePatNum === _ridepatToManipulate);
-    let dateToManipulate = new Date(ridepatToManipulate.PickupTime.replace('+00:00', '')) // convertDBDate2FrontEndDate(ridepatToManipulate.PickupTime);
+    console.log('pickuptimne ', ridepatToManipulate.PickupTime)
+    const timeWithNoOffset = location.href.includes("localhost") ? ridepatToManipulate.PickupTime : parseMSDateNoOffset(ridepatToManipulate.PickupTime);
+    let dateToManipulate = convertDBDate2FrontEndDate(timeWithNoOffset);
     dateToManipulate.setHours(hours, minutes);
+    console.log('before -> ', dateToManipulate)
     dateToManipulate = formatDateTimeForServer(dateToManipulate);
+    console.log('after -> ', dateToManipulate)
     const userName = GENERAL.USER.getUserDisplayName();
 
     let data = {
