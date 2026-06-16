@@ -4671,7 +4671,8 @@ function prepreparationEditTimeModal(thisBtn, ridepatNum) {
 
     let ridePatTime;
     if (/^\/Date\((\d+)\)\/$/.test(raw)) {
-        const ms = parseInt(raw.match(/\d+/)[0]);
+        const timeWithoutOffset = parseMSDateNoOffset(raw);
+        const ms = parseInt(timeWithoutOffset.match(/\d+/)[0]);
         ridePatTime = new Date(ms);
     } else {
         const withoutOffset = raw.replace(/[+-]\d{2}:\d{2}$/, '');
