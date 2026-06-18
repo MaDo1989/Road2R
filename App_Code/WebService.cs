@@ -1,6 +1,7 @@
 ﻿using log4net;
 using Newtonsoft.Json;
 using System;
+using System.Activities.Statements;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -49,9 +50,84 @@ public class WebService : System.Web.Services.WebService
     //    var a = 0;
     //}
 
+    // -------------------------- Mobile APIs START -------------------------- \\
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string LoginMobileApp(string userPhone)
+    {
+        try
+        {
+            var manager = new MobileManager();
 
+            return j.Serialize(
+                manager.LoginWithPhoneNumber(userPhone));
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex);
+            return j.Serialize(
+                new MobileLoginResponse
+                {
+                    ResponseStatus = 500,
+                    Message = "Unexpected server error"
+                });
+        }
+    }
+    [WebMethod]
+    public string GetVolunteerPreferencesMobile(int volunteerId)
+    {
+        try
+        {
+            var manager = new MobileManager();
 
+            return j.Serialize(
+                manager.GetVolunteerPreferences(volunteerId));
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex);
 
+            return j.Serialize(
+                new VolunteerPreferencesResponse());
+        }
+    }
+    [WebMethod]
+    public string GetMyUnityRidesMobile(int volunteerId)
+    {
+        try
+        {
+            var manager = new MobileManager();
+
+            return j.Serialize(
+                manager.GetMyUnityRides(volunteerId));
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex);
+
+            return j.Serialize(
+                new List<MobileUnityRide>());
+        }
+    }
+    [WebMethod]
+    public string GetAllUnityRidesMobile()
+    {
+        try
+        {
+            var manager = new MobileManager();
+
+            return j.Serialize(
+                manager.GetAllUnityRidesWithEquipments());
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex);
+
+            return j.Serialize(
+                new List<MobileUnityRide>());
+        }
+    }
+    // -------------------------- Mobile APIs END -------------------------- \\
 
     [WebMethod(EnableSession = true)]
     public double CpuPrefTesting(int rounds)
