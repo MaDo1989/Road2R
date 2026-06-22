@@ -1,4 +1,4 @@
-const API_BASE = "/WebService.asmx";
+const API_BASE = MASTER.getBaseUrl();
 
 const form = document.getElementById("loginForm");
 const phoneInput = document.getElementById("phone");
@@ -31,6 +31,7 @@ form.addEventListener("submit", async (e) => {
 
     if (data.ResponseStatus === 200) {
       alert("שלום " + data.DisplayName + "! התחברת בהצלחה.");
+      sessionStorage.setItem("current-user", JSON.stringify(data));
     } else {
       const msg = getErrorMessage(data.ResponseStatus, data.Message);
       showToast(msg, "error");
@@ -45,7 +46,7 @@ form.addEventListener("submit", async (e) => {
 
 /* ---- API call ---- */
 async function loginRequest(phone) {
-  const response = await fetch(API_BASE + "/LoginMobileApp", {
+  const response = await fetch(API_BASE + "LoginMobileApp", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ userPhone: phone }),
@@ -151,3 +152,5 @@ function showToast(message, type) {
     }, 300);
   }, 2500);
 }
+
+console.log("running on ", MASTER.environmentDetected());
