@@ -1,0 +1,281 @@
+/* ===================================================
+   master.css — Road to Recovery Mobile
+   Shared design tokens, base styles, and reusable
+   components. Import this first on every page.
+   =================================================== */
+
+/* ===== 1. CSS Token System ===== */
+:root {
+  /* Typography */
+  --font-body: 18px;
+  --font-heading-sm: 24px;
+  --font-heading-lg: 32px;
+  --line-height-body: 1.6;
+  --line-height-heading: 1.3;
+
+  /* Spacing */
+  --padding-card: 32px;
+  --gutter: 20px;
+  --touch-target: 56px;
+  --radius-card: 20px;
+  --radius-input: 12px;
+  --radius-btn: 12px;
+
+  /* R2R Teal Brand Colors — WCAG AA compliant (≥4.5:1 on white) */
+  --color-primary: #005f85; /* ~5.5:1 on white */
+  --color-primary-hover: #00486a;
+  --color-primary-active: #003a55;
+  --color-primary-text: #ffffff;
+  --color-surface: #ffffff;
+  --color-background: #e8f2f7;
+  --color-text: #1a1a1a; /* 17.1:1 on white */
+  --color-text-secondary: #595959; /* 7.0:1  on white */
+  --color-border: #767676; /* 4.54:1 on white */
+  --color-input-border: #7fb3c8;
+  --color-input-focus: #005f85;
+  --color-error: #b91c1c; /* 5.9:1 on white */
+  --color-error-bg: #fef2f2;
+  --color-success: #166534; /* 7.3:1 on white */
+  --color-warning: #92400e; /* 5.9:1 on white */
+
+  /* Shadows */
+  --shadow-card: 0 8px 32px rgba(0, 95, 133, 0.18);
+  --shadow-btn: 0 4px 12px rgba(0, 95, 133, 0.35);
+
+  /* Animation */
+  --duration-fast: 200ms;
+  --duration-max: 300ms;
+}
+
+/* ===== 2. Reset + Base ===== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: var(--font-body);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  font-size: var(--font-body);
+  line-height: var(--line-height-body);
+  color: var(--color-text);
+  background: var(--color-background);
+  min-height: 100dvh;
+  direction: rtl;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== 3. Form Primitives ===== */
+
+/* Field wrapper */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Label — always visible above input (no placeholder-only fields) */
+.label {
+  font-size: var(--font-body);
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: var(--line-height-heading);
+}
+
+/* Input */
+.input {
+  width: 100%;
+  height: var(--touch-target);
+  padding: 0 16px;
+  font-size: var(--font-body);
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 2px solid var(--color-input-border);
+  border-radius: var(--radius-input);
+  outline: none;
+  transition:
+    border-color var(--duration-fast),
+    box-shadow var(--duration-fast);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.input::placeholder {
+  color: var(--color-text-secondary);
+  opacity: 0.65;
+}
+
+.input:focus,
+.input:focus-visible {
+  border-color: var(--color-input-focus);
+  box-shadow: 0 0 0 3px rgba(0, 95, 133, 0.18);
+}
+
+.input:active {
+  border-color: var(--color-primary-active);
+}
+
+.input--error {
+  border-color: var(--color-error);
+  background: var(--color-error-bg);
+}
+
+.input--error:focus {
+  box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.18);
+}
+
+/* Hint text below input */
+.hint {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+/* Inline field error (icon + text) */
+.field-error {
+  font-size: 16px;
+  color: var(--color-error);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.4;
+}
+
+/* ===== 4. Buttons ===== */
+
+/* Primary CTA — one per screen */
+.btn-primary {
+  width: 100%;
+  height: var(--touch-target);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: var(--font-heading-sm);
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--color-primary-text);
+  background: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  box-shadow: var(--shadow-btn);
+  transition:
+    background var(--duration-fast),
+    transform var(--duration-fast),
+    box-shadow var(--duration-fast);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-hover);
+  box-shadow: 0 6px 18px rgba(0, 95, 133, 0.42);
+}
+
+.btn-primary:focus,
+.btn-primary:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 3px;
+  background: var(--color-primary-hover);
+}
+
+.btn-primary:active {
+  background: var(--color-primary-active);
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(0, 95, 133, 0.28);
+}
+
+.btn-primary:disabled {
+  background: #9fbfcf;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Loading spinner inside a button */
+.btn-spinner {
+  display: none;
+  width: 22px;
+  height: 22px;
+  border: 3px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== 5. Utilities ===== */
+
+/* Horizontal rule / section divider */
+.card-divider {
+  height: 1px;
+  background: #e0eef5;
+  margin: 0 -4px;
+}
+
+/* ===== 6. Toast ===== */
+#toast-container {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  width: calc(100% - 40px);
+  max-width: 380px;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 22px;
+  border-radius: 14px;
+  font-size: var(--font-body);
+  font-weight: 600;
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.22);
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity var(--duration-max),
+    transform var(--duration-max);
+  direction: rtl;
+}
+
+.toast--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast--success {
+  background: var(--color-success);
+}
+.toast--error {
+  background: var(--color-error);
+}
+.toast--warning {
+  background: var(--color-warning);
+}
+
+.toast-icon {
+  font-size: 20px;
+  font-weight: 700;
+  flex-shrink: 0;
+}

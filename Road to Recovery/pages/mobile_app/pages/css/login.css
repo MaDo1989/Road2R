@@ -1,0 +1,100 @@
+/* ===================================================
+   login.css — Login page styles
+   Depends on: master.css (must be loaded first)
+   =================================================== */
+
+/* ===== Page Layout ===== */
+.page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--gutter);
+  background: linear-gradient(160deg, #b8dbe9 0%, #e8f2f7 55%, #d0e9f5 100%);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: var(--padding-card);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ===== Login Card ===== */
+
+/* Logo */
+.logo-wrap {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 4px;
+}
+
+.logo {
+  width: 130px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Welcome text */
+.welcome-wrap {
+  text-align: center;
+}
+
+.heading {
+  font-size: var(--font-heading-lg);
+  font-weight: 700;
+  line-height: var(--line-height-heading);
+  color: var(--color-text);
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: var(--font-body);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-body);
+}
+
+/* Form wrapper — login-specific spacing */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Phone input alignment override */
+.input--phone {
+  letter-spacing: 1px;
+  direction: ltr;
+  text-align: center;
+}
+
+/* Submit button top spacing */
+.btn-primary--login {
+  margin-top: 4px;
+}
+
+/* Hint centering for login */
+.hint--center {
+  text-align: center;
+}
+
+.field-error--center {
+  justify-content: center;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 400px) {
+  .login-card {
+    padding: 24px 20px;
+  }
+
+  .heading {
+    font-size: 28px;
+  }
+}
