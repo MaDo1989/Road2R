@@ -1436,13 +1436,19 @@ function copyMessageButton(copyMsgBtn, table) {
 
     let ridePatNum = parseInt(copyMsgBtn.id);
     let messageObject = showMessage(arr_rides, ridePatNum);
-
+    let hour = 0;
+    let min = 0;
     if (!messageObject.date.includes('Date')) {
-
+        hour = messageObject.date.split("T")[1].split(":")[0];
+        min = messageObject.date.split("T")[1].split(":")[1]
         const dateTicks = new Date(messageObject.date).getTime()
         messageObject.date = repaireDateForMeesageModule(dateTicks);
     }
-    let textMessageToCopy = buildMessage(messageObject);
+    else {
+        console.log('NOTE there is no "Date" format mabye there is offset here ', messageObject.date);
+        messageObject.date = parseMSDateNoOffset(messageObject.date);
+    }
+    let textMessageToCopy = buildMessage(messageObject, hour, min);
     navigator.clipboard.writeText(textMessageToCopy)
         .then(function () {
             swal({

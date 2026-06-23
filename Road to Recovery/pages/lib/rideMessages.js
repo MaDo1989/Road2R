@@ -78,7 +78,7 @@ const showMessage = (arr_rides, ridePatNum) => {
 
 
 
-function buildMessage(message) {
+function buildMessage(message,hour,min) {
     const sep = `\n`;
     let firstName = message.driver.split(" ")[0];
 
@@ -94,7 +94,7 @@ function buildMessage(message) {
         ? `סה"כ אדם אחד${sep}`
         : `סה"כ ${message.totalPeople} אנשים${sep}`;
 
-    txt += messageDate(message.date);
+    txt += messageDate(message.date,hour,min);
 
     for (let i = 0; i < message.patients.length; i++) {
         let p = message.patients[i];
@@ -168,27 +168,34 @@ validateMobileNumFullVersion = (mobileNum) => {
     return true;
 };
 
-function messageDate(date) {
-    // let jsDate = convertDBDate2FrontEndDate(date);
-
+function messageDate(date,Hour,Min) {
     let txt = ``;
     let currentDate = new Date();
-    let rideDate = new Date(netDate(date));
+
+    let normalizedDate = date;
+    let ticks = parseInt(normalizedDate.replace(/\D/g, ''));
+    let rideDate = new Date(ticks);
+
     let dayInWeek = days[rideDate.getDay()];
     let sameDay = datesAreOnSameDay(currentDate, rideDate);
-    let hour = location.href.includes('localhost') ? rideDate.getHours() : rideDate.getUTCHours();
-    let min = location.href.includes('localhost') ? rideDate.getMinutes() : rideDate.getUTCMinutes();
-    if (min == "0") min = "00";
-    let afternoonRide = false;
-    if (min == 14) afternoonRide = true;
-    if (sameDay && !afternoonRide) txt = `היום בשעה ${hour}:${min}`;
-    else if (sameDay && afternoonRide) txt = `היום אחר הצהריים`;
-    else if (!sameDay && !afternoonRide)
-        txt = `ביום ${dayInWeek} ${rideDate.getDate()}.${rideDate.getMonth() + 1
-            } בשעה ${hour}:${min}`;
-    else
-        txt = `ביום ${dayInWeek} ${rideDate.getDate()}.${rideDate.getMonth() + 1
-            } בשעות אחר הצהריים`;
+
+    let hour = Hour;
+    let min = Min;
+
+    if (min == 0) min = "00";
+
+    let afternoonRide = (min == 14);
+
+    if (sameDay && !afternoonRide) {
+        txt = `היום בשעה ${hour}:${min}`;
+    } else if (sameDay && afternoonRide) {
+        txt = `היום אחר הצהריים`;
+    } else if (!sameDay && !afternoonRide) {
+        txt = `ביום ${dayInWeek} ${rideDate.getDate()}.${rideDate.getMonth() + 1} בשעה ${hour}:${min}`;
+    } else {
+        txt = `ביום ${dayInWeek} ${rideDate.getDate()}.${rideDate.getMonth() + 1} בשעות אחר הצהריים`;
+    }
+
     return txt;
 }
 
@@ -252,3 +259,27 @@ const patientMessage = (patient, shouldShowDestination, sep) => {
 };
 
 
+function parseMSDateNoOffset(dateInput) {
+    let d;
+
+    if (typeof dateInput === 'string' && dateInput.startsWith('/Date(')) {
+        // פורמט מקורי: /Date(1779660840000)/
+        const ticks = parseInt(dateInput.replace('/Date(', '').replace(')/', ''));
+        d = new Date(ticks);
+        // שימוש ב-UTC getters כי ה-ticks מגיעים "naive" מהשרת
+        return `/Date(${new Date(
+            d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(),
+            d.getUTCHours(), d.getUTCMinutes(), d.getUTCSeconds()
+        ).getTime()})/`;
+
+    } else if (typeof dateInput === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(dateInput)) {
+        // פורמט ISO 8601: 2026-06-09T07:00:00+03:00 או 2026-06-09T07:00:00
+        // קורעים את ה-offset ולוקחים את הזמן המקומי כפשוטו
+        const withoutOffset = dateInput.replace(/([+-]\d{2}:\d{2}|Z)$/, '');
+        d = new Date(withoutOffset); // ייפורס כ-local time ללא offset
+        return `/Date(${d.getTime()})/`;
+
+    } else {
+        throw new Error(`parseMSDateNoOffset: פורמט לא מוכר: ${dateInput}`);
+    }
+}
