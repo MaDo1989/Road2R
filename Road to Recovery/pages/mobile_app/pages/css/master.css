@@ -15,6 +15,7 @@
 
   /* Spacing */
   --padding-card: 32px;
+  --padding-card-sm: 16px;
   --gutter: 20px;
   --touch-target: 56px;
   --radius-card: 20px;
@@ -26,6 +27,7 @@
   --color-primary-hover: #00486a;
   --color-primary-active: #003a55;
   --color-primary-text: #ffffff;
+  --color-accent: #e8a020; /* secondary brand accent, use sparingly */
   --color-surface: #ffffff;
   --color-background: #e8f2f7;
   --color-text: #1a1a1a; /* 17.1:1 on white */
@@ -278,4 +280,61 @@ body {
   font-size: 20px;
   font-weight: 700;
   flex-shrink: 0;
+}
+
+/* ===== 7. Bottom Navigation ===== */
+/* Shared across every screen — keep page content above .page-with-nav clear */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--color-surface);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.12);
+  z-index: 10;
+}
+
+.nav-item {
+  background: none;
+  border: none;
+  min-height: var(--touch-target);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 4px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.nav-item__icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.nav-item__label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.nav-item.is-active {
+  color: var(--color-primary);
+}
+
+.nav-item.is-active .nav-item__icon {
+  color: var(--color-accent);
+}
+
+.nav-item:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Page wrapper that reserves space for the fixed bottom nav */
+.page-with-nav {
+  padding-bottom: calc(var(--touch-target) + 24px);
 }

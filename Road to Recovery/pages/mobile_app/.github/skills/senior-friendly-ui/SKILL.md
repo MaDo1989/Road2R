@@ -6,7 +6,7 @@ argument-hint: 'Describe the screen or component to build (e.g. "appointment boo
 
 # Senior-Friendly UI
 
-Builds accessible, mobile-first HTML/CSS/JS UIs optimized for users aged 55+.
+Builds accessible, mobile-first HTML/CSS/JS JQUERY UIs optimized for users aged 55+.
 Always outputs a **single self-contained file** — no external dependencies unless explicitly requested.
 Uses **CSS custom properties** as the design token system.
 

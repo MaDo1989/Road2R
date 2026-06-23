@@ -1,0 +1,197 @@
+/* ===================================================
+   main-menu.css — Home screen styles
+   Depends on: master.css (must be loaded first)
+   =================================================== */
+
+/* ===== Header ===== */
+.header {
+  background: var(--color-primary);
+  color: var(--color-primary-text);
+  padding: 28px var(--gutter) 36px;
+  border-bottom-left-radius: var(--radius-card);
+  border-bottom-right-radius: var(--radius-card);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+
+.header__logo-wrap {
+  background: var(--color-surface);
+  border-radius: 50%;
+  width: 84px;
+  height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+  box-shadow: var(--shadow-card);
+}
+
+.header__logo {
+  width: 64px;
+  height: auto;
+  object-fit: contain;
+}
+
+.header__greeting {
+  font-size: var(--font-heading-lg);
+  font-weight: 700;
+  line-height: var(--line-height-heading);
+}
+
+.header__sub {
+  font-size: var(--font-body);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* ===== Stats bar ===== */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  padding: 24px var(--gutter) 0;
+}
+
+.stat-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 20px 8px;
+  text-align: center;
+}
+
+.stat-card__value {
+  font-size: var(--font-heading-lg);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.stat-card__label {
+  margin-top: 6px;
+  font-size: var(--font-body);
+  color: var(--color-text-secondary);
+}
+
+/* ===== Content ===== */
+.content {
+  padding: 32px var(--gutter) 0;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.section-title {
+  font-size: var(--font-heading-sm);
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+/* ===== Quick action grid (2x2) ===== */
+.quick-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.quick-action {
+  background: var(--color-surface);
+  border: none;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: var(--padding-card-sm);
+  min-height: var(--touch-target);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: transform var(--duration-fast) ease;
+  color: var(--color-text);
+  text-align: center;
+  font-family: inherit;
+}
+
+.quick-action:active,
+.quick-action:focus-visible {
+  transform: scale(0.97);
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.quick-action__icon {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.quick-action__label {
+  font-size: var(--font-body);
+  font-weight: 600;
+}
+
+/* ===== Ride cards ===== */
+.ride-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ride-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: var(--padding-card-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-right: 6px solid var(--color-accent);
+}
+
+.ride-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ride-card__time {
+  font-size: var(--font-heading-sm);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.ride-card__status {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-success);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ride-card__route {
+  font-size: var(--font-body);
+  color: var(--color-text);
+}
+
+.ride-card__patient {
+  font-size: var(--font-body);
+  color: var(--color-text-secondary);
+}
+
+/* ===== Empty state ===== */
+.empty-state {
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 32px var(--padding-card-sm);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.empty-state__icon {
+  font-size: 36px;
+}

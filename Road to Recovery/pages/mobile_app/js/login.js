@@ -1,11 +1,9 @@
-const API_BASE = MASTER.getBaseUrl();
-
 const form = document.getElementById("loginForm");
 const phoneInput = document.getElementById("phone");
 const loginBtn = document.getElementById("loginBtn");
 
 /* ---- Form submit ---- */
-form.addEventListener("submit", async (e) => {
+form.addEventListener("submit", function (e) {
   e.preventDefault();
 
   const phone = phoneInput.value.trim().replace(/[-\s()]/g, "");
@@ -25,39 +23,43 @@ form.addEventListener("submit", async (e) => {
   clearFieldError("phone");
   setLoading(true);
 
-  try {
-    const data = await loginRequest(phone);
-    console.log("Login response:", data);
-
-    if (data.ResponseStatus === 200) {
-      alert("שלום " + data.DisplayName + "! התחברת בהצלחה.");
-      sessionStorage.setItem("current-user", JSON.stringify(data));
-    } else {
-      const msg = getErrorMessage(data.ResponseStatus, data.Message);
-      showToast(msg, "error");
-    }
-  } catch (err) {
-    console.error("Login error:", err);
-    showToast("שגיאה בחיבור לשרת. נסו שנית.", "error");
-  } finally {
-    setLoading(false);
-  }
+  loginRequest(phone);
 });
 
 /* ---- API call ---- */
-async function loginRequest(phone) {
-  const response = await fetch(API_BASE + "LoginMobileApp", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ userPhone: phone }),
-  });
+function loginRequest(phone) {
+  MASTER.ajax(
+    "LoginMobileApp",
+    { userPhone: phone },
+    function (wrapper) {
+      const data = JSON.parse(wrapper.d);
+      console.log("Login response:", data);
 
-  if (!response.ok) {
-    throw new Error("HTTP " + response.status);
-  }
-
-  const wrapper = await response.json();
-  return JSON.parse(wrapper.d);
+      if (data.ResponseStatus === 200) {
+        sessionStorage.setItem("current-user", JSON.stringify(data));
+        Swal.fire({
+          icon: "success",
+          title: "ברוך הבא!",
+          text: "שלום " + data.DisplayName + "! התחברת בהצלחה.",
+          confirmButtonText: "המשך",
+          confirmButtonColor: "#005f85",
+          timer: 2500,
+          timerProgressBar: true,
+        }).then(function () {
+          window.location.href = "main-menu.html";
+        });
+      } else {
+        const msg = getErrorMessage(data.ResponseStatus, data.Message);
+        showToast(msg, "error");
+      }
+      setLoading(false);
+    },
+    function (xhr, status, error) {
+      console.error("Login error:", error);
+      showToast("שגיאה בחיבור לשרת. נסו שנית.", "error");
+      setLoading(false);
+    },
+  );
 }
 
 /* ---- Error messages ---- */

@@ -1,11 +1,93 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    
-</body>
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#005f85" />
+    <title>תפריט ראשי — Road to Recovery</title>
+    <script src="../js/master.js"></script>
+    <link rel="stylesheet" href="css/master.css" />
+    <link rel="stylesheet" href="css/main-menu.css" />
+  </head>
+  <body>
+    <div class="page page-with-nav">
+      <header class="header">
+        <div class="header__logo-wrap">
+          <img
+            src="../../../../Media/R2R Logo.png"
+            alt="Road to Recovery"
+            class="header__logo"
+          />
+        </div>
+        <h1 class="header__greeting" id="greeting">שלום!</h1>
+        <p class="header__sub" id="greetingSub">מוכנים לעזור היום?</p>
+      </header>
+
+      <section class="stats-bar" aria-label="סטטיסטיקת נסיעות">
+        <div class="stat-card">
+          <div class="stat-card__value" id="statMonth">0</div>
+          <div class="stat-card__label">החודש</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__value" id="statTotal">0</div>
+          <div class="stat-card__label">סה״כ</div>
+        </div>
+      </section>
+
+      <main class="content">
+        <section aria-label="פעולות מהירות">
+          <h2 class="section-title">פעולות מהירות</h2>
+          <div class="quick-actions">
+            <button class="quick-action" id="actionFindRide">
+              <span class="quick-action__icon" aria-hidden="true">🔍</span>
+              <span class="quick-action__label">חיפוש נסיעה</span>
+            </button>
+            <button class="quick-action" id="actionMyRides">
+              <span class="quick-action__icon" aria-hidden="true">🚗</span>
+              <span class="quick-action__label">הנסיעות שלי</span>
+            </button>
+            <button class="quick-action" id="actionPreferences">
+              <span class="quick-action__icon" aria-hidden="true">⚙️</span>
+              <span class="quick-action__label">העדפות</span>
+            </button>
+            <button class="quick-action" id="actionStats">
+              <span class="quick-action__icon" aria-hidden="true">📊</span>
+              <span class="quick-action__label">סטטיסטיקה</span>
+            </button>
+          </div>
+        </section>
+
+        <section aria-label="הנסיעות של היום">
+          <h2 class="section-title">הנסיעות של היום</h2>
+          <div class="ride-list" id="rideList"></div>
+        </section>
+      </main>
+    </div>
+
+    <nav class="bottom-nav" aria-label="ניווט ראשי">
+      <button class="nav-item is-active" id="navHome" aria-current="page">
+        <span class="nav-item__icon" aria-hidden="true">🏠</span>
+        <span class="nav-item__label">בית</span>
+      </button>
+      <button class="nav-item" id="navFindRide">
+        <span class="nav-item__icon" aria-hidden="true">🔍</span>
+        <span class="nav-item__label">חיפוש נסיעה</span>
+      </button>
+      <button class="nav-item" id="navMyRides">
+        <span class="nav-item__icon" aria-hidden="true">🚗</span>
+        <span class="nav-item__label">הנסיעות שלי</span>
+      </button>
+      <button class="nav-item" id="navSettings">
+        <span class="nav-item__icon" aria-hidden="true">⚙️</span>
+        <span class="nav-item__label">הגדרות</span>
+      </button>
+    </nav>
+
+    <!-- Toast container -->
+    <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../js/main-menu.js"></script>
+  </body>
 </html>
