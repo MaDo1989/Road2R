@@ -131,21 +131,7 @@ const isProductionDatabase = (onResult) => {
 };
 MASTER.IsProductionDatabase = isProductionDatabase;
 
-const HEBREW_DAY_NAMES = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
-const HEBREW_MONTH_NAMES = [
-  "ינואר",
-  "פברואר",
-  "מרץ",
-  "אפריל",
-  "מאי",
-  "יוני",
-  "יולי",
-  "אוגוסט",
-  "ספטמבר",
-  "אוקטובר",
-  "נובמבר",
-  "דצמבר",
-];
+const HEBREW_DAY_ABBR = ["א'", "ב'", "ג'", "ד'", "ה'", "ו'", "ש'"];
 
 /* ASMX endpoints wrap the JSON payload as a serialised string in `.d` */
 const parseResponse = (wrapper) => {
@@ -175,11 +161,13 @@ const formatHebrewDate = (dateStr) => {
   if (isNaN(d.getTime())) return "";
   return (
     "יום " +
-    HEBREW_DAY_NAMES[d.getDay()] +
+    HEBREW_DAY_ABBR[d.getDay()] +
     ", " +
     d.getDate() +
-    " ב" +
-    HEBREW_MONTH_NAMES[d.getMonth()]
+    "." +
+    (d.getMonth() + 1) +
+    "." +
+    d.getFullYear()
   );
 };
 MASTER.formatHebrewDate = formatHebrewDate;

@@ -74,7 +74,62 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ===== 3. Form Primitives ===== */
+/* ===== 3. Header ===== */
+/* Shared across every screen — logo + title, optional subtitle */
+.header {
+  background: var(--color-surface);
+  padding: 18px var(--gutter);
+  border-bottom: 1px solid #e0eef5;
+  box-shadow: 0 2px 10px rgba(0, 95, 133, 0.06);
+}
+
+.header__top-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+}
+
+.header__logo-wrap {
+  background: var(--color-background);
+  border-radius: 50%;
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-card);
+}
+
+.header__logo {
+  width: 44px;
+  height: auto;
+  object-fit: contain;
+}
+
+.header__title-group {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+  gap: 2px;
+}
+
+.header__greeting {
+  font-size: var(--font-heading-sm);
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: var(--line-height-heading);
+  margin: 0;
+}
+
+.header__sub {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* ===== 4. Form Primitives ===== */
 
 /* Field wrapper */
 .field {
@@ -152,7 +207,7 @@ body {
   line-height: 1.4;
 }
 
-/* ===== 4. Buttons ===== */
+/* ===== 5. Buttons ===== */
 
 /* Primary CTA — one per screen */
 .btn-primary {
@@ -222,7 +277,7 @@ body {
   }
 }
 
-/* ===== 5. Utilities ===== */
+/* ===== 6. Utilities ===== */
 
 /* Horizontal rule / section divider */
 .card-divider {
@@ -231,7 +286,7 @@ body {
   margin: 0 -4px;
 }
 
-/* ===== 6. Toast ===== */
+/* ===== 7. Toast ===== */
 #toast-container {
   position: fixed;
   bottom: 28px;
@@ -282,7 +337,7 @@ body {
   flex-shrink: 0;
 }
 
-/* ===== 7. Bottom Navigation ===== */
+/* ===== 8. Bottom Navigation ===== */
 /* Shared across every screen — keep page content above .page-with-nav clear */
 .bottom-nav {
   position: fixed;
@@ -339,7 +394,7 @@ body {
   padding-bottom: calc(var(--touch-target) + 24px);
 }
 
-/* ===== 8. Empty State ===== */
+/* ===== 9. Empty State ===== */
 /* Shared across every screen with a list that can be empty */
 .empty-state {
   background: var(--color-surface);

@@ -25,7 +25,6 @@
           </div>
           <div class="header__title-group">
             <h1 class="header__greeting">הנסיעות שלי</h1>
-            <p class="header__sub" id="ridesSummary">טוען נסיעות...</p>
           </div>
         </div>
       </header>
@@ -95,6 +94,78 @@
         <span class="nav-item__label">הגדרות</span>
       </button>
     </nav>
+
+    <!-- Ride details modal -->
+    <div class="modal-overlay" id="tripModalOverlay" hidden>
+      <div
+        class="modal-sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitle"
+      >
+        <div class="modal-sheet__handle" aria-hidden="true"></div>
+        <div class="modal-sheet__header">
+          <h2 id="modalTitle">פרטי הסעה</h2>
+        </div>
+
+        <div class="modal-info-box">
+          <div class="modal-info-box__top">
+            <span class="modal-info-box__time" id="modalTime"></span>
+            <span class="modal-info-box__date" id="modalDate"></span>
+          </div>
+          <div class="modal-route">
+            <div class="modal-route__point">
+              <span class="modal-route__dot modal-route__dot--origin"></span>
+              <span>מוצא: <strong id="modalOrigin"></strong></span>
+            </div>
+            <div class="modal-route__line"></div>
+            <div class="modal-route__point">
+              <span class="modal-route__dot modal-route__dot--dest"></span>
+              <span>יעד: <strong id="modalDest"></strong></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-meta">
+          <div class="modal-meta__row">
+            <span class="modal-meta__label">נוסע</span>
+            <span class="modal-meta__value">
+              <span aria-hidden="true">👤</span>
+              <span id="modalPatient"></span>
+            </span>
+          </div>
+          <div class="modal-meta__divider"></div>
+          <div class="modal-meta__row" id="modalEscortsRow" hidden>
+            <span class="modal-meta__label">מלווים</span>
+            <span class="modal-meta__value">
+              <span aria-hidden="true">🧑‍🤝‍🧑</span>
+              <span id="modalEscorts"></span>
+            </span>
+          </div>
+          <div class="modal-meta__divider" id="modalEscortsDivider" hidden></div>
+          <div class="modal-meta__row">
+            <span class="modal-meta__label">אזור</span>
+            <span class="modal-meta__value">
+              <span aria-hidden="true">📍</span>
+              <span id="modalArea"></span>
+            </span>
+          </div>
+          <div class="modal-meta__divider" id="modalPhoneDivider" hidden></div>
+          <div class="modal-meta__row" id="modalPhoneRow" hidden>
+            <span class="modal-meta__label">טלפון ליצירת קשר</span>
+            <span class="modal-meta__value modal-meta__value--phone">
+              <span id="modalPhone"></span>
+              <a class="modal-call-btn" id="modalCallBtn" aria-label="התקשרות">📞</a>
+            </span>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-cancel" id="modalCancelBtn">בטל רישום</button>
+          <button class="btn-secondary" id="modalCloseBtn">סגור</button>
+        </div>
+      </div>
+    </div>
 
     <!-- Toast container -->
     <div id="toast-container" aria-live="polite" aria-atomic="true"></div>

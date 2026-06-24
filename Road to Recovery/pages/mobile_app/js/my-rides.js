@@ -40,7 +40,7 @@ function filterTrips(filter) {
   return trips;
 }
 
-/* ---- Header summary + tab counts ---- */
+/* ---- Tab counts ---- */
 function updateSummary() {
   var upcoming = allTrips.filter(function (t) {
     return !t.IsInThePast;
@@ -52,14 +52,6 @@ function updateSummary() {
   $("#countUpcoming").text(upcoming || "");
   $("#countPast").text(past || "");
   $("#countAll").text(allTrips.length || "");
-
-  if (allTrips.length === 0) {
-    $("#ridesSummary").text("אין נסיעות להצגה");
-  } else {
-    $("#ridesSummary").text(
-      upcoming + " נסיעות קרובות מתוך " + allTrips.length + " בסך הכל",
-    );
-  }
 }
 
 /* ---- Card builder ---- */
@@ -68,76 +60,85 @@ function buildTripCard(trip) {
   var $card = $(
     '<article class="trip-card' +
       (isPast ? " trip-card--past" : "") +
-      '">' +
-      '<div class="trip-card__top">' +
-      '<div class="trip-card__date">' +
-      '<span class="trip-card__day"></span>' +
+      '" tabindex="0" role="button">' +
+      '<div class="trip-card__head">' +
+      '<span class="status-badge"><span class="status-badge__dot" aria-hidden="true"></span><span class="status-badge__text"></span></span>' +
+      '<span class="trip-card__date"></span>' +
       "</div>" +
-      '<span class="trip-card__time"></span>' +
+      '<h3 class="trip-card__route"></h3>' +
+      '<div class="trip-card__row">' +
+      '<span class="trip-card__patient"><span aria-hidden="true">👤</span><span class="trip-card__patient-text"></span></span>' +
+      '<span class="trip-card__time"><span aria-hidden="true">🕐</span><span class="trip-card__time-text"></span></span>' +
       "</div>" +
-      '<div class="trip-card__badges">' +
-      '<span class="status-badge"><span aria-hidden="true"></span><span class="status-badge__text"></span></span>' +
-      '<span class="shift-badge"></span>' +
-      "</div>" +
-      '<div class="trip-card__divider"></div>' +
-      '<div class="trip-card__route">' +
-      '<div class="route-point route-point--origin"><span class="route-point__icon" aria-hidden="true">📍</span><span class="route-point__text"></span></div>' +
-      '<div class="route-arrow" aria-hidden="true">⬇</div>' +
-      '<div class="route-point route-point--dest"><span class="route-point__icon" aria-hidden="true">🏥</span><span class="route-point__text"></span></div>' +
-      "</div>" +
-      '<div class="trip-card__meta">' +
-      '<span class="meta-patient"><span aria-hidden="true">👤</span><span class="meta-patient__text"></span></span>' +
-      '<span class="meta-area"><span aria-hidden="true">🌍</span><span class="meta-area__text"></span></span>' +
-      "</div>" +
+      '<button class="btn-cancel" type="button">בטל רישום</button>' +
       "</article>",
   );
 
-  $card.find(".trip-card__day").text(MASTER.formatHebrewDate(trip.PickupTime));
-  $card.find(".trip-card__time").text(MASTER.formatTime(trip.PickupTime));
+  $card.data("trip", trip);
+
+  $card.find(".trip-card__date").text(MASTER.formatHebrewDate(trip.PickupTime));
+  $card.find(".trip-card__time-text").text(MASTER.formatTime(trip.PickupTime));
 
   var statusText = trip.Status || (isPast ? "בוצעה" : "מתוכננת");
   var badgeClass = statusBadgeClass(statusText);
-  var statusIcons = {
-    "status-badge--success": "✓",
-    "status-badge--error": "✕",
-    "status-badge--warning": "⚠",
-    "status-badge--default": "•",
-  };
   $card.find(".status-badge").addClass(badgeClass);
-  $card.find(".status-badge span[aria-hidden]").text(statusIcons[badgeClass]);
   $card.find(".status-badge__text").text(statusText);
 
   $card
-    .find(".shift-badge")
-    .text(trip.IsAfterNoon ? "☀️ אחר הצהריים" : "🌅 בוקר");
+    .find(".trip-card__route")
+    .text((trip.Origin || "—") + " ← " + (trip.Destination || "—"));
 
-  $card.find(".route-point--origin .route-point__text").text(trip.Origin || "—");
-  $card
-    .find(".route-point--dest .route-point__text")
-    .text(trip.Destination || "—");
+  $card.find(".trip-card__patient-text").text(trip.PatientName || "מטופל/ת");
 
-  $card.find(".meta-patient__text").text(trip.PatientName || "מטופל/ת");
-  $card.find(".meta-area__text").text(trip.Area || "—");
+  return $card;
+}
+
+/* ---- Details modal ---- */
+function openTripModal(trip) {
+  $("#modalTime").text(MASTER.formatTime(trip.PickupTime));
+  $("#modalDate").text(MASTER.formatHebrewDate(trip.PickupTime));
+  $("#modalOrigin").text(trip.Origin || "—");
+  $("#modalDest").text(trip.Destination || "—");
+  $("#modalPatient").text(trip.PatientName || "מטופל/ת");
+  $("#modalArea").text(trip.Area || "—");
 
   if (trip.AmountOfEscorts) {
-    $card.find(".trip-card__meta").append(
-      $('<span class="meta-escorts"></span>')
-        .append('<span aria-hidden="true">🧑‍🤝‍🧑</span>')
-        .append(
-          $("<span></span>").text(trip.AmountOfEscorts + " מלווים"),
-        ),
-    );
+    $("#modalEscorts").text(trip.AmountOfEscorts + " מלווה");
+    $("#modalEscortsRow, #modalEscortsDivider").removeAttr("hidden");
+  } else {
+    $("#modalEscortsRow, #modalEscortsDivider").attr("hidden", "hidden");
   }
 
   if (trip.PatientCellPhone) {
-    var $call = $('<a class="btn-call"></a>')
-      .attr("href", "tel:" + trip.PatientCellPhone)
-      .append('<span aria-hidden="true">📞</span>')
-      .append($("<span></span>").text("התקשרות למטופל/ת"));
-    $card.append($call);
+    $("#modalPhone").text(trip.PatientCellPhone);
+    $("#modalCallBtn").attr("href", "tel:" + trip.PatientCellPhone);
+    $("#modalPhoneRow, #modalPhoneDivider").removeAttr("hidden");
+  } else {
+    $("#modalPhoneRow, #modalPhoneDivider").attr("hidden", "hidden");
   }
 
-  return $card;
+  $("#tripModalOverlay").data("trip", trip).removeAttr("hidden");
+}
+
+function closeTripModal() {
+  $("#tripModalOverlay").attr("hidden", "hidden");
+}
+
+function confirmCancelTrip(trip) {
+  Swal.fire({
+    title: "בטל רישום לנסיעה זו?",
+    text: trip.Origin + " ← " + trip.Destination,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "בטל רישום",
+    cancelButtonText: "חזרה",
+    confirmButtonColor: "#b91c1c",
+  }).then(function (result) {
+    if (result.isConfirmed) {
+      closeTripModal();
+      MASTER.showToast("הרישום בוטל", "success");
+    }
+  });
 }
 
 /* ---- Empty / error states ---- */
@@ -281,5 +282,22 @@ $(function () {
   });
   $(document).on("click", "#retryLoad", function () {
     fetchTrips(user.Id);
+  });
+
+  $(document).on("click", ".trip-card .btn-cancel", function (e) {
+    e.stopImmediatePropagation();
+    confirmCancelTrip($(this).closest(".trip-card").data("trip"));
+  });
+  $(document).on("click keypress", ".trip-card", function (e) {
+    if (e.type === "keypress" && e.key !== "Enter") return;
+    openTripModal($(this).data("trip"));
+  });
+
+  $("#modalCloseBtn").on("click", closeTripModal);
+  $("#modalCancelBtn").on("click", function () {
+    confirmCancelTrip($("#tripModalOverlay").data("trip"));
+  });
+  $("#tripModalOverlay").on("click", function (e) {
+    if (e.target === this) closeTripModal();
   });
 });

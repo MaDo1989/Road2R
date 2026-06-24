@@ -91,50 +91,34 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  border-right: 6px solid var(--color-primary);
+  cursor: pointer;
+  transition: transform var(--duration-fast) ease;
+}
+
+.trip-card:active {
+  transform: scale(0.98);
+}
+
+.trip-card:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 .trip-card--past {
-  border-right-color: var(--color-border);
   opacity: 0.85;
 }
 
-.trip-card__top {
+.trip-card__head {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 10px;
 }
 
 .trip-card__date {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.trip-card__day {
-  font-size: var(--font-body);
-  font-weight: 700;
-  color: var(--color-text);
-}
-
-.trip-card__time {
-  font-size: var(--font-heading-sm);
-  font-weight: 700;
-  color: var(--color-primary);
-  flex-shrink: 0;
-}
-
-.trip-card--past .trip-card__time {
+  font-size: 15px;
+  font-weight: 600;
   color: var(--color-text-secondary);
-}
-
-/* Status + shift row */
-.trip-card__badges {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
 }
 
 .status-badge {
@@ -145,6 +129,13 @@
   font-weight: 700;
   padding: 6px 12px;
   border-radius: 999px;
+}
+
+.status-badge__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
 }
 
 .status-badge--success {
@@ -167,90 +158,252 @@
   background: var(--color-background);
 }
 
-.shift-badge {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-text-secondary);
-  background: var(--color-background);
-  padding: 6px 12px;
-  border-radius: 999px;
-}
-
-.trip-card__divider {
-  height: 1px;
-  background: #e0eef5;
-}
-
-/* Route */
 .trip-card__route {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.route-point {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  font-size: var(--font-body);
+  font-size: var(--font-heading-sm);
+  font-weight: 700;
   color: var(--color-text);
-  line-height: var(--line-height-body);
 }
 
-.route-point__icon {
-  flex-shrink: 0;
-  font-size: 18px;
-  line-height: 1.4;
-}
-
-.route-arrow {
-  font-size: 16px;
-  color: var(--color-text-secondary);
-  padding-right: 4px;
-}
-
-/* Meta row */
-.trip-card__meta {
+.trip-card__row {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
   gap: 14px;
   font-size: 16px;
   color: var(--color-text-secondary);
 }
 
-.trip-card__meta span {
+.trip-card__row span {
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
 
-/* Call button */
-.btn-call {
+.trip-card__time {
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.trip-card--past .trip-card__time {
+  color: var(--color-text-secondary);
+}
+
+/* Cancel button — used both on the card and inside the modal */
+.btn-cancel {
   width: 100%;
   height: var(--touch-target);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
   font-size: 17px;
   font-weight: 700;
   font-family: inherit;
-  color: var(--color-primary);
-  background: var(--color-background);
-  border: 2px solid var(--color-primary);
+  color: #fff;
+  background: var(--color-error);
+  border: none;
   border-radius: var(--radius-btn);
-  text-decoration: none;
   cursor: pointer;
   transition: background var(--duration-fast);
 }
 
-.btn-call:active {
-  background: #d6e9f1;
+.btn-cancel:active {
+  background: #9d1717;
 }
 
-.btn-call:focus-visible {
+.btn-cancel:focus-visible {
   outline: 3px solid var(--color-accent);
   outline-offset: 2px;
+}
+
+.btn-secondary {
+  width: 100%;
+  height: var(--touch-target);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--color-primary);
+  background: var(--color-surface);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  transition: background var(--duration-fast);
+}
+
+.btn-secondary:active {
+  background: var(--color-background);
+}
+
+.btn-secondary:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ===== Ride details modal ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal-overlay[hidden] {
+  display: none;
+}
+
+.modal-sheet {
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--color-surface);
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  padding: 12px var(--padding-card-sm) calc(var(--padding-card-sm) + 16px);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.modal-sheet__handle {
+  width: 44px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--color-border);
+  opacity: 0.4;
+  align-self: center;
+}
+
+.modal-sheet__header h2 {
+  font-size: var(--font-heading-sm);
+  font-weight: 700;
+  text-align: right;
+}
+
+.modal-info-box {
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: var(--radius-card);
+  padding: var(--padding-card-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-info-box__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.modal-info-box__time {
+  font-size: var(--font-heading-lg);
+  font-weight: 700;
+}
+
+.modal-info-box__date {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.modal-route {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.modal-route__point {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--font-body);
+}
+
+.modal-route__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.modal-route__dot--origin {
+  background: #fff;
+}
+
+.modal-route__dot--dest {
+  background: var(--color-accent);
+}
+
+.modal-route__line {
+  width: 1px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.4);
+  margin-right: 4px;
+}
+
+.modal-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-meta__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.modal-meta__row[hidden] {
+  display: none;
+}
+
+.modal-meta__label {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+}
+
+.modal-meta__value {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--font-body);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.modal-meta__value--phone {
+  gap: 12px;
+}
+
+.modal-call-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #fde2e1;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.modal-meta__divider {
+  height: 1px;
+  background: #e0eef5;
+}
+
+.modal-meta__divider[hidden] {
+  display: none;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
 }
 
 /* ===== Loading skeleton ===== */
