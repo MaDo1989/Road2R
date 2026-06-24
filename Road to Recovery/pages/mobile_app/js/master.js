@@ -130,3 +130,56 @@ const isProductionDatabase = (onResult) => {
   );
 };
 MASTER.IsProductionDatabase = isProductionDatabase;
+
+const HEBREW_DAY_NAMES = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+const HEBREW_MONTH_NAMES = [
+  "ינואר",
+  "פברואר",
+  "מרץ",
+  "אפריל",
+  "מאי",
+  "יוני",
+  "יולי",
+  "אוגוסט",
+  "ספטמבר",
+  "אוקטובר",
+  "נובמבר",
+  "דצמבר",
+];
+
+/* ASMX endpoints wrap the JSON payload as a serialised string in `.d` */
+const parseResponse = (wrapper) => {
+  try {
+    const raw = wrapper && wrapper.d !== undefined ? wrapper.d : wrapper;
+    return typeof raw === "string" ? JSON.parse(raw) : raw;
+  } catch (e) {
+    MASTER.devLog("Error parsing API response: " + e, "error");
+    return null;
+  }
+};
+MASTER.parseResponse = parseResponse;
+
+const formatTime = (dateStr) => {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return "";
+  const h = d.getHours().toString().padStart(2, "0");
+  const m = d.getMinutes().toString().padStart(2, "0");
+  return h + ":" + m;
+};
+MASTER.formatTime = formatTime;
+
+const formatHebrewDate = (dateStr) => {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return "";
+  return (
+    "יום " +
+    HEBREW_DAY_NAMES[d.getDay()] +
+    ", " +
+    d.getDate() +
+    " ב" +
+    HEBREW_MONTH_NAMES[d.getMonth()]
+  );
+};
+MASTER.formatHebrewDate = formatHebrewDate;

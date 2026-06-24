@@ -1,0 +1,301 @@
+/* ===================================================
+   my-rides.css — "My Rides" screen styles
+   Depends on: master.css (must be loaded first)
+   =================================================== */
+
+/* ===== Content wrapper ===== */
+.content {
+  padding: 24px var(--gutter) 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ===== Filter tabs ===== */
+.filter-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.filter-tab {
+  min-height: var(--touch-target);
+  background: var(--color-surface);
+  border: 2px solid transparent;
+  border-radius: var(--radius-btn);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 8px 4px;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  font-family: inherit;
+  text-align: center;
+  transition:
+    border-color var(--duration-fast),
+    color var(--duration-fast),
+    transform var(--duration-fast);
+}
+
+.filter-tab__icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.filter-tab__label {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.filter-tab__count {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  min-height: 16px;
+}
+
+.filter-tab.is-active {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.filter-tab.is-active .filter-tab__count {
+  color: var(--color-primary);
+}
+
+.filter-tab:active {
+  transform: scale(0.97);
+}
+
+.filter-tab:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ===== Trip list ===== */
+.trip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ===== Trip card ===== */
+.trip-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: var(--padding-card-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-right: 6px solid var(--color-primary);
+}
+
+.trip-card--past {
+  border-right-color: var(--color-border);
+  opacity: 0.85;
+}
+
+.trip-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.trip-card__date {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.trip-card__day {
+  font-size: var(--font-body);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.trip-card__time {
+  font-size: var(--font-heading-sm);
+  font-weight: 700;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.trip-card--past .trip-card__time {
+  color: var(--color-text-secondary);
+}
+
+/* Status + shift row */
+.trip-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+
+.status-badge--success {
+  color: var(--color-success);
+  background: #e8f5ee;
+}
+
+.status-badge--error {
+  color: var(--color-error);
+  background: var(--color-error-bg);
+}
+
+.status-badge--warning {
+  color: var(--color-warning);
+  background: #fef3e2;
+}
+
+.status-badge--default {
+  color: var(--color-primary);
+  background: var(--color-background);
+}
+
+.shift-badge {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: var(--color-background);
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+
+.trip-card__divider {
+  height: 1px;
+  background: #e0eef5;
+}
+
+/* Route */
+.trip-card__route {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.route-point {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: var(--font-body);
+  color: var(--color-text);
+  line-height: var(--line-height-body);
+}
+
+.route-point__icon {
+  flex-shrink: 0;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.route-arrow {
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  padding-right: 4px;
+}
+
+/* Meta row */
+.trip-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 16px;
+  color: var(--color-text-secondary);
+}
+
+.trip-card__meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Call button */
+.btn-call {
+  width: 100%;
+  height: var(--touch-target);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 17px;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--color-primary);
+  background: var(--color-background);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-btn);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--duration-fast);
+}
+
+.btn-call:active {
+  background: #d6e9f1;
+}
+
+.btn-call:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ===== Loading skeleton ===== */
+.skeleton-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: var(--padding-card-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.skeleton-line {
+  height: 16px;
+  border-radius: 8px;
+  background: linear-gradient(
+    90deg,
+    var(--color-background) 25%,
+    #f3f8fb 50%,
+    var(--color-background) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+.skeleton-line--short {
+  width: 40%;
+}
+
+.skeleton-line--tall {
+  height: 24px;
+  width: 30%;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ===== Empty / error state extras ===== */
+.empty-state__retry {
+  margin-top: 4px;
+}

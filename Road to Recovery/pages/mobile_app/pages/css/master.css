@@ -338,3 +338,27 @@ body {
 .page-with-nav {
   padding-bottom: calc(var(--touch-target) + 24px);
 }
+
+/* ===== 8. Empty State ===== */
+/* Shared across every screen with a list that can be empty */
+.empty-state {
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 32px var(--padding-card-sm);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.empty-state__icon {
+  font-size: 36px;
+}
+
+.empty-state p {
+  font-size: var(--font-body);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-body);
+}

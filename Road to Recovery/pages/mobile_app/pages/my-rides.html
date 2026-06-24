@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#005f85" />
+    <title>הנסיעות שלי — Road to Recovery</title>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../js/master.js"></script>
+    <link rel="stylesheet" href="css/master.css" />
+    <link rel="stylesheet" href="css/my-rides.css" />
+  </head>
+  <body>
+    <div class="page page-with-nav">
+      <header class="header">
+        <div class="header__top-row">
+          <div class="header__logo-wrap">
+            <img
+              src="../../../../Media/R2R Logo.png"
+              alt="Road to Recovery"
+              class="header__logo"
+            />
+          </div>
+          <div class="header__title-group">
+            <h1 class="header__greeting">הנסיעות שלי</h1>
+            <p class="header__sub" id="ridesSummary">טוען נסיעות...</p>
+          </div>
+        </div>
+      </header>
+
+      <main class="content">
+        <section
+          class="filter-tabs"
+          role="tablist"
+          aria-label="סינון נסיעות"
+        >
+          <button
+            class="filter-tab is-active"
+            id="tabUpcoming"
+            role="tab"
+            aria-selected="true"
+            data-filter="upcoming"
+          >
+            <span class="filter-tab__icon" aria-hidden="true">📅</span>
+            <span class="filter-tab__label">קרובות</span>
+            <span class="filter-tab__count" id="countUpcoming"></span>
+          </button>
+          <button
+            class="filter-tab"
+            id="tabPast"
+            role="tab"
+            aria-selected="false"
+            data-filter="past"
+          >
+            <span class="filter-tab__icon" aria-hidden="true">🕓</span>
+            <span class="filter-tab__label">עבר</span>
+            <span class="filter-tab__count" id="countPast"></span>
+          </button>
+          <button
+            class="filter-tab"
+            id="tabAll"
+            role="tab"
+            aria-selected="false"
+            data-filter="all"
+          >
+            <span class="filter-tab__icon" aria-hidden="true">📋</span>
+            <span class="filter-tab__label">הכל</span>
+            <span class="filter-tab__count" id="countAll"></span>
+          </button>
+        </section>
+
+        <section aria-label="רשימת נסיעות">
+          <div class="trip-list" id="tripList"></div>
+        </section>
+      </main>
+    </div>
+
+    <nav class="bottom-nav" aria-label="ניווט ראשי">
+      <button class="nav-item" id="navHome">
+        <span class="nav-item__icon" aria-hidden="true">🏠</span>
+        <span class="nav-item__label">בית</span>
+      </button>
+      <button class="nav-item" id="navFindRide">
+        <span class="nav-item__icon" aria-hidden="true">🔍</span>
+        <span class="nav-item__label">חיפוש נסיעה</span>
+      </button>
+      <button class="nav-item is-active" id="navMyRides" aria-current="page">
+        <span class="nav-item__icon" aria-hidden="true">🚗</span>
+        <span class="nav-item__label">הנסיעות שלי</span>
+      </button>
+      <button class="nav-item" id="navSettings">
+        <span class="nav-item__icon" aria-hidden="true">⚙️</span>
+        <span class="nav-item__label">הגדרות</span>
+      </button>
+    </nav>
+
+    <!-- Toast container -->
+    <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <script src="../js/my-rides.js"></script>
+  </body>
+</html>
