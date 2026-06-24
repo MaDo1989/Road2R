@@ -2,7 +2,12 @@ const MASTER = {
   getBaseUrl: () => {
     const env = MASTER.environmentDetected();
     if (env === "local")
-      return "http://localhost:59819/Road%20to%20Recovery/pages/WebService.asmx/";
+      return (
+        location.protocol +
+        "//" +
+        location.host +
+        "/Road%20to%20Recovery/pages/WebService.asmx/"
+      );
     if (env === "test")
       return "https://roadtorecovery.org.il/Gilad_test/Road%20to%20Recovery/pages/WebService.asmx/";
     return "https://roadtorecovery.org.il/prod/Road%20to%20Recovery/pages/WebService.asmx/";
@@ -72,4 +77,56 @@ const MASTER = {
       }, 300);
     }, 2500);
   },
+  devLog: (message, state) => {
+    const states = {
+      error: {
+        label: "ERROR",
+        bg: "#c0392b",
+        color: "#fff",
+        method: "error",
+      },
+      warning: {
+        label: "WARNING",
+        bg: "#e67e22",
+        color: "#fff",
+        method: "warn",
+      },
+      important: {
+        label: "IMPORTANT",
+        bg: "#2980b9",
+        color: "#fff",
+        method: "log",
+      },
+    };
+
+    const cfg = states[state] || states["important"];
+    const badge =
+      `background:${cfg.bg};color:${cfg.color};` +
+      `font-size:14px;font-weight:bold;padding:4px 10px;border-radius:4px 0 0 4px;`;
+    const text =
+      `background:#1a1a1a;color:${cfg.bg};` +
+      `font-size:14px;font-weight:bold;padding:4px 10px;border-radius:0 4px 4px 0;`;
+
+    console[cfg.method](`%c ${cfg.label} %c ${message} `, badge, text);
+  },
 };
+const isProductionDatabase = (onResult) => {
+  MASTER.ajax(
+    "isProductionDatabase",
+    {},
+    function (response) {
+      const isProd = response.d == true;
+      if (isProd) {
+        MASTER.devLog("Connected to PRODUCTION database.", "important");
+      } else {
+        MASTER.devLog("Not connected to production database.", "important");
+      }
+      if (typeof onResult === "function") onResult(isProd);
+    },
+    function (xhr, status, error) {
+      MASTER.devLog("Error checking database environment: " + error, "error");
+      if (typeof onResult === "function") onResult(false);
+    },
+  );
+};
+MASTER.IsProductionDatabase = isProductionDatabase;

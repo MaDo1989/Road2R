@@ -16,9 +16,18 @@ var SAMPLE_RIDES = [
   },
 ];
 
+function getTimeGreeting() {
+  var h = new Date().getHours();
+  if (h >= 5 && h < 12) return "בוקר טוב";
+  if (h >= 12 && h < 17) return "צהריים טובים";
+  if (h >= 17 && h < 21) return "ערב טוב";
+  return "לילה טוב";
+}
+
 function renderGreeting(user) {
   var name = (user && user.DisplayName) || "מתנדב/ת";
-  $("#greeting").text("שלום, " + name + "!");
+  var timeGreet = getTimeGreeting();
+  $("#greeting").text(timeGreet + ", " + name + "!");
 }
 
 function renderStats(user) {
@@ -67,9 +76,19 @@ function renderRides(rides) {
 
 $(function () {
   var user = MASTER.getCurrentUser();
+  if (!user) {
+    window.location.replace("login.html");
+    return;
+  }
   renderGreeting(user);
   renderStats(user);
   renderRides(SAMPLE_RIDES);
+
+  MASTER.IsProductionDatabase(function (isProd) {
+    if (!isProd) {
+      $(".header").css("background-color", "#f39c12");
+    }
+  });
 
   $("#actionFindRide, #navFindRide").on("click", function () {
     window.location.href = "find-ride.html";
