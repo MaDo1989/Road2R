@@ -75,6 +75,8 @@ function renderRides(rides) {
 }
 
 $(function () {
+  MASTER.renderHeader("#appHeader", { title: "שלום!", subtitle: "מוכנים לעזור היום?" });
+
   var user = MASTER.getCurrentUser();
   if (!user) {
     window.location.replace("login.html");

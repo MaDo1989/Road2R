@@ -131,6 +131,33 @@ const isProductionDatabase = (onResult) => {
 };
 MASTER.IsProductionDatabase = isProductionDatabase;
 
+/* Shared header component — logo + title (+ optional subtitle). */
+const renderHeader = (selector, opts) => {
+  opts = opts || {};
+  const titleId = opts.titleId || "greeting";
+  const subId = opts.subId || "greetingSub";
+  const logoSrc = opts.logoSrc || "../../../../Media/R2R Logo.png";
+  const subHtml =
+    opts.subtitle != null
+      ? `<p class="header__sub" id="${subId}">${opts.subtitle}</p>`
+      : "";
+
+  $(selector)
+    .addClass("header")
+    .html(
+      '<div class="header__top-row">' +
+        '<div class="header__logo-wrap">' +
+        `<img src="${logoSrc}" alt="Road to Recovery" class="header__logo" />` +
+        "</div>" +
+        '<div class="header__title-group">' +
+        `<h1 class="header__greeting" id="${titleId}">${opts.title || ""}</h1>` +
+        subHtml +
+        "</div>" +
+        "</div>",
+    );
+};
+MASTER.renderHeader = renderHeader;
+
 const HEBREW_DAY_ABBR = ["א'", "ב'", "ג'", "ד'", "ה'", "ו'", "ש'"];
 
 /* ASMX endpoints wrap the JSON payload as a serialised string in `.d` */

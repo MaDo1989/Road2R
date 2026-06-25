@@ -62,15 +62,19 @@ function buildTripCard(trip) {
       (isPast ? " trip-card--past" : "") +
       '" tabindex="0" role="button">' +
       '<div class="trip-card__head">' +
-      '<span class="status-badge"><span class="status-badge__dot" aria-hidden="true"></span><span class="status-badge__text"></span></span>' +
-      '<span class="trip-card__date"></span>' +
+      '<span class="trip-card__when">' +
+      '<span aria-hidden="true">📅</span><span class="trip-card__date"></span>' +
+      '<span class="trip-card__when-time"><span aria-hidden="true">🕐</span><span class="trip-card__time-text"></span></span>' +
+      "</span>" +
+      '<span class="status-badge status-badge--sm"><span class="status-badge__dot" aria-hidden="true"></span><span class="status-badge__text"></span></span>' +
       "</div>" +
       '<h3 class="trip-card__route"></h3>' +
       '<div class="trip-card__row">' +
       '<span class="trip-card__patient"><span aria-hidden="true">👤</span><span class="trip-card__patient-text"></span></span>' +
-      '<span class="trip-card__time"><span aria-hidden="true">🕐</span><span class="trip-card__time-text"></span></span>' +
       "</div>" +
-      '<button class="btn-cancel" type="button">בטל רישום</button>' +
+      (isPast
+        ? ""
+        : '<button class="btn-cancel" type="button">בטל רישום</button>') +
       "</article>",
   );
 
@@ -116,6 +120,8 @@ function openTripModal(trip) {
   } else {
     $("#modalPhoneRow, #modalPhoneDivider").attr("hidden", "hidden");
   }
+
+  $("#modalCancelBtn").toggle(!trip.IsInThePast);
 
   $("#tripModalOverlay").data("trip", trip).removeAttr("hidden");
 }
@@ -245,6 +251,8 @@ function fetchTrips(volunteerId) {
 }
 
 $(function () {
+  MASTER.renderHeader("#appHeader", { title: "הנסיעות שלי" });
+
   var user = MASTER.getCurrentUser();
   if (!user) {
     window.location.replace("login.html");

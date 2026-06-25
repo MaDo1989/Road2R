@@ -115,10 +115,22 @@
   gap: 10px;
 }
 
-.trip-card__date {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--color-text-secondary);
+/* Date + time — the most senior-friendly-critical info on the card:
+   "when is my ride" must read instantly, ahead of status. */
+.trip-card__when {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: var(--font-heading-sm);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.trip-card__when-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .status-badge {
@@ -129,6 +141,12 @@
   font-weight: 700;
   padding: 6px 12px;
   border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.status-badge--sm {
+  font-size: 13px;
+  padding: 4px 10px;
 }
 
 .status-badge__dot {
@@ -179,12 +197,7 @@
   gap: 6px;
 }
 
-.trip-card__time {
-  font-weight: 700;
-  color: var(--color-primary);
-}
-
-.trip-card--past .trip-card__time {
+.trip-card--past .trip-card__when {
   color: var(--color-text-secondary);
 }
 
@@ -296,8 +309,24 @@
 
 .modal-info-box__top {
   display: flex;
-  align-items: baseline;
+  align-items: flex-end;
   justify-content: space-between;
+}
+
+.modal-info-box__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.modal-info-box__field--date {
+  align-items: flex-end;
+}
+
+.modal-info-box__label {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .modal-info-box__time {
@@ -306,8 +335,8 @@
 }
 
 .modal-info-box__date {
-  font-size: 15px;
-  color: rgba(255, 255, 255, 0.85);
+  font-size: var(--font-heading-sm);
+  font-weight: 700;
 }
 
 .modal-route {
