@@ -1015,7 +1015,7 @@
                 let str = '';
                 for (var i = 0; i < EscortedList.length; i++) {
                     let flagCheck = false;
-                    if (ThisRide?.AmountOfEscorts == null || ThisRide?.AmountOfEscorts == undefined) {
+                    if (ThisRide?.AmountOfEscorts == null || ThisRide?.AmountOfEscorts == undefined || arr_customer.func == "new") {
                         if (patient.ActiveEscorts != undefined && i < patient.ActiveEscorts.length) {
                             flagCheck = true;
                         }

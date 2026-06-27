@@ -1,5 +1,5 @@
 /* ===================================================
-   my-rides.css — "My Rides" screen styles
+   find-ride.css — "Find a Ride" screen styles
    Depends on: master.css (must be loaded first)
    =================================================== */
 
@@ -75,14 +75,14 @@
   outline-offset: 2px;
 }
 
-/* ===== Trip list ===== */
+/* ===== Ride list (shares card layout language with trip-list) ===== */
 .trip-list {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-/* ===== Trip card ===== */
+/* ===== Ride card ===== */
 .trip-card {
   background: var(--color-surface);
   border-radius: var(--radius-card);
@@ -104,10 +104,6 @@
   outline-offset: 2px;
 }
 
-.trip-card--past {
-  opacity: 0.85;
-}
-
 .trip-card__head {
   display: flex;
   align-items: center;
@@ -116,7 +112,7 @@
 }
 
 /* Date + time — the most senior-friendly-critical info on the card:
-   "when is my ride" must read instantly, ahead of status. */
+   "when is this ride" must read instantly. */
 .trip-card__when {
   display: flex;
   align-items: center;
@@ -137,13 +133,6 @@
   font-size: 13px;
   font-weight: 700;
   color: var(--color-text-secondary, #6b7280);
-}
-
-.modal-info-box__afternoon-label {
-  font-size: 14px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.85);
-  margin-inline-start: 4px;
 }
 
 .status-badge {
@@ -167,21 +156,6 @@
   height: 8px;
   border-radius: 50%;
   background: currentColor;
-}
-
-.status-badge--success {
-  color: var(--color-success);
-  background: #e8f5ee;
-}
-
-.status-badge--error {
-  color: var(--color-error);
-  background: var(--color-error-bg);
-}
-
-.status-badge--warning {
-  color: var(--color-warning);
-  background: #fef3e2;
 }
 
 .status-badge--default {
@@ -210,33 +184,50 @@
   gap: 6px;
 }
 
-.trip-card--past .trip-card__when {
-  color: var(--color-text-secondary);
+/* ===== Medical equipment chips (card + modal) ===== */
+.equipment-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-/* Cancel button — used both on the card and inside the modal */
-.btn-cancel {
+.equipment-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: var(--color-background);
+  border-radius: 999px;
+  padding: 6px 12px;
+}
+
+/* Register button — primary action on every open ride */
+.btn-register {
   width: 100%;
   height: var(--touch-target);
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   font-size: 17px;
   font-weight: 700;
   font-family: inherit;
-  color: #fff;
-  background: var(--color-error);
+  color: var(--color-primary-text);
+  background: var(--color-primary);
   border: none;
   border-radius: var(--radius-btn);
   cursor: pointer;
+  box-shadow: var(--shadow-btn);
   transition: background var(--duration-fast);
 }
 
-.btn-cancel:active {
-  background: #9d1717;
+.btn-register:active {
+  background: var(--color-primary-active);
 }
 
-.btn-cancel:focus-visible {
+.btn-register:focus-visible {
   outline: 3px solid var(--color-accent);
   outline-offset: 2px;
 }
@@ -347,6 +338,13 @@
   font-weight: 700;
 }
 
+.modal-info-box__afternoon-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+  margin-inline-start: 4px;
+}
+
 .modal-info-box__date {
   font-size: var(--font-heading-sm);
   font-weight: 700;
@@ -400,6 +398,10 @@
   padding: 12px 0;
 }
 
+.modal-meta__row--equipment {
+  align-items: flex-start;
+}
+
 .modal-meta__row[hidden] {
   display: none;
 }
@@ -407,6 +409,7 @@
 .modal-meta__label {
   font-size: 15px;
   color: var(--color-text-secondary);
+  flex-shrink: 0;
 }
 
 .modal-meta__value {

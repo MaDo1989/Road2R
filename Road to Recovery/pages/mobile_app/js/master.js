@@ -77,7 +77,7 @@ const MASTER = {
       }, 300);
     }, 2500);
   },
-  devLog: (message, state) => {
+  devLog: (message, state, customColor) => {
     const states = {
       error: {
         label: "ERROR",
@@ -99,7 +99,8 @@ const MASTER = {
       },
     };
 
-    const cfg = states[state] || states["important"];
+    const cfg = Object.assign({}, states[state] || states["important"]);
+    if (customColor) cfg.bg = customColor;
     const badge =
       `background:${cfg.bg};color:${cfg.color};` +
       `font-size:14px;font-weight:bold;padding:4px 10px;border-radius:4px 0 0 4px;`;
@@ -119,7 +120,7 @@ const isProductionDatabase = (onResult) => {
       if (isProd) {
         MASTER.devLog("Connected to PRODUCTION database.", "important");
       } else {
-        MASTER.devLog("Not connected to production database.", "important");
+        MASTER.devLog("Connected to NON-PRODUCTION database.", "important" , "orange");
       }
       if (typeof onResult === "function") onResult(isProd);
     },
@@ -136,7 +137,7 @@ const renderHeader = (selector, opts) => {
   opts = opts || {};
   const titleId = opts.titleId || "greeting";
   const subId = opts.subId || "greetingSub";
-  const logoSrc = opts.logoSrc || "../../../../Media/R2R Logo.png";
+  const logoSrc = opts.logoSrc || "../assets/logo-no-bg-sm.png";
   const subHtml =
     opts.subtitle != null
       ? `<p class="header__sub" id="${subId}">${opts.subtitle}</p>`
@@ -172,20 +173,70 @@ const parseResponse = (wrapper) => {
 };
 MASTER.parseResponse = parseResponse;
 
+/*
+ * The API serialises dates as ASP.NET AJAX's "/Date(ms)/" format, where `ms`
+ * is an absolute epoch timestamp (UTC). `new Date("/Date(ms)/")` is NOT
+ * understood by modern JS engines and silently yields an Invalid Date — this
+ * is what caused times/sorting to break once the app stopped talking to a
+ * mocked/local payload that happened to use a plain ISO string. Because the
+ * embedded value is an absolute epoch instant, parsing it correctly removes
+ * any dependency on the server's timezone/location: the browser always
+ * renders it in the viewer's local time, consistently across environments.
+ */
+const parseDate = (value) => {
+  if (value === null || value === undefined || value === "") return null;
+  if (value instanceof Date) return isNaN(value.getTime()) ? null : value;
+
+  if (typeof value === "number") {
+    const d = new Date(value);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  if (typeof value === "string") {
+    const aspNetMatch = value.match(/^\/Date\((-?\d+)\)\/$/);
+    if (aspNetMatch) {
+      const d = new Date(Number(aspNetMatch[1]));
+      return isNaN(d.getTime()) ? null : d;
+    }
+    const d = new Date(value);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  return null;
+};
+MASTER.parseDate = parseDate;
+
 const formatTime = (dateStr) => {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return "";
+  const d = parseDate(dateStr);
+  if (!d) return "";
   const h = d.getHours().toString().padStart(2, "0");
   const m = d.getMinutes().toString().padStart(2, "0");
   return h + ":" + m;
 };
 MASTER.formatTime = formatTime;
 
+const AFTERNOON_LABEL = 'אחה"צ';
+
+/*
+ * Afternoon rides logged with the placeholder minute :14 carry no real
+ * pickup time — show only the אחה"צ label for those. Afternoon rides with a
+ * real time show both the time and a small אחה"צ label next to it.
+ */
+const getRideTimeDisplay = (pickupTime, isAfterNoon) => {
+  const d = parseDate(pickupTime);
+  const isPlaceholderTime = !!isAfterNoon && !!d && d.getMinutes() === 14;
+
+  return {
+    time: isPlaceholderTime ? "" : formatTime(pickupTime),
+    showLabel: !!isAfterNoon,
+    label: AFTERNOON_LABEL,
+  };
+};
+MASTER.getRideTimeDisplay = getRideTimeDisplay;
+
 const formatHebrewDate = (dateStr) => {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return "";
+  const d = parseDate(dateStr);
+  if (!d) return "";
   return (
     "יום " +
     HEBREW_DAY_ABBR[d.getDay()] +

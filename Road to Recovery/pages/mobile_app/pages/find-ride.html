@@ -4,13 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#005f85" />
-    <title>הנסיעות שלי — Road to Recovery</title>
+    <title>חיפוש נסיעה — Road to Recovery</title>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../js/master.js"></script>
     <link rel="stylesheet" href="css/master.css" />
-    <link rel="stylesheet" href="css/my-rides.css" />
+    <link rel="stylesheet" href="css/find-ride.css" />
   </head>
   <body>
     <div class="page page-with-nav">
@@ -24,41 +24,41 @@
         >
           <button
             class="filter-tab is-active"
-            id="tabUpcoming"
-            role="tab"
-            aria-selected="true"
-            data-filter="upcoming"
-          >
-            <span class="filter-tab__icon" aria-hidden="true">📅</span>
-            <span class="filter-tab__label">קרובות</span>
-            <span class="filter-tab__count" id="countUpcoming"></span>
-          </button>
-          <button
-            class="filter-tab"
-            id="tabPast"
-            role="tab"
-            aria-selected="false"
-            data-filter="past"
-          >
-            <span class="filter-tab__icon" aria-hidden="true">🕓</span>
-            <span class="filter-tab__label">עבר</span>
-            <span class="filter-tab__count" id="countPast"></span>
-          </button>
-          <button
-            class="filter-tab"
             id="tabAll"
             role="tab"
-            aria-selected="false"
+            aria-selected="true"
             data-filter="all"
           >
             <span class="filter-tab__icon" aria-hidden="true">📋</span>
             <span class="filter-tab__label">הכל</span>
             <span class="filter-tab__count" id="countAll"></span>
           </button>
+          <button
+            class="filter-tab"
+            id="tabMorning"
+            role="tab"
+            aria-selected="false"
+            data-filter="morning"
+          >
+            <span class="filter-tab__icon" aria-hidden="true">🌅</span>
+            <span class="filter-tab__label">בוקר</span>
+            <span class="filter-tab__count" id="countMorning"></span>
+          </button>
+          <button
+            class="filter-tab"
+            id="tabAfternoon"
+            role="tab"
+            aria-selected="false"
+            data-filter="afternoon"
+          >
+            <span class="filter-tab__icon" aria-hidden="true">🌇</span>
+            <span class="filter-tab__label">אחה"צ</span>
+            <span class="filter-tab__count" id="countAfternoon"></span>
+          </button>
         </section>
 
-        <section aria-label="רשימת נסיעות">
-          <div class="trip-list" id="tripList"></div>
+        <section aria-label="רשימת נסיעות פתוחות">
+          <div class="trip-list" id="rideList"></div>
         </section>
       </main>
     </div>
@@ -68,11 +68,11 @@
         <span class="nav-item__icon" aria-hidden="true">🏠</span>
         <span class="nav-item__label">בית</span>
       </button>
-      <button class="nav-item" id="navFindRide">
+      <button class="nav-item is-active" id="navFindRide" aria-current="page">
         <span class="nav-item__icon" aria-hidden="true">🔍</span>
         <span class="nav-item__label">חיפוש נסיעה</span>
       </button>
-      <button class="nav-item is-active" id="navMyRides" aria-current="page">
+      <button class="nav-item" id="navMyRides">
         <span class="nav-item__icon" aria-hidden="true">🚗</span>
         <span class="nav-item__label">הנסיעות שלי</span>
       </button>
@@ -83,7 +83,7 @@
     </nav>
 
     <!-- Ride details modal -->
-    <div class="modal-overlay" id="tripModalOverlay" hidden>
+    <div class="modal-overlay" id="rideModalOverlay" hidden>
       <div
         class="modal-sheet"
         role="dialog"
@@ -144,6 +144,11 @@
               <span id="modalArea"></span>
             </span>
           </div>
+          <div class="modal-meta__divider" id="modalEquipmentDivider" hidden></div>
+          <div class="modal-meta__row modal-meta__row--equipment" id="modalEquipmentRow" hidden>
+            <span class="modal-meta__label">ציוד רפואי נדרש</span>
+            <div class="equipment-chips" id="modalEquipmentChips"></div>
+          </div>
           <div class="modal-meta__divider" id="modalPhoneDivider" hidden></div>
           <div class="modal-meta__row" id="modalPhoneRow" hidden>
             <span class="modal-meta__label">טלפון ליצירת קשר</span>
@@ -155,8 +160,8 @@
         </div>
 
         <div class="modal-actions">
-          <button class="btn-cancel" id="modalCancelBtn">בטל רישום</button>
           <button class="btn-secondary" id="modalCloseBtn">סגור</button>
+          <button class="btn-primary" id="modalRegisterBtn">הירשם לנסיעה</button>
         </div>
       </div>
     </div>
@@ -164,6 +169,6 @@
     <!-- Toast container -->
     <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
 
-    <script src="../js/my-rides.js"></script>
+    <script src="../js/find-ride.js"></script>
   </body>
 </html>

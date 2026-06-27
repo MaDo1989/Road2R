@@ -98,14 +98,11 @@ $(function () {
   $("#actionMyRides, #navMyRides").on("click", function () {
     window.location.href = "my-rides.html";
   });
-  $("#actionPreferences").on("click", function () {
+  $("#actionPreferences, #navPreferences").on("click", function () {
     window.location.href = "preferences.html";
   });
   $("#actionStats").on("click", function () {
     window.location.href = "stats.html";
-  });
-  $("#navSettings").on("click", function () {
-    window.location.href = "settings.html";
   });
   $(document).on("click", "#emptyFindRide", function () {
     window.location.href = "find-ride.html";

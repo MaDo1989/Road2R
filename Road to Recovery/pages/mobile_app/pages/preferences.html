@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#005f85" />
+    <title>העדפות שלי — Road to Recovery</title>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../js/master.js"></script>
+    <link rel="stylesheet" href="css/master.css" />
+    <link rel="stylesheet" href="css/preferences.css" />
+  </head>
+  <body>
+    <div class="page page-with-nav">
+      <header class="header" id="appHeader"></header>
+
+      <section class="pref-tabs" role="tablist" aria-label="בחירת מסך העדפות">
+        <button class="pref-tab is-active" id="tabProfile" role="tab" aria-selected="true" data-panel="profile">
+          <span class="pref-tab__icon" aria-hidden="true">👤</span>
+          <span class="pref-tab__label">פרופיל</span>
+        </button>
+        <button class="pref-tab" id="tabDays" role="tab" aria-selected="false" data-panel="days">
+          <span class="pref-tab__icon" aria-hidden="true">🗓️</span>
+          <span class="pref-tab__label">ימים ושעות</span>
+        </button>
+        <button class="pref-tab" id="tabAreas" role="tab" aria-selected="false" data-panel="areas">
+          <span class="pref-tab__icon" aria-hidden="true">📍</span>
+          <span class="pref-tab__label">אזורים</span>
+        </button>
+      </section>
+
+      <main class="content">
+        <section class="pref-panel" id="panelProfile" aria-label="פרטי המתנדב">
+          <div class="profile-card">
+            <div class="profile-card__avatar" id="profileAvatar" aria-hidden="true"></div>
+            <div class="profile-card__info">
+              <h2 class="profile-card__name" id="profileName"></h2>
+              <span class="profile-card__badge" id="profileBadge" hidden>
+                <span aria-hidden="true">✓</span>
+                <span>מתנדב מאושר</span>
+              </span>
+              <p class="profile-card__stats" id="profileStats"></p>
+            </div>
+          </div>
+
+          <div class="seats-card">
+            <span class="seats-card__icon" aria-hidden="true">🚗</span>
+            <div class="seats-card__text">
+              <span class="seats-card__label">מקומות פנויים ברכב</span>
+            </div>
+            <div class="seats-stepper">
+              <button class="seats-stepper__btn" id="seatsMinus" type="button" aria-label="הפחת מקום">−</button>
+              <span class="seats-stepper__value" id="seatsValue"></span>
+              <button class="seats-stepper__btn" id="seatsPlus" type="button" aria-label="הוסף מקום">+</button>
+            </div>
+          </div>
+
+          <button class="btn-primary" id="saveProfileBtn" type="button">שמירת העדפות</button>
+
+          <button class="btn-logout" id="logoutBtn" type="button">
+            <span aria-hidden="true">🚪</span>
+            <span>התנתקות</span>
+          </button>
+        </section>
+
+        <section class="pref-panel" id="panelDays" aria-label="ימים ושעות מועדפים" hidden>
+          <h2 class="section-title">ימים ושעות מועדפים</h2>
+          <p class="section-hint">בחרו את הימים והשעות בהם תרצו לקבל הצעות להסעה.</p>
+          <div class="day-list" id="dayList"></div>
+          <button class="btn-primary" id="saveDaysBtn" type="button">שמירת העדפות</button>
+        </section>
+
+        <section class="pref-panel" id="panelAreas" aria-label="אזורים מועדפים" hidden>
+          <h2 class="section-title">אזורים מועדפים</h2>
+          <p class="section-hint">בחרו את האזורים בהם תרצו לבצע הסעות. אזור מסומן ✓ הוא אזור נבחר.</p>
+          <div class="area-chips" id="areaChips"></div>
+          <button class="btn-primary" id="saveAreasBtn" type="button">שמירת העדפות</button>
+        </section>
+      </main>
+    </div>
+
+    <nav class="bottom-nav" aria-label="ניווט ראשי">
+      <button class="nav-item" id="navHome">
+        <span class="nav-item__icon" aria-hidden="true">🏠</span>
+        <span class="nav-item__label">בית</span>
+      </button>
+      <button class="nav-item" id="navFindRide">
+        <span class="nav-item__icon" aria-hidden="true">🔍</span>
+        <span class="nav-item__label">חיפוש נסיעה</span>
+      </button>
+      <button class="nav-item" id="navMyRides">
+        <span class="nav-item__icon" aria-hidden="true">🚗</span>
+        <span class="nav-item__label">הנסיעות שלי</span>
+      </button>
+      <button class="nav-item is-active" id="navPreferences" aria-current="page">
+        <span class="nav-item__icon" aria-hidden="true">⚙️</span>
+        <span class="nav-item__label">העדפות</span>
+      </button>
+    </nav>
+
+    <!-- Toast container -->
+    <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <script src="../js/preferences.js"></script>
+  </body>
+</html>

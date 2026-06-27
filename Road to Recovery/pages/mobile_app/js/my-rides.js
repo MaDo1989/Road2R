@@ -22,18 +22,27 @@ function filterTrips(filter) {
       return !t.IsInThePast;
     });
     trips.sort(function (a, b) {
-      return new Date(a.PickupTime) - new Date(b.PickupTime);
+      return (
+        (MASTER.parseDate(a.PickupTime) || 0) -
+        (MASTER.parseDate(b.PickupTime) || 0)
+      );
     });
   } else if (filter === "past") {
     trips = trips.filter(function (t) {
       return !!t.IsInThePast;
     });
     trips.sort(function (a, b) {
-      return new Date(b.PickupTime) - new Date(a.PickupTime);
+      return (
+        (MASTER.parseDate(b.PickupTime) || 0) -
+        (MASTER.parseDate(a.PickupTime) || 0)
+      );
     });
   } else {
     trips.sort(function (a, b) {
-      return new Date(b.PickupTime) - new Date(a.PickupTime);
+      return (
+        (MASTER.parseDate(b.PickupTime) || 0) -
+        (MASTER.parseDate(a.PickupTime) || 0)
+      );
     });
   }
 
@@ -64,7 +73,7 @@ function buildTripCard(trip) {
       '<div class="trip-card__head">' +
       '<span class="trip-card__when">' +
       '<span aria-hidden="true">📅</span><span class="trip-card__date"></span>' +
-      '<span class="trip-card__when-time"><span aria-hidden="true">🕐</span><span class="trip-card__time-text"></span></span>' +
+      '<span class="trip-card__when-time"><span aria-hidden="true">🕐</span><span class="trip-card__time-text"></span><span class="trip-card__afternoon-label" hidden></span></span>' +
       "</span>" +
       '<span class="status-badge status-badge--sm"><span class="status-badge__dot" aria-hidden="true"></span><span class="status-badge__text"></span></span>' +
       "</div>" +
@@ -80,8 +89,13 @@ function buildTripCard(trip) {
 
   $card.data("trip", trip);
 
+  var timeInfo = MASTER.getRideTimeDisplay(trip.PickupTime, trip.IsAfterNoon);
   $card.find(".trip-card__date").text(MASTER.formatHebrewDate(trip.PickupTime));
-  $card.find(".trip-card__time-text").text(MASTER.formatTime(trip.PickupTime));
+  $card.find(".trip-card__time-text").text(timeInfo.time);
+  $card
+    .find(".trip-card__afternoon-label")
+    .text(timeInfo.showLabel ? timeInfo.label : "")
+    .attr("hidden", timeInfo.showLabel ? null : "hidden");
 
   var statusText = trip.Status || (isPast ? "בוצעה" : "מתוכננת");
   var badgeClass = statusBadgeClass(statusText);
@@ -99,7 +113,11 @@ function buildTripCard(trip) {
 
 /* ---- Details modal ---- */
 function openTripModal(trip) {
-  $("#modalTime").text(MASTER.formatTime(trip.PickupTime));
+  var modalTimeInfo = MASTER.getRideTimeDisplay(trip.PickupTime, trip.IsAfterNoon);
+  $("#modalTime").text(modalTimeInfo.time);
+  $("#modalAfternoonLabel")
+    .text(modalTimeInfo.showLabel ? modalTimeInfo.label : "")
+    .attr("hidden", modalTimeInfo.showLabel ? null : "hidden");
   $("#modalDate").text(MASTER.formatHebrewDate(trip.PickupTime));
   $("#modalOrigin").text(trip.Origin || "—");
   $("#modalDest").text(trip.Destination || "—");
@@ -281,8 +299,8 @@ $(function () {
   $("#navMyRides").on("click", function () {
     MASTER.showToast("את/ה כבר במסך הנסיעות שלי", "warning");
   });
-  $("#navSettings").on("click", function () {
-    window.location.href = "settings.html";
+  $("#navPreferences").on("click", function () {
+    window.location.href = "preferences.html";
   });
 
   $(document).on("click", "#emptyFindRide", function () {
