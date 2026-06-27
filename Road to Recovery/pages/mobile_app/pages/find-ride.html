@@ -17,6 +17,45 @@
       <header class="header" id="appHeader"></header>
 
       <main class="content">
+        <section class="ride-search" aria-label="חיפוש וסינון נסיעות">
+          <div class="search-box">
+            <span class="search-box__icon" aria-hidden="true">🔎</span>
+            <input
+              type="text"
+              id="searchInput"
+              class="search-box__input"
+              placeholder="חיפוש לפי שם מטופל/ת, מוצא או יעד"
+              aria-label="חיפוש לפי שם מטופל/ת, מוצא או יעד"
+            />
+            <button
+              type="button"
+              class="search-box__clear"
+              id="searchClearBtn"
+              aria-label="ניקוי חיפוש"
+              hidden
+            >
+              ✕
+            </button>
+          </div>
+
+          <button
+            type="button"
+            class="pref-filter-toggle"
+            id="prefOnlyToggle"
+            aria-pressed="false"
+          >
+            <span aria-hidden="true">⭐</span>
+            <span>הצג רק נסיעות לפי ההעדפות שלי</span>
+          </button>
+
+          <div
+            class="date-chip-row"
+            id="dateChipRow"
+            role="group"
+            aria-label="סינון לפי תאריך"
+          ></div>
+        </section>
+
         <section
           class="filter-tabs"
           role="tablist"

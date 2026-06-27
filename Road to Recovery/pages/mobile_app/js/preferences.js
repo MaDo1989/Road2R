@@ -166,6 +166,7 @@ function loadPreferences(volunteerId) {
     { volunteerId: volunteerId },
     function (wrapper) {
       var prefs = MASTER.parseResponse(wrapper) || {};
+      MASTER.cachePreferences(prefs);
       applyExistingPreferences(prefs);
       renderDayList();
       renderAreaChips();
@@ -176,6 +177,31 @@ function loadPreferences(volunteerId) {
       MASTER.showToast("שגיאה בטעינת ההעדפות. נסו שנית.", "error");
     },
   );
+}
+
+/* ---- Save (days / areas) ---- */
+function buildPreferencesPayload() {
+  var preferredDays = [];
+  Object.keys(selectedDays).forEach(function (day) {
+    Object.keys(selectedDays[day]).forEach(function (shift) {
+      preferredDays.push({ PreferedDayDayInWeek: day, Shift: shift });
+    });
+  });
+  var preferredAreas = Object.keys(selectedAreas).map(function (area) {
+    return { PreferredArea: area };
+  });
+  return { PreferredDays: preferredDays, PreferredAreas: preferredAreas };
+}
+
+/*
+ * No backend save endpoint exists yet (SaveVolunteerPreferencesMobile TBD).
+ * Once it does, wrap this in MASTER.ajax and only cache + toast inside its
+ * success callback — the cache/toast logic below is already what that
+ * callback should do.
+ */
+function saveVolunteerPreferences() {
+  MASTER.cachePreferences(buildPreferencesPayload());
+  MASTER.showToast("ההעדפות נשמרו", "success");
 }
 
 function loadAreas() {
@@ -238,7 +264,9 @@ $(function () {
     changeSeats(1);
   });
 
-  $("#saveProfileBtn, #saveDaysBtn, #saveAreasBtn").on("click", function () {
+  $("#saveDaysBtn, #saveAreasBtn").on("click", saveVolunteerPreferences);
+
+  $("#saveProfileBtn").on("click", function () {
     MASTER.showToast("שמירת העדפות תהיה זמינה בקרוב", "warning");
   });
 

@@ -1,10 +1,67 @@
 var allRides = [];
 var currentFilter = "all";
 var loadFailed = false;
+var currentUser = null;
+
+var searchQuery = "";
+var selectedDateKey = "all";
+var prefsOnly = false;
+var cachedPrefs = null;
 
 /* ---- Filtering / sorting ---- */
-function filterRides(filter) {
+function dateKeyOf(ride) {
+  var d = MASTER.parseDate(ride.PickupTime);
+  if (!d) return null;
+  return (
+    d.getFullYear() +
+    "-" +
+    String(d.getMonth() + 1).padStart(2, "0") +
+    "-" +
+    String(d.getDate()).padStart(2, "0")
+  );
+}
+
+function rideMatchesQuery(ride, query) {
+  var haystack = [
+    patientDisplayName(ride),
+    ride.Origin,
+    ride.Destination,
+    ride.Area,
+  ]
+    .join(" ")
+    .toLowerCase();
+  return haystack.indexOf(query) !== -1;
+}
+
+/* Rides matching every filter except the morning/afternoon tab — shared by
+   the list itself and by the tab counts, so counts stay in sync with search/date/prefs. */
+function baseFilteredRides() {
   var rides = allRides.slice();
+
+  if (selectedDateKey !== "all") {
+    rides = rides.filter(function (r) {
+      return dateKeyOf(r) === selectedDateKey;
+    });
+  }
+
+  if (prefsOnly) {
+    rides = rides.filter(function (r) {
+      return MASTER.rideMatchesPreferences(r, cachedPrefs);
+    });
+  }
+
+  var query = searchQuery.trim().toLowerCase();
+  if (query) {
+    rides = rides.filter(function (r) {
+      return rideMatchesQuery(r, query);
+    });
+  }
+
+  return rides;
+}
+
+function filterRides(filter) {
+  var rides = baseFilteredRides();
 
   if (filter === "morning") {
     rides = rides.filter(function (r) {
@@ -28,16 +85,52 @@ function filterRides(filter) {
 
 /* ---- Tab counts ---- */
 function updateSummary() {
-  var morning = allRides.filter(function (r) {
+  var rides = baseFilteredRides();
+  var morning = rides.filter(function (r) {
     return !r.IsAfterNoon;
   }).length;
-  var afternoon = allRides.filter(function (r) {
+  var afternoon = rides.filter(function (r) {
     return !!r.IsAfterNoon;
   }).length;
 
-  $("#countAll").text(allRides.length || "");
+  $("#countAll").text(rides.length || "");
   $("#countMorning").text(morning || "");
   $("#countAfternoon").text(afternoon || "");
+}
+
+/* ---- Date chips ---- */
+function shortDateLabel(d) {
+  return MASTER.HEBREW_DAY_ABBR[d.getDay()] + " " + d.getDate() + "." + (d.getMonth() + 1);
+}
+
+function renderDateChips() {
+  var $row = $("#dateChipRow").empty();
+  var seen = {};
+  var dates = [];
+
+  allRides.forEach(function (r) {
+    var d = MASTER.parseDate(r.PickupTime);
+    var key = dateKeyOf(r);
+    if (!d || !key || seen[key]) return;
+    seen[key] = true;
+    dates.push({ key: key, date: d });
+  });
+
+  dates.sort(function (a, b) {
+    return a.date - b.date;
+  });
+
+  $row.append(
+    $('<button type="button" class="date-chip is-selected" aria-pressed="true" data-key="all">הכל</button>'),
+  );
+
+  dates.forEach(function (entry) {
+    $row.append(
+      $('<button type="button" class="date-chip" aria-pressed="false"></button>')
+        .attr("data-key", entry.key)
+        .text(shortDateLabel(entry.date)),
+    );
+  });
 }
 
 /* ---- Patient display helpers ---- */
@@ -161,15 +254,60 @@ function confirmRegisterRide(ride) {
     cancelButtonText: "חזרה",
     confirmButtonColor: "#005f85",
   }).then(function (result) {
-    if (result.isConfirmed) {
-      closeRideModal();
-      MASTER.showToast("נרשמת בהצלחה לנסיעה", "success");
-    }
+    if (!result.isConfirmed) return;
+
+    MASTER.ajax(
+      "AssignUpdateDriverToUnityRide",
+      {
+        UnityRideId: ride.RidePatNum,
+        DriverId: currentUser.Id,
+        isDelete: false,
+        userName: currentUser.DisplayName,
+      },
+      function (wrapper) {
+        var updatedRide = MASTER.parseResponse(wrapper);
+        if (updatedRide && updatedRide.RidePatNum === -5) {
+          MASTER.showToast("הנסיעה הזו שובצה לנהג אחר. נסו לרענן.", "error");
+          closeRideModal();
+          fetchRides();
+          return;
+        }
+
+        closeRideModal();
+        allRides = allRides.filter(function (r) {
+          return r.RidePatNum !== ride.RidePatNum;
+        });
+        updateSummary();
+        renderRides();
+        MASTER.showToast("נרשמת בהצלחה לנסיעה", "success");
+        MASTER.refreshCurrentUser(function (user) {
+          currentUser = user;
+        });
+      },
+      function (xhr, status, error) {
+        MASTER.devLog("Error in AssignUpdateDriverToUnityRide: " + error, "error");
+        MASTER.showToast("שגיאה בהרשמה לנסיעה. נסו שנית.", "error");
+      },
+    );
   });
 }
 
 /* ---- Empty / error states ---- */
+function hasActiveExtraFilters() {
+  return !!searchQuery.trim() || selectedDateKey !== "all" || prefsOnly;
+}
+
 function buildEmptyState(filter) {
+  if (hasActiveExtraFilters()) {
+    return $(
+      '<div class="empty-state">' +
+        '<span class="empty-state__icon" aria-hidden="true">🔍</span>' +
+        "<p>לא נמצאו נסיעות התואמות את הסינון שנבחר.</p>" +
+        '<button class="btn-secondary empty-state__retry" id="clearFilters">איפוס סינון</button>' +
+        "</div>",
+    );
+  }
+
   var messages = {
     all: "אין כרגע נסיעות פתוחות להרשמה.",
     morning: "אין נסיעות פתוחות בבוקר כרגע.",
@@ -254,12 +392,15 @@ function fetchRides() {
   loadFailed = false;
   renderLoading();
 
+  selectedDateKey = "all";
+
   MASTER.ajax(
     "GetAllUnityRidesMobile",
     {},
     function (wrapper) {
       allRides = MASTER.parseResponse(wrapper) || [];
       console.log("Fetched rides:", allRides);
+      renderDateChips();
       updateSummary();
       renderRides();
     },
@@ -275,12 +416,13 @@ function fetchRides() {
 $(function () {
   MASTER.renderHeader("#appHeader", { title: "חיפוש נסיעה" });
 
-  var user = MASTER.getCurrentUser();
-  if (!user) {
+  currentUser = MASTER.getCurrentUser();
+  if (!currentUser) {
     window.location.replace("login.html");
     return;
   }
 
+  cachedPrefs = MASTER.getCachedPreferences();
   fetchRides();
 
   MASTER.IsProductionDatabase(function (isProd) {
@@ -291,6 +433,50 @@ $(function () {
 
   $(".filter-tab").on("click", function () {
     setActiveTab($(this).data("filter"));
+    renderRides();
+  });
+
+  $("#searchInput").on("input", function () {
+    searchQuery = $(this).val();
+    $("#searchClearBtn").attr("hidden", searchQuery ? null : "hidden");
+    updateSummary();
+    renderRides();
+  });
+
+  $("#searchClearBtn").on("click", function () {
+    searchQuery = "";
+    $("#searchInput").val("");
+    $(this).attr("hidden", "hidden");
+    updateSummary();
+    renderRides();
+  });
+
+  $(document).on("click", "#dateChipRow .date-chip", function () {
+    selectedDateKey = $(this).data("key");
+    $("#dateChipRow .date-chip")
+      .removeClass("is-selected")
+      .attr("aria-pressed", "false");
+    $(this).addClass("is-selected").attr("aria-pressed", "true");
+    updateSummary();
+    renderRides();
+  });
+
+  $("#prefOnlyToggle").on("click", function () {
+    var hasPrefs =
+      cachedPrefs &&
+      ((cachedPrefs.PreferredDays || []).length ||
+        (cachedPrefs.PreferredAreas || []).length);
+    if (!prefsOnly && !hasPrefs) {
+      MASTER.showToast(
+        "טרם הוגדרו העדפות. ניתן להגדיר בעמוד ההעדפות שלי",
+        "warning",
+      );
+    }
+    prefsOnly = !prefsOnly;
+    $(this)
+      .toggleClass("is-active", prefsOnly)
+      .attr("aria-pressed", prefsOnly ? "true" : "false");
+    updateSummary();
     renderRides();
   });
 
@@ -309,6 +495,23 @@ $(function () {
 
   $(document).on("click", "#retryLoad", function () {
     fetchRides();
+  });
+
+  $(document).on("click", "#clearFilters", function () {
+    searchQuery = "";
+    selectedDateKey = "all";
+    prefsOnly = false;
+    $("#searchInput").val("");
+    $("#searchClearBtn").attr("hidden", "hidden");
+    $("#prefOnlyToggle").removeClass("is-active").attr("aria-pressed", "false");
+    $("#dateChipRow .date-chip")
+      .removeClass("is-selected")
+      .attr("aria-pressed", "false");
+    $('#dateChipRow .date-chip[data-key="all"]')
+      .addClass("is-selected")
+      .attr("aria-pressed", "true");
+    updateSummary();
+    renderRides();
   });
 
   $(document).on("click", ".trip-card .btn-register", function (e) {

@@ -37,6 +37,7 @@ function loginRequest(phone) {
 
       if (data.ResponseStatus === 200) {
         sessionStorage.setItem("current-user", JSON.stringify(data));
+        if (data.Id) MASTER.fetchAndCachePreferences(data.Id);
         Swal.fire({
           icon: "success",
           title: "ברוך הבא!",

@@ -43,6 +43,30 @@ const MASTER = {
       return null;
     }
   },
+  /* Re-runs LoginMobileApp for the logged-in user and refreshes sessionStorage —
+   * used after ride assignment changes so stats like NoOfRides stay current. */
+  refreshCurrentUser: (onDone) => {
+    const user = MASTER.getCurrentUser();
+    if (!user || !user.CellPhone) {
+      if (typeof onDone === "function") onDone(user);
+      return;
+    }
+    MASTER.ajax(
+      "LoginMobileApp",
+      { userPhone: user.CellPhone },
+      (wrapper) => {
+        const data = MASTER.parseResponse(wrapper);
+        if (data && data.ResponseStatus === 200) {
+          sessionStorage.setItem("current-user", JSON.stringify(data));
+        }
+        if (typeof onDone === "function") onDone(data || user);
+      },
+      (xhr, status, error) => {
+        MASTER.devLog("Error refreshing current user: " + error, "error");
+        if (typeof onDone === "function") onDone(user);
+      },
+    );
+  },
   showToast: (message, type) => {
     type = type || "success";
     const icons = { success: "✓", error: "✕", warning: "⚠" };
@@ -233,6 +257,84 @@ const getRideTimeDisplay = (pickupTime, isAfterNoon) => {
   };
 };
 MASTER.getRideTimeDisplay = getRideTimeDisplay;
+
+const PREFERENCES_STORAGE_KEY = "volunteer-preferences";
+
+/* Cached { PreferredDays, PreferredAreas } from GetVolunteerPreferencesMobile — read by find-ride's "preferences only" filter. */
+const getCachedPreferences = () => {
+  try {
+    const raw = sessionStorage.getItem(PREFERENCES_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+};
+MASTER.getCachedPreferences = getCachedPreferences;
+
+const cachePreferences = (prefs) => {
+  sessionStorage.setItem(
+    PREFERENCES_STORAGE_KEY,
+    JSON.stringify(prefs || { PreferredDays: [], PreferredAreas: [] }),
+  );
+};
+MASTER.cachePreferences = cachePreferences;
+
+/* Fetches a volunteer's preferences from the server and refreshes the cache — called once after login, and again whenever the preferences page reloads them. */
+const fetchAndCachePreferences = (volunteerId, onDone) => {
+  MASTER.ajax(
+    "GetVolunteerPreferencesMobile",
+    { volunteerId: volunteerId },
+    (wrapper) => {
+      const prefs = MASTER.parseResponse(wrapper) || {
+        PreferredDays: [],
+        PreferredAreas: [],
+      };
+      cachePreferences(prefs);
+      if (typeof onDone === "function") onDone(prefs);
+    },
+    (xhr, status, error) => {
+      MASTER.devLog("Error fetching volunteer preferences: " + error, "error");
+      if (typeof onDone === "function") onDone(getCachedPreferences());
+    },
+  );
+};
+MASTER.fetchAndCachePreferences = fetchAndCachePreferences;
+
+/*
+ * Whether a ride matches the volunteer's saved preferences. A dimension
+ * (days/shifts or areas) with no saved preference is treated as "any" and
+ * doesn't constrain the match — preferences are additive, not exclusionary.
+ * An unknown (never-fetched) preference set is treated the same as "no
+ * preference saved" so the filter degrades to "show everything" rather than
+ * hiding rides because of a missing cache entry.
+ */
+const rideMatchesPreferences = (ride, prefs) => {
+  const days = (prefs && prefs.PreferredDays) || [];
+  const areas = (prefs && prefs.PreferredAreas) || [];
+
+  if (days.length) {
+    const d = parseDate(ride.PickupTime);
+    const dayName = d ? HEBREW_WEEKDAYS[d.getDay()] : null;
+    const shiftMatches = days.some((entry) => {
+      if (entry.PreferedDayDayInWeek !== dayName) return false;
+      if (entry.Shift === "כל") return true;
+      return entry.Shift === "אחהצ" ? !!ride.IsAfterNoon : !ride.IsAfterNoon;
+    });
+    if (!shiftMatches) return false;
+  }
+
+  if (areas.length) {
+    const areaMatches = areas.some((entry) => entry.PreferredArea === ride.Area);
+    if (!areaMatches) return false;
+  }
+
+  return true;
+};
+MASTER.rideMatchesPreferences = rideMatchesPreferences;
+
+const HEBREW_WEEKDAYS = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+MASTER.HEBREW_WEEKDAYS = HEBREW_WEEKDAYS;
+MASTER.HEBREW_DAY_ABBR = HEBREW_DAY_ABBR;
 
 const formatHebrewDate = (dateStr) => {
   const d = parseDate(dateStr);

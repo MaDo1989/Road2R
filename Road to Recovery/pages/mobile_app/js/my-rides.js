@@ -1,6 +1,7 @@
 var allTrips = [];
 var currentFilter = "upcoming";
 var loadFailed = false;
+var currentUser = null;
 
 /* ---- Status → badge class ---- */
 function statusBadgeClass(status) {
@@ -149,6 +150,8 @@ function closeTripModal() {
 }
 
 function confirmCancelTrip(trip) {
+  if (trip.IsInThePast) return;
+
   Swal.fire({
     title: "בטל רישום לנסיעה זו?",
     text: trip.Origin + " ← " + trip.Destination,
@@ -158,10 +161,33 @@ function confirmCancelTrip(trip) {
     cancelButtonText: "חזרה",
     confirmButtonColor: "#b91c1c",
   }).then(function (result) {
-    if (result.isConfirmed) {
-      closeTripModal();
-      MASTER.showToast("הרישום בוטל", "success");
-    }
+    if (!result.isConfirmed) return;
+
+    MASTER.ajax(
+      "AssignUpdateDriverToUnityRide",
+      {
+        UnityRideId: trip.RidePatNum,
+        DriverId: currentUser.Id,
+        isDelete: true,
+        userName: currentUser.DisplayName,
+      },
+      function () {
+        closeTripModal();
+        allTrips = allTrips.filter(function (t) {
+          return t.RidePatNum !== trip.RidePatNum;
+        });
+        updateSummary();
+        renderTrips();
+        MASTER.showToast("הרישום בוטל", "success");
+        MASTER.refreshCurrentUser(function (user) {
+          currentUser = user;
+        });
+      },
+      function (xhr, status, error) {
+        MASTER.devLog("Error in AssignUpdateDriverToUnityRide: " + error, "error");
+        MASTER.showToast("שגיאה בביטול הרישום. נסו שנית.", "error");
+      },
+    );
   });
 }
 
@@ -271,13 +297,13 @@ function fetchTrips(volunteerId) {
 $(function () {
   MASTER.renderHeader("#appHeader", { title: "הנסיעות שלי" });
 
-  var user = MASTER.getCurrentUser();
-  if (!user) {
+  currentUser = MASTER.getCurrentUser();
+  if (!currentUser) {
     window.location.replace("login.html");
     return;
   }
 
-  fetchTrips(user.Id);
+  fetchTrips(currentUser.Id);
 
   MASTER.IsProductionDatabase(function (isProd) {
     if (!isProd) {
@@ -307,7 +333,7 @@ $(function () {
     window.location.href = "find-ride.html";
   });
   $(document).on("click", "#retryLoad", function () {
-    fetchTrips(user.Id);
+    fetchTrips(currentUser.Id);
   });
 
   $(document).on("click", ".trip-card .btn-cancel", function (e) {
