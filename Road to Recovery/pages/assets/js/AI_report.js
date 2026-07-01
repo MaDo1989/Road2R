@@ -382,6 +382,13 @@ function generateReport_SCB(data) {
 }
 function generateReport_ECB(err) {
     console.error('error , ', err);
+    document.getElementById('ai-loader').classList.add('hidden');
+    const fullError = JSON.parse(JSON.parse(err.message).error.message)
+    swal({
+        title: "שגיאה",
+        text: `${fullError.code}\n${fullError.message}`,
+        type: "error"
+    });
 
 }
 function PromptBuilder(stracture, userPrompt) {
