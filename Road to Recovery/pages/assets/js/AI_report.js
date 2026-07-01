@@ -352,7 +352,7 @@ function generateReport() {
     }
     document.getElementById('ai-loader').classList.remove('hidden');
     $.ajax({
-        url: 'https://querymaker.onrender.com/generate',
+        url: 'https://querymaker-suic.onrender.com/generate',
         contentType: "application/json; charset=utf-8",
         type: "POST",
         data: JSON.stringify(request),
@@ -389,7 +389,11 @@ function PromptBuilder(stracture, userPrompt) {
     ${userPrompt}
     And use the following description to help you understand the structure of the data in the database:
     ${JSON.stringify(stracture)}
-    `
+    Something important to note about the status column in the unityride table: the value comes from a closed list:
+    ממתינה לשיבוץ
+    נמחקה
+    שובץ נהג
+    Generally, what is marked with NVARCHAR (probably in Hebrew)`
     return FinalPrompt;
 }
 
