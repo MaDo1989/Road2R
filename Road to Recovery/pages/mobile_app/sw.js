@@ -1,4 +1,4 @@
-const CACHE_NAME = "r2r-v1";
+const CACHE_NAME = "r2r-v2";
 
 // App shell — all pages and shared assets
 const APP_SHELL = [
