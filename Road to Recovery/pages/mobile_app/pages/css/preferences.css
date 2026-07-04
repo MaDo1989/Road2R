@@ -294,7 +294,7 @@
 .shift-chip.is-selected {
   border-color: var(--color-primary);
   color: var(--color-primary);
-  background: #e0eef5;
+  background: #f7ecc2;
 }
 
 .shift-chip:active {

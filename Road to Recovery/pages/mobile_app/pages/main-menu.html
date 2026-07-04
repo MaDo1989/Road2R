@@ -29,31 +29,68 @@
           <h2 class="section-title">פעולות מהירות</h2>
           <div class="quick-actions">
             <button class="quick-action" id="actionMyRides">
-              <span class="quick-action__icon quick-action__icon--coral" aria-hidden="true">📋</span>
+              <span class="quick-action__icon quick-action__icon--coral"
+                aria-hidden="true">📋</span>
               <span class="quick-action__title">ההסעות שלי</span>
               <span class="quick-action__sub">מתוכנן ועבר</span>
             </button>
             <button class="quick-action" id="actionFindRide">
-              <span class="quick-action__icon quick-action__icon--blue" aria-hidden="true">🔍</span>
+              <span class="quick-action__icon quick-action__icon--blue"
+                aria-hidden="true">🔍</span>
               <span class="quick-action__title">שבץ אותי להסעה</span>
               <span class="quick-action__sub">מצא הסעה פנויה</span>
             </button>
-            <button class="quick-action" id="actionStats">
-              <span class="quick-action__icon quick-action__icon--purple" aria-hidden="true">📊</span>
-              <span class="quick-action__title">סטטיסטיקות</span>
-              <span class="quick-action__sub">פעילות שלי</span>
-            </button>
             <button class="quick-action" id="actionPreferences">
-              <span class="quick-action__icon quick-action__icon--yellow" aria-hidden="true">⚙️</span>
+              <span class="quick-action__icon quick-action__icon--yellow"
+                aria-hidden="true">⚙️</span>
               <span class="quick-action__title">העדפות שלי</span>
               <span class="quick-action__sub">אזורים ושעות</span>
             </button>
           </div>
         </section>
 
-        <section aria-label="הנסיעות של היום">
-          <h2 class="section-title">הנסיעות של היום</h2>
-          <div class="ride-list" id="rideList"></div>
+        <section aria-label="מידע שימושי">
+          <h2 class="section-title">מידע שימושי</h2>
+
+          <!-- Contact card -->
+          <a href="tel:0747582715" class="contact-card"
+            aria-label="התקשרו לתמיכה במספר 074-758-2715">
+            <span class="contact-card__icon" aria-hidden="true">📞</span>
+            <div class="contact-card__body">
+              <span class="contact-card__title">בעיה באפליקציה?</span>
+              <span class="contact-card__sub">לחצו כאן להתקשרות:
+                074-758-2715</span>
+            </div>
+            <span class="contact-card__arrow" aria-hidden="true">◄</span>
+          </a>
+
+          <!-- How-to tips -->
+          <div class="info-list">
+            <div class="info-card">
+              <span class="info-card__icon" aria-hidden="true">🔍</span>
+              <div class="info-card__body">
+                <span class="info-card__title">רוצה להצטרף להסעה?</span>
+                <span class="info-card__desc">לחצו על &quot;שבץ אותי להסעה&quot;
+                  בפעולות המהירות למעלה</span>
+              </div>
+            </div>
+            <div class="info-card">
+              <span class="info-card__icon" aria-hidden="true">🚗</span>
+              <div class="info-card__body">
+                <span class="info-card__title">רוצה להסיר הסעה?</span>
+                <span class="info-card__desc">לחצו על &quot;ההסעות שלי&quot;
+                  ובחרו את ההסעה להסרה</span>
+              </div>
+            </div>
+            <div class="info-card">
+              <span class="info-card__icon" aria-hidden="true">⚙️</span>
+              <div class="info-card__body">
+                <span class="info-card__title">רוצה לשנות העדפות?</span>
+                <span class="info-card__desc">לחצו על &quot;העדפות שלי&quot;
+                  לשינוי אזורים ושעות</span>
+              </div>
+            </div>
+          </div>
         </section>
       </main>
     </div>

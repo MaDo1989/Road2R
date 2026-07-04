@@ -356,7 +356,107 @@ GO
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+-- =======================================================
+-- Create Stored Procedure Template for Azure SQL Database
+-- =======================================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      <Gilad Meirson>
+-- Create Date: <04/07/2026>
+-- Description: <Set Pref Of Driver Volunteer and the number of the AvailableSeats>
+-- =============================================
+CREATE PROCEDURE USP_Set_pref_Seats_Mobile
+(
+    @VolunteerId INT,
+    @AvailableSeats INT,
+    @PreferredDaysJson NVARCHAR(MAX),
+    @PreferredAreasJson NVARCHAR(MAX)
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
 
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        IF NOT EXISTS
+        (
+            SELECT 1
+            FROM Volunteer
+            WHERE Id = @VolunteerId
+        )
+        BEGIN
+            ROLLBACK TRANSACTION;
+
+            SELECT 
+                404 AS ResponseStatus,
+                N'Volunteer not found' AS Message;
+
+            RETURN;
+        END
+
+        UPDATE Volunteer
+        SET AvailableSeats = @AvailableSeats
+        WHERE Id = @VolunteerId;
+
+        DELETE FROM PreferedDay_Volunteer
+        WHERE VolunteerId = @VolunteerId;
+
+        INSERT INTO PreferedDay_Volunteer
+        (
+            VolunteerId,
+            PreferedDayDayInWeek,
+            Shift
+        )
+        SELECT
+            @VolunteerId,
+            PreferedDayDayInWeek,
+            Shift
+        FROM OPENJSON(@PreferredDaysJson)
+        WITH
+        (
+            PreferedDayDayInWeek NVARCHAR(50) '$.PreferedDayDayInWeek',
+            Shift NVARCHAR(50) '$.Shift'
+        )
+        WHERE PreferedDayDayInWeek IS NOT NULL;
+
+        DELETE FROM PreferredArea_Volunteer
+        WHERE VolunteerId = @VolunteerId;
+
+        INSERT INTO PreferredArea_Volunteer
+        (
+            VolunteerId,
+            PreferredArea
+        )
+        SELECT
+            @VolunteerId,
+            PreferredArea
+        FROM OPENJSON(@PreferredAreasJson)
+        WITH
+        (
+            PreferredArea NVARCHAR(255) '$.PreferredArea'
+        )
+        WHERE PreferredArea IS NOT NULL;
+
+        COMMIT TRANSACTION;
+
+        SELECT 
+            200 AS ResponseStatus,
+            N'OK' AS Message;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+
+        SELECT 
+            500 AS ResponseStatus,
+            ERROR_MESSAGE() AS Message;
+    END CATCH
+END
+GO
 
 
 

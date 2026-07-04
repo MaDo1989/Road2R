@@ -127,6 +127,40 @@ public class WebService : System.Web.Services.WebService
                 new List<MobileUnityRide>());
         }
     }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string SetVolunteerPreferencesMobile(
+    int volunteerId,
+    int availableSeats,
+    List<PreferredDayMobile> preferredDays,
+    List<PreferredAreaMobile> preferredAreas)
+    {
+        try
+        {
+            var manager = new MobileManager();
+
+            return j.Serialize(
+                manager.SetVolunteerPreferences(
+                    volunteerId,
+                    availableSeats,
+                    preferredDays,
+                    preferredAreas));
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex);
+
+            return j.Serialize(
+                new BaseResponse
+                {
+                    ResponseStatus = 500,
+                    Message = "Unexpected server error"
+                });
+        }
+    }
+
+
     // -------------------------- Mobile APIs END -------------------------- \\
 
     [WebMethod(EnableSession = true)]

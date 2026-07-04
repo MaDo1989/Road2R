@@ -193,15 +193,54 @@ function buildPreferencesPayload() {
   return { PreferredDays: preferredDays, PreferredAreas: preferredAreas };
 }
 
-/*
- * No backend save endpoint exists yet (SaveVolunteerPreferencesMobile TBD).
- * Once it does, wrap this in MASTER.ajax and only cache + toast inside its
- * success callback — the cache/toast logic below is already what that
- * callback should do.
- */
 function saveVolunteerPreferences() {
-  MASTER.cachePreferences(buildPreferencesPayload());
-  MASTER.showToast("ההעדפות נשמרו", "success");
+  var user = MASTER.getCurrentUser();
+  if (!user) return;
+
+  var payload = buildPreferencesPayload();
+  var fullPayload = {
+    volunteerId: user.Id,
+    availableSeats: availableSeats,
+    preferredDays: payload.PreferredDays,
+    preferredAreas: payload.PreferredAreas,
+  };
+
+  $("#saveDaysBtn, #saveAreasBtn, #saveProfileBtn").prop("disabled", true);
+
+  MASTER.ajax(
+    "SetVolunteerPreferencesMobile",
+    fullPayload,
+    function (wrapper) {
+      var data = MASTER.parseResponse(wrapper);
+      $("#saveDaysBtn, #saveAreasBtn, #saveProfileBtn").prop("disabled", false);
+
+      if (data && data.ResponseStatus === 200) {
+        MASTER.showToast("ההעדפות נשמרו בהצלחה", "success");
+        MASTER.fetchAndCachePreferences(user.Id);
+        MASTER.refreshCurrentUser();
+      } else {
+        var msg;
+        var status = data && data.ResponseStatus;
+        if (status === 400) {
+          msg =
+            "הנתונים שנשלחו אינם תקינים" +
+            (data.Message ? ": " + data.Message : "");
+        } else if (status === 404) {
+          msg = "המתנדב לא נמצא במערכת";
+        } else if (status === 500) {
+          msg = "שגיאת שרת. נסו שנית.";
+        } else {
+          msg = "שגיאה בשמירת ההעדפות. נסו שנית.";
+        }
+        MASTER.showToast(msg, "error");
+      }
+    },
+    function (xhr, status, err) {
+      MASTER.devLog("Error saving preferences: " + err, "error");
+      $("#saveDaysBtn, #saveAreasBtn, #saveProfileBtn").prop("disabled", false);
+      MASTER.showToast("שגיאה בשמירת ההעדפות. נסו שנית.", "error");
+    },
+  );
 }
 
 function loadAreas() {
@@ -264,11 +303,10 @@ $(function () {
     changeSeats(1);
   });
 
-  $("#saveDaysBtn, #saveAreasBtn").on("click", saveVolunteerPreferences);
-
-  $("#saveProfileBtn").on("click", function () {
-    MASTER.showToast("שמירת העדפות תהיה זמינה בקרוב", "warning");
-  });
+  $("#saveDaysBtn, #saveAreasBtn, #saveProfileBtn").on(
+    "click",
+    saveVolunteerPreferences,
+  );
 
   $("#logoutBtn").on("click", function () {
     Swal.fire({

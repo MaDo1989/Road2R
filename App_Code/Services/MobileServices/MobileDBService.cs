@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -182,7 +183,41 @@ public class MobileDBService
     }
 
 
+    public BaseResponse SetVolunteerPreferences(
+    int volunteerId,
+    int availableSeats,
+    List<PreferredDayMobile> preferredDays,
+    List<PreferredAreaMobile> preferredAreas)
+    {
+        BaseResponse result = new BaseResponse();
 
+        string preferredDaysJson = JsonConvert.SerializeObject(preferredDays ?? new List<PreferredDayMobile>());
+        string preferredAreasJson = JsonConvert.SerializeObject(preferredAreas ?? new List<PreferredAreaMobile>());
+
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        using (SqlCommand command = new SqlCommand("dbo.USP_Set_pref_Seats_Mobile", connection))
+        {
+            command.CommandType = CommandType.StoredProcedure;
+
+            command.Parameters.Add("@VolunteerId", SqlDbType.Int).Value = volunteerId;
+            command.Parameters.Add("@AvailableSeats", SqlDbType.Int).Value = availableSeats;
+            command.Parameters.Add("@PreferredDaysJson", SqlDbType.NVarChar).Value = preferredDaysJson;
+            command.Parameters.Add("@PreferredAreasJson", SqlDbType.NVarChar).Value = preferredAreasJson;
+
+            connection.Open();
+
+            using (SqlDataReader reader = command.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    result.ResponseStatus = reader.GetNullableInt("ResponseStatus") ?? 500;
+                    result.Message = reader.GetNullableString("Message");
+                }
+            }
+        }
+
+        return result;
+    }
 
     //-------------private methods for internal use-------------\\
     private List<MobileUnityRide> GetAllUnityRides()
