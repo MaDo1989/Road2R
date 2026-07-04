@@ -367,3 +367,11 @@ const formatHebrewDate = (dateStr) => {
   );
 };
 MASTER.formatHebrewDate = formatHebrewDate;
+
+// PWA — register service worker (lives one level above /pages/)
+if ("serviceWorker" in navigator) {
+  const swPath = location.pathname.includes("/pages/") ? "../sw.js" : "sw.js";
+  navigator.serviceWorker.register(swPath).catch((err) => {
+    MASTER.devLog("Service worker registration failed: " + err, "warning");
+  });
+}

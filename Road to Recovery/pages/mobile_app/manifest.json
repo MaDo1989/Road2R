@@ -1,0 +1,25 @@
+{
+    "name": "Road to Recovery",
+    "short_name": "R2R",
+    "description": "אפליקציית נהגי מתנדבים — Road to Recovery",
+    "start_url": "pages/login.html",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#005f85",
+    "dir": "rtl",
+    "lang": "he",
+    "icons": [
+        {
+            "src": "assets/images/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "assets/images/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
