@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#005f85" />
     <title>חיפוש נסיעה — Road to Recovery</title>
+    <link rel="shortcut icon" href="../../assets/images/favicon_1.ico">
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -25,15 +26,13 @@
               id="searchInput"
               class="search-box__input"
               placeholder="חיפוש לפי שם מטופל/ת, מוצא או יעד"
-              aria-label="חיפוש לפי שם מטופל/ת, מוצא או יעד"
-            />
+              aria-label="חיפוש לפי שם מטופל/ת, מוצא או יעד" />
             <button
               type="button"
               class="search-box__clear"
               id="searchClearBtn"
               aria-label="ניקוי חיפוש"
-              hidden
-            >
+              hidden>
               ✕
             </button>
           </div>
@@ -42,8 +41,7 @@
             type="button"
             class="pref-filter-toggle"
             id="prefOnlyToggle"
-            aria-pressed="false"
-          >
+            aria-pressed="false">
             <span aria-hidden="true">⭐</span>
             <span>הצג רק נסיעות לפי ההעדפות שלי</span>
           </button>
@@ -52,22 +50,19 @@
             class="date-chip-row"
             id="dateChipRow"
             role="group"
-            aria-label="סינון לפי תאריך"
-          ></div>
+            aria-label="סינון לפי תאריך"></div>
         </section>
 
         <section
           class="filter-tabs"
           role="tablist"
-          aria-label="סינון נסיעות"
-        >
+          aria-label="סינון נסיעות">
           <button
             class="filter-tab is-active"
             id="tabAll"
             role="tab"
             aria-selected="true"
-            data-filter="all"
-          >
+            data-filter="all">
             <span class="filter-tab__icon" aria-hidden="true">📋</span>
             <span class="filter-tab__label">הכל</span>
             <span class="filter-tab__count" id="countAll"></span>
@@ -77,8 +72,7 @@
             id="tabMorning"
             role="tab"
             aria-selected="false"
-            data-filter="morning"
-          >
+            data-filter="morning">
             <span class="filter-tab__icon" aria-hidden="true">🌅</span>
             <span class="filter-tab__label">בוקר</span>
             <span class="filter-tab__count" id="countMorning"></span>
@@ -88,8 +82,7 @@
             id="tabAfternoon"
             role="tab"
             aria-selected="false"
-            data-filter="afternoon"
-          >
+            data-filter="afternoon">
             <span class="filter-tab__icon" aria-hidden="true">🌇</span>
             <span class="filter-tab__label">אחה"צ</span>
             <span class="filter-tab__count" id="countAfternoon"></span>
@@ -127,8 +120,7 @@
         class="modal-sheet"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="modalTitle"
-      >
+        aria-labelledby="modalTitle">
         <div class="modal-sheet__handle" aria-hidden="true"></div>
         <div class="modal-sheet__header">
           <h2 id="modalTitle">פרטי הסעה</h2>
@@ -139,7 +131,8 @@
             <div class="modal-info-box__field">
               <span class="modal-info-box__label">שעה</span>
               <span class="modal-info-box__time" id="modalTime"></span>
-              <span class="modal-info-box__afternoon-label" id="modalAfternoonLabel" hidden></span>
+              <span class="modal-info-box__afternoon-label"
+                id="modalAfternoonLabel" hidden></span>
             </div>
             <div class="modal-info-box__field modal-info-box__field--date">
               <span class="modal-info-box__label">תאריך</span>
@@ -175,7 +168,8 @@
               <span id="modalEscorts"></span>
             </span>
           </div>
-          <div class="modal-meta__divider" id="modalEscortsDivider" hidden></div>
+          <div class="modal-meta__divider" id="modalEscortsDivider"
+            hidden></div>
           <div class="modal-meta__row">
             <span class="modal-meta__label">אזור</span>
             <span class="modal-meta__value">
@@ -183,8 +177,10 @@
               <span id="modalArea"></span>
             </span>
           </div>
-          <div class="modal-meta__divider" id="modalEquipmentDivider" hidden></div>
-          <div class="modal-meta__row modal-meta__row--equipment" id="modalEquipmentRow" hidden>
+          <div class="modal-meta__divider" id="modalEquipmentDivider"
+            hidden></div>
+          <div class="modal-meta__row modal-meta__row--equipment"
+            id="modalEquipmentRow" hidden>
             <span class="modal-meta__label">ציוד רפואי נדרש</span>
             <div class="equipment-chips" id="modalEquipmentChips"></div>
           </div>
@@ -193,14 +189,16 @@
             <span class="modal-meta__label">טלפון ליצירת קשר</span>
             <span class="modal-meta__value modal-meta__value--phone">
               <span id="modalPhone"></span>
-              <a class="modal-call-btn" id="modalCallBtn" aria-label="התקשרות">📞</a>
+              <a class="modal-call-btn" id="modalCallBtn"
+                aria-label="התקשרות">📞</a>
             </span>
           </div>
         </div>
 
         <div class="modal-actions">
           <button class="btn-secondary" id="modalCloseBtn">סגור</button>
-          <button class="btn-primary" id="modalRegisterBtn">הירשם לנסיעה</button>
+          <button class="btn-primary" id="modalRegisterBtn">הירשם
+            לנסיעה</button>
         </div>
       </div>
     </div>

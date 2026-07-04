@@ -1,4 +1,5 @@
 const MASTER = {
+  getVersion: () => "1.0.1",
   getBaseUrl: () => {
     const env = MASTER.environmentDetected();
     if (env === "local")
@@ -144,7 +145,11 @@ const isProductionDatabase = (onResult) => {
       if (isProd) {
         MASTER.devLog("Connected to PRODUCTION database.", "important");
       } else {
-        MASTER.devLog("Connected to NON-PRODUCTION database.", "important" , "orange");
+        MASTER.devLog(
+          "Connected to NON-PRODUCTION database.",
+          "important",
+          "orange",
+        );
       }
       if (typeof onResult === "function") onResult(isProd);
     },
@@ -178,6 +183,7 @@ const renderHeader = (selector, opts) => {
         `<h1 class="header__greeting" id="${titleId}">${opts.title || ""}</h1>` +
         subHtml +
         "</div>" +
+        `<span class="header__version">v${MASTER.getVersion()}</span>` +
         "</div>",
     );
 };
@@ -324,7 +330,9 @@ const rideMatchesPreferences = (ride, prefs) => {
   }
 
   if (areas.length) {
-    const areaMatches = areas.some((entry) => entry.PreferredArea === ride.Area);
+    const areaMatches = areas.some(
+      (entry) => entry.PreferredArea === ride.Area,
+    );
     if (!areaMatches) return false;
   }
 
@@ -332,7 +340,15 @@ const rideMatchesPreferences = (ride, prefs) => {
 };
 MASTER.rideMatchesPreferences = rideMatchesPreferences;
 
-const HEBREW_WEEKDAYS = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+const HEBREW_WEEKDAYS = [
+  "ראשון",
+  "שני",
+  "שלישי",
+  "רביעי",
+  "חמישי",
+  "שישי",
+  "שבת",
+];
 MASTER.HEBREW_WEEKDAYS = HEBREW_WEEKDAYS;
 MASTER.HEBREW_DAY_ABBR = HEBREW_DAY_ABBR;
 
