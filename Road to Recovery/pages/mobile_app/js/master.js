@@ -239,8 +239,13 @@ MASTER.parseDate = parseDate;
 const formatTime = (dateStr) => {
   const d = parseDate(dateStr);
   if (!d) return "";
-  const h = d.getHours().toString().padStart(2, "0");
-  const m = d.getMinutes().toString().padStart(2, "0");
+  const useUtc = MASTER.environmentDetected() !== "local";
+  const h = (useUtc ? d.getUTCHours() : d.getHours())
+    .toString()
+    .padStart(2, "0");
+  const m = (useUtc ? d.getUTCMinutes() : d.getMinutes())
+    .toString()
+    .padStart(2, "0");
   return h + ":" + m;
 };
 MASTER.formatTime = formatTime;
@@ -254,7 +259,11 @@ const AFTERNOON_LABEL = 'אחה"צ';
  */
 const getRideTimeDisplay = (pickupTime, isAfterNoon) => {
   const d = parseDate(pickupTime);
-  const isPlaceholderTime = !!isAfterNoon && !!d && d.getMinutes() === 14;
+  const useUtc = MASTER.environmentDetected() !== "local";
+  const isPlaceholderTime =
+    !!isAfterNoon &&
+    !!d &&
+    (useUtc ? d.getUTCMinutes() : d.getMinutes()) === 14;
 
   return {
     time: isPlaceholderTime ? "" : formatTime(pickupTime),
