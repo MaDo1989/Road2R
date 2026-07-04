@@ -1,5 +1,5 @@
 const MASTER = {
-  getVersion: () => "1.0.1",
+  getVersion: () => "1.0.2",
   getBaseUrl: () => {
     const env = MASTER.environmentDetected();
     if (env === "local")
