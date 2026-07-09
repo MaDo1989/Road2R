@@ -23,7 +23,13 @@ const MASTER = {
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       data: JSON.stringify(data),
-      headers: token ? { "x-querymaker-token": token } : {},
+      // The proxy is always a different origin, so the browser's default
+      // Referrer-Policy strips the path from Referer before it gets there —
+      // send our own location explicitly instead of relying on that header.
+      headers: Object.assign(
+        { "x-client-url": window.location.href },
+        token ? { "x-querymaker-token": token } : {},
+      ),
       success: function (response, status, xhr) {
         const refreshed = xhr.getResponseHeader("x-querymaker-token");
         if (refreshed) localStorage.setItem("queryMakerToken", refreshed);
@@ -48,6 +54,7 @@ const MASTER = {
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       data: JSON.stringify(data),
+      headers: { "x-client-url": window.location.href },
       success: function (response) {
         if (response && response.queryMakerKey) {
           localStorage.setItem("queryMakerToken", response.queryMakerKey);
