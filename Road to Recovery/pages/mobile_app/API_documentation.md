@@ -1,6 +1,6 @@
 ﻿# Road to Recovery — Mobile API Documentation
 
-> **Base URL:** `https://<your-server>/WebService.asmx` - the base url is return by the function getBaseUrl inside master.js MASTER object.
+> **Base URL:** `https://<your-server>/WebService.asmx` - the base url is return by the function getBaseUrl inside master.js MASTER object and use proxy for real api.
 > **Protocol:** SOAP / ASMX Web Service — `HTTP POST`, `Content-Type: application/json`
 > **Responses:** All endpoints return a JSON-serialised string.
 

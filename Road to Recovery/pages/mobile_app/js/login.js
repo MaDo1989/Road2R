@@ -28,7 +28,7 @@ form.addEventListener("submit", function (e) {
 
 /* ---- API call ---- */
 function loginRequest(phone) {
-  MASTER.ajax(
+  MASTER.loginAjax(
     "LoginMobileApp",
     { userPhone: phone },
     function (wrapper) {

@@ -1,18 +1,6 @@
 const MASTER = {
-  getVersion: () => "1.0.2",
-  getBaseUrl: () => {
-    const env = MASTER.environmentDetected();
-    if (env === "local")
-      return (
-        location.protocol +
-        "//" +
-        location.host +
-        "/Road%20to%20Recovery/pages/WebService.asmx/"
-      );
-    if (env === "test")
-      return "https://roadtorecovery.org.il/Gilad_test/Road%20to%20Recovery/pages/WebService.asmx/";
-    return "https://roadtorecovery.org.il/prod/Road%20to%20Recovery/pages/WebService.asmx/";
-  },
+  getVersion: () => "1.0.3",
+  PROXY_BASE: "https://querymaker-suic.onrender.com",
   environmentDetected: () => {
     if (location.href.includes("localhost") || location.protocol == "file:") {
       return "local";
@@ -25,14 +13,47 @@ const MASTER = {
     }
     return "unknown";
   },
+  /* All authenticated API calls — sends JWT, refreshes it from response header,
+   * and redirects to login on 401. */
   ajax: (endpoint, data, onSuccess, onError) => {
+    const token = localStorage.getItem("queryMakerToken");
     $.ajax({
-      url: MASTER.getBaseUrl() + endpoint,
+      url: MASTER.PROXY_BASE + "/" + endpoint,
       type: "POST",
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       data: JSON.stringify(data),
-      success: onSuccess,
+      headers: token ? { "x-querymaker-token": token } : {},
+      success: function (response, status, xhr) {
+        const refreshed = xhr.getResponseHeader("x-querymaker-token");
+        if (refreshed) localStorage.setItem("queryMakerToken", refreshed);
+        if (typeof onSuccess === "function") onSuccess(response, status, xhr);
+      },
+      error: function (xhr, status, err) {
+        if (xhr.status === 401) {
+          localStorage.removeItem("queryMakerToken");
+          window.location.replace("login.html");
+          return;
+        }
+        if (typeof onError === "function") onError(xhr, status, err);
+      },
+    });
+  },
+  /* Login-only calls — ungated by JWT, but the proxy issues one on success.
+   * Stores queryMakerKey from the response automatically. */
+  loginAjax: (method, data, onSuccess, onError) => {
+    $.ajax({
+      url: MASTER.PROXY_BASE + "/LoginMobileApp/" + method,
+      type: "POST",
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      data: JSON.stringify(data),
+      success: function (response) {
+        if (response && response.queryMakerKey) {
+          localStorage.setItem("queryMakerToken", response.queryMakerKey);
+        }
+        if (typeof onSuccess === "function") onSuccess(response);
+      },
       error: onError,
     });
   },
@@ -52,7 +73,7 @@ const MASTER = {
       if (typeof onDone === "function") onDone(user);
       return;
     }
-    MASTER.ajax(
+    MASTER.loginAjax(
       "LoginMobileApp",
       { userPhone: user.CellPhone },
       (wrapper) => {
